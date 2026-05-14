@@ -1,0 +1,32 @@
+@import "../styles/home.css";
+
+:root {
+  color-scheme: light;
+  --bg: #f5f7f3;
+  --surface: #ffffff;
+  --surface-soft: #eef5ef;
+  --text: #17211c;
+  --muted: #66746d;
+  --primary: #176b5c;
+  --primary-dark: #0f4f44;
+  --line: #dce5df;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
