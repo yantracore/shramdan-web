@@ -2,164 +2,420 @@
 
 import {
   ArrowRightOutlined,
+  BankOutlined,
+  BgColorsOutlined,
   CalendarOutlined,
   CheckCircleOutlined,
-  EnvironmentOutlined,
-  NotificationOutlined,
+  CodeOutlined,
+  DatabaseOutlined,
+  FilePptOutlined,
+  FileTextOutlined,
+  GithubOutlined,
+  HeartOutlined,
+  LineChartOutlined,
+  RocketOutlined,
+  TeamOutlined,
+  ToolOutlined
 } from "@ant-design/icons";
-import { Button, Progress, Statistic } from "antd";
-import {
-  campaigns,
-  contributionOptions,
-  impactStories,
-  issues,
-  lifecycleSteps
-} from "@/data/mockData";
-import { CampaignCard } from "@/components/CampaignCard";
-import { ContributionOption } from "@/components/ContributionOption";
-import { IssueCard } from "@/components/IssueCard";
-import { StatusTag } from "@/components/StatusTag";
-import { ImpactStoryCard } from "@/components/ImpactStoryCard";
+import { Button } from "antd";
+import Image from "next/image";
+import Confetti from "react-confetti";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { SiteShell } from "@/components/SiteShell";
+import { usePreferences } from "@/app/providers";
+import { copy } from "@/lib/siteContent";
+
+const LAUNCH_STORAGE_KEY = "shramdan-inaugurated";
+const LAUNCH_DURATION_MS = 5600;
+const INAUGURATION_AT = new Date("2026-05-15T12:15:00+05:45").getTime();
+const IS_PRODUCTION = process.env.NODE_ENV === "production";
+
+const getCountdownParts = (remainingMs) => {
+  const totalSeconds = Math.max(0, Math.floor(remainingMs / 1000));
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  return { days, hours, minutes, seconds };
+};
+
+const formatCountdownValue = (value) => String(value).padStart(2, "0");
+
+const resourceIcons = {
+  presentation: FilePptOutlined,
+  documents: FileTextOutlined,
+  github: GithubOutlined
+};
+
+const volunteerRoleIcons = {
+  frontend: CodeOutlined,
+  backend: DatabaseOutlined,
+  uiux: RocketOutlined,
+  graphics: BgColorsOutlined,
+  legal: BankOutlined,
+  finance: LineChartOutlined,
+  donors: HeartOutlined,
+  leaders: TeamOutlined
+};
+
+const workflowStepIcons = {
+  listing: FileTextOutlined,
+  vote: CheckCircleOutlined,
+  plan: CalendarOutlined,
+  event: ToolOutlined,
+  results: LineChartOutlined
+};
 
 export default function Home() {
-  const featuredCampaign = campaigns[0];
-  const topIssues = issues.slice(0, 3);
+  const { language } = usePreferences();
+  const t = copy[language];
+  const heroRef = useRef(null);
+  const launchTimerRef = useRef(null);
+  const [hasInaugurated, setHasInaugurated] = useState(() => {
+    if (!IS_PRODUCTION || typeof window === "undefined") {
+      return false;
+    }
+
+    try {
+      return window.localStorage.getItem(LAUNCH_STORAGE_KEY) === "true";
+    } catch {
+      return false;
+    }
+  });
+  const [isLaunching, setIsLaunching] = useState(false);
+  const [hasAutoLaunched, setHasAutoLaunched] = useState(false);
+  const [launchRun, setLaunchRun] = useState(0);
+  const [heroSize, setHeroSize] = useState({ width: 0, height: 0 });
+  const [viewportWidth, setViewportWidth] = useState(0);
+  const [reduceMotion, setReduceMotion] = useState(false);
+  const [now, setNow] = useState(() => Date.now());
+
+  const triggerLaunch = useCallback(() => {
+    setHasAutoLaunched(true);
+
+    if (IS_PRODUCTION) {
+      setHasInaugurated(true);
+
+      try {
+        window.localStorage.setItem(LAUNCH_STORAGE_KEY, "true");
+      } catch {
+        // The launch should still feel complete even if storage is unavailable.
+      }
+    }
+
+    if (reduceMotion) {
+      return;
+    }
+
+    setLaunchRun((current) => current + 1);
+    setIsLaunching(true);
+    if (launchTimerRef.current) {
+      window.clearTimeout(launchTimerRef.current);
+    }
+
+    launchTimerRef.current = window.setTimeout(() => {
+      setIsLaunching(false);
+    }, LAUNCH_DURATION_MS);
+  }, [reduceMotion]);
+
+  useEffect(() => {
+    if (!heroRef.current) {
+      return undefined;
+    }
+
+    const updateHeroSize = () => {
+      const rect = heroRef.current.getBoundingClientRect();
+      setHeroSize({ width: rect.width, height: rect.height });
+    };
+
+    updateHeroSize();
+    const observer = new ResizeObserver(updateHeroSize);
+    observer.observe(heroRef.current);
+
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const updateViewportWidth = () => setViewportWidth(window.innerWidth);
+
+    updateViewportWidth();
+    window.addEventListener("resize", updateViewportWidth);
+
+    return () => window.removeEventListener("resize", updateViewportWidth);
+  }, []);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const syncMotionPreference = () => setReduceMotion(mediaQuery.matches);
+
+    syncMotionPreference();
+    mediaQuery.addEventListener("change", syncMotionPreference);
+
+    return () => mediaQuery.removeEventListener("change", syncMotionPreference);
+  }, []);
+
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      const currentTime = Date.now();
+
+      setNow(currentTime);
+
+      if (currentTime >= INAUGURATION_AT && !hasInaugurated && !hasAutoLaunched) {
+        triggerLaunch();
+      }
+    }, 1000);
+
+    return () => window.clearInterval(interval);
+  }, [hasAutoLaunched, hasInaugurated, triggerLaunch]);
+
+  useEffect(
+    () => () => {
+      if (launchTimerRef.current) {
+        window.clearTimeout(launchTimerRef.current);
+      }
+    },
+    []
+  );
+
+  const hasCountdownEnded = now >= INAUGURATION_AT;
+  const remainingMs = Math.max(0, INAUGURATION_AT - now);
+  const countdown = useMemo(() => getCountdownParts(remainingMs), [remainingMs]);
+  const panel = hasCountdownEnded || hasInaugurated ? t.panel.launched : t.panel.countdown;
+  const countdownItems = [
+    { key: "days", value: countdown.days, label: t.panel.units.days },
+    { key: "hours", value: countdown.hours, label: t.panel.units.hours },
+    { key: "minutes", value: countdown.minutes, label: t.panel.units.minutes },
+    { key: "seconds", value: countdown.seconds, label: t.panel.units.seconds }
+  ];
 
   return (
-    <main className="site-shell">
-      <header className="topbar" aria-label="Main navigation">
-        <a className="brand" href="#top" aria-label="Shramdaan home">
-          <span className="brand-mark">S</span>
-          <span>Shramdaan</span>
-        </a>
-        <nav className="nav-links" aria-label="Primary">
-          <a href="#issues">Issues</a>
-          <a href="#campaign">Campaign</a>
-          <a href="#impact">Impact</a>
-        </nav>
-        <Button type="primary" href="#join">
-          Join a cleanup
-        </Button>
-      </header>
-
-      <section id="top" className="hero-section">
+    <SiteShell>
+      <section
+        id="top"
+        ref={heroRef}
+        className={`hero-section${isLaunching ? " is-launching" : ""}${
+          hasInaugurated ? " has-inaugurated" : ""
+        }`}
+      >
+        {isLaunching && viewportWidth > 0 && heroSize.height > 0 ? (
+          <Confetti
+            key={launchRun}
+            className="hero-confetti"
+            width={Math.round(viewportWidth)}
+            height={Math.round(heroSize.height)}
+            numberOfPieces={1080}
+            recycle={false}
+            gravity={0.23}
+            wind={0.02}
+            initialVelocityX={14}
+            initialVelocityY={28}
+            tweenDuration={LAUNCH_DURATION_MS}
+            colors={["#176b5c", "#e75f1b", "#f5b642", "#5cbf9f", "#f8fff8", "#ffcf70"]}
+          />
+        ) : null}
         <div className="hero-copy">
-          <StatusTag status="Campaign Ready" />
-          <h1>Community cleanups, organized from first report to final proof.</h1>
-          <p>
-            Shramdaan helps local residents turn visible cleanup problems into
-            supported campaigns with clear contribution paths and transparent
-            outcomes.
-          </p>
+          {t.hero.eyebrow ? <span className="eyebrow">{t.hero.eyebrow}</span> : null}
+          <h1>{t.hero.title}</h1>
+          <p className="hero-subtitle">{t.hero.subtitle}</p>
+          <p>{t.hero.support}</p>
           <div className="hero-actions">
-            <Button type="primary" size="large" href="#issues">
-              Support an issue <ArrowRightOutlined />
-            </Button>
-            <Button size="large" href="#campaign">
-              View campaign
+            <Button type="primary" size="large" href="/join" icon={<HeartOutlined />}>
+              {t.hero.join}
             </Button>
           </div>
         </div>
-
-        <aside className="hero-panel" aria-label="Featured cleanup campaign">
-          <div className="panel-heading">
-            <div>
-              <span className="eyebrow">Featured campaign</span>
-              <h2>{featuredCampaign.title}</h2>
+        <aside className="hero-panel" aria-label={t.ariaLabels.launchNote} aria-live="polite">
+          {isLaunching ? (
+            <span className="launch-burst" aria-hidden="true">
+              <span />
+              <span />
+              <span />
+              <span />
+            </span>
+          ) : null}
+          <h2>{panel.title}</h2>
+          {!hasCountdownEnded && !hasInaugurated ? (
+            <div className="countdown-grid" aria-label={t.panel.countdownLabel}>
+              {countdownItems.map((item) => (
+                <span className="countdown-item" key={item.key}>
+                  <strong>{formatCountdownValue(item.value)}</strong>
+                  <span>{item.label}</span>
+                </span>
+              ))}
             </div>
-            <StatusTag status={featuredCampaign.status} compact />
-          </div>
-          <p>{featuredCampaign.goal}</p>
-          <div className="campaign-meta">
-            <span>
-              <EnvironmentOutlined /> {featuredCampaign.location}
-            </span>
-            <span>
-              <CalendarOutlined /> {featuredCampaign.date}
-            </span>
-          </div>
-          <Progress
-            percent={featuredCampaign.progress}
-            strokeColor="#176b5c"
-            railColor="#d8e8df"
-            aria-label={`${featuredCampaign.progress}% of campaign help pledged`}
-          />
-          <div className="stat-grid">
-            <Statistic title="Volunteers" value={featuredCampaign.volunteers} />
-            <Statistic title="Supporters" value={featuredCampaign.supporters} />
-          </div>
+          ) : null}
+          <p>{panel.body}</p>
+          {!hasCountdownEnded && !hasInaugurated ? (
+            <span className="countdown-target">{t.panel.target}</span>
+          ) : null}
         </aside>
       </section>
 
-      <section className="trust-strip" aria-label="Shramdaan lifecycle">
-        {lifecycleSteps.map((step) => (
-          <div key={step} className="lifecycle-step">
-            <CheckCircleOutlined />
-            <span>{step}</span>
+      <section className="core-idea-section" aria-labelledby="core-idea-title">
+        <div className="core-idea-hero">
+          <div className="core-idea-copy">
+            <span className="core-idea-eyebrow">
+              <span aria-hidden="true">
+                <Image alt="" height={96} src="/images/logo.png" width={96} />
+              </span>
+              {t.coreIdea.eyebrow}
+            </span>
+            <h2 id="core-idea-title">{t.coreIdea.title}</h2>
           </div>
-        ))}
-      </section>
-
-      <section id="issues" className="page-section">
-        <div className="section-heading">
-          <span className="eyebrow">Local issues</span>
-          <h2>Problems that can become community action.</h2>
-          <p>
-            Each issue keeps the essentials visible: location, support, urgency,
-            status, and what needs to happen next.
-          </p>
-        </div>
-        <div className="card-grid">
-          {topIssues.map((issue) => (
-            <IssueCard key={issue.id} issue={issue} />
-          ))}
-        </div>
-      </section>
-
-      <section id="campaign" className="page-section split-section">
-        <div className="section-heading">
-          <span className="eyebrow">Campaign detail</span>
-          <h2>Join the Bagmati riverbank cleanup.</h2>
-          <p>
-            This first campaign view models volunteer intent, material support,
-            and transparent progress without assuming production backend systems.
-          </p>
-          <div className="notice">
-            <NotificationOutlined />
-            <span>Nearby residents and interested supporters can opt in for follow-up updates.</span>
+          <div className="core-idea-landscape" aria-hidden="true">
+            <span className="landscape-people">
+              <TeamOutlined />
+            </span>
           </div>
         </div>
-        <CampaignCard campaign={featuredCampaign} featured />
+
+        <div className="workflow-grid">
+          {t.coreIdea.steps.map((step, index) => {
+            const Icon = workflowStepIcons[step.id] ?? FileTextOutlined;
+            const isLastStep = index === t.coreIdea.steps.length - 1;
+
+            return (
+              <div className="workflow-item" key={step.id}>
+                <article className="workflow-card" data-step={step.id}>
+                  <div className="workflow-card-heading">
+                    <span className="workflow-number">{index + 1}</span>
+                    <h3>{step.title}</h3>
+                    <span className="workflow-icon" aria-hidden="true">
+                      <Icon />
+                    </span>
+                  </div>
+                  <div className="workflow-visual">
+                    <Image
+                      alt={step.imageAlt}
+                      fill
+                      sizes="(max-width: 620px) calc(100vw - 56px), (max-width: 980px) 45vw, 220px"
+                      src={step.image}
+                    />
+                    <span aria-hidden="true">
+                      <Icon />
+                    </span>
+                  </div>
+                  <p>{step.body}</p>
+                </article>
+                {!isLastStep ? (
+                  <span className="workflow-arrow" aria-hidden="true">
+                    <ArrowRightOutlined />
+                  </span>
+                ) : null}
+              </div>
+            );
+          })}
+        </div>
+
+        <p className="phase-note">
+          <span aria-hidden="true">
+            <Image alt="" height={96} src="/images/logo.png" width={96} />
+          </span>
+          {t.coreIdea.phaseNote}
+        </p>
       </section>
 
-      <section id="join" className="page-section">
-        <div className="section-heading">
-          <span className="eyebrow">Contribution paths</span>
-          <h2>Help can mean labor, time, funds, materials, logistics, or sharing.</h2>
+      <section className="volunteer-invite-section" aria-labelledby="volunteer-invite-title">
+        <div className="volunteer-visual">
+          <div className="volunteer-brand-card">
+            <span className="volunteer-logo">
+              <Image alt="" height={96} src="/images/logo.png" width={96} />
+            </span>
+            <span>{t.volunteerInvite.brandLine}</span>
+          </div>
+          <div className="volunteer-copy-block">
+            <span className="eyebrow">{t.volunteerInvite.eyebrow}</span>
+            <h2 id="volunteer-invite-title">
+              <span>{t.volunteerInvite.titleLead}</span>
+              <strong>{t.volunteerInvite.titleStrong}</strong>
+              <span>{t.volunteerInvite.titleTrail}</span>
+            </h2>
+            <p>{t.volunteerInvite.intro}</p>
+            <div className="volunteer-actions">
+              <Button type="primary" size="large" href="/join" icon={<HeartOutlined />}>
+                {t.volunteerInvite.primaryCta}
+              </Button>
+              <Button size="large" href="/feedback" icon={<ArrowRightOutlined />}>
+                {t.volunteerInvite.secondaryCta}
+              </Button>
+            </div>
+          </div>
+
+          <aside className="volunteer-goal-card">
+            <span className="volunteer-goal-icon" aria-hidden="true">
+              <TeamOutlined />
+            </span>
+            <div>
+              <h3>{t.volunteerInvite.goal.title}</h3>
+              <p>{t.volunteerInvite.goal.body}</p>
+            </div>
+          </aside>
         </div>
-        <div className="option-grid">
-          {contributionOptions.map((option) => (
-            <ContributionOption key={option.title} option={option} />
-          ))}
+
+        <div className="volunteer-roles-panel">
+          <div className="volunteer-panel-heading">
+            <span className="eyebrow">{t.volunteerInvite.panelEyebrow}</span>
+            <h2>{t.volunteerInvite.panelTitle}</h2>
+            <p>{t.volunteerInvite.panelIntro}</p>
+          </div>
+
+          <div className="volunteer-role-grid">
+            {t.volunteerInvite.roles.map((role) => {
+              const Icon = volunteerRoleIcons[role.id] ?? TeamOutlined;
+
+              return (
+                <article className="volunteer-role-card" data-role={role.id} key={role.id}>
+                  <span className="volunteer-role-icon" aria-hidden="true">
+                    <Icon />
+                  </span>
+                  <h3>{role.title}</h3>
+                  <span className="volunteer-role-badge">{role.badge}</span>
+                  <p>{role.description}</p>
+                  <Button
+                    href={`/join?role=${encodeURIComponent(role.value)}`}
+                    size="small"
+                    type="text"
+                    icon={<ArrowRightOutlined />}
+                  >
+                    {t.volunteerInvite.cardCta}
+                  </Button>
+                </article>
+              );
+            })}
+          </div>
         </div>
+
       </section>
 
-      <section id="impact" className="page-section">
-        <div className="section-heading">
-          <span className="eyebrow">Published impact</span>
-          <h2>Completed work should be visible, specific, and easy to trust.</h2>
+      <section className="page-section resources-section" aria-labelledby="resources-title">
+        <div className="section-heading resources-heading">
+          <span className="eyebrow">{t.resources.eyebrow}</span>
+          <h2 id="resources-title">{t.resources.title}</h2>
+          <p>{t.resources.intro}</p>
         </div>
-        <div className="impact-grid">
-          {impactStories.map((story) => (
-            <ImpactStoryCard key={story.id} story={story} />
-          ))}
+
+        <div className="resources-grid">
+          {t.resources.items.map((item) => {
+            const Icon = resourceIcons[item.id];
+
+            return (
+              <article className="resource-card" key={item.id}>
+                <span className="resource-icon" aria-hidden="true">
+                  <Icon />
+                </span>
+                <div className="resource-card-copy">
+                  <h3>{item.title}</h3>
+                  <p>{item.description}</p>
+                </div>
+                <Button href={item.href} rel="noreferrer" target="_blank" icon={<Icon />}>
+                  {item.button}
+                </Button>
+              </article>
+            );
+          })}
         </div>
       </section>
-
-      <footer className="footer">
-        <span>Shramdaan</span>
-        <span>Built for practical community action in Nepal.</span>
-      </footer>
-    </main>
+    </SiteShell>
   );
 }

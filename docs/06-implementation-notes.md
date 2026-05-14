@@ -75,6 +75,17 @@ Examples:
 
 Do not build production payment, notification, authentication, or moderation flows unless the project scope explicitly changes.
 
+## API Integration Guidance
+
+Use `docs/07-api-reference.md` as the source of truth for backend endpoint contracts when replacing simulated frontend actions with API-backed submissions.
+
+Current API assumptions:
+
+- Base URL can be configured with `NEXT_PUBLIC_API_BASE_URL`; the current frontend fallback is `https://z0n76c1j-3000.usw3.devtunnels.ms/api`.
+- Public form submissions should map to `/applications` and `/feedback`.
+- Auth and admin routes require bearer token handling; do not build admin flows until frontend token storage, request attachment, and protected-route behavior are explicitly scoped.
+- Keep existing simulated form behavior as a graceful fallback while API integration is incomplete or unavailable.
+
 ## Documentation Rules For Future Threads
 
 Before implementing Shramdaan work, future threads should read:
@@ -85,6 +96,7 @@ Before implementing Shramdaan work, future threads should read:
 - `docs/04-website-structure.md` for page structure.
 - `docs/05-design-language-guide.md` for tone and UI direction.
 - `docs/06-implementation-notes.md` for technical guardrails.
+- `docs/07-api-reference.md` for backend endpoint contracts.
 
 When product behavior changes, update the relevant document in the same change.
 
