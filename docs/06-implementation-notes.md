@@ -81,7 +81,7 @@ Use `docs/07-api-reference.md` as the source of truth for backend endpoint contr
 
 Current API assumptions:
 
-- Base URL can be configured with `NEXT_PUBLIC_API_BASE_URL`; the current frontend fallback is `https://z0n76c1j-3000.usw3.devtunnels.ms/api`.
+- Base URL can be configured with `NEXT_PUBLIC_API_BASE_URL`; the current frontend fallback is `https://z0n76c1j-3000.usw3.devtunnels.ms/api/v1`. If an environment value still ends in `/api`, the frontend normalizes it to `/api/v1`.
 - Public form submissions should map to `/applications` and `/feedback`.
 - Auth and admin routes require bearer token handling; do not build admin flows until frontend token storage, request attachment, and protected-route behavior are explicitly scoped.
 - Keep existing simulated form behavior as a graceful fallback while API integration is incomplete or unavailable.

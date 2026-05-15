@@ -1,8 +1,18 @@
-const FALLBACK_API_BASE_URL = "https://z0n76c1j-3000.usw3.devtunnels.ms/api";
+const FALLBACK_API_BASE_URL = "https://z0n76c1j-3000.usw3.devtunnels.ms/api/v1";
 
-export const API_BASE_URL = (
+function normalizeApiBaseUrl(baseUrl) {
+  const normalizedBaseUrl = baseUrl.replace(/\/+$/, "");
+
+  if (/\/api$/i.test(normalizedBaseUrl)) {
+    return `${normalizedBaseUrl}/v1`;
+  }
+
+  return normalizedBaseUrl;
+}
+
+export const API_BASE_URL = normalizeApiBaseUrl(
   process.env.NEXT_PUBLIC_API_BASE_URL || FALLBACK_API_BASE_URL
-).replace(/\/+$/, "");
+);
 
 export function compactPayload(values) {
   return Object.fromEntries(
