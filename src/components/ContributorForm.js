@@ -34,7 +34,7 @@ export function ContributorForm({ content, initialRole, onSubmit, submitting = f
     >
       <div className="form-grid">
         <Form.Item name="name" label={labels.name} rules={[requiredRule]}>
-          <Input placeholder={content.placeholders.name} />
+          <Input autoFocus placeholder={content.placeholders.joinName} />
         </Form.Item>
         <Form.Item
           name="email"
@@ -58,7 +58,7 @@ export function ContributorForm({ content, initialRole, onSubmit, submitting = f
         <Form.Item name="resumeUrl" label={labels.resumeUrl}>
           <Input placeholder={content.placeholders.resumeUrl} />
         </Form.Item>
-        <Form.Item name="experience" label={labels.experience}>
+        <Form.Item name="experience" label={labels.experience} className="wide-field">
           <Input.TextArea rows={4} maxLength={500} showCount placeholder={content.placeholders.experience} />
         </Form.Item>
         <Form.Item name="motivation" label={labels.motivation} className="wide-field" rules={[requiredRule]}>

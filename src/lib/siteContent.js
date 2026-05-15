@@ -16,6 +16,8 @@ export const copy = {
     },
     controls: {
       language: "English",
+      languageTooltip: "Change to English language",
+      themeTooltip: "थिम बदल्नुहोस्",
       darkTheme: "गाढा थिम",
       lightTheme: "उज्यालो थिम"
     },
@@ -23,7 +25,7 @@ export const copy = {
       eyebrow: "",
       title: "श्रमदान",
       subtitle: "हाम्रो श्रम, हाम्रो समाज, हाम्रो भविष्य।",
-      support: "देशका हरेक समस्या सरकारको प्रतीक्षा गरेर समाधान हुँदैन। हामी नागरिकहरू मिलेर सरसफाइ, मर्मत, वृक्षारोपण, टोल सुधार जस्ता आधारभूत काम आफैं अघि बढाउन सक्छौँ। श्रमदान त्यही सामूहिक जिम्मेवारीको सुरुवात हो।\n\nसाना साना हातहरू मिलेर ठूला परिवर्तन सम्भव हुन्छ। आज हाम्रो श्रमदान, भोलि सुन्दर समाजको निर्माण।",
+      support: "देशका हरेक समस्या सरकारको प्रतीक्षा गरेर समाधान हुँदैन। हामी नागरिकहरू आफैं मिलेर सरसफाइ, मर्मत, वृक्षारोपण, टोल सुधार जस्ता आधारभूत काम अघि बढाउन सक्छौँ। श्रमदान त्यही सामूहिक जिम्मेवारीको सुरुवात हो। साना साना हातहरू मिलेर ठूला परिवर्तन सम्भव हुन्छ। आज हाम्रो श्रमदान, भोलि सुन्दर समाजको निर्माण।",
       launch: "उद्घाटन",
       join: "योगदान गर्नुहोस्"
     },
@@ -48,122 +50,122 @@ export const copy = {
     coreIdea: {
       eyebrow: "मुख्य विचार",
       title:
-        "Shramdan App ले स्थानीय समस्यालाई reporting, voting र श्रम योगदानमार्फत community events मा बदल्छ।",
-      phaseNote: "पहिलो phase मा हामी community cleanup बाट मात्र सुरु गर्छौं।",
+        "श्रमदान एपले स्थानीय समस्यालाई सूचना, मतदान र श्रम योगदानमार्फत सामुदायिक कार्यक्रममा बदल्छ।",
+      phaseNote: "पहिलो चरणमा हामी सामुदायिक सरसफाइबाट मात्र सुरु गर्छौं।",
       steps: [
         {
           id: "listing",
           image: "/images/homepage/core-idea/listing.png",
-          imageAlt: "Listing step visual",
-          title: "Listing",
-          body: "सदस्यहरूले location र photos सहित स्थानीय समस्या report गर्छन्।"
+          imageAlt: "समस्या सूचीकृत गर्ने चरणको दृश्य",
+          title: "सूचना",
+          body: "सदस्यहरूले स्थान र तस्वीरसहित स्थानीय समस्या पठाउँछन्।"
         },
         {
           id: "vote",
           image: "/images/homepage/core-idea/vote.png",
-          imageAlt: "Voting step visual",
-          title: "Vote",
-          body: "सदस्यहरूले महत्त्वपूर्ण समस्यालाई priority दिन vote गर्छन्।"
+          imageAlt: "मतदान चरणको दृश्य",
+          title: "मतदान",
+          body: "सदस्यहरूले महत्त्वपूर्ण समस्यालाई प्राथमिकता दिन मतदान गर्छन्।"
         },
         {
           id: "plan",
           image: "/images/homepage/core-idea/plan.png",
-          imageAlt: "Planning step visual",
-          title: "Plan",
-          body: "Top issues छानिन्छन् र सहभागीहरूलाई सूचना पठाइन्छ।"
+          imageAlt: "योजना बनाउने चरणको दृश्य",
+          title: "योजना",
+          body: "सबैभन्दा आवश्यक समस्या छानिन्छन् र सहभागीहरूलाई सूचना पठाइन्छ।"
         },
         {
           id: "event",
           image: "/images/homepage/core-idea/events.png",
-          imageAlt: "Cleanup event step visual",
-          title: "Event",
-          body: "Cleanup events organize, complete र document गरिन्छ।"
+          imageAlt: "सरसफाइ कार्यक्रम चरणको दृश्य",
+          title: "कार्यक्रम",
+          body: "सरसफाइ कार्यक्रम आयोजना, सम्पन्न र अभिलेख गरिन्छ।"
         },
         {
           id: "results",
           image: "/images/homepage/core-idea/results.png",
-          imageAlt: "Results step visual",
-          title: "Results",
-          body: "परिणाम Shramdan app मा सार्वजनिक रूपमा share गरिन्छ।"
+          imageAlt: "परिणाम सार्वजनिक गर्ने चरणको दृश्य",
+          title: "परिणाम",
+          body: "परिणाम श्रमदान एपमा सार्वजनिक रूपमा देखाइन्छ।"
         }
       ]
     },
     volunteerInvite: {
-      brandLine: "Donate Your Labour. Build Your Community.",
+      brandLine: "आफ्नो श्रम दिनुहोस्। आफ्नो समुदाय बनाउनुहोस्।",
       eyebrow: "स्वयंसेवक निम्तो",
       titleLead: "हामीसँग",
-      titleStrong: "Shramdan बनाउनुहोस्",
+      titleStrong: "श्रमदान बनाउनुहोस्",
       titleTrail: "नेपालका लागि",
       intro:
-        "यो community-driven platform सबैका लागि खुला छ। आफ्नो skill, समय वा network प्रयोग गरेर team बनाउनुहोस्, भूमिका लिनुहोस्, र स्थानीय प्रभाव सुरु गर्नुहोस्।",
+        "यो समुदायबाट चल्ने मञ्च सबैका लागि खुला छ। आफ्नो सीप, समय वा सम्पर्क प्रयोग गरेर टोली बनाउनुहोस्, भूमिका लिनुहोस्, र स्थानीय परिवर्तन सुरु गर्नुहोस्।",
       primaryCta: "स्वयंसेवक बन्नुहोस्",
       secondaryCta: "सुझाव दिनुहोस्",
       panelEyebrow: "हामीलाई तपाईं चाहिन्छ",
-      panelTitle: "कुनै पनि भूमिका लिनुहोस्। आफ्नो team बनाउनुहोस्।",
+      panelTitle: "कुनै पनि भूमिका लिनुहोस् र App Development मा श्रमदान गर्नुहोस्।",
       panelIntro:
-        "Code, design, कानुन, finance, donation वा local leadership - Shramdan मा योगदान गर्ने बाटो सबैका लागि छ।",
+        "प्रविधि, डिजाइन, कानुन, वित्त, सहयोग वा स्थानीय नेतृत्व - श्रमदानमा योगदान गर्ने बाटो सबैका लागि छ।",
       cardCta: "यो भूमिका रोज्नुहोस्",
       goal: {
         title: "हाम्रो लक्ष्य: समुदायले नेतृत्व गर्ने",
         body:
-          "हामी यस्तो आधार बनाउँदैछौं जहाँ community ले project चलाउन, निर्णय लिन र impact own गर्न सकोस्।"
+          "हामी यस्तो आधार बनाउँदैछौं जहाँ समुदायले कार्यक्रम चलाउन, निर्णय लिन र परिणामको जिम्मेवारी लिन सकोस्।"
       },
       roles: [
         {
           id: "frontend",
           value: "FRONTEND_DEVELOPER",
-          title: "Frontend Developer",
+          title: "अग्रभाग विकासकर्ता",
           badge: "१ स्वयंसेवक",
-          description: "React, Next.js र UI implementation मा साथ दिनुहोस्।"
+          description: "वेब पृष्ठ, अन्तरक्रिया र प्रयोगकर्ता अनुभव बनाउन साथ दिनुहोस्।"
         },
         {
           id: "backend",
           value: "BACKEND_DEVELOPER",
-          title: "Backend Developer",
+          title: "पछाडिको प्रणाली विकासकर्ता",
           badge: "१ स्वयंसेवक",
-          description: "APIs, database र secure service design मा योगदान गर्नुहोस्।"
+          description: "सुरक्षित सेवा, तथ्याङ्क भण्डारण र प्रणाली संरचनामा योगदान गर्नुहोस्।"
         },
         {
           id: "uiux",
           value: "UI_UX_DESIGNER",
-          title: "UI/UX Designer",
+          title: "अनुभव तथा रूपरेखा डिजाइनर",
           badge: "१ स्वयंसेवक",
-          description: "User experience, wireframes र design systems सुधार्नुहोस्।"
+          description: "प्रयोगकर्ता अनुभव, रूपरेखा र डिजाइन प्रणाली सुधार्नुहोस्।"
         },
         {
           id: "graphics",
           value: "GRAPHICS_DESIGNER",
-          title: "Graphics Designer",
+          title: "दृश्य सामग्री डिजाइनर",
           badge: "१ स्वयंसेवक",
-          description: "Branding, visuals, illustrations र campaign assets बनाउनुहोस्।"
+          description: "पहिचान, दृश्य सामग्री, चित्रण र अभियान सामग्री बनाउनुहोस्।"
         },
         {
           id: "legal",
           value: "LEGAL",
-          title: "Lawyer / Legal",
+          title: "कानुनी सल्लाहकार",
           badge: "१ स्वयंसेवक",
-          description: "Legal guidance, organization र compliance मा बाटो देखाउनुहोस्।"
+          description: "कानुनी मार्गदर्शन, संस्था निर्माण र नियमपालनमा बाटो देखाउनुहोस्।"
         },
         {
           id: "finance",
           value: "FINANCE",
-          title: "Financial Advisor",
+          title: "वित्तीय सल्लाहकार",
           badge: "१ स्वयंसेवक",
-          description: "Financial planning, transparency र strategy मा सहयोग गर्नुहोस्।"
+          description: "वित्तीय योजना, पारदर्शिता र रणनीतिमा सहयोग गर्नुहोस्।"
         },
         {
           id: "donors",
           value: "DONOR",
-          title: "Donors",
+          title: "सहयोगदाता",
           badge: "हरेक योगदान महत्त्वपूर्ण",
-          description: "Mission लाई fund गरेर real community impact सम्भव बनाउनुहोस्।"
+          description: "आर्थिक सहयोगमार्फत वास्तविक सामुदायिक परिवर्तन सम्भव बनाउनुहोस्।"
         },
         {
           id: "leaders",
           value: "COMMUNITY_MANAGER",
-          title: "Community Leaders",
-          badge: "Local impact makers",
-          description: "आफ्नो ठाउँमा organize गर्नुहोस्, मानिसहरू जोड्नुहोस्।"
+          title: "समुदाय नेतृत्वकर्ता",
+          badge: "स्थानीय परिवर्तनका अगुवा",
+          description: "आफ्नो ठाउँमा कार्यक्रम मिलाउनुहोस् र मानिसहरू जोड्नुहोस्।"
         }
       ]
     },
@@ -223,6 +225,7 @@ export const copy = {
       submit: "प्रतिक्रिया पठाउनुहोस्"
     },
     placeholders: {
+      joinName: "जस्तै: Muna Gurung",
       name: "जस्तै: सुस्मिता थापा",
       email: "susmita@example.com",
       phone: "+9779800000000",
@@ -266,7 +269,7 @@ export const copy = {
     footer: {
       brand: "श्रमदान",
       ariaLabel: "श्रमदान footer",
-      intro: "श्रमदान नागरिक, समुदाय र योगदानकर्तालाई एउटै उद्देश्यमा जोड्ने अभियान हो: श्रम, सहकार्य र जिम्मेवारीबाट सुन्दर समाज निर्माण गर्ने।",
+      intro: "देशका हरेक समस्या सरकारको प्रतीक्षा गरेर समाधान हुँदैन। हामी नागरिकहरू आफैं मिलेर सरसफाइ, मर्मत, वृक्षारोपण, टोल सुधार जस्ता आधारभूत काम अघि बढाउन सक्छौँ। श्रमदान त्यही सामूहिक जिम्मेवारीको सुरुवात हो। साना साना हातहरू मिलेर ठूला परिवर्तन सम्भव हुन्छ। आज हाम्रो श्रमदान, भोलि सुन्दर समाजको निर्माण।",
       note: "हाम्रो श्रम, हाम्रो समाज, हाम्रो भविष्य।",
       columns: {
         quickLinks: "द्रुत लिंकहरू",
@@ -302,6 +305,8 @@ export const copy = {
     },
     controls: {
       language: "नेपाली",
+      languageTooltip: "नेपाली भाषामा बदल्नुहोस्",
+      themeTooltip: "Switch theme",
       darkTheme: "Dark theme",
       lightTheme: "Light theme"
     },
@@ -309,7 +314,7 @@ export const copy = {
       eyebrow: "",
       title: "Shramdan",
       subtitle: "Our labor, our society, our future.",
-      support: "Not every problem in the country will be solved by waiting for the government. As citizens, we can come together to move basic work forward ourselves, from cleanups and repairs to tree planting and neighborhood improvement. Shramdan is the beginning of that shared responsibility.\n\nSmall hands together can make big change possible. Our Shramdan today builds a better society tomorrow.",
+      support: "Not every problem in the country will be solved by waiting for the government. As citizens, we can come together to move basic work forward ourselves, from cleanups and repairs to tree planting and neighborhood improvement. Shramdan is the beginning of that shared responsibility. Small hands together can make big change possible. Our Shramdan today builds a better society tomorrow.",
       launch: "Inaugurate",
       join: "Contribute"
     },
@@ -385,7 +390,7 @@ export const copy = {
       primaryCta: "Become a volunteer",
       secondaryCta: "Share feedback",
       panelEyebrow: "We need you",
-      panelTitle: "Join any role. Build your team.",
+      panelTitle: "Take any role and contribute to App Development.",
       panelIntro:
         "Code, design, law, finance, donation, or local leadership - there is a clear way to contribute to Shramdan.",
       cardCta: "Choose this role",
@@ -509,6 +514,7 @@ export const copy = {
       submit: "Submit feedback"
     },
     placeholders: {
+      joinName: "e.g. Muna Gurung",
       name: "e.g. Susmita Thapa",
       email: "susmita@example.com",
       phone: "+9779800000000",
@@ -552,7 +558,7 @@ export const copy = {
     footer: {
       brand: "Shramdan",
       ariaLabel: "Shramdan footer",
-      intro: "Shramdan connects citizens, communities, and contributors around one mission: building a better society through labor, collaboration, and shared responsibility.",
+      intro: "Not every problem in the country will be solved by waiting for the government. As citizens, we can come together to move basic work forward ourselves, from cleanups and repairs to tree planting and neighborhood improvement. Shramdan is the beginning of that shared responsibility. Small hands together can make big change possible. Our Shramdan today builds a better society tomorrow.",
       note: "Our labor, our society, our future.",
       columns: {
         quickLinks: "Quick Links",

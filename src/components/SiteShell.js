@@ -8,7 +8,7 @@ import {
   TranslationOutlined,
   UserAddOutlined
 } from "@ant-design/icons";
-import { Button } from "antd";
+import { Button, Tooltip } from "antd";
 import Image from "next/image";
 import Link from "next/link";
 import { FaFacebookF, FaTiktok, FaXTwitter, FaYoutube } from "react-icons/fa6";
@@ -92,14 +92,22 @@ export function SiteShell({ children }) {
         </nav>
 
         <div className="toolbar" aria-label={t.ariaLabels.preferences}>
-          <Button
-            aria-label={t.ariaLabels.toggleTheme}
-            icon={mode === "light" ? <SunOutlined /> : <MoonOutlined />}
-            onClick={toggleMode}
-          />
-          <Button icon={<TranslationOutlined />} onClick={toggleLanguage}>
-            {t.controls.language}
-          </Button>
+          <Tooltip title={t.controls.themeTooltip}>
+            <Button
+              aria-label={t.controls.themeTooltip}
+              icon={mode === "light" ? <SunOutlined /> : <MoonOutlined />}
+              onClick={toggleMode}
+            />
+          </Tooltip>
+          <Tooltip title={t.controls.languageTooltip}>
+            <Button
+              aria-label={t.controls.languageTooltip}
+              icon={<TranslationOutlined />}
+              onClick={toggleLanguage}
+            >
+              {t.controls.language}
+            </Button>
+          </Tooltip>
           <Button type="primary" href="/join" icon={<UserAddOutlined />}>
             {t.nav.join}
           </Button>
@@ -113,10 +121,10 @@ export function SiteShell({ children }) {
             <Link href="/">{t.nav.home}</Link>
             <Link href="/join">{t.nav.join}</Link>
             <Link href="/feedback">{t.nav.feedback}</Link>
-            <button type="button" onClick={toggleMode}>
+            <button type="button" aria-label={t.controls.themeTooltip} title={t.controls.themeTooltip} onClick={toggleMode}>
               {mode === "light" ? t.controls.darkTheme : t.controls.lightTheme}
             </button>
-            <button type="button" onClick={toggleLanguage}>
+            <button type="button" aria-label={t.controls.languageTooltip} title={t.controls.languageTooltip} onClick={toggleLanguage}>
               {t.controls.language}
             </button>
           </div>

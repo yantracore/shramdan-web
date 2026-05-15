@@ -72,24 +72,14 @@ export default function Home() {
   const t = copy[language];
   const heroRef = useRef(null);
   const launchTimerRef = useRef(null);
-  const [hasInaugurated, setHasInaugurated] = useState(() => {
-    if (!IS_PRODUCTION || typeof window === "undefined") {
-      return false;
-    }
-
-    try {
-      return window.localStorage.getItem(LAUNCH_STORAGE_KEY) === "true";
-    } catch {
-      return false;
-    }
-  });
+  const [hasInaugurated, setHasInaugurated] = useState(false);
   const [isLaunching, setIsLaunching] = useState(false);
   const [hasAutoLaunched, setHasAutoLaunched] = useState(false);
   const [launchRun, setLaunchRun] = useState(0);
   const [heroSize, setHeroSize] = useState({ width: 0, height: 0 });
   const [viewportWidth, setViewportWidth] = useState(0);
   const [reduceMotion, setReduceMotion] = useState(false);
-  const [now, setNow] = useState(() => Date.now());
+  const [now, setNow] = useState(null);
 
   const triggerLaunch = useCallback(() => {
     setHasAutoLaunched(true);
@@ -118,6 +108,22 @@ export default function Home() {
       setIsLaunching(false);
     }, LAUNCH_DURATION_MS);
   }, [reduceMotion]);
+
+  useEffect(() => {
+    if (!IS_PRODUCTION) {
+      return undefined;
+    }
+
+    const storageTimer = window.setTimeout(() => {
+      try {
+        setHasInaugurated(window.localStorage.getItem(LAUNCH_STORAGE_KEY) === "true");
+      } catch {
+        setHasInaugurated(false);
+      }
+    }, 0);
+
+    return () => window.clearTimeout(storageTimer);
+  }, []);
 
   useEffect(() => {
     if (!heroRef.current) {
@@ -156,7 +162,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const interval = window.setInterval(() => {
+    const syncCountdown = () => {
       const currentTime = Date.now();
 
       setNow(currentTime);
@@ -164,9 +170,15 @@ export default function Home() {
       if (currentTime >= INAUGURATION_AT && !hasInaugurated && !hasAutoLaunched) {
         triggerLaunch();
       }
-    }, 1000);
+    };
 
-    return () => window.clearInterval(interval);
+    const initialTimer = window.setTimeout(syncCountdown, 0);
+    const interval = window.setInterval(syncCountdown, 1000);
+
+    return () => {
+      window.clearTimeout(initialTimer);
+      window.clearInterval(interval);
+    };
   }, [hasAutoLaunched, hasInaugurated, triggerLaunch]);
 
   useEffect(
@@ -178,8 +190,8 @@ export default function Home() {
     []
   );
 
-  const hasCountdownEnded = now >= INAUGURATION_AT;
-  const remainingMs = Math.max(0, INAUGURATION_AT - now);
+  const hasCountdownEnded = now !== null && now >= INAUGURATION_AT;
+  const remainingMs = now === null ? 0 : Math.max(0, INAUGURATION_AT - now);
   const countdown = useMemo(() => getCountdownParts(remainingMs), [remainingMs]);
   const panel = hasCountdownEnded || hasInaugurated ? t.panel.launched : t.panel.countdown;
   const countdownItems = [
@@ -225,7 +237,7 @@ export default function Home() {
             </Button>
           </div>
         </div>
-        <aside className="hero-panel" aria-label={t.ariaLabels.launchNote} aria-live="polite">
+        <aside className="hero-panel glass-panel" aria-label={t.ariaLabels.launchNote} aria-live="polite">
           {isLaunching ? (
             <span className="launch-burst" aria-hidden="true">
               <span />
@@ -235,7 +247,7 @@ export default function Home() {
             </span>
           ) : null}
           <h2>{panel.title}</h2>
-          {!hasCountdownEnded && !hasInaugurated ? (
+          {now !== null && !hasCountdownEnded && !hasInaugurated ? (
             <div className="countdown-grid" aria-label={t.panel.countdownLabel}>
               {countdownItems.map((item) => (
                 <span className="countdown-item" key={item.key}>
@@ -246,7 +258,7 @@ export default function Home() {
             </div>
           ) : null}
           <p>{panel.body}</p>
-          {!hasCountdownEnded && !hasInaugurated ? (
+          {now !== null && !hasCountdownEnded && !hasInaugurated ? (
             <span className="countdown-target">{t.panel.target}</span>
           ) : null}
         </aside>
@@ -292,9 +304,6 @@ export default function Home() {
                       sizes="(max-width: 620px) calc(100vw - 56px), (max-width: 980px) 45vw, 220px"
                       src={step.image}
                     />
-                    <span aria-hidden="true">
-                      <Icon />
-                    </span>
                   </div>
                   <p>{step.body}</p>
                 </article>
@@ -318,7 +327,7 @@ export default function Home() {
 
       <section className="volunteer-invite-section" aria-labelledby="volunteer-invite-title">
         <div className="volunteer-visual">
-          <div className="volunteer-brand-card">
+          <div className="volunteer-brand-card glass-panel">
             <span className="volunteer-logo">
               <Image alt="" height={96} src="/images/logo.png" width={96} />
             </span>
@@ -342,7 +351,7 @@ export default function Home() {
             </div>
           </div>
 
-          <aside className="volunteer-goal-card">
+          <aside className="volunteer-goal-card glass-panel">
             <span className="volunteer-goal-icon" aria-hidden="true">
               <TeamOutlined />
             </span>

@@ -21,7 +21,7 @@ export function FeedbackForm({ content, onSubmit, submitting = false }) {
     <Form form={form} layout="vertical" className="content-card form-card" onFinish={handleFinish}>
       <div className="form-grid">
         <Form.Item name="name" label={labels.name} rules={[requiredRule]}>
-          <Input placeholder={content.placeholders.name} />
+          <Input autoFocus placeholder={content.placeholders.name} />
         </Form.Item>
         <Form.Item
           name="email"
