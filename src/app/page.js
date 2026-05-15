@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  ApiOutlined,
   ArrowRightOutlined,
   BankOutlined,
   BgColorsOutlined,
@@ -47,6 +48,7 @@ const getCountdownParts = (remainingMs) => {
 const formatCountdownValue = (value) => String(value).padStart(2, "0");
 
 const resourceIcons = {
+  apiDocs: ApiOutlined,
   presentation: FilePptOutlined,
   documents: FileTextOutlined,
   github: GithubOutlined

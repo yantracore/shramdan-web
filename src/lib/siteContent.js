@@ -228,7 +228,7 @@ export const copy = {
       ]
     },
     resources: {
-      eyebrow: "Open source",
+      eyebrow: "Open sources",
       title: "खुला विकास सामग्री",
       intro: "Shramdan को mission, walkthrough, documents र source code सबै सार्वजनिक छन्। हेर्नुस्, सिक्नुस्, अनि चाहिँदा contribution पठाउनुस्.",
       items: [
@@ -252,6 +252,13 @@ export const copy = {
           description: "Public source code, issues र contribution history भएको open-source repo.",
           button: "Repo हेर्नुहोस्",
           href: "https://github.com/yantracore/shramdan-web"
+        },
+        {
+          id: "apiDocs",
+          title: "API Documentation",
+          description: "Backend API endpoints, request formats र testing references भएको सार्वजनिक API documentation।",
+          button: "API docs खोल्नुहोस्",
+          href: "https://z0n76c1j-3000.usw3.devtunnels.ms/api-docs/"
         }
       ]
     },
@@ -575,7 +582,7 @@ export const copy = {
       ]
     },
     resources: {
-      eyebrow: "Open source",
+      eyebrow: "Open sources",
       title: "Open Development Resources",
       intro: "Shramdan keeps its mission, walkthrough, documents, and source code public so anyone can learn, review, and contribute.",
       items: [
@@ -599,6 +606,13 @@ export const copy = {
           description: "Public open-source repo with the source code, issues, and contribution history.",
           button: "View repo",
           href: "https://github.com/yantracore/shramdan-web"
+        },
+        {
+          id: "apiDocs",
+          title: "API Documentation",
+          description: "Public API docs for backend endpoints, request formats, and testing references.",
+          button: "Open API docs",
+          href: "https://z0n76c1j-3000.usw3.devtunnels.ms/api-docs/"
         }
       ]
     },
