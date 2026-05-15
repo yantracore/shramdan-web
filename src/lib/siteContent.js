@@ -47,6 +47,64 @@ export const copy = {
         body: "अब अभियान योगदान, प्रतिक्रिया र सहकार्यका लागि खुला छ।"
       }
     },
+    cleanupAreas: {
+      eyebrow: "के सफा गर्ने?",
+      title: "सुरुवातका सफाइ क्षेत्रहरू",
+      intro:
+        "श्रमदान पहिलो चरणमा आँखाले देखिने, सबैले महसुस गर्ने र समुदायले तुरुन्तै हात हाल्न सक्ने ठाउँबाट सुरु हुन्छ - एक पटकमा एक ठाउँ।",
+      reasonsTitle: "किन यिनै ठाउँहरू?",
+      reasonsLabel: "सफाइ क्षेत्र छान्नुका कारणहरू",
+      reasons: [
+        "स्वच्छ वातावरण र स्वस्थ समुदाय",
+        "प्रकृति संरक्षण र पानीको सुरक्षा",
+        "समुदायबीच सहकार्य बढाउने",
+        "सुन्दर शहर, सुरक्षित बाटो र साझा ठाउँ"
+      ],
+      items: [
+        {
+          id: "roadside",
+          image: "/images/homepage/cleanup-areas/roadside.png",
+          imageAlt: "सडक किनार सफाइमा सहभागी स्वयंसेवकहरू",
+          title: "सडक र फुटपाथ",
+          body: "मुख्य सडक, गल्ली, फुटपाथ र सडकछेउमा देखिने फोहोर सफा गर्ने।"
+        },
+        {
+          id: "lands",
+          image: "/images/homepage/cleanup-areas/empty-lands.png",
+          imageAlt: "खाली जमिनमा फोहोर संकलन गर्दै स्वयंसेवकहरू",
+          title: "खाली जग्गा",
+          body: "बाँझो जमिन, खुला प्लट र बेवास्ता गरिएका ठाउँलाई सफा र सुरक्षित बनाउने।"
+        },
+        {
+          id: "riverbanks",
+          image: "/images/homepage/cleanup-areas/riverbanks.png",
+          imageAlt: "नदी किनारमा सफाइ अभियान",
+          title: "नदी किनार र जलमार्ग",
+          body: "नदी, खोला, ताल र पानी बग्ने क्षेत्रमा जम्मा भएको फोहोर हटाउने।"
+        },
+        {
+          id: "drains",
+          image: "/images/homepage/cleanup-areas/drains.png",
+          imageAlt: "ढल र नाला सफाइ गर्दै टोली",
+          title: "ढल र नाला",
+          body: "पानी जम्ने ठाउँ, नाली र गल्लीका निकासहरू सफा राख्ने।"
+        },
+        {
+          id: "parks",
+          image: "/images/homepage/cleanup-areas/parks.png",
+          imageAlt: "पार्क र सार्वजनिक ठाउँ सफाइ",
+          title: "पार्क र सार्वजनिक ठाउँ",
+          body: "पार्क, चौक, बस स्टप, सामुदायिक क्षेत्र र भेटघाट हुने ठाउँ सफा गर्ने।"
+        },
+        {
+          id: "trails",
+          image: "/images/homepage/cleanup-areas/nature-trails.png",
+          imageAlt: "प्रकृति मार्गमा सफाइ गर्दै समूह",
+          title: "हाइकिङ ट्रेल र प्रकृति मार्ग",
+          body: "जंगल बाटो, दृश्यावलोकन स्थल, ट्रेल र प्रकृति मार्गलाई फोहोरमुक्त बनाउने।"
+        }
+      ]
+    },
     coreIdea: {
       eyebrow: "मुख्य विचार",
       title:
@@ -335,6 +393,64 @@ export const copy = {
         title: "Shramdan is inaugurated",
         body: "The campaign is now open for contribution, feedback, and collaboration."
       }
+    },
+    cleanupAreas: {
+      eyebrow: "What we clean",
+      title: "Cleanup Areas We Start With",
+      intro:
+        "Shramdan begins with visible local cleanup work people can understand, join, and measure quickly - one place at a time.",
+      reasonsTitle: "Why these cleanups?",
+      reasonsLabel: "Reasons for choosing cleanup areas",
+      reasons: [
+        "Cleaner surroundings and healthier communities",
+        "Nature protection and safer waterways",
+        "Stronger local cooperation",
+        "Better streets, shared spaces, and public pride"
+      ],
+      items: [
+        {
+          id: "roadside",
+          image: "/images/homepage/cleanup-areas/roadside.png",
+          imageAlt: "Volunteers cleaning a roadside area",
+          title: "Street & Roadside",
+          body: "Clean visible litter along roads, alleys, footpaths, and street edges."
+        },
+        {
+          id: "lands",
+          image: "/images/homepage/cleanup-areas/empty-lands.png",
+          imageAlt: "Volunteers collecting waste from vacant land",
+          title: "Vacant Lands",
+          body: "Turn neglected plots and open grounds into cleaner, safer local spaces."
+        },
+        {
+          id: "riverbanks",
+          image: "/images/homepage/cleanup-areas/riverbanks.png",
+          imageAlt: "Cleanup work along a riverbank",
+          title: "Riverbanks & Waterways",
+          body: "Remove waste from riversides, streams, ponds, and nearby water routes."
+        },
+        {
+          id: "drains",
+          image: "/images/homepage/cleanup-areas/drains.png",
+          imageAlt: "Team cleaning drains and gullies",
+          title: "Drains & Gullies",
+          body: "Keep drains, gullies, and waterlogged corners clean and flowing."
+        },
+        {
+          id: "parks",
+          image: "/images/homepage/cleanup-areas/parks.png",
+          imageAlt: "Volunteers cleaning a park and public space",
+          title: "Parks & Public Spaces",
+          body: "Clean parks, squares, bus stops, community zones, and gathering spaces."
+        },
+        {
+          id: "trails",
+          image: "/images/homepage/cleanup-areas/nature-trails.png",
+          imageAlt: "Group cleaning a nature trail",
+          title: "Hiking Trails & Nature Routes",
+          body: "Protect forest paths, viewpoints, trails, and nature routes from litter."
+        }
+      ]
     },
     coreIdea: {
       eyebrow: "Core Idea",

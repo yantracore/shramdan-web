@@ -8,14 +8,18 @@ import {
   CheckCircleOutlined,
   CodeOutlined,
   DatabaseOutlined,
+  EnvironmentOutlined,
   FilePptOutlined,
   FileTextOutlined,
   GithubOutlined,
   HeartOutlined,
   LineChartOutlined,
+  PartitionOutlined,
   RocketOutlined,
+  ShopOutlined,
   TeamOutlined,
-  ToolOutlined
+  ToolOutlined,
+  TrophyOutlined
 } from "@ant-design/icons";
 import { Button } from "antd";
 import Image from "next/image";
@@ -57,6 +61,15 @@ const volunteerRoleIcons = {
   finance: LineChartOutlined,
   donors: HeartOutlined,
   leaders: TeamOutlined
+};
+
+const cleanupAreaIcons = {
+  roadside: EnvironmentOutlined,
+  lands: PartitionOutlined,
+  riverbanks: LineChartOutlined,
+  drains: ToolOutlined,
+  parks: ShopOutlined,
+  trails: TrophyOutlined
 };
 
 const workflowStepIcons = {
@@ -262,6 +275,50 @@ export default function Home() {
             <span className="countdown-target">{t.panel.target}</span>
           ) : null}
         </aside>
+      </section>
+
+      <section className="cleanup-areas-section" aria-labelledby="cleanup-areas-title">
+        <div className="cleanup-areas-heading">
+          <span className="eyebrow">{t.cleanupAreas.eyebrow}</span>
+          <div>
+            <h2 id="cleanup-areas-title">{t.cleanupAreas.title}</h2>
+            <p>{t.cleanupAreas.intro}</p>
+          </div>
+        </div>
+
+        <div className="cleanup-areas-grid">
+          {t.cleanupAreas.items.map((area, index) => {
+            const Icon = cleanupAreaIcons[area.id] ?? EnvironmentOutlined;
+
+            return (
+              <article className="cleanup-area-card" data-area={area.id} key={area.id}>
+                <div className="cleanup-area-topline">
+                  <span className="cleanup-area-number">{String(index + 1).padStart(2, "0")}</span>
+                  <h3>{area.title}</h3>
+                </div>
+                <div className="cleanup-area-image">
+                  <Image
+                    alt={area.imageAlt}
+                    fill
+                    sizes="(max-width: 700px) calc(100vw - 56px), (max-width: 1180px) 30vw, 180px"
+                    src={area.image}
+                  />
+                </div>
+                <span className="cleanup-area-icon" aria-hidden="true">
+                  <Icon />
+                </span>
+                <p>{area.body}</p>
+              </article>
+            );
+          })}
+        </div>
+
+        <div className="cleanup-reasons" aria-label={t.cleanupAreas.reasonsLabel}>
+          <strong>{t.cleanupAreas.reasonsTitle}</strong>
+          {t.cleanupAreas.reasons.map((reason) => (
+            <span key={reason}>{reason}</span>
+          ))}
+        </div>
       </section>
 
       <section className="core-idea-section" aria-labelledby="core-idea-title">
