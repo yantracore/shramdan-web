@@ -396,8 +396,8 @@ export default function Home() {
             <span className="eyebrow">{t.volunteerInvite.eyebrow}</span>
             <h2 id="volunteer-invite-title">
               <span>{t.volunteerInvite.titleLead}</span>
-              <strong>{t.volunteerInvite.titleStrong}</strong>
               <span>{t.volunteerInvite.titleTrail}</span>
+              <strong>{t.volunteerInvite.titleStrong}</strong>
             </h2>
             <p>{t.volunteerInvite.intro}</p>
             <div className="volunteer-actions">
@@ -438,7 +438,6 @@ export default function Home() {
                     <Icon />
                   </span>
                   <h3>{role.title}</h3>
-                  <span className="volunteer-role-badge">{role.badge}</span>
                   <p>{role.description}</p>
                   <Button
                     href={`/join?role=${encodeURIComponent(role.value)}`}

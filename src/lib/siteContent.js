@@ -151,9 +151,9 @@ export const copy = {
     volunteerInvite: {
       brandLine: "आफ्नो श्रम दिनुहोस्। आफ्नो समुदाय बनाउनुहोस्।",
       eyebrow: "स्वयंसेवक निम्तो",
-      titleLead: "हामीसँग",
-      titleStrong: "श्रमदान बनाउनुहोस्",
-      titleTrail: "नेपालका लागि",
+      titleLead: "हामी सबै मिली",
+      titleStrong: "श्रमदान गरौँ",
+      titleTrail: "आफ्नो देशका लागि",
       intro:
         "यो समुदायबाट चल्ने मञ्च सबैका लागि खुला छ। आफ्नो सीप, समय वा सम्पर्क प्रयोग गरेर टोली बनाउनुहोस्, भूमिका लिनुहोस्, र स्थानीय परिवर्तन सुरु गर्नुहोस्।",
       primaryCta: "स्वयंसेवक बन्नुहोस्",
@@ -166,34 +166,34 @@ export const copy = {
       goal: {
         title: "हाम्रो लक्ष्य: समुदायले नेतृत्व गर्ने",
         body:
-          "हामी यस्तो आधार बनाउँदैछौं जहाँ समुदायले कार्यक्रम चलाउन, निर्णय लिन र परिणामको जिम्मेवारी लिन सकोस्।"
+          "हामी यस्तो आधार बनाउँदैछौं जहाँ समुदायले कार्यक्रम चलाउन, निर्णय लिन र परिणामको जिम्मेवारी लिन सकून्।"
       },
       roles: [
         {
           id: "frontend",
           value: "FRONTEND_DEVELOPER",
-          title: "अग्रभाग विकासकर्ता",
+          title: "फ्रन्टएन्ड डेभलपर",
           badge: "१ स्वयंसेवक",
           description: "वेब पृष्ठ, अन्तरक्रिया र प्रयोगकर्ता अनुभव बनाउन साथ दिनुहोस्।"
         },
         {
           id: "backend",
           value: "BACKEND_DEVELOPER",
-          title: "पछाडिको प्रणाली विकासकर्ता",
+          title: "ब्याकएन्ड डेभलपर",
           badge: "१ स्वयंसेवक",
           description: "सुरक्षित सेवा, तथ्याङ्क भण्डारण र प्रणाली संरचनामा योगदान गर्नुहोस्।"
         },
         {
           id: "uiux",
           value: "UI_UX_DESIGNER",
-          title: "अनुभव तथा रूपरेखा डिजाइनर",
+          title: "यूआई/यूएक्स डिजाइनर",
           badge: "१ स्वयंसेवक",
           description: "प्रयोगकर्ता अनुभव, रूपरेखा र डिजाइन प्रणाली सुधार्नुहोस्।"
         },
         {
           id: "graphics",
           value: "GRAPHICS_DESIGNER",
-          title: "दृश्य सामग्री डिजाइनर",
+          title: "ग्राफिक्स डिजाइनर",
           badge: "१ स्वयंसेवक",
           description: "पहिचान, दृश्य सामग्री, चित्रण र अभियान सामग्री बनाउनुहोस्।"
         },
@@ -214,43 +214,43 @@ export const copy = {
         {
           id: "donors",
           value: "DONOR",
-          title: "सहयोगदाता",
+          title: "आर्थिक सहयोगदाता",
           badge: "हरेक योगदान महत्त्वपूर्ण",
           description: "आर्थिक सहयोगमार्फत वास्तविक सामुदायिक परिवर्तन सम्भव बनाउनुहोस्।"
         },
         {
           id: "leaders",
           value: "COMMUNITY_MANAGER",
-          title: "समुदाय नेतृत्वकर्ता",
+          title: "सामुदायिक नेतृत्वकर्ता",
           badge: "स्थानीय परिवर्तनका अगुवा",
           description: "आफ्नो ठाउँमा कार्यक्रम मिलाउनुहोस् र मानिसहरू जोड्नुहोस्।"
         }
       ]
     },
     resources: {
-      eyebrow: "Open sources",
+      eyebrow: "खुला स्रोतहरू",
       title: "खुला विकास सामग्री",
-      intro: "Shramdan को mission, walkthrough, documents र source code सबै सार्वजनिक छन्। हेर्नुस्, सिक्नुस्, अनि चाहिँदा contribution पठाउनुस्.",
+      intro: "श्रमदानको उद्देश्य, विकास यात्रा, कागजात र स्रोत कोड सबै सार्वजनिक छन्। हेर्नुहोस्, सिक्नुहोस्, समीक्षा गर्नुहोस्, र चाहिँदा योगदान पठाउनुहोस्।",
       items: [
         {
           id: "presentation",
-          title: "Livestream Presentation Slides",
-          description: "Mission र पूरा development walkthrough समेटिएका presentation slides.",
-          button: "Slides खोल्नुहोस्",
+          title: "प्रत्यक्ष प्रसारण प्रस्तुति स्लाइडहरू",
+          description: "श्रमदानको उद्देश्य र पूरा विकास यात्रालाई समेटिएका प्रस्तुति स्लाइडहरू।",
+          button: "स्लाइडहरू खोल्नुहोस्",
           href: "https://drive.google.com/drive/folders/19Iuu_W7GRhD9F6qph0A8drKJQlN2UbUy"
         },
         {
           id: "documents",
-          title: "Project Documents",
-          description: "Planning, design, implementation र API reference docs को shared Google Drive folder.",
-          button: "Docs खोल्नुहोस्",
+          title: "परियोजना कागजातहरू",
+          description: "योजना, डिजाइन, कार्यान्वयन र API सन्दर्भ कागजात राखिएको साझा Google Drive folder।",
+          button: "कागजातहरू खोल्नुहोस्",
           href: "https://drive.google.com/drive/folders/1bYVrxNRPnEV1oSeVLKuCaJUlb9Soi1VY"
         },
         {
           id: "github",
-          title: "GitHub Repository",
-          description: "Public source code, issues र contribution history भएको open-source repo.",
-          button: "Repo हेर्नुहोस्",
+          title: "GitHub स्रोत भण्डार",
+          description: "सार्वजनिक स्रोत कोड, समस्या सूची र योगदान इतिहास भएको खुला स्रोत repository।",
+          button: "स्रोत कोड हेर्नुहोस्",
           href: "https://github.com/yantracore/shramdan-web"
         },
         {
@@ -290,9 +290,9 @@ export const copy = {
       submit: "प्रतिक्रिया पठाउनुहोस्"
     },
     placeholders: {
-      joinName: "जस्तै: Muna Gurung",
-      name: "जस्तै: सुस्मिता थापा",
-      email: "susmita@example.com",
+      joinName: "e.g. Muna Gurung",
+      name: "e.g. Muna Gurung",
+      email: "e.g. muna@example.com",
       phone: "+9779800000000",
       role: "भूमिका छान्नुहोस्",
       portfolio: "https://example.com",
@@ -306,16 +306,16 @@ export const copy = {
     },
     options: {
       applicationRoles: [
-        { label: "Frontend Developer", value: "FRONTEND_DEVELOPER" },
-        { label: "Backend Developer", value: "BACKEND_DEVELOPER" },
-        { label: "UI/UX Designer", value: "UI_UX_DESIGNER" },
-        { label: "Graphics Designer", value: "GRAPHICS_DESIGNER" },
-        { label: "Legal", value: "LEGAL" },
-        { label: "Finance", value: "FINANCE" },
-        { label: "Donor", value: "DONOR" },
-        { label: "Community Manager", value: "COMMUNITY_MANAGER" },
-        { label: "Volunteer", value: "VOLUNTEER" },
-        { label: "Other", value: "OTHER" }
+        { label: "फ्रन्टएन्ड डेभलपर", value: "FRONTEND_DEVELOPER" },
+        { label: "ब्याकएन्ड डेभलपर", value: "BACKEND_DEVELOPER" },
+        { label: "यूआई/यूएक्स डिजाइनर", value: "UI_UX_DESIGNER" },
+        { label: "ग्राफिक्स डिजाइनर", value: "GRAPHICS_DESIGNER" },
+        { label: "कानुनी सल्लाहकार", value: "LEGAL" },
+        { label: "वित्तीय सल्लाहकार", value: "FINANCE" },
+        { label: "आर्थिक सहयोगदाता", value: "DONOR" },
+        { label: "सामुदायिक नेतृत्वकर्ता", value: "COMMUNITY_MANAGER" },
+        { label: "भोलन्टियर", value: "VOLUNTEER" },
+        { label: "अदर", value: "OTHER" }
       ],
       feedbackTypes: [
         { label: "सुझाव", value: "SUGGESTION" },
@@ -645,8 +645,8 @@ export const copy = {
     },
     placeholders: {
       joinName: "e.g. Muna Gurung",
-      name: "e.g. Susmita Thapa",
-      email: "susmita@example.com",
+      name: "e.g. Muna Gurung",
+      email: "e.g. muna@example.com",
       phone: "+9779800000000",
       role: "Select a role",
       portfolio: "https://example.com",

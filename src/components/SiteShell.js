@@ -11,6 +11,7 @@ import {
 import { Button, Tooltip } from "antd";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { FaFacebookF, FaTiktok, FaXTwitter, FaYoutube } from "react-icons/fa6";
 import { usePreferences } from "@/app/providers";
 import { copy } from "@/lib/siteContent";
@@ -25,15 +26,18 @@ const socialIcons = {
 export function SiteShell({ children }) {
   const { language, mode, toggleLanguage, toggleMode } = usePreferences();
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
+  const pathname = usePathname();
   const t = copy[language];
+  const activePath = pathname === "/" ? "/" : `/${pathname.split("/").filter(Boolean)[0]}`;
+  const navItems = [
+    { href: "/", label: t.nav.home },
+    { href: "/join", label: t.nav.join },
+    { href: "/feedback", label: t.nav.feedback }
+  ];
   const footerLinks = [
     {
       title: t.footer.columns.quickLinks,
-      links: [
-        { href: "/", label: t.nav.home },
-        { href: "/join", label: t.nav.join },
-        { href: "/feedback", label: t.nav.feedback }
-      ]
+      links: navItems
     },
     {
       title: t.footer.columns.getInvolved,
@@ -86,9 +90,20 @@ export function SiteShell({ children }) {
         </Link>
 
         <nav className="nav-links" aria-label={t.ariaLabels.nav}>
-          <Link href="/">{t.nav.home}</Link>
-          <Link href="/join">{t.nav.join}</Link>
-          <Link href="/feedback">{t.nav.feedback}</Link>
+          {navItems.map((item) => {
+            const isActive = activePath === item.href;
+
+            return (
+              <Link
+                aria-current={isActive ? "page" : undefined}
+                className={isActive ? "is-active" : undefined}
+                href={item.href}
+                key={item.href}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
         </nav>
 
         <div className="toolbar" aria-label={t.ariaLabels.preferences}>
@@ -118,9 +133,20 @@ export function SiteShell({ children }) {
             <MenuOutlined />
           </summary>
           <div className="mobile-menu-panel">
-            <Link href="/">{t.nav.home}</Link>
-            <Link href="/join">{t.nav.join}</Link>
-            <Link href="/feedback">{t.nav.feedback}</Link>
+            {navItems.map((item) => {
+              const isActive = activePath === item.href;
+
+              return (
+                <Link
+                  aria-current={isActive ? "page" : undefined}
+                  className={isActive ? "is-active" : undefined}
+                  href={item.href}
+                  key={item.href}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
             <button type="button" aria-label={t.controls.themeTooltip} title={t.controls.themeTooltip} onClick={toggleMode}>
               {mode === "light" ? t.controls.darkTheme : t.controls.lightTheme}
             </button>
