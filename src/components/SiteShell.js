@@ -107,23 +107,25 @@ export function SiteShell({ children }) {
         </nav>
 
         <div className="toolbar" aria-label={t.ariaLabels.preferences}>
-          <Tooltip title={t.controls.themeTooltip}>
-            <Button
-              aria-label={t.controls.themeTooltip}
-              icon={mode === "light" ? <SunOutlined /> : <MoonOutlined />}
-              onClick={toggleMode}
-            />
-          </Tooltip>
-          <Tooltip title={t.controls.languageTooltip}>
-            <Button
-              aria-label={t.controls.languageTooltip}
-              icon={<TranslationOutlined />}
-              onClick={toggleLanguage}
-            >
-              {t.controls.language}
-            </Button>
-          </Tooltip>
-          <Button type="primary" href="/join" icon={<UserAddOutlined />}>
+          <div className="preference-controls">
+            <Tooltip title={t.controls.themeTooltip}>
+              <Button
+                aria-label={t.controls.themeTooltip}
+                icon={mode === "light" ? <SunOutlined /> : <MoonOutlined />}
+                onClick={toggleMode}
+              />
+            </Tooltip>
+            <Tooltip title={t.controls.languageTooltip}>
+              <Button
+                aria-label={t.controls.languageTooltip}
+                icon={<TranslationOutlined />}
+                onClick={toggleLanguage}
+              >
+                {t.controls.language}
+              </Button>
+            </Tooltip>
+          </div>
+          <Button className="toolbar-cta" type="primary" href="/join" icon={<UserAddOutlined />}>
             {t.nav.join}
           </Button>
         </div>
@@ -147,12 +149,14 @@ export function SiteShell({ children }) {
                 </Link>
               );
             })}
-            <button type="button" aria-label={t.controls.themeTooltip} title={t.controls.themeTooltip} onClick={toggleMode}>
-              {mode === "light" ? t.controls.darkTheme : t.controls.lightTheme}
-            </button>
-            <button type="button" aria-label={t.controls.languageTooltip} title={t.controls.languageTooltip} onClick={toggleLanguage}>
-              {t.controls.language}
-            </button>
+            <div className="mobile-menu-preferences" aria-label={t.ariaLabels.preferences}>
+              <button type="button" aria-label={t.controls.themeTooltip} title={t.controls.themeTooltip} onClick={toggleMode}>
+                {mode === "light" ? t.controls.darkTheme : t.controls.lightTheme}
+              </button>
+              <button type="button" aria-label={t.controls.languageTooltip} title={t.controls.languageTooltip} onClick={toggleLanguage}>
+                {t.controls.language}
+              </button>
+            </div>
           </div>
         </details>
       </header>
