@@ -64,6 +64,8 @@ Expected sections:
 - Donation or material contribution intent.
 - Progress indicators.
 - Organizer notes and practical instructions.
+- Public safety notices when relevant.
+- Leader or admin-only incident controls when authenticated operational views exist.
 
 ### Participation Flow
 
@@ -88,6 +90,21 @@ Expected sections:
 - Volunteers and contribution summary.
 - Fund or material usage summary when applicable.
 - Blog or vlog-style story format.
+
+### Operational Safety View
+
+Purpose: Give event leaders, safety leads, medical professionals, and admins a private place to manage real-world risk.
+
+Expected sections:
+
+- Campaign status and risk level.
+- Safety checklist and permission notes.
+- Incident list with type, severity, status, assignee, and timestamps.
+- Escalation actions for injury, conflict, land permission, weather, flood, theft, or property damage.
+- Notification history and acknowledgement state.
+- Evidence uploads where access control allows it.
+
+This view should not be public by default. Public pages can show general safety notices without exposing sensitive incident details.
 
 ## Responsive Expectations
 

@@ -78,6 +78,34 @@ Expected journey:
 
 The first frontend may represent organizer behavior through campaign status, sample dashboards, or static campaign detail sections.
 
+## Event Safety Lead
+
+An event safety lead watches operational risk before and during a cleanup campaign.
+
+Expected journey:
+
+1. Reviews campaign location, permission notes, weather concerns, and safety checklist.
+2. Confirms whether first-aid or medical support is available.
+3. Receives alerts when an incident is reported.
+4. Assigns or coordinates the right responder.
+5. Pauses, escalates, or resolves the safety state when needed.
+
+Incident details may be private and should not be exposed to public visitors by default.
+
+## Medical Professional
+
+A medical professional or first-aid volunteer helps respond to health and injury cases.
+
+Expected journey:
+
+1. Applies or is assigned as medical support for a campaign.
+2. Confirms whether they can attend the specific event.
+3. Receives injury or health-related incident alerts.
+4. Records or confirms first-aid action when appropriate.
+5. Helps decide whether external care or hospital transfer is needed.
+
+Medical support is availability-based. The app should not imply guaranteed medical coverage unless a qualified person is confirmed for that campaign.
+
 ## Nearby Resident
 
 A nearby resident needs quick local relevance.

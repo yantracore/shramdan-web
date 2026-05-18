@@ -24,6 +24,7 @@ Version 1.0 should include the following visible capabilities:
 - Participation options for labor, time, funds, materials, or logistics.
 - Donation intent UI without requiring a production payment backend in the first frontend version.
 - Notification concept for nearby or interested people, shown as part of the experience.
+- Safety, incident, and escalation concepts for cleanup campaigns where real-world risk may exist.
 - Completion summary with before-and-after evidence, participants, contribution summary, and outcome.
 - Public impact publishing through blog, vlog, story, or result page.
 
@@ -41,6 +42,8 @@ Issues should move through a simple visible lifecycle:
 
 The initial frontend may represent this lifecycle with sample data and clear status labels.
 
+Issue lifecycle status should describe the public product flow only. Do not overload it with safety incidents, medical events, conflict reports, land-permission disputes, weather emergencies, or legal concerns. Those operational concerns should be tracked through the safety and incident model in `docs/08-operational-safety-and-event-model.md`.
+
 ## Contribution Model
 
 Shramdaan should support multiple contribution types:
@@ -50,6 +53,8 @@ Shramdaan should support multiple contribution types:
 - Fund donation intent for expenses such as tools, transport, refreshments, or disposal.
 - Material donation for gloves, bags, tools, cleaning supplies, or other campaign needs.
 - Visibility support through sharing and inviting nearby people.
+- Medical or first-aid support from qualified volunteers when available.
+- Safety, logistics, legal, and documentation support for campaigns that need clearer operational control.
 
 ## Transparency Requirements
 
@@ -76,6 +81,16 @@ The first frontend version should avoid overcommitting to:
 - Government or institutional workflows.
 
 These can be represented as frontend concepts or future-ready placeholders.
+
+## Open Product Decisions
+
+The project still needs explicit decisions before backend implementation:
+
+- Whether the promoted cleanup work is named `Event` or `Campaign` in the backend contract.
+- Whether issue promotion automatically creates an event/campaign record.
+- Which status transitions are automatic, organizer-driven, or admin-only.
+- Which safety incidents should be visible publicly and which must stay private to leaders/admins.
+- Which notification channels are required for urgent incidents: in-app, SMS, phone call escalation, or external manual process.
 
 ## How To Update This Document
 

@@ -30,6 +30,7 @@ Future implementation should:
 - Keep the product fully responsive.
 - Prefer reusable components for issue cards, campaign cards, status tags, progress indicators, contribution options, and story summaries.
 - Keep issue and campaign statuses consistent across pages.
+- Keep normal lifecycle status separate from operational risk, incident, and safety state.
 - Use safe frontend fallbacks for missing images, empty lists, loading states, and unavailable backend behavior.
 - Avoid introducing backend assumptions that are hard to undo.
 - Keep user actions clear even when they are simulated.
@@ -61,6 +62,8 @@ Use a small, consistent set of statuses for version 1.0:
 
 Status tags should stay consistent across cards, detail pages, filters, and story sections.
 
+Do not encode every safety or operational case as another primary lifecycle status. Use a separate incident/risk model for injury, conflict, theft, land-permission, weather, flood, legal, or urgent safety scenarios. See `docs/08-operational-safety-and-event-model.md`.
+
 ## Frontend Interaction Rules
 
 For version 1.0, interactions may be simulated when backend systems are not ready.
@@ -84,6 +87,7 @@ Current API assumptions:
 - Base URL can be configured with `NEXT_PUBLIC_API_BASE_URL`; the current frontend fallback is `https://z0n76c1j-3000.usw3.devtunnels.ms/api/v1`. If an environment value still ends in `/api`, the frontend normalizes it to `/api/v1`.
 - Public form submissions should map to `/applications` and `/feedback`.
 - Auth and admin routes require bearer token handling; do not build admin flows until frontend token storage, request attachment, and protected-route behavior are explicitly scoped.
+- Event/campaign, incident, role assignment, and notification APIs are not yet finalized. When they arrive, align implementation with `docs/08-operational-safety-and-event-model.md` before wiring UI behavior.
 - Keep existing simulated form behavior as a graceful fallback while API integration is incomplete or unavailable.
 
 ## Documentation Rules For Future Threads
@@ -97,6 +101,7 @@ Before implementing Shramdaan work, future threads should read:
 - `docs/05-design-language-guide.md` for tone and UI direction.
 - `docs/06-implementation-notes.md` for technical guardrails.
 - `docs/07-api-reference.md` for backend endpoint contracts.
+- `docs/08-operational-safety-and-event-model.md` for event/campaign modeling, safety incidents, roles, risk levels, and notification planning.
 
 When product behavior changes, update the relevant document in the same change.
 
