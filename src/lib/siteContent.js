@@ -241,10 +241,10 @@ export const copy = {
         },
         {
           id: "documents",
-          title: "परियोजना कागजातहरू",
-          description: "योजना, डिजाइन, कार्यान्वयन र API सन्दर्भ कागजात राखिएको साझा Google Drive folder।",
-          button: "कागजातहरू खोल्नुहोस्",
-          href: "https://drive.google.com/drive/folders/1bYVrxNRPnEV1oSeVLKuCaJUlb9Soi1VY"
+          title: "GitHub कागजातहरू",
+          description: "योजना, डिजाइन, कार्यान्वयन, API सन्दर्भ र safety/event model docs source repo मै राखिएका छन्।",
+          button: "GitHub docs खोल्नुहोस्",
+          href: "https://github.com/yantracore/shramdan-web/tree/main/docs"
         },
         {
           id: "github",
@@ -595,10 +595,10 @@ export const copy = {
         },
         {
           id: "documents",
-          title: "Project Documents",
-          description: "Shared Google Drive folder for planning, design, implementation, and API reference docs.",
-          button: "Open docs",
-          href: "https://drive.google.com/drive/folders/1bYVrxNRPnEV1oSeVLKuCaJUlb9Soi1VY"
+          title: "GitHub Documentation",
+          description: "Planning, design, implementation, API reference, and safety/event model docs maintained directly in the source repo.",
+          button: "Open GitHub docs",
+          href: "https://github.com/yantracore/shramdan-web/tree/main/docs"
         },
         {
           id: "github",
