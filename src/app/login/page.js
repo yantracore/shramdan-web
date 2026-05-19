@@ -12,15 +12,15 @@ import { copy } from "@/lib/siteContent";
 
 const loginCopy = {
   np: {
-    title: "Login",
-    intro: "Sign in to continue.",
-    email: "Email address",
-    password: "Password",
-    submit: "Login",
+    title: "लगइन",
+    intro: "अगाडि बढ्न आफ्नो खाता प्रयोग गरेर लगइन गर्नुहोस्।",
+    email: "इमेल ठेगाना",
+    password: "पासवर्ड",
+    submit: "लगइन",
     required: "यो विवरण आवश्यक छ।",
-    emailInvalid: "कृपया सही email address लेख्नुहोस्।",
-    success: "Login successful.",
-    adminOnly: "Admin access only."
+    emailInvalid: "कृपया सही इमेल ठेगाना लेख्नुहोस्।",
+    success: "लगइन सफल भयो।",
+    adminOnly: "यो भाग admin का लागि मात्र हो।"
   },
   en: {
     title: "Login",

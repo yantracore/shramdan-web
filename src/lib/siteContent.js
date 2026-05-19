@@ -5,7 +5,7 @@ export const copy = {
       home: "गृहपृष्ठ",
       join: "जोडिनुहोस्",
       feedback: "प्रतिक्रिया",
-      login: "Login"
+      login: "लगइन"
     },
     ariaLabels: {
       home: "श्रमदान गृहपृष्ठ",
