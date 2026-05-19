@@ -12,6 +12,25 @@ The website should show how community action moves from problem discovery to com
 
 ## Primary Pages
 
+### Route Architecture
+
+Version 1.0 separates the public website from authenticated internal tools:
+
+- `/` remains the public introduction and mission homepage.
+- `/join` remains the public contributor application form.
+- `/feedback` remains the public feedback form.
+- `/login` is the shared authentication entry point for internal tools.
+- `/admin` is the protected admin control center.
+- `/app` is reserved for a future authenticated user/PWA-style web shell.
+
+After login, admin users should be redirected to `/admin`. Non-admin users should
+see an admin-access-required state until the future `/app` experience is built.
+
+The first admin control center module should manage participation applications.
+Feedback management follows as the second admin module. Issue, event, incident,
+role assignment, and notification administration should wait until those backend
+contracts are finalized.
+
 ### Public Home
 
 Purpose: Introduce Shramdaan and guide people into active issues, campaigns, and completed impact.
@@ -122,6 +141,11 @@ The website should be structured so future mobile app work can reuse the same pr
 - Contribution options.
 - Impact story structure.
 - Location-aware discovery.
+
+The mobile app and authenticated web surfaces should share the same API contracts,
+domain models, and permission rules. The public website can include introduction
+and mission content that the mobile app does not need, because mobile app users
+are expected to arrive with stronger product intent.
 
 ## How To Update This Document
 
