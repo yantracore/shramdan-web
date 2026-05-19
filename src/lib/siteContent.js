@@ -12,7 +12,7 @@ export const copy = {
       preferences: "वेबसाइट प्राथमिकताहरू",
       toggleTheme: "थिम बदल्नुहोस्",
       openMenu: "नेभिगेसन खोल्नुहोस्",
-      launchNote: "प्रक्षेपण सूचना"
+      heroPanel: "श्रमदान कार्य केन्द्र"
     },
     controls: {
       language: "English",
@@ -26,26 +26,35 @@ export const copy = {
       title: "श्रमदान",
       subtitle: "हाम्रो श्रम, हाम्रो समाज, हाम्रो भविष्य।",
       support: "देशका हरेक समस्या सरकारको प्रतीक्षा गरेर समाधान हुँदैन। हामी नागरिकहरू आफैं मिलेर सरसफाइ, मर्मत, वृक्षारोपण, टोल सुधार जस्ता आधारभूत काम अघि बढाउन सक्छौँ। श्रमदान त्यही सामूहिक जिम्मेवारीको सुरुवात हो। साना साना हातहरू मिलेर ठूला परिवर्तन सम्भव हुन्छ। आज हाम्रो श्रमदान, भोलि सुन्दर समाजको निर्माण।",
-      launch: "उद्घाटन",
       join: "योगदान गर्नुहोस्"
     },
-    panel: {
-      countdown: {
-        title: "उद्घाटनसम्म बाँकी",
-        body: "भोलि दिउँसो १२:१५ मा श्रमदान सार्वजनिक रूपमा खुल्दैछ।"
-      },
-      countdownLabel: "उद्घाटन countdown",
-      target: "१५ मे २०२६, १२:१५ PM नेपाल समय",
-      units: {
-        days: "दिन",
-        hours: "घण्टा",
-        minutes: "मिनेट",
-        seconds: "सेकेन्ड"
-      },
-      launched: {
-        title: "श्रमदान उद्घाटन भयो",
-        body: "अब अभियान योगदान, प्रतिक्रिया र सहकार्यका लागि खुला छ।"
-      }
+    heroPanel: {
+      kicker: "अब गर्ने काम",
+      title: "समुदायबाट सुरु हुने काममा जोडिनुहोस्",
+      body:
+        "श्रमदान अब योगदान, सुझाव र खुला सहकार्यका लागि तयार छ। तपाईंको सीप, समय वा स्थानीय जानकारीले अर्को सफाइ अभियानलाई अगाडि बढाउन सक्छ।",
+      primaryCta: "स्वयंसेवक बन्नुहोस्",
+      secondaryCta: "सुझाव दिनुहोस्",
+      phaseLabel: "पहिलो चरण",
+      phaseValue: "समुदायिक सरसफाइ",
+      resourcesLabel: "श्रमदान उपयोगी लिंकहरू",
+      resources: [
+        {
+          id: "documents",
+          title: "कार्य योजना र docs",
+          label: "प्रक्रिया, API र implementation notes"
+        },
+        {
+          id: "github",
+          title: "Open-source repo",
+          label: "Code हेर्नुहोस् वा योगदान गर्नुहोस्"
+        },
+        {
+          id: "apiDocs",
+          title: "API docs",
+          label: "Frontend/backend integration reference"
+        }
+      ]
     },
     cleanupAreas: {
       eyebrow: "के सफा गर्ने?",
@@ -366,7 +375,7 @@ export const copy = {
       preferences: "Site preferences",
       toggleTheme: "Toggle theme",
       openMenu: "Open navigation",
-      launchNote: "Launch note"
+      heroPanel: "Shramdan action hub"
     },
     controls: {
       language: "नेपाली",
@@ -380,26 +389,35 @@ export const copy = {
       title: "Shramdan",
       subtitle: "Our labor, our society, our future.",
       support: "Not every problem in the country will be solved by waiting for the government. As citizens, we can come together to move basic work forward ourselves, from cleanups and repairs to tree planting and neighborhood improvement. Shramdan is the beginning of that shared responsibility. Small hands together can make big change possible. Our Shramdan today builds a better society tomorrow.",
-      launch: "Inaugurate",
       join: "Contribute"
     },
-    panel: {
-      countdown: {
-        title: "Countdown to inauguration",
-        body: "Shramdan opens publicly tomorrow at 12:15 PM Nepal time."
-      },
-      countdownLabel: "Inauguration countdown",
-      target: "May 15, 2026, 12:15 PM Nepal time",
-      units: {
-        days: "Days",
-        hours: "Hours",
-        minutes: "Minutes",
-        seconds: "Seconds"
-      },
-      launched: {
-        title: "Shramdan is inaugurated",
-        body: "The campaign is now open for contribution, feedback, and collaboration."
-      }
+    heroPanel: {
+      kicker: "What to do now",
+      title: "Join the work that starts with community",
+      body:
+        "Shramdan is now open for contribution, feedback, and collaboration. Your skill, time, or local knowledge can help move the next cleanup forward.",
+      primaryCta: "Become a volunteer",
+      secondaryCta: "Share feedback",
+      phaseLabel: "Current phase",
+      phaseValue: "Community cleanup",
+      resourcesLabel: "Useful Shramdan links",
+      resources: [
+        {
+          id: "documents",
+          title: "Plans and docs",
+          label: "Process, API, and implementation notes"
+        },
+        {
+          id: "github",
+          title: "Open-source repo",
+          label: "Review code or contribute"
+        },
+        {
+          id: "apiDocs",
+          title: "API docs",
+          label: "Frontend/backend integration reference"
+        }
+      ]
     },
     cleanupAreas: {
       eyebrow: "What we clean",

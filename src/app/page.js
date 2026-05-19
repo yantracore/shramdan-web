@@ -24,28 +24,9 @@ import {
 } from "@ant-design/icons";
 import { Button } from "antd";
 import Image from "next/image";
-import Confetti from "react-confetti";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
 import { copy } from "@/lib/siteContent";
-
-const LAUNCH_STORAGE_KEY = "shramdan-inaugurated";
-const LAUNCH_DURATION_MS = 5600;
-const INAUGURATION_AT = new Date("2026-05-15T12:15:00+05:45").getTime();
-const IS_PRODUCTION = process.env.NODE_ENV === "production";
-
-const getCountdownParts = (remainingMs) => {
-  const totalSeconds = Math.max(0, Math.floor(remainingMs / 1000));
-  const days = Math.floor(totalSeconds / 86400);
-  const hours = Math.floor((totalSeconds % 86400) / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
-
-  return { days, hours, minutes, seconds };
-};
-
-const formatCountdownValue = (value) => String(value).padStart(2, "0");
 
 const resourceIcons = {
   apiDocs: ApiOutlined,
@@ -85,162 +66,20 @@ const workflowStepIcons = {
 export default function Home() {
   const { language } = usePreferences();
   const t = copy[language];
-  const heroRef = useRef(null);
-  const launchTimerRef = useRef(null);
-  const [hasInaugurated, setHasInaugurated] = useState(false);
-  const [isLaunching, setIsLaunching] = useState(false);
-  const [hasAutoLaunched, setHasAutoLaunched] = useState(false);
-  const [launchRun, setLaunchRun] = useState(0);
-  const [heroSize, setHeroSize] = useState({ width: 0, height: 0 });
-  const [viewportWidth, setViewportWidth] = useState(0);
-  const [reduceMotion, setReduceMotion] = useState(false);
-  const [now, setNow] = useState(null);
+  const featuredResources = t.heroPanel.resources.map((resource) => {
+    const item = t.resources.items.find((candidate) => candidate.id === resource.id);
+    const Icon = resourceIcons[resource.id] ?? FileTextOutlined;
 
-  const triggerLaunch = useCallback(() => {
-    setHasAutoLaunched(true);
-
-    if (IS_PRODUCTION) {
-      setHasInaugurated(true);
-
-      try {
-        window.localStorage.setItem(LAUNCH_STORAGE_KEY, "true");
-      } catch {
-        // The launch should still feel complete even if storage is unavailable.
-      }
-    }
-
-    if (reduceMotion) {
-      return;
-    }
-
-    setLaunchRun((current) => current + 1);
-    setIsLaunching(true);
-    if (launchTimerRef.current) {
-      window.clearTimeout(launchTimerRef.current);
-    }
-
-    launchTimerRef.current = window.setTimeout(() => {
-      setIsLaunching(false);
-    }, LAUNCH_DURATION_MS);
-  }, [reduceMotion]);
-
-  useEffect(() => {
-    if (!IS_PRODUCTION) {
-      return undefined;
-    }
-
-    const storageTimer = window.setTimeout(() => {
-      try {
-        setHasInaugurated(window.localStorage.getItem(LAUNCH_STORAGE_KEY) === "true");
-      } catch {
-        setHasInaugurated(false);
-      }
-    }, 0);
-
-    return () => window.clearTimeout(storageTimer);
-  }, []);
-
-  useEffect(() => {
-    if (!heroRef.current) {
-      return undefined;
-    }
-
-    const updateHeroSize = () => {
-      const rect = heroRef.current.getBoundingClientRect();
-      setHeroSize({ width: rect.width, height: rect.height });
+    return {
+      ...resource,
+      href: resource.href ?? item?.href ?? "#",
+      Icon
     };
-
-    updateHeroSize();
-    const observer = new ResizeObserver(updateHeroSize);
-    observer.observe(heroRef.current);
-
-    return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
-    const updateViewportWidth = () => setViewportWidth(window.innerWidth);
-
-    updateViewportWidth();
-    window.addEventListener("resize", updateViewportWidth);
-
-    return () => window.removeEventListener("resize", updateViewportWidth);
-  }, []);
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const syncMotionPreference = () => setReduceMotion(mediaQuery.matches);
-
-    syncMotionPreference();
-    mediaQuery.addEventListener("change", syncMotionPreference);
-
-    return () => mediaQuery.removeEventListener("change", syncMotionPreference);
-  }, []);
-
-  useEffect(() => {
-    const syncCountdown = () => {
-      const currentTime = Date.now();
-
-      setNow(currentTime);
-
-      if (currentTime >= INAUGURATION_AT && !hasInaugurated && !hasAutoLaunched) {
-        triggerLaunch();
-      }
-    };
-
-    const initialTimer = window.setTimeout(syncCountdown, 0);
-    const interval = window.setInterval(syncCountdown, 1000);
-
-    return () => {
-      window.clearTimeout(initialTimer);
-      window.clearInterval(interval);
-    };
-  }, [hasAutoLaunched, hasInaugurated, triggerLaunch]);
-
-  useEffect(
-    () => () => {
-      if (launchTimerRef.current) {
-        window.clearTimeout(launchTimerRef.current);
-      }
-    },
-    []
-  );
-
-  const hasCountdownEnded = now !== null && now >= INAUGURATION_AT;
-  const remainingMs = now === null ? 0 : Math.max(0, INAUGURATION_AT - now);
-  const countdown = useMemo(() => getCountdownParts(remainingMs), [remainingMs]);
-  const panel = hasCountdownEnded || hasInaugurated ? t.panel.launched : t.panel.countdown;
-  const countdownItems = [
-    { key: "days", value: countdown.days, label: t.panel.units.days },
-    { key: "hours", value: countdown.hours, label: t.panel.units.hours },
-    { key: "minutes", value: countdown.minutes, label: t.panel.units.minutes },
-    { key: "seconds", value: countdown.seconds, label: t.panel.units.seconds }
-  ];
+  });
 
   return (
     <SiteShell>
-      <section
-        id="top"
-        ref={heroRef}
-        className={`hero-section${isLaunching ? " is-launching" : ""}${
-          hasInaugurated ? " has-inaugurated" : ""
-        }`}
-      >
-        {isLaunching && viewportWidth > 0 && heroSize.height > 0 ? (
-          <Confetti
-            key={launchRun}
-            className="hero-confetti"
-            width={Math.round(viewportWidth)}
-            height={Math.round(heroSize.height)}
-            numberOfPieces={1080}
-            recycle={false}
-            gravity={0.23}
-            wind={0.02}
-            initialVelocityX={14}
-            initialVelocityY={28}
-            tweenDuration={LAUNCH_DURATION_MS}
-            colors={["#176b5c", "#e75f1b", "#f5b642", "#5cbf9f", "#f8fff8", "#ffcf70"]}
-          />
-        ) : null}
+      <section id="top" className="hero-section">
         <div className="hero-copy">
           {t.hero.eyebrow ? <span className="eyebrow">{t.hero.eyebrow}</span> : null}
           <h1>{t.hero.title}</h1>
@@ -252,30 +91,36 @@ export default function Home() {
             </Button>
           </div>
         </div>
-        <aside className="hero-panel glass-panel" aria-label={t.ariaLabels.launchNote} aria-live="polite">
-          {isLaunching ? (
-            <span className="launch-burst" aria-hidden="true">
-              <span />
-              <span />
-              <span />
-              <span />
-            </span>
-          ) : null}
-          <h2>{panel.title}</h2>
-          {now !== null && !hasCountdownEnded && !hasInaugurated ? (
-            <div className="countdown-grid" aria-label={t.panel.countdownLabel}>
-              {countdownItems.map((item) => (
-                <span className="countdown-item" key={item.key}>
-                  <strong>{formatCountdownValue(item.value)}</strong>
-                  <span>{item.label}</span>
+        <aside className="hero-panel glass-panel" aria-label={t.ariaLabels.heroPanel}>
+          <span className="hero-panel-kicker">{t.heroPanel.kicker}</span>
+          <h2>{t.heroPanel.title}</h2>
+          <p>{t.heroPanel.body}</p>
+          <div className="hero-panel-actions">
+            <Button type="primary" href="/join" icon={<HeartOutlined />}>
+              {t.heroPanel.primaryCta}
+            </Button>
+            <Button href="/feedback" icon={<ArrowRightOutlined />}>
+              {t.heroPanel.secondaryCta}
+            </Button>
+          </div>
+          <div className="hero-panel-phase">
+            <span>{t.heroPanel.phaseLabel}</span>
+            <strong>{t.heroPanel.phaseValue}</strong>
+          </div>
+          <div className="hero-panel-links" aria-label={t.heroPanel.resourcesLabel}>
+            {featuredResources.map(({ Icon, href, id, label, title }) => (
+              <a href={href} key={id} rel="noreferrer" target="_blank">
+                <span className="hero-panel-link-icon" aria-hidden="true">
+                  <Icon />
                 </span>
-              ))}
-            </div>
-          ) : null}
-          <p>{panel.body}</p>
-          {now !== null && !hasCountdownEnded && !hasInaugurated ? (
-            <span className="countdown-target">{t.panel.target}</span>
-          ) : null}
+                <span>
+                  <strong>{title}</strong>
+                  <small>{label}</small>
+                </span>
+                <ArrowRightOutlined aria-hidden="true" />
+              </a>
+            ))}
+          </div>
         </aside>
       </section>
 
