@@ -1409,6 +1409,68 @@
   font-weight: 800;
 }
 
+.login-section {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.42fr) minmax(320px, 0.58fr);
+  gap: 34px;
+  align-items: start;
+  min-height: 70vh;
+}
+
+.login-heading {
+  position: sticky;
+  top: 112px;
+}
+
+.login-security-note {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+  margin-top: 24px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--surface) 78%, transparent);
+  color: var(--muted);
+}
+
+.login-security-note .anticon {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border-radius: 8px;
+  background: var(--primary);
+  color: #ffffff;
+  font-size: 18px;
+}
+
+.login-security-note strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--text);
+}
+
+.login-security-note p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.login-card {
+  display: grid;
+  gap: 18px;
+}
+
+.login-card .ant-form-item-label > label {
+  font-weight: 800;
+}
+
+.login-actions {
+  display: grid;
+  gap: 10px;
+}
+
 .wide-field {
   grid-column: 1 / -1;
 }
@@ -1560,8 +1622,13 @@
 
   .hero-section,
   .volunteer-invite-section,
-  .form-section {
+  .form-section,
+  .login-section {
     grid-template-columns: 1fr;
+  }
+
+  .login-heading {
+    position: static;
   }
 
   .core-idea-hero {
