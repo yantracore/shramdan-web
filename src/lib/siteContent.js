@@ -4,7 +4,8 @@ export const copy = {
     nav: {
       home: "गृहपृष्ठ",
       join: "जोडिनुहोस्",
-      feedback: "प्रतिक्रिया"
+      feedback: "प्रतिक्रिया",
+      login: "Login"
     },
     ariaLabels: {
       home: "श्रमदान गृहपृष्ठ",
@@ -365,7 +366,8 @@ export const copy = {
     nav: {
       home: "Home",
       join: "Join",
-      feedback: "Feedback"
+      feedback: "Feedback",
+      login: "Login"
     },
     ariaLabels: {
       home: "Shramdan home",

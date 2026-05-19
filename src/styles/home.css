@@ -1422,41 +1422,6 @@
   top: 112px;
 }
 
-.login-security-note {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 12px;
-  align-items: start;
-  margin-top: 24px;
-  padding: 16px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: color-mix(in srgb, var(--surface) 78%, transparent);
-  color: var(--muted);
-}
-
-.login-security-note .anticon {
-  display: grid;
-  width: 38px;
-  height: 38px;
-  place-items: center;
-  border-radius: 8px;
-  background: var(--primary);
-  color: #ffffff;
-  font-size: 18px;
-}
-
-.login-security-note strong {
-  display: block;
-  margin-bottom: 4px;
-  color: var(--text);
-}
-
-.login-security-note p {
-  margin: 0;
-  line-height: 1.6;
-}
-
 .login-card {
   display: grid;
   gap: 18px;

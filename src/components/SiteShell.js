@@ -32,7 +32,8 @@ export function SiteShell({ children }) {
   const navItems = [
     { href: "/", label: t.nav.home },
     { href: "/join", label: t.nav.join },
-    { href: "/feedback", label: t.nav.feedback }
+    { href: "/feedback", label: t.nav.feedback },
+    { href: "/login", label: t.nav.login }
   ];
   const footerLinks = [
     {
