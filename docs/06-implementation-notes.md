@@ -84,7 +84,7 @@ Use `docs/07-api-reference.md` as the source of truth for backend endpoint contr
 
 Current API assumptions:
 
-- Base URL can be configured with `NEXT_PUBLIC_API_BASE_URL`; the current frontend fallback is `https://z0n76c1j-3000.usw3.devtunnels.ms/api/v1`. If an environment value still ends in `/api`, the frontend normalizes it to `/api/v1`.
+- Base URL can be configured with `NEXT_PUBLIC_API_BASE_URL`; the current frontend fallback is `https://backend.shramdan.org/api/v1`. If an environment value still ends in `/api`, the frontend normalizes it to `/api/v1`.
 - Public form submissions should map to `/applications` and `/feedback`.
 - Auth and admin routes are now scoped for version 1.0. Use `/login` as the authentication entry point, store `accessToken` plus a minimal `user` object in `localStorage`, attach `Authorization: Bearer <accessToken>` to protected requests, and clear the session on `INVALID_TOKEN` or `AUTH_REQUIRED`.
 - Route authenticated admins to `/admin`. If the logged-in user is not `role === "ADMIN"`, show an admin-access-required state until the future `/app` route is implemented for normal authenticated users.
