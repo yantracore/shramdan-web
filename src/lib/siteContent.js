@@ -29,12 +29,12 @@ export const copy = {
       join: "योगदान गर्नुहोस्"
     },
     heroPanel: {
-      kicker: "अब गर्ने काम",
-      title: "समुदायबाट सुरु हुने काममा जोडिनुहोस्",
+      kicker: "अब बनाउने काम",
+      title: "श्रमदान गरेर Shramdan App बनाऔँ",
       body:
-        "श्रमदान अब योगदान, सुझाव र खुला सहकार्यका लागि तयार छ। तपाईंको सीप, समय वा स्थानीय जानकारीले अर्को सफाइ अभियानलाई अगाडि बढाउन सक्छ।",
-      phaseLabel: "पहिलो चरण",
-      phaseValue: "समुदायिक सरसफाइ",
+        "श्रमदान अहिले app-building चरणमा छ। आफ्नो समय, सीप, विचार र समन्वय दिएर platform आफैं निर्माण गर्न योगदान गर्न सकिन्छ।",
+      phaseLabel: "हालको चरण",
+      phaseValue: "श्रमदानमार्फत Shramdan App निर्माण",
       resourcesLabel: "श्रमदान उपयोगी लिंकहरू",
       resources: [
         {
@@ -390,12 +390,12 @@ export const copy = {
       join: "Contribute"
     },
     heroPanel: {
-      kicker: "What to do now",
-      title: "Join the work that starts with community",
+      kicker: "What to build now",
+      title: "Build the Shramdan App with shramdan",
       body:
-        "Shramdan is now open for contribution, feedback, and collaboration. Your skill, time, or local knowledge can help move the next cleanup forward.",
+        "Shramdan is now in its app-building phase. Contributors can donate their time, skill, ideas, and coordination to help shape the platform itself.",
       phaseLabel: "Current phase",
-      phaseValue: "Community cleanup",
+      phaseValue: "Building Shramdan App with shramdan",
       resourcesLabel: "Useful Shramdan links",
       resources: [
         {
