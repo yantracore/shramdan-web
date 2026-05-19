@@ -95,14 +95,6 @@ export default function Home() {
           <span className="hero-panel-kicker">{t.heroPanel.kicker}</span>
           <h2>{t.heroPanel.title}</h2>
           <p>{t.heroPanel.body}</p>
-          <div className="hero-panel-actions">
-            <Button type="primary" href="/join" icon={<HeartOutlined />}>
-              {t.heroPanel.primaryCta}
-            </Button>
-            <Button href="/feedback" icon={<ArrowRightOutlined />}>
-              {t.heroPanel.secondaryCta}
-            </Button>
-          </div>
           <div className="hero-panel-phase">
             <span>{t.heroPanel.phaseLabel}</span>
             <strong>{t.heroPanel.phaseValue}</strong>

@@ -375,12 +375,6 @@
   margin: 0;
 }
 
-.hero-panel-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
 .hero-panel-phase {
   display: grid;
   gap: 5px;
@@ -1877,7 +1871,6 @@
     padding: 18px;
   }
 
-  .hero-panel-actions .ant-btn,
   .hero-panel-links a {
     width: 100%;
   }

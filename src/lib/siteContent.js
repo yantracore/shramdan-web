@@ -33,8 +33,6 @@ export const copy = {
       title: "समुदायबाट सुरु हुने काममा जोडिनुहोस्",
       body:
         "श्रमदान अब योगदान, सुझाव र खुला सहकार्यका लागि तयार छ। तपाईंको सीप, समय वा स्थानीय जानकारीले अर्को सफाइ अभियानलाई अगाडि बढाउन सक्छ।",
-      primaryCta: "स्वयंसेवक बन्नुहोस्",
-      secondaryCta: "सुझाव दिनुहोस्",
       phaseLabel: "पहिलो चरण",
       phaseValue: "समुदायिक सरसफाइ",
       resourcesLabel: "श्रमदान उपयोगी लिंकहरू",
@@ -396,8 +394,6 @@ export const copy = {
       title: "Join the work that starts with community",
       body:
         "Shramdan is now open for contribution, feedback, and collaboration. Your skill, time, or local knowledge can help move the next cleanup forward.",
-      primaryCta: "Become a volunteer",
-      secondaryCta: "Share feedback",
       phaseLabel: "Current phase",
       phaseValue: "Community cleanup",
       resourcesLabel: "Useful Shramdan links",
