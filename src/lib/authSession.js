@@ -79,6 +79,20 @@ export function clearAuthSession() {
   emitSessionChange();
 }
 
+export function subscribeAuthSession(callback) {
+  if (typeof window === "undefined") {
+    return () => {};
+  }
+
+  window.addEventListener(AUTH_SESSION_EVENT, callback);
+  window.addEventListener("storage", callback);
+
+  return () => {
+    window.removeEventListener(AUTH_SESSION_EVENT, callback);
+    window.removeEventListener("storage", callback);
+  };
+}
+
 export function getStoredAccessToken() {
   return getAuthSession()?.accessToken ?? null;
 }
