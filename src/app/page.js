@@ -200,7 +200,7 @@ export default function Home() {
                   <Image
                     alt={area.imageAlt}
                     fill
-                    sizes="(max-width: 700px) calc(100vw - 56px), (max-width: 1180px) 30vw, 180px"
+                    sizes="(max-width: 620px) calc(100vw - 56px), (max-width: 1180px) 30vw, 380px"
                     src={area.image}
                   />
                 </div>
