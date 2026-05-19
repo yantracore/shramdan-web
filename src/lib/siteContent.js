@@ -265,7 +265,7 @@ export const copy = {
           title: "API Documentation",
           description: "Backend API endpoints, request formats र testing references भएको सार्वजनिक API documentation।",
           button: "API docs खोल्नुहोस्",
-          href: "https://z0n76c1j-3000.usw3.devtunnels.ms/api-docs/"
+          href: "https://backend.shramdan.org/api-docs/"
         }
       ]
     },
@@ -626,7 +626,7 @@ export const copy = {
           title: "API Documentation",
           description: "Public API docs for backend endpoints, request formats, and testing references.",
           button: "Open API docs",
-          href: "https://z0n76c1j-3000.usw3.devtunnels.ms/api-docs/"
+          href: "https://backend.shramdan.org/api-docs/"
         }
       ]
     },
