@@ -15,7 +15,9 @@ const loginCopy = {
     title: "लगइन",
     intro: "अगाडि बढ्न आफ्नो खाता प्रयोग गरेर लगइन गर्नुहोस्।",
     email: "इमेल ठेगाना",
+    emailPlaceholder: "इमेल",
     password: "पासवर्ड",
+    passwordPlaceholder: "पासवर्ड",
     submit: "लगइन",
     required: "यो विवरण आवश्यक छ।",
     emailInvalid: "कृपया सही इमेल ठेगाना लेख्नुहोस्।",
@@ -26,7 +28,9 @@ const loginCopy = {
     title: "Login",
     intro: "Sign in to continue.",
     email: "Email address",
+    emailPlaceholder: "Email",
     password: "Password",
+    passwordPlaceholder: "Password",
     submit: "Login",
     required: "This field is required.",
     emailInvalid: "Please enter a valid email address.",
@@ -93,7 +97,7 @@ export default function LoginPage() {
                 { type: "email", message: t.emailInvalid }
               ]}
             >
-              <Input autoComplete="email" prefix={<MailOutlined />} />
+              <Input autoComplete="email" placeholder={t.emailPlaceholder} prefix={<MailOutlined />} />
             </Form.Item>
 
             <Form.Item
@@ -101,7 +105,11 @@ export default function LoginPage() {
               name="password"
               rules={[{ required: true, message: t.required }]}
             >
-              <Input.Password autoComplete="current-password" prefix={<LockOutlined />} />
+              <Input.Password
+                autoComplete="current-password"
+                placeholder={t.passwordPlaceholder}
+                prefix={<LockOutlined />}
+              />
             </Form.Item>
 
             <div className="login-actions">
