@@ -239,6 +239,11 @@ export const copy = {
       eyebrow: "खुला स्रोतहरू",
       title: "खुला विकास सामग्री",
       intro: "श्रमदानको उद्देश्य, विकास यात्रा, कागजात र स्रोत कोड सबै सार्वजनिक छन्। हेर्नुहोस्, सिक्नुहोस्, समीक्षा गर्नुहोस्, र चाहिँदा योगदान पठाउनुहोस्।",
+      playlist: {
+        title: "Shramdan development playlist",
+        description: "श्रमदानको development walkthrough, livestream र project context यहीँबाट सिधै हेर्न सकिन्छ।",
+        embedUrl: "https://www.youtube-nocookie.com/embed/videoseries?list=PLWkh0s4xHPcTF4FOcYjkdR3i97YbkSDGo"
+      },
       items: [
         {
           id: "presentation",
@@ -601,6 +606,11 @@ export const copy = {
       eyebrow: "Open sources",
       title: "Open Development Resources",
       intro: "Shramdan keeps its mission, walkthrough, documents, and source code public so anyone can learn, review, and contribute.",
+      playlist: {
+        title: "Shramdan development playlist",
+        description: "Watch the Shramdan development walkthrough, livestream, and project context directly from this page.",
+        embedUrl: "https://www.youtube-nocookie.com/embed/videoseries?list=PLWkh0s4xHPcTF4FOcYjkdR3i97YbkSDGo"
+      },
       items: [
         {
           id: "presentation",

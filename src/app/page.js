@@ -16,6 +16,7 @@ import {
   HeartOutlined,
   LineChartOutlined,
   PartitionOutlined,
+  PlayCircleOutlined,
   RocketOutlined,
   ShopOutlined,
   TeamOutlined,
@@ -298,6 +299,27 @@ export default function Home() {
           <h2 id="resources-title">{t.resources.title}</h2>
           <p>{t.resources.intro}</p>
         </div>
+
+        <article className="resources-playlist-card">
+          <div className="resources-playlist-copy">
+            <span className="resource-icon resources-playlist-icon" aria-hidden="true">
+              <PlayCircleOutlined />
+            </span>
+            <div>
+              <h3>{t.resources.playlist.title}</h3>
+              <p>{t.resources.playlist.description}</p>
+            </div>
+          </div>
+          <div className="resources-playlist-frame">
+            <iframe
+              src={t.resources.playlist.embedUrl}
+              title={t.resources.playlist.title}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerPolicy="strict-origin-when-cross-origin"
+              allowFullScreen
+            />
+          </div>
+        </article>
 
         <div className="resources-grid">
           {t.resources.items.map((item) => {
