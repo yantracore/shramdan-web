@@ -24,6 +24,8 @@ function normalizeUser(user) {
     id: user.id,
     email: user.email,
     name: user.name ?? null,
+    username: user.username ?? null,
+    avatar: user.avatar ?? null,
     role: user.role,
     isVerified: Boolean(user.isVerified)
   };

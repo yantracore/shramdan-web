@@ -344,6 +344,65 @@ export const copy = {
       email: "कृपया सही इमेल ठेगाना लेख्नुहोस्।",
       submitError: "पठाउन सकिएन। कृपया फेरि प्रयास गर्नुहोस्।"
     },
+    me: {
+      title: "मेरो प्रोफाइल",
+      intro: "आफ्नो खाताका विवरण हेर्नुहोस् र अद्यावधिक गर्नुहोस्।",
+      navLabel: "मेरो प्रोफाइल",
+      identity: {
+        heading: "खाताका विवरण",
+        intro: "केवल हेर्नका लागि मात्र।",
+        email: "इमेल",
+        phone: "फोन",
+        role: "भूमिका",
+        memberSince: "खाता बनाइएको मिति",
+        verified: "प्रमाणित",
+        notVerified: "अप्रमाणित",
+        oauthBadge: "बाह्य लगइन प्रयोग गरिएको",
+        roleLabels: { USER: "प्रयोगकर्ता", ADMIN: "व्यवस्थापक" },
+        notAvailable: "उपलब्ध छैन"
+      },
+      avatar: {
+        heading: "प्रोफाइल तस्वीर",
+        intro: "JPG, PNG वा WEBP, अधिकतम ५ MB।",
+        change: "तस्वीर परिवर्तन गर्नुहोस्",
+        uploading: "अपलोड हुँदै..."
+      },
+      profile: {
+        heading: "आधारभूत जानकारी",
+        intro: "नाम र युजरनेम अद्यावधिक गर्नुहोस्।",
+        name: "पूरा नाम",
+        username: "युजरनेम",
+        save: "सुरक्षित गर्नुहोस्"
+      },
+      password: {
+        heading: "पासवर्ड परिवर्तन",
+        intro: "सुरक्षाको लागि नियमित अन्तरालमा पासवर्ड बदल्नुहोस्।",
+        current: "हालको पासवर्ड",
+        next: "नयाँ पासवर्ड",
+        confirm: "नयाँ पासवर्ड पुनः लेख्नुहोस्",
+        save: "पासवर्ड बदल्नुहोस्",
+        oauthDisabled: "तपाईंले बाह्य लगइन (Google जस्तो) प्रयोग गरेर खाता खोल्नुभएको छ, त्यसैले यहाँ पासवर्ड परिवर्तन उपलब्ध छैन।"
+      },
+      validation: {
+        required: "यो विवरण आवश्यक छ।",
+        passwordMismatch: "नयाँ पासवर्ड मेल खाँदैन।",
+        passwordTooShort: "पासवर्ड कम्तीमा ८ अक्षरको हुनुपर्छ।",
+        avatarTooLarge: "तस्वीर ५ MB भन्दा सानो हुनुपर्छ।",
+        avatarBadType: "PNG, JPG वा WEBP फाइल मात्र अनुमति छ।"
+      },
+      errors: {
+        usernameTaken: "यो युजरनेम पहिल्यै लिइसकिएको छ।",
+        wrongCurrentPassword: "हालको पासवर्ड मिलेन।",
+        samePassword: "नयाँ पासवर्ड हालकोभन्दा फरक हुनुपर्छ।",
+        loadFailed: "प्रोफाइल लोड गर्न सकिएन।",
+        retry: "फेरि प्रयास गर्नुहोस्"
+      },
+      success: {
+        profileSaved: "प्रोफाइल अद्यावधिक भयो।",
+        avatarSaved: "तस्वीर अद्यावधिक भयो।",
+        passwordChanged: "पासवर्ड बदलियो।"
+      }
+    },
     footer: {
       brand: "श्रमदान",
       ariaLabel: "श्रमदान footer",
@@ -710,6 +769,65 @@ export const copy = {
       required: "This field is required.",
       email: "Please enter a valid email address.",
       submitError: "Could not submit. Please try again."
+    },
+    me: {
+      title: "My profile",
+      intro: "Review and update your account details.",
+      navLabel: "My profile",
+      identity: {
+        heading: "Account details",
+        intro: "Read-only information.",
+        email: "Email",
+        phone: "Phone",
+        role: "Role",
+        memberSince: "Member since",
+        verified: "Verified",
+        notVerified: "Not verified",
+        oauthBadge: "External login",
+        roleLabels: { USER: "User", ADMIN: "Admin" },
+        notAvailable: "Not provided"
+      },
+      avatar: {
+        heading: "Profile photo",
+        intro: "JPG, PNG, or WEBP up to 5 MB.",
+        change: "Change photo",
+        uploading: "Uploading..."
+      },
+      profile: {
+        heading: "Basic information",
+        intro: "Update your name and username.",
+        name: "Full name",
+        username: "Username",
+        save: "Save"
+      },
+      password: {
+        heading: "Change password",
+        intro: "Rotate your password regularly to stay secure.",
+        current: "Current password",
+        next: "New password",
+        confirm: "Confirm new password",
+        save: "Update password",
+        oauthDisabled: "You signed in with an external provider (e.g. Google), so password change is not available here."
+      },
+      validation: {
+        required: "This field is required.",
+        passwordMismatch: "New password and confirmation do not match.",
+        passwordTooShort: "Password must be at least 8 characters.",
+        avatarTooLarge: "Image must be smaller than 5 MB.",
+        avatarBadType: "Only PNG, JPG, or WEBP files are allowed."
+      },
+      errors: {
+        usernameTaken: "This username is already taken.",
+        wrongCurrentPassword: "The current password is incorrect.",
+        samePassword: "New password must differ from the current one.",
+        loadFailed: "Could not load profile.",
+        retry: "Try again"
+      },
+      success: {
+        profileSaved: "Profile updated.",
+        avatarSaved: "Photo updated.",
+        passwordChanged: "Password changed."
+      }
     },
     footer: {
       brand: "Shramdan",

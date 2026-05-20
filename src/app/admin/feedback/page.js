@@ -1,143 +1,74 @@
 "use client";
 
-import { DeleteOutlined, EditOutlined, ReloadOutlined } from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { Button, Empty, Form, Input, Modal, Popconfirm, Select, Table, Tag, message } from "antd";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { AdminResponsiveList } from "@/components/AdminResponsiveList";
 import { AdminShell } from "@/components/AdminShell";
-import { deleteJson, getJson, patchJson } from "@/lib/apiClient";
+import { AdminFilters } from "@/components/admin/AdminFilters";
+import { AdminListCard } from "@/components/admin/AdminListCard";
+import { AdminPanelHeading } from "@/components/admin/AdminPanelHeading";
+import { AdminStatusSelect } from "@/components/admin/AdminStatusSelect";
 import { copy } from "@/lib/siteContent";
-
-const feedbackStatuses = ["NEW", "REVIEWED", "IN_PROGRESS", "RESOLVED", "CLOSED"];
-
-function formatEnum(value) {
-  return value
-    .toLowerCase()
-    .split("_")
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(" ");
-}
-
-function getResponseData(response, fallback) {
-  return response?.data ?? fallback;
-}
+import { FEEDBACK_STATUSES, buildEnumOptions, formatEnum } from "@/lib/adminUtils";
+import { useAdminEditModal } from "@/hooks/useAdminEditModal";
+import { useAdminItemMutation } from "@/hooks/useAdminItemMutation";
+import { useAdminListResource } from "@/hooks/useAdminListResource";
 
 export default function AdminFeedbackPage() {
   const [messageApi, contextHolder] = message.useMessage();
-  const [feedbackItems, setFeedbackItems] = useState([]);
-  const [loadingFeedback, setLoadingFeedback] = useState(false);
-  const [feedbackError, setFeedbackError] = useState("");
-  const [feedbackFilters, setFeedbackFilters] = useState({});
-  const [updatingFeedbackId, setUpdatingFeedbackId] = useState("");
-  const [replyForm] = Form.useForm();
-  const [replyFeedback, setReplyFeedback] = useState(null);
-  const [savingReply, setSavingReply] = useState(false);
+  const {
+    items: feedbackItems,
+    setItems: setFeedbackItems,
+    loading: loadingFeedback,
+    error: feedbackError,
+    filters,
+    setFilter,
+    refetch: fetchFeedback
+  } = useAdminListResource({
+    path: "/feedback",
+    errorMessage: "Could not load feedback.",
+    onError: (msg) => messageApi.error(msg)
+  });
+
+  const { updatingId, patchStatus, patchField, deleteItem } = useAdminItemMutation({
+    messageApi,
+    setItems: setFeedbackItems
+  });
+
+  const replyModal = useAdminEditModal({
+    fieldName: "adminReply",
+    save: (item, values) =>
+      patchField({
+        path: `/feedback/${item.id}/reply`,
+        item,
+        body: values,
+        errorMsg: "Could not save admin reply."
+      }),
+    messageApi,
+    successMsg: "Admin reply saved.",
+    errorMsg: "Could not save admin reply."
+  });
+
   const feedbackTypeOptions = useMemo(() => copy.en.options.feedbackTypes, []);
-  const feedbackStatusOptions = useMemo(
-    () => feedbackStatuses.map((status) => ({ label: formatEnum(status), value: status })),
-    []
-  );
+  const feedbackStatusOptions = useMemo(() => buildEnumOptions(FEEDBACK_STATUSES), []);
 
-  const fetchFeedback = useCallback(async () => {
-    setLoadingFeedback(true);
-    setFeedbackError("");
+  const handleStatusChange = (feedback, status) =>
+    patchStatus({
+      path: `/feedback/${feedback.id}/status`,
+      item: feedback,
+      body: { status },
+      successMsg: "Feedback status updated.",
+      errorMsg: "Could not update feedback status."
+    });
 
-    try {
-      const response = await getJson("/feedback", {
-        params: feedbackFilters,
-        requireAuth: true
-      });
-      setFeedbackItems(getResponseData(response, []));
-    } catch (error) {
-      setFeedbackError(error.message || "Could not load feedback.");
-      messageApi.error(error.message || "Could not load feedback.");
-    } finally {
-      setLoadingFeedback(false);
-    }
-  }, [feedbackFilters, messageApi]);
-
-  useEffect(() => {
-    const fetchTimer = window.setTimeout(() => {
-      void fetchFeedback();
-    }, 0);
-
-    return () => {
-      window.clearTimeout(fetchTimer);
-    };
-  }, [fetchFeedback]);
-
-  const handleFilterChange = (key, value) => {
-    setFeedbackFilters((currentFilters) => ({
-      ...currentFilters,
-      [key]: value
-    }));
-  };
-
-  const handleStatusChange = async (feedback, status) => {
-    setUpdatingFeedbackId(feedback.id);
-
-    try {
-      const response = await patchJson(
-        `/feedback/${feedback.id}/status`,
-        { status },
-        { requireAuth: true }
-      );
-      const updatedFeedback = getResponseData(response, feedback);
-
-      setFeedbackItems((currentItems) =>
-        currentItems.map((item) => (item.id === feedback.id ? updatedFeedback : item))
-      );
-      messageApi.success("Feedback status updated.");
-    } catch (error) {
-      messageApi.error(error.message || "Could not update feedback status.");
-    } finally {
-      setUpdatingFeedbackId("");
-    }
-  };
-
-  const openReplyModal = (feedback) => {
-    setReplyFeedback(feedback);
-    replyForm.setFieldsValue({ adminReply: feedback.adminReply ?? "" });
-  };
-
-  const handleSaveReply = async () => {
-    const values = await replyForm.validateFields();
-    setSavingReply(true);
-
-    try {
-      const response = await patchJson(
-        `/feedback/${replyFeedback.id}/reply`,
-        values,
-        { requireAuth: true }
-      );
-      const updatedFeedback = getResponseData(response, replyFeedback);
-
-      setFeedbackItems((currentItems) =>
-        currentItems.map((item) => (item.id === replyFeedback.id ? updatedFeedback : item))
-      );
-      setReplyFeedback(null);
-      replyForm.resetFields();
-      messageApi.success("Admin reply saved.");
-    } catch (error) {
-      messageApi.error(error.message || "Could not save admin reply.");
-    } finally {
-      setSavingReply(false);
-    }
-  };
-
-  const handleDeleteFeedback = async (feedback) => {
-    setUpdatingFeedbackId(feedback.id);
-
-    try {
-      await deleteJson(`/feedback/${feedback.id}`, { requireAuth: true });
-      setFeedbackItems((currentItems) => currentItems.filter((item) => item.id !== feedback.id));
-      messageApi.success("Feedback deleted.");
-    } catch (error) {
-      messageApi.error(error.message || "Could not delete feedback.");
-    } finally {
-      setUpdatingFeedbackId("");
-    }
-  };
+  const handleDeleteFeedback = (feedback) =>
+    deleteItem({
+      path: `/feedback/${feedback.id}`,
+      item: feedback,
+      successMsg: "Feedback deleted.",
+      errorMsg: "Could not delete feedback."
+    });
 
   const columns = [
     {
@@ -162,12 +93,11 @@ export default function AdminFeedbackPage() {
       dataIndex: "status",
       key: "status",
       render: (status, feedback) => (
-        <Select
-          className="admin-status-select"
-          loading={updatingFeedbackId === feedback.id}
-          onChange={(nextStatus) => handleStatusChange(feedback, nextStatus)}
-          options={feedbackStatusOptions}
+        <AdminStatusSelect
           value={status}
+          options={feedbackStatusOptions}
+          loading={updatingId === feedback.id}
+          onChange={(nextStatus) => handleStatusChange(feedback, nextStatus)}
         />
       )
     },
@@ -182,7 +112,7 @@ export default function AdminFeedbackPage() {
       dataIndex: "adminReply",
       key: "adminReply",
       render: (adminReply, feedback) => (
-        <Button icon={<EditOutlined />} onClick={() => openReplyModal(feedback)}>
+        <Button icon={<EditOutlined />} onClick={() => replyModal.openFor(feedback)}>
           {adminReply ? "Edit reply" : "Add reply"}
         </Button>
       )
@@ -197,7 +127,7 @@ export default function AdminFeedbackPage() {
           okText="Delete"
           onConfirm={() => handleDeleteFeedback(feedback)}
         >
-          <Button danger icon={<DeleteOutlined />} loading={updatingFeedbackId === feedback.id}>
+          <Button danger icon={<DeleteOutlined />} loading={updatingId === feedback.id}>
             Delete
           </Button>
         </Popconfirm>
@@ -205,37 +135,57 @@ export default function AdminFeedbackPage() {
     }
   ];
 
+  const renderFeedbackDetail = (feedback) => (
+    <>
+      {feedback.experienceRating ? (
+        <p>
+          <strong>Experience rating:</strong> {feedback.experienceRating}/5
+        </p>
+      ) : null}
+      {feedback.screenshot ? (
+        <p>
+          <strong>Screenshot:</strong>{" "}
+          <a href={feedback.screenshot} rel="noreferrer" target="_blank">
+            {feedback.screenshot}
+          </a>
+        </p>
+      ) : null}
+      {feedback.adminReply ? (
+        <p>
+          <strong>Admin reply:</strong> {feedback.adminReply}
+        </p>
+      ) : null}
+    </>
+  );
+
   return (
     <AdminShell title="Feedback">
       {contextHolder}
       <section className="admin-panel">
-        <div className="admin-panel-heading">
-          <div>
-            <span className="eyebrow">Feedback</span>
-            <h2>Feedback</h2>
-            <p>Review public messages, update review state, and save admin replies.</p>
-          </div>
-          <Button icon={<ReloadOutlined />} loading={loadingFeedback} onClick={fetchFeedback}>
-            Refresh
-          </Button>
-        </div>
+        <AdminPanelHeading
+          eyebrow="Feedback"
+          title="Feedback"
+          description="Review public messages, update review state, and save admin replies."
+          onRefresh={fetchFeedback}
+          refreshing={loadingFeedback}
+        />
 
-        <div className="admin-filters">
+        <AdminFilters>
           <Select
             allowClear
-            onChange={(value) => handleFilterChange("type", value)}
+            onChange={(value) => setFilter("type", value)}
             options={feedbackTypeOptions}
             placeholder="Filter by type"
-            value={feedbackFilters.type}
+            value={filters.type}
           />
           <Select
             allowClear
-            onChange={(value) => handleFilterChange("status", value)}
+            onChange={(value) => setFilter("status", value)}
             options={feedbackStatusOptions}
             placeholder="Filter by status"
-            value={feedbackFilters.status}
+            value={filters.status}
           />
-        </div>
+        </AdminFilters>
 
         {feedbackError ? <p className="admin-error-text">{feedbackError}</p> : null}
 
@@ -251,32 +201,15 @@ export default function AdminFeedbackPage() {
               dataSource={feedbackItems}
               expandable={{
                 expandedRowRender: (feedback) => (
-                  <div className="admin-row-detail">
-                    {feedback.experienceRating ? (
-                      <p>
-                        <strong>Experience rating:</strong> {feedback.experienceRating}/5
-                      </p>
-                    ) : null}
-                    {feedback.screenshot ? (
-                      <p>
-                        <strong>Screenshot:</strong>{" "}
-                        <a href={feedback.screenshot} rel="noreferrer" target="_blank">
-                          {feedback.screenshot}
-                        </a>
-                      </p>
-                    ) : null}
-                    {feedback.adminReply ? (
-                      <p>
-                        <strong>Admin reply:</strong> {feedback.adminReply}
-                      </p>
-                    ) : null}
-                  </div>
+                  <div className="admin-row-detail">{renderFeedbackDetail(feedback)}</div>
                 )
               }}
               locale={{
                 emptyText: (
                   <Empty
-                    description={feedbackError ? "Feedback could not be loaded." : "No feedback found."}
+                    description={
+                      feedbackError ? "Feedback could not be loaded." : "No feedback found."
+                    }
                   />
                 )
               }}
@@ -288,78 +221,65 @@ export default function AdminFeedbackPage() {
           }
         >
           {feedbackItems.map((feedback) => (
-            <article className="admin-list-card" key={feedback.id}>
-              <div className="admin-list-card-header">
-                <div className="admin-list-card-title">
-                  <strong>{feedback.name}</strong>
-                  <span>{feedback.email}</span>
-                </div>
-                <Tag>{formatEnum(feedback.type)}</Tag>
-              </div>
-
-              <div className="admin-list-card-control">
-                <span>Status</span>
-                <Select
-                  className="admin-status-select"
-                  loading={updatingFeedbackId === feedback.id}
-                  onChange={(nextStatus) => handleStatusChange(feedback, nextStatus)}
-                  options={feedbackStatusOptions}
-                  value={feedback.status}
-                />
-              </div>
-
-              <p className="admin-list-card-note">{feedback.message}</p>
-
-              <div className="admin-list-card-detail">
-                {feedback.experienceRating ? (
-                  <p>
-                    <strong>Experience rating:</strong> {feedback.experienceRating}/5
-                  </p>
-                ) : null}
-                {feedback.screenshot ? (
-                  <p>
-                    <strong>Screenshot:</strong>{" "}
-                    <a href={feedback.screenshot} rel="noreferrer" target="_blank">
-                      {feedback.screenshot}
-                    </a>
-                  </p>
-                ) : null}
-                {feedback.adminReply ? (
-                  <p>
-                    <strong>Admin reply:</strong> {feedback.adminReply}
-                  </p>
-                ) : null}
-              </div>
-
-              <div className="admin-list-card-actions">
-                <Button icon={<EditOutlined />} onClick={() => openReplyModal(feedback)}>
-                  {feedback.adminReply ? "Edit reply" : "Add reply"}
-                </Button>
-                <Popconfirm
-                  title="Delete this feedback?"
-                  okButtonProps={{ danger: true }}
-                  okText="Delete"
-                  onConfirm={() => handleDeleteFeedback(feedback)}
-                >
-                  <Button danger icon={<DeleteOutlined />} loading={updatingFeedbackId === feedback.id}>
-                    Delete
+            <AdminListCard
+              key={feedback.id}
+              header={
+                <>
+                  <div className="admin-list-card-title">
+                    <strong>{feedback.name}</strong>
+                    <span>{feedback.email}</span>
+                  </div>
+                  <Tag>{formatEnum(feedback.type)}</Tag>
+                </>
+              }
+              control={
+                <>
+                  <span>Status</span>
+                  <AdminStatusSelect
+                    value={feedback.status}
+                    options={feedbackStatusOptions}
+                    loading={updatingId === feedback.id}
+                    onChange={(nextStatus) => handleStatusChange(feedback, nextStatus)}
+                  />
+                </>
+              }
+              note={feedback.message}
+              detail={renderFeedbackDetail(feedback)}
+              actions={
+                <>
+                  <Button icon={<EditOutlined />} onClick={() => replyModal.openFor(feedback)}>
+                    {feedback.adminReply ? "Edit reply" : "Add reply"}
                   </Button>
-                </Popconfirm>
-              </div>
-            </article>
+                  <Popconfirm
+                    title="Delete this feedback?"
+                    okButtonProps={{ danger: true }}
+                    okText="Delete"
+                    onConfirm={() => handleDeleteFeedback(feedback)}
+                  >
+                    <Button
+                      danger
+                      icon={<DeleteOutlined />}
+                      loading={updatingId === feedback.id}
+                    >
+                      Delete
+                    </Button>
+                  </Popconfirm>
+                </>
+              }
+            />
           ))}
         </AdminResponsiveList>
       </section>
 
       <Modal
-        confirmLoading={savingReply}
+        confirmLoading={replyModal.saving}
         okText="Save reply"
-        onCancel={() => setReplyFeedback(null)}
-        onOk={handleSaveReply}
-        open={Boolean(replyFeedback)}
-        title={replyFeedback ? `Admin reply: ${replyFeedback.name}` : "Admin reply"}
+        onCancel={replyModal.close}
+        onOk={replyModal.handleOk}
+        open={replyModal.open}
+        title={replyModal.item ? `Admin reply: ${replyModal.item.name}` : "Admin reply"}
       >
-        <Form form={replyForm} layout="vertical">
+        <Form form={replyModal.form} layout="vertical">
           <Form.Item
             label="Admin reply"
             name="adminReply"

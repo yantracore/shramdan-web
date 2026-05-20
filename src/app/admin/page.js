@@ -1,6 +1,13 @@
 "use client";
 
-import { FormOutlined, MessageOutlined, RightOutlined, ToolOutlined } from "@ant-design/icons";
+import {
+  CalendarOutlined,
+  EnvironmentOutlined,
+  FormOutlined,
+  MessageOutlined,
+  RightOutlined,
+  ToolOutlined
+} from "@ant-design/icons";
 import { Button, Tag } from "antd";
 import Link from "next/link";
 import { AdminShell } from "@/components/AdminShell";
@@ -21,7 +28,21 @@ const dashboardModules = [
     status: "Live"
   },
   {
-    body: "Issue, event, incident, role, and notification administration will be added after backend contracts are finalized.",
+    body: "Browse community-reported issues, filter by status or category, and inspect full details with attached uploads.",
+    href: "/admin/issues",
+    icon: <EnvironmentOutlined />,
+    label: "Issues",
+    status: "Live"
+  },
+  {
+    body: "Track cleanup events, assign event leaders, settle leader voting, and resolve tie-breaks.",
+    href: "/admin/events",
+    icon: <CalendarOutlined />,
+    label: "Events",
+    status: "Live"
+  },
+  {
+    body: "Incident, role, and notification administration will be added after backend contracts are finalized.",
     href: "#",
     icon: <ToolOutlined />,
     label: "Operations",
@@ -31,7 +52,7 @@ const dashboardModules = [
 
 export default function AdminDashboardPage() {
   return (
-    <AdminShell title="Control Center">
+    <AdminShell title="Dashboard">
       <section className="admin-dashboard-grid">
         {dashboardModules.map((module) => {
           const isDisabled = module.href === "#";
@@ -59,8 +80,10 @@ export default function AdminDashboardPage() {
       <section className="admin-dashboard-note">
         <h2>Today&apos;s admin scope</h2>
         <p>
-          Applications and Feedback are connected to the live backend. Profile details come from
-          the login session until the API exposes a dedicated profile endpoint.
+          Applications, Feedback, Issues, and Events are connected to the live backend. Issues is
+          read-only until the backend exposes admin-side mutation endpoints. Events supports
+          leader assignment, tie-break, and voting settle; scheduling and completion remain with
+          the assigned event leader by API design.
         </p>
         <Link href="/">Back to public site</Link>
       </section>

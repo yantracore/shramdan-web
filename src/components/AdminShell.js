@@ -2,6 +2,8 @@
 
 import {
   AppstoreOutlined,
+  CalendarOutlined,
+  EnvironmentOutlined,
   FormOutlined,
   LogoutOutlined,
   MenuOutlined,
@@ -17,10 +19,26 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 import { usePreferences } from "@/app/providers";
 import { clearAuthSession, getAuthSession, isAdminUser, subscribeAuthSession } from "@/lib/authSession";
 
+function getUserInitials(name, email) {
+  const source = (name || "").trim();
+
+  if (source) {
+    const parts = source.split(/\s+/).filter(Boolean);
+    const letters = parts.length >= 2
+      ? `${parts[0][0]}${parts[parts.length - 1][0]}`
+      : parts[0][0];
+    return letters.toUpperCase();
+  }
+
+  return (email || "?").slice(0, 1).toUpperCase();
+}
+
 const adminNavItems = [
   { href: "/admin", icon: <AppstoreOutlined />, label: "Dashboard" },
   { href: "/admin/applications", icon: <FormOutlined />, label: "Applications" },
-  { href: "/admin/feedback", icon: <MessageOutlined />, label: "Feedback" }
+  { href: "/admin/feedback", icon: <MessageOutlined />, label: "Feedback" },
+  { href: "/admin/issues", icon: <EnvironmentOutlined />, label: "Issues" },
+  { href: "/admin/events", icon: <CalendarOutlined />, label: "Events" }
 ];
 
 function AdminSidebar({ activePath, onNavigate }) {
@@ -71,6 +89,11 @@ export function AdminShell({ children, title }) {
     }
   }, [router, session]);
 
+  useEffect(() => {
+    if (!title) return;
+    document.title = `${title} - Shramdan Control Center`;
+  }, [title]);
+
   const handleLogout = () => {
     clearAuthSession();
     router.replace("/login");
@@ -85,6 +108,7 @@ export function AdminShell({ children, title }) {
   }
 
   const displayName = session.user.name || session.user.email;
+  const userInitials = getUserInitials(session.user.name, session.user.email);
   const userMenu = {
     items: [
       {
@@ -99,6 +123,12 @@ export function AdminShell({ children, title }) {
         )
       },
       { type: "divider" },
+      {
+        key: "profile",
+        icon: <UserOutlined />,
+        label: "My profile",
+        onClick: () => router.push("/me")
+      },
       {
         key: "logout",
         icon: <LogoutOutlined />,
@@ -140,7 +170,7 @@ export function AdminShell({ children, title }) {
             </Tooltip>
             <Dropdown menu={userMenu} placement="bottomRight" trigger={["click"]}>
               <Button className="admin-user-button">
-                <Avatar size={24} icon={<UserOutlined />} />
+                <Avatar size={24}>{userInitials}</Avatar>
                 <span>{displayName}</span>
               </Button>
             </Dropdown>

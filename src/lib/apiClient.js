@@ -160,3 +160,15 @@ export function deleteJson(path, options) {
 export function loginWithPassword(credentials) {
   return postJson("/auth/login", credentials);
 }
+
+export function fetchMe() {
+  return getJson("/auth/me", { requireAuth: true });
+}
+
+export function updateMe(values) {
+  return patchJson("/auth/me", values, { requireAuth: true });
+}
+
+export function changePassword(values) {
+  return postJson("/auth/change-password", values, { requireAuth: true });
+}

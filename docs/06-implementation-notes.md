@@ -80,7 +80,7 @@ Do not build production payment, notification, authentication, or moderation flo
 
 ## API Integration Guidance
 
-Use `docs/07-api-reference.md` as the source of truth for backend endpoint contracts when replacing simulated frontend actions with API-backed submissions.
+Use `docs/07-api-reference.json` (OpenAPI 3.0 spec) as the source of truth for backend endpoint contracts when replacing simulated frontend actions with API-backed submissions. See `docs/10-frontend-api-usage.md` for the page-to-endpoint usage map.
 
 Current API assumptions:
 
@@ -102,8 +102,9 @@ Before implementing Shramdaan work, future threads should read:
 - `docs/04-website-structure.md` for page structure.
 - `docs/05-design-language-guide.md` for tone and UI direction.
 - `docs/06-implementation-notes.md` for technical guardrails.
-- `docs/07-api-reference.md` for backend endpoint contracts.
+- `docs/07-api-reference.json` for backend endpoint contracts (OpenAPI 3.0 spec).
 - `docs/08-operational-safety-and-event-model.md` for event/campaign modeling, safety incidents, roles, risk levels, and notification planning.
+- `docs/10-frontend-api-usage.md` for the page-to-endpoint usage map.
 
 When product behavior changes, update the relevant document in the same change.
 

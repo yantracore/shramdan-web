@@ -1,154 +1,74 @@
 "use client";
 
-import { DeleteOutlined, EditOutlined, ReloadOutlined } from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { Button, Empty, Form, Input, Modal, Popconfirm, Select, Table, Tag, message } from "antd";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { AdminResponsiveList } from "@/components/AdminResponsiveList";
 import { AdminShell } from "@/components/AdminShell";
-import { deleteJson, getJson, patchJson } from "@/lib/apiClient";
+import { AdminFilters } from "@/components/admin/AdminFilters";
+import { AdminListCard } from "@/components/admin/AdminListCard";
+import { AdminPanelHeading } from "@/components/admin/AdminPanelHeading";
+import { AdminStatusSelect } from "@/components/admin/AdminStatusSelect";
 import { copy } from "@/lib/siteContent";
-
-const applicationStatuses = [
-  "SUBMITTED",
-  "UNDER_REVIEW",
-  "SHORTLISTED",
-  "ONBOARDING",
-  "ACTIVE",
-  "REJECTED"
-];
-
-function formatEnum(value) {
-  return value
-    .toLowerCase()
-    .split("_")
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(" ");
-}
-
-function getResponseData(response, fallback) {
-  return response?.data ?? fallback;
-}
+import { APPLICATION_STATUSES, buildEnumOptions, formatEnum } from "@/lib/adminUtils";
+import { useAdminEditModal } from "@/hooks/useAdminEditModal";
+import { useAdminItemMutation } from "@/hooks/useAdminItemMutation";
+import { useAdminListResource } from "@/hooks/useAdminListResource";
 
 export default function AdminApplicationsPage() {
   const [messageApi, contextHolder] = message.useMessage();
-  const [applications, setApplications] = useState([]);
-  const [loadingApplications, setLoadingApplications] = useState(false);
-  const [applicationError, setApplicationError] = useState("");
-  const [filters, setFilters] = useState({});
-  const [updatingApplicationId, setUpdatingApplicationId] = useState("");
-  const [notesForm] = Form.useForm();
-  const [notesApplication, setNotesApplication] = useState(null);
-  const [savingNotes, setSavingNotes] = useState(false);
+  const {
+    items: applications,
+    setItems: setApplications,
+    loading: loadingApplications,
+    error: applicationError,
+    filters,
+    setFilter,
+    refetch: fetchApplications
+  } = useAdminListResource({
+    path: "/applications",
+    errorMessage: "Could not load applications.",
+    onError: (msg) => messageApi.error(msg)
+  });
+
+  const { updatingId, patchStatus, patchField, deleteItem } = useAdminItemMutation({
+    messageApi,
+    setItems: setApplications
+  });
+
+  const notesModal = useAdminEditModal({
+    fieldName: "adminNotes",
+    save: (item, values) =>
+      patchField({
+        path: `/applications/${item.id}/notes`,
+        item,
+        body: values,
+        errorMsg: "Could not save notes."
+      }),
+    messageApi,
+    successMsg: "Admin notes saved.",
+    errorMsg: "Could not save notes."
+  });
+
   const roleOptions = useMemo(() => copy.en.options.applicationRoles, []);
-  const statusOptions = useMemo(
-    () => applicationStatuses.map((status) => ({ label: formatEnum(status), value: status })),
-    []
-  );
+  const statusOptions = useMemo(() => buildEnumOptions(APPLICATION_STATUSES), []);
 
-  const fetchApplications = useCallback(async () => {
-    setLoadingApplications(true);
-    setApplicationError("");
+  const handleStatusChange = (application, status) =>
+    patchStatus({
+      path: `/applications/${application.id}/status`,
+      item: application,
+      body: { status },
+      successMsg: "Application status updated.",
+      errorMsg: "Could not update status."
+    });
 
-    try {
-      const response = await getJson("/applications", {
-        params: filters,
-        requireAuth: true
-      });
-      setApplications(getResponseData(response, []));
-    } catch (error) {
-      setApplicationError(error.message || "Could not load applications.");
-      messageApi.error(error.message || "Could not load applications.");
-    } finally {
-      setLoadingApplications(false);
-    }
-  }, [filters, messageApi]);
-
-  useEffect(() => {
-    const fetchTimer = window.setTimeout(() => {
-      void fetchApplications();
-    }, 0);
-
-    return () => {
-      window.clearTimeout(fetchTimer);
-    };
-  }, [fetchApplications]);
-
-  const handleFilterChange = (key, value) => {
-    setFilters((currentFilters) => ({
-      ...currentFilters,
-      [key]: value
-    }));
-  };
-
-  const handleStatusChange = async (application, status) => {
-    setUpdatingApplicationId(application.id);
-
-    try {
-      const response = await patchJson(
-        `/applications/${application.id}/status`,
-        { status },
-        { requireAuth: true }
-      );
-      const updatedApplication = getResponseData(response, application);
-
-      setApplications((currentApplications) =>
-        currentApplications.map((item) => (item.id === application.id ? updatedApplication : item))
-      );
-      messageApi.success("Application status updated.");
-    } catch (error) {
-      messageApi.error(error.message || "Could not update status.");
-    } finally {
-      setUpdatingApplicationId("");
-    }
-  };
-
-  const openNotesModal = (application) => {
-    setNotesApplication(application);
-    notesForm.setFieldsValue({ adminNotes: application.adminNotes ?? "" });
-  };
-
-  const handleSaveNotes = async () => {
-    const values = await notesForm.validateFields();
-    setSavingNotes(true);
-
-    try {
-      const response = await patchJson(
-        `/applications/${notesApplication.id}/notes`,
-        values,
-        { requireAuth: true }
-      );
-      const updatedApplication = getResponseData(response, notesApplication);
-
-      setApplications((currentApplications) =>
-        currentApplications.map((item) =>
-          item.id === notesApplication.id ? updatedApplication : item
-        )
-      );
-      setNotesApplication(null);
-      notesForm.resetFields();
-      messageApi.success("Admin notes saved.");
-    } catch (error) {
-      messageApi.error(error.message || "Could not save notes.");
-    } finally {
-      setSavingNotes(false);
-    }
-  };
-
-  const handleDeleteApplication = async (application) => {
-    setUpdatingApplicationId(application.id);
-
-    try {
-      await deleteJson(`/applications/${application.id}`, { requireAuth: true });
-      setApplications((currentApplications) =>
-        currentApplications.filter((item) => item.id !== application.id)
-      );
-      messageApi.success("Application deleted.");
-    } catch (error) {
-      messageApi.error(error.message || "Could not delete application.");
-    } finally {
-      setUpdatingApplicationId("");
-    }
-  };
+  const handleDeleteApplication = (application) =>
+    deleteItem({
+      path: `/applications/${application.id}`,
+      item: application,
+      successMsg: "Application deleted.",
+      errorMsg: "Could not delete application."
+    });
 
   const columns = [
     {
@@ -174,12 +94,11 @@ export default function AdminApplicationsPage() {
       dataIndex: "status",
       key: "status",
       render: (status, application) => (
-        <Select
-          className="admin-status-select"
-          loading={updatingApplicationId === application.id}
-          onChange={(nextStatus) => handleStatusChange(application, nextStatus)}
-          options={statusOptions}
+        <AdminStatusSelect
           value={status}
+          options={statusOptions}
+          loading={updatingId === application.id}
+          onChange={(nextStatus) => handleStatusChange(application, nextStatus)}
         />
       )
     },
@@ -194,7 +113,7 @@ export default function AdminApplicationsPage() {
       dataIndex: "adminNotes",
       key: "adminNotes",
       render: (adminNotes, application) => (
-        <Button icon={<EditOutlined />} onClick={() => openNotesModal(application)}>
+        <Button icon={<EditOutlined />} onClick={() => notesModal.openFor(application)}>
           {adminNotes ? "Edit notes" : "Add notes"}
         </Button>
       )
@@ -209,7 +128,7 @@ export default function AdminApplicationsPage() {
           okText="Delete"
           onConfirm={() => handleDeleteApplication(application)}
         >
-          <Button danger icon={<DeleteOutlined />} loading={updatingApplicationId === application.id}>
+          <Button danger icon={<DeleteOutlined />} loading={updatingId === application.id}>
             Delete
           </Button>
         </Popconfirm>
@@ -217,43 +136,78 @@ export default function AdminApplicationsPage() {
     }
   ];
 
+  const renderApplicationDetail = (application) => (
+    <>
+      {application.experience ? (
+        <p>
+          <strong>Experience:</strong> {application.experience}
+        </p>
+      ) : null}
+      {application.additionalInfo ? (
+        <p>
+          <strong>Additional info:</strong> {application.additionalInfo}
+        </p>
+      ) : null}
+      {application.portfolio ? (
+        <p>
+          <strong>Portfolio:</strong>{" "}
+          <a href={application.portfolio} rel="noreferrer" target="_blank">
+            {application.portfolio}
+          </a>
+        </p>
+      ) : null}
+      {application.resumeUrl ? (
+        <p>
+          <strong>Resume:</strong>{" "}
+          <a href={application.resumeUrl} rel="noreferrer" target="_blank">
+            {application.resumeUrl}
+          </a>
+        </p>
+      ) : null}
+      {application.adminNotes ? (
+        <p>
+          <strong>Admin notes:</strong> {application.adminNotes}
+        </p>
+      ) : null}
+    </>
+  );
+
   return (
     <AdminShell title="Applications">
       {contextHolder}
       <section className="admin-panel">
-        <div className="admin-panel-heading">
-          <div>
-            <span className="eyebrow">First CRUD</span>
-            <h2>Applications</h2>
-            <p>Review contributor applications and manage their onboarding state.</p>
-          </div>
-          <Button icon={<ReloadOutlined />} loading={loadingApplications} onClick={fetchApplications}>
-            Refresh
-          </Button>
-        </div>
+        <AdminPanelHeading
+          eyebrow="First CRUD"
+          title="Applications"
+          description="Review contributor applications and manage their onboarding state."
+          onRefresh={fetchApplications}
+          refreshing={loadingApplications}
+        />
 
-        <div className="admin-filters">
+        <AdminFilters>
           <Select
             allowClear
-            onChange={(value) => handleFilterChange("role", value)}
+            onChange={(value) => setFilter("role", value)}
             options={roleOptions}
             placeholder="Filter by role"
             value={filters.role}
           />
           <Select
             allowClear
-            onChange={(value) => handleFilterChange("status", value)}
+            onChange={(value) => setFilter("status", value)}
             options={statusOptions}
             placeholder="Filter by status"
             value={filters.status}
           />
-        </div>
+        </AdminFilters>
 
         {applicationError ? <p className="admin-error-text">{applicationError}</p> : null}
 
         <AdminResponsiveList
           ariaLabel="Applications list"
-          emptyDescription={applicationError ? "Applications could not be loaded." : "No applications found."}
+          emptyDescription={
+            applicationError ? "Applications could not be loaded." : "No applications found."
+          }
           isEmpty={applications.length === 0}
           loading={loadingApplications}
           loadingLabel="Loading applications..."
@@ -263,46 +217,16 @@ export default function AdminApplicationsPage() {
               dataSource={applications}
               expandable={{
                 expandedRowRender: (application) => (
-                  <div className="admin-row-detail">
-                    {application.experience ? (
-                      <p>
-                        <strong>Experience:</strong> {application.experience}
-                      </p>
-                    ) : null}
-                    {application.additionalInfo ? (
-                      <p>
-                        <strong>Additional info:</strong> {application.additionalInfo}
-                      </p>
-                    ) : null}
-                    {application.portfolio ? (
-                      <p>
-                        <strong>Portfolio:</strong>{" "}
-                        <a href={application.portfolio} rel="noreferrer" target="_blank">
-                          {application.portfolio}
-                        </a>
-                      </p>
-                    ) : null}
-                    {application.resumeUrl ? (
-                      <p>
-                        <strong>Resume:</strong>{" "}
-                        <a href={application.resumeUrl} rel="noreferrer" target="_blank">
-                          {application.resumeUrl}
-                        </a>
-                      </p>
-                    ) : null}
-                    {application.adminNotes ? (
-                      <p>
-                        <strong>Admin notes:</strong> {application.adminNotes}
-                      </p>
-                    ) : null}
-                  </div>
+                  <div className="admin-row-detail">{renderApplicationDetail(application)}</div>
                 )
               }}
               locale={{
                 emptyText: (
                   <Empty
                     description={
-                      applicationError ? "Applications could not be loaded." : "No applications found."
+                      applicationError
+                        ? "Applications could not be loaded."
+                        : "No applications found."
                     }
                   />
                 )
@@ -315,92 +239,69 @@ export default function AdminApplicationsPage() {
           }
         >
           {applications.map((application) => (
-            <article className="admin-list-card" key={application.id}>
-              <div className="admin-list-card-header">
-                <div className="admin-list-card-title">
-                  <strong>{application.name}</strong>
-                  <span>{application.email}</span>
-                  {application.phone ? <span>{application.phone}</span> : null}
-                </div>
-                <Tag>{formatEnum(application.role)}</Tag>
-              </div>
-
-              <div className="admin-list-card-control">
-                <span>Status</span>
-                <Select
-                  className="admin-status-select"
-                  loading={updatingApplicationId === application.id}
-                  onChange={(nextStatus) => handleStatusChange(application, nextStatus)}
-                  options={statusOptions}
-                  value={application.status}
-                />
-              </div>
-
-              <p className="admin-list-card-note">{application.motivation}</p>
-
-              <div className="admin-list-card-detail">
-                {application.experience ? (
-                  <p>
-                    <strong>Experience:</strong> {application.experience}
-                  </p>
-                ) : null}
-                {application.additionalInfo ? (
-                  <p>
-                    <strong>Additional info:</strong> {application.additionalInfo}
-                  </p>
-                ) : null}
-                {application.portfolio ? (
-                  <p>
-                    <strong>Portfolio:</strong>{" "}
-                    <a href={application.portfolio} rel="noreferrer" target="_blank">
-                      {application.portfolio}
-                    </a>
-                  </p>
-                ) : null}
-                {application.resumeUrl ? (
-                  <p>
-                    <strong>Resume:</strong>{" "}
-                    <a href={application.resumeUrl} rel="noreferrer" target="_blank">
-                      {application.resumeUrl}
-                    </a>
-                  </p>
-                ) : null}
-                {application.adminNotes ? (
-                  <p>
-                    <strong>Admin notes:</strong> {application.adminNotes}
-                  </p>
-                ) : null}
-              </div>
-
-              <div className="admin-list-card-actions">
-                <Button icon={<EditOutlined />} onClick={() => openNotesModal(application)}>
-                  {application.adminNotes ? "Edit notes" : "Add notes"}
-                </Button>
-                <Popconfirm
-                  title="Delete this application?"
-                  okButtonProps={{ danger: true }}
-                  okText="Delete"
-                  onConfirm={() => handleDeleteApplication(application)}
-                >
-                  <Button danger icon={<DeleteOutlined />} loading={updatingApplicationId === application.id}>
-                    Delete
+            <AdminListCard
+              key={application.id}
+              header={
+                <>
+                  <div className="admin-list-card-title">
+                    <strong>{application.name}</strong>
+                    <span>{application.email}</span>
+                    {application.phone ? <span>{application.phone}</span> : null}
+                  </div>
+                  <Tag>{formatEnum(application.role)}</Tag>
+                </>
+              }
+              control={
+                <>
+                  <span>Status</span>
+                  <AdminStatusSelect
+                    value={application.status}
+                    options={statusOptions}
+                    loading={updatingId === application.id}
+                    onChange={(nextStatus) => handleStatusChange(application, nextStatus)}
+                  />
+                </>
+              }
+              note={application.motivation}
+              detail={renderApplicationDetail(application)}
+              actions={
+                <>
+                  <Button
+                    icon={<EditOutlined />}
+                    onClick={() => notesModal.openFor(application)}
+                  >
+                    {application.adminNotes ? "Edit notes" : "Add notes"}
                   </Button>
-                </Popconfirm>
-              </div>
-            </article>
+                  <Popconfirm
+                    title="Delete this application?"
+                    okButtonProps={{ danger: true }}
+                    okText="Delete"
+                    onConfirm={() => handleDeleteApplication(application)}
+                  >
+                    <Button
+                      danger
+                      icon={<DeleteOutlined />}
+                      loading={updatingId === application.id}
+                    >
+                      Delete
+                    </Button>
+                  </Popconfirm>
+                </>
+              }
+            />
           ))}
         </AdminResponsiveList>
       </section>
 
       <Modal
-        confirmLoading={savingNotes}
+        confirmLoading={notesModal.saving}
         okText="Save notes"
-        onCancel={() => setNotesApplication(null)}
-        onOk={handleSaveNotes}
-        open={Boolean(notesApplication)}
-        title={notesApplication ? `Admin notes: ${notesApplication.name}` : "Admin notes"}
+        onCancel={notesModal.close}
+        onOk={notesModal.handleOk}
+        open={notesModal.open}
+        title={notesModal.item ? `Admin notes: ${notesModal.item.name}` : "Admin notes"}
       >
-        <Form form={notesForm} layout="vertical">
+        <Form form={notesModal.form} layout="vertical">
           <Form.Item
             label="Admin notes"
             name="adminNotes"

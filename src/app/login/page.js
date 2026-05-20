@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { usePreferences } from "@/app/providers";
 import { SiteShell } from "@/components/SiteShell";
 import { loginWithPassword } from "@/lib/apiClient";
-import { clearAuthSession, getAuthSession, isAdminUser, setAuthSession } from "@/lib/authSession";
+import { getAuthSession, isAdminUser, setAuthSession } from "@/lib/authSession";
 import { copy } from "@/lib/siteContent";
 
 const loginCopy = {
@@ -21,8 +21,7 @@ const loginCopy = {
     submit: "लगइन",
     required: "यो विवरण आवश्यक छ।",
     emailInvalid: "कृपया सही इमेल ठेगाना लेख्नुहोस्।",
-    success: "लगइन सफल भयो।",
-    adminOnly: "यो भाग admin का लागि मात्र हो।"
+    success: "लगइन सफल भयो।"
   },
   en: {
     title: "Login",
@@ -34,10 +33,13 @@ const loginCopy = {
     submit: "Login",
     required: "This field is required.",
     emailInvalid: "Please enter a valid email address.",
-    success: "Login successful.",
-    adminOnly: "Admin access only."
+    success: "Login successful."
   }
 };
+
+function redirectPathForUser(user) {
+  return isAdminUser(user) ? "/admin" : "/me";
+}
 
 export default function LoginPage() {
   const router = useRouter();
@@ -51,8 +53,8 @@ export default function LoginPage() {
   useEffect(() => {
     const session = getAuthSession();
 
-    if (isAdminUser(session?.user)) {
-      router.replace("/admin");
+    if (session?.user) {
+      router.replace(redirectPathForUser(session.user));
     }
   }, [router]);
 
@@ -63,14 +65,8 @@ export default function LoginPage() {
       const response = await loginWithPassword(values);
       const session = setAuthSession(response.data);
 
-      if (isAdminUser(session?.user)) {
-        messageApi.success(t.success);
-        router.replace("/admin");
-        return;
-      }
-
-      clearAuthSession();
-      messageApi.warning(t.adminOnly);
+      messageApi.success(t.success);
+      router.replace(redirectPathForUser(session?.user));
     } catch (error) {
       messageApi.error(error.message || globalCopy.messages.submitError);
     } finally {

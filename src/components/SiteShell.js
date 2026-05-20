@@ -1,20 +1,34 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import {
   MenuOutlined,
   MoonOutlined,
   SunOutlined,
   TranslationOutlined,
-  UserAddOutlined
+  UserAddOutlined,
+  UserOutlined
 } from "@ant-design/icons";
-import { Button, Tooltip } from "antd";
+import { Avatar, Button, Tooltip } from "antd";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FaFacebookF, FaTiktok, FaXTwitter, FaYoutube } from "react-icons/fa6";
 import { usePreferences } from "@/app/providers";
 import { copy } from "@/lib/siteContent";
+import { getAuthSession, subscribeAuthSession } from "@/lib/authSession";
+
+function getInitials(user) {
+  const source = user?.name || user?.username || user?.email || "";
+  const cleaned = source.trim();
+
+  if (!cleaned) {
+    return "";
+  }
+
+  const parts = cleaned.split(/\s+/).slice(0, 2);
+  return parts.map((part) => part[0]?.toUpperCase() ?? "").join("");
+}
 
 const socialIcons = {
   facebook: FaFacebookF,
@@ -27,13 +41,17 @@ export function SiteShell({ children }) {
   const { language, mode, toggleLanguage, toggleMode } = usePreferences();
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
   const pathname = usePathname();
+  const session = useSyncExternalStore(subscribeAuthSession, getAuthSession, () => null);
   const t = copy[language];
   const activePath = pathname === "/" ? "/" : `/${pathname.split("/").filter(Boolean)[0]}`;
+  const isAuthenticated = Boolean(session?.user);
   const navItems = [
     { href: "/", label: t.nav.home },
     { href: "/join", label: t.nav.join },
     { href: "/feedback", label: t.nav.feedback },
-    { href: "/login", label: t.nav.login }
+    isAuthenticated
+      ? { href: "/me", label: t.me.navLabel }
+      : { href: "/login", label: t.nav.login }
   ];
   const footerLinks = [
     {
@@ -126,9 +144,26 @@ export function SiteShell({ children }) {
               </Button>
             </Tooltip>
           </div>
-          <Button className="toolbar-cta" type="primary" href="/join" icon={<UserAddOutlined />}>
-            {t.nav.join}
-          </Button>
+          {isAuthenticated ? (
+            <Link
+              className="toolbar-avatar"
+              href="/me"
+              aria-label={t.me.navLabel}
+              title={t.me.navLabel}
+            >
+              <Avatar
+                src={session.user.avatar || undefined}
+                icon={<UserOutlined />}
+                size={38}
+              >
+                {getInitials(session.user)}
+              </Avatar>
+            </Link>
+          ) : (
+            <Button className="toolbar-cta" type="primary" href="/join" icon={<UserAddOutlined />}>
+              {t.nav.join}
+            </Button>
+          )}
         </div>
 
         <details className="mobile-menu">
