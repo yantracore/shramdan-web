@@ -36,22 +36,22 @@ export const copy = {
         "श्रमदान अहिले app-building चरणमा छ। आफ्नो समय, सीप, विचार र समन्वय दिएर platform आफैं निर्माण गर्न योगदान गर्न सकिन्छ।",
       phaseLabel: "हालको चरण",
       phaseValue: "श्रमदानमार्फत Shramdan App निर्माण",
-      resourcesLabel: "श्रमदान उपयोगी लिंकहरू",
+      resourcesLabel: "श्रमदानका उपयोगी सामग्रीहरू",
       resources: [
         {
           id: "documents",
-          title: "कार्य योजना र docs",
-          label: "प्रक्रिया, API र implementation notes"
+          title: "कार्य योजना र कागजात",
+          label: "प्रक्रिया, एपीआई र कार्यान्वयन टिप्पणीहरू"
         },
         {
           id: "github",
-          title: "Open-source repo",
-          label: "Code हेर्नुहोस् वा योगदान गर्नुहोस्"
+          title: "खुला स्रोत भण्डार",
+          label: "स्रोत कोड हेर्नुहोस् वा योगदान गर्नुहोस्"
         },
         {
           id: "apiDocs",
-          title: "API docs",
-          label: "Frontend/backend integration reference"
+          title: "एपीआई कागजात",
+          label: "साइट र सर्भर जोड्ने सन्दर्भ"
         }
       ]
     },
@@ -240,37 +240,37 @@ export const copy = {
       title: "खुला विकास सामग्री",
       intro: "श्रमदानको उद्देश्य, विकास यात्रा, कागजात र स्रोत कोड सबै सार्वजनिक छन्। हेर्नुहोस्, सिक्नुहोस्, समीक्षा गर्नुहोस्, र चाहिँदा योगदान पठाउनुहोस्।",
       playlist: {
-        title: "Shramdan development playlist",
-        description: "श्रमदानको development walkthrough, livestream र project context यहीँबाट सिधै हेर्न सकिन्छ।",
+        title: "श्रमदान विकास भिडियो शृङ्खला",
+        description: "श्रमदानको विकास यात्रा, प्रत्यक्ष प्रसारण र परियोजनाको सन्दर्भ यहीँबाट सिधै हेर्न सकिन्छ।",
         embedUrl: "https://www.youtube-nocookie.com/embed/videoseries?list=PLWkh0s4xHPcTF4FOcYjkdR3i97YbkSDGo"
       },
       items: [
         {
           id: "presentation",
-          title: "प्रत्यक्ष प्रसारण प्रस्तुति स्लाइडहरू",
-          description: "श्रमदानको उद्देश्य र पूरा विकास यात्रालाई समेटिएका प्रस्तुति स्लाइडहरू।",
-          button: "स्लाइडहरू खोल्नुहोस्",
+          title: "प्रत्यक्ष प्रसारण प्रस्तुति सामग्री",
+          description: "श्रमदानको उद्देश्य र पूरा विकास यात्रालाई समेटिएको प्रस्तुति सामग्री।",
+          button: "प्रस्तुति खोल्नुहोस्",
           href: "https://drive.google.com/drive/folders/19Iuu_W7GRhD9F6qph0A8drKJQlN2UbUy"
         },
         {
           id: "documents",
-          title: "GitHub कागजातहरू",
-          description: "योजना, डिजाइन, कार्यान्वयन, API सन्दर्भ र safety/event model docs source repo मै राखिएका छन्।",
-          button: "GitHub docs खोल्नुहोस्",
+          title: "गिटहब कागजातहरू",
+          description: "योजना, रूपरेखा, कार्यान्वयन, एपीआई सन्दर्भ र सुरक्षा/कार्यक्रम मोडेलका कागजातहरू स्रोत भण्डारमै राखिएका छन्।",
+          button: "गिटहब कागजात खोल्नुहोस्",
           href: "https://github.com/yantracore/shramdan-web/tree/main/docs"
         },
         {
           id: "github",
-          title: "GitHub स्रोत भण्डार",
-          description: "सार्वजनिक स्रोत कोड, समस्या सूची र योगदान इतिहास भएको खुला स्रोत repository।",
+          title: "गिटहब स्रोत भण्डार",
+          description: "सार्वजनिक स्रोत कोड, समस्या सूची र योगदान इतिहास समेटिएको खुला स्रोत भण्डार।",
           button: "स्रोत कोड हेर्नुहोस्",
           href: "https://github.com/yantracore/shramdan-web"
         },
         {
           id: "apiDocs",
-          title: "API Documentation",
-          description: "Backend API endpoints, request formats र testing references भएको सार्वजनिक API documentation।",
-          button: "API docs खोल्नुहोस्",
+          title: "एपीआई कागजात",
+          description: "सर्भर एपीआईका ठेगाना, अनुरोध ढाँचा र परीक्षण सन्दर्भहरू समेटिएको सार्वजनिक एपीआई कागजात।",
+          button: "एपीआई कागजात खोल्नुहोस्",
           href: "https://backend.shramdan.org/api-docs/"
         }
       ]
