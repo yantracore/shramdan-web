@@ -1574,6 +1574,7 @@
 
 .admin-workspace {
   min-width: 0;
+  overflow-x: clip;
 }
 
 .admin-topbar {
@@ -1596,6 +1597,7 @@
   gap: 12px;
   align-items: center;
   min-width: 0;
+  flex: 1 1 auto;
 }
 
 .admin-title-block h1,
@@ -1613,12 +1615,14 @@
   margin-top: 4px;
   color: var(--muted);
   font-size: 14px;
+  overflow-wrap: anywhere;
 }
 
 .admin-topbar-actions {
   display: flex;
   gap: 10px;
   align-items: center;
+  flex: 0 0 auto;
 }
 
 .admin-user-button {
@@ -1877,6 +1881,10 @@
   justify-content: space-between;
 }
 
+.admin-panel-heading > div {
+  min-width: 0;
+}
+
 .admin-panel-heading h2,
 .admin-panel-heading p {
   margin: 0;
@@ -1891,17 +1899,45 @@
   margin-top: 8px;
   color: var(--muted);
   line-height: 1.6;
+  overflow-wrap: anywhere;
 }
 
 .admin-filters {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(180px, 240px));
+  display: flex;
+  flex-wrap: wrap;
   gap: 12px;
+}
+
+.admin-filters .ant-select {
+  flex: 1 1 190px;
+  max-width: 260px;
+  min-width: 0;
+}
+
+.admin-table-view {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.admin-table-view .ant-table-wrapper,
+.admin-table-view .ant-spin-nested-loading,
+.admin-table-view .ant-spin-container,
+.admin-table-view .ant-table {
+  min-width: 0;
+}
+
+.admin-table-view .ant-table-content {
+  overflow-x: auto !important;
+}
+
+.admin-table-view .ant-table-cell {
+  vertical-align: top;
 }
 
 .admin-applicant-cell {
   display: grid;
   gap: 4px;
+  min-width: 0;
 }
 
 .admin-applicant-cell strong {
@@ -1914,10 +1950,18 @@
   color: var(--muted);
 }
 
+.admin-applicant-cell span,
+.admin-row-detail a,
+.admin-list-card-title span,
+.admin-list-card-detail a {
+  overflow-wrap: anywhere;
+}
+
 .admin-table-note {
   max-width: 320px;
   margin: 0;
   line-height: 1.55;
+  overflow-wrap: anywhere;
 }
 
 .admin-status-select {
@@ -1935,6 +1979,96 @@
 .admin-application-detail p,
 .admin-row-detail p {
   margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.admin-list-view {
+  display: none;
+}
+
+.admin-list-state {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 750;
+}
+
+.admin-list-card {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--surface-soft) 82%, transparent);
+}
+
+.admin-list-card-header {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.admin-list-card-title {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.admin-list-card-title strong {
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+.admin-list-card-title span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.admin-list-card-control {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.admin-list-card-control > span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.admin-list-card-note {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.admin-list-card-detail {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+
+.admin-list-card-detail p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.admin-list-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
 }
 
 .admin-error-text {
@@ -2102,6 +2236,14 @@
     grid-template-columns: 1fr;
   }
 
+  .admin-panel-heading {
+    align-items: stretch;
+  }
+
+  .admin-panel-heading .ant-btn {
+    align-self: start;
+  }
+
   .topbar {
     grid-template-columns: auto 1fr auto;
     align-items: center;
@@ -2259,9 +2401,25 @@
   }
 }
 
+@media (max-width: 860px) {
+  .admin-table-view {
+    display: none;
+  }
+
+  .admin-list-view {
+    display: grid;
+    gap: 12px;
+  }
+
+  .admin-status-select {
+    width: min(100%, 220px);
+  }
+}
+
 @media (max-width: 720px) {
   .admin-topbar {
     align-items: flex-start;
+    flex-wrap: wrap;
   }
 
   .admin-title-block {
@@ -2272,7 +2430,6 @@
     font-size: 20px;
   }
 
-  .admin-title-block p,
   .admin-user-button span:last-child {
     display: none;
   }
@@ -2306,7 +2463,22 @@
   }
 
   .admin-filters {
-    grid-template-columns: 1fr;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .admin-filters .ant-select {
+    max-width: none;
+  }
+
+  .admin-list-card-header,
+  .admin-list-card-control {
+    display: grid;
+    justify-content: stretch;
+  }
+
+  .admin-list-card-actions .ant-btn {
+    flex: 1 1 150px;
   }
 }
 

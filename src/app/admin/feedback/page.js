@@ -3,6 +3,7 @@
 import { DeleteOutlined, EditOutlined, ReloadOutlined } from "@ant-design/icons";
 import { Button, Empty, Form, Input, Modal, Popconfirm, Select, Table, Tag, message } from "antd";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { AdminResponsiveList } from "@/components/AdminResponsiveList";
 import { AdminShell } from "@/components/AdminShell";
 import { deleteJson, getJson, patchJson } from "@/lib/apiClient";
 import { copy } from "@/lib/siteContent";
@@ -238,12 +239,78 @@ export default function AdminFeedbackPage() {
 
         {feedbackError ? <p className="admin-error-text">{feedbackError}</p> : null}
 
-        <Table
-          columns={columns}
-          dataSource={feedbackItems}
-          expandable={{
-            expandedRowRender: (feedback) => (
-              <div className="admin-row-detail">
+        <AdminResponsiveList
+          ariaLabel="Feedback list"
+          emptyDescription={feedbackError ? "Feedback could not be loaded." : "No feedback found."}
+          isEmpty={feedbackItems.length === 0}
+          loading={loadingFeedback}
+          loadingLabel="Loading feedback..."
+          table={
+            <Table
+              columns={columns}
+              dataSource={feedbackItems}
+              expandable={{
+                expandedRowRender: (feedback) => (
+                  <div className="admin-row-detail">
+                    {feedback.experienceRating ? (
+                      <p>
+                        <strong>Experience rating:</strong> {feedback.experienceRating}/5
+                      </p>
+                    ) : null}
+                    {feedback.screenshot ? (
+                      <p>
+                        <strong>Screenshot:</strong>{" "}
+                        <a href={feedback.screenshot} rel="noreferrer" target="_blank">
+                          {feedback.screenshot}
+                        </a>
+                      </p>
+                    ) : null}
+                    {feedback.adminReply ? (
+                      <p>
+                        <strong>Admin reply:</strong> {feedback.adminReply}
+                      </p>
+                    ) : null}
+                  </div>
+                )
+              }}
+              locale={{
+                emptyText: (
+                  <Empty
+                    description={feedbackError ? "Feedback could not be loaded." : "No feedback found."}
+                  />
+                )
+              }}
+              loading={loadingFeedback}
+              pagination={{ pageSize: 8 }}
+              rowKey="id"
+              scroll={{ x: 980 }}
+            />
+          }
+        >
+          {feedbackItems.map((feedback) => (
+            <article className="admin-list-card" key={feedback.id}>
+              <div className="admin-list-card-header">
+                <div className="admin-list-card-title">
+                  <strong>{feedback.name}</strong>
+                  <span>{feedback.email}</span>
+                </div>
+                <Tag>{formatEnum(feedback.type)}</Tag>
+              </div>
+
+              <div className="admin-list-card-control">
+                <span>Status</span>
+                <Select
+                  className="admin-status-select"
+                  loading={updatingFeedbackId === feedback.id}
+                  onChange={(nextStatus) => handleStatusChange(feedback, nextStatus)}
+                  options={feedbackStatusOptions}
+                  value={feedback.status}
+                />
+              </div>
+
+              <p className="admin-list-card-note">{feedback.message}</p>
+
+              <div className="admin-list-card-detail">
                 {feedback.experienceRating ? (
                   <p>
                     <strong>Experience rating:</strong> {feedback.experienceRating}/5
@@ -263,20 +330,25 @@ export default function AdminFeedbackPage() {
                   </p>
                 ) : null}
               </div>
-            )
-          }}
-          locale={{
-            emptyText: (
-              <Empty
-                description={feedbackError ? "Feedback could not be loaded." : "No feedback found."}
-              />
-            )
-          }}
-          loading={loadingFeedback}
-          pagination={{ pageSize: 8 }}
-          rowKey="id"
-          scroll={{ x: 980 }}
-        />
+
+              <div className="admin-list-card-actions">
+                <Button icon={<EditOutlined />} onClick={() => openReplyModal(feedback)}>
+                  {feedback.adminReply ? "Edit reply" : "Add reply"}
+                </Button>
+                <Popconfirm
+                  title="Delete this feedback?"
+                  okButtonProps={{ danger: true }}
+                  okText="Delete"
+                  onConfirm={() => handleDeleteFeedback(feedback)}
+                >
+                  <Button danger icon={<DeleteOutlined />} loading={updatingFeedbackId === feedback.id}>
+                    Delete
+                  </Button>
+                </Popconfirm>
+              </div>
+            </article>
+          ))}
+        </AdminResponsiveList>
       </section>
 
       <Modal

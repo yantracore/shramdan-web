@@ -131,6 +131,14 @@ The website should be mobile-first. Important actions such as support, join, con
 
 Desktop layouts can show richer summaries, side panels, maps, or progress sections, but mobile should never feel like a reduced afterthought.
 
+Admin pages are desktop-first because they support operational review work, but
+they still need a complete responsive path. Admin list pages should use the
+shared table-to-card/list pattern documented in the design guide: wide screens
+may show tables, while intermediate and handheld widths must switch to stacked
+records before the table causes page-level overflow. Filters, refresh controls,
+page titles, and descriptions should wrap inside the panel rather than clipping
+or extending past the viewport.
+
 ## Future Mobile App Readiness
 
 The website should be structured so future mobile app work can reuse the same product concepts:

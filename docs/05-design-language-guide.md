@@ -66,6 +66,30 @@ Avoid:
 - Unclear contribution calls to action.
 - Visual styles that make the platform feel like advertising instead of civic action.
 
+## Admin List Pattern
+
+Admin pages are desktop-first operational surfaces, but every list must also work
+cleanly on intermediate laptop/tablet widths and handheld screens. Do not build
+admin lists as table-only views.
+
+For each admin list:
+
+- Start from the shared `AdminResponsiveList` structure and the admin list CSS classes.
+- Keep a full table view for wide desktop screens where column comparison is useful.
+- Provide a stacked card/list view for narrower screens using the same data and actions.
+- Switch to the card/list view before the table forces page-level horizontal overflow.
+- Keep filters in a wrapping toolbar; controls should stack before they leave the panel.
+- Keep refresh and secondary actions compact, wrapping below the title when needed.
+- Let page titles and descriptions wrap naturally; do not hide the description just because the screen is narrow.
+- Use `min-width: 0`, `overflow-wrap: anywhere`, and controlled internal scrolling for long names, emails, links, notes, and messages.
+- Preserve the same core actions across table and card/list views: status changes, notes/replies, delete, and future row actions.
+- Design the card/list structure so it can later map to the mobile app: primary identity first, status/type chips next, summary text, detail metadata, then actions.
+
+Current admin list surfaces, including Applications and Feedback, should follow
+this pattern. Future Issue, Event, Incident, Upload, role, and notification lists
+should start from the same responsive pattern instead of receiving one-off
+responsive fixes later.
+
 ## Content Priorities
 
 For issues, prioritize:

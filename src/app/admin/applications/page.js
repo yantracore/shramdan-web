@@ -3,6 +3,7 @@
 import { DeleteOutlined, EditOutlined, ReloadOutlined } from "@ant-design/icons";
 import { Button, Empty, Form, Input, Modal, Popconfirm, Select, Table, Tag, message } from "antd";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { AdminResponsiveList } from "@/components/AdminResponsiveList";
 import { AdminShell } from "@/components/AdminShell";
 import { deleteJson, getJson, patchJson } from "@/lib/apiClient";
 import { copy } from "@/lib/siteContent";
@@ -250,12 +251,94 @@ export default function AdminApplicationsPage() {
 
         {applicationError ? <p className="admin-error-text">{applicationError}</p> : null}
 
-        <Table
-          columns={columns}
-          dataSource={applications}
-          expandable={{
-            expandedRowRender: (application) => (
-              <div className="admin-row-detail">
+        <AdminResponsiveList
+          ariaLabel="Applications list"
+          emptyDescription={applicationError ? "Applications could not be loaded." : "No applications found."}
+          isEmpty={applications.length === 0}
+          loading={loadingApplications}
+          loadingLabel="Loading applications..."
+          table={
+            <Table
+              columns={columns}
+              dataSource={applications}
+              expandable={{
+                expandedRowRender: (application) => (
+                  <div className="admin-row-detail">
+                    {application.experience ? (
+                      <p>
+                        <strong>Experience:</strong> {application.experience}
+                      </p>
+                    ) : null}
+                    {application.additionalInfo ? (
+                      <p>
+                        <strong>Additional info:</strong> {application.additionalInfo}
+                      </p>
+                    ) : null}
+                    {application.portfolio ? (
+                      <p>
+                        <strong>Portfolio:</strong>{" "}
+                        <a href={application.portfolio} rel="noreferrer" target="_blank">
+                          {application.portfolio}
+                        </a>
+                      </p>
+                    ) : null}
+                    {application.resumeUrl ? (
+                      <p>
+                        <strong>Resume:</strong>{" "}
+                        <a href={application.resumeUrl} rel="noreferrer" target="_blank">
+                          {application.resumeUrl}
+                        </a>
+                      </p>
+                    ) : null}
+                    {application.adminNotes ? (
+                      <p>
+                        <strong>Admin notes:</strong> {application.adminNotes}
+                      </p>
+                    ) : null}
+                  </div>
+                )
+              }}
+              locale={{
+                emptyText: (
+                  <Empty
+                    description={
+                      applicationError ? "Applications could not be loaded." : "No applications found."
+                    }
+                  />
+                )
+              }}
+              loading={loadingApplications}
+              pagination={{ pageSize: 8 }}
+              rowKey="id"
+              scroll={{ x: 980 }}
+            />
+          }
+        >
+          {applications.map((application) => (
+            <article className="admin-list-card" key={application.id}>
+              <div className="admin-list-card-header">
+                <div className="admin-list-card-title">
+                  <strong>{application.name}</strong>
+                  <span>{application.email}</span>
+                  {application.phone ? <span>{application.phone}</span> : null}
+                </div>
+                <Tag>{formatEnum(application.role)}</Tag>
+              </div>
+
+              <div className="admin-list-card-control">
+                <span>Status</span>
+                <Select
+                  className="admin-status-select"
+                  loading={updatingApplicationId === application.id}
+                  onChange={(nextStatus) => handleStatusChange(application, nextStatus)}
+                  options={statusOptions}
+                  value={application.status}
+                />
+              </div>
+
+              <p className="admin-list-card-note">{application.motivation}</p>
+
+              <div className="admin-list-card-detail">
                 {application.experience ? (
                   <p>
                     <strong>Experience:</strong> {application.experience}
@@ -288,22 +371,25 @@ export default function AdminApplicationsPage() {
                   </p>
                 ) : null}
               </div>
-            )
-          }}
-          locale={{
-            emptyText: (
-              <Empty
-                description={
-                  applicationError ? "Applications could not be loaded." : "No applications found."
-                }
-              />
-            )
-          }}
-          loading={loadingApplications}
-          pagination={{ pageSize: 8 }}
-          rowKey="id"
-          scroll={{ x: 980 }}
-        />
+
+              <div className="admin-list-card-actions">
+                <Button icon={<EditOutlined />} onClick={() => openNotesModal(application)}>
+                  {application.adminNotes ? "Edit notes" : "Add notes"}
+                </Button>
+                <Popconfirm
+                  title="Delete this application?"
+                  okButtonProps={{ danger: true }}
+                  okText="Delete"
+                  onConfirm={() => handleDeleteApplication(application)}
+                >
+                  <Button danger icon={<DeleteOutlined />} loading={updatingApplicationId === application.id}>
+                    Delete
+                  </Button>
+                </Popconfirm>
+              </div>
+            </article>
+          ))}
+        </AdminResponsiveList>
       </section>
 
       <Modal
