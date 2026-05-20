@@ -31,10 +31,7 @@ const dashboardModules = [
 
 export default function AdminDashboardPage() {
   return (
-    <AdminShell
-      title="Control Center"
-      subtitle="A focused workspace for managing Shramdan operations."
-    >
+    <AdminShell title="Control Center">
       <section className="admin-dashboard-grid">
         {dashboardModules.map((module) => {
           const isDisabled = module.href === "#";

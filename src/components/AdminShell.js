@@ -52,7 +52,7 @@ function AdminSidebar({ activePath, onNavigate }) {
   );
 }
 
-export function AdminShell({ children, subtitle, title }) {
+export function AdminShell({ children, title }) {
   const router = useRouter();
   const pathname = usePathname();
   const session = useSyncExternalStore(subscribeAuthSession, getAuthSession, () => null);
@@ -132,7 +132,6 @@ export function AdminShell({ children, subtitle, title }) {
             />
             <div>
               <h1>{title}</h1>
-              {subtitle ? <p>{subtitle}</p> : null}
             </div>
           </div>
           <div className="admin-topbar-actions">

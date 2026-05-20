@@ -1600,8 +1600,7 @@
   flex: 1 1 auto;
 }
 
-.admin-title-block h1,
-.admin-title-block p {
+.admin-title-block h1 {
   margin: 0;
 }
 
@@ -1609,13 +1608,6 @@
   color: var(--text);
   font-size: 24px;
   line-height: 1.1;
-}
-
-.admin-title-block p {
-  margin-top: 4px;
-  color: var(--muted);
-  font-size: 14px;
-  overflow-wrap: anywhere;
 }
 
 .admin-topbar-actions {
@@ -2418,12 +2410,14 @@
 
 @media (max-width: 720px) {
   .admin-topbar {
-    align-items: flex-start;
-    flex-wrap: wrap;
+    align-items: center;
+    min-height: auto;
+    flex-wrap: nowrap;
+    padding-block: 10px;
   }
 
   .admin-title-block {
-    align-items: flex-start;
+    align-items: center;
   }
 
   .admin-title-block h1 {

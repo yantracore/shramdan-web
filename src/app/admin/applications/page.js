@@ -218,7 +218,7 @@ export default function AdminApplicationsPage() {
   ];
 
   return (
-    <AdminShell title="Applications" subtitle="Review and manage contributor applications.">
+    <AdminShell title="Applications">
       {contextHolder}
       <section className="admin-panel">
         <div className="admin-panel-heading">

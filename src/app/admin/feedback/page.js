@@ -206,7 +206,7 @@ export default function AdminFeedbackPage() {
   ];
 
   return (
-    <AdminShell title="Feedback" subtitle="Review public messages and save admin replies.">
+    <AdminShell title="Feedback">
       {contextHolder}
       <section className="admin-panel">
         <div className="admin-panel-heading">
