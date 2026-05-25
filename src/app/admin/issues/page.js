@@ -2,6 +2,7 @@
 
 import { EnvironmentOutlined, EyeOutlined, PlusOutlined, RiseOutlined } from "@ant-design/icons";
 import { Button, Empty, Modal, Select, Spin, Table, Tag } from "antd";
+import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { AdminResponsiveList } from "@/components/AdminResponsiveList";
@@ -18,6 +19,7 @@ import {
   formatCoordinates,
   formatDate,
   formatEnum,
+  getFirstIssueImage,
   getListItems
 } from "@/lib/adminUtils";
 import { useAdminListResource } from "@/hooks/useAdminListResource";
@@ -79,14 +81,28 @@ export default function AdminIssuesPage() {
       title: "Issue",
       dataIndex: "title",
       key: "title",
-      render: (_, issue) => (
-        <div className="admin-applicant-cell">
-          <strong>{issue.title}</strong>
-          <span>
-            <EnvironmentOutlined /> {issue.addressText}
-          </span>
-        </div>
-      )
+      render: (_, issue) => {
+        const cover = getFirstIssueImage(issue);
+        return (
+          <div className="admin-issue-row">
+            <div className="admin-issue-thumb" aria-hidden={!cover}>
+              {cover ? (
+                <Image alt="" height={56} src={cover.url} unoptimized width={56} />
+              ) : (
+                <span className="admin-issue-thumb-placeholder">
+                  <EnvironmentOutlined />
+                </span>
+              )}
+            </div>
+            <div className="admin-applicant-cell">
+              <strong>{issue.title}</strong>
+              <span>
+                <EnvironmentOutlined /> {issue.addressText}
+              </span>
+            </div>
+          </div>
+        );
+      }
     },
     {
       title: "Category",
@@ -196,16 +212,31 @@ export default function AdminIssuesPage() {
             />
           }
         >
-          {issues.map((issue) => (
+          {issues.map((issue) => {
+            const cardCover = getFirstIssueImage(issue);
+            return (
             <AdminListCard
               key={issue.id}
               header={
                 <>
                   <div className="admin-list-card-title">
-                    <strong>{issue.title}</strong>
-                    <span>
-                      <EnvironmentOutlined /> {issue.addressText}
-                    </span>
+                    <div className="admin-issue-row">
+                      <div className="admin-issue-thumb" aria-hidden={!cardCover}>
+                        {cardCover ? (
+                          <Image alt="" height={56} src={cardCover.url} unoptimized width={56} />
+                        ) : (
+                          <span className="admin-issue-thumb-placeholder">
+                            <EnvironmentOutlined />
+                          </span>
+                        )}
+                      </div>
+                      <div>
+                        <strong>{issue.title}</strong>
+                        <span>
+                          <EnvironmentOutlined /> {issue.addressText}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                   <Tag color={ISSUE_STATUS_COLORS[issue.status]}>{formatEnum(issue.status)}</Tag>
                 </>
@@ -229,7 +260,8 @@ export default function AdminIssuesPage() {
                 </Button>
               }
             />
-          ))}
+            );
+          })}
         </AdminResponsiveList>
       </section>
 

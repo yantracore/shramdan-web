@@ -105,3 +105,15 @@ export function getListItems(response) {
 export function buildEnumOptions(values) {
   return values.map((value) => ({ label: formatEnum(value), value }));
 }
+
+export function isImageUpload(upload) {
+  if (!upload || !upload.url) return false;
+  if (upload.fileType === "IMAGE") return true;
+  if (typeof upload.mimeType === "string" && upload.mimeType.startsWith("image/")) return true;
+  return /\.(png|jpe?g|webp|gif|avif)$/i.test(upload.url);
+}
+
+export function getFirstIssueImage(issue) {
+  const uploads = Array.isArray(issue?.uploads) ? issue.uploads : [];
+  return uploads.find(isImageUpload) || null;
+}
