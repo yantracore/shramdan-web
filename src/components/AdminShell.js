@@ -5,6 +5,7 @@ import {
   CalendarOutlined,
   EnvironmentOutlined,
   FormOutlined,
+  GlobalOutlined,
   LogoutOutlined,
   MenuOutlined,
   MessageOutlined,
@@ -124,11 +125,18 @@ export function AdminShell({ children, title }) {
       },
       { type: "divider" },
       {
+        key: "back-to-website",
+        icon: <GlobalOutlined />,
+        label: "Back to website",
+        onClick: () => router.push("/")
+      },
+      {
         key: "profile",
         icon: <UserOutlined />,
         label: "My profile",
         onClick: () => router.push("/me")
       },
+      { type: "divider" },
       {
         key: "logout",
         icon: <LogoutOutlined />,
