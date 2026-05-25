@@ -2944,10 +2944,33 @@
   justify-content: center;
   border-radius: 999px;
   transition: transform 0.15s ease;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  color: inherit;
 }
 
-.toolbar-avatar:hover {
+.toolbar-avatar:hover,
+.toolbar-avatar:focus-visible {
   transform: scale(1.05);
+  outline: none;
+}
+
+.toolbar-user-menu-profile {
+  display: grid;
+  gap: 4px;
+  min-width: 220px;
+  padding: 4px 0;
+}
+
+.toolbar-user-menu-profile strong {
+  color: var(--text);
+}
+
+.toolbar-user-menu-profile span {
+  color: var(--muted);
+  font-size: 12px;
 }
 
 @media (max-width: 620px) {

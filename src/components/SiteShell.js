@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useSyncExternalStore } from "react";
 import {
+  AppstoreOutlined,
+  LogoutOutlined,
   MenuOutlined,
   MoonOutlined,
   SunOutlined,
@@ -9,14 +11,14 @@ import {
   UserAddOutlined,
   UserOutlined
 } from "@ant-design/icons";
-import { Avatar, Button, Tooltip } from "antd";
+import { Avatar, Button, Dropdown, Tag, Tooltip } from "antd";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { FaFacebookF, FaTiktok, FaXTwitter, FaYoutube } from "react-icons/fa6";
 import { usePreferences } from "@/app/providers";
 import { copy } from "@/lib/siteContent";
-import { getAuthSession, subscribeAuthSession } from "@/lib/authSession";
+import { clearAuthSession, getAuthSession, isAdminUser, subscribeAuthSession } from "@/lib/authSession";
 
 function getInitials(user) {
   const source = user?.name || user?.username || user?.email || "";
@@ -41,10 +43,12 @@ export function SiteShell({ children }) {
   const { language, mode, toggleLanguage, toggleMode } = usePreferences();
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
   const pathname = usePathname();
+  const router = useRouter();
   const session = useSyncExternalStore(subscribeAuthSession, getAuthSession, () => null);
   const t = copy[language];
   const activePath = pathname === "/" ? "/" : `/${pathname.split("/").filter(Boolean)[0]}`;
   const isAuthenticated = Boolean(session?.user);
+  const isAdmin = isAuthenticated && isAdminUser(session.user);
   const navItems = [
     { href: "/", label: t.nav.home },
     { href: "/join", label: t.nav.join },
@@ -53,6 +57,53 @@ export function SiteShell({ children }) {
       ? { href: "/me", label: t.me.navLabel }
       : { href: "/login", label: t.nav.login }
   ];
+
+  const handleLogout = () => {
+    clearAuthSession();
+    router.replace("/login");
+  };
+
+  const userMenu = isAuthenticated
+    ? {
+        items: [
+          {
+            key: "identity",
+            disabled: true,
+            label: (
+              <div className="toolbar-user-menu-profile">
+                <strong>{session.user.name || session.user.username || session.user.email}</strong>
+                <span>{session.user.email}</span>
+                {isAdmin ? <Tag color="green">{session.user.role}</Tag> : null}
+              </div>
+            )
+          },
+          { type: "divider" },
+          ...(isAdmin
+            ? [
+                {
+                  key: "admin-center",
+                  icon: <AppstoreOutlined />,
+                  label: t.me.menu.adminCenter,
+                  onClick: () => router.push("/admin")
+                }
+              ]
+            : []),
+          {
+            key: "profile",
+            icon: <UserOutlined />,
+            label: t.me.menu.myProfile,
+            onClick: () => router.push("/me")
+          },
+          { type: "divider" },
+          {
+            key: "logout",
+            icon: <LogoutOutlined />,
+            label: t.me.menu.logout,
+            onClick: handleLogout
+          }
+        ]
+      }
+    : null;
   const footerLinks = [
     {
       title: t.footer.columns.quickLinks,
@@ -145,20 +196,22 @@ export function SiteShell({ children }) {
             </Tooltip>
           </div>
           {isAuthenticated ? (
-            <Link
-              className="toolbar-avatar"
-              href="/me"
-              aria-label={t.me.navLabel}
-              title={t.me.navLabel}
-            >
-              <Avatar
-                src={session.user.avatar || undefined}
-                icon={<UserOutlined />}
-                size={38}
+            <Dropdown menu={userMenu} placement="bottomRight" trigger={["click"]}>
+              <button
+                type="button"
+                className="toolbar-avatar"
+                aria-label={t.ariaLabels.userMenu}
+                title={t.ariaLabels.userMenu}
               >
-                {getInitials(session.user)}
-              </Avatar>
-            </Link>
+                <Avatar
+                  src={session.user.avatar || undefined}
+                  icon={<UserOutlined />}
+                  size={38}
+                >
+                  {getInitials(session.user)}
+                </Avatar>
+              </button>
+            </Dropdown>
           ) : (
             <Button className="toolbar-cta" type="primary" href="/join" icon={<UserAddOutlined />}>
               {t.nav.join}
@@ -185,6 +238,15 @@ export function SiteShell({ children }) {
                 </Link>
               );
             })}
+            {isAdmin ? (
+              <Link
+                aria-current={activePath === "/admin" ? "page" : undefined}
+                className={activePath === "/admin" ? "is-active" : undefined}
+                href="/admin"
+              >
+                {t.me.menu.adminCenter}
+              </Link>
+            ) : null}
             <div className="mobile-menu-preferences" aria-label={t.ariaLabels.preferences}>
               <button type="button" aria-label={t.controls.themeTooltip} title={t.controls.themeTooltip} onClick={toggleMode}>
                 {mode === "light" ? t.controls.darkTheme : t.controls.lightTheme}
@@ -192,6 +254,11 @@ export function SiteShell({ children }) {
               <button type="button" aria-label={t.controls.languageTooltip} title={t.controls.languageTooltip} onClick={toggleLanguage}>
                 {t.controls.language}
               </button>
+              {isAuthenticated ? (
+                <button type="button" onClick={handleLogout}>
+                  {t.me.menu.logout}
+                </button>
+              ) : null}
             </div>
           </div>
         </details>

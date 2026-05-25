@@ -13,7 +13,8 @@ export const copy = {
       preferences: "वेबसाइट प्राथमिकताहरू",
       toggleTheme: "थिम बदल्नुहोस्",
       openMenu: "नेभिगेसन खोल्नुहोस्",
-      heroPanel: "श्रमदान कार्य केन्द्र"
+      heroPanel: "श्रमदान कार्य केन्द्र",
+      userMenu: "प्रयोगकर्ता मेनु"
     },
     controls: {
       language: "English",
@@ -350,6 +351,11 @@ export const copy = {
       title: "मेरो प्रोफाइल",
       intro: "आफ्नो खाताका विवरण हेर्नुहोस् र अद्यावधिक गर्नुहोस्।",
       navLabel: "मेरो प्रोफाइल",
+      menu: {
+        adminCenter: "एड्मिन कन्ट्रोल सेन्टर",
+        myProfile: "मेरो प्रोफाइल",
+        logout: "लग आउट"
+      },
       identity: {
         heading: "खाताका विवरण",
         intro: "केवल हेर्नका लागि मात्र।",
@@ -441,7 +447,8 @@ export const copy = {
       preferences: "Site preferences",
       toggleTheme: "Toggle theme",
       openMenu: "Open navigation",
-      heroPanel: "Shramdan action hub"
+      heroPanel: "Shramdan action hub",
+      userMenu: "User menu"
     },
     controls: {
       language: "नेपाली",
@@ -778,6 +785,11 @@ export const copy = {
       title: "My profile",
       intro: "Review and update your account details.",
       navLabel: "My profile",
+      menu: {
+        adminCenter: "Admin Control Center",
+        myProfile: "My profile",
+        logout: "Logout"
+      },
       identity: {
         heading: "Account details",
         intro: "Read-only information.",
