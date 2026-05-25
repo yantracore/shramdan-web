@@ -35,13 +35,21 @@ function getUserInitials(name, email) {
   return (email || "?").slice(0, 1).toUpperCase();
 }
 
-const adminNavItems = [
-  { href: "/admin", icon: <AppstoreOutlined />, label: "Dashboard" },
-  { href: "/admin/applications", icon: <FormOutlined />, label: "Applications" },
-  { href: "/admin/feedback", icon: <MessageOutlined />, label: "Feedback" },
-  { href: "/admin/issues", icon: <EnvironmentOutlined />, label: "Issues" },
-  { href: "/admin/events", icon: <CalendarOutlined />, label: "Events" },
-  { href: "/admin/users", icon: <TeamOutlined />, label: "Users" }
+const adminNavGroups = [
+  [
+    { href: "/admin", icon: <AppstoreOutlined />, label: "Dashboard" }
+  ],
+  [
+    { href: "/admin/applications", icon: <FormOutlined />, label: "Applications" },
+    { href: "/admin/feedback", icon: <MessageOutlined />, label: "Feedback" }
+  ],
+  [
+    { href: "/admin/issues", icon: <EnvironmentOutlined />, label: "Issues" },
+    { href: "/admin/events", icon: <CalendarOutlined />, label: "Events" }
+  ],
+  [
+    { href: "/admin/users", icon: <TeamOutlined />, label: "Users" }
+  ]
 ];
 
 function AdminSidebar({ activePath, onNavigate }) {
@@ -52,22 +60,27 @@ function AdminSidebar({ activePath, onNavigate }) {
         <strong>Shramdan</strong>
       </Link>
       <nav className="admin-sidebar-nav">
-        {adminNavItems.map((item) => {
-          const isActive = activePath === item.href;
+        {adminNavGroups.map((group, groupIndex) => (
+          <div className="admin-sidebar-group" key={groupIndex}>
+            {groupIndex > 0 ? <hr aria-hidden="true" className="admin-sidebar-divider" /> : null}
+            {group.map((item) => {
+              const isActive = activePath === item.href;
 
-          return (
-            <Link
-              aria-current={isActive ? "page" : undefined}
-              className={isActive ? "is-active" : undefined}
-              href={item.href}
-              key={item.href}
-              onClick={onNavigate}
-            >
-              {item.icon}
-              <span>{item.label}</span>
-            </Link>
-          );
-        })}
+              return (
+                <Link
+                  aria-current={isActive ? "page" : undefined}
+                  className={isActive ? "is-active" : undefined}
+                  href={item.href}
+                  key={item.href}
+                  onClick={onNavigate}
+                >
+                  {item.icon}
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
+          </div>
+        ))}
       </nav>
     </aside>
   );

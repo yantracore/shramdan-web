@@ -1560,6 +1560,18 @@
   gap: 6px;
 }
 
+.admin-sidebar-group {
+  display: grid;
+  gap: 6px;
+}
+
+.admin-sidebar-divider {
+  border: 0;
+  height: 1px;
+  margin: 6px 4px 10px;
+  background: color-mix(in srgb, var(--border) 70%, transparent);
+}
+
 .admin-sidebar-nav a {
   display: flex;
   gap: 10px;
