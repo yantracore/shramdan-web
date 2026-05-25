@@ -15,6 +15,7 @@ import {
   GithubOutlined,
   HeartOutlined,
   LineChartOutlined,
+  MessageOutlined,
   PartitionOutlined,
   PlayCircleOutlined,
   RocketOutlined,
@@ -22,6 +23,7 @@ import {
   TeamOutlined,
   ToolOutlined,
   TrophyOutlined,
+  VideoCameraOutlined,
   YoutubeOutlined
 } from "@ant-design/icons";
 import { Button } from "antd";
@@ -31,6 +33,9 @@ import { usePreferences } from "@/app/providers";
 import { copy } from "@/lib/siteContent";
 
 const resourceIcons = {
+  participate: VideoCameraOutlined,
+  watchLive: YoutubeOutlined,
+  discord: MessageOutlined,
   apiDocs: ApiOutlined,
   presentation: FilePptOutlined,
   documents: FileTextOutlined,

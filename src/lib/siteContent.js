@@ -250,6 +250,27 @@ export const copy = {
       },
       items: [
         {
+          id: "participate",
+          title: "प्रत्यक्ष सहभागिता",
+          description: "Google Meet मार्फत दैनिक श्रमदान कार्य सत्रमा सामेल हुनुहोस् — सोमबारदेखि शुक्रबार दिनको १२ बजे।",
+          button: "Participate 12 PM Mon–Fri",
+          href: "https://meet.google.com/kwi-kqyi-iyf"
+        },
+        {
+          id: "watchLive",
+          title: "प्रत्यक्ष प्रसारण हेर्नुहोस्",
+          description: "YouTube मा दैनिक विकास प्रत्यक्ष प्रसारण — सोमबारदेखि शुक्रबार दिनको १२ बजे।",
+          button: "Watch Live 12 PM Mon–Fri",
+          href: "https://www.youtube.com/@yantracore"
+        },
+        {
+          id: "discord",
+          title: "Discord समुदाय",
+          description: "Discord मा सबैसँग कुराकानी गर्नुहोस्, प्रश्न सोध्नुहोस् र समाचार पाउनुहोस्।",
+          button: "Join Discord",
+          href: "https://discord.gg/Cd57PXxf"
+        },
+        {
           id: "presentation",
           title: "प्रत्यक्ष प्रसारण प्रस्तुति सामग्री",
           description: "श्रमदानको उद्देश्य र पूरा विकास यात्रालाई समेटिएको प्रस्तुति सामग्री।",
@@ -806,6 +827,27 @@ export const copy = {
         button: "Watch Full Playlist on YouTube"
       },
       items: [
+        {
+          id: "participate",
+          title: "Participate Live",
+          description: "Join the daily Shramdan working session on Google Meet, 12 PM Monday to Friday.",
+          button: "Participate 12 PM Mon–Fri",
+          href: "https://meet.google.com/kwi-kqyi-iyf"
+        },
+        {
+          id: "watchLive",
+          title: "Watch Live Stream",
+          description: "Tune in to the development livestream on YouTube, 12 PM Monday to Friday.",
+          button: "Watch Live 12 PM Mon–Fri",
+          href: "https://www.youtube.com/@yantracore"
+        },
+        {
+          id: "discord",
+          title: "Discord Community",
+          description: "Chat with the community, ask questions, and follow updates on Discord.",
+          button: "Join Discord",
+          href: "https://discord.gg/Cd57PXxf"
+        },
         {
           id: "presentation",
           title: "Livestream Presentation Slides",
