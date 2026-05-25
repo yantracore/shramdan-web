@@ -1396,6 +1396,12 @@
   border: 0;
 }
 
+.resources-playlist-action {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+}
+
 .resource-card {
   display: grid;
   align-content: start;

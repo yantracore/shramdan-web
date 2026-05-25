@@ -21,7 +21,8 @@ import {
   ShopOutlined,
   TeamOutlined,
   ToolOutlined,
-  TrophyOutlined
+  TrophyOutlined,
+  YoutubeOutlined
 } from "@ant-design/icons";
 import { Button } from "antd";
 import Image from "next/image";
@@ -318,6 +319,16 @@ export default function Home() {
               referrerPolicy="strict-origin-when-cross-origin"
               allowFullScreen
             />
+          </div>
+          <div className="resources-playlist-action">
+            <Button
+              href={t.resources.playlist.playlistUrl}
+              target="_blank"
+              rel="noreferrer"
+              icon={<YoutubeOutlined />}
+            >
+              {t.resources.playlist.button}
+            </Button>
           </div>
         </article>
 

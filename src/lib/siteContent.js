@@ -242,7 +242,9 @@ export const copy = {
       playlist: {
         title: "श्रमदान विकास भिडियो शृङ्खला",
         description: "श्रमदानको विकास यात्रा, प्रत्यक्ष प्रसारण र परियोजनाको सन्दर्भ यहीँबाट सिधै हेर्न सकिन्छ।",
-        embedUrl: "https://www.youtube-nocookie.com/embed/videoseries?list=PLWkh0s4xHPcTF4FOcYjkdR3i97YbkSDGo"
+        embedUrl: "https://www.youtube-nocookie.com/embed/videoseries?list=PLWkh0s4xHPcTF4FOcYjkdR3i97YbkSDGo",
+        playlistUrl: "https://www.youtube.com/playlist?list=PLWkh0s4xHPcTF4FOcYjkdR3i97YbkSDGo",
+        button: "YouTube मा पूरै प्लेलिस्ट हेर्नुहोस्"
       },
       items: [
         {
@@ -668,7 +670,9 @@ export const copy = {
       playlist: {
         title: "Shramdan development playlist",
         description: "Watch the Shramdan development walkthrough, livestream, and project context directly from this page.",
-        embedUrl: "https://www.youtube-nocookie.com/embed/videoseries?list=PLWkh0s4xHPcTF4FOcYjkdR3i97YbkSDGo"
+        embedUrl: "https://www.youtube-nocookie.com/embed/videoseries?list=PLWkh0s4xHPcTF4FOcYjkdR3i97YbkSDGo",
+        playlistUrl: "https://www.youtube.com/playlist?list=PLWkh0s4xHPcTF4FOcYjkdR3i97YbkSDGo",
+        button: "Watch full playlist on YouTube"
       },
       items: [
         {
