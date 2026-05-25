@@ -10,6 +10,14 @@ Project documentation should be written in English from this point forward so fu
 
 User-facing product language may later be refined in Nepali, English, or bilingual formats depending on the audience and launch plan.
 
+## Language Scope For Surfaces
+
+- **Public site** (homepage and every public page under `/`, including `/join`, `/feedback`, future `/issues`, `/campaigns`, `/impact-stories`, public footer, error/empty states): bilingual EN ↔ NE with the toggle. All public-facing copy is translated.
+- **Admin control center** (`/admin/*`, including every admin form, table, modal, status label, error message, and notes/reply UI): English only. Do not add NE translations or expose the language toggle here.
+- **Member portal** (`/app/*`, once it ships): bilingual EN ↔ NE, treated like the public site.
+
+When adding new copy, locate it correctly in `src/lib/siteContent.js` (or its successor) — admin strings should never appear under a translation key, and public strings should never be EN-only.
+
 ## Brand Feeling
 
 Shramdaan should feel:

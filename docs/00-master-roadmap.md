@@ -95,9 +95,9 @@ Goal: A live public site, deployable, with the basic surfaces users currently se
   - [x] 0.5.2 `/admin` shell + role gate `w:1`
   - [x] 0.5.3 Admin user dropdown on public site header `w:1`
 - [x] 0.6 Docs 01–10 set authored `w:1`
-- [~] 0.7 Bilingual EN/NE toggle across all surfaces `w:1`
+- [~] 0.7 Bilingual EN/NE on the public site only `w:1` *(admin shell, admin forms, and any `/admin/*` surface stay EN-only by product decision)*
   - [x] 0.7.1 Toggle scaffold + homepage copy
-  - [ ] 0.7.2 Forms, errors, admin shell, public footer copy in NE
+  - [ ] 0.7.2 Remaining public-site copy in NE: `/join`, `/feedback`, public footer, error/empty states, and future public pages (`/issues`, `/campaigns`, `/impact-stories`)
 
 ## Phase 1 — Public Issue Discovery & Voting `w:15` 📊 0%
 
@@ -235,7 +235,7 @@ Goal: Ship native iOS + Android once `/app` web shell is stable. Reuse the same 
 
 - [x] 11.1 Responsive admin list pattern (`AdminResponsiveList`) `w:1`
 - [ ] 11.2 Accessibility audit (WCAG AA) `w:2`
-- [ ] 11.3 Bilingual EN/NE complete coverage `w:2`
+- [ ] 11.3 Bilingual EN/NE coverage across the public site `w:2` *(admin control center is intentionally EN-only)*
 - [ ] 11.4 SEO + meta + sitemap `w:1`
 - [ ] 11.5 Analytics + observability `w:1`
 - [ ] 11.6 Performance (Lighthouse mobile > 90) `w:1`
