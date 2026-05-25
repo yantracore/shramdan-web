@@ -1,7 +1,7 @@
 "use client";
 
 import { LockOutlined, MailOutlined } from "@ant-design/icons";
-import { Button, Form, Input, message } from "antd";
+import { Button, Form, Input } from "antd";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { usePreferences } from "@/app/providers";
@@ -9,6 +9,7 @@ import { SiteShell } from "@/components/SiteShell";
 import { loginWithPassword } from "@/lib/apiClient";
 import { getAuthSession, isAdminUser, setAuthSession } from "@/lib/authSession";
 import { copy } from "@/lib/siteContent";
+import { useToast } from "@/lib/toast";
 
 const loginCopy = {
   np: {
@@ -47,7 +48,7 @@ export default function LoginPage() {
   const t = loginCopy[language] ?? loginCopy.np;
   const globalCopy = copy[language] ?? copy.np;
   const [form] = Form.useForm();
-  const [messageApi, contextHolder] = message.useMessage();
+  const messageApi = useToast();
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -76,7 +77,6 @@ export default function LoginPage() {
 
   return (
     <SiteShell>
-      {contextHolder}
       <section className="page-section login-section">
         <div className="section-heading login-heading">
           <h1>{t.title}</h1>

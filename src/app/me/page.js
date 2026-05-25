@@ -9,7 +9,7 @@ import {
   UploadOutlined,
   UserOutlined
 } from "@ant-design/icons";
-import { Alert, Avatar, Button, Form, Input, Spin, Tag, message } from "antd";
+import { Alert, Avatar, Button, Form, Input, Spin, Tag } from "antd";
 import { usePreferences } from "@/app/providers";
 import { SiteShell } from "@/components/SiteShell";
 import { changePassword, fetchMe, updateMe } from "@/lib/apiClient";
@@ -19,6 +19,7 @@ import {
   subscribeAuthSession
 } from "@/lib/authSession";
 import { copy } from "@/lib/siteContent";
+import { useToast } from "@/lib/toast";
 import { uploadAvatar } from "@/lib/uploads";
 
 const AVATAR_MAX_BYTES = 5 * 1024 * 1024;
@@ -74,7 +75,7 @@ export default function MePage() {
 
   const [profileForm] = Form.useForm();
   const [passwordForm] = Form.useForm();
-  const [messageApi, contextHolder] = message.useMessage();
+  const messageApi = useToast();
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -230,7 +231,6 @@ export default function MePage() {
   if (!session || loadingProfile) {
     return (
       <SiteShell>
-        {contextHolder}
         <section className="page-section me-section">
           <div className="me-loading">
             <Spin size="large" />
@@ -243,7 +243,6 @@ export default function MePage() {
   if (loadError) {
     return (
       <SiteShell>
-        {contextHolder}
         <section className="page-section me-section">
           <Alert
             type="error"
@@ -267,7 +266,6 @@ export default function MePage() {
 
   return (
     <SiteShell>
-      {contextHolder}
       <section className="page-section me-section">
         <div className="section-heading">
           <h1>{t.title}</h1>

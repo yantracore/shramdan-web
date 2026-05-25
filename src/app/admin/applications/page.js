@@ -1,7 +1,7 @@
 "use client";
 
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
-import { Button, Empty, Form, Input, Modal, Popconfirm, Select, Table, Tag, message } from "antd";
+import { Button, Empty, Form, Input, Modal, Popconfirm, Select, Table, Tag } from "antd";
 import { useMemo } from "react";
 import { AdminResponsiveList } from "@/components/AdminResponsiveList";
 import { AdminShell } from "@/components/AdminShell";
@@ -14,9 +14,10 @@ import { APPLICATION_STATUSES, buildEnumOptions, formatEnum } from "@/lib/adminU
 import { useAdminEditModal } from "@/hooks/useAdminEditModal";
 import { useAdminItemMutation } from "@/hooks/useAdminItemMutation";
 import { useAdminListResource } from "@/hooks/useAdminListResource";
+import { useToast } from "@/lib/toast";
 
 export default function AdminApplicationsPage() {
-  const [messageApi, contextHolder] = message.useMessage();
+  const messageApi = useToast();
   const {
     items: applications,
     setItems: setApplications,
@@ -174,7 +175,6 @@ export default function AdminApplicationsPage() {
 
   return (
     <AdminShell title="Applications">
-      {contextHolder}
       <section className="admin-panel">
         <AdminPanelHeading
           eyebrow="First CRUD"

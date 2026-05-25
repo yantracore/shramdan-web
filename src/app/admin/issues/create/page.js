@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowLeftOutlined, SaveOutlined } from "@ant-design/icons";
-import { Button, Form, Input, InputNumber, Select, message } from "antd";
+import { Button, Form, Input, InputNumber, Select } from "antd";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
@@ -9,11 +9,12 @@ import { AdminShell } from "@/components/AdminShell";
 import { AdminPanelHeading } from "@/components/admin/AdminPanelHeading";
 import { postJson } from "@/lib/apiClient";
 import { ISSUE_CATEGORIES, buildEnumOptions } from "@/lib/adminUtils";
+import { useToast } from "@/lib/toast";
 
 export default function AdminIssueCreatePage() {
   const router = useRouter();
   const [form] = Form.useForm();
-  const [messageApi, contextHolder] = message.useMessage();
+  const toast = useToast();
   const [submitting, setSubmitting] = useState(false);
 
   const categoryOptions = useMemo(() => buildEnumOptions(ISSUE_CATEGORIES), []);
@@ -23,10 +24,10 @@ export default function AdminIssueCreatePage() {
 
     try {
       await postJson("/issues", values, { requireAuth: true });
-      messageApi.success("Issue created.");
+      toast.success("Issue created.");
       router.push("/admin/issues");
     } catch (error) {
-      messageApi.error(error.message || "Could not create issue.");
+      toast.error(error.message || "Could not create issue.");
     } finally {
       setSubmitting(false);
     }
@@ -34,7 +35,6 @@ export default function AdminIssueCreatePage() {
 
   return (
     <AdminShell title="Create issue">
-      {contextHolder}
       <section className="admin-panel">
         <AdminPanelHeading
           eyebrow="Community issues"

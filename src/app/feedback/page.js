@@ -1,17 +1,17 @@
 "use client";
 
-import { message } from "antd";
 import { useState } from "react";
 import { FeedbackForm } from "@/components/FeedbackForm";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
 import { postJson } from "@/lib/apiClient";
 import { copy } from "@/lib/siteContent";
+import { useToast } from "@/lib/toast";
 
 export default function FeedbackPage() {
   const { language } = usePreferences();
   const t = copy[language];
-  const [messageApi, contextHolder] = message.useMessage();
+  const messageApi = useToast();
   const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async (values) => {
@@ -31,7 +31,6 @@ export default function FeedbackPage() {
 
   return (
     <SiteShell>
-      {contextHolder}
       <section className="page-section form-section">
         <div className="section-heading">
           <span className="eyebrow">{t.feedback.eyebrow}</span>

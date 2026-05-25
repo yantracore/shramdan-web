@@ -1,6 +1,6 @@
 "use client";
 
-import { ConfigProvider, theme as antdTheme } from "antd";
+import { App as AntdApp, ConfigProvider, theme as antdTheme } from "antd";
 import { createContext, useCallback, useContext, useEffect, useMemo, useSyncExternalStore } from "react";
 
 const PreferenceContext = createContext(null);
@@ -120,7 +120,9 @@ export function Providers({ children }) {
 
   return (
     <PreferenceContext.Provider value={value}>
-      <ConfigProvider theme={theme}>{children}</ConfigProvider>
+      <ConfigProvider theme={theme}>
+        <AntdApp component={false}>{children}</AntdApp>
+      </ConfigProvider>
     </PreferenceContext.Provider>
   );
 }

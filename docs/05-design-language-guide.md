@@ -152,6 +152,52 @@ The list page header is the only entry point for creation. Add the create button
 `Create <entity-singular>` (e.g. "Create issue", "Create event"). The href points to
 `/admin/<entity>/create`.
 
+### Toasts (success and error messages)
+
+Every page that submits to the API — public forms, admin lists, admin create/edit
+pages — must surface a clear success or error toast after the request settles.
+Toasts use Ant Design's `message` API, but they are wired through a single
+app-wide context so they survive navigation (e.g. after a successful create that
+calls `router.push(...)` the toast is still rendered on the next page).
+
+How it is wired:
+
+- The root `Providers` component (`src/app/providers.js`) wraps the tree in
+  Ant Design's `<App component={false}>`. That mounts a long-lived
+  `message` context holder at the document root.
+- Pages and components call the `useToast` hook from `@/lib/toast` to get
+  the shared `message` instance.
+
+Usage in a page:
+
+```js
+import { useToast } from "@/lib/toast";
+
+const toast = useToast();
+
+try {
+  await postJson("/issues", values, { requireAuth: true });
+  toast.success("Issue created.");
+  router.push("/admin/issues");
+} catch (error) {
+  toast.error(error.message || "Could not create issue.");
+}
+```
+
+Rules:
+
+- Never call `message.useMessage()` directly inside a page or component. The
+  returned `contextHolder` would unmount with the page and the toast would
+  disappear before the user can read it. Always use `useToast()`.
+- Pair every awaited API call with a `toast.success` on the happy path and a
+  `toast.error` in `catch`. Prefer the server-provided error message
+  (`error.message`) and fall back to a localized generic message only when the
+  server did not provide one.
+- Toast strings on public surfaces (`/`, `/join`, `/feedback`, `/me`, `/login`,
+  future `/issues`, `/campaigns`) must come from `copy[language]` so they
+  translate. Toast strings inside `/admin/*` are English-only by the language
+  scope rules above.
+
 ### Read-only entities
 
 If an entity is intentionally read-only for the admin (because the backend or

@@ -1,7 +1,7 @@
 "use client";
 
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
-import { Button, Empty, Form, Input, Modal, Popconfirm, Select, Table, Tag, message } from "antd";
+import { Button, Empty, Form, Input, Modal, Popconfirm, Select, Table, Tag } from "antd";
 import { useMemo } from "react";
 import { AdminResponsiveList } from "@/components/AdminResponsiveList";
 import { AdminShell } from "@/components/AdminShell";
@@ -14,9 +14,10 @@ import { FEEDBACK_STATUSES, buildEnumOptions, formatEnum } from "@/lib/adminUtil
 import { useAdminEditModal } from "@/hooks/useAdminEditModal";
 import { useAdminItemMutation } from "@/hooks/useAdminItemMutation";
 import { useAdminListResource } from "@/hooks/useAdminListResource";
+import { useToast } from "@/lib/toast";
 
 export default function AdminFeedbackPage() {
-  const [messageApi, contextHolder] = message.useMessage();
+  const messageApi = useToast();
   const {
     items: feedbackItems,
     setItems: setFeedbackItems,
@@ -160,7 +161,6 @@ export default function AdminFeedbackPage() {
 
   return (
     <AdminShell title="Feedback">
-      {contextHolder}
       <section className="admin-panel">
         <AdminPanelHeading
           eyebrow="Feedback"

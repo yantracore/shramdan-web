@@ -19,8 +19,7 @@ import {
   Space,
   Spin,
   Table,
-  Tag,
-  message
+  Tag
 } from "antd";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { AdminResponsiveList } from "@/components/AdminResponsiveList";
@@ -42,13 +41,14 @@ import {
   getListItems,
   getResponseData
 } from "@/lib/adminUtils";
+import { useToast } from "@/lib/toast";
 
 const EVENT_EXTRA_PARAMS = { limit: 100 };
 
 const USER_SEARCH_LIMIT = 20;
 
 export default function AdminEventsPage() {
-  const [messageApi, contextHolder] = message.useMessage();
+  const messageApi = useToast();
 
   const {
     items: events,
@@ -316,7 +316,6 @@ export default function AdminEventsPage() {
 
   return (
     <AdminShell title="Events">
-      {contextHolder}
       <section className="admin-panel">
         <AdminPanelHeading
           eyebrow="Cleanup events"
