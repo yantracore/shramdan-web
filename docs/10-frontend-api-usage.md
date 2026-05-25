@@ -53,12 +53,34 @@ All admin requests are sent with `requireAuth: true`.
 
 ### `src/app/admin/issues/page.js`
 
-Read-only. Mutations are blocked by missing backend endpoints — see `docs/09-backend-admin-gaps.md`.
+Mutations beyond create/edit (status change, notes, delete) are still blocked by missing backend endpoints — see `docs/09-backend-admin-gaps.md`.
 
 | Method + path | apiClient fn | Trigger |
 | --- | --- | --- |
 | `GET /issues` | `getJson` | Initial load; params: `status`, `category`, `sort`, `limit=100` |
 | `GET /issues/{id}` | `getJson` | "View detail" on a row (fetches uploads + reporter info) |
+
+### `src/app/admin/issues/create/page.js`
+
+| Method + path | apiClient fn | Trigger |
+| --- | --- | --- |
+| `POST /issues` | `postJson` | Submit of the shared `IssueForm` |
+
+### `src/app/admin/issues/[id]/edit/page.js`
+
+Uses the same `IssueForm` component as the create page (see "One shared form component per entity" in `docs/05-design-language-guide.md`).
+
+| Method + path | apiClient fn | Trigger |
+| --- | --- | --- |
+| `GET /issues/{id}` | `getJson` | Initial load to populate `initialValues` |
+| `PATCH /issues/{id}` | `patchJson` | Submit of the shared `IssueForm` — currently blocked by missing backend endpoint, see `docs/09-backend-admin-gaps.md` |
+
+### Public issue pages
+
+| Page | Method + path | apiClient fn | Notes |
+| --- | --- | --- | --- |
+| `src/app/issues/page.js` | `GET /issues` | `getJson` | Anonymous; params: `status`, `category`, `sort`, `limit=50`; client-side filters out non-public statuses |
+| `src/app/issues/[id]/page.js` | `GET /issues/{id}` | `getJson` | Anonymous; loads detail + a second `GET /issues` call (by category) for "Other issues in this category" |
 
 ### `src/app/admin/events/page.js`
 

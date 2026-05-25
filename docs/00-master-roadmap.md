@@ -216,7 +216,8 @@ Goal: Every public-facing entity has an admin counterpart with full CRUD + audit
 - [x] 9.3 Issues read-only listing `w:1`
 - [x] 9.4 Events module (assign leader, tie-break, settle) `w:1`
 - [x] 9.5a Issues admin create page (`/admin/issues/create` via existing `POST /issues`) `w:0`
-- [ ] 9.5 Issues full CRUD (status, edit, notes, delete) `w:1` ← blocked: see [09-backend-admin-gaps.md](09-backend-admin-gaps.md)
+- [x] 9.5b Issues admin edit page wired (`/admin/issues/[id]/edit`, shared `IssueForm`, `PATCH /issues/{id}` submit) `w:0` *(UI ready; PATCH endpoint not yet shipped on backend — submit errors with toast until then; see [09-backend-admin-gaps.md](09-backend-admin-gaps.md))*
+- [!] 9.5 Issues full CRUD (status, notes, delete; PATCH endpoint for edit) `w:1` ← blocked: see [09-backend-admin-gaps.md](09-backend-admin-gaps.md)
 - [ ] 9.6 Incidents admin view `w:1`
 - [ ] 9.7 Roles / KYC verification panel `w:1`
 - [ ] 9.8 Notifications admin (templates + queue) `w:1`

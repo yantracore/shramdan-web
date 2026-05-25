@@ -144,6 +144,36 @@ creating or editing the entity as a whole.
 - On successful submit, route back to the list page (`router.push("/admin/<entity>")`)
   and surface a success message via Ant Design's `message` API.
 
+### One shared form component per entity
+
+Create and edit MUST render the exact same form. Extract the form into a single
+component under `src/components/admin/<Entity>Form.js` and use it from both the
+create page and the edit page.
+
+- The form component owns the `Form.useForm()` instance, all `Form.Item` fields,
+  their validation rules, the field grid layout, and the submit + cancel row. It
+  does not own the page chrome (`AdminShell`, `AdminPanelHeading`, breadcrumbs).
+- The form accepts at minimum: `initialValues`, `onSubmit`, `submitting`,
+  `submitLabel`, and `cancelHref`. The parent page passes `submitLabel` ("Create
+  issue" vs "Save changes") and an `onSubmit` that calls either `postJson` or
+  `patchJson`.
+- The form is **field-shape, not endpoint-shape**. It must not know whether it is
+  in create or edit mode. The only thing different on edit is that
+  `initialValues` is populated from a `GET /<entity>/{id}` fetch and the submit
+  hits `patchJson(...)` instead of `postJson(...)`.
+- When the edit page lands, it should fetch the entity, show a `Spin` while
+  loading, then mount the form once data is available so `initialValues` is
+  applied on first render. The shared form should also call `form.setFieldsValue`
+  in an effect when `initialValues` changes, so late-arriving data still
+  populates fields.
+- Field changes that are NOT part of the full edit form — per-row status select,
+  inline notes modal, KYC verification toggle — stay on the list page or on a
+  dedicated single-field surface, not inside the shared entity form.
+
+Future entities (events, incidents, uploads, roles, notifications) must follow
+the same shared-form-per-entity pattern. Do not build a separate create form and
+a separate edit form for the same entity.
+
 ### Create button placement on the list page
 
 The list page header is the only entry point for creation. Add the create button to
@@ -151,6 +181,15 @@ The list page header is the only entry point for creation. Add the create button
 `primary` Ant Design button with `PlusOutlined`. The button text should read
 `Create <entity-singular>` (e.g. "Create issue", "Create event"). The href points to
 `/admin/<entity>/create`.
+
+### Edit entry point from the list page
+
+Each row in the list page renders its row actions in an `admin-row-actions` flex
+container. The edit entry point is a secondary `Button` with `EditOutlined`
+wrapped in a `Link` pointing to `/admin/<entity>/<id>/edit`. It sits alongside
+the other row actions (view detail, status select, delete). Reserve modal/drawer
+flows for short, focused operations; the full edit form always lives on the
+dedicated edit page.
 
 ### Toasts (success and error messages)
 

@@ -1,6 +1,12 @@
 "use client";
 
-import { EnvironmentOutlined, EyeOutlined, PlusOutlined, RiseOutlined } from "@ant-design/icons";
+import {
+  EditOutlined,
+  EnvironmentOutlined,
+  EyeOutlined,
+  PlusOutlined,
+  RiseOutlined
+} from "@ant-design/icons";
 import { Button, Empty, Modal, Select, Spin, Table, Tag } from "antd";
 import Image from "next/image";
 import Link from "next/link";
@@ -136,9 +142,14 @@ export default function AdminIssuesPage() {
       title: "Actions",
       key: "actions",
       render: (_, issue) => (
-        <Button icon={<EyeOutlined />} onClick={() => openDetailModal(issue)}>
-          View detail
-        </Button>
+        <div className="admin-row-actions">
+          <Button icon={<EyeOutlined />} onClick={() => openDetailModal(issue)}>
+            View detail
+          </Button>
+          <Link href={`/admin/issues/${issue.id}/edit`}>
+            <Button icon={<EditOutlined />}>Edit</Button>
+          </Link>
+        </div>
       )
     }
   ];
@@ -255,9 +266,14 @@ export default function AdminIssuesPage() {
                 </>
               }
               actions={
-                <Button icon={<EyeOutlined />} onClick={() => openDetailModal(issue)}>
-                  View detail
-                </Button>
+                <div className="admin-row-actions">
+                  <Button icon={<EyeOutlined />} onClick={() => openDetailModal(issue)}>
+                    View detail
+                  </Button>
+                  <Link href={`/admin/issues/${issue.id}/edit`}>
+                    <Button icon={<EditOutlined />}>Edit</Button>
+                  </Link>
+                </div>
               }
             />
             );
