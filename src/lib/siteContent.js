@@ -679,7 +679,7 @@ export const copy = {
         description: "Watch the Shramdan development walkthrough, livestream, and project context directly from this page.",
         embedUrl: "https://www.youtube-nocookie.com/embed/videoseries?list=PLWkh0s4xHPcTF4FOcYjkdR3i97YbkSDGo",
         playlistUrl: "https://www.youtube.com/playlist?list=PLWkh0s4xHPcTF4FOcYjkdR3i97YbkSDGo",
-        button: "Watch full playlist on YouTube"
+        button: "Watch Full Playlist on YouTube"
       },
       items: [
         {

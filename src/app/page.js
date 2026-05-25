@@ -310,6 +310,16 @@ export default function Home() {
               <h3>{t.resources.playlist.title}</h3>
               <p>{t.resources.playlist.description}</p>
             </div>
+            <div className="resources-playlist-action">
+              <Button
+                href={t.resources.playlist.playlistUrl}
+                target="_blank"
+                rel="noreferrer"
+                icon={<YoutubeOutlined />}
+              >
+                {t.resources.playlist.button}
+              </Button>
+            </div>
           </div>
           <div className="resources-playlist-frame">
             <iframe
@@ -319,16 +329,6 @@ export default function Home() {
               referrerPolicy="strict-origin-when-cross-origin"
               allowFullScreen
             />
-          </div>
-          <div className="resources-playlist-action">
-            <Button
-              href={t.resources.playlist.playlistUrl}
-              target="_blank"
-              rel="noreferrer"
-              icon={<YoutubeOutlined />}
-            >
-              {t.resources.playlist.button}
-            </Button>
           </div>
         </article>
 

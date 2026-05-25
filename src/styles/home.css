@@ -1397,9 +1397,8 @@
 }
 
 .resources-playlist-action {
-  grid-column: 1 / -1;
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
 }
 
 .resource-card {
