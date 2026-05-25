@@ -1568,8 +1568,8 @@
 .admin-sidebar-divider {
   border: 0;
   height: 1px;
-  margin: 6px 4px 10px;
-  background: color-mix(in srgb, var(--border) 70%, transparent);
+  margin: 8px 8px 10px;
+  background: color-mix(in srgb, var(--muted) 35%, transparent);
 }
 
 .admin-sidebar-nav a {
