@@ -3,6 +3,7 @@ export const copy = {
     brand: "श्रमदान",
     nav: {
       home: "गृहपृष्ठ",
+      issues: "समस्याहरू",
       join: "जोडिनुहोस्",
       feedback: "प्रतिक्रिया",
       login: "लगइन"
@@ -411,6 +412,128 @@ export const copy = {
         passwordChanged: "पासवर्ड बदलियो।"
       }
     },
+    issues: {
+      list: {
+        eyebrow: "समुदायका समस्याहरू",
+        title: "स्थानीय समस्या, समुदायको साथ",
+        intro:
+          "समुदायका सदस्यले रिपोर्ट गरेका सफाइ सम्बन्धी समस्याहरू हेर्नुहोस्। महत्त्वपूर्ण लाग्ने समस्यामा समर्थन जनाउनुहोस् र छिमेकलाई पनि सहभागी हुन आह्वान गर्नुहोस्।"
+      },
+      filters: {
+        statusLabel: "स्थिति",
+        statusPlaceholder: "सबै स्थिति",
+        categoryLabel: "क्षेत्र",
+        categoryPlaceholder: "सबै क्षेत्र",
+        sortLabel: "क्रमबद्ध",
+        sortMostVotes: "सबैभन्दा बढी समर्थन",
+        sortNewest: "नयाँ पहिले"
+      },
+      statusLabels: {
+        OPEN: "खुला",
+        EVENT_SCHEDULED: "अभियान तय",
+        COMPLETED: "सम्पन्न"
+      },
+      categoryLabels: {
+        ROADSIDE: "सडक र फुटपाथ",
+        VACANT_LAND: "खाली जग्गा",
+        RIVERBANK: "नदी किनार",
+        DRAINAGE: "ढल र नाला",
+        PARK_PUBLIC_SPACE: "पार्क र सार्वजनिक स्थान",
+        HIKING_TRAIL: "पदयात्रा मार्ग",
+        OTHER: "अन्य"
+      },
+      card: {
+        supportersOne: "१ समर्थक",
+        supportersMany: "{n} समर्थक",
+        viewDetail: "विस्तृत हेर्नुहोस्",
+        voteAction: "समर्थन गर्नुहोस्",
+        voteDisabledTooltip: "समर्थन जनाउन साइन इन गर्नुहोस्"
+      },
+      states: {
+        loading: "समस्याहरू लोड हुँदै...",
+        emptyTitle: "कुनै समस्या भेटिएन",
+        emptyBody: "फिल्टर हटाएर पुनः हेर्नुहोस् वा पछि फेरि भेट्न आउनुहोस् — समुदायले निरन्तर नयाँ समस्या थप्दैछ।",
+        errorTitle: "समस्याहरू लोड गर्न सकिएन",
+        errorBody: "सर्भरसँग जोडिँदा केही गडबड भयो। केही क्षणपछि फेरि प्रयास गर्नुहोस्।",
+        retry: "फेरि प्रयास गर्नुहोस्"
+      },
+      detail: {
+        backToList: "सबै समस्यामा फर्किनुहोस्",
+        reportedOn: "रिपोर्ट मिति",
+        locationLabel: "स्थान",
+        categoryLabel: "क्षेत्र",
+        statusLabel: "स्थिति",
+        descriptionTitle: "समस्याबारे विवरण",
+        evidenceTitle: "तस्वीर र प्रमाण",
+        noEvidence: "अहिलेसम्म कुनै तस्वीर अपलोड भएको छैन।",
+        relatedTitle: "यस क्षेत्रका अन्य समस्याहरू",
+        noRelated: "यस क्षेत्रमा अहिले अरू समस्या रिपोर्ट गरिएको छैन।",
+        notFoundTitle: "समस्या भेटिएन",
+        notFoundBody: "यो समस्या हटाइएको हुनसक्छ वा लिंक गलत छ।"
+      }
+    },
+    issues: {
+      list: {
+        eyebrow: "समुदायका समस्याहरू",
+        title: "स्थानीय समस्याहरू, समुदायको प्रतिक्रिया",
+        intro:
+          "समुदायका सदस्यले रिपोर्ट गरेका सरसफाइ सम्बन्धी समस्याहरू हेर्नुहोस्। महत्त्वपूर्ण लाग्ने समस्यामा समर्थन देखाउनुहोस् र छिमेकीहरूलाई पनि सहभागी हुन आह्वान गर्नुहोस्।"
+      },
+      filters: {
+        statusLabel: "स्थिति",
+        statusPlaceholder: "सबै स्थिति",
+        categoryLabel: "क्षेत्र",
+        categoryPlaceholder: "सबै क्षेत्र",
+        sortLabel: "क्रमबद्ध",
+        sortMostVotes: "सबैभन्दा बढी समर्थन",
+        sortNewest: "नयाँ पहिले"
+      },
+      statusLabels: {
+        OPEN: "खुला",
+        EVENT_SCHEDULED: "अभियान तय",
+        COMPLETED: "सम्पन्न"
+      },
+      categoryLabels: {
+        ROADSIDE: "सडक र फुटपाथ",
+        VACANT_LAND: "खाली जग्गा",
+        RIVERBANK: "नदी किनार",
+        DRAINAGE: "ढल र नाला",
+        PARK_PUBLIC_SPACE: "पार्क र सार्वजनिक स्थान",
+        HIKING_TRAIL: "पदयात्रा मार्ग",
+        OTHER: "अन्य"
+      },
+      card: {
+        supportersOne: "१ समर्थक",
+        supportersMany: "{n} समर्थक",
+        viewDetail: "विस्तृत हेर्नुहोस्",
+        voteAction: "समर्थन गर्नुहोस्",
+        voteDisabledTooltip: "समर्थन गर्न साइन इन गर्नुहोस्"
+      },
+      states: {
+        loading: "समस्याहरू लोड हुँदै...",
+        emptyTitle: "कुनै समस्या भेटिएन",
+        emptyBody:
+          "फिल्टर हटाएर वा पछि फेरि हेर्नुहोस् — समुदायले निरन्तर नयाँ समस्या थप्दैछ।",
+        errorTitle: "समस्याहरू लोड गर्न सकिएन",
+        errorBody:
+          "सर्भरसँग जोडिँदा केही गडबड भयो। केही क्षणपछि फेरि प्रयास गर्नुहोस्।",
+        retry: "फेरि प्रयास गर्नुहोस्"
+      },
+      detail: {
+        backToList: "सबै समस्यामा फर्किनुहोस्",
+        reportedOn: "रिपोर्ट मिति",
+        locationLabel: "स्थान",
+        categoryLabel: "क्षेत्र",
+        statusLabel: "स्थिति",
+        descriptionTitle: "समस्याबारे विवरण",
+        evidenceTitle: "तस्वीर र प्रमाण",
+        noEvidence: "अहिलेसम्म कुनै तस्वीर अपलोड भएको छैन।",
+        relatedTitle: "यस क्षेत्रका अन्य समस्याहरू",
+        noRelated: "यस क्षेत्रमा अहिले अरू समस्या रिपोर्ट गरिएको छैन।",
+        notFoundTitle: "समस्या भेटिएन",
+        notFoundBody: "यो समस्या हटाइएको हुनसक्छ वा लिङ्क गलत छ।"
+      }
+    },
     footer: {
       brand: "श्रमदान",
       ariaLabel: "श्रमदान footer",
@@ -437,6 +560,7 @@ export const copy = {
     brand: "Shramdan",
     nav: {
       home: "Home",
+      issues: "Issues",
       join: "Join",
       feedback: "Feedback",
       login: "Login"
@@ -843,6 +967,128 @@ export const copy = {
         profileSaved: "Profile updated.",
         avatarSaved: "Photo updated.",
         passwordChanged: "Password changed."
+      }
+    },
+    issues: {
+      list: {
+        eyebrow: "Community issues",
+        title: "Local problems looking for community action",
+        intro:
+          "Browse cleanup-related issues reported by community members. Support what matters most and invite your neighborhood to join in."
+      },
+      filters: {
+        statusLabel: "Status",
+        statusPlaceholder: "All statuses",
+        categoryLabel: "Category",
+        categoryPlaceholder: "All categories",
+        sortLabel: "Sort by",
+        sortMostVotes: "Most supported",
+        sortNewest: "Newest first"
+      },
+      statusLabels: {
+        OPEN: "Open",
+        EVENT_SCHEDULED: "Campaign scheduled",
+        COMPLETED: "Completed"
+      },
+      categoryLabels: {
+        ROADSIDE: "Roadside",
+        VACANT_LAND: "Vacant land",
+        RIVERBANK: "Riverbank",
+        DRAINAGE: "Drainage",
+        PARK_PUBLIC_SPACE: "Park / public space",
+        HIKING_TRAIL: "Hiking trail",
+        OTHER: "Other"
+      },
+      card: {
+        supportersOne: "1 supporter",
+        supportersMany: "{n} supporters",
+        viewDetail: "View detail",
+        voteAction: "Support",
+        voteDisabledTooltip: "Sign in to support"
+      },
+      states: {
+        loading: "Loading issues...",
+        emptyTitle: "No issues found",
+        emptyBody: "Try clearing filters or check back later — new reports come in often.",
+        errorTitle: "Could not load issues",
+        errorBody: "Something went wrong while reaching the server. Please try again in a moment.",
+        retry: "Try again"
+      },
+      detail: {
+        backToList: "Back to all issues",
+        reportedOn: "Reported on",
+        locationLabel: "Location",
+        categoryLabel: "Category",
+        statusLabel: "Status",
+        descriptionTitle: "About this issue",
+        evidenceTitle: "Photos and evidence",
+        noEvidence: "No photos uploaded yet.",
+        relatedTitle: "Other issues in this category",
+        noRelated: "No other issues in this category yet.",
+        notFoundTitle: "Issue not found",
+        notFoundBody: "This issue may have been removed, or the link is incorrect."
+      }
+    },
+    issues: {
+      list: {
+        eyebrow: "Community issues",
+        title: "Local problems looking for community action",
+        intro:
+          "Browse cleanup-related issues reported by community members. Support what matters most and invite your neighborhood to join in."
+      },
+      filters: {
+        statusLabel: "Status",
+        statusPlaceholder: "All statuses",
+        categoryLabel: "Category",
+        categoryPlaceholder: "All categories",
+        sortLabel: "Sort by",
+        sortMostVotes: "Most supported",
+        sortNewest: "Newest first"
+      },
+      statusLabels: {
+        OPEN: "Open",
+        EVENT_SCHEDULED: "Campaign scheduled",
+        COMPLETED: "Completed"
+      },
+      categoryLabels: {
+        ROADSIDE: "Roadside",
+        VACANT_LAND: "Vacant land",
+        RIVERBANK: "Riverbank",
+        DRAINAGE: "Drainage",
+        PARK_PUBLIC_SPACE: "Park / public space",
+        HIKING_TRAIL: "Hiking trail",
+        OTHER: "Other"
+      },
+      card: {
+        supportersOne: "1 supporter",
+        supportersMany: "{n} supporters",
+        viewDetail: "View detail",
+        voteAction: "Support",
+        voteDisabledTooltip: "Sign in to vote"
+      },
+      states: {
+        loading: "Loading issues...",
+        emptyTitle: "No issues found",
+        emptyBody:
+          "Try clearing filters or check back later — new reports come in often.",
+        errorTitle: "Could not load issues",
+        errorBody:
+          "Something went wrong while reaching the server. Please try again in a moment.",
+        retry: "Try again"
+      },
+      detail: {
+        backToList: "Back to all issues",
+        reportedOn: "Reported on",
+        locationLabel: "Location",
+        categoryLabel: "Category",
+        statusLabel: "Status",
+        descriptionTitle: "About this issue",
+        evidenceTitle: "Photos and evidence",
+        noEvidence: "No photos uploaded yet.",
+        relatedTitle: "Other issues in this category",
+        noRelated: "No other issues in this category yet.",
+        notFoundTitle: "Issue not found",
+        notFoundBody: "This issue may have been removed, or the link is incorrect."
       }
     },
     footer: {
