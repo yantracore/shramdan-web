@@ -570,7 +570,7 @@ export const copy = {
         feedback: "प्रतिक्रिया दिनुहोस्"
       },
       social: [
-        { id: "facebook", label: "Facebook मा श्रमदान", href: "#" },
+        { id: "facebook", label: "Facebook मा श्रमदान", href: "https://www.facebook.com/profile.php?id=61589961623195" },
         { id: "twitter", label: "Twitter/X मा श्रमदान", href: "#" },
         { id: "tiktok", label: "TikTok मा श्रमदान", href: "#" },
         { id: "youtube", label: "YouTube मा श्रमदान", href: "#" }
@@ -1148,7 +1148,7 @@ export const copy = {
         feedback: "Share feedback"
       },
       social: [
-        { id: "facebook", label: "Shramdan on Facebook", href: "#" },
+        { id: "facebook", label: "Shramdan on Facebook", href: "https://www.facebook.com/profile.php?id=61589961623195" },
         { id: "twitter", label: "Shramdan on Twitter/X", href: "#" },
         { id: "tiktok", label: "Shramdan on TikTok", href: "#" },
         { id: "youtube", label: "Shramdan on YouTube", href: "#" }
