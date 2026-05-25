@@ -4,6 +4,14 @@
 >
 > **This file is maintained by coding agents (Codex, Claude, etc.), not by humans.** Agents must update it inline as work progresses — see [Agent Update Protocol](#agent-update-protocol) below.
 
+## Overall Progress — 14%
+
+```
+0% [==============--------------------------------------------------------------------------------------] 100%
+```
+
+The bar is 100 characters wide so each `=` equals exactly one percentage point. Recompute and redraw the bar in the same edit that changes any phase percentage — see [Aggregate Progress](#aggregate-progress) for the per-phase breakdown that feeds this number.
+
 ## How To Read This File
 
 Each task is a node in a weighted tree:
@@ -48,7 +56,7 @@ When you are working on a task that appears in this roadmap, you MUST:
 1. **Flip the marker to `[~]` before you start** the leaf you are working on. Only one or two leaves per phase should be `[~]` at any time.
 2. **Flip to `[x]` immediately when done** — when the change is merged or when tests/build pass locally for in-progress branches. Do not batch completions across multiple leaves.
 3. **Update the phase `📊 N%`** in the same edit. Recompute from the weighted formula above.
-4. **Recompute Aggregate Progress** if the phase percentage moved.
+4. **Recompute Aggregate Progress** if the phase percentage moved, and **redraw the Overall Progress bar near the top** in the same edit. The bar is 100 chars wide — `=` chars equal the rounded overall percent, `-` chars fill the rest.
 5. **Add new leaves freely** as you discover scope. Renumber siblings if needed; keep the tree at ≤4 levels deep, prefer 3.
 6. **Never silently delete** a leaf. If a task is dropped, mark it `[-]` with a one-line reason inline.
 7. **Note blockers explicitly**: `[!] 5.4.1 Esewa integration w:1 ← blocked: awaiting merchant account approval`.
@@ -263,7 +271,7 @@ Weighted across all phases (sum of phase weights = 125):
 | 11 Cross-cutting | 10 | 10% |
 | 12 Documentation & Community | 5 | 40% |
 
-**Overall: ≈ 13%** (weighted sum / total weight; recompute on every edit).
+**Overall: ≈ 14%** (weighted sum / total weight; recompute on every edit, and redraw the [Overall Progress](#overall-progress--14) bar near the top of this file in the same edit).
 
 # How To Update This Document
 
