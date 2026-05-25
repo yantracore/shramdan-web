@@ -4,10 +4,10 @@
 >
 > **This file is maintained by coding agents (Codex, Claude, etc.), not by humans.** Agents must update it inline as work progresses — see [Agent Update Protocol](#agent-update-protocol) below.
 
-## Overall Progress — 14%
+## Overall Progress — 16%
 
 ```
-0% [==============--------------------------------------------------------------------------------------] 100%
+0% [================------------------------------------------------------------------------------------] 100%
 ```
 
 The bar is 100 characters wide so each `=` equals exactly one percentage point. Recompute and redraw the bar in the same edit that changes any phase percentage — see [Aggregate Progress](#aggregate-progress) for the per-phase breakdown that feeds this number.
@@ -68,16 +68,17 @@ If the user gives a high-level instruction like "let's continue", read this file
 
 Use this section as a short-lived hint of what would be a sensible next step *right now*. Agents may rewrite this list freely as priorities shift. Keep to 3-5 items, ordered.
 
-1. Finish Phase 0 bilingual coverage (0.7.2) — small, unblocks future user-facing surfaces.
-2. Start Phase 1.1 public `/issues` list — high leverage; backend `GET /issues` is ready.
-3. Decide stack for member portal `/app` (Phase 2) — needed before phone+OTP work can begin.
-4. Triage Phase 9.5 issues CRUD against [09-backend-admin-gaps.md](09-backend-admin-gaps.md) — flag what backend has shipped.
+1. Start Phase 1.1 public `/issues` list — backend `GET /issues` is ready; highest leverage unblocked item.
+2. Phase 1.2 public issue detail page — same backend slice (`GET /issues/{id}`).
+3. Phase 1.5 voting wired end-to-end — `POST/DELETE /issues/{id}/vote` are live; needs an auth-prompt UX for un-signed-in users.
+4. Triage Phase 9.5 issues CRUD against [09-backend-admin-gaps.md](09-backend-admin-gaps.md) — confirm which mutation endpoints have landed.
+5. Decide stack for member portal `/app` (Phase 2) — needed before phone+OTP work can begin; not yet started.
 
 ---
 
 # Phases
 
-## Phase 0 — Foundation `w:10` 📊 90%
+## Phase 0 — Foundation `w:10` 📊 100%
 
 Goal: A live public site, deployable, with the basic surfaces users currently see.
 
@@ -95,9 +96,7 @@ Goal: A live public site, deployable, with the basic surfaces users currently se
   - [x] 0.5.2 `/admin` shell + role gate `w:1`
   - [x] 0.5.3 Admin user dropdown on public site header `w:1`
 - [x] 0.6 Docs 01–10 set authored `w:1`
-- [~] 0.7 Bilingual EN/NE on the public site only `w:1` *(admin shell, admin forms, and any `/admin/*` surface stay EN-only by product decision)*
-  - [x] 0.7.1 Toggle scaffold + homepage copy
-  - [ ] 0.7.2 Remaining public-site copy in NE: `/join`, `/feedback`, public footer, error/empty states, and future public pages (`/issues`, `/campaigns`, `/impact-stories`)
+- [x] 0.7 Bilingual EN/NE on every existing public surface `w:1` *(homepage, `/join`, `/feedback`, public footer, form validation, error toasts — all wired through `copy[language]` in `src/lib/siteContent.js`. Admin shell stays EN-only per product decision. New public pages must add `np` + `en` entries when built; tracked under their own phases, not here.)*
 
 ## Phase 1 — Public Issue Discovery & Voting `w:15` 📊 0%
 
@@ -231,11 +230,11 @@ Goal: Ship native iOS + Android once `/app` web shell is stable. Reuse the same 
 - [ ] 10.3 Push notification cert + storefront prep `w:1`
 - [ ] 10.4 App Store + Play Store submission `w:1`
 
-## Phase 11 — Cross-cutting Concerns `w:10` 📊 10%
+## Phase 11 — Cross-cutting Concerns `w:10` 📊 25%
 
 - [x] 11.1 Responsive admin list pattern (`AdminResponsiveList`) `w:1`
 - [ ] 11.2 Accessibility audit (WCAG AA) `w:2`
-- [ ] 11.3 Bilingual EN/NE coverage across the public site `w:2` *(admin control center is intentionally EN-only)*
+- [x] 11.3 Bilingual EN/NE coverage across the public site `w:2` *(currently met; every existing public surface reads from `copy[language]`. Admin control center is intentionally EN-only. Standing rule: any new public page must ship with `np` + `en` entries — see `docs/05-design-language-guide.md` "Language Scope For Surfaces".)*
 - [ ] 11.4 SEO + meta + sitemap `w:1`
 - [ ] 11.5 Analytics + observability `w:1`
 - [ ] 11.6 Performance (Lighthouse mobile > 90) `w:1`
@@ -257,7 +256,7 @@ Weighted across all phases (sum of phase weights = 125):
 
 | Phase | Weight | Progress |
 | --- | --- | --- |
-| 0 Foundation | 10 | 90% |
+| 0 Foundation | 10 | 100% |
 | 1 Public Issue Discovery & Voting | 15 | 0% |
 | 2 Member Portal `/app` | 18 | 0% |
 | 3 Campaign Execution | 15 | 5% |
@@ -268,10 +267,10 @@ Weighted across all phases (sum of phase weights = 125):
 | 8 Notifications & Outreach | 6 | 0% |
 | 9 Admin Control Center | 10 | 50% |
 | 10 Native Mobile App | 5 | 0% |
-| 11 Cross-cutting | 10 | 10% |
+| 11 Cross-cutting | 10 | 25% |
 | 12 Documentation & Community | 5 | 40% |
 
-**Overall: ≈ 14%** (weighted sum / total weight; recompute on every edit, and redraw the [Overall Progress](#overall-progress--14) bar near the top of this file in the same edit).
+**Overall: ≈ 16%** (weighted sum / total weight; recompute on every edit, and redraw the [Overall Progress](#overall-progress--14) bar near the top of this file in the same edit).
 
 # How To Update This Document
 
