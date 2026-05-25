@@ -822,17 +822,6 @@
   background-size: cover;
 }
 
-.core-idea-landscape::after {
-  position: absolute;
-  right: 4%;
-  bottom: 0;
-  width: 72%;
-  height: 34px;
-  border-radius: 999px 0 0 0;
-  background: color-mix(in srgb, var(--primary) 70%, transparent);
-  content: "";
-}
-
 .landscape-people {
   position: absolute;
   right: 18%;
