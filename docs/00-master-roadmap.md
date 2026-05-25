@@ -207,7 +207,7 @@ Goal: Safety leads, medical professionals, and admins can manage real-world risk
 - [ ] 8.3 PWA push notifications `w:1`
 - [ ] 8.4 AI assistant on WhatsApp / Messenger / IG `w:2` *(future / Meta API)*
 
-## Phase 9 — Admin Control Center Expansion `w:10` 📊 50%
+## Phase 9 — Admin Control Center Expansion `w:10` 📊 55%
 
 Goal: Every public-facing entity has an admin counterpart with full CRUD + audit, gated by role.
 
@@ -222,6 +222,7 @@ Goal: Every public-facing entity has an admin counterpart with full CRUD + audit
 - [ ] 9.7 Roles / KYC verification panel `w:1`
 - [ ] 9.8 Notifications admin (templates + queue) `w:1`
 - [ ] 9.9 Audit log + activity feed `w:1`
+- [x] 9.10 Users browse list (`/admin/users`, read-only) `w:1` *(UI ready; staging `GET /users` returns 500 due to backend `take` Int cast bug — see [09-backend-admin-gaps.md](09-backend-admin-gaps.md))*
 
 ## Phase 10 — Native Mobile App `w:5` 📊 0%
 
@@ -267,7 +268,7 @@ Weighted across all phases (sum of phase weights = 125):
 | 6 Transparency & Ledger | 8 | 0% |
 | 7 Impact Stories | 5 | 0% |
 | 8 Notifications & Outreach | 6 | 0% |
-| 9 Admin Control Center | 10 | 50% |
+| 9 Admin Control Center | 10 | 55% |
 | 10 Native Mobile App | 5 | 0% |
 | 11 Cross-cutting | 10 | 25% |
 | 12 Documentation & Community | 5 | 40% |

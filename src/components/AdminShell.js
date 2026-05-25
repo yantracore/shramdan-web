@@ -11,6 +11,7 @@ import {
   MessageOutlined,
   MoonOutlined,
   SunOutlined,
+  TeamOutlined,
   UserOutlined
 } from "@ant-design/icons";
 import { Avatar, Button, Drawer, Dropdown, Spin, Tag, Tooltip } from "antd";
@@ -39,7 +40,8 @@ const adminNavItems = [
   { href: "/admin/applications", icon: <FormOutlined />, label: "Applications" },
   { href: "/admin/feedback", icon: <MessageOutlined />, label: "Feedback" },
   { href: "/admin/issues", icon: <EnvironmentOutlined />, label: "Issues" },
-  { href: "/admin/events", icon: <CalendarOutlined />, label: "Events" }
+  { href: "/admin/events", icon: <CalendarOutlined />, label: "Events" },
+  { href: "/admin/users", icon: <TeamOutlined />, label: "Users" }
 ];
 
 function AdminSidebar({ activePath, onNavigate }) {

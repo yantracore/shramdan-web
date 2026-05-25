@@ -40,3 +40,39 @@ When these arrive, mirror the patterns already in `src/app/admin/applications/pa
 - Notes modal using `patchJson(`/issues/${id}/notes`, { adminNotes })`
 - Delete `Popconfirm` using `deleteJson(`/issues/${id}`)`
 - Edit page at `/admin/issues/{id}/edit` reusing the same form layout as `/admin/issues/create`, calling `patchJson(`/issues/${id}`, values)`
+
+## Users
+
+Current API exposes:
+
+- `GET /users` — admin-only paginated list with filters (`role`, `isVerified`, `search`, `limit`, `cursor`)
+- `GET /users/{id}` — admin-only detail
+- `PATCH /users/{id}/role` — admin-only role change (USER ↔ ADMIN; cannot change own role)
+
+### Known backend bugs (staging)
+
+- `GET /users` currently returns `500 UNKNOWN_ERROR` on staging because the handler
+  passes `take` to Prisma as a string instead of an integer
+  (`Invalid prisma.user.findMany() invocation — Argument 'take': Invalid value
+  provided. Expected Int, provided String.`). The `/admin/users` page is wired
+  correctly and will start working as soon as the handler casts `limit + 1` to
+  an integer.
+
+### Missing for admin CRUD
+
+The `/admin/users` page currently renders a read-only browse view. To make it a
+full admin surface, the backend should provide:
+
+- Stable, paginated `GET /users` (fix the `take` Int cast bug above)
+- `PATCH /users/{id}` — edit profile fields the admin is allowed to correct
+  (name, username, phone, verification flag) for support cases
+- `DELETE /users/{id}` — remove abusive accounts; should soft-delete and
+  cascade ownership of issues/uploads to a tombstone user, not hard-delete
+- Optional: `POST /users/{id}/verify` — admin-side verification override for
+  cases where a real user cannot complete the OTP flow
+
+When `PATCH /users/{id}/role` is exercised from the UI, wire a small confirm
+modal per row using `patchJson(`/users/${id}/role`, { role })` and refresh the
+list on success. Do not surface the action for the currently-logged-in admin
+(the backend forbids self-role-change anyway, but hiding the control avoids a
+confusing error).

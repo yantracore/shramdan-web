@@ -6,6 +6,7 @@ import {
   FormOutlined,
   MessageOutlined,
   RightOutlined,
+  TeamOutlined,
   ToolOutlined
 } from "@ant-design/icons";
 import { Button, Tag } from "antd";
@@ -39,6 +40,13 @@ const dashboardModules = [
     href: "/admin/events",
     icon: <CalendarOutlined />,
     label: "Events",
+    status: "Live"
+  },
+  {
+    body: "Browse registered users, filter by role and verification, and inspect contact details. Read-only until backend role-change is wired.",
+    href: "/admin/users",
+    icon: <TeamOutlined />,
+    label: "Users",
     status: "Live"
   },
   {

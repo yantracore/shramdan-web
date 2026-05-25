@@ -1990,11 +1990,23 @@
   min-width: 0;
 }
 
-.admin-issue-row {
+.admin-issue-row,
+.admin-user-row {
   display: flex;
   align-items: center;
   gap: 12px;
   min-width: 0;
+}
+
+.admin-user-row > div:last-child {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.admin-user-row > div:last-child span {
+  color: var(--muted);
+  font-size: 13px;
 }
 
 .admin-issue-thumb {
