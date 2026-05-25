@@ -2,7 +2,13 @@
 
 ## Version Context
 
-Version 1.0 is the first cleanup campaign's complete visible feature set: from issue listing to publishing the final campaign results.
+Version 1.0 is the first cleanup campaign's complete visible feature set: from issue listing to publishing the final campaign results. The visible surface spans three coordinated experiences that share the same API contracts and component vocabulary:
+
+- The **public website** — discovery, mission, and issue/campaign browsing for anyone.
+- The **admin control center** at `/admin` — operational tools for the founding team and future moderators.
+- The **member portal** at `/app` — authenticated, mobile-first surface for members to list issues, vote, join campaigns, contribute, and submit KYC. This is the design source for the future native mobile app.
+
+For the live "what is left and how far along" view across all three surfaces, see [00-master-roadmap.md](00-master-roadmap.md).
 
 ## Purpose
 

@@ -2,6 +2,8 @@
 
 This document tracks backend endpoints that the admin UI needs but that are not yet exposed by the API (`docs/07-api-reference.json`). The admin frontend treats these modules as read-only until the endpoints land.
 
+Gaps tracked here typically appear as `[!]` blocked leaves in [00-master-roadmap.md](00-master-roadmap.md). When a gap is closed, both files should be updated in the same change.
+
 ## Issues
 
 Current API only exposes:

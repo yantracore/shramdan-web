@@ -96,6 +96,7 @@ Current API assumptions:
 
 Before implementing Shramdaan work, future threads should read:
 
+- `docs/00-master-roadmap.md` for the live weighted task tree, current progress, and the next-up queue. **This is the first file to read each session** and the file you must keep in sync as you work — see "Roadmap Maintenance" below.
 - `docs/01-project-summary.md` for mission and philosophy.
 - `docs/02-product-plan.md` for current feature scope.
 - `docs/03-user-journeys.md` for user intent.
@@ -107,6 +108,18 @@ Before implementing Shramdaan work, future threads should read:
 - `docs/10-frontend-api-usage.md` for the page-to-endpoint usage map.
 
 When product behavior changes, update the relevant document in the same change.
+
+## Roadmap Maintenance
+
+`docs/00-master-roadmap.md` is the single source of truth for "what is left to build" and "how far along we are". Treat its maintenance as part of every change, not a separate chore:
+
+- Before you start a leaf task, flip its marker from `[ ]` to `[~]` and announce briefly what you're starting.
+- The instant a leaf is fully done (merged or build/tests green for in-progress branches), flip to `[x]`. Do not batch completions.
+- Update the affected phase's `📊 N%` and the Aggregate Progress table in the same edit. Cancelled (`[-]`) leaves are excluded from the denominator; blocked (`[!]`) leaves count as pending.
+- When you discover new scope, add new leaves under the right phase. Keep the tree at ≤4 levels deep, prefer 3.
+- Never delete a leaf silently. Mark it `[-]` with a one-line reason if it's dropped.
+- Use the "Currently Suggested Next Up" list as a short-lived hint. Rewrite it freely as priorities shift.
+- Do not ask the user for permission to update this file — it is owned by the agent, audited by the human.
 
 ## How To Update This Document
 

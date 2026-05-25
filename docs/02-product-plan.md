@@ -4,6 +4,8 @@
 
 Version 1.0 is the first cleanup campaign's complete visible feature set: from issue listing to publishing the final campaign results.
 
+See [00-master-roadmap.md](00-master-roadmap.md) for the live phase-by-phase progress and the prioritized next-up queue. This document defines *what* the v1.0 feature set is; the roadmap tracks *how complete* each piece is.
+
 ## Product Goal
 
 The first release should demonstrate the full public journey of a community cleanup campaign. The website should make it clear how a problem becomes visible, gains support, becomes a campaign, receives contributions, gets completed, and is published as an impact story.
