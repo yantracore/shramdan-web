@@ -106,7 +106,7 @@ Goal: Anyone (logged-in or not) can browse listed issues, see detail, and — on
   - [x] 1.1.1 `PublicIssueCard` (new component, API shape) `w:1`
   - [x] 1.1.2 Filter / sort: status, category, sort by votes/newest `w:2`
   - [x] 1.1.3 Empty / loading / error states (no mock fallback) `w:1`
-- [~] 1.2 Issue detail `/issues/[id]` `w:3`
+- [x] 1.2 Issue detail `/issues/[id]` `w:3`
   - [x] 1.2.1 Description, location, evidence gallery `w:1`
   - [ ] 1.2.2 Vote action + live count `w:1` *(Block B; visible-but-disabled in Block A with "Sign in to vote" tooltip)*
   - [x] 1.2.3 Related / nearby issues `w:1`
