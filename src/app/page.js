@@ -134,11 +134,7 @@ export default function Home() {
             </span>
             <h2 id="core-idea-title">{t.coreIdea.title}</h2>
           </div>
-          <div className="core-idea-landscape" aria-hidden="true">
-            <span className="landscape-people">
-              <TeamOutlined />
-            </span>
-          </div>
+          <div className="core-idea-landscape" aria-hidden="true" />
         </div>
 
         <div className="workflow-grid">
