@@ -41,6 +41,21 @@ When these arrive, mirror the patterns already in `src/app/admin/applications/pa
 - Delete `Popconfirm` using `deleteJson(`/issues/${id}`)`
 - Edit page at `/admin/issues/{id}/edit` reusing the same form layout as `/admin/issues/create`, calling `patchJson(`/issues/${id}`, values)`
 
+### Cover image (uploads) wiring
+
+Both `/admin/issues/create` and `/admin/issues/[id]/edit` ship a drag-and-drop
+cover field via the shared `IssueCoverUpload` component. It follows the same
+three-step `/uploads/presign` → R2 PUT → `/uploads/{id}/confirm` flow exposed by
+`uploadImage` in `src/lib/uploads.js`.
+
+- **Create:** if a cover is set, `POST /issues` includes `uploadIds: [coverId]`.
+- **Edit:** the page diffs cover id against the prefilled one and only sends
+  `uploadIds` when it changed — an array of one id when a new image was uploaded
+  or replaced, or an empty array when the user cleared an existing cover. When
+  `PATCH /issues/{id}` lands, the backend should accept both shapes as a full
+  replacement of attached uploads (similar to how arrays replace, not append, in
+  REST PATCH bodies for this entity).
+
 ## Users
 
 Current API exposes:

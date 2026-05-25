@@ -4,6 +4,7 @@ import { SaveOutlined } from "@ant-design/icons";
 import { Button, Form, Input, InputNumber, Select } from "antd";
 import Link from "next/link";
 import { useEffect, useMemo } from "react";
+import { IssueCoverUpload } from "@/components/admin/IssueCoverUpload";
 import { ISSUE_CATEGORIES, buildEnumOptions } from "@/lib/adminUtils";
 
 export function IssueForm({
@@ -31,6 +32,15 @@ export function IssueForm({
       initialValues={initialValues || { category: "ROADSIDE" }}
     >
       <div className="admin-form-grid">
+        <Form.Item
+          className="admin-form-wide"
+          name="cover"
+          label="Cover image (optional)"
+          valuePropName="value"
+        >
+          <IssueCoverUpload />
+        </Form.Item>
+
         <Form.Item
           className="admin-form-wide"
           name="title"

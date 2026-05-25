@@ -1,6 +1,6 @@
 import { ApiError, postJson } from "@/lib/apiClient";
 
-export async function uploadAvatar(file) {
+export async function uploadImage(file) {
   const presign = await postJson(
     "/uploads/presign",
     {
@@ -48,5 +48,10 @@ export async function uploadAvatar(file) {
     });
   }
 
-  return downloadUrl;
+  return { id: upload.id, url: downloadUrl };
+}
+
+export async function uploadAvatar(file) {
+  const result = await uploadImage(file);
+  return result.url;
 }

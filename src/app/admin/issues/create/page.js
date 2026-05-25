@@ -19,8 +19,11 @@ export default function AdminIssueCreatePage() {
   const handleFinish = async (values) => {
     setSubmitting(true);
 
+    const { cover, ...rest } = values;
+    const payload = cover?.id ? { ...rest, uploadIds: [cover.id] } : rest;
+
     try {
-      await postJson("/issues", values, { requireAuth: true });
+      await postJson("/issues", payload, { requireAuth: true });
       toast.success("Issue created.");
       router.push("/admin/issues");
     } catch (error) {

@@ -9,7 +9,7 @@ import { AdminShell } from "@/components/AdminShell";
 import { AdminPanelHeading } from "@/components/admin/AdminPanelHeading";
 import { IssueForm } from "@/components/admin/IssueForm";
 import { getJson, patchJson } from "@/lib/apiClient";
-import { getResponseData } from "@/lib/adminUtils";
+import { getFirstIssueImage, getResponseData } from "@/lib/adminUtils";
 import { useToast } from "@/lib/toast";
 
 const EDITABLE_FIELDS = [
@@ -24,12 +24,19 @@ const EDITABLE_FIELDS = [
 ];
 
 function pickEditableFields(issue) {
-  return EDITABLE_FIELDS.reduce((acc, key) => {
+  const data = EDITABLE_FIELDS.reduce((acc, key) => {
     if (issue?.[key] !== undefined && issue?.[key] !== null) {
       acc[key] = issue[key];
     }
     return acc;
   }, {});
+
+  const coverImage = getFirstIssueImage(issue);
+  if (coverImage) {
+    data.cover = { id: coverImage.id, url: coverImage.url };
+  }
+
+  return data;
 }
 
 export default function AdminIssueEditPage() {
@@ -75,8 +82,17 @@ export default function AdminIssueEditPage() {
   const handleFinish = async (values) => {
     setSubmitting(true);
 
+    const { cover, ...rest } = values;
+    const originalCoverId = initialValues?.cover?.id || null;
+    const nextCoverId = cover?.id || null;
+
+    const payload = { ...rest };
+    if (nextCoverId !== originalCoverId) {
+      payload.uploadIds = nextCoverId ? [nextCoverId] : [];
+    }
+
     try {
-      await patchJson(`/issues/${issueId}`, values, { requireAuth: true });
+      await patchJson(`/issues/${issueId}`, payload, { requireAuth: true });
       toast.success("Issue updated.");
       router.push("/admin/issues");
     } catch (error) {
