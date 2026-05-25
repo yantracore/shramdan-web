@@ -3,7 +3,17 @@
 import { ReloadOutlined } from "@ant-design/icons";
 import { Button } from "antd";
 
-export function AdminPanelHeading({ eyebrow, title, description, onRefresh, refreshing }) {
+export function AdminPanelHeading({
+  eyebrow,
+  title,
+  description,
+  onRefresh,
+  refreshing,
+  actions
+}) {
+  const hasRefresh = Boolean(onRefresh);
+  const hasActions = Boolean(actions);
+
   return (
     <div className="admin-panel-heading">
       <div>
@@ -11,10 +21,15 @@ export function AdminPanelHeading({ eyebrow, title, description, onRefresh, refr
         <h2>{title}</h2>
         {description ? <p>{description}</p> : null}
       </div>
-      {onRefresh ? (
-        <Button icon={<ReloadOutlined />} loading={refreshing} onClick={onRefresh}>
-          Refresh
-        </Button>
+      {hasRefresh || hasActions ? (
+        <div className="admin-panel-heading-actions">
+          {hasRefresh ? (
+            <Button icon={<ReloadOutlined />} loading={refreshing} onClick={onRefresh}>
+              Refresh
+            </Button>
+          ) : null}
+          {actions}
+        </div>
       ) : null}
     </div>
   );

@@ -102,14 +102,14 @@ Goal: A live public site, deployable, with the basic surfaces users currently se
 
 Goal: Anyone (logged-in or not) can browse listed issues, see detail, and — once authenticated — vote.
 
-- [ ] 1.1 Public `/issues` list `w:4`
-  - [ ] 1.1.1 `IssueCard` polish + `StatusTag` reuse `w:1`
-  - [ ] 1.1.2 Filter / sort: status, category, support count, recency `w:2`
-  - [ ] 1.1.3 Empty / loading / error states `w:1`
-- [ ] 1.2 Issue detail `/issues/[id]` `w:3`
-  - [ ] 1.2.1 Description, location, evidence gallery `w:1`
-  - [ ] 1.2.2 Vote action + live count `w:1`
-  - [ ] 1.2.3 Related / nearby issues `w:1`
+- [~] 1.1 Public `/issues` list `w:4`
+  - [~] 1.1.1 `PublicIssueCard` (new component, API shape) `w:1`
+  - [~] 1.1.2 Filter / sort: status, category, sort by votes/newest `w:2`
+  - [~] 1.1.3 Empty / loading / error states (no mock fallback) `w:1`
+- [~] 1.2 Issue detail `/issues/[id]` `w:3`
+  - [~] 1.2.1 Description, location, evidence gallery `w:1`
+  - [ ] 1.2.2 Vote action + live count `w:1` *(Block B; visible-but-disabled in Block A with "Sign in to vote" tooltip)*
+  - [~] 1.2.3 Related / nearby issues `w:1`
 - [ ] 1.3 Map view with pins `w:2` *(optional v1.1)*
 - [ ] 1.4 Public sharing — OG tags + share button `w:2`
 - [ ] 1.5 Voting wired end-to-end `w:4`
@@ -215,7 +215,8 @@ Goal: Every public-facing entity has an admin counterpart with full CRUD + audit
 - [x] 9.2 Feedback module `w:1`
 - [x] 9.3 Issues read-only listing `w:1`
 - [x] 9.4 Events module (assign leader, tie-break, settle) `w:1`
-- [ ] 9.5 Issues full CRUD `w:1` ← blocked: see [09-backend-admin-gaps.md](09-backend-admin-gaps.md)
+- [x] 9.5a Issues admin create page (`/admin/issues/create` via existing `POST /issues`) `w:0`
+- [ ] 9.5 Issues full CRUD (status, edit, notes, delete) `w:1` ← blocked: see [09-backend-admin-gaps.md](09-backend-admin-gaps.md)
 - [ ] 9.6 Incidents admin view `w:1`
 - [ ] 9.7 Roles / KYC verification panel `w:1`
 - [ ] 9.8 Notifications admin (templates + queue) `w:1`

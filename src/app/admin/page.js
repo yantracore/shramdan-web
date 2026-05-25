@@ -28,7 +28,7 @@ const dashboardModules = [
     status: "Live"
   },
   {
-    body: "Browse community-reported issues, filter by status or category, and inspect full details with attached uploads.",
+    body: "Browse community-reported issues, filter by status or category, inspect details, and create new issues on behalf of verified contributors.",
     href: "/admin/issues",
     icon: <EnvironmentOutlined />,
     label: "Issues",
@@ -80,10 +80,11 @@ export default function AdminDashboardPage() {
       <section className="admin-dashboard-note">
         <h2>Today&apos;s admin scope</h2>
         <p>
-          Applications, Feedback, Issues, and Events are connected to the live backend. Issues is
-          read-only until the backend exposes admin-side mutation endpoints. Events supports
-          leader assignment, tie-break, and voting settle; scheduling and completion remain with
-          the assigned event leader by API design.
+          Applications, Feedback, Issues, and Events are connected to the live backend. Admins can
+          create new issues on behalf of verified contributors; status changes, edits, notes, and
+          deletes are still pending backend mutation endpoints. Events supports leader assignment,
+          tie-break, and voting settle; scheduling and completion remain with the assigned event
+          leader by API design.
         </p>
         <Link href="/">Back to public site</Link>
       </section>

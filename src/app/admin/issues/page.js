@@ -1,7 +1,8 @@
 "use client";
 
-import { EnvironmentOutlined, EyeOutlined, RiseOutlined } from "@ant-design/icons";
+import { EnvironmentOutlined, EyeOutlined, PlusOutlined, RiseOutlined } from "@ant-design/icons";
 import { Button, Empty, Modal, Select, Spin, Table, Tag } from "antd";
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import { AdminResponsiveList } from "@/components/AdminResponsiveList";
 import { AdminShell } from "@/components/AdminShell";
@@ -137,6 +138,13 @@ export default function AdminIssuesPage() {
           description="Monitor reported issues, their categories, vote counts, and current lifecycle status."
           onRefresh={fetchIssues}
           refreshing={loadingIssues}
+          actions={
+            <Link href="/admin/issues/create">
+              <Button type="primary" icon={<PlusOutlined />}>
+                Create issue
+              </Button>
+            </Link>
+          }
         />
 
         <AdminFilters>

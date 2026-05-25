@@ -1899,6 +1899,53 @@
   overflow-wrap: anywhere;
 }
 
+.admin-panel-heading-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.admin-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 20px;
+}
+
+.admin-form-wide {
+  grid-column: 1 / -1;
+}
+
+.admin-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: flex-end;
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+}
+
+@media (max-width: 720px) {
+  .admin-form-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .admin-form-actions {
+    justify-content: stretch;
+  }
+
+  .admin-form-actions .ant-btn,
+  .admin-form-actions a {
+    flex: 1 1 160px;
+  }
+}
+
 .admin-filters {
   display: flex;
   flex-wrap: wrap;
@@ -2347,6 +2394,10 @@
   }
 
   .admin-panel-heading .ant-btn {
+    align-self: start;
+  }
+
+  .admin-panel-heading-actions {
     align-self: start;
   }
 

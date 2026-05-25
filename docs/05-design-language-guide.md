@@ -98,6 +98,67 @@ this pattern. Future Issue, Event, Incident, Upload, role, and notification list
 should start from the same responsive pattern instead of receiving one-off
 responsive fixes later.
 
+## Admin Entity Routing And Create/Edit Pattern
+
+Admin entities follow a consistent navigation shape so that future entities (issues,
+events, incidents, uploads, roles, notifications) can be added without rethinking the
+information architecture every time.
+
+- **Sidebar** lists each admin entity once. The sidebar entry always links to the
+  entity list page, not to a dashboard card.
+- **List page** lives at `/admin/<entity>` (e.g. `/admin/issues`, `/admin/events`). It
+  shows filters, a responsive table/card list, and per-row actions. The list page
+  header (rendered through `AdminPanelHeading`) is the home for the **Create** button.
+- **Create page** lives at `/admin/<entity>/create`. It is reached only from the
+  primary "Create" button on the list page header.
+- **Edit page** lives at `/admin/<entity>/<id>/edit`. It is reached from the row
+  actions on the list page (or from a detail view).
+
+### Why full-body pages, not modals or drawers
+
+Entity create/edit forms in Shramdaan can carry meaningful payload (coordinates,
+addresses, long descriptions, uploads, scheduling fields, planning notes, structured
+sub-sections). Modals and drawers compress that work into a cramped surface that
+hides the rest of the page, scrolls awkwardly, and does not survive a browser
+refresh or a shared link.
+
+Use full-body pages for create and edit so the work surface gets the room it needs,
+deep-links are shareable, the back button works the way users expect, and the layout
+can grow new sections without breaking out of an overlay container.
+
+Modals and drawers remain appropriate for short, focused operations on top of an
+existing list — confirmations, single-field status changes, quick notes — not for
+creating or editing the entity as a whole.
+
+### Required pieces on every create/edit page
+
+- Wrap the page in `AdminShell` with a clear `title`.
+- Use `AdminPanelHeading` with a back button (`ArrowLeftOutlined`) wired into the
+  `actions` slot so the user can return to the list without using the browser back
+  button.
+- Lay out form fields with the shared `admin-form` / `admin-form-grid` /
+  `admin-form-wide` classes so fields collapse cleanly to a single column on narrow
+  screens.
+- Place the primary submit button and a `Cancel` link back to the list page in
+  `admin-form-actions` at the bottom of the form.
+- On successful submit, route back to the list page (`router.push("/admin/<entity>")`)
+  and surface a success message via Ant Design's `message` API.
+
+### Create button placement on the list page
+
+The list page header is the only entry point for creation. Add the create button to
+`AdminPanelHeading`'s `actions` slot, immediately after the refresh button, as a
+`primary` Ant Design button with `PlusOutlined`. The button text should read
+`Create <entity-singular>` (e.g. "Create issue", "Create event"). The href points to
+`/admin/<entity>/create`.
+
+### Read-only entities
+
+If an entity is intentionally read-only for the admin (because the backend or
+product design says so — e.g. `applications` and `feedback`, which are created by the
+public), omit the create button from the list header rather than disabling it. Keep
+the rest of the pattern (filters, list, row actions) the same.
+
 ## Content Priorities
 
 For issues, prioritize:
