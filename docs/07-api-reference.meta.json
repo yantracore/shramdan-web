@@ -1,0 +1,10 @@
+{
+  "source": "https://backend.shramdan.org/api-docs.json",
+  "localPath": "docs/07-api-reference.json",
+  "lastFetchedAt": "2026-05-26T13:03:47+05:45",
+  "lastFetchedAtDisplay": "2026-05-26 13:03 NPT",
+  "stalenessThresholdHours": 6,
+  "timezone": "Asia/Kathmandu (UTC+05:45)",
+  "fetchCommand": "curl -fsSL https://backend.shramdan.org/api-docs.json -o docs/07-api-reference.json",
+  "protocol": "Agents must read this sidecar BEFORE consulting docs/07-api-reference.json or quoting endpoint contracts. If (now - lastFetchedAt) >= stalenessThresholdHours, silently run fetchCommand, then update lastFetchedAt + lastFetchedAtDisplay to the new fetch time in NPT, and announce the refresh in one line. Inside the 6h window, trust the local copy and skip the network call. See docs/10-frontend-api-usage.md §Freshness protocol."
+}

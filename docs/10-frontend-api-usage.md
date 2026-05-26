@@ -4,6 +4,17 @@ The authoritative source for backend endpoint contracts (request bodies, respons
 
 This map is maintained by hand. Do **not** auto-generate it from the OpenAPI spec — the value here is showing real call sites, which the spec cannot describe.
 
+## Freshness protocol
+
+The backend deploys outside our working hours, so the local `docs/07-api-reference.json` can be stale at the start of a new working session. Agents enforce freshness via a 6-hour TTL stored in `docs/07-api-reference.meta.json`:
+
+- Before consulting `07-api-reference.json` or citing any endpoint contract, read `07-api-reference.meta.json` and compare `lastFetchedAt` (NPT, UTC+05:45) against the current time.
+- If the gap is **≥ `stalenessThresholdHours`** (currently 6), silently run the `fetchCommand` (`curl -fsSL https://backend.shramdan.org/api-docs.json -o docs/07-api-reference.json`), then update `lastFetchedAt` + `lastFetchedAtDisplay` in the meta file to the new fetch moment, and announce the refresh in one line (`API docs were Xh stale — refreshed from backend.`).
+- Inside the 6h window, trust the local copy and skip the network call.
+- Do not prompt the user; freshness is automatic. An explicit "update the API docs" from the user still triggers an immediate fetch regardless of the timestamp.
+
+The 6h threshold lives in the meta file, not in code, so it can be adjusted in one place.
+
 ## API Client
 
 All requests go through `src/lib/apiClient.js`:
