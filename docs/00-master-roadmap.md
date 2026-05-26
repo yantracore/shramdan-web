@@ -17,8 +17,8 @@ The bar is 100 characters wide so each `=` equals exactly one percentage point. 
 Each task is a node in a weighted tree:
 
 ```
-- [x] 1.2 Issue detail page `w:3` `status:done`
-  - [x] 1.2.1 Vote action `w:1`
+- [x] 1.2 Issue detail page `w:3` ← done: 2026-05-25
+  - [x] 1.2.1 Vote action `w:1` ← done: 2026-05-25
   - [ ] 1.2.2 Related issues `w:1`
   - [~] 1.2.3 Evidence gallery `w:1` ← in progress
 ```
@@ -32,6 +32,18 @@ Each task is a node in a weighted tree:
 | `[x]` | **done** | Fully implemented, tested, merged |
 | `[!]` | **blocked** | External dependency (e.g. backend endpoint, legal decision) — add `← blocked: <reason>` |
 | `[-]` | **cancelled / out of scope** | Decided not to do; keep the line, don't delete |
+
+### Completion date (`← done: YYYY-MM-DD`)
+
+Every leaf that has been flipped to `[x]` carries the calendar date it was finished, appended at the end of the line in ISO format: `← done: 2026-05-25`. Use the date the change was merged (or the date the local build passed for unmerged branches). This lets us scan the file and answer "when did we finish X?" without digging through `git log`. The marker mirrors the existing `← blocked: <reason>` convention so both kinds of annotation sit in the same spot.
+
+Place the date *after* the weight and *before* any `*(notes)*` block:
+
+```
+- [x] 0.7 Bilingual EN/NE coverage `w:1` ← done: 2026-05-25 *(see notes…)*
+```
+
+Cancelled (`[-]`) leaves do not need a date. Sub-leaves without an explicit weight (e.g. `3.4.1`) still get a date when done.
 
 ### Weight (`w:N`)
 
@@ -55,6 +67,7 @@ When you are working on a task that appears in this roadmap, you MUST:
 
 1. **Flip the marker to `[~]` before you start** the leaf you are working on. Only one or two leaves per phase should be `[~]` at any time.
 2. **Flip to `[x]` immediately when done** — when the change is merged or when tests/build pass locally for in-progress branches. Do not batch completions across multiple leaves.
+   - **Append `← done: YYYY-MM-DD`** in the same edit, using today's date in ISO format. See [Completion date](#completion-date--done-yyyy-mm-dd). Never leave an `[x]` leaf without a date.
 3. **Update the phase `📊 N%`** in the same edit. Recompute from the weighted formula above.
 4. **Recompute Aggregate Progress** if the phase percentage moved, and **redraw the Overall Progress bar near the top** in the same edit. The bar is 100 chars wide — `=` chars equal the rounded overall percent, `-` chars fill the rest.
 5. **Add new leaves freely** as you discover scope. Renumber siblings if needed; keep the tree at ≤4 levels deep, prefer 3.
@@ -82,34 +95,34 @@ Use this section as a short-lived hint of what would be a sensible next step *ri
 
 Goal: A live public site, deployable, with the basic surfaces users currently see.
 
-- [x] 0.1 Domain, hosting, Vercel deploy pipeline `w:1`
-- [x] 0.2 Next.js + Ant Design scaffold `w:1`
-- [x] 0.3 Public homepage `w:2`
-  - [x] 0.3.1 Hero + mission `w:1`
-  - [x] 0.3.2 Volunteer roles section `w:1`
-  - [x] 0.3.3 Resources playlist + watch-on-YouTube `w:1`
-- [x] 0.4 Public submission forms `w:2`
-  - [x] 0.4.1 `/join` → `POST /applications` `w:1`
-  - [x] 0.4.2 `/feedback` → `POST /feedback` `w:1`
-- [x] 0.5 Auth + admin shell `w:2`
-  - [x] 0.5.1 `/login` with bearer token + session storage `w:1`
-  - [x] 0.5.2 `/admin` shell + role gate `w:1`
-  - [x] 0.5.3 Admin user dropdown on public site header `w:1`
-- [x] 0.6 Docs 01–10 set authored `w:1`
-- [x] 0.7 Bilingual EN/NE on every existing public surface `w:1` *(homepage, `/join`, `/feedback`, public footer, form validation, error toasts — all wired through `copy[language]` in `src/lib/siteContent.js`. Admin shell stays EN-only per product decision. New public pages must add `np` + `en` entries when built; tracked under their own phases, not here.)*
+- [x] 0.1 Domain, hosting, Vercel deploy pipeline `w:1` ← done: 2026-05-14
+- [x] 0.2 Next.js + Ant Design scaffold `w:1` ← done: 2026-05-14
+- [x] 0.3 Public homepage `w:2` ← done: 2026-05-25
+  - [x] 0.3.1 Hero + mission `w:1` ← done: 2026-05-15
+  - [x] 0.3.2 Volunteer roles section `w:1` ← done: 2026-05-15
+  - [x] 0.3.3 Resources playlist + watch-on-YouTube `w:1` ← done: 2026-05-25
+- [x] 0.4 Public submission forms `w:2` ← done: 2026-05-15
+  - [x] 0.4.1 `/join` → `POST /applications` `w:1` ← done: 2026-05-15
+  - [x] 0.4.2 `/feedback` → `POST /feedback` `w:1` ← done: 2026-05-15
+- [x] 0.5 Auth + admin shell `w:2` ← done: 2026-05-25
+  - [x] 0.5.1 `/login` with bearer token + session storage `w:1` ← done: 2026-05-19
+  - [x] 0.5.2 `/admin` shell + role gate `w:1` ← done: 2026-05-19
+  - [x] 0.5.3 Admin user dropdown on public site header `w:1` ← done: 2026-05-25
+- [x] 0.6 Docs 01–10 set authored `w:1` ← done: 2026-05-20
+- [x] 0.7 Bilingual EN/NE on every existing public surface `w:1` ← done: 2026-05-25 *(homepage, `/join`, `/feedback`, public footer, form validation, error toasts — all wired through `copy[language]` in `src/lib/siteContent.js`. Admin shell stays EN-only per product decision. New public pages must add `np` + `en` entries when built; tracked under their own phases, not here.)*
 
 ## Phase 1 — Public Issue Discovery & Voting `w:15` 📊 40%
 
 Goal: Anyone (logged-in or not) can browse listed issues, see detail, and — once authenticated — vote.
 
-- [x] 1.1 Public `/issues` list `w:4`
-  - [x] 1.1.1 `PublicIssueCard` (new component, API shape) `w:1`
-  - [x] 1.1.2 Filter / sort: status, category, sort by votes/newest `w:2`
-  - [x] 1.1.3 Empty / loading / error states (no mock fallback) `w:1`
-- [x] 1.2 Issue detail `/issues/[id]` `w:3`
-  - [x] 1.2.1 Description, location, evidence gallery `w:1`
+- [x] 1.1 Public `/issues` list `w:4` ← done: 2026-05-25
+  - [x] 1.1.1 `PublicIssueCard` (new component, API shape) `w:1` ← done: 2026-05-25
+  - [x] 1.1.2 Filter / sort: status, category, sort by votes/newest `w:2` ← done: 2026-05-25
+  - [x] 1.1.3 Empty / loading / error states (no mock fallback) `w:1` ← done: 2026-05-25
+- [x] 1.2 Issue detail `/issues/[id]` `w:3` ← done: 2026-05-25
+  - [x] 1.2.1 Description, location, evidence gallery `w:1` ← done: 2026-05-25
   - [ ] 1.2.2 Vote action + live count `w:1` *(Block B; visible-but-disabled in Block A with "Sign in to vote" tooltip)*
-  - [x] 1.2.3 Related / nearby issues `w:1`
+  - [x] 1.2.3 Related / nearby issues `w:1` ← done: 2026-05-25
 - [ ] 1.3 Map view with pins `w:2` *(optional v1.1)*
 - [ ] 1.4 Public sharing — OG tags + share button `w:2`
 - [ ] 1.5 Voting wired end-to-end `w:4`
@@ -144,7 +157,7 @@ Goal: Authenticated member experience that ships before the native mobile app an
 
 Goal: A promoted issue becomes a real-world campaign with leader, schedule, roster, and completion.
 
-- [x] 3.1 Admin events list (read) `w:1`
+- [x] 3.1 Admin events list (read) `w:1` ← done: 2026-05-19
 - [ ] 3.2 Public campaign detail page `w:3`
   - [ ] 3.2.1 Date, time, meeting point, goal `w:1`
   - [ ] 3.2.2 Help-needed breakdown `w:1`
@@ -153,7 +166,7 @@ Goal: A promoted issue becomes a real-world campaign with leader, schedule, rost
   - [ ] 3.3.1 Vote-threshold rule + admin trigger `w:1`
   - [ ] 3.3.2 Auto-create campaign record on promote `w:1`
 - [ ] 3.4 Leader nomination + voting `w:3`
-  - [x] 3.4.1 Admin leader assignment (exists in `/admin/events`)
+  - [x] 3.4.1 Admin leader assignment (exists in `/admin/events`) ← done: 2026-05-19
   - [ ] 3.4.2 Member nomination flow on `/app` `w:1`
   - [ ] 3.4.3 Member-side tie-break + settle surface `w:1`
 - [ ] 3.5 Scheduling + completion (leader-only) `w:3`
@@ -211,18 +224,18 @@ Goal: Safety leads, medical professionals, and admins can manage real-world risk
 
 Goal: Every public-facing entity has an admin counterpart with full CRUD + audit, gated by role.
 
-- [x] 9.1 Applications module `w:2`
-- [x] 9.2 Feedback module `w:1`
-- [x] 9.3 Issues read-only listing `w:1`
-- [x] 9.4 Events module (assign leader, tie-break, settle) `w:1`
-- [x] 9.5a Issues admin create page (`/admin/issues/create` via existing `POST /issues`) `w:0`
-- [x] 9.5b Issues admin edit page wired (`/admin/issues/[id]/edit`, shared `IssueForm`, `PATCH /issues/{id}` submit) `w:0` *(UI ready; PATCH endpoint not yet shipped on backend — submit errors with toast until then; see [09-backend-admin-gaps.md](09-backend-admin-gaps.md))*
+- [x] 9.1 Applications module `w:2` ← done: 2026-05-19
+- [x] 9.2 Feedback module `w:1` ← done: 2026-05-19
+- [x] 9.3 Issues read-only listing `w:1` ← done: 2026-05-19
+- [x] 9.4 Events module (assign leader, tie-break, settle) `w:1` ← done: 2026-05-19
+- [x] 9.5a Issues admin create page (`/admin/issues/create` via existing `POST /issues`) `w:0` ← done: 2026-05-25
+- [x] 9.5b Issues admin edit page wired (`/admin/issues/[id]/edit`, shared `IssueForm`, `PATCH /issues/{id}` submit) `w:0` ← done: 2026-05-25 *(UI ready; PATCH endpoint not yet shipped on backend — submit errors with toast until then; see [09-backend-admin-gaps.md](09-backend-admin-gaps.md))*
 - [!] 9.5 Issues full CRUD (status, notes, delete; PATCH endpoint for edit) `w:1` ← blocked: see [09-backend-admin-gaps.md](09-backend-admin-gaps.md)
 - [ ] 9.6 Incidents admin view `w:1`
 - [ ] 9.7 Roles / KYC verification panel `w:1`
 - [ ] 9.8 Notifications admin (templates + queue) `w:1`
 - [ ] 9.9 Audit log + activity feed `w:1`
-- [x] 9.10 Users browse list (`/admin/users`, read-only) `w:1` *(UI ready; staging `GET /users` returns 500 due to backend `take` Int cast bug — see [09-backend-admin-gaps.md](09-backend-admin-gaps.md))*
+- [x] 9.10 Users browse list (`/admin/users`, read-only) `w:1` ← done: 2026-05-25 *(UI ready; staging `GET /users` returns 500 due to backend `take` Int cast bug — see [09-backend-admin-gaps.md](09-backend-admin-gaps.md))*
 
 ## Phase 10 — Native Mobile App `w:5` 📊 0%
 
@@ -235,9 +248,9 @@ Goal: Ship native iOS + Android once `/app` web shell is stable. Reuse the same 
 
 ## Phase 11 — Cross-cutting Concerns `w:10` 📊 25%
 
-- [x] 11.1 Responsive admin list pattern (`AdminResponsiveList`) `w:1`
+- [x] 11.1 Responsive admin list pattern (`AdminResponsiveList`) `w:1` ← done: 2026-05-20
 - [ ] 11.2 Accessibility audit (WCAG AA) `w:2`
-- [x] 11.3 Bilingual EN/NE coverage across the public site `w:2` *(currently met; every existing public surface reads from `copy[language]`. Admin control center is intentionally EN-only. Standing rule: any new public page must ship with `np` + `en` entries — see `docs/05-design-language-guide.md` "Language Scope For Surfaces".)*
+- [x] 11.3 Bilingual EN/NE coverage across the public site `w:2` ← done: 2026-05-25 *(currently met; every existing public surface reads from `copy[language]`. Admin control center is intentionally EN-only. Standing rule: any new public page must ship with `np` + `en` entries — see `docs/05-design-language-guide.md` "Language Scope For Surfaces".)*
 - [ ] 11.4 SEO + meta + sitemap `w:1`
 - [ ] 11.5 Analytics + observability `w:1`
 - [ ] 11.6 Performance (Lighthouse mobile > 90) `w:1`
@@ -246,7 +259,7 @@ Goal: Ship native iOS + Android once `/app` web shell is stable. Reuse the same 
 
 ## Phase 12 — Documentation & Community `w:5` 📊 40%
 
-- [x] 12.1 Docs 01–10 set + this roadmap `w:2`
+- [x] 12.1 Docs 01–10 set + this roadmap `w:2` ← done: 2026-05-25
 - [ ] 12.2 CONTRIBUTING.md `w:1`
 - [ ] 12.3 Public FAQ on website `w:1`
 - [ ] 12.4 Decision log / ADRs `w:1`
