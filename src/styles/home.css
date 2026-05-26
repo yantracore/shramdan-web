@@ -3289,7 +3289,7 @@
 
 .public-issue-detail {
   display: grid;
-  gap: 18px;
+  gap: 22px;
   padding: 28px;
 }
 
@@ -3318,19 +3318,20 @@
   color: var(--accent);
 }
 
-.public-issue-detail-actions {
+.public-issue-detail-support {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 0;
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
+  gap: 16px;
+  padding: 14px 18px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface) 96%, transparent);
 }
 
-.public-issue-detail-vote-count {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--accent);
+.public-issue-detail-supporters {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
 }
 
 .public-issue-detail-section-block {
@@ -3353,30 +3354,302 @@
   font-style: italic;
 }
 
-.public-issue-gallery {
+.public-issue-detail-skeleton {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 12px;
+  gap: 18px;
 }
 
-.public-issue-gallery-item {
-  display: block;
-  overflow: hidden;
-  border-radius: 8px;
-  border: 1px solid var(--line);
-  background: var(--surface);
+/* Photo gallery (Swiper-based) — full-bleed within card */
+.public-issue-gallery {
+  margin-inline: -28px;
+  background: #0b0b0b;
+  display: grid;
+  gap: 8px;
+  padding-bottom: 12px;
 }
 
-.public-issue-gallery-item img {
+.public-issue-gallery-main {
+  width: 100%;
+  background: #000;
+}
+
+.public-issue-gallery-main .swiper-slide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+}
+
+.public-issue-gallery-slide-button,
+.public-issue-gallery-single {
+  position: relative;
   display: block;
   width: 100%;
-  height: 180px;
-  object-fit: cover;
-  transition: transform 220ms ease;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: #000;
+  cursor: zoom-in;
 }
 
-.public-issue-gallery-item:hover img {
-  transform: scale(1.04);
+.public-issue-gallery-slide-button img,
+.public-issue-gallery-single img {
+  display: block;
+  width: 100%;
+  height: clamp(260px, 48vw, 460px);
+  object-fit: contain;
+  background: #000;
+}
+
+.public-issue-gallery-expand {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 16px;
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+
+.public-issue-gallery-slide-button:hover .public-issue-gallery-expand,
+.public-issue-gallery-slide-button:focus-visible .public-issue-gallery-expand,
+.public-issue-gallery-single:hover .public-issue-gallery-expand,
+.public-issue-gallery-single:focus-visible .public-issue-gallery-expand {
+  opacity: 1;
+}
+
+.public-issue-gallery-main .swiper-button-next,
+.public-issue-gallery-main .swiper-button-prev {
+  color: #fff;
+  background: rgba(0, 0, 0, 0.45);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.public-issue-gallery-main .swiper-button-next::after,
+.public-issue-gallery-main .swiper-button-prev::after {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.public-issue-gallery-main .swiper-pagination-bullet {
+  background: rgba(255, 255, 255, 0.6);
+  opacity: 1;
+}
+
+.public-issue-gallery-main .swiper-pagination-bullet-active {
+  background: var(--accent);
+}
+
+.public-issue-gallery-thumbs {
+  padding: 0 12px;
+}
+
+.public-issue-gallery-thumbs .swiper-slide {
+  width: 96px;
+  height: 64px;
+  cursor: pointer;
+  border-radius: 6px;
+  overflow: hidden;
+  opacity: 0.55;
+  transition: opacity 180ms ease, outline-color 180ms ease;
+  outline: 2px solid transparent;
+}
+
+.public-issue-gallery-thumbs .swiper-slide-thumb-active {
+  opacity: 1;
+  outline-color: var(--accent);
+}
+
+.public-issue-gallery-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Lightbox modal */
+.public-issue-lightbox-wrap .ant-modal-content {
+  background: rgba(0, 0, 0, 0.92);
+  padding: 16px;
+}
+
+.public-issue-lightbox-wrap .ant-modal-close {
+  color: #fff;
+}
+
+.public-issue-lightbox-swiper {
+  width: 100%;
+}
+
+.public-issue-lightbox-slide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+}
+
+.public-issue-lightbox-slide img {
+  max-width: 100%;
+  max-height: 80vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+.public-issue-lightbox-swiper .swiper-button-next,
+.public-issue-lightbox-swiper .swiper-button-prev {
+  color: #fff;
+}
+
+.public-issue-lightbox-swiper .swiper-pagination-bullet {
+  background: rgba(255, 255, 255, 0.6);
+  opacity: 1;
+}
+
+.public-issue-lightbox-swiper .swiper-pagination-bullet-active {
+  background: var(--accent);
+}
+
+/* Status timeline */
+.public-issue-timeline-block {
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 18px 0;
+}
+
+.public-issue-status-timeline {
+  padding: 6px 4px 0;
+}
+
+.public-issue-status-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px dashed var(--line);
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.public-issue-status-banner-rejected {
+  border-color: color-mix(in srgb, #d4380d 40%, var(--line));
+}
+
+/* Share row */
+.public-issue-share-row {
+  display: grid;
+  gap: 10px;
+}
+
+.public-issue-share-row h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.public-issue-share-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.public-issue-share-buttons button {
+  cursor: pointer;
+}
+
+.public-issue-share-buttons .react-share__ShareButton {
+  border-radius: 50%;
+  transition: transform 180ms ease;
+}
+
+.public-issue-share-buttons .react-share__ShareButton:hover {
+  transform: translateY(-2px);
+}
+
+.public-issue-share-copy.ant-btn {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.public-issue-share-copy.ant-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Location card */
+.public-issue-location-card {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface) 96%, transparent);
+}
+
+.public-issue-location-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.public-issue-location-card h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.public-issue-location-address {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.public-issue-location-address .anticon {
+  margin-right: 6px;
+  color: var(--accent);
+}
+
+.public-issue-location-open-link {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.public-issue-location-open-link:hover {
+  text-decoration: underline;
+}
+
+.public-issue-location-map {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+}
+
+.public-issue-location-map iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
 }
 
 .public-issue-related {
@@ -3397,6 +3670,7 @@
 
   .public-issue-detail {
     padding: 20px;
+    gap: 18px;
   }
 
   .public-issue-detail h1 {
@@ -3405,5 +3679,28 @@
 
   .public-issue-card-actions {
     flex-wrap: wrap;
+  }
+
+  .public-issue-gallery {
+    margin-inline: -20px;
+  }
+
+  .public-issue-gallery-slide-button img,
+  .public-issue-gallery-single img {
+    height: clamp(220px, 60vw, 360px);
+  }
+
+  .public-issue-gallery-thumbs .swiper-slide {
+    width: 72px;
+    height: 48px;
+  }
+
+  .public-issue-detail-support {
+    flex-wrap: wrap;
+    padding: 12px 14px;
+  }
+
+  .public-issue-location-card {
+    padding: 14px;
   }
 }

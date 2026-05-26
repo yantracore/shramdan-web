@@ -4,20 +4,22 @@ import {
   ArrowLeftOutlined,
   CalendarOutlined,
   EnvironmentOutlined,
-  LikeOutlined,
-  RiseOutlined
+  LikeOutlined
 } from "@ant-design/icons";
-import { Button, Empty, Spin, Tag, Tooltip } from "antd";
-import Image from "next/image";
+import { Button, Empty, Skeleton, Tag, Tooltip } from "antd";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import { PublicIssueCard, formatSupporters, toLocalDigits } from "@/components/PublicIssueCard";
+import { IssueLocationCard } from "@/components/IssueLocationCard";
+import { IssuePhotoGallery } from "@/components/IssuePhotoGallery";
+import { IssueShareRow } from "@/components/IssueShareRow";
+import { IssueStatusTimeline } from "@/components/IssueStatusTimeline";
+import { PublicIssueCard, formatSupporters } from "@/components/PublicIssueCard";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
 import { getJson } from "@/lib/apiClient";
 import { copy } from "@/lib/siteContent";
-import { ISSUE_STATUS_COLORS, getListItems, getResponseData } from "@/lib/adminUtils";
+import { ISSUE_STATUS_COLORS, getListItems, getResponseData, isImageUpload } from "@/lib/adminUtils";
 
 const PUBLIC_ISSUE_STATUSES = ["OPEN", "EVENT_SCHEDULED", "COMPLETED"];
 const RELATED_LIMIT = 6;
@@ -100,10 +102,7 @@ export default function IssueDetailPage() {
   }, [fetchIssue]);
 
   const uploads = Array.isArray(issue?.uploads) ? issue.uploads : [];
-  const imageUploads = uploads.filter((upload) => {
-    const url = upload?.url || "";
-    return /\.(png|jpe?g|webp|gif|avif)$/i.test(url);
-  });
+  const imageUploads = uploads.filter(isImageUpload);
 
   return (
     <SiteShell>
@@ -113,10 +112,12 @@ export default function IssueDetailPage() {
         </Link>
 
         {loading ? (
-          <div className="public-issues-loading" role="status">
-            <Spin />
-            <span>{content.states.loading}</span>
-          </div>
+          <article className="content-card public-issue-detail public-issue-detail-skeleton" role="status" aria-live="polite">
+            <Skeleton.Button active size="small" style={{ width: 120 }} />
+            <Skeleton active title={{ width: "70%" }} paragraph={{ rows: 1, width: ["40%"] }} />
+            <Skeleton.Image active style={{ width: "100%", height: 320 }} />
+            <Skeleton active paragraph={{ rows: 3 }} />
+          </article>
         ) : null}
 
         {!loading && error ? (
@@ -162,9 +163,6 @@ export default function IssueDetailPage() {
                   <EnvironmentOutlined /> {issue.addressText}
                 </span>
               ) : null}
-              <span>
-                <RiseOutlined /> {formatSupporters(issue.voteCount, content, language)}
-              </span>
               {issue.createdAt ? (
                 <span>
                   <CalendarOutlined /> {content.detail.reportedOn}:{" "}
@@ -173,16 +171,23 @@ export default function IssueDetailPage() {
               ) : null}
             </div>
 
-            <div className="public-issue-detail-actions">
-              <Tooltip title={content.card.voteDisabledTooltip}>
-                <Button disabled icon={<LikeOutlined />} size="large" type="primary">
-                  {content.card.voteAction}
-                </Button>
-              </Tooltip>
-              <span className="public-issue-detail-vote-count">
-                {toLocalDigits(issue.voteCount ?? 0, language)}
-              </span>
-            </div>
+            {imageUploads.length > 0 ? (
+              <IssuePhotoGallery
+                images={imageUploads}
+                title={issue.title}
+                content={content}
+              />
+            ) : (
+              <section className="public-issue-detail-section-block">
+                <h2>{content.detail.evidenceTitle}</h2>
+                <p className="public-issue-detail-muted">{content.detail.noEvidence}</p>
+              </section>
+            )}
+
+            <section className="public-issue-detail-section-block public-issue-timeline-block">
+              <h2>{content.detail.timelineTitle}</h2>
+              <IssueStatusTimeline status={issue.status} content={content} />
+            </section>
 
             {issue.description ? (
               <section className="public-issue-detail-section-block">
@@ -191,32 +196,29 @@ export default function IssueDetailPage() {
               </section>
             ) : null}
 
-            <section className="public-issue-detail-section-block">
-              <h2>{content.detail.evidenceTitle}</h2>
-              {imageUploads.length > 0 ? (
-                <div className="public-issue-gallery">
-                  {imageUploads.map((upload) => (
-                    <a
-                      className="public-issue-gallery-item"
-                      href={upload.url}
-                      key={upload.id || upload.url}
-                      rel="noreferrer"
-                      target="_blank"
-                    >
-                      <Image
-                        alt={issue.title}
-                        height={240}
-                        src={upload.url}
-                        unoptimized
-                        width={320}
-                      />
-                    </a>
-                  ))}
-                </div>
-              ) : (
-                <p className="public-issue-detail-muted">{content.detail.noEvidence}</p>
-              )}
-            </section>
+            <div className="public-issue-detail-support">
+              <Tooltip title={content.card.voteDisabledTooltip}>
+                <Button disabled icon={<LikeOutlined />} size="large" type="primary">
+                  {content.card.voteAction}
+                </Button>
+              </Tooltip>
+              <span className="public-issue-detail-supporters">
+                {formatSupporters(issue.voteCount, content, language)}
+              </span>
+            </div>
+
+            <IssueShareRow
+              title={issue.title}
+              content={content}
+              language={language}
+            />
+
+            <IssueLocationCard
+              addressText={issue.addressText}
+              latitude={issue.latitude}
+              longitude={issue.longitude}
+              content={content}
+            />
           </article>
         ) : null}
 

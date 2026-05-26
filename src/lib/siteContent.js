@@ -490,7 +490,18 @@ export const copy = {
         relatedTitle: "यस क्षेत्रका अन्य समस्याहरू",
         noRelated: "यस क्षेत्रमा अहिले अरू समस्या रिपोर्ट गरिएको छैन।",
         notFoundTitle: "समस्या भेटिएन",
-        notFoundBody: "यो समस्या हटाइएको हुनसक्छ वा लिंक गलत छ।"
+        notFoundBody: "यो समस्या हटाइएको हुनसक्छ वा लिंक गलत छ।",
+        timelineTitle: "अहिलेसम्मको प्रगति",
+        shareTitle: "साझेदारी गर्नुहोस्",
+        shareCopyLink: "लिङ्क प्रतिलिपि गर्नुहोस्",
+        shareCopied: "लिङ्क प्रतिलिपि भयो",
+        locationTitle: "स्थान",
+        openInMaps: "नक्सामा खोल्नुहोस्",
+        galleryAria: "फोटो ग्यालरी",
+        viewPhoto: "फोटो ठूलो हेर्नुहोस्",
+        photoCount: "{n} तस्वीर",
+        rejectedNote: "यो समस्या अस्वीकृत गरिएको छ।",
+        duplicateNote: "यो समस्या डुप्लिकेट रिपोर्ट हो।"
       }
     },
     issues: {
@@ -552,7 +563,18 @@ export const copy = {
         relatedTitle: "यस क्षेत्रका अन्य समस्याहरू",
         noRelated: "यस क्षेत्रमा अहिले अरू समस्या रिपोर्ट गरिएको छैन।",
         notFoundTitle: "समस्या भेटिएन",
-        notFoundBody: "यो समस्या हटाइएको हुनसक्छ वा लिङ्क गलत छ।"
+        notFoundBody: "यो समस्या हटाइएको हुनसक्छ वा लिङ्क गलत छ।",
+        timelineTitle: "अहिलेसम्मको प्रगति",
+        shareTitle: "साझेदारी गर्नुहोस्",
+        shareCopyLink: "लिङ्क प्रतिलिपि गर्नुहोस्",
+        shareCopied: "लिङ्क प्रतिलिपि भयो",
+        locationTitle: "स्थान",
+        openInMaps: "नक्सामा खोल्नुहोस्",
+        galleryAria: "फोटो ग्यालरी",
+        viewPhoto: "फोटो ठूलो हेर्नुहोस्",
+        photoCount: "{n} तस्वीर",
+        rejectedNote: "यो समस्या अस्वीकृत गरिएको छ।",
+        duplicateNote: "यो समस्या डुप्लिकेट रिपोर्ट हो।"
       }
     },
     footer: {
@@ -1068,7 +1090,18 @@ export const copy = {
         relatedTitle: "Other issues in this category",
         noRelated: "No other issues in this category yet.",
         notFoundTitle: "Issue not found",
-        notFoundBody: "This issue may have been removed, or the link is incorrect."
+        notFoundBody: "This issue may have been removed, or the link is incorrect.",
+        timelineTitle: "Progress so far",
+        shareTitle: "Share this issue",
+        shareCopyLink: "Copy link",
+        shareCopied: "Link copied",
+        locationTitle: "Location",
+        openInMaps: "Open in Maps",
+        galleryAria: "Photo gallery",
+        viewPhoto: "View photo",
+        photoCount: "{n} photo",
+        rejectedNote: "This issue has been rejected.",
+        duplicateNote: "This issue is a duplicate report."
       }
     },
     issues: {
@@ -1130,7 +1163,18 @@ export const copy = {
         relatedTitle: "Other issues in this category",
         noRelated: "No other issues in this category yet.",
         notFoundTitle: "Issue not found",
-        notFoundBody: "This issue may have been removed, or the link is incorrect."
+        notFoundBody: "This issue may have been removed, or the link is incorrect.",
+        timelineTitle: "Progress so far",
+        shareTitle: "Share this issue",
+        shareCopyLink: "Copy link",
+        shareCopied: "Link copied",
+        locationTitle: "Location",
+        openInMaps: "Open in Maps",
+        galleryAria: "Photo gallery",
+        viewPhoto: "View photo",
+        photoCount: "{n} photo",
+        rejectedNote: "This issue has been rejected.",
+        duplicateNote: "This issue is a duplicate report."
       }
     },
     footer: {
