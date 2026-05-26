@@ -3485,6 +3485,14 @@
 .public-issue-detail-topline {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.public-issue-detail-topline-tags {
+  display: flex;
+  flex-wrap: wrap;
   gap: 8px;
 }
 
@@ -3504,11 +3512,7 @@
 .public-issue-detail-support {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 14px 18px;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--surface) 96%, transparent);
+  gap: 12px;
 }
 
 .public-issue-detail-supporters {
@@ -3895,7 +3899,6 @@
 
   .public-issue-detail-support {
     flex-wrap: wrap;
-    padding: 12px 14px;
   }
 
   .public-issue-location-card {

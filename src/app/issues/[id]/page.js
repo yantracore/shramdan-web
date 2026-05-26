@@ -9,8 +9,8 @@ import {
 import { Button, Empty, Skeleton, Tag, Tooltip } from "antd";
 import Image from "next/image";
 import Link from "next/link";
-import { useParams } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import { IssueLocationCard } from "@/components/IssueLocationCard";
 import { IssuePhotoGallery } from "@/components/IssuePhotoGallery";
 import { IssueShareRow } from "@/components/IssueShareRow";
@@ -19,6 +19,7 @@ import { PublicIssueCard, formatSupporters } from "@/components/PublicIssueCard"
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
 import { getJson } from "@/lib/apiClient";
+import { getAuthSession, subscribeAuthSession } from "@/lib/authSession";
 import { copy } from "@/lib/siteContent";
 import {
   ISSUE_STATUS_COLORS,
@@ -49,10 +50,13 @@ function formatIssueDate(value, language) {
 
 export default function IssueDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const issueId = params?.id;
   const { language } = usePreferences();
   const t = copy[language];
   const content = t.issues;
+  const session = useSyncExternalStore(subscribeAuthSession, getAuthSession, () => null);
+  const isAuthenticated = Boolean(session?.user);
 
   const [issue, setIssue] = useState(null);
   const [related, setRelated] = useState([]);
@@ -174,10 +178,28 @@ export default function IssueDetailPage() {
 
             <div className="public-issue-detail-body">
               <div className="public-issue-detail-topline">
-                <Tag color={ISSUE_STATUS_COLORS[issue.status]}>
-                  {content.statusLabels[issue.status] || issue.status}
-                </Tag>
-                <Tag>{content.categoryLabels[issue.category] || issue.category}</Tag>
+                <div className="public-issue-detail-topline-tags">
+                  <Tag color={ISSUE_STATUS_COLORS[issue.status]}>
+                    {content.statusLabels[issue.status] || issue.status}
+                  </Tag>
+                  <Tag>{content.categoryLabels[issue.category] || issue.category}</Tag>
+                </div>
+                <div className="public-issue-detail-support">
+                  <Tooltip title={isAuthenticated ? "" : content.card.voteDisabledTooltip}>
+                    <Button
+                      disabled={isAuthenticated}
+                      icon={<LikeOutlined />}
+                      onClick={isAuthenticated ? undefined : () => router.push("/login")}
+                      size="large"
+                      type="primary"
+                    >
+                      {content.card.voteAction}
+                    </Button>
+                  </Tooltip>
+                  <span className="public-issue-detail-supporters">
+                    {formatSupporters(issue.voteCount, content, language)}
+                  </span>
+                </div>
               </div>
 
               <h1>{issue.title}</h1>
@@ -202,15 +224,9 @@ export default function IssueDetailPage() {
                   title={issue.title}
                   content={content}
                 />
-              ) : (
-                <section className="public-issue-detail-section-block">
-                  <h2>{content.detail.evidenceTitle}</h2>
-                  <p className="public-issue-detail-muted">{content.detail.noEvidence}</p>
-                </section>
-              )}
+              ) : null}
 
               <section className="public-issue-detail-section-block public-issue-timeline-block">
-                <h2>{content.detail.timelineTitle}</h2>
                 <IssueStatusTimeline status={issue.status} content={content} />
               </section>
 
@@ -220,17 +236,6 @@ export default function IssueDetailPage() {
                   <p>{issue.description}</p>
                 </section>
               ) : null}
-
-              <div className="public-issue-detail-support">
-                <Tooltip title={content.card.voteDisabledTooltip}>
-                  <Button disabled icon={<LikeOutlined />} size="large" type="primary">
-                    {content.card.voteAction}
-                  </Button>
-                </Tooltip>
-                <span className="public-issue-detail-supporters">
-                  {formatSupporters(issue.voteCount, content, language)}
-                </span>
-              </div>
 
               <IssueShareRow
                 title={issue.title}
