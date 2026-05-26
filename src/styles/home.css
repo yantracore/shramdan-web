@@ -1239,10 +1239,9 @@
 }
 
 .form-section {
-  display: grid;
-  grid-template-columns: minmax(220px, 0.36fr) minmax(0, 1fr);
-  gap: 34px;
-  align-items: start;
+  width: 100%;
+  max-width: 720px;
+  margin-inline: auto;
 }
 
 .section-heading {
@@ -1257,6 +1256,32 @@
   font-size: clamp(34px, 5vw, 56px);
   line-height: 1.04;
   letter-spacing: 0;
+}
+
+.form-card-heading {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.form-card-heading .eyebrow {
+  margin-bottom: 2px;
+}
+
+.form-card-heading h1 {
+  margin: 0;
+  color: var(--text);
+  font-size: clamp(28px, 3.4vw, 40px);
+  line-height: 1.1;
+  letter-spacing: 0;
+}
+
+.form-card-heading p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.65;
 }
 
 .content-card {
@@ -1431,21 +1456,14 @@
 }
 
 .login-section {
-  display: grid;
-  grid-template-columns: minmax(240px, 0.42fr) minmax(320px, 0.58fr);
-  gap: 34px;
-  align-items: start;
+  width: 100%;
+  max-width: 480px;
+  margin-inline: auto;
   min-height: 70vh;
-}
-
-.login-heading {
-  position: sticky;
-  top: 112px;
 }
 
 .login-card {
   display: grid;
-  gap: 18px;
 }
 
 .login-card .ant-form-item-label > label {
@@ -2639,14 +2657,8 @@
 
   .hero-section,
   .volunteer-invite-section,
-  .form-section,
-  .login-section,
   .admin-hero {
     grid-template-columns: 1fr;
-  }
-
-  .login-heading {
-    position: static;
   }
 
   .core-idea-hero {
@@ -3223,10 +3235,11 @@
   min-width: 200px;
 }
 
-.public-issues-filters .ant-select-selection-placeholder,
-.public-issues-filters .ant-select-selection-item {
-  color: var(--text);
-  font-weight: 600;
+.public-issues-filters .ant-select .ant-select-selection-placeholder,
+.public-issues-filters .ant-select .ant-select-placeholder,
+.public-issues-filters .ant-select .ant-select-selection-item {
+  color: rgba(0, 0, 0, 0.88) !important;
+  opacity: 1 !important;
 }
 
 .public-issues-grid {
