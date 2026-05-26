@@ -7,22 +7,20 @@ import {
   PlusOutlined,
   RiseOutlined
 } from "@ant-design/icons";
-import { Button, Empty, Modal, Select, Spin, Table, Tag } from "antd";
+import { Button, Empty, Select, Table, Tag } from "antd";
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { AdminResponsiveList } from "@/components/AdminResponsiveList";
 import { AdminShell } from "@/components/AdminShell";
 import { AdminFilters } from "@/components/admin/AdminFilters";
 import { AdminListCard } from "@/components/admin/AdminListCard";
 import { AdminPanelHeading } from "@/components/admin/AdminPanelHeading";
-import { getJson } from "@/lib/apiClient";
 import {
   ISSUE_CATEGORIES,
   ISSUE_STATUSES,
   ISSUE_STATUS_COLORS,
   buildEnumOptions,
-  formatCoordinates,
   formatDate,
   formatEnum,
   getIssueCoverImageUrl,
@@ -53,34 +51,8 @@ export default function AdminIssuesPage() {
     errorMessage: "Could not load issues."
   });
 
-  const [detailIssue, setDetailIssue] = useState(null);
-  const [detailLoading, setDetailLoading] = useState(false);
-  const [detailError, setDetailError] = useState("");
-
   const statusOptions = useMemo(() => buildEnumOptions(ISSUE_STATUSES), []);
   const categoryOptions = useMemo(() => buildEnumOptions(ISSUE_CATEGORIES), []);
-
-  const openDetailModal = async (issue) => {
-    setDetailIssue(issue);
-    setDetailError("");
-    setDetailLoading(true);
-
-    try {
-      const response = await getJson(`/issues/${issue.id}`, { requireAuth: true });
-      const fullIssue = response?.data ?? issue;
-      setDetailIssue(fullIssue);
-    } catch (error) {
-      setDetailError(error.message || "Could not load issue detail.");
-    } finally {
-      setDetailLoading(false);
-    }
-  };
-
-  const closeDetailModal = () => {
-    setDetailIssue(null);
-    setDetailError("");
-    setDetailLoading(false);
-  };
 
   const columns = [
     {
@@ -143,9 +115,9 @@ export default function AdminIssuesPage() {
       key: "actions",
       render: (_, issue) => (
         <div className="admin-row-actions">
-          <Button icon={<EyeOutlined />} onClick={() => openDetailModal(issue)}>
-            View detail
-          </Button>
+          <Link href={`/admin/issues/${issue.id}/view`}>
+            <Button icon={<EyeOutlined />}>View detail</Button>
+          </Link>
           <Link href={`/admin/issues/${issue.id}/edit`}>
             <Button icon={<EditOutlined />}>Edit</Button>
           </Link>
@@ -153,8 +125,6 @@ export default function AdminIssuesPage() {
       )
     }
   ];
-
-  const detailUploads = Array.isArray(detailIssue?.uploads) ? detailIssue.uploads : [];
 
   return (
     <AdminShell title="Issues">
@@ -267,9 +237,9 @@ export default function AdminIssuesPage() {
               }
               actions={
                 <div className="admin-row-actions">
-                  <Button icon={<EyeOutlined />} onClick={() => openDetailModal(issue)}>
-                    View detail
-                  </Button>
+                  <Link href={`/admin/issues/${issue.id}/view`}>
+                    <Button icon={<EyeOutlined />}>View detail</Button>
+                  </Link>
                   <Link href={`/admin/issues/${issue.id}/edit`}>
                     <Button icon={<EditOutlined />}>Edit</Button>
                   </Link>
@@ -280,87 +250,6 @@ export default function AdminIssuesPage() {
           })}
         </AdminResponsiveList>
       </section>
-
-      <Modal
-        footer={null}
-        onCancel={closeDetailModal}
-        open={Boolean(detailIssue)}
-        title={detailIssue ? detailIssue.title : "Issue detail"}
-        width={640}
-      >
-        {detailLoading ? (
-          <div className="admin-modal-loading">
-            <Spin />
-          </div>
-        ) : null}
-
-        {detailError ? <p className="admin-error-text">{detailError}</p> : null}
-
-        {detailIssue && !detailLoading ? (
-          <div className="admin-modal-body">
-            <div className="admin-modal-tags">
-              <Tag>{formatEnum(detailIssue.category)}</Tag>
-              <Tag color={ISSUE_STATUS_COLORS[detailIssue.status]}>
-                {formatEnum(detailIssue.status)}
-              </Tag>
-              <Tag>
-                <RiseOutlined /> {detailIssue.voteCount ?? 0} votes
-              </Tag>
-            </div>
-
-            {detailIssue.description ? (
-              <p className="admin-modal-description">{detailIssue.description}</p>
-            ) : null}
-
-            <dl className="admin-modal-meta">
-              <dt>Address</dt>
-              <dd>{detailIssue.addressText || "—"}</dd>
-
-              {detailIssue.municipality ? (
-                <>
-                  <dt>Municipality</dt>
-                  <dd>{detailIssue.municipality}</dd>
-                </>
-              ) : null}
-
-              {detailIssue.ward ? (
-                <>
-                  <dt>Ward</dt>
-                  <dd>{detailIssue.ward}</dd>
-                </>
-              ) : null}
-
-              <dt>Coordinates</dt>
-              <dd>{formatCoordinates(detailIssue.latitude, detailIssue.longitude) || "—"}</dd>
-
-              <dt>Reported</dt>
-              <dd>{formatDate(detailIssue.createdAt) || "—"}</dd>
-
-              {detailIssue.reporter?.name ? (
-                <>
-                  <dt>Reporter</dt>
-                  <dd>{detailIssue.reporter.name}</dd>
-                </>
-              ) : null}
-            </dl>
-
-            {detailUploads.length > 0 ? (
-              <div className="admin-modal-uploads">
-                <strong>Attached uploads</strong>
-                <ul>
-                  {detailUploads.map((upload) => (
-                    <li key={upload.id || upload.url}>
-                      <a href={upload.url} rel="noreferrer" target="_blank">
-                        {upload.url}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
-          </div>
-        ) : null}
-      </Modal>
     </AdminShell>
   );
 }
