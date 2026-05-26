@@ -91,3 +91,20 @@ modal per row using `patchJson(`/users/${id}/role`, { role })` and refresh the
 list on success. Do not surface the action for the currently-logged-in admin
 (the backend forbids self-role-change anyway, but hiding the control avoids a
 confusing error).
+
+## Applications
+
+### Application role enum expansion
+
+The homepage "We need you" section now invites three additional dev-phase roles
+that the backend `ApplicationRole` enum does not yet accept:
+
+- `QA_ENGINEER`
+- `DEVOPS_ENGINEER`
+- `CONTENT_WRITER`
+
+The frontend cards link to `/join?role=<VALUE>` and the join-form dropdown
+(`src/lib/siteContent.js → options.applicationRoles`) lists them, but
+`POST /applications` will reject submissions with one of these values until
+the backend enum is extended. Add the three values to the enum (and to the
+admin filter list) when convenient — no other contract change is needed.

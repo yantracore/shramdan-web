@@ -32,12 +32,14 @@ export default function FeedbackPage() {
   return (
     <SiteShell>
       <section className="page-section form-section">
-        <div className="section-heading">
-          <span className="eyebrow">{t.feedback.eyebrow}</span>
-          <h1>{t.feedback.title}</h1>
-          <p>{t.feedback.intro}</p>
-        </div>
-        <FeedbackForm content={t} onSubmit={handleSubmit} submitting={submitting} />
+        <FeedbackForm
+          content={t}
+          eyebrow={t.feedback.eyebrow}
+          title={t.feedback.title}
+          intro={t.feedback.intro}
+          onSubmit={handleSubmit}
+          submitting={submitting}
+        />
       </section>
     </SiteShell>
   );

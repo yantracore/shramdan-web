@@ -4,7 +4,7 @@ import { MessageOutlined } from "@ant-design/icons";
 import { Button, Form, Input, Rate, Select } from "antd";
 import { toSelectOptions } from "@/lib/siteContent";
 
-export function FeedbackForm({ content, onSubmit, submitting = false }) {
+export function FeedbackForm({ content, eyebrow, title, intro, onSubmit, submitting = false }) {
   const [form] = Form.useForm();
   const labels = content.feedback;
   const requiredRule = { required: true, message: content.messages.required };
@@ -19,6 +19,13 @@ export function FeedbackForm({ content, onSubmit, submitting = false }) {
 
   return (
     <Form form={form} layout="vertical" className="content-card form-card" onFinish={handleFinish}>
+      {(eyebrow || title || intro) && (
+        <header className="form-card-heading">
+          {eyebrow && <span className="eyebrow">{eyebrow}</span>}
+          {title && <h1>{title}</h1>}
+          {intro && <p>{intro}</p>}
+        </header>
+      )}
       <div className="form-grid">
         <Form.Item name="name" label={labels.name} rules={[requiredRule]}>
           <Input autoFocus placeholder={content.placeholders.name} />

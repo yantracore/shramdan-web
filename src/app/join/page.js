@@ -37,13 +37,11 @@ function JoinPageContent() {
   return (
     <SiteShell>
       <section className="page-section form-section">
-        <div className="section-heading">
-          <span className="eyebrow">{t.join.eyebrow}</span>
-          <h1>{t.join.title}</h1>
-          <p>{t.join.intro}</p>
-        </div>
         <ContributorForm
           content={t}
+          eyebrow={t.join.eyebrow}
+          title={t.join.title}
+          intro={t.join.intro}
           initialRole={initialRole}
           onSubmit={handleSubmit}
           submitting={submitting}

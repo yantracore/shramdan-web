@@ -32,28 +32,30 @@ export const copy = {
       join: "योगदान गर्नुहोस्"
     },
     heroPanel: {
-      kicker: "अब बनाउने काम",
+      kicker: "एप बनाउन सहयोग गर्नुहोस्",
       title: "श्रमदान गरेर श्रमदान एप बनाऔँ",
       body:
         "श्रमदान अहिले एप निर्माणको चरणमा छ। आफ्नो समय, सीप, विचार र समन्वय दिएर मञ्च आफैं निर्माण गर्न योगदान गर्न सकिन्छ।",
       phaseLabel: "हालको चरण",
       phaseValue: "श्रमदानमार्फत श्रमदान एप निर्माण",
       resourcesLabel: "श्रमदानका उपयोगी सामग्रीहरू",
+      liveBadge: "लाइभ",
+      liveAria: "अहिले प्रत्यक्ष",
       resources: [
         {
-          id: "documents",
-          title: "कार्य योजना र कागजात",
-          label: "प्रक्रिया, एपीआई र कार्यान्वयन टिप्पणीहरू"
+          id: "participate",
+          title: "प्रत्यक्ष सहभागिता",
+          label: "गुगल मीटमा १२ बजे, सोम–शुक्र"
         },
         {
-          id: "github",
-          title: "खुला स्रोत भण्डार",
-          label: "स्रोत कोड हेर्नुहोस् वा योगदान गर्नुहोस्"
+          id: "watchLive",
+          title: "प्रत्यक्ष प्रसारण",
+          label: "युट्युबमा १२ बजे, सोम–शुक्र"
         },
         {
-          id: "apiDocs",
-          title: "एपीआई कागजात",
-          label: "साइट र सर्भर जोड्ने सन्दर्भ"
+          id: "discord",
+          title: "डिस्कोर्ड समुदाय",
+          label: "कुराकानी, प्रश्न र समाचार"
         }
       ]
     },
@@ -274,7 +276,7 @@ export const copy = {
           title: "प्रत्यक्ष प्रसारण हेर्नुहोस्",
           description: "युट्युबमा दैनिक विकास प्रत्यक्ष प्रसारण — सोमबारदेखि शुक्रबार दिनको १२ बजे।",
           button: "प्रत्यक्ष हेर्नुहोस्",
-          href: "https://www.youtube.com/@yantracore"
+          href: "https://www.youtube.com/@yantracore/streams"
         },
         {
           id: "discord",
@@ -646,28 +648,30 @@ export const copy = {
       join: "Contribute"
     },
     heroPanel: {
-      kicker: "What to build now",
+      kicker: "Help us build the app",
       title: "Build the Shramdan App with shramdan",
       body:
         "Shramdan is now in its app-building phase. Contributors can donate their time, skill, ideas, and coordination to help shape the platform itself.",
       phaseLabel: "Current phase",
       phaseValue: "Building Shramdan App with shramdan",
       resourcesLabel: "Useful Shramdan links",
+      liveBadge: "LIVE",
+      liveAria: "Live right now",
       resources: [
         {
-          id: "documents",
-          title: "Plans and docs",
-          label: "Process, API, and implementation notes"
+          id: "participate",
+          title: "Participate Live",
+          label: "Google Meet, 12 PM Mon–Fri"
         },
         {
-          id: "github",
-          title: "Open-source repo",
-          label: "Review code or contribute"
+          id: "watchLive",
+          title: "Watch Live Stream",
+          label: "YouTube, 12 PM Mon–Fri"
         },
         {
-          id: "apiDocs",
-          title: "API docs",
-          label: "Frontend/backend integration reference"
+          id: "discord",
+          title: "Discord Community",
+          label: "Chat, ask, and follow updates"
         }
       ]
     },
@@ -888,7 +892,7 @@ export const copy = {
           title: "Watch Live Stream",
           description: "Tune in to the development livestream on YouTube, 12 PM Monday to Friday.",
           button: "Watch Live",
-          href: "https://www.youtube.com/@yantracore"
+          href: "https://www.youtube.com/@yantracore/streams"
         },
         {
           id: "discord",

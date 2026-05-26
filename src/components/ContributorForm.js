@@ -5,7 +5,7 @@ import { Button, Form, Input, Select } from "antd";
 import { useEffect } from "react";
 import { toSelectOptions } from "@/lib/siteContent";
 
-export function ContributorForm({ content, initialRole, onSubmit, submitting = false }) {
+export function ContributorForm({ content, eyebrow, title, intro, initialRole, onSubmit, submitting = false }) {
   const [form] = Form.useForm();
   const labels = content.join;
   const requiredRule = { required: true, message: content.messages.required };
@@ -32,6 +32,13 @@ export function ContributorForm({ content, initialRole, onSubmit, submitting = f
       initialValues={initialRole ? { role: initialRole } : undefined}
       onFinish={handleFinish}
     >
+      {(eyebrow || title || intro) && (
+        <header className="form-card-heading">
+          {eyebrow && <span className="eyebrow">{eyebrow}</span>}
+          {title && <h1>{title}</h1>}
+          {intro && <p>{intro}</p>}
+        </header>
+      )}
       <div className="form-grid">
         <Form.Item name="name" label={labels.name} rules={[requiredRule]}>
           <Input autoFocus placeholder={content.placeholders.joinName} />

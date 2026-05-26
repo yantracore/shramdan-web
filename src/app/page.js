@@ -5,32 +5,61 @@ import {
   ArrowRightOutlined,
   BankOutlined,
   BgColorsOutlined,
+  BugOutlined,
   CalendarOutlined,
   CheckCircleOutlined,
+  CloudServerOutlined,
   CodeOutlined,
   DatabaseOutlined,
-  EnvironmentOutlined,
+  EditOutlined,
   FilePptOutlined,
   FileTextOutlined,
   GithubOutlined,
   HeartOutlined,
   LineChartOutlined,
   MessageOutlined,
-  PartitionOutlined,
   PlayCircleOutlined,
   RocketOutlined,
-  ShopOutlined,
   TeamOutlined,
   ToolOutlined,
-  TrophyOutlined,
   VideoCameraOutlined,
   YoutubeOutlined
 } from "@ant-design/icons";
 import { Button } from "antd";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
 import { copy } from "@/lib/siteContent";
+
+const LIVE_RESOURCE_IDS = new Set(["participate", "watchLive"]);
+
+function isNowLiveNpt(now = new Date()) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Kathmandu",
+    weekday: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false
+  }).formatToParts(now);
+  const weekday = parts.find((p) => p.type === "weekday")?.value;
+  const hour = Number(parts.find((p) => p.type === "hour")?.value);
+  const minute = Number(parts.find((p) => p.type === "minute")?.value);
+  const weekdays = new Set(["Mon", "Tue", "Wed", "Thu", "Fri"]);
+  if (!weekdays.has(weekday) || hour !== 12) return false;
+  return minute < 30;
+}
+
+function useIsLiveNow() {
+  const [isLive, setIsLive] = useState(false);
+  useEffect(() => {
+    const tick = () => setIsLive(isNowLiveNpt());
+    tick();
+    const id = setInterval(tick, 30_000);
+    return () => clearInterval(id);
+  }, []);
+  return isLive;
+}
 
 const resourceIcons = {
   participate: VideoCameraOutlined,
@@ -45,21 +74,15 @@ const resourceIcons = {
 const volunteerRoleIcons = {
   frontend: CodeOutlined,
   backend: DatabaseOutlined,
+  qa: BugOutlined,
+  devops: CloudServerOutlined,
   uiux: RocketOutlined,
   graphics: BgColorsOutlined,
+  content: EditOutlined,
   legal: BankOutlined,
   finance: LineChartOutlined,
   donors: HeartOutlined,
   leaders: TeamOutlined
-};
-
-const cleanupAreaIcons = {
-  roadside: EnvironmentOutlined,
-  lands: PartitionOutlined,
-  riverbanks: LineChartOutlined,
-  drains: ToolOutlined,
-  parks: ShopOutlined,
-  trails: TrophyOutlined
 };
 
 const workflowStepIcons = {
@@ -73,6 +96,7 @@ const workflowStepIcons = {
 export default function Home() {
   const { language } = usePreferences();
   const t = copy[language];
+  const isLiveNow = useIsLiveNow();
   const featuredResources = t.heroPanel.resources.map((resource) => {
     const item = t.resources.items.find((candidate) => candidate.id === resource.id);
     const Icon = resourceIcons[resource.id] ?? FileTextOutlined;
@@ -107,18 +131,35 @@ export default function Home() {
             <strong>{t.heroPanel.phaseValue}</strong>
           </div>
           <div className="hero-panel-links" aria-label={t.heroPanel.resourcesLabel}>
-            {featuredResources.map(({ Icon, href, id, label, title }) => (
-              <a href={href} key={id} rel="noreferrer" target="_blank">
-                <span className="hero-panel-link-icon" aria-hidden="true">
-                  <Icon />
-                </span>
-                <span>
-                  <strong>{title}</strong>
-                  <small>{label}</small>
-                </span>
-                <ArrowRightOutlined aria-hidden="true" />
-              </a>
-            ))}
+            {featuredResources.map(({ Icon, href, id, label, title }) => {
+              const isLive = isLiveNow && LIVE_RESOURCE_IDS.has(id);
+              return (
+                <a
+                  href={href}
+                  key={id}
+                  rel="noreferrer"
+                  target="_blank"
+                  className={isLive ? "is-live" : undefined}
+                >
+                  <span className="hero-panel-link-icon" aria-hidden="true">
+                    <Icon />
+                  </span>
+                  <span>
+                    <strong>
+                      {title}
+                      {isLive ? (
+                        <span className="live-badge" aria-label={t.heroPanel.liveAria}>
+                          <span className="live-dot" aria-hidden="true" />
+                          {t.heroPanel.liveBadge}
+                        </span>
+                      ) : null}
+                    </strong>
+                    <small>{label}</small>
+                  </span>
+                  <ArrowRightOutlined aria-hidden="true" />
+                </a>
+              );
+            })}
           </div>
         </aside>
       </section>
@@ -190,36 +231,22 @@ export default function Home() {
         </div>
 
         <div className="cleanup-areas-grid">
-          {t.cleanupAreas.items.map((area, index) => {
-            const Icon = cleanupAreaIcons[area.id] ?? EnvironmentOutlined;
-
-            return (
-              <article className="cleanup-area-card" data-area={area.id} key={area.id}>
-                <div className="cleanup-area-topline">
-                  <span className="cleanup-area-number">{String(index + 1).padStart(2, "0")}</span>
-                  <h3>{area.title}</h3>
-                </div>
-                <span className="cleanup-area-icon" aria-hidden="true">
-                  <Icon />
-                </span>
-                <div className="cleanup-area-image">
-                  <Image
-                    alt={area.imageAlt}
-                    fill
-                    sizes="(max-width: 620px) calc(100vw - 56px), (max-width: 1180px) 30vw, 380px"
-                    src={area.image}
-                  />
-                </div>
-                <p>{area.body}</p>
-              </article>
-            );
-          })}
-        </div>
-
-        <div className="cleanup-reasons" aria-label={t.cleanupAreas.reasonsLabel}>
-          <strong>{t.cleanupAreas.reasonsTitle}</strong>
-          {t.cleanupAreas.reasons.map((reason) => (
-            <span key={reason}>{reason}</span>
+          {t.cleanupAreas.items.map((area, index) => (
+            <article className="cleanup-area-card" data-area={area.id} key={area.id}>
+              <div className="cleanup-area-topline">
+                <span className="cleanup-area-number">{String(index + 1).padStart(2, "0")}</span>
+                <h3>{area.title}</h3>
+              </div>
+              <div className="cleanup-area-image">
+                <Image
+                  alt={area.imageAlt}
+                  fill
+                  sizes="(max-width: 620px) calc(100vw - 56px), (max-width: 1180px) 30vw, 380px"
+                  src={area.image}
+                />
+              </div>
+              <p>{area.body}</p>
+            </article>
           ))}
         </div>
       </section>
@@ -277,8 +304,10 @@ export default function Home() {
                   <span className="volunteer-role-icon" aria-hidden="true">
                     <Icon />
                   </span>
-                  <h3>{role.title}</h3>
-                  <p>{role.description}</p>
+                  <div className="volunteer-role-body">
+                    <h3>{role.title}</h3>
+                    <p>{role.description}</p>
+                  </div>
                   <Button
                     href={`/join?role=${encodeURIComponent(role.value)}`}
                     size="small"
