@@ -172,77 +172,79 @@ export default function IssueDetailPage() {
               </div>
             ) : null}
 
-            <div className="public-issue-detail-topline">
-              <Tag color={ISSUE_STATUS_COLORS[issue.status]}>
-                {content.statusLabels[issue.status] || issue.status}
-              </Tag>
-              <Tag>{content.categoryLabels[issue.category] || issue.category}</Tag>
-            </div>
+            <div className="public-issue-detail-body">
+              <div className="public-issue-detail-topline">
+                <Tag color={ISSUE_STATUS_COLORS[issue.status]}>
+                  {content.statusLabels[issue.status] || issue.status}
+                </Tag>
+                <Tag>{content.categoryLabels[issue.category] || issue.category}</Tag>
+              </div>
 
-            <h1>{issue.title}</h1>
+              <h1>{issue.title}</h1>
 
-            <div className="public-issue-detail-meta">
-              {issue.addressText ? (
-                <span>
-                  <EnvironmentOutlined /> {issue.addressText}
-                </span>
+              <div className="public-issue-detail-meta">
+                {issue.addressText ? (
+                  <span>
+                    <EnvironmentOutlined /> {issue.addressText}
+                  </span>
+                ) : null}
+                {issue.createdAt ? (
+                  <span>
+                    <CalendarOutlined /> {content.detail.reportedOn}:{" "}
+                    {formatIssueDate(issue.createdAt, language)}
+                  </span>
+                ) : null}
+              </div>
+
+              {imageUploads.length > 0 ? (
+                <IssuePhotoGallery
+                  images={imageUploads}
+                  title={issue.title}
+                  content={content}
+                />
+              ) : (
+                <section className="public-issue-detail-section-block">
+                  <h2>{content.detail.evidenceTitle}</h2>
+                  <p className="public-issue-detail-muted">{content.detail.noEvidence}</p>
+                </section>
+              )}
+
+              <section className="public-issue-detail-section-block public-issue-timeline-block">
+                <h2>{content.detail.timelineTitle}</h2>
+                <IssueStatusTimeline status={issue.status} content={content} />
+              </section>
+
+              {issue.description ? (
+                <section className="public-issue-detail-section-block">
+                  <h2>{content.detail.descriptionTitle}</h2>
+                  <p>{issue.description}</p>
+                </section>
               ) : null}
-              {issue.createdAt ? (
-                <span>
-                  <CalendarOutlined /> {content.detail.reportedOn}:{" "}
-                  {formatIssueDate(issue.createdAt, language)}
-                </span>
-              ) : null}
-            </div>
 
-            {imageUploads.length > 0 ? (
-              <IssuePhotoGallery
-                images={imageUploads}
+              <div className="public-issue-detail-support">
+                <Tooltip title={content.card.voteDisabledTooltip}>
+                  <Button disabled icon={<LikeOutlined />} size="large" type="primary">
+                    {content.card.voteAction}
+                  </Button>
+                </Tooltip>
+                <span className="public-issue-detail-supporters">
+                  {formatSupporters(issue.voteCount, content, language)}
+                </span>
+              </div>
+
+              <IssueShareRow
                 title={issue.title}
                 content={content}
+                language={language}
               />
-            ) : (
-              <section className="public-issue-detail-section-block">
-                <h2>{content.detail.evidenceTitle}</h2>
-                <p className="public-issue-detail-muted">{content.detail.noEvidence}</p>
-              </section>
-            )}
 
-            <section className="public-issue-detail-section-block public-issue-timeline-block">
-              <h2>{content.detail.timelineTitle}</h2>
-              <IssueStatusTimeline status={issue.status} content={content} />
-            </section>
-
-            {issue.description ? (
-              <section className="public-issue-detail-section-block">
-                <h2>{content.detail.descriptionTitle}</h2>
-                <p>{issue.description}</p>
-              </section>
-            ) : null}
-
-            <div className="public-issue-detail-support">
-              <Tooltip title={content.card.voteDisabledTooltip}>
-                <Button disabled icon={<LikeOutlined />} size="large" type="primary">
-                  {content.card.voteAction}
-                </Button>
-              </Tooltip>
-              <span className="public-issue-detail-supporters">
-                {formatSupporters(issue.voteCount, content, language)}
-              </span>
+              <IssueLocationCard
+                addressText={issue.addressText}
+                latitude={issue.latitude}
+                longitude={issue.longitude}
+                content={content}
+              />
             </div>
-
-            <IssueShareRow
-              title={issue.title}
-              content={content}
-              language={language}
-            />
-
-            <IssueLocationCard
-              addressText={issue.addressText}
-              latitude={issue.latitude}
-              longitude={issue.longitude}
-              content={content}
-            />
           </article>
         ) : null}
 

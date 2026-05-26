@@ -3451,6 +3451,12 @@
 }
 
 .public-issue-detail {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.public-issue-detail-body {
   display: grid;
   gap: 22px;
   padding: 28px;
@@ -3458,11 +3464,7 @@
 
 .public-issue-detail-cover {
   position: relative;
-  margin: -28px -28px 0;
-  width: calc(100% + 56px);
   background: #000;
-  border-top-left-radius: inherit;
-  border-top-right-radius: inherit;
   overflow: hidden;
   aspect-ratio: 21 / 9;
   display: flex;
@@ -3568,6 +3570,7 @@
 .public-issue-detail-skeleton {
   display: grid;
   gap: 18px;
+  padding: 28px;
 }
 
 /* Photo gallery (Swiper-based) — full-bleed within card */
@@ -3879,9 +3882,13 @@
     width: 100%;
   }
 
-  .public-issue-detail {
+  .public-issue-detail-body {
     padding: 20px;
     gap: 18px;
+  }
+
+  .public-issue-detail-skeleton {
+    padding: 20px;
   }
 
   .public-issue-detail h1 {
@@ -3897,8 +3904,6 @@
   }
 
   .public-issue-detail-cover {
-    margin: -20px -20px 0;
-    width: calc(100% + 40px);
     aspect-ratio: 16 / 10;
   }
 

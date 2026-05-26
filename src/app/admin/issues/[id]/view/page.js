@@ -197,110 +197,114 @@ export default function AdminIssueViewPage() {
                 />
                 {detailActions}
               </div>
-            ) : (
-              <div className="public-issue-detail-actions-bar">{detailActions}</div>
-            )}
+            ) : null}
 
-            <div className="public-issue-detail-topline">
-              <Tag color={ISSUE_STATUS_COLORS[issue.status]}>
-                {ADMIN_ISSUE_CONTENT.statusLabels[issue.status] || formatEnum(issue.status)}
-              </Tag>
-              <Tag>{formatEnum(issue.category)}</Tag>
-              <Tag>
-                <RiseOutlined /> {issue.voteCount ?? 0} votes
-              </Tag>
-            </div>
-
-            <h1>{issue.title}</h1>
-
-            <div className="public-issue-detail-meta">
-              {issue.addressText ? (
-                <span>
-                  <EnvironmentOutlined /> {issue.addressText}
-                </span>
+            <div className="public-issue-detail-body">
+              {!coverImageUrl ? (
+                <div className="public-issue-detail-actions-bar">{detailActions}</div>
               ) : null}
-              {issue.createdAt ? (
-                <span>
-                  <CalendarOutlined /> Reported on: {formatDate(issue.createdAt)}
-                </span>
-              ) : null}
-              {issue.reporter?.name ? (
-                <span>
-                  <UserOutlined /> {issue.reporter.name}
-                </span>
-              ) : null}
-            </div>
 
-            {imageUploads.length > 0 ? (
-              <IssuePhotoGallery
+              <div className="public-issue-detail-topline">
+                <Tag color={ISSUE_STATUS_COLORS[issue.status]}>
+                  {ADMIN_ISSUE_CONTENT.statusLabels[issue.status] || formatEnum(issue.status)}
+                </Tag>
+                <Tag>{formatEnum(issue.category)}</Tag>
+                <Tag>
+                  <RiseOutlined /> {issue.voteCount ?? 0} votes
+                </Tag>
+              </div>
+
+              <h1>{issue.title}</h1>
+
+              <div className="public-issue-detail-meta">
+                {issue.addressText ? (
+                  <span>
+                    <EnvironmentOutlined /> {issue.addressText}
+                  </span>
+                ) : null}
+                {issue.createdAt ? (
+                  <span>
+                    <CalendarOutlined /> Reported on: {formatDate(issue.createdAt)}
+                  </span>
+                ) : null}
+                {issue.reporter?.name ? (
+                  <span>
+                    <UserOutlined /> {issue.reporter.name}
+                  </span>
+                ) : null}
+              </div>
+
+              {imageUploads.length > 0 ? (
+                <IssuePhotoGallery
+                  content={ADMIN_ISSUE_CONTENT}
+                  images={imageUploads}
+                  title={issue.title}
+                />
+              ) : (
+                <section className="public-issue-detail-section-block">
+                  <h2>Photos and evidence</h2>
+                  <p className="public-issue-detail-muted">No photos uploaded yet.</p>
+                </section>
+              )}
+
+              <section className="public-issue-detail-section-block public-issue-timeline-block">
+                <h2>Progress so far</h2>
+                <IssueStatusTimeline content={ADMIN_ISSUE_CONTENT} status={issue.status} />
+              </section>
+
+              {issue.description ? (
+                <section className="public-issue-detail-section-block">
+                  <h2>About this issue</h2>
+                  <p>{issue.description}</p>
+                </section>
+              ) : null}
+
+              <section className="public-issue-detail-section-block">
+                <h2>Administrative details</h2>
+                <dl className="admin-modal-meta">
+                  {issue.municipality ? (
+                    <>
+                      <dt>Municipality</dt>
+                      <dd>{issue.municipality}</dd>
+                    </>
+                  ) : null}
+                  {issue.ward ? (
+                    <>
+                      <dt>Ward</dt>
+                      <dd>{issue.ward}</dd>
+                    </>
+                  ) : null}
+                  <dt>Coordinates</dt>
+                  <dd>{formatCoordinates(issue.latitude, issue.longitude) || "—"}</dd>
+                  <dt>Reporter</dt>
+                  <dd>{issue.reporter?.name || "—"}</dd>
+                  <dt>Vote count</dt>
+                  <dd>{issue.voteCount ?? 0}</dd>
+                </dl>
+              </section>
+
+              {nonImageUploads.length > 0 ? (
+                <section className="public-issue-detail-section-block">
+                  <h2>Other uploads</h2>
+                  <ul className="admin-modal-uploads-list">
+                    {nonImageUploads.map((upload) => (
+                      <li key={upload.id || upload.url}>
+                        <a href={upload.url} rel="noreferrer" target="_blank">
+                          {upload.url}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ) : null}
+
+              <IssueLocationCard
+                addressText={issue.addressText}
                 content={ADMIN_ISSUE_CONTENT}
-                images={imageUploads}
-                title={issue.title}
+                latitude={issue.latitude}
+                longitude={issue.longitude}
               />
-            ) : (
-              <section className="public-issue-detail-section-block">
-                <h2>Photos and evidence</h2>
-                <p className="public-issue-detail-muted">No photos uploaded yet.</p>
-              </section>
-            )}
-
-            <section className="public-issue-detail-section-block public-issue-timeline-block">
-              <h2>Progress so far</h2>
-              <IssueStatusTimeline content={ADMIN_ISSUE_CONTENT} status={issue.status} />
-            </section>
-
-            {issue.description ? (
-              <section className="public-issue-detail-section-block">
-                <h2>About this issue</h2>
-                <p>{issue.description}</p>
-              </section>
-            ) : null}
-
-            <section className="public-issue-detail-section-block">
-              <h2>Administrative details</h2>
-              <dl className="admin-modal-meta">
-                {issue.municipality ? (
-                  <>
-                    <dt>Municipality</dt>
-                    <dd>{issue.municipality}</dd>
-                  </>
-                ) : null}
-                {issue.ward ? (
-                  <>
-                    <dt>Ward</dt>
-                    <dd>{issue.ward}</dd>
-                  </>
-                ) : null}
-                <dt>Coordinates</dt>
-                <dd>{formatCoordinates(issue.latitude, issue.longitude) || "—"}</dd>
-                <dt>Reporter</dt>
-                <dd>{issue.reporter?.name || "—"}</dd>
-                <dt>Vote count</dt>
-                <dd>{issue.voteCount ?? 0}</dd>
-              </dl>
-            </section>
-
-            {nonImageUploads.length > 0 ? (
-              <section className="public-issue-detail-section-block">
-                <h2>Other uploads</h2>
-                <ul className="admin-modal-uploads-list">
-                  {nonImageUploads.map((upload) => (
-                    <li key={upload.id || upload.url}>
-                      <a href={upload.url} rel="noreferrer" target="_blank">
-                        {upload.url}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            ) : null}
-
-            <IssueLocationCard
-              addressText={issue.addressText}
-              content={ADMIN_ISSUE_CONTENT}
-              latitude={issue.latitude}
-              longitude={issue.longitude}
-            />
+            </div>
           </article>
         ) : null}
       </section>
