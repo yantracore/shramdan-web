@@ -259,28 +259,28 @@ export const copy = {
         description: "श्रमदानको विकास यात्रा, प्रत्यक्ष प्रसारण र परियोजनाको सन्दर्भ यहीँबाट सिधै हेर्न सकिन्छ।",
         embedUrl: "https://www.youtube-nocookie.com/embed/videoseries?list=PLWkh0s4xHPcTF4FOcYjkdR3i97YbkSDGo",
         playlistUrl: "https://www.youtube.com/playlist?list=PLWkh0s4xHPcTF4FOcYjkdR3i97YbkSDGo",
-        button: "YouTube मा पूरै प्लेलिस्ट हेर्नुहोस्"
+        button: "युट्युबमा पूरै प्लेलिस्ट हेर्नुहोस्"
       },
       items: [
         {
           id: "participate",
           title: "प्रत्यक्ष सहभागिता",
-          description: "Google Meet मार्फत दैनिक श्रमदान कार्य सत्रमा सामेल हुनुहोस् — सोमबारदेखि शुक्रबार दिनको १२ बजे।",
-          button: "Participate 12 PM Mon–Fri",
+          description: "गुगल मीट मार्फत दैनिक श्रमदान कार्य सत्रमा सामेल हुनुहोस् — सोमबारदेखि शुक्रबार दिनको १२ बजे।",
+          button: "सहभागी हुनुहोस् — सोम–शुक्र, दिनको १२ बजे",
           href: "https://meet.google.com/kwi-kqyi-iyf"
         },
         {
           id: "watchLive",
           title: "प्रत्यक्ष प्रसारण हेर्नुहोस्",
-          description: "YouTube मा दैनिक विकास प्रत्यक्ष प्रसारण — सोमबारदेखि शुक्रबार दिनको १२ बजे।",
-          button: "Watch Live 12 PM Mon–Fri",
+          description: "युट्युबमा दैनिक विकास प्रत्यक्ष प्रसारण — सोमबारदेखि शुक्रबार दिनको १२ बजे।",
+          button: "प्रत्यक्ष हेर्नुहोस् — सोम–शुक्र, दिनको १२ बजे",
           href: "https://www.youtube.com/@yantracore"
         },
         {
           id: "discord",
-          title: "Discord समुदाय",
-          description: "Discord मा सबैसँग कुराकानी गर्नुहोस्, प्रश्न सोध्नुहोस् र समाचार पाउनुहोस्।",
-          button: "Join Discord",
+          title: "डिस्कोर्ड समुदाय",
+          description: "डिस्कोर्डमा सबैसँग कुराकानी गर्नुहोस्, प्रश्न सोध्नुहोस् र समाचार पाउनुहोस्।",
+          button: "डिस्कोर्डमा सामेल हुनुहोस्",
           href: "https://discord.gg/Cd57PXxf"
         },
         {
@@ -606,10 +606,10 @@ export const copy = {
         feedback: "प्रतिक्रिया दिनुहोस्"
       },
       social: [
-        { id: "facebook", label: "Facebook मा श्रमदान", href: "https://www.facebook.com/profile.php?id=61589961623195" },
-        { id: "twitter", label: "Twitter/X मा श्रमदान", href: "#" },
-        { id: "tiktok", label: "TikTok मा श्रमदान", href: "#" },
-        { id: "youtube", label: "YouTube मा श्रमदान", href: "#" }
+        { id: "facebook", label: "फेसबुकमा श्रमदान", href: "https://www.facebook.com/profile.php?id=61589961623195" },
+        { id: "twitter", label: "ट्विटर/एक्समा श्रमदान", href: "#" },
+        { id: "tiktok", label: "टिकटकमा श्रमदान", href: "#" },
+        { id: "youtube", label: "युट्युबमा श्रमदान", href: "#" }
       ]
     }
   },
