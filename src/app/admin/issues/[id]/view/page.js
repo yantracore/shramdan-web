@@ -6,9 +6,10 @@ import {
   EditOutlined,
   EnvironmentOutlined,
   RiseOutlined,
+  ThunderboltOutlined,
   UserOutlined
 } from "@ant-design/icons";
-import { Button, Empty, Skeleton, Tag } from "antd";
+import { Button, Empty, Popconfirm, Skeleton, Tag } from "antd";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -18,7 +19,8 @@ import { AdminPanelHeading } from "@/components/admin/AdminPanelHeading";
 import { IssueLocationCard } from "@/components/IssueLocationCard";
 import { IssuePhotoGallery } from "@/components/IssuePhotoGallery";
 import { IssueStatusTimeline } from "@/components/IssueStatusTimeline";
-import { getJson } from "@/lib/apiClient";
+import { getJson, postJson } from "@/lib/apiClient";
+import { useToast } from "@/lib/toast";
 import {
   ISSUE_STATUS_COLORS,
   formatCoordinates,
@@ -50,11 +52,13 @@ const ADMIN_ISSUE_CONTENT = {
 export default function AdminIssueViewPage() {
   const params = useParams();
   const issueId = params?.id;
+  const messageApi = useToast();
 
   const [issue, setIssue] = useState(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
   const [notFound, setNotFound] = useState(false);
+  const [converting, setConverting] = useState(false);
 
   const loadIssue = useCallback(async () => {
     if (!issueId) return;
@@ -88,6 +92,20 @@ export default function AdminIssueViewPage() {
     loadIssue();
   }, [loadIssue]);
 
+  const handleConvertToEvent = useCallback(async () => {
+    if (!issueId) return;
+    setConverting(true);
+    try {
+      await postJson(`/issues/${issueId}/convert-to-event`, undefined, { requireAuth: true });
+      messageApi.success("Issue promoted to a scheduled event.");
+      await loadIssue();
+    } catch (error) {
+      messageApi.error(error?.message || "Could not convert this issue to an event.");
+    } finally {
+      setConverting(false);
+    }
+  }, [issueId, loadIssue, messageApi]);
+
   const uploads = Array.isArray(issue?.uploads) ? issue.uploads : [];
   const imageUploads = uploads.filter(isImageUpload);
   const nonImageUploads = uploads.filter((upload) => !isImageUpload(upload));
@@ -105,6 +123,30 @@ export default function AdminIssueViewPage() {
               <Link href="/admin/issues">
                 <Button icon={<ArrowLeftOutlined />}>Back to issues</Button>
               </Link>
+              {issue?.status === "OPEN" ? (
+                <Popconfirm
+                  cancelText="Cancel"
+                  description={
+                    <div style={{ maxWidth: 320 }}>
+                      Promotes this issue to a scheduled event without waiting for the vote
+                      threshold. A leader will be auto-assigned and voters with verified phones
+                      will receive an SMS. This cannot be undone.
+                    </div>
+                  }
+                  okButtonProps={{ danger: true }}
+                  okText="Convert to event"
+                  onConfirm={handleConvertToEvent}
+                  title="Force-convert to a scheduled event?"
+                >
+                  <Button
+                    danger
+                    icon={<ThunderboltOutlined />}
+                    loading={converting}
+                  >
+                    Convert to event
+                  </Button>
+                </Popconfirm>
+              ) : null}
               {issue ? (
                 <Link href={`/admin/issues/${issue.id}/edit`}>
                   <Button icon={<EditOutlined />} type="primary">
