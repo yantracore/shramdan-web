@@ -4,25 +4,27 @@ import { DeleteOutlined, InboxOutlined, LoadingOutlined } from "@ant-design/icon
 import { Button, Upload } from "antd";
 import Image from "next/image";
 import { useState } from "react";
+import {
+  ACCEPTED_IMAGE_ACCEPT_ATTR,
+  ACCEPTED_IMAGE_TYPES,
+  MAX_IMAGE_BYTES
+} from "@/components/admin/imageUploadConstants";
 import { uploadImage } from "@/lib/uploads";
 import { useToast } from "@/lib/toast";
 
 const { Dragger } = Upload;
-
-const MAX_BYTES = 8 * 1024 * 1024;
-const ACCEPTED_TYPES = ["image/png", "image/jpeg", "image/jpg", "image/webp", "image/gif", "image/avif"];
 
 export function IssueCoverUpload({ value, onChange, disabled }) {
   const toast = useToast();
   const [uploading, setUploading] = useState(false);
 
   const handleBeforeUpload = async (file) => {
-    if (!ACCEPTED_TYPES.includes(file.type)) {
+    if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
       toast.error("Only PNG, JPG, WebP, GIF, or AVIF images are supported.");
       return Upload.LIST_IGNORE;
     }
 
-    if (file.size > MAX_BYTES) {
+    if (file.size > MAX_IMAGE_BYTES) {
       toast.error("Cover image must be smaller than 8 MB.");
       return Upload.LIST_IGNORE;
     }
@@ -57,7 +59,7 @@ export function IssueCoverUpload({ value, onChange, disabled }) {
         </div>
         <div className="admin-cover-preview-actions">
           <Upload
-            accept={ACCEPTED_TYPES.join(",")}
+            accept={ACCEPTED_IMAGE_ACCEPT_ATTR}
             beforeUpload={handleBeforeUpload}
             disabled={disabled || uploading}
             multiple={false}
@@ -82,7 +84,7 @@ export function IssueCoverUpload({ value, onChange, disabled }) {
 
   return (
     <Dragger
-      accept={ACCEPTED_TYPES.join(",")}
+      accept={ACCEPTED_IMAGE_ACCEPT_ATTR}
       beforeUpload={handleBeforeUpload}
       className="admin-cover-dragger"
       disabled={disabled || uploading}

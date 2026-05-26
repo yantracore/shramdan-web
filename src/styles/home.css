@@ -566,7 +566,7 @@
 .cleanup-area-card {
   position: relative;
   display: grid;
-  grid-template-rows: auto 184px auto 1fr;
+  grid-template-rows: auto auto 184px 1fr;
   min-width: 0;
   min-height: 100%;
   overflow: hidden;
@@ -673,10 +673,12 @@
 }
 
 .cleanup-area-icon {
+  position: relative;
+  z-index: 2;
   justify-self: center;
   width: 64px;
   height: 64px;
-  margin-top: -32px;
+  margin: 4px 0 -32px;
   border: 5px solid var(--surface);
   border-radius: 999px;
   background: var(--primary);
@@ -1982,6 +1984,118 @@
   gap: 8px;
 }
 
+.admin-issue-images {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.admin-issue-images-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.admin-issue-images-item {
+  position: relative;
+  width: 104px;
+  height: 104px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.admin-issue-images-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+}
+
+.admin-issue-images-item.is-dragging {
+  opacity: 0.4;
+  cursor: grabbing;
+}
+
+.admin-issue-images-item.is-drop-target {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+.admin-issue-images-item.is-uploading {
+  cursor: progress;
+  color: var(--muted);
+  font-size: 20px;
+  background: color-mix(in srgb, var(--surface) 60%, transparent);
+}
+
+.admin-issue-images-remove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease, background 0.15s ease;
+}
+
+.admin-issue-images-item:hover .admin-issue-images-remove,
+.admin-issue-images-remove:focus-visible {
+  opacity: 1;
+}
+
+.admin-issue-images-remove:hover {
+  background: rgba(0, 0, 0, 0.75);
+}
+
+.admin-issue-images-uploader .ant-upload-select {
+  margin: 0;
+  width: 104px;
+  height: 104px;
+}
+
+.admin-issue-images-add {
+  width: 104px;
+  height: 104px;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: var(--muted);
+  font-size: 13px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.admin-issue-images-add:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.admin-issue-images-hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
 @media (max-width: 720px) {
   .admin-form-grid {
     grid-template-columns: minmax(0, 1fr);
@@ -2603,7 +2717,7 @@
   }
 
   .cleanup-area-card {
-    grid-template-rows: auto 210px auto 1fr;
+    grid-template-rows: auto auto 210px 1fr;
   }
 
   .cleanup-reasons {
@@ -2811,7 +2925,7 @@
   }
 
   .cleanup-area-card {
-    grid-template-rows: auto 220px auto auto;
+    grid-template-rows: auto auto 220px auto;
   }
 
   .cleanup-area-card:hover,

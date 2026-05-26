@@ -20,7 +20,13 @@ import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
 import { getJson } from "@/lib/apiClient";
 import { copy } from "@/lib/siteContent";
-import { ISSUE_STATUS_COLORS, getListItems, getResponseData, isImageUpload } from "@/lib/adminUtils";
+import {
+  ISSUE_STATUS_COLORS,
+  getIssueCoverImageUrl,
+  getListItems,
+  getResponseData,
+  isImageUpload
+} from "@/lib/adminUtils";
 
 const PUBLIC_ISSUE_STATUSES = ["OPEN", "EVENT_SCHEDULED", "COMPLETED"];
 const RELATED_LIMIT = 6;
@@ -103,15 +109,10 @@ export default function IssueDetailPage() {
   }, [fetchIssue]);
 
   const uploads = Array.isArray(issue?.uploads) ? issue.uploads : [];
-  const imageUploads = uploads.filter(isImageUpload);
-
-  const coverImageUrl = (() => {
-    const raw = issue?.coverImage;
-    if (!raw) return null;
-    if (typeof raw === "string") return raw;
-    if (typeof raw === "object" && typeof raw.url === "string") return raw.url;
-    return null;
-  })();
+  const coverImageUrl = getIssueCoverImageUrl(issue);
+  const imageUploads = uploads
+    .filter(isImageUpload)
+    .filter((upload) => upload.url !== coverImageUrl);
 
   return (
     <SiteShell>

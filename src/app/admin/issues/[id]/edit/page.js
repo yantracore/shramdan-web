@@ -9,7 +9,11 @@ import { AdminShell } from "@/components/AdminShell";
 import { AdminPanelHeading } from "@/components/admin/AdminPanelHeading";
 import { IssueForm } from "@/components/admin/IssueForm";
 import { getJson, patchJson } from "@/lib/apiClient";
-import { getIssueCoverImageUrl, getResponseData } from "@/lib/adminUtils";
+import {
+  getIssueCoverImageUrl,
+  getResponseData,
+  isImageUpload
+} from "@/lib/adminUtils";
 import { useToast } from "@/lib/toast";
 
 const EDITABLE_FIELDS = [
@@ -36,7 +40,22 @@ function pickEditableFields(issue) {
     data.cover = { url: coverUrl };
   }
 
+  const uploads = Array.isArray(issue?.uploads) ? issue.uploads : [];
+  const additionalImages = uploads
+    .filter(isImageUpload)
+    .filter((upload) => upload.url !== coverUrl)
+    .map((upload) => ({ id: upload.id, url: upload.url }));
+  data.additionalImages = additionalImages;
+
   return data;
+}
+
+function sameIdSet(a, b) {
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i += 1) {
+    if (a[i] !== b[i]) return false;
+  }
+  return true;
 }
 
 export default function AdminIssueEditPage() {
@@ -82,13 +101,21 @@ export default function AdminIssueEditPage() {
   const handleFinish = async (values) => {
     setSubmitting(true);
 
-    const { cover, ...rest } = values;
+    const { cover, additionalImages, ...rest } = values;
     const originalCoverUrl = initialValues?.cover?.url || null;
     const nextCoverUrl = cover?.url || null;
 
     const payload = { ...rest };
     if (nextCoverUrl !== originalCoverUrl) {
       payload.coverImage = nextCoverUrl;
+    }
+
+    const originalIds = (initialValues?.additionalImages || []).map((image) => image.id);
+    const nextIds = Array.isArray(additionalImages)
+      ? additionalImages.map((image) => image.id)
+      : [];
+    if (!sameIdSet(originalIds, nextIds)) {
+      payload.uploadIds = nextIds;
     }
 
     try {

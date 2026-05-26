@@ -5,7 +5,13 @@ import { Button, Form, Input, InputNumber, Select } from "antd";
 import Link from "next/link";
 import { useEffect, useMemo } from "react";
 import { IssueCoverUpload } from "@/components/admin/IssueCoverUpload";
+import { IssueImagesUpload } from "@/components/admin/IssueImagesUpload";
 import { ISSUE_CATEGORIES, buildEnumOptions } from "@/lib/adminUtils";
+
+const coverImageValidator = (_, cover) =>
+  cover?.url
+    ? Promise.resolve()
+    : Promise.reject(new Error("Cover image is required."));
 
 export function IssueForm({
   initialValues,
@@ -35,10 +41,21 @@ export function IssueForm({
         <Form.Item
           className="admin-form-wide"
           name="cover"
-          label="Cover image (optional)"
+          label="Cover image"
+          required
+          rules={[{ validator: coverImageValidator }]}
           valuePropName="value"
         >
           <IssueCoverUpload />
+        </Form.Item>
+
+        <Form.Item
+          className="admin-form-wide"
+          name="additionalImages"
+          label="Additional images (optional)"
+          valuePropName="value"
+        >
+          <IssueImagesUpload />
         </Form.Item>
 
         <Form.Item

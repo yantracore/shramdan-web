@@ -199,6 +199,9 @@ export default function Home() {
                   <span className="cleanup-area-number">{String(index + 1).padStart(2, "0")}</span>
                   <h3>{area.title}</h3>
                 </div>
+                <span className="cleanup-area-icon" aria-hidden="true">
+                  <Icon />
+                </span>
                 <div className="cleanup-area-image">
                   <Image
                     alt={area.imageAlt}
@@ -207,9 +210,6 @@ export default function Home() {
                     src={area.image}
                   />
                 </div>
-                <span className="cleanup-area-icon" aria-hidden="true">
-                  <Icon />
-                </span>
                 <p>{area.body}</p>
               </article>
             );

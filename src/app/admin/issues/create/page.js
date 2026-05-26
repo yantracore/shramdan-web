@@ -19,8 +19,12 @@ export default function AdminIssueCreatePage() {
   const handleFinish = async (values) => {
     setSubmitting(true);
 
-    const { cover, ...rest } = values;
-    const payload = cover?.url ? { ...rest, coverImage: cover.url } : rest;
+    const { cover, additionalImages, ...rest } = values;
+    const payload = { ...rest };
+    if (cover?.url) payload.coverImage = cover.url;
+    if (Array.isArray(additionalImages) && additionalImages.length) {
+      payload.uploadIds = additionalImages.map((image) => image.id);
+    }
 
     try {
       await postJson("/issues", payload, { requireAuth: true });
