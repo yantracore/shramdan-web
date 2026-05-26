@@ -62,14 +62,6 @@ export const copy = {
       title: "सुरुवातका सफाइ क्षेत्रहरू",
       intro:
         "श्रमदान पहिलो चरणमा आँखाले देखिने, सबैले महसुस गर्ने र समुदायले तुरुन्तै हात हाल्न सक्ने ठाउँबाट सुरु हुन्छ - एक पटकमा एक ठाउँ।",
-      reasonsTitle: "किन यिनै ठाउँहरू?",
-      reasonsLabel: "सफाइ क्षेत्र छान्नुका कारणहरू",
-      reasons: [
-        "स्वच्छ वातावरण र स्वस्थ समुदाय",
-        "प्रकृति संरक्षण र पानीको सुरक्षा",
-        "समुदायबीच सहकार्य बढाउने",
-        "सुन्दर शहर, सुरक्षित बाटो र साझा ठाउँ"
-      ],
       items: [
         {
           id: "roadside",
@@ -172,7 +164,7 @@ export const copy = {
       panelTitle: "कुनै पनि भूमिका लिनुहोस् र एप विकासमा श्रमदान गर्नुहोस्।",
       panelIntro:
         "प्रविधि, डिजाइन, कानुन, वित्त, सहयोग वा स्थानीय नेतृत्व - श्रमदानमा योगदान गर्ने बाटो सबैका लागि छ।",
-      cardCta: "यो भूमिका रोज्नुहोस्",
+      cardCta: "योगदान दिनुहोस्",
       goal: {
         title: "हाम्रो लक्ष्य: समुदायले नेतृत्व गर्ने",
         body:
@@ -194,6 +186,20 @@ export const copy = {
           description: "सुरक्षित सेवा, तथ्याङ्क भण्डारण र प्रणाली संरचनामा योगदान गर्नुहोस्।"
         },
         {
+          id: "qa",
+          value: "QA_ENGINEER",
+          title: "गुणस्तर परीक्षक (QA)",
+          badge: "१ स्वयंसेवक",
+          description: "एप परीक्षण, बग पहिचान र रिलिजअघि गुणस्तर सुनिश्चित गर्नुहोस्।"
+        },
+        {
+          id: "devops",
+          value: "DEVOPS_ENGINEER",
+          title: "डेभअप्स इन्जिनियर",
+          badge: "१ स्वयंसेवक",
+          description: "सर्भर, CI/CD, deployment र निगरानी प्रणाली सञ्चालन गर्नुहोस्।"
+        },
+        {
           id: "uiux",
           value: "UI_UX_DESIGNER",
           title: "यूआई/यूएक्स डिजाइनर",
@@ -206,6 +212,13 @@ export const copy = {
           title: "ग्राफिक्स डिजाइनर",
           badge: "१ स्वयंसेवक",
           description: "पहिचान, दृश्य सामग्री, चित्रण र अभियान सामग्री बनाउनुहोस्।"
+        },
+        {
+          id: "content",
+          value: "CONTENT_WRITER",
+          title: "कन्टेन्ट लेखक",
+          badge: "१ स्वयंसेवक",
+          description: "लेख, कथा र समुदायिक सामग्री दुवै भाषामा तयार गर्नुहोस्।"
         },
         {
           id: "legal",
@@ -346,8 +359,11 @@ export const copy = {
       applicationRoles: [
         { label: "फ्रन्टएन्ड डेभलपर", value: "FRONTEND_DEVELOPER" },
         { label: "ब्याकएन्ड डेभलपर", value: "BACKEND_DEVELOPER" },
+        { label: "गुणस्तर परीक्षक (QA)", value: "QA_ENGINEER" },
+        { label: "डेभअप्स इन्जिनियर", value: "DEVOPS_ENGINEER" },
         { label: "यूआई/यूएक्स डिजाइनर", value: "UI_UX_DESIGNER" },
         { label: "ग्राफिक्स डिजाइनर", value: "GRAPHICS_DESIGNER" },
+        { label: "कन्टेन्ट लेखक", value: "CONTENT_WRITER" },
         { label: "कानुनी सल्लाहकार", value: "LEGAL" },
         { label: "वित्तीय सल्लाहकार", value: "FINANCE" },
         { label: "आर्थिक सहयोगदाता", value: "DONOR" },
@@ -491,7 +507,6 @@ export const copy = {
         noRelated: "यस क्षेत्रमा अहिले अरू समस्या रिपोर्ट गरिएको छैन।",
         notFoundTitle: "समस्या भेटिएन",
         notFoundBody: "यो समस्या हटाइएको हुनसक्छ वा लिंक गलत छ।",
-        timelineTitle: "अहिलेसम्मको प्रगति",
         shareTitle: "साझेदारी गर्नुहोस्",
         shareCopyLink: "लिङ्क प्रतिलिपि गर्नुहोस्",
         shareCopied: "लिङ्क प्रतिलिपि भयो",
@@ -564,7 +579,6 @@ export const copy = {
         noRelated: "यस क्षेत्रमा अहिले अरू समस्या रिपोर्ट गरिएको छैन।",
         notFoundTitle: "समस्या भेटिएन",
         notFoundBody: "यो समस्या हटाइएको हुनसक्छ वा लिङ्क गलत छ।",
-        timelineTitle: "अहिलेसम्मको प्रगति",
         shareTitle: "साझेदारी गर्नुहोस्",
         shareCopyLink: "लिङ्क प्रतिलिपि गर्नुहोस्",
         shareCopied: "लिङ्क प्रतिलिपि भयो",
@@ -662,14 +676,6 @@ export const copy = {
       title: "Cleanup Areas We Start With",
       intro:
         "Shramdan begins with visible local cleanup work people can understand, join, and measure quickly - one place at a time.",
-      reasonsTitle: "Why these cleanups?",
-      reasonsLabel: "Reasons for choosing cleanup areas",
-      reasons: [
-        "Cleaner surroundings and healthier communities",
-        "Nature protection and safer waterways",
-        "Stronger local cooperation",
-        "Better streets, shared spaces, and public pride"
-      ],
       items: [
         {
           id: "roadside",
@@ -772,7 +778,7 @@ export const copy = {
       panelTitle: "Take any role and contribute to App Development.",
       panelIntro:
         "Code, design, law, finance, donation, or local leadership - there is a clear way to contribute to Shramdan.",
-      cardCta: "Choose this role",
+      cardCta: "Contribute",
       goal: {
         title: "Our goal: community-led ownership",
         body:
@@ -794,6 +800,20 @@ export const copy = {
           description: "Node.js, APIs, database design."
         },
         {
+          id: "qa",
+          value: "QA_ENGINEER",
+          title: "QA / Quality Analyst",
+          badge: "1 Volunteer",
+          description: "Test the app, file bugs, sign off on quality before release."
+        },
+        {
+          id: "devops",
+          value: "DEVOPS_ENGINEER",
+          title: "DevOps Engineer",
+          badge: "1 Volunteer",
+          description: "Server setup, CI/CD, deployments, monitoring."
+        },
+        {
           id: "uiux",
           value: "UI_UX_DESIGNER",
           title: "UI/UX Designer",
@@ -806,6 +826,13 @@ export const copy = {
           title: "Graphics Designer",
           badge: "1 Volunteer",
           description: "Branding, visuals, illustrations, motion."
+        },
+        {
+          id: "content",
+          value: "CONTENT_WRITER",
+          title: "Content Writer",
+          badge: "1 Volunteer",
+          description: "Articles, case studies, community stories — bilingual."
         },
         {
           id: "legal",
@@ -946,8 +973,11 @@ export const copy = {
       applicationRoles: [
         { label: "Frontend Developer", value: "FRONTEND_DEVELOPER" },
         { label: "Backend Developer", value: "BACKEND_DEVELOPER" },
+        { label: "QA / Quality Analyst", value: "QA_ENGINEER" },
+        { label: "DevOps Engineer", value: "DEVOPS_ENGINEER" },
         { label: "UI/UX Designer", value: "UI_UX_DESIGNER" },
         { label: "Graphics Designer", value: "GRAPHICS_DESIGNER" },
+        { label: "Content Writer", value: "CONTENT_WRITER" },
         { label: "Legal", value: "LEGAL" },
         { label: "Finance", value: "FINANCE" },
         { label: "Donor", value: "DONOR" },
@@ -1042,12 +1072,12 @@ export const copy = {
       },
       filters: {
         statusLabel: "Status",
-        statusPlaceholder: "All statuses",
+        statusPlaceholder: "All Statuses",
         categoryLabel: "Category",
-        categoryPlaceholder: "All categories",
-        sortLabel: "Sort by",
-        sortMostVotes: "Most supported",
-        sortNewest: "Newest first"
+        categoryPlaceholder: "All Categories",
+        sortLabel: "Sort By",
+        sortMostVotes: "Most Supported",
+        sortNewest: "Newest First"
       },
       statusLabels: {
         OPEN: "Open",
@@ -1066,7 +1096,7 @@ export const copy = {
       card: {
         supportersOne: "1 supporter",
         supportersMany: "{n} supporters",
-        viewDetail: "Detail",
+        viewDetail: "Details",
         voteAction: "Support",
         voteDisabledTooltip: "Sign in to support"
       },
@@ -1091,7 +1121,6 @@ export const copy = {
         noRelated: "No other issues in this category yet.",
         notFoundTitle: "Issue not found",
         notFoundBody: "This issue may have been removed, or the link is incorrect.",
-        timelineTitle: "Progress so far",
         shareTitle: "Share this issue",
         shareCopyLink: "Copy link",
         shareCopied: "Link copied",
@@ -1113,12 +1142,12 @@ export const copy = {
       },
       filters: {
         statusLabel: "Status",
-        statusPlaceholder: "All statuses",
+        statusPlaceholder: "All Statuses",
         categoryLabel: "Category",
-        categoryPlaceholder: "All categories",
-        sortLabel: "Sort by",
-        sortMostVotes: "Most supported",
-        sortNewest: "Newest first"
+        categoryPlaceholder: "All Categories",
+        sortLabel: "Sort By",
+        sortMostVotes: "Most Supported",
+        sortNewest: "Newest First"
       },
       statusLabels: {
         OPEN: "Open",
@@ -1137,7 +1166,7 @@ export const copy = {
       card: {
         supportersOne: "1 supporter",
         supportersMany: "{n} supporters",
-        viewDetail: "Detail",
+        viewDetail: "Details",
         voteAction: "Support",
         voteDisabledTooltip: "Sign in to vote"
       },
@@ -1164,7 +1193,6 @@ export const copy = {
         noRelated: "No other issues in this category yet.",
         notFoundTitle: "Issue not found",
         notFoundBody: "This issue may have been removed, or the link is incorrect.",
-        timelineTitle: "Progress so far",
         shareTitle: "Share this issue",
         shareCopyLink: "Copy link",
         shareCopied: "Link copied",
