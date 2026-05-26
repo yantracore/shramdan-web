@@ -1192,16 +1192,15 @@
 
 .volunteer-role-card {
   display: grid;
-  justify-items: center;
-  align-content: start;
-  gap: 8px;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 6px 12px;
   min-width: 0;
-  min-height: 208px;
-  padding: 18px 14px;
+  padding: 12px 12px 8px;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: color-mix(in srgb, var(--surface) 94%, transparent);
-  text-align: center;
+  text-align: left;
   transition:
     border-color 180ms ease,
     box-shadow 180ms ease,
@@ -1211,18 +1210,23 @@
 .volunteer-role-card:hover {
   border-color: color-mix(in srgb, var(--primary) 42%, var(--line));
   box-shadow: 0 18px 44px rgba(23, 33, 28, 0.1);
-  transform: translateY(-3px);
+  transform: translateY(-2px);
+}
+
+.volunteer-role-grid > .volunteer-role-card:nth-child(odd):last-child {
+  grid-column: 1 / -1;
 }
 
 .volunteer-role-icon {
   display: grid;
-  width: 54px;
-  height: 54px;
+  width: 40px;
+  height: 40px;
+  grid-row: 1 / span 2;
   place-items: center;
-  border-radius: 999px;
+  border-radius: 8px;
   background: var(--primary);
   color: var(--surface);
-  font-size: 27px;
+  font-size: 20px;
 }
 
 .volunteer-role-card[data-role="backend"] .volunteer-role-icon,
@@ -1243,24 +1247,46 @@
   background: #d99a00;
 }
 
+.volunteer-role-card[data-role="qa"] .volunteer-role-icon {
+  background: #2f9e44;
+}
+
+.volunteer-role-card[data-role="devops"] .volunteer-role-icon {
+  background: #0c8599;
+}
+
+.volunteer-role-card[data-role="content"] .volunteer-role-icon {
+  background: #e8590c;
+}
+
+.volunteer-role-body {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
 .volunteer-role-card h3 {
   margin: 0;
   color: var(--text);
-  font-size: 16px;
-  line-height: 1.18;
+  font-size: 14px;
+  line-height: 1.2;
   letter-spacing: 0;
   overflow-wrap: anywhere;
 }
 
 .volunteer-role-card p {
-  min-height: 46px;
-  font-size: 13px;
+  font-size: 12px;
+  line-height: 1.45;
 }
 
 .volunteer-role-card .ant-btn {
-  max-width: 100%;
-  margin-top: auto;
-  white-space: normal;
+  grid-column: 2;
+  justify-self: end;
+  margin-top: 2px;
+  padding-inline: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 .form-section {
@@ -3293,6 +3319,26 @@
   padding: 28px;
 }
 
+.public-issue-detail-cover {
+  margin: -28px -28px 0;
+  width: calc(100% + 56px);
+  background: #000;
+  border-top-left-radius: inherit;
+  border-top-right-radius: inherit;
+  overflow: hidden;
+  aspect-ratio: 21 / 9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.public-issue-detail-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
 .public-issue-detail h1 {
   margin: 0;
   font-size: 28px;
@@ -3683,6 +3729,12 @@
 
   .public-issue-gallery {
     margin-inline: -20px;
+  }
+
+  .public-issue-detail-cover {
+    margin: -20px -20px 0;
+    width: calc(100% + 40px);
+    aspect-ratio: 16 / 10;
   }
 
   .public-issue-gallery-slide-button img,

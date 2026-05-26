@@ -7,6 +7,7 @@ import {
   LikeOutlined
 } from "@ant-design/icons";
 import { Button, Empty, Skeleton, Tag, Tooltip } from "antd";
+import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
@@ -104,6 +105,14 @@ export default function IssueDetailPage() {
   const uploads = Array.isArray(issue?.uploads) ? issue.uploads : [];
   const imageUploads = uploads.filter(isImageUpload);
 
+  const coverImageUrl = (() => {
+    const raw = issue?.coverImage;
+    if (!raw) return null;
+    if (typeof raw === "string") return raw;
+    if (typeof raw === "object" && typeof raw.url === "string") return raw.url;
+    return null;
+  })();
+
   return (
     <SiteShell>
       <section className="page-section public-issue-detail-section">
@@ -148,6 +157,20 @@ export default function IssueDetailPage() {
 
         {!loading && !error && !notFound && issue ? (
           <article className="content-card public-issue-detail">
+            {coverImageUrl ? (
+              <div className="public-issue-detail-cover">
+                <Image
+                  alt={issue.title}
+                  height={720}
+                  src={coverImageUrl}
+                  unoptimized
+                  width={1920}
+                  sizes="(max-width: 768px) 100vw, 1180px"
+                  priority
+                />
+              </div>
+            ) : null}
+
             <div className="public-issue-detail-topline">
               <Tag color={ISSUE_STATUS_COLORS[issue.status]}>
                 {content.statusLabels[issue.status] || issue.status}
