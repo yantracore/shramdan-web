@@ -2,6 +2,7 @@
 
 import { LockOutlined, MailOutlined } from "@ant-design/icons";
 import { Button, Form, Input } from "antd";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { usePreferences } from "@/app/providers";
@@ -24,7 +25,9 @@ const loginCopy = {
     submit: "लगइन",
     required: "यो विवरण आवश्यक छ।",
     emailInvalid: "कृपया सही इमेल ठेगाना लेख्नुहोस्।",
-    success: "लगइन सफल भयो।"
+    success: "लगइन सफल भयो।",
+    joinPrompt: "श्रमदानको सदस्य हुनुहुन्न?",
+    joinCta: "सदस्य बन्नुहोस्"
   },
   en: {
     eyebrow: "Member access",
@@ -38,7 +41,9 @@ const loginCopy = {
     submit: "Login",
     required: "This field is required.",
     emailInvalid: "Please enter a valid email address.",
-    success: "Login successful."
+    success: "Login successful.",
+    joinPrompt: "Not a member?",
+    joinCta: "Become a Member"
   }
 };
 
@@ -118,6 +123,10 @@ export default function LoginPage() {
               </Button>
             </div>
           </Form>
+          <p className="login-join-prompt">
+            {t.joinPrompt}{" "}
+            <Link href="/join">{t.joinCta}</Link>
+          </p>
         </div>
       </section>
     </SiteShell>

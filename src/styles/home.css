@@ -1475,6 +1475,25 @@
   gap: 10px;
 }
 
+.login-join-prompt {
+  margin: 18px 0 0;
+  text-align: center;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.login-join-prompt a {
+  margin-left: 4px;
+  font-weight: 700;
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.login-join-prompt a:hover {
+  color: var(--primary-dark);
+  text-decoration: underline;
+}
+
 .admin-auth-loading {
   display: grid;
   min-height: 100vh;
