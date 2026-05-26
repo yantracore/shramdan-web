@@ -212,7 +212,7 @@
 .hero-section {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(300px, 0.42fr);
+  grid-template-columns: minmax(0, 1fr) minmax(390px, 0.55fr);
   gap: 48px;
   align-items: center;
   width: 100%;
@@ -475,24 +475,9 @@
   position: relative;
   display: grid;
   gap: 26px;
-  width: min(1280px, calc(100% - 32px));
+  width: min(1180px, calc(100% - 32px));
   margin: 0 auto;
   padding-top: 92px;
-}
-
-.cleanup-areas-section::before {
-  position: absolute;
-  inset: 56px -80px auto auto;
-  z-index: 0;
-  width: 340px;
-  height: 220px;
-  border-radius: 8px;
-  background:
-    linear-gradient(135deg, color-mix(in srgb, var(--primary) 18%, transparent), transparent 64%),
-    linear-gradient(45deg, transparent 0 30%, color-mix(in srgb, var(--accent) 13%, transparent) 30% 38%, transparent 38% 100%);
-  content: "";
-  opacity: 0.75;
-  pointer-events: none;
 }
 
 .cleanup-areas-heading,
@@ -682,7 +667,7 @@
   position: relative;
   display: grid;
   gap: 24px;
-  width: min(1280px, calc(100% - 32px));
+  width: min(1180px, calc(100% - 32px));
   margin: 0 auto;
   padding-top: 92px;
 }
@@ -2898,10 +2883,6 @@
   .cleanup-areas-section {
     gap: 16px;
     padding-top: 56px;
-  }
-
-  .cleanup-areas-section::before {
-    display: none;
   }
 
   .cleanup-areas-heading {
