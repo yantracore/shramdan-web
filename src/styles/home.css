@@ -1380,7 +1380,7 @@
 
 .resource-card {
   display: grid;
-  align-content: start;
+  grid-template-rows: auto 1fr auto;
   gap: 20px;
   min-width: 0;
   min-height: 100%;
@@ -1442,7 +1442,7 @@
 .resource-card .ant-btn {
   width: fit-content;
   max-width: 100%;
-  margin-top: auto;
+  justify-self: end;
 }
 
 .form-grid {
@@ -3245,6 +3245,12 @@
 .public-issues-filters .ant-select .ant-select-selection-item {
   color: rgba(0, 0, 0, 0.88) !important;
   opacity: 1 !important;
+}
+
+:root[data-theme="dark"] .public-issues-filters .ant-select .ant-select-selection-placeholder,
+:root[data-theme="dark"] .public-issues-filters .ant-select .ant-select-placeholder,
+:root[data-theme="dark"] .public-issues-filters .ant-select .ant-select-selection-item {
+  color: rgba(255, 255, 255, 0.85) !important;
 }
 
 .public-issues-grid {
