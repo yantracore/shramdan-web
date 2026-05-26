@@ -1442,7 +1442,7 @@
 .resource-card .ant-btn {
   width: fit-content;
   max-width: 100%;
-  justify-self: end;
+  justify-self: start;
 }
 
 .form-grid {
