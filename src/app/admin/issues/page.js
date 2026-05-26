@@ -62,7 +62,7 @@ export default function AdminIssuesPage() {
       render: (_, issue) => {
         const coverUrl = getIssueCoverImageUrl(issue);
         return (
-          <div className="admin-issue-row">
+          <Link className="admin-issue-row admin-issue-row-link" href={`/admin/issues/${issue.id}/view`}>
             <div className="admin-issue-thumb" aria-hidden={!coverUrl}>
               {coverUrl ? (
                 <Image alt="" height={56} src={coverUrl} unoptimized width={56} />
@@ -78,7 +78,7 @@ export default function AdminIssuesPage() {
                 <EnvironmentOutlined /> {issue.addressText}
               </span>
             </div>
-          </div>
+          </Link>
         );
       }
     },
@@ -116,7 +116,7 @@ export default function AdminIssuesPage() {
       render: (_, issue) => (
         <div className="admin-row-actions">
           <Link href={`/admin/issues/${issue.id}/view`}>
-            <Button icon={<EyeOutlined />}>View detail</Button>
+            <Button icon={<EyeOutlined />}>View</Button>
           </Link>
           <Link href={`/admin/issues/${issue.id}/edit`}>
             <Button icon={<EditOutlined />}>Edit</Button>
@@ -201,7 +201,7 @@ export default function AdminIssuesPage() {
               header={
                 <>
                   <div className="admin-list-card-title">
-                    <div className="admin-issue-row">
+                    <Link className="admin-issue-row admin-issue-row-link" href={`/admin/issues/${issue.id}/view`}>
                       <div className="admin-issue-thumb" aria-hidden={!cardCoverUrl}>
                         {cardCoverUrl ? (
                           <Image alt="" height={56} src={cardCoverUrl} unoptimized width={56} />
@@ -217,7 +217,7 @@ export default function AdminIssuesPage() {
                           <EnvironmentOutlined /> {issue.addressText}
                         </span>
                       </div>
-                    </div>
+                    </Link>
                   </div>
                   <Tag color={ISSUE_STATUS_COLORS[issue.status]}>{formatEnum(issue.status)}</Tag>
                 </>
@@ -238,7 +238,7 @@ export default function AdminIssuesPage() {
               actions={
                 <div className="admin-row-actions">
                   <Link href={`/admin/issues/${issue.id}/view`}>
-                    <Button icon={<EyeOutlined />}>View detail</Button>
+                    <Button icon={<EyeOutlined />}>View</Button>
                   </Link>
                   <Link href={`/admin/issues/${issue.id}/edit`}>
                     <Button icon={<EditOutlined />}>Edit</Button>
