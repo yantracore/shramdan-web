@@ -117,3 +117,10 @@ export function getFirstIssueImage(issue) {
   const uploads = Array.isArray(issue?.uploads) ? issue.uploads : [];
   return uploads.find(isImageUpload) || null;
 }
+
+export function getIssueCoverImageUrl(issue) {
+  const raw = issue?.coverImage;
+  if (typeof raw === "string" && raw) return raw;
+  if (raw && typeof raw === "object" && typeof raw.url === "string" && raw.url) return raw.url;
+  return getFirstIssueImage(issue)?.url || null;
+}

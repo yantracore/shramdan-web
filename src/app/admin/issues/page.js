@@ -25,7 +25,7 @@ import {
   formatCoordinates,
   formatDate,
   formatEnum,
-  getFirstIssueImage,
+  getIssueCoverImageUrl,
   getListItems
 } from "@/lib/adminUtils";
 import { useAdminListResource } from "@/hooks/useAdminListResource";
@@ -88,12 +88,12 @@ export default function AdminIssuesPage() {
       dataIndex: "title",
       key: "title",
       render: (_, issue) => {
-        const cover = getFirstIssueImage(issue);
+        const coverUrl = getIssueCoverImageUrl(issue);
         return (
           <div className="admin-issue-row">
-            <div className="admin-issue-thumb" aria-hidden={!cover}>
-              {cover ? (
-                <Image alt="" height={56} src={cover.url} unoptimized width={56} />
+            <div className="admin-issue-thumb" aria-hidden={!coverUrl}>
+              {coverUrl ? (
+                <Image alt="" height={56} src={coverUrl} unoptimized width={56} />
               ) : (
                 <span className="admin-issue-thumb-placeholder">
                   <EnvironmentOutlined />
@@ -224,7 +224,7 @@ export default function AdminIssuesPage() {
           }
         >
           {issues.map((issue) => {
-            const cardCover = getFirstIssueImage(issue);
+            const cardCoverUrl = getIssueCoverImageUrl(issue);
             return (
             <AdminListCard
               key={issue.id}
@@ -232,9 +232,9 @@ export default function AdminIssuesPage() {
                 <>
                   <div className="admin-list-card-title">
                     <div className="admin-issue-row">
-                      <div className="admin-issue-thumb" aria-hidden={!cardCover}>
-                        {cardCover ? (
-                          <Image alt="" height={56} src={cardCover.url} unoptimized width={56} />
+                      <div className="admin-issue-thumb" aria-hidden={!cardCoverUrl}>
+                        {cardCoverUrl ? (
+                          <Image alt="" height={56} src={cardCoverUrl} unoptimized width={56} />
                         ) : (
                           <span className="admin-issue-thumb-placeholder">
                             <EnvironmentOutlined />

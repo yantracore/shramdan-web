@@ -9,7 +9,7 @@ import { AdminShell } from "@/components/AdminShell";
 import { AdminPanelHeading } from "@/components/admin/AdminPanelHeading";
 import { IssueForm } from "@/components/admin/IssueForm";
 import { getJson, patchJson } from "@/lib/apiClient";
-import { getFirstIssueImage, getResponseData } from "@/lib/adminUtils";
+import { getIssueCoverImageUrl, getResponseData } from "@/lib/adminUtils";
 import { useToast } from "@/lib/toast";
 
 const EDITABLE_FIELDS = [
@@ -31,9 +31,9 @@ function pickEditableFields(issue) {
     return acc;
   }, {});
 
-  const coverImage = getFirstIssueImage(issue);
-  if (coverImage) {
-    data.cover = { id: coverImage.id, url: coverImage.url };
+  const coverUrl = getIssueCoverImageUrl(issue);
+  if (coverUrl) {
+    data.cover = { url: coverUrl };
   }
 
   return data;
@@ -83,12 +83,12 @@ export default function AdminIssueEditPage() {
     setSubmitting(true);
 
     const { cover, ...rest } = values;
-    const originalCoverId = initialValues?.cover?.id || null;
-    const nextCoverId = cover?.id || null;
+    const originalCoverUrl = initialValues?.cover?.url || null;
+    const nextCoverUrl = cover?.url || null;
 
     const payload = { ...rest };
-    if (nextCoverId !== originalCoverId) {
-      payload.uploadIds = nextCoverId ? [nextCoverId] : [];
+    if (nextCoverUrl !== originalCoverUrl) {
+      payload.coverImage = nextCoverUrl;
     }
 
     try {

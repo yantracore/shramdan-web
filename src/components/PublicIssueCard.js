@@ -4,7 +4,7 @@ import { ArrowRightOutlined, LikeOutlined } from "@ant-design/icons";
 import { Button, Tag, Tooltip } from "antd";
 import Image from "next/image";
 import Link from "next/link";
-import { ISSUE_STATUS_COLORS, getFirstIssueImage } from "@/lib/adminUtils";
+import { ISSUE_STATUS_COLORS, getIssueCoverImageUrl } from "@/lib/adminUtils";
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 
@@ -24,11 +24,11 @@ export function formatSupporters(count, content, language) {
 export function PublicIssueCard({ issue, content, language }) {
   const statusLabel = content.statusLabels[issue.status] || issue.status;
   const categoryLabel = content.categoryLabels[issue.category] || issue.category;
-  const coverImage = getFirstIssueImage(issue);
+  const coverImageUrl = getIssueCoverImageUrl(issue);
 
   return (
     <article className="content-card public-issue-card">
-      {coverImage ? (
+      {coverImageUrl ? (
         <Link
           aria-label={issue.title}
           className="public-issue-card-cover"
@@ -38,7 +38,7 @@ export function PublicIssueCard({ issue, content, language }) {
             alt={issue.title}
             height={240}
             sizes="(max-width: 720px) 100vw, 360px"
-            src={coverImage.url}
+            src={coverImageUrl}
             unoptimized
             width={360}
           />

@@ -20,7 +20,7 @@ export default function AdminIssueCreatePage() {
     setSubmitting(true);
 
     const { cover, ...rest } = values;
-    const payload = cover?.id ? { ...rest, uploadIds: [cover.id] } : rest;
+    const payload = cover?.url ? { ...rest, coverImage: cover.url } : rest;
 
     try {
       await postJson("/issues", payload, { requireAuth: true });
