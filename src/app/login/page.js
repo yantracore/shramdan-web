@@ -13,9 +13,10 @@ import { useToast } from "@/lib/toast";
 
 const loginCopy = {
   np: {
+    eyebrow: "सदस्य पहुँच",
     title: "लगइन",
     intro:
-      "Shramdan सदस्यका रूपमा स्थानीय समस्या रिपोर्ट गर्न, सामुदायिक प्राथमिकतामा भोट दिन र वरपरका सरसफाइ कार्यक्रममा सहभागी हुन लगइन गर्नुहोस्। Admin हरू पनि यहीँबाट लगइन गर्न सक्नुहुन्छ।",
+      "Shramdan सदस्यका रूपमा स्थानीय समस्या रिपोर्ट गर्न, सामुदायिक प्राथमिकतामा भोट दिन र वरपरका सरसफाइ कार्यक्रममा सहभागी हुन लगइन गर्नुहोस्।",
     email: "इमेल ठेगाना",
     emailPlaceholder: "इमेल",
     password: "पासवर्ड",
@@ -26,9 +27,10 @@ const loginCopy = {
     success: "लगइन सफल भयो।"
   },
   en: {
+    eyebrow: "Member access",
     title: "Login",
     intro:
-      "Sign in as a Shramdan member to report local issues, vote on community priorities, and join cleanup events near you. Admins can also sign in here.",
+      "Sign in as a Shramdan member to report local issues, vote on community priorities, and join cleanup events near you.",
     email: "Email address",
     emailPlaceholder: "Email",
     password: "Password",
@@ -82,6 +84,7 @@ export default function LoginPage() {
       <section className="page-section login-section">
         <div className="content-card login-card">
           <header className="form-card-heading">
+            <span className="eyebrow">{t.eyebrow}</span>
             <h1>{t.title}</h1>
             <p>{t.intro}</p>
           </header>
