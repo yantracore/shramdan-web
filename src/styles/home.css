@@ -1527,10 +1527,13 @@
   display: grid;
   align-content: start;
   gap: 26px;
-  min-height: 100vh;
+  height: 100vh;
+  max-height: 100vh;
   padding: 22px 16px;
   border-right: 1px solid var(--line);
   background: color-mix(in srgb, var(--surface) 94%, transparent);
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .admin-sidebar-brand {
@@ -1667,10 +1670,13 @@
 
 .admin-mobile-drawer .admin-sidebar {
   position: static;
+  height: auto;
+  max-height: none;
   min-height: auto;
   padding: 0;
   border-right: 0;
   background: transparent;
+  overflow: visible;
 }
 
 .admin-content {
