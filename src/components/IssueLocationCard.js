@@ -33,7 +33,7 @@ export function IssueLocationCard({ addressText, latitude, longitude, content })
   const mapsLink = buildMapsLink(addressText, latitude, longitude);
 
   return (
-    <section className="public-issue-location-card">
+    <section className="public-issue-location-card" id="issue-location">
       <div className="public-issue-location-header">
         <h2>{content.detail.locationTitle}</h2>
         {mapsLink ? (

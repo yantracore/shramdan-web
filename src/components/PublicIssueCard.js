@@ -4,7 +4,10 @@ import { ArrowRightOutlined, LikeOutlined } from "@ant-design/icons";
 import { Button, Tag, Tooltip } from "antd";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useSyncExternalStore } from "react";
 import { ISSUE_STATUS_COLORS, getIssueCoverImageUrl } from "@/lib/adminUtils";
+import { getAuthSession, subscribeAuthSession } from "@/lib/authSession";
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 
@@ -22,9 +25,19 @@ export function formatSupporters(count, content, language) {
 }
 
 export function PublicIssueCard({ issue, content, language }) {
+  const router = useRouter();
+  const session = useSyncExternalStore(subscribeAuthSession, getAuthSession, () => null);
+  const isAuthenticated = Boolean(session?.user);
   const statusLabel = content.statusLabels[issue.status] || issue.status;
   const categoryLabel = content.categoryLabels[issue.category] || issue.category;
   const coverImageUrl = getIssueCoverImageUrl(issue);
+
+  const handleSupportClick = (event) => {
+    event.preventDefault();
+    if (!isAuthenticated) {
+      router.push("/login");
+    }
+  };
 
   return (
     <article className="content-card public-issue-card">
@@ -57,12 +70,12 @@ export function PublicIssueCard({ issue, content, language }) {
         {issue.addressText ? <span>{issue.addressText}</span> : null}
       </div>
       <div className="public-issue-card-actions">
-        <Tooltip title={content.card.voteDisabledTooltip}>
+        <Tooltip title={isAuthenticated ? "" : content.card.voteDisabledTooltip}>
           <Button
-            aria-disabled="true"
+            aria-disabled={isAuthenticated ? "true" : undefined}
             className="public-issue-card-support"
             icon={<LikeOutlined />}
-            onClick={(event) => event.preventDefault()}
+            onClick={handleSupportClick}
           >
             <span className="public-issue-card-support-count">
               {toLocalDigits(issue.voteCount ?? 0, language)}

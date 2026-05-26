@@ -248,7 +248,6 @@ export default function AdminIssueViewPage() {
               )}
 
               <section className="public-issue-detail-section-block public-issue-timeline-block">
-                <h2>Progress so far</h2>
                 <IssueStatusTimeline content={ADMIN_ISSUE_CONTENT} status={issue.status} />
               </section>
 

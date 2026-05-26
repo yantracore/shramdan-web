@@ -3496,6 +3496,33 @@
   gap: 8px;
 }
 
+.public-issue-detail-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.public-issue-detail-meta-row .public-issue-share-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.public-issue-detail-meta-row .public-issue-share-row h2 {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .public-issue-detail-meta {
   display: flex;
   flex-wrap: wrap;
@@ -3507,6 +3534,30 @@
 .public-issue-detail-meta .anticon {
   margin-right: 6px;
   color: var(--accent);
+}
+
+.public-issue-detail-meta-link {
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.public-issue-detail-meta-link:hover,
+.public-issue-detail-meta-link:focus-visible {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.public-issue-detail-meta-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 2px;
 }
 
 .public-issue-detail-support {

@@ -118,6 +118,13 @@ export default function IssueDetailPage() {
     .filter(isImageUpload)
     .filter((upload) => upload.url !== coverImageUrl);
 
+  const scrollToLocation = () => {
+    const target = document.getElementById("issue-location");
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
   return (
     <SiteShell>
       <section className="page-section public-issue-detail-section">
@@ -185,6 +192,9 @@ export default function IssueDetailPage() {
                   <Tag>{content.categoryLabels[issue.category] || issue.category}</Tag>
                 </div>
                 <div className="public-issue-detail-support">
+                  <span className="public-issue-detail-supporters">
+                    {formatSupporters(issue.voteCount, content, language)}
+                  </span>
                   <Tooltip title={isAuthenticated ? "" : content.card.voteDisabledTooltip}>
                     <Button
                       disabled={isAuthenticated}
@@ -196,26 +206,34 @@ export default function IssueDetailPage() {
                       {content.card.voteAction}
                     </Button>
                   </Tooltip>
-                  <span className="public-issue-detail-supporters">
-                    {formatSupporters(issue.voteCount, content, language)}
-                  </span>
                 </div>
               </div>
 
               <h1>{issue.title}</h1>
 
-              <div className="public-issue-detail-meta">
-                {issue.addressText ? (
-                  <span>
-                    <EnvironmentOutlined /> {issue.addressText}
-                  </span>
-                ) : null}
-                {issue.createdAt ? (
-                  <span>
-                    <CalendarOutlined /> {content.detail.reportedOn}:{" "}
-                    {formatIssueDate(issue.createdAt, language)}
-                  </span>
-                ) : null}
+              <div className="public-issue-detail-meta-row">
+                <div className="public-issue-detail-meta">
+                  {issue.addressText ? (
+                    <button
+                      className="public-issue-detail-meta-link"
+                      onClick={scrollToLocation}
+                      type="button"
+                    >
+                      <EnvironmentOutlined /> {issue.addressText}
+                    </button>
+                  ) : null}
+                  {issue.createdAt ? (
+                    <span>
+                      <CalendarOutlined /> {content.detail.reportedOn}:{" "}
+                      {formatIssueDate(issue.createdAt, language)}
+                    </span>
+                  ) : null}
+                </div>
+                <IssueShareRow
+                  title={issue.title}
+                  content={content}
+                  language={language}
+                />
               </div>
 
               {imageUploads.length > 0 ? (
@@ -236,12 +254,6 @@ export default function IssueDetailPage() {
                   <p>{issue.description}</p>
                 </section>
               ) : null}
-
-              <IssueShareRow
-                title={issue.title}
-                content={content}
-                language={language}
-              />
 
               <IssueLocationCard
                 addressText={issue.addressText}
