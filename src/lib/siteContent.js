@@ -314,7 +314,7 @@ export const copy = {
       ]
     },
     join: {
-      eyebrow: "योगदानकर्ता समुदाय",
+      eyebrow: "समुदायमा सामेल हुनुहोस्",
       title: "योगदानकर्ता आवेदन",
       intro: "आफ्नो सीप, समय र ऊर्जा प्रयोग गरेर श्रमदान निर्माणमा साथ दिनुहोस्।",
       name: "पूरा नाम",
@@ -329,7 +329,7 @@ export const copy = {
       submit: "आवेदन पठाउनुहोस्"
     },
     feedback: {
-      eyebrow: "खुला प्रतिक्रिया",
+      eyebrow: "तपाईंको प्रतिक्रिया चाहिन्छ",
       title: "प्रतिक्रिया फाराम",
       intro: "सुझाव, समस्या, प्रश्न र सामान्य प्रतिक्रिया सबैले श्रमदानको बाटो स्पष्ट बनाउँछन्।",
       name: "पूरा नाम",
@@ -928,7 +928,7 @@ export const copy = {
       ]
     },
     join: {
-      eyebrow: "Contributor community",
+      eyebrow: "Join the community",
       title: "Contributor Application",
       intro: "Use your skills, time, and energy to help build Shramdan.",
       name: "Full name",
@@ -943,7 +943,7 @@ export const copy = {
       submit: "Submit application"
     },
     feedback: {
-      eyebrow: "Open feedback",
+      eyebrow: "We need your feedback",
       title: "Feedback Form",
       intro: "Suggestions, issues, questions, and general feedback all help shape Shramdan.",
       name: "Full name",
