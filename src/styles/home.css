@@ -3124,13 +3124,13 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 20px;
+  padding: 15px;
   height: 100%;
 }
 
 .public-issue-card-cover {
   display: block;
-  margin: -20px -20px 4px;
+  margin: -15px -15px 4px;
   aspect-ratio: 16 / 9;
   background: var(--line);
   border-top-left-radius: inherit;
@@ -3155,6 +3155,12 @@
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  align-items: center;
+}
+
+.public-issue-card-category {
+  margin-left: auto;
+  margin-right: 0;
 }
 
 .public-issue-card h3 {

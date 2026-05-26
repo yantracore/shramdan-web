@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRightOutlined, EnvironmentOutlined, LikeOutlined } from "@ant-design/icons";
+import { ArrowRightOutlined, LikeOutlined } from "@ant-design/icons";
 import { Button, Tag, Tooltip } from "antd";
 import Image from "next/image";
 import Link from "next/link";
@@ -46,15 +46,11 @@ export function PublicIssueCard({ issue, content, language }) {
       ) : null}
       <div className="card-topline">
         <Tag color={ISSUE_STATUS_COLORS[issue.status]}>{statusLabel}</Tag>
-        <Tag>{categoryLabel}</Tag>
+        <Tag className="public-issue-card-category">{categoryLabel}</Tag>
       </div>
       <h3>{issue.title}</h3>
       <div className="meta-list">
-        {issue.addressText ? (
-          <span>
-            <EnvironmentOutlined /> {issue.addressText}
-          </span>
-        ) : null}
+        {issue.addressText ? <span>{issue.addressText}</span> : null}
       </div>
       <div className="public-issue-card-actions">
         <Tooltip title={content.card.voteDisabledTooltip}>
