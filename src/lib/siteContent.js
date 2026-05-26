@@ -266,14 +266,14 @@ export const copy = {
           id: "participate",
           title: "प्रत्यक्ष सहभागिता",
           description: "गुगल मीट मार्फत दैनिक श्रमदान कार्य सत्रमा सामेल हुनुहोस् — सोमबारदेखि शुक्रबार दिनको १२ बजे।",
-          button: "सहभागी हुनुहोस् — सोम–शुक्र, दिनको १२ बजे",
+          button: "सहभागी हुनुहोस्",
           href: "https://meet.google.com/kwi-kqyi-iyf"
         },
         {
           id: "watchLive",
           title: "प्रत्यक्ष प्रसारण हेर्नुहोस्",
           description: "युट्युबमा दैनिक विकास प्रत्यक्ष प्रसारण — सोमबारदेखि शुक्रबार दिनको १२ बजे।",
-          button: "प्रत्यक्ष हेर्नुहोस् — सोम–शुक्र, दिनको १२ बजे",
+          button: "प्रत्यक्ष हेर्नुहोस्",
           href: "https://www.youtube.com/@yantracore"
         },
         {
@@ -772,8 +772,8 @@ export const copy = {
       titleTrail: "for Nepal",
       intro:
         "Shramdan is a community-driven platform open to everyone. Bring your skill, time, or network, build your team, and start local impact.",
-      primaryCta: "Become a volunteer",
-      secondaryCta: "Share feedback",
+      primaryCta: "Become a Volunteer",
+      secondaryCta: "Share Feedback",
       panelEyebrow: "We need you",
       panelTitle: "Take any role and contribute to App Development.",
       panelIntro:
@@ -880,14 +880,14 @@ export const copy = {
           id: "participate",
           title: "Participate Live",
           description: "Join the daily Shramdan working session on Google Meet, 12 PM Monday to Friday.",
-          button: "Participate 12 PM Mon–Fri",
+          button: "Participate",
           href: "https://meet.google.com/kwi-kqyi-iyf"
         },
         {
           id: "watchLive",
           title: "Watch Live Stream",
           description: "Tune in to the development livestream on YouTube, 12 PM Monday to Friday.",
-          button: "Watch Live 12 PM Mon–Fri",
+          button: "Watch Live",
           href: "https://www.youtube.com/@yantracore"
         },
         {
@@ -901,28 +901,28 @@ export const copy = {
           id: "presentation",
           title: "Livestream Presentation Slides",
           description: "Mission notes and the full development walkthrough from the Shramdan livestream.",
-          button: "Open slides",
+          button: "Open Slides",
           href: "https://drive.google.com/drive/folders/19Iuu_W7GRhD9F6qph0A8drKJQlN2UbUy"
         },
         {
           id: "documents",
           title: "GitHub Documentation",
           description: "Planning, design, implementation, API reference, and safety/event model docs maintained directly in the source repo.",
-          button: "Open GitHub docs",
+          button: "Open GitHub Docs",
           href: "https://github.com/yantracore/shramdan-web/tree/main/docs"
         },
         {
           id: "github",
           title: "GitHub Repository",
           description: "Public open-source repo with the source code, issues, and contribution history.",
-          button: "View repo",
+          button: "View Repo",
           href: "https://github.com/yantracore/shramdan-web"
         },
         {
           id: "apiDocs",
           title: "API Documentation",
           description: "Public API docs for backend endpoints, request formats, and testing references.",
-          button: "Open API docs",
+          button: "Open API Docs",
           href: "https://backend.shramdan.org/api-docs/"
         }
       ]
@@ -940,7 +940,7 @@ export const copy = {
       experience: "Your experience",
       motivation: "Why do you want to contribute to Shramdan?",
       additionalInfo: "Additional information",
-      submit: "Submit application"
+      submit: "Submit Application"
     },
     feedback: {
       eyebrow: "We need your feedback",
@@ -952,7 +952,7 @@ export const copy = {
       experienceRating: "Experience rating",
       message: "Your feedback",
       screenshot: "Screenshot URL",
-      submit: "Submit feedback"
+      submit: "Submit Feedback"
     },
     placeholders: {
       joinName: "e.g. Muna Gurung",
@@ -1055,7 +1055,7 @@ export const copy = {
         wrongCurrentPassword: "The current password is incorrect.",
         samePassword: "New password must differ from the current one.",
         loadFailed: "Could not load profile.",
-        retry: "Try again"
+        retry: "Try Again"
       },
       success: {
         profileSaved: "Profile updated.",
@@ -1106,10 +1106,10 @@ export const copy = {
         emptyBody: "Try clearing filters or check back later — new reports come in often.",
         errorTitle: "Could not load issues",
         errorBody: "Something went wrong while reaching the server. Please try again in a moment.",
-        retry: "Try again"
+        retry: "Try Again"
       },
       detail: {
-        backToList: "Back to all issues",
+        backToList: "Back to All Issues",
         reportedOn: "Reported on",
         locationLabel: "Location",
         categoryLabel: "Category",
@@ -1122,7 +1122,7 @@ export const copy = {
         notFoundTitle: "Issue not found",
         notFoundBody: "This issue may have been removed, or the link is incorrect.",
         shareTitle: "Share this issue",
-        shareCopyLink: "Copy link",
+        shareCopyLink: "Copy Link",
         shareCopied: "Link copied",
         locationTitle: "Location",
         openInMaps: "Open in Maps",
@@ -1178,10 +1178,10 @@ export const copy = {
         errorTitle: "Could not load issues",
         errorBody:
           "Something went wrong while reaching the server. Please try again in a moment.",
-        retry: "Try again"
+        retry: "Try Again"
       },
       detail: {
-        backToList: "Back to all issues",
+        backToList: "Back to All Issues",
         reportedOn: "Reported on",
         locationLabel: "Location",
         categoryLabel: "Category",
@@ -1194,7 +1194,7 @@ export const copy = {
         notFoundTitle: "Issue not found",
         notFoundBody: "This issue may have been removed, or the link is incorrect.",
         shareTitle: "Share this issue",
-        shareCopyLink: "Copy link",
+        shareCopyLink: "Copy Link",
         shareCopied: "Link copied",
         locationTitle: "Location",
         openInMaps: "Open in Maps",
