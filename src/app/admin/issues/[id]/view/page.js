@@ -15,7 +15,6 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { AdminShell } from "@/components/AdminShell";
-import { AdminPanelHeading } from "@/components/admin/AdminPanelHeading";
 import { IssueLocationCard } from "@/components/IssueLocationCard";
 import { IssuePhotoGallery } from "@/components/IssuePhotoGallery";
 import { IssueStatusTimeline } from "@/components/IssueStatusTimeline";
@@ -111,53 +110,42 @@ export default function AdminIssueViewPage() {
   const nonImageUploads = uploads.filter((upload) => !isImageUpload(upload));
   const coverImageUrl = getIssueCoverImageUrl(issue);
 
+  const detailActions = issue ? (
+    <div className="public-issue-detail-cover-actions">
+      <Link href="/admin/issues">
+        <Button icon={<ArrowLeftOutlined />}>Back to issues</Button>
+      </Link>
+      {issue.status === "OPEN" ? (
+        <Popconfirm
+          cancelText="Cancel"
+          description={
+            <div style={{ maxWidth: 320 }}>
+              Promotes this issue to a scheduled event without waiting for the vote
+              threshold. A leader will be auto-assigned and voters with verified phones
+              will receive an SMS. This cannot be undone.
+            </div>
+          }
+          okButtonProps={{ danger: true }}
+          okText="Convert to event"
+          onConfirm={handleConvertToEvent}
+          title="Force-convert to a scheduled event?"
+        >
+          <Button danger icon={<ThunderboltOutlined />} loading={converting}>
+            Convert to event
+          </Button>
+        </Popconfirm>
+      ) : null}
+      <Link href={`/admin/issues/${issue.id}/edit`}>
+        <Button icon={<EditOutlined />} type="primary">
+          Edit
+        </Button>
+      </Link>
+    </div>
+  ) : null;
+
   return (
     <AdminShell title={issue?.title || "Issue detail"}>
       <section className="admin-panel">
-        <AdminPanelHeading
-          eyebrow="Community issues"
-          title={issue?.title || "Issue detail"}
-          description="Full detail view of a reported community issue — photos, location map, timeline, and reporter info."
-          actions={
-            <div className="admin-row-actions">
-              <Link href="/admin/issues">
-                <Button icon={<ArrowLeftOutlined />}>Back to issues</Button>
-              </Link>
-              {issue?.status === "OPEN" ? (
-                <Popconfirm
-                  cancelText="Cancel"
-                  description={
-                    <div style={{ maxWidth: 320 }}>
-                      Promotes this issue to a scheduled event without waiting for the vote
-                      threshold. A leader will be auto-assigned and voters with verified phones
-                      will receive an SMS. This cannot be undone.
-                    </div>
-                  }
-                  okButtonProps={{ danger: true }}
-                  okText="Convert to event"
-                  onConfirm={handleConvertToEvent}
-                  title="Force-convert to a scheduled event?"
-                >
-                  <Button
-                    danger
-                    icon={<ThunderboltOutlined />}
-                    loading={converting}
-                  >
-                    Convert to event
-                  </Button>
-                </Popconfirm>
-              ) : null}
-              {issue ? (
-                <Link href={`/admin/issues/${issue.id}/edit`}>
-                  <Button icon={<EditOutlined />} type="primary">
-                    Edit
-                  </Button>
-                </Link>
-              ) : null}
-            </div>
-          }
-        />
-
         {loading ? (
           <article
             aria-live="polite"
@@ -207,8 +195,11 @@ export default function AdminIssueViewPage() {
                   unoptimized
                   width={1920}
                 />
+                {detailActions}
               </div>
-            ) : null}
+            ) : (
+              <div className="public-issue-detail-actions-bar">{detailActions}</div>
+            )}
 
             <div className="public-issue-detail-topline">
               <Tag color={ISSUE_STATUS_COLORS[issue.status]}>

@@ -3457,6 +3457,7 @@
 }
 
 .public-issue-detail-cover {
+  position: relative;
   margin: -28px -28px 0;
   width: calc(100% + 56px);
   background: #000;
@@ -3474,6 +3475,33 @@
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+.public-issue-detail-cover-actions {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.public-issue-detail-cover-actions .ant-btn {
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
+}
+
+.public-issue-detail-actions-bar {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.public-issue-detail-actions-bar .public-issue-detail-cover-actions {
+  position: static;
+}
+
+.public-issue-detail-actions-bar .public-issue-detail-cover-actions .ant-btn {
+  box-shadow: none;
 }
 
 .public-issue-detail h1 {
@@ -3872,6 +3900,12 @@
     margin: -20px -20px 0;
     width: calc(100% + 40px);
     aspect-ratio: 16 / 10;
+  }
+
+  .public-issue-detail-cover-actions {
+    top: 10px;
+    right: 10px;
+    gap: 6px;
   }
 
   .public-issue-gallery-slide-button img,
