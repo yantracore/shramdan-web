@@ -466,7 +466,7 @@ export const copy = {
       card: {
         supportersOne: "१ समर्थक",
         supportersMany: "{n} समर्थक",
-        viewDetail: "विस्तृत हेर्नुहोस्",
+        viewDetail: "विस्तृत",
         voteAction: "समर्थन गर्नुहोस्",
         voteDisabledTooltip: "समर्थन जनाउन साइन इन गर्नुहोस्"
       },
@@ -526,7 +526,7 @@ export const copy = {
       card: {
         supportersOne: "१ समर्थक",
         supportersMany: "{n} समर्थक",
-        viewDetail: "विस्तृत हेर्नुहोस्",
+        viewDetail: "विस्तृत",
         voteAction: "समर्थन गर्नुहोस्",
         voteDisabledTooltip: "समर्थन गर्न साइन इन गर्नुहोस्"
       },
@@ -1044,7 +1044,7 @@ export const copy = {
       card: {
         supportersOne: "1 supporter",
         supportersMany: "{n} supporters",
-        viewDetail: "View detail",
+        viewDetail: "Detail",
         voteAction: "Support",
         voteDisabledTooltip: "Sign in to support"
       },
@@ -1104,7 +1104,7 @@ export const copy = {
       card: {
         supportersOne: "1 supporter",
         supportersMany: "{n} supporters",
-        viewDetail: "View detail",
+        viewDetail: "Detail",
         voteAction: "Support",
         voteDisabledTooltip: "Sign in to vote"
       },

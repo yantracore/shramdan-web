@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  ArrowRightOutlined,
-  EnvironmentOutlined,
-  LikeOutlined,
-  RiseOutlined
-} from "@ant-design/icons";
+import { ArrowRightOutlined, EnvironmentOutlined, LikeOutlined } from "@ant-design/icons";
 import { Button, Tag, Tooltip } from "antd";
 import Image from "next/image";
 import Link from "next/link";
@@ -54,23 +49,27 @@ export function PublicIssueCard({ issue, content, language }) {
         <Tag>{categoryLabel}</Tag>
       </div>
       <h3>{issue.title}</h3>
-      {issue.description ? (
-        <p className="public-issue-card-description">{issue.description}</p>
-      ) : null}
       <div className="meta-list">
         {issue.addressText ? (
           <span>
             <EnvironmentOutlined /> {issue.addressText}
           </span>
         ) : null}
-        <span>
-          <RiseOutlined /> {formatSupporters(issue.voteCount, content, language)}
-        </span>
       </div>
       <div className="public-issue-card-actions">
         <Tooltip title={content.card.voteDisabledTooltip}>
-          <Button disabled icon={<LikeOutlined />}>
-            {content.card.voteAction}
+          <Button
+            aria-disabled="true"
+            className="public-issue-card-support"
+            icon={<LikeOutlined />}
+            onClick={(event) => event.preventDefault()}
+          >
+            <span className="public-issue-card-support-count">
+              {toLocalDigits(issue.voteCount ?? 0, language)}
+            </span>
+            <span className="public-issue-card-support-label">
+              {content.card.voteAction}
+            </span>
           </Button>
         </Tooltip>
         <Link className="card-link" href={`/issues/${issue.id}`}>

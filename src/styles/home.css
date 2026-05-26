@@ -3163,17 +3163,6 @@
   line-height: 1.4;
 }
 
-.public-issue-card-description {
-  margin: 0;
-  color: var(--muted);
-  font-size: 14px;
-  line-height: 1.55;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
 .public-issue-card .meta-list {
   display: flex;
   flex-direction: column;
@@ -3195,6 +3184,37 @@
   gap: 12px;
   padding-top: 8px;
   border-top: 1px solid var(--line);
+}
+
+.public-issue-card-support.ant-btn,
+.public-issue-card-support.ant-btn:hover,
+.public-issue-card-support.ant-btn:focus,
+.public-issue-card-support.ant-btn:active {
+  cursor: default;
+  color: var(--text);
+  background: var(--surface);
+  border-color: var(--line);
+  box-shadow: none;
+}
+
+.public-issue-card-support .public-issue-card-support-count,
+.public-issue-card-support .public-issue-card-support-label {
+  display: inline-block;
+  margin-left: 6px;
+}
+
+.public-issue-card-support-count {
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.public-issue-card-support-label {
+  color: var(--muted);
+}
+
+.public-issue-card-actions .card-link {
+  font-size: 13px;
+  white-space: nowrap;
 }
 
 .public-issues-loading {
