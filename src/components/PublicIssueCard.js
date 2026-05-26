@@ -48,7 +48,11 @@ export function PublicIssueCard({ issue, content, language }) {
         <Tag color={ISSUE_STATUS_COLORS[issue.status]}>{statusLabel}</Tag>
         <Tag className="public-issue-card-category">{categoryLabel}</Tag>
       </div>
-      <h3>{issue.title}</h3>
+      <h3>
+        <Link className="public-issue-card-title" href={`/issues/${issue.id}`}>
+          {issue.title}
+        </Link>
+      </h3>
       <div className="meta-list">
         {issue.addressText ? <span>{issue.addressText}</span> : null}
       </div>
