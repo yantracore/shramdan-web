@@ -3,6 +3,8 @@
 > Single source of truth for *what is left to build* and *how complete each piece is* across the public website, admin control center, member portal (`/app`), native mobile app, backend gaps, and operations.
 >
 > **This file is maintained by coding agents (Codex, Claude, etc.), not by humans.** Agents must update it inline as work progresses — see [Agent Update Protocol](#agent-update-protocol) below.
+>
+> **Companion doc:** improvements to *already-shipped* features live in [00-polish-backlog.md](00-polish-backlog.md), not here. The roadmap is for discrete ship work; polish is continuous and tracked separately so this file stays focused.
 
 ## Overall Progress — 21%
 
@@ -73,13 +75,14 @@ When you are working on a task that appears in this roadmap, you MUST:
 5. **Add new leaves freely** as you discover scope. Renumber siblings if needed; keep the tree at ≤4 levels deep, prefer 3.
 6. **Never silently delete** a leaf. If a task is dropped, mark it `[-]` with a one-line reason inline.
 7. **Note blockers explicitly**: `[!] 5.4.1 Esewa integration w:1 ← blocked: awaiting merchant account approval`.
-8. **Do this without being asked.** Treat roadmap maintenance the same as updating a changelog — part of the work, not a separate step. Do not ask the user for permission to update this file.
+8. **Polish, not new scope, goes to the [polish backlog](00-polish-backlog.md).** If you notice an improvement to an *already-shipped* (`[x]`) feature, do not add it as a new leaf here — add it to `00-polish-backlog.md` instead. A new `[ ]` leaf in this file should represent ship work, not refinement.
+9. **Do this without being asked.** Treat roadmap maintenance the same as updating a changelog — part of the work, not a separate step. Do not ask the user for permission to update this file.
 
 If the user gives a high-level instruction like "let's continue", read this file first, pick the highest-leverage unblocked `[ ]` leaf, announce what you're starting, flip it to `[~]`, and proceed.
 
 ## Currently Suggested Next Up
 
-Use this section as a short-lived hint of what would be a sensible next step *right now*. Agents may rewrite this list freely as priorities shift. Keep to 3-5 items, ordered.
+Use this section as a short-lived hint of what would be a sensible next step *right now*. Agents may rewrite this list freely as priorities shift. Keep to 3-5 items, ordered. When proposing "what's next", agents must also consult open `P1` items in [00-polish-backlog.md](00-polish-backlog.md) and mix them in here when they outweigh a fresh ship leaf.
 
 1. Phase 1.5 voting wired end-to-end (Block B) — vote button currently visible-but-disabled in 1.2.2; activate `POST/DELETE /issues/{id}/vote` with sign-in prompt for un-authed users.
 2. Phase 1.4 public sharing — OG tags + share button on `/issues/[id]`; small, leverages existing detail page.
