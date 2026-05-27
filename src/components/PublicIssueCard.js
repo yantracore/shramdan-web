@@ -72,7 +72,6 @@ export function PublicIssueCard({ issue, content, language }) {
           initialVoteCount={issue.voteCount}
           issueId={issue.id}
           language={language}
-          type={undefined}
         />
         <Link className="card-link" href={`/issues/${issue.id}`}>
           {content.card.viewDetail} <ArrowRightOutlined />

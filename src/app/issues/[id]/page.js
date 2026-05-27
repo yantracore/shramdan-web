@@ -198,6 +198,7 @@ export default function IssueDetailPage() {
                     language={language}
                     showCount={false}
                     size="large"
+                    type="primary"
                   />
                 </div>
               </div>

@@ -3426,15 +3426,34 @@
   border-top: 1px solid var(--line);
 }
 
-.public-issue-card-support.ant-btn,
-.public-issue-card-support.ant-btn:hover,
-.public-issue-card-support.ant-btn:focus,
-.public-issue-card-support.ant-btn:active {
-  cursor: default;
+.public-issue-card-support.ant-btn {
+  cursor: pointer;
   color: var(--text);
   background: var(--surface);
   border-color: var(--line);
   box-shadow: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.public-issue-card-support.ant-btn:hover,
+.public-issue-card-support.ant-btn:focus-visible {
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 8%, var(--surface));
+  border-color: color-mix(in srgb, var(--primary) 45%, var(--line));
+}
+
+.public-issue-card-support.ant-btn:disabled,
+.public-issue-card-support.ant-btn[disabled],
+.public-issue-card-support.ant-btn.ant-btn-loading {
+  cursor: not-allowed;
+}
+
+.public-issue-card-support.ant-btn:disabled,
+.public-issue-card-support.ant-btn[disabled] {
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 10%, var(--surface));
+  border-color: color-mix(in srgb, var(--primary) 35%, var(--line));
+  opacity: 1;
 }
 
 .public-issue-card-support .public-issue-card-support-count,
@@ -3443,13 +3462,21 @@
   margin-left: 6px;
 }
 
-.public-issue-card-support-count {
+.public-issue-card-support .public-issue-card-support-count {
   font-weight: 700;
   color: var(--accent);
 }
 
-.public-issue-card-support-label {
-  color: var(--muted);
+.public-issue-card-support .public-issue-card-support-label {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.public-issue-card-support.ant-btn:disabled .public-issue-card-support-label,
+.public-issue-card-support.ant-btn[disabled] .public-issue-card-support-label,
+.public-issue-card-support.ant-btn:disabled .public-issue-card-support-count,
+.public-issue-card-support.ant-btn[disabled] .public-issue-card-support-count {
+  color: var(--primary);
 }
 
 .public-issue-card-actions .card-link {

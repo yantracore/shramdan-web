@@ -18,7 +18,7 @@ export function IssueVoteButton({
   content,
   language,
   size,
-  type = "primary",
+  type,
   showCount = true,
   showLabel = true,
   className
