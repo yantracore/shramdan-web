@@ -1,9 +1,13 @@
 "use client";
 
-import { ReloadOutlined } from "@ant-design/icons";
-import { Button, Empty, Select, Spin } from "antd";
+import { LeftOutlined, ReloadOutlined, RightOutlined } from "@ant-design/icons";
+import { Button, Empty, Pagination, Select } from "antd";
 import { useCallback, useEffect, useState } from "react";
-import { PublicIssueCard } from "@/components/PublicIssueCard";
+import {
+  PublicIssueCard,
+  PublicIssueCardSkeleton,
+  toLocalDigits
+} from "@/components/PublicIssueCard";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
 import { getJson } from "@/lib/apiClient";
@@ -15,7 +19,9 @@ const SORT_OPTIONS = [
   { value: "voteCount", labelKey: "sortMostVotes" },
   { value: "createdAt", labelKey: "sortNewest" }
 ];
-const FETCH_LIMIT = 50;
+const FETCH_LIMIT = 100;
+const PAGE_SIZE = 20;
+const SKELETON_COUNT = 8;
 
 function isPublicIssue(issue) {
   return PUBLIC_ISSUE_STATUSES.includes(issue?.status);
@@ -34,6 +40,7 @@ export default function IssuesListPage() {
     category: undefined,
     sort: "voteCount"
   });
+  const [currentPage, setCurrentPage] = useState(1);
 
   const fetchIssues = useCallback(async () => {
     setLoading(true);
@@ -65,6 +72,7 @@ export default function IssuesListPage() {
 
   const setFilter = (key, value) => {
     setFilters((current) => ({ ...current, [key]: value }));
+    setCurrentPage(1);
   };
 
   const statusOptions = PUBLIC_ISSUE_STATUSES.map((value) => ({
@@ -82,8 +90,45 @@ export default function IssuesListPage() {
     label: content.filters[option.labelKey]
   }));
 
+  const totalIssues = issues.length;
+  const totalPages = Math.max(1, Math.ceil(totalIssues / PAGE_SIZE));
+  const safePage = Math.min(Math.max(1, currentPage), totalPages);
+  const pageStart = (safePage - 1) * PAGE_SIZE;
+  const visibleIssues = issues.slice(pageStart, pageStart + PAGE_SIZE);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
+  const renderPaginationItem = (page, type, originalElement) => {
+    if (type === "prev") {
+      return (
+        <button className="public-issues-pagination-nav" type="button">
+          <LeftOutlined />
+          <span>{content.pagination.previous}</span>
+        </button>
+      );
+    }
+    if (type === "next") {
+      return (
+        <button className="public-issues-pagination-nav" type="button">
+          <span>{content.pagination.next}</span>
+          <RightOutlined />
+        </button>
+      );
+    }
+    if (type === "page") {
+      return <a>{toLocalDigits(page, language)}</a>;
+    }
+    return originalElement;
+  };
+
   const showEmpty = !loading && !error && issues.length === 0;
   const showError = !loading && Boolean(error);
+  const showResults = !loading && !error && totalIssues > 0;
 
   return (
     <SiteShell>
@@ -120,9 +165,15 @@ export default function IssuesListPage() {
         </div>
 
         {loading ? (
-          <div className="public-issues-loading" role="status">
-            <Spin />
-            <span>{content.states.loading}</span>
+          <div
+            aria-busy="true"
+            aria-label={content.states.loading}
+            className="public-issues-grid public-issues-grid-skeleton"
+            role="status"
+          >
+            {Array.from({ length: SKELETON_COUNT }).map((_, index) => (
+              <PublicIssueCardSkeleton key={index} />
+            ))}
           </div>
         ) : null}
 
@@ -148,17 +199,34 @@ export default function IssuesListPage() {
           />
         ) : null}
 
-        {!loading && !error && issues.length > 0 ? (
-          <div className="public-issues-grid">
-            {issues.map((issue) => (
-              <PublicIssueCard
-                key={issue.id}
-                issue={issue}
-                content={content}
-                language={language}
-              />
-            ))}
-          </div>
+        {showResults ? (
+          <>
+            <div className="public-issues-grid">
+              {visibleIssues.map((issue) => (
+                <PublicIssueCard
+                  key={issue.id}
+                  issue={issue}
+                  content={content}
+                  language={language}
+                />
+              ))}
+            </div>
+            {totalPages > 1 ? (
+              <nav
+                aria-label={content.pagination.ariaLabel}
+                className="public-issues-pagination"
+              >
+                <Pagination
+                  current={safePage}
+                  itemRender={renderPaginationItem}
+                  onChange={handlePageChange}
+                  pageSize={PAGE_SIZE}
+                  showSizeChanger={false}
+                  total={totalIssues}
+                />
+              </nav>
+            ) : null}
+          </>
         ) : null}
       </section>
     </SiteShell>

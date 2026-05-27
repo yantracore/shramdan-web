@@ -92,3 +92,27 @@ export function PublicIssueCard({ issue, content, language }) {
     </article>
   );
 }
+
+export function PublicIssueCardSkeleton() {
+  return (
+    <article
+      aria-hidden="true"
+      className="content-card public-issue-card public-issue-card-skeleton"
+    >
+      <div className="public-issue-card-cover skeleton-shimmer" />
+      <div className="card-topline">
+        <span className="skeleton-shimmer skeleton-chip" />
+        <span className="skeleton-shimmer skeleton-chip skeleton-chip-alt" />
+      </div>
+      <div className="skeleton-shimmer skeleton-title" />
+      <div className="skeleton-shimmer skeleton-title skeleton-title-short" />
+      <div className="meta-list">
+        <span className="skeleton-shimmer skeleton-line" />
+      </div>
+      <div className="public-issue-card-actions">
+        <span className="skeleton-shimmer skeleton-button" />
+        <span className="skeleton-shimmer skeleton-link" />
+      </div>
+    </article>
+  );
+}

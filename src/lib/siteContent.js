@@ -568,6 +568,11 @@ export const copy = {
           "सर्भरसँग जोडिँदा केही गडबड भयो। केही क्षणपछि फेरि प्रयास गर्नुहोस्।",
         retry: "फेरि प्रयास गर्नुहोस्"
       },
+      pagination: {
+        previous: "अघिल्लो",
+        next: "अर्को",
+        ariaLabel: "पृष्ठहरू"
+      },
       detail: {
         backToList: "सबै समस्यामा फर्किनुहोस्",
         reportedOn: "रिपोर्ट मिति",
@@ -1183,6 +1188,11 @@ export const copy = {
         errorBody:
           "Something went wrong while reaching the server. Please try again in a moment.",
         retry: "Try Again"
+      },
+      pagination: {
+        previous: "Previous",
+        next: "Next",
+        ariaLabel: "Pagination"
       },
       detail: {
         backToList: "Back to All Issues",
