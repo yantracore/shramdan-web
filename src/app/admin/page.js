@@ -12,32 +12,19 @@ import {
   TeamOutlined,
   ThunderboltOutlined
 } from "@ant-design/icons";
-import { Alert, Button, Skeleton, Tag } from "antd";
+import { Alert, Button, Skeleton } from "antd";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { AdminShell } from "@/components/AdminShell";
-import {
-  ApplicationsPanel,
-  EventsPanel,
-  IssuesPanel,
-  OverviewPanel
-} from "@/components/admin/reports/ReportPanels";
-import { KpiTile } from "@/components/admin/reports/reportPrimitives";
-import {
-  fetchReport,
-  formatBytes,
-  formatCount,
-  formatPercent
-} from "@/lib/reportsApi";
+import { OverviewPanel } from "@/components/admin/reports/ReportPanels";
+import { fetchReport, formatCount, formatPercent } from "@/lib/reportsApi";
 
 const DASHBOARD_SECTIONS = [
   "overview",
-  "users",
   "issues",
   "events",
   "feedback",
-  "applications",
-  "uploads"
+  "applications"
 ];
 
 function todayLabel() {
@@ -76,8 +63,8 @@ export default function AdminDashboardPage() {
   const overview = report?.overview;
   const feedback = report?.feedback;
   const apps = report?.applications;
-  const users = report?.users;
-  const uploads = report?.uploads;
+  const issues = report?.issues;
+  const events = report?.events;
 
   return (
     <AdminShell title="Dashboard">
@@ -87,8 +74,9 @@ export default function AdminDashboardPage() {
             <span className="eyebrow">Control center</span>
             <h2>Shramdan admin dashboard</h2>
             <p>
-              Snapshot of the active community — accounts, reported issues, scheduled events, and
-              contributor engagement. {todayLabel()}.
+              At-a-glance snapshot of what needs attention today. Open Reports for the deep dive.
+              {" "}
+              {todayLabel()}.
             </p>
           </div>
           <div className="admin-dashboard-quick-actions">
@@ -99,12 +87,6 @@ export default function AdminDashboardPage() {
             </Link>
             <Link href="/admin/issues/create">
               <Button icon={<PlusOutlined />}>Create issue</Button>
-            </Link>
-            <Link href="/admin/applications">
-              <Button icon={<FormOutlined />}>Review applications</Button>
-            </Link>
-            <Link href="/admin/feedback">
-              <Button icon={<MessageOutlined />}>Open feedback</Button>
             </Link>
             <Link href="/">
               <Button icon={<GlobalOutlined />}>Public site</Button>
@@ -129,7 +111,7 @@ export default function AdminDashboardPage() {
         {loading && !report ? (
           <>
             <Skeleton active paragraph={{ rows: 2 }} />
-            <Skeleton active paragraph={{ rows: 6 }} />
+            <Skeleton active paragraph={{ rows: 4 }} />
           </>
         ) : null}
 
@@ -161,7 +143,9 @@ export default function AdminDashboardPage() {
                   <div className="shortcut-head">
                     <FormOutlined /> Open applications
                   </div>
-                  <strong>{formatCount((apps?.funnel?.submitted || 0) + (apps?.funnel?.underReview || 0))}</strong>
+                  <strong>
+                    {formatCount((apps?.funnel?.submitted || 0) + (apps?.funnel?.underReview || 0))}
+                  </strong>
                   <span className="shortcut-hint">
                     {formatCount(apps?.funnel?.submitted)} submitted ·{" "}
                     {formatCount(apps?.funnel?.underReview)} under review
@@ -174,10 +158,10 @@ export default function AdminDashboardPage() {
                   <div className="shortcut-head">
                     <EnvironmentOutlined /> Open issues
                   </div>
-                  <strong>{formatCount(report.issues?.byStatus?.OPEN)}</strong>
+                  <strong>{formatCount(issues?.byStatus?.OPEN)}</strong>
                   <span className="shortcut-hint">
-                    Avg {Number(report.issues?.avgVoteCount ?? 0).toFixed(1)} votes / issue ·{" "}
-                    {formatPercent(report.issues?.conversionRate?.issueToEventPercent)} converted
+                    Avg {Number(issues?.avgVoteCount ?? 0).toFixed(1)} votes / issue ·{" "}
+                    {formatPercent(issues?.conversionRate?.issueToEventPercent)} converted
                   </span>
                   <span className="admin-dashboard-link-row">
                     Triage issues <ArrowRightOutlined />
@@ -187,9 +171,9 @@ export default function AdminDashboardPage() {
                   <div className="shortcut-head">
                     <ThunderboltOutlined /> Events awaiting admin
                   </div>
-                  <strong>{formatCount(report.events?.leaderVotingState?.PENDING_ADMIN)}</strong>
+                  <strong>{formatCount(events?.leaderVotingState?.PENDING_ADMIN)}</strong>
                   <span className="shortcut-hint">
-                    {formatCount(report.events?.leaderVotingState?.OPEN)} leader votes open
+                    {formatCount(events?.leaderVotingState?.OPEN)} leader votes open
                   </span>
                   <span className="admin-dashboard-link-row">
                     Open events <ArrowRightOutlined />
@@ -197,59 +181,6 @@ export default function AdminDashboardPage() {
                 </Link>
               </div>
             </section>
-
-            <section className="admin-report-section">
-              <header className="admin-report-section-heading">
-                <h2>Community pulse</h2>
-                <p>Member base posture and content footprint.</p>
-              </header>
-              <div className="admin-report-kpi-grid">
-                <KpiTile
-                  label="Verified users"
-                  value={users?.verifiedPercent}
-                  delta={null}
-                  formatValue={(v) => formatPercent(v)}
-                  accent="#176b5c"
-                  icon={<TeamOutlined />}
-                  hint={`${formatCount(users?.verified)} of ${formatCount(users?.total)}`}
-                />
-                <KpiTile
-                  label="OAuth signups"
-                  value={users?.oauth}
-                  delta={null}
-                  accent="#7e5bd0"
-                  icon={<TeamOutlined />}
-                  hint={`${formatCount(users?.native)} native sign-ups`}
-                />
-                <KpiTile
-                  label="Stored media"
-                  value={uploads?.totalSizeBytes}
-                  formatValue={formatBytes}
-                  delta={null}
-                  accent="#5f7269"
-                  hint={`${formatCount(uploads?.total)} uploads · ${formatCount(uploads?.unconfirmed)} unconfirmed`}
-                />
-                <KpiTile
-                  label="Orphaned uploads"
-                  value={uploads?.byLinkedEntity?.orphan}
-                  delta={null}
-                  accent="#d94646"
-                  hint="Uploads with no linked issue, event, or user"
-                />
-              </div>
-            </section>
-
-            {report.issues ? (
-              <IssuesPanel data={report.issues} bucket={bucket} loading={loading} />
-            ) : null}
-
-            {report.events ? (
-              <EventsPanel data={report.events} bucket={bucket} loading={loading} />
-            ) : null}
-
-            {report.applications ? (
-              <ApplicationsPanel data={report.applications} bucket={bucket} loading={loading} />
-            ) : null}
 
             <section className="admin-report-section">
               <header className="admin-report-section-heading">
@@ -281,7 +212,7 @@ export default function AdminDashboardPage() {
                   <div className="shortcut-head">
                     <EnvironmentOutlined /> Issues
                   </div>
-                  <strong>{formatCount(report.issues?.total)}</strong>
+                  <strong>{formatCount(issues?.total)}</strong>
                   <span className="shortcut-hint">Reported community issues.</span>
                   <span className="admin-dashboard-link-row">
                     Open <ArrowRightOutlined />
@@ -291,7 +222,7 @@ export default function AdminDashboardPage() {
                   <div className="shortcut-head">
                     <CalendarOutlined /> Events
                   </div>
-                  <strong>{formatCount(report.events?.total)}</strong>
+                  <strong>{formatCount(events?.total)}</strong>
                   <span className="shortcut-hint">Scheduled cleanups & leadership.</span>
                   <span className="admin-dashboard-link-row">
                     Open <ArrowRightOutlined />
@@ -301,7 +232,7 @@ export default function AdminDashboardPage() {
                   <div className="shortcut-head">
                     <TeamOutlined /> Users
                   </div>
-                  <strong>{formatCount(users?.total)}</strong>
+                  <strong>Browse</strong>
                   <span className="shortcut-hint">Registered members & verification.</span>
                   <span className="admin-dashboard-link-row">
                     Open <ArrowRightOutlined />
@@ -313,7 +244,7 @@ export default function AdminDashboardPage() {
                   </div>
                   <strong>Full analytics</strong>
                   <span className="shortcut-hint">
-                    Filter by date, geography, status and more across every domain.
+                    Filter by date, geography, status, and more across every domain.
                   </span>
                   <span className="admin-dashboard-link-row">
                     Open <ArrowRightOutlined />
