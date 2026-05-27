@@ -11,6 +11,7 @@ import {
   BugOutlined,
   CalendarOutlined,
   CheckCircleOutlined,
+  ClockCircleOutlined,
   CloudServerOutlined,
   CodeOutlined,
   DatabaseOutlined,
@@ -161,41 +162,57 @@ function relativeShippedLabel(doneAt, t) {
   return t.buildInPublic.relativeDaysAgo.replace("{n}", String(days));
 }
 
-function buildBuildingNowItems({ inProgress, recentlyDone, t, maxCards = 6 }) {
+function buildBuildingNowItems({ inProgress, upcoming, recentlyDone, t, perBucket = 2 }) {
   const overrides = t.buildInPublic.taskOverrides || {};
-  const cards = [];
-  for (const item of inProgress) {
-    const o = overrides[item.id];
-    if (!o) continue;
-    cards.push({
-      key: `active-${item.id}`,
-      status: "active",
-      statusLabel: t.buildInPublic.statusActive,
-      id: item.id,
-      title: o.title,
-      blurb: o.blurb || t.buildInPublic.fallbackBlurb,
-      iconKey: o.iconKey,
-      phaseNumber: item.phaseNumber,
-      meta: null
-    });
-  }
-  for (const item of recentlyDone) {
-    if (cards.length >= maxCards) break;
-    const o = overrides[item.id];
-    if (!o) continue;
-    cards.push({
-      key: `shipped-${item.id}`,
-      status: "shipped",
-      statusLabel: t.buildInPublic.statusShipped,
-      id: item.id,
-      title: o.title,
-      blurb: o.blurb || t.buildInPublic.fallbackBlurb,
-      iconKey: o.iconKey,
-      phaseNumber: item.phaseNumber,
-      meta: relativeShippedLabel(item.doneAt, t)
-    });
-  }
-  return cards.slice(0, maxCards);
+
+  const pickWithOverride = (items, build) => {
+    const out = [];
+    for (const item of items) {
+      if (out.length >= perBucket) break;
+      const o = overrides[item.id];
+      if (!o) continue;
+      out.push(build(item, o));
+    }
+    return out;
+  };
+
+  const activeCards = pickWithOverride(inProgress, (item, o) => ({
+    key: `active-${item.id}`,
+    status: "active",
+    statusLabel: t.buildInPublic.statusActive,
+    id: item.id,
+    title: o.title,
+    blurb: o.blurb || t.buildInPublic.fallbackBlurb,
+    iconKey: o.iconKey,
+    phaseNumber: item.phaseNumber,
+    meta: null
+  }));
+
+  const upcomingCards = pickWithOverride(upcoming, (item, o) => ({
+    key: `upcoming-${item.id}`,
+    status: "upcoming",
+    statusLabel: t.buildInPublic.statusUpcoming,
+    id: item.id,
+    title: o.title,
+    blurb: o.blurb || t.buildInPublic.fallbackBlurb,
+    iconKey: o.iconKey,
+    phaseNumber: item.phaseNumber,
+    meta: t.buildInPublic.relativeUpcoming || null
+  }));
+
+  const shippedCards = pickWithOverride(recentlyDone, (item, o) => ({
+    key: `shipped-${item.id}`,
+    status: "shipped",
+    statusLabel: t.buildInPublic.statusShipped,
+    id: item.id,
+    title: o.title,
+    blurb: o.blurb || t.buildInPublic.fallbackBlurb,
+    iconKey: o.iconKey,
+    phaseNumber: item.phaseNumber,
+    meta: relativeShippedLabel(item.doneAt, t)
+  }));
+
+  return [...activeCards, ...upcomingCards, ...shippedCards];
 }
 
 export default function HomeClient({ summary }) {
@@ -456,8 +473,8 @@ export default function HomeClient({ summary }) {
             <span className="eyebrow">{t.volunteerInvite.eyebrow}</span>
             <h2 id="volunteer-invite-title">
               <span>{t.volunteerInvite.titleLead}</span>
-              <span>{t.volunteerInvite.titleTrail}</span>
               <strong>{t.volunteerInvite.titleStrong}</strong>
+              <span>{t.volunteerInvite.titleTrail}</span>
             </h2>
             <p>{t.volunteerInvite.intro}</p>
             <div className="volunteer-actions">
