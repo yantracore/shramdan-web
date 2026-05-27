@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRightOutlined } from "@ant-design/icons";
+import { ArrowRightOutlined, PictureOutlined } from "@ant-design/icons";
 import { Tag } from "antd";
 import Image from "next/image";
 import Link from "next/link";
@@ -44,7 +44,15 @@ export function PublicIssueCard({ issue, content, language }) {
             width={360}
           />
         </Link>
-      ) : null}
+      ) : (
+        <Link
+          aria-label={issue.title}
+          className="public-issue-card-cover public-issue-card-cover-placeholder"
+          href={`/issues/${issue.id}`}
+        >
+          <PictureOutlined aria-hidden="true" />
+        </Link>
+      )}
       <div className="card-topline">
         <Tag color={ISSUE_STATUS_COLORS[issue.status]}>{statusLabel}</Tag>
         <Tag className="public-issue-card-category">{categoryLabel}</Tag>

@@ -3350,6 +3350,30 @@
   transform: scale(1.03);
 }
 
+.public-issue-card-cover-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--accent) 8%, var(--surface)),
+    color-mix(in srgb, var(--accent) 2%, var(--surface))
+  );
+  color: color-mix(in srgb, var(--accent) 40%, var(--muted));
+}
+
+.public-issue-card-cover-placeholder .anticon {
+  font-size: 56px;
+  opacity: 0.55;
+  transition: opacity 0.2s ease, transform 0.3s ease;
+}
+
+.public-issue-card-cover-placeholder:hover .anticon,
+.public-issue-card-cover-placeholder:focus-visible .anticon {
+  opacity: 0.8;
+  transform: scale(1.05);
+}
+
 .public-issue-card .card-topline {
   display: flex;
   flex-wrap: wrap;
