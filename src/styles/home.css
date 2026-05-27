@@ -294,6 +294,41 @@
   box-shadow: 0 24px 70px rgba(23, 33, 28, 0.11);
 }
 
+/* ── Shared card hover affordance ───────────────────────────────
+   Mirrors .volunteer-role-card. Add new card classes to this list
+   instead of duplicating the transition / hover declarations. */
+.cleanup-area-card,
+.volunteer-role-card,
+.resource-card,
+.workflow-card,
+.building-now-card,
+.public-issue-card {
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.cleanup-area-card:hover,
+.volunteer-role-card:hover,
+.resource-card:hover,
+.building-now-card:hover,
+.public-issue-card:hover {
+  border-color: color-mix(in srgb, var(--primary) 42%, var(--line));
+  box-shadow: 0 18px 44px rgba(23, 33, 28, 0.1);
+  transform: translateY(-2px);
+}
+
+/* Workflow card keeps its 6px step-coloured bottom border —
+   tint only the top/left/right edges. */
+.workflow-card:hover {
+  border-top-color: color-mix(in srgb, var(--primary) 42%, var(--line));
+  border-right-color: color-mix(in srgb, var(--primary) 42%, var(--line));
+  border-left-color: color-mix(in srgb, var(--primary) 42%, var(--line));
+  box-shadow: 0 18px 44px rgba(23, 33, 28, 0.1);
+  transform: translateY(-2px);
+}
+
 .glass-panel {
   border: 1px solid rgba(255, 255, 255, 0.24);
   border-radius: 8px;
@@ -595,16 +630,6 @@
     linear-gradient(180deg, color-mix(in srgb, var(--surface) 99%, transparent), color-mix(in srgb, var(--surface-soft) 80%, transparent)),
     var(--surface);
   box-shadow: 0 18px 48px rgba(23, 33, 28, 0.08);
-  transition:
-    border-color 180ms ease,
-    box-shadow 180ms ease,
-    transform 180ms ease;
-}
-
-.cleanup-area-card:hover {
-  border-color: color-mix(in srgb, var(--primary) 40%, var(--line));
-  box-shadow: 0 24px 64px rgba(23, 33, 28, 0.12);
-  transform: translateY(-3px);
 }
 
 .cleanup-area-topline {
@@ -1172,16 +1197,6 @@
   border-radius: 8px;
   background: color-mix(in srgb, var(--surface) 94%, transparent);
   text-align: left;
-  transition:
-    border-color 180ms ease,
-    box-shadow 180ms ease,
-    transform 180ms ease;
-}
-
-.volunteer-role-card:hover {
-  border-color: color-mix(in srgb, var(--primary) 42%, var(--line));
-  box-shadow: 0 18px 44px rgba(23, 33, 28, 0.1);
-  transform: translateY(-2px);
 }
 
 .volunteer-role-grid > .volunteer-role-card:nth-child(odd):last-child {
@@ -1413,16 +1428,6 @@
     linear-gradient(180deg, color-mix(in srgb, var(--surface) 98%, transparent), color-mix(in srgb, var(--surface-soft) 72%, transparent)),
     var(--surface);
   box-shadow: 0 18px 48px rgba(23, 33, 28, 0.08);
-  transition:
-    border-color 180ms ease,
-    box-shadow 180ms ease,
-    transform 180ms ease;
-}
-
-.resource-card:hover {
-  border-color: color-mix(in srgb, var(--primary) 42%, var(--line));
-  box-shadow: 0 24px 64px rgba(23, 33, 28, 0.12);
-  transform: translateY(-3px);
 }
 
 .resource-icon {
@@ -2946,6 +2951,14 @@
   }
 
   .cleanup-area-card:hover,
+  .volunteer-role-card:hover,
+  .resource-card:hover,
+  .workflow-card:hover,
+  .building-now-card:hover,
+  .public-issue-card:hover {
+    transform: none;
+  }
+
   .cleanup-area-card:hover .cleanup-area-image img {
     transform: none;
   }
@@ -3046,10 +3059,6 @@
     min-height: auto;
   }
 
-  .volunteer-role-card:hover {
-    transform: none;
-  }
-
   .volunteer-role-card p {
     min-height: auto;
   }
@@ -3086,10 +3095,6 @@
 
   .resource-card {
     padding: 18px;
-  }
-
-  .resource-card:hover {
-    transform: none;
   }
 
   .resource-card .ant-btn {
@@ -4867,7 +4872,6 @@
   box-shadow: 0 1px 2px rgba(15, 32, 28, 0.04), 0 8px 24px -16px rgba(15, 32, 28, 0.18);
   position: relative;
   overflow: hidden;
-  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
 }
 
 .building-now-card::before {
@@ -4882,12 +4886,6 @@
 .building-now-card--shipped::before {
   background: linear-gradient(180deg, #6fcf97 0%, #2e7d32 100%);
   opacity: 0.7;
-}
-
-.building-now-card:hover {
-  transform: translateY(-2px);
-  border-color: rgba(23, 107, 92, 0.28);
-  box-shadow: 0 4px 8px rgba(15, 32, 28, 0.06), 0 18px 32px -20px rgba(15, 32, 28, 0.28);
 }
 
 .building-now-card-head {
