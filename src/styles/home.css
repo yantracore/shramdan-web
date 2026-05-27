@@ -375,30 +375,12 @@
   margin: 0;
 }
 
-.hero-panel-phase {
-  display: grid;
-  gap: 5px;
-  padding: 16px;
-  border: 1px solid color-mix(in srgb, var(--primary) 18%, rgba(255, 255, 255, 0.22));
-  border-radius: 8px;
-  background:
-    linear-gradient(135deg, color-mix(in srgb, var(--primary) 12%, transparent), color-mix(in srgb, var(--accent) 8%, transparent)),
-    color-mix(in srgb, var(--surface) 20%, transparent);
-}
-
-.hero-panel-phase span,
 .hero-panel-links small {
   color: var(--muted);
   font-size: 12px;
   font-weight: 850;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-}
-
-.hero-panel-phase strong {
-  color: var(--text);
-  font-size: 22px;
-  line-height: 1.15;
 }
 
 .hero-panel-links {
@@ -4812,6 +4794,10 @@
   justify-content: space-between;
   font-size: 13px;
   color: var(--text-primary, #1d2a26);
+}
+
+.hero-panel-progress-row span {
+  font-weight: 700;
 }
 
 .hero-panel-progress-row strong {

@@ -36,8 +36,6 @@ export const copy = {
       title: "श्रमदान गरेर श्रमदान एप बनाऔँ",
       body:
         "श्रमदान अहिले एप निर्माणको चरणमा छ। आफ्नो समय, सीप, विचार र समन्वय दिएर मञ्च आफैं निर्माण गर्न योगदान गर्न सकिन्छ।",
-      phaseLabel: "हालको चरण",
-      phaseValue: "श्रमदानमार्फत श्रमदान एप निर्माण",
       resourcesLabel: "श्रमदानका उपयोगी सामग्रीहरू",
       liveBadge: "लाइभ",
       liveAria: "अहिले प्रत्यक्ष",
@@ -762,8 +760,6 @@ export const copy = {
       title: "Build the Shramdan App with shramdan",
       body:
         "Shramdan is now in its app-building phase. Contributors can donate their time, skill, ideas, and coordination to help shape the platform itself.",
-      phaseLabel: "Current phase",
-      phaseValue: "Building Shramdan App with shramdan",
       resourcesLabel: "Useful Shramdan links",
       liveBadge: "LIVE",
       liveAria: "Live right now",

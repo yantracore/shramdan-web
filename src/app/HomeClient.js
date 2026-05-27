@@ -236,10 +236,6 @@ export default function HomeClient({ summary }) {
           <span className="hero-panel-kicker">{t.heroPanel.kicker}</span>
           <h2>{t.heroPanel.title}</h2>
           <p>{t.heroPanel.body}</p>
-          <div className="hero-panel-phase">
-            <span>{t.heroPanel.phaseLabel}</span>
-            <strong>{t.heroPanel.phaseValue}</strong>
-          </div>
           {overallPercent != null ? (
             <div className="hero-panel-progress" aria-label={t.buildInPublic.heroAria}>
               <div className="hero-panel-progress-row">
