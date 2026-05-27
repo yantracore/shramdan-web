@@ -481,7 +481,7 @@ export default function HomeClient({ summary }) {
             <span className="eyebrow">{t.volunteerInvite.eyebrow}</span>
             <h2 id="volunteer-invite-title">
               <span>{t.volunteerInvite.titleLead}</span>
-              {language === "ne" ? (
+              {language === "np" ? (
                 <>
                   <span>{t.volunteerInvite.titleTrail}</span>
                   <strong>{t.volunteerInvite.titleStrong}</strong>
