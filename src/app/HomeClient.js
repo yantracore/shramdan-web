@@ -228,7 +228,7 @@ export default function HomeClient({ summary }) {
           <p className="hero-subtitle">{t.hero.subtitle}</p>
           <p>{t.hero.support}</p>
           <div className="hero-actions">
-            <Button type="primary" size="large" href="/join" icon={<HeartOutlined />}>
+            <Button type="primary" size="large" href="#we-need-you" icon={<HeartOutlined />}>
               {t.hero.join}
             </Button>
           </div>
@@ -481,7 +481,7 @@ export default function HomeClient({ summary }) {
           </aside>
         </div>
 
-        <div className="volunteer-roles-panel">
+        <div className="volunteer-roles-panel" id="we-need-you">
           <div className="volunteer-panel-heading">
             <span className="eyebrow">{t.volunteerInvite.panelEyebrow}</span>
             <h2>{t.volunteerInvite.panelTitle}</h2>

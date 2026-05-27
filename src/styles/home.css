@@ -1134,6 +1134,7 @@
   gap: 18px;
   min-width: 0;
   padding: 24px;
+  scroll-margin-top: calc(var(--header-height) + 16px);
   background:
     linear-gradient(180deg, color-mix(in srgb, var(--surface) 98%, transparent), color-mix(in srgb, var(--surface-soft) 76%, transparent)),
     var(--surface);
