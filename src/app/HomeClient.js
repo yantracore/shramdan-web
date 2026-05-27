@@ -222,6 +222,7 @@ export default function HomeClient({ summary }) {
   const overallPercent = summary?.overallPercent ?? null;
   const buildingNowCards = buildBuildingNowItems({
     inProgress: summary?.inProgress ?? [],
+    upcoming: summary?.upcoming ?? [],
     recentlyDone: summary?.recentlyDone ?? [],
     t
   });
@@ -322,7 +323,14 @@ export default function HomeClient({ summary }) {
           <div className="building-now-grid">
             {buildingNowCards.map((card) => {
               const Icon = pickBuildingNowIcon(card.iconKey, card.phaseNumber);
-              const isActive = card.status === "active";
+              let StatusIcon = CheckCircleOutlined;
+              let statusIconProps = { "aria-hidden": "true" };
+              if (card.status === "active") {
+                StatusIcon = LoadingOutlined;
+                statusIconProps = { ...statusIconProps, spin: true };
+              } else if (card.status === "upcoming") {
+                StatusIcon = ClockCircleOutlined;
+              }
               return (
                 <article
                   className={`building-now-card building-now-card--${card.status}`}
@@ -337,11 +345,7 @@ export default function HomeClient({ summary }) {
                     </span>
                     <div className="building-now-status-stack">
                       <span className={`building-now-status building-now-status--${card.status}`}>
-                        {isActive ? (
-                          <LoadingOutlined aria-hidden="true" spin />
-                        ) : (
-                          <CheckCircleOutlined aria-hidden="true" />
-                        )}
+                        <StatusIcon {...statusIconProps} />
                         {card.statusLabel}
                       </span>
                       <span className="building-now-phase-tag">
@@ -354,7 +358,11 @@ export default function HomeClient({ summary }) {
                   <p className="building-now-blurb">{card.blurb}</p>
                   {card.meta ? (
                     <span className="building-now-meta">
-                      <CalendarOutlined aria-hidden="true" />
+                      {card.status === "upcoming" ? (
+                        <ClockCircleOutlined aria-hidden="true" />
+                      ) : (
+                        <CalendarOutlined aria-hidden="true" />
+                      )}
                       {card.meta}
                     </span>
                   ) : null}
@@ -473,8 +481,17 @@ export default function HomeClient({ summary }) {
             <span className="eyebrow">{t.volunteerInvite.eyebrow}</span>
             <h2 id="volunteer-invite-title">
               <span>{t.volunteerInvite.titleLead}</span>
-              <strong>{t.volunteerInvite.titleStrong}</strong>
-              <span>{t.volunteerInvite.titleTrail}</span>
+              {language === "ne" ? (
+                <>
+                  <span>{t.volunteerInvite.titleTrail}</span>
+                  <strong>{t.volunteerInvite.titleStrong}</strong>
+                </>
+              ) : (
+                <>
+                  <strong>{t.volunteerInvite.titleStrong}</strong>
+                  <span>{t.volunteerInvite.titleTrail}</span>
+                </>
+              )}
             </h2>
             <p>{t.volunteerInvite.intro}</p>
             <div className="volunteer-actions">
