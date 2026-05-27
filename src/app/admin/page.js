@@ -5,9 +5,7 @@ import {
   CalendarOutlined,
   EnvironmentOutlined,
   FormOutlined,
-  GlobalOutlined,
   MessageOutlined,
-  PlusOutlined,
   RiseOutlined,
   TeamOutlined,
   ThunderboltOutlined
@@ -26,15 +24,6 @@ const DASHBOARD_SECTIONS = [
   "feedback",
   "applications"
 ];
-
-function todayLabel() {
-  return new Date().toLocaleDateString("en-US", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-    year: "numeric"
-  });
-}
 
 export default function AdminDashboardPage() {
   const [report, setReport] = useState(null);
@@ -69,31 +58,6 @@ export default function AdminDashboardPage() {
   return (
     <AdminShell title="Dashboard">
       <section className="admin-dashboard-overview">
-        <div className="admin-dashboard-hero">
-          <div className="admin-dashboard-hero-headline">
-            <span className="eyebrow">Control center</span>
-            <h2>Shramdan admin dashboard</h2>
-            <p>
-              At-a-glance snapshot of what needs attention today. Open Reports for the deep dive.
-              {" "}
-              {todayLabel()}.
-            </p>
-          </div>
-          <div className="admin-dashboard-quick-actions">
-            <Link href="/admin/reports">
-              <Button type="primary" icon={<RiseOutlined />}>
-                Open full reports
-              </Button>
-            </Link>
-            <Link href="/admin/issues/create">
-              <Button icon={<PlusOutlined />}>Create issue</Button>
-            </Link>
-            <Link href="/">
-              <Button icon={<GlobalOutlined />}>Public site</Button>
-            </Link>
-          </div>
-        </div>
-
         {error ? (
           <Alert
             type="error"
