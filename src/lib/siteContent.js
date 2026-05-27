@@ -167,42 +167,42 @@ export const copy = {
       items: [
         {
           id: "roadside",
-          image: "/images/homepage/cleanup-areas/roadside.png",
+          image: "/images/homepage/cleanup-areas/roadside.jpg",
           imageAlt: "सडक किनार सफाइमा सहभागी स्वयंसेवकहरू",
           title: "सडक र फुटपाथ",
           body: "मुख्य सडक, गल्ली, फुटपाथ र सडकछेउमा देखिने फोहोर सफा गर्ने।"
         },
         {
           id: "lands",
-          image: "/images/homepage/cleanup-areas/empty-lands.png",
+          image: "/images/homepage/cleanup-areas/empty-lands.jpg",
           imageAlt: "खाली जमिनमा फोहोर संकलन गर्दै स्वयंसेवकहरू",
           title: "खाली जग्गा",
           body: "बाँझो जमिन, खुला प्लट र बेवास्ता गरिएका ठाउँलाई सफा र सुरक्षित बनाउने।"
         },
         {
           id: "riverbanks",
-          image: "/images/homepage/cleanup-areas/riverbanks.png",
+          image: "/images/homepage/cleanup-areas/riverbanks.jpg",
           imageAlt: "नदी किनारमा सफाइ अभियान",
           title: "नदी किनार र जलमार्ग",
           body: "नदी, खोला, ताल र पानी बग्ने क्षेत्रमा जम्मा भएको फोहोर हटाउने।"
         },
         {
           id: "drains",
-          image: "/images/homepage/cleanup-areas/drains.png",
+          image: "/images/homepage/cleanup-areas/drains.jpg",
           imageAlt: "ढल र नाला सफाइ गर्दै टोली",
           title: "ढल र नाला",
           body: "पानी जम्ने ठाउँ, नाली र गल्लीका निकासहरू सफा राख्ने।"
         },
         {
           id: "parks",
-          image: "/images/homepage/cleanup-areas/parks.png",
+          image: "/images/homepage/cleanup-areas/parks.jpg",
           imageAlt: "पार्क र सार्वजनिक ठाउँ सफाइ",
           title: "पार्क र सार्वजनिक ठाउँ",
           body: "पार्क, चौक, बस स्टप, सामुदायिक क्षेत्र र भेटघाट हुने ठाउँ सफा गर्ने।"
         },
         {
           id: "trails",
-          image: "/images/homepage/cleanup-areas/nature-trails.png",
+          image: "/images/homepage/cleanup-areas/nature-trails.jpg",
           imageAlt: "प्रकृति मार्गमा सफाइ गर्दै समूह",
           title: "हाइकिङ ट्रेल र प्रकृति मार्ग",
           body: "जंगल बाटो, दृश्यावलोकन स्थल, ट्रेल र प्रकृति मार्गलाई फोहोरमुक्त बनाउने।"
@@ -908,42 +908,42 @@ export const copy = {
       items: [
         {
           id: "roadside",
-          image: "/images/homepage/cleanup-areas/roadside.png",
+          image: "/images/homepage/cleanup-areas/roadside.jpg",
           imageAlt: "Volunteers cleaning a roadside area",
           title: "Street & Roadside",
           body: "Clean visible litter along roads, alleys, footpaths, and street edges."
         },
         {
           id: "lands",
-          image: "/images/homepage/cleanup-areas/empty-lands.png",
+          image: "/images/homepage/cleanup-areas/empty-lands.jpg",
           imageAlt: "Volunteers collecting waste from vacant land",
           title: "Vacant Lands",
           body: "Turn neglected plots and open grounds into cleaner, safer local spaces."
         },
         {
           id: "riverbanks",
-          image: "/images/homepage/cleanup-areas/riverbanks.png",
+          image: "/images/homepage/cleanup-areas/riverbanks.jpg",
           imageAlt: "Cleanup work along a riverbank",
           title: "Riverbanks & Waterways",
           body: "Remove waste from riversides, streams, ponds, and nearby water routes."
         },
         {
           id: "drains",
-          image: "/images/homepage/cleanup-areas/drains.png",
+          image: "/images/homepage/cleanup-areas/drains.jpg",
           imageAlt: "Team cleaning drains and gullies",
           title: "Drains & Gullies",
           body: "Keep drains, gullies, and waterlogged corners clean and flowing."
         },
         {
           id: "parks",
-          image: "/images/homepage/cleanup-areas/parks.png",
+          image: "/images/homepage/cleanup-areas/parks.jpg",
           imageAlt: "Volunteers cleaning a park and public space",
           title: "Parks & Public Spaces",
           body: "Clean parks, squares, bus stops, community zones, and gathering spaces."
         },
         {
           id: "trails",
-          image: "/images/homepage/cleanup-areas/nature-trails.png",
+          image: "/images/homepage/cleanup-areas/nature-trails.jpg",
           imageAlt: "Group cleaning a nature trail",
           title: "Hiking Trails & Nature Routes",
           body: "Protect forest paths, viewpoints, trails, and nature routes from litter."
