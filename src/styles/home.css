@@ -4827,12 +4827,20 @@
 }
 
 .building-now-section {
-  padding: 64px 24px;
+  padding: 64px 24px 0;
   max-width: 1180px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 32px;
+}
+
+.building-now-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
 }
 
 .building-now-heading {
@@ -4883,6 +4891,11 @@
   opacity: 0.85;
 }
 
+.building-now-card--upcoming::before {
+  background: linear-gradient(180deg, #e0a82e 0%, #b8801e 100%);
+  opacity: 0.8;
+}
+
 .building-now-card--shipped::before {
   background: linear-gradient(180deg, #6fcf97 0%, #2e7d32 100%);
   opacity: 0.7;
@@ -4906,6 +4919,12 @@
   background: linear-gradient(135deg, rgba(46, 158, 135, 0.18) 0%, rgba(23, 107, 92, 0.12) 100%);
   color: #176b5c;
   border: 1px solid rgba(23, 107, 92, 0.22);
+}
+
+.building-now-thumb--upcoming {
+  background: linear-gradient(135deg, rgba(224, 168, 46, 0.22) 0%, rgba(184, 128, 30, 0.14) 100%);
+  color: #a06b15;
+  border-color: rgba(184, 128, 30, 0.28);
 }
 
 .building-now-thumb--shipped {
@@ -4936,6 +4955,11 @@
 .building-now-status--active {
   background: rgba(23, 107, 92, 0.12);
   color: #176b5c;
+}
+
+.building-now-status--upcoming {
+  background: rgba(184, 128, 30, 0.14);
+  color: #a06b15;
 }
 
 .building-now-status--shipped {
@@ -4982,26 +5006,6 @@
   padding-top: 4px;
 }
 
-.building-now-cta {
-  align-self: flex-start;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 18px;
-  border-radius: 999px;
-  font-size: 14px;
-  color: #ffffff;
-  background: #176b5c;
-  text-decoration: none;
-  font-weight: 600;
-  transition: background 160ms ease, transform 160ms ease;
-}
-
-.building-now-cta:hover {
-  background: #145a4d;
-  transform: translateY(-1px);
-}
-
 [data-theme="dark"] .building-now-card {
   background: rgba(20, 32, 28, 0.6);
   border-color: rgba(110, 200, 178, 0.18);
@@ -5021,6 +5025,12 @@
   border-color: rgba(110, 200, 178, 0.28);
 }
 
+[data-theme="dark"] .building-now-thumb--upcoming {
+  background: linear-gradient(135deg, rgba(240, 196, 96, 0.22) 0%, rgba(184, 128, 30, 0.14) 100%);
+  color: #f0c460;
+  border-color: rgba(240, 196, 96, 0.32);
+}
+
 [data-theme="dark"] .building-now-thumb--shipped {
   background: linear-gradient(135deg, rgba(111, 207, 151, 0.22) 0%, rgba(46, 125, 50, 0.14) 100%);
   color: #6fcf97;
@@ -5032,6 +5042,11 @@
   color: #6ec8b2;
 }
 
+[data-theme="dark"] .building-now-status--upcoming {
+  background: rgba(240, 196, 96, 0.16);
+  color: #f0c460;
+}
+
 [data-theme="dark"] .building-now-status--shipped {
   background: rgba(111, 207, 151, 0.16);
   color: #6fcf97;
@@ -5039,8 +5054,13 @@
 
 @media (max-width: 620px) {
   .building-now-section {
-    padding: 44px 20px;
+    padding: 44px 20px 0;
     gap: 24px;
+  }
+
+  .building-now-header {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .building-now-heading h2 {

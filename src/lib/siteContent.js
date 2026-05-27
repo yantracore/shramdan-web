@@ -66,12 +66,14 @@ export const copy = {
       sectionEyebrow: "अहिले के भइरहेको छ",
       sectionTitle: "श्रमदान एपमा हालैको प्रगति",
       sectionIntro:
-        "हाम्रो दैनिक १२ बजेको लाइभ स्ट्रिममा सक्रिय रहेका कामहरू र भर्खर तयार भएका सुविधाहरू। यो सूची रोडम्यापबाटै सिधै आउँछ - काम अघि बढ्दै जाँदा यहीँ आफै अपडेट हुन्छ।",
+        "हाम्रो दैनिक १२ बजेको लाइभ स्ट्रिममा सक्रिय रहेका कामहरू, अब आउने सुविधाहरू र भर्खर तयार भएका सुविधाहरू। यो सूची रोडम्यापबाटै सिधै आउँछ - काम अघि बढ्दै जाँदा यहीँ आफै अपडेट हुन्छ।",
       statusActive: "अहिले बनाइँदै",
+      statusUpcoming: "अबको पालो",
       statusShipped: "भर्खर तयार",
       relativeToday: "आज तयार",
       relativeYesterday: "हिजो तयार",
       relativeDaysAgo: "{n} दिनअघि तयार",
+      relativeUpcoming: "लाइनमा",
       fallbackBlurb: "रोडम्यापको यो खण्डमा सक्रिय काम; पूर्ण विवरण रोडम्यापमा हेर्नुहोस्।",
       fullRoadmapCta: "सबै काम र प्रगति रोडम्यापमा हेर्नुहोस्",
       taskOverrides: {
@@ -797,12 +799,14 @@ export const copy = {
       sectionEyebrow: "What's Happening Now",
       sectionTitle: "Recent Progress on the Shramdan App",
       sectionIntro:
-        "Work actively underway in our daily 12 PM live stream, alongside features that just shipped. This list comes straight from the roadmap and updates itself as work moves forward.",
+        "Work actively underway in our daily 12 PM live stream, what's lined up next, and features that just shipped. This list comes straight from the roadmap and updates itself as work moves forward.",
       statusActive: "In Progress",
+      statusUpcoming: "Up Next",
       statusShipped: "Just Shipped",
       relativeToday: "Shipped today",
       relativeYesterday: "Shipped yesterday",
       relativeDaysAgo: "Shipped {n} days ago",
+      relativeUpcoming: "On deck",
       fallbackBlurb: "Active work in this part of the roadmap; full detail on the roadmap.",
       fullRoadmapCta: "See All Tasks & Progress on the Roadmap",
       taskOverrides: {

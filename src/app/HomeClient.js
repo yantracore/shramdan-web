@@ -315,10 +315,22 @@ export default function HomeClient({ summary }) {
 
       {buildingNowCards.length > 0 ? (
         <section className="building-now-section" aria-labelledby="building-now-title">
-          <div className="building-now-heading">
-            <span className="eyebrow">{t.buildInPublic.sectionEyebrow}</span>
-            <h2 id="building-now-title">{t.buildInPublic.sectionTitle}</h2>
-            <p>{t.buildInPublic.sectionIntro}</p>
+          <div className="building-now-header">
+            <div className="building-now-heading">
+              <span className="eyebrow">{t.buildInPublic.sectionEyebrow}</span>
+              <h2 id="building-now-title">{t.buildInPublic.sectionTitle}</h2>
+              <p>{t.buildInPublic.sectionIntro}</p>
+            </div>
+            <Button
+              type="primary"
+              size="large"
+              href={t.buildInPublic.roadmapHref}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {t.buildInPublic.fullRoadmapCta}
+              <ArrowRightOutlined aria-hidden="true" />
+            </Button>
           </div>
           <div className="building-now-grid">
             {buildingNowCards.map((card) => {
@@ -370,15 +382,6 @@ export default function HomeClient({ summary }) {
               );
             })}
           </div>
-          <a
-            className="building-now-cta"
-            href={t.buildInPublic.roadmapHref}
-            rel="noreferrer"
-            target="_blank"
-          >
-            {t.buildInPublic.fullRoadmapCta}
-            <ArrowRightOutlined aria-hidden="true" />
-          </a>
         </section>
       ) : null}
 
@@ -449,12 +452,8 @@ export default function HomeClient({ summary }) {
         </div>
 
         <div className="cleanup-areas-grid">
-          {t.cleanupAreas.items.map((area, index) => (
+          {t.cleanupAreas.items.map((area) => (
             <article className="cleanup-area-card" data-area={area.id} key={area.id}>
-              <div className="cleanup-area-topline">
-                <span className="cleanup-area-number">{String(index + 1).padStart(2, "0")}</span>
-                <h3>{area.title}</h3>
-              </div>
               <div className="cleanup-area-image">
                 <Image
                   alt={area.imageAlt}
@@ -463,6 +462,7 @@ export default function HomeClient({ summary }) {
                   src={area.image}
                 />
               </div>
+              <h3>{area.title}</h3>
               <p>{area.body}</p>
             </article>
           ))}

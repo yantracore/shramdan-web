@@ -36,6 +36,7 @@ export function getRoadmapSummary() {
   let overallPercent = null;
   const phases = [];
   const inProgressAll = [];
+  const pendingAll = [];
   const doneRecent = [];
   let currentPhase = null;
 
@@ -76,6 +77,9 @@ export function getRoadmapSummary() {
 
     if (status === "~") {
       inProgressAll.push(base);
+    } else if (status === " ") {
+      if (HIDDEN_PHASES.has(currentPhase.number)) continue;
+      pendingAll.push(base);
     } else if (status === "x") {
       const dateMatch = rest.match(DONE_DATE_RE);
       if (!dateMatch) continue;
@@ -91,13 +95,18 @@ export function getRoadmapSummary() {
     (item) => ![...activeIds].some((other) => other !== item.id && other.startsWith(`${item.id}.`))
   );
 
+  const pendingIds = new Set(pendingAll.map((p) => p.id));
+  const upcoming = pendingAll.filter(
+    (item) => ![...pendingIds].some((other) => other !== item.id && item.id.startsWith(`${other}.`))
+  );
+
   const doneIds = new Set(doneRecent.map((d) => d.id));
   const recentlyDone = doneRecent
     .filter((item) => ![...doneIds].some((other) => other !== item.id && item.id.startsWith(`${other}.`)))
     .sort((a, b) => (a.doneAt < b.doneAt ? 1 : a.doneAt > b.doneAt ? -1 : 0))
     .slice(0, RECENT_DONE_CAP);
 
-  cached = { overallPercent, phases, inProgress, recentlyDone };
+  cached = { overallPercent, phases, inProgress, upcoming, recentlyDone };
   return cached;
 }
 
