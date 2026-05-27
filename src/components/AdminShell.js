@@ -2,6 +2,7 @@
 
 import {
   AppstoreOutlined,
+  BarChartOutlined,
   CalendarOutlined,
   EnvironmentOutlined,
   FormOutlined,
@@ -37,7 +38,8 @@ function getUserInitials(name, email) {
 
 const adminNavGroups = [
   [
-    { href: "/admin", icon: <AppstoreOutlined />, label: "Dashboard" }
+    { href: "/admin", icon: <AppstoreOutlined />, label: "Dashboard" },
+    { href: "/admin/reports", icon: <BarChartOutlined />, label: "Reports" }
   ],
   [
     { href: "/admin/applications", icon: <FormOutlined />, label: "Applications" },
