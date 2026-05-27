@@ -1,8 +1,8 @@
 {
   "source": "https://backend.shramdan.org/api-docs.json",
   "localPath": "docs/07-api-reference.json",
-  "lastFetchedAt": "2026-05-26T13:03:47+05:45",
-  "lastFetchedAtDisplay": "2026-05-26 13:03 NPT",
+  "lastFetchedAt": "2026-05-27T06:20:50+05:45",
+  "lastFetchedAtDisplay": "2026-05-27 06:20 NPT",
   "stalenessThresholdHours": 6,
   "timezone": "Asia/Kathmandu (UTC+05:45)",
   "fetchCommand": "curl -fsSL https://backend.shramdan.org/api-docs.json -o docs/07-api-reference.json",

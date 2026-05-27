@@ -119,7 +119,13 @@ export function getFirstIssueImage(issue) {
 }
 
 export function getIssueCoverImageUrl(issue) {
-  const raw = issue?.coverImage;
+  if (!issue) return null;
+  const uploads = Array.isArray(issue.uploads) ? issue.uploads : [];
+  if (issue.coverImageId) {
+    const match = uploads.find((upload) => upload?.id === issue.coverImageId);
+    if (match?.url) return match.url;
+  }
+  const raw = issue.coverImage;
   if (typeof raw === "string" && raw) return raw;
   if (raw && typeof raw === "object" && typeof raw.url === "string" && raw.url) return raw.url;
   return getFirstIssueImage(issue)?.url || null;

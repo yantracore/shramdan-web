@@ -36,14 +36,15 @@ function pickEditableFields(issue) {
   }, {});
 
   const coverUrl = getIssueCoverImageUrl(issue);
-  if (coverUrl) {
-    data.cover = { url: coverUrl };
+  const coverId = issue?.coverImageId || null;
+  if (coverUrl || coverId) {
+    data.cover = { id: coverId, url: coverUrl };
   }
 
   const uploads = Array.isArray(issue?.uploads) ? issue.uploads : [];
   const additionalImages = uploads
     .filter(isImageUpload)
-    .filter((upload) => upload.url !== coverUrl)
+    .filter((upload) => upload.id !== coverId && upload.url !== coverUrl)
     .map((upload) => ({ id: upload.id, url: upload.url }));
   data.additionalImages = additionalImages;
 
@@ -102,12 +103,12 @@ export default function AdminIssueEditPage() {
     setSubmitting(true);
 
     const { cover, additionalImages, ...rest } = values;
-    const originalCoverUrl = initialValues?.cover?.url || null;
-    const nextCoverUrl = cover?.url || null;
+    const originalCoverId = initialValues?.cover?.id || null;
+    const nextCoverId = cover?.id || null;
 
     const payload = { ...rest };
-    if (nextCoverUrl !== originalCoverUrl) {
-      payload.coverImage = nextCoverUrl;
+    if (nextCoverId !== originalCoverId) {
+      payload.coverImageId = nextCoverId;
     }
 
     const originalIds = (initialValues?.additionalImages || []).map((image) => image.id);

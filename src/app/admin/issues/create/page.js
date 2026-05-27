@@ -21,7 +21,7 @@ export default function AdminIssueCreatePage() {
 
     const { cover, additionalImages, ...rest } = values;
     const payload = { ...rest };
-    if (cover?.url) payload.coverImage = cover.url;
+    if (cover?.id) payload.coverImageId = cover.id;
     if (Array.isArray(additionalImages) && additionalImages.length) {
       payload.uploadIds = additionalImages.map((image) => image.id);
     }
