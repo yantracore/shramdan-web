@@ -75,7 +75,7 @@ export const copy = {
       relativeDaysAgo: "{n} दिनअघि तयार",
       relativeUpcoming: "लाइनमा",
       fallbackBlurb: "रोडम्यापको यो खण्डमा सक्रिय काम; पूर्ण विवरण रोडम्यापमा हेर्नुहोस्।",
-      fullRoadmapCta: "सबै काम र प्रगति रोडम्यापमा हेर्नुहोस्",
+      fullRoadmapCta: "रोडम्याप पढ्नुहोस्",
       taskOverrides: {
         "1.5.1": {
           title: "इश्युमा भोट हाल्ने सुविधा",
@@ -808,7 +808,7 @@ export const copy = {
       relativeDaysAgo: "Shipped {n} days ago",
       relativeUpcoming: "On deck",
       fallbackBlurb: "Active work in this part of the roadmap; full detail on the roadmap.",
-      fullRoadmapCta: "See All Tasks & Progress on the Roadmap",
+      fullRoadmapCta: "Read The Roadmap",
       taskOverrides: {
         "1.5.1": {
           title: "Vote on community issues",
