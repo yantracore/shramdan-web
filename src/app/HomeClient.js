@@ -81,6 +81,7 @@ const resourceIcons = {
   discord: MessageOutlined,
   apiDocs: ApiOutlined,
   presentation: FilePptOutlined,
+  roadmap: BuildOutlined,
   documents: FileTextOutlined,
   github: GithubOutlined
 };

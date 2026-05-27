@@ -391,6 +391,13 @@ export const copy = {
           href: "https://drive.google.com/drive/folders/19Iuu_W7GRhD9F6qph0A8drKJQlN2UbUy"
         },
         {
+          id: "roadmap",
+          title: "विकास योजना (रोडम्याप)",
+          description: "श्रमदान एप निर्माणका चरण, कार्यसूची र प्रगति समेटिएको पूरै मास्टर रोडम्याप।",
+          button: "रोडम्याप खोल्नुहोस्",
+          href: "https://github.com/yantracore/shramdan-web/blob/main/docs/00-master-roadmap.md"
+        },
+        {
           id: "documents",
           title: "गिटहब कागजातहरू",
           description: "योजना, रूपरेखा, कार्यान्वयन, एपीआई सन्दर्भ र सुरक्षा/कार्यक्रम मोडेलका कागजातहरू स्रोत भण्डारमै राखिएका छन्।",
@@ -1121,6 +1128,13 @@ export const copy = {
           description: "Mission notes and the full development walkthrough from the Shramdan livestream.",
           button: "Open Slides",
           href: "https://drive.google.com/drive/folders/19Iuu_W7GRhD9F6qph0A8drKJQlN2UbUy"
+        },
+        {
+          id: "roadmap",
+          title: "Development Roadmap",
+          description: "The full master roadmap — phases, tasks, and progress that drive the Shramdan app build.",
+          button: "Open Roadmap",
+          href: "https://github.com/yantracore/shramdan-web/blob/main/docs/00-master-roadmap.md"
         },
         {
           id: "documents",
