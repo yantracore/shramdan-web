@@ -6,10 +6,10 @@
 >
 > **Companion doc:** improvements to *already-shipped* features live in [00-polish-backlog.md](00-polish-backlog.md), not here. The roadmap is for discrete ship work; polish is continuous and tracked separately so this file stays focused.
 
-## Overall Progress — 21%
+## Overall Progress — 23%
 
 ```
-0% [=====================-------------------------------------------------------------------------------] 100%
+0% [=======================-----------------------------------------------------------------------------] 100%
 ```
 
 The bar is 100 characters wide so each `=` equals exactly one percentage point. Recompute and redraw the bar in the same edit that changes any phase percentage — see [Aggregate Progress](#aggregate-progress) for the per-phase breakdown that feeds this number.
@@ -84,11 +84,11 @@ If the user gives a high-level instruction like "let's continue", read this file
 
 Use this section as a short-lived hint of what would be a sensible next step *right now*. Agents may rewrite this list freely as priorities shift. Keep to 3-5 items, ordered. When proposing "what's next", agents must also consult open `P1` items in [00-polish-backlog.md](00-polish-backlog.md) and mix them in here when they outweigh a fresh ship leaf.
 
-1. Phase 1.5 voting wired end-to-end (Block B) — vote button currently visible-but-disabled in 1.2.2; activate `POST/DELETE /issues/{id}/vote` with sign-in prompt for un-authed users.
-2. Phase 1.4 public sharing — OG tags + share button on `/issues/[id]`; small, leverages existing detail page.
-3. Phase 3.2 public campaign detail page — backend `GET /events/{id}` is ready; the natural next read-only public surface after issues.
-4. Decide stack for member portal `/app` (Phase 2) — needed before phone+OTP work can begin; biggest blocker for member-side voting.
-5. Triage Phase 9.5 issues CRUD against [09-backend-admin-gaps.md](09-backend-admin-gaps.md) — confirm which mutation endpoints have landed since the admin create page was added.
+1. Phase 2.1 phone+OTP member signup — biggest unlock; without member auth, 1.5 voting and `/app` dashboard stay blocked. Needs Phase 2 stack decision in the same swing.
+2. Decide stack for member portal `/app` (Phase 2) — Expo / Capacitor / Next-only — feeds into 2.1.
+3. Phase 3.2 public campaign detail page — backend `GET /events/{id}` is ready; sensible next read-only public surface after issues. *(Deferred per user 2026-05-27 — revisit later.)*
+4. Triage Phase 9.5 issues CRUD against [09-backend-admin-gaps.md](09-backend-admin-gaps.md) — confirm which mutation endpoints have landed since the admin create page was added.
+5. Set `metadataBase` in root layout + sitemap.xml + robots.txt (Phase 11.4 SEO leaf) — small, complements 1.4.2 OG work.
 
 ---
 
@@ -114,7 +114,7 @@ Goal: A live public site, deployable, with the basic surfaces users currently se
 - [x] 0.6 Docs 01–10 set authored `w:1` ← done: 2026-05-20
 - [x] 0.7 Bilingual EN/NE on every existing public surface `w:1` ← done: 2026-05-25 *(homepage, `/join`, `/feedback`, public footer, form validation, error toasts — all wired through `copy[language]` in `src/lib/siteContent.js`. Admin shell stays EN-only per product decision. New public pages must add `np` + `en` entries when built; tracked under their own phases, not here.)*
 
-## Phase 1 — Public Issue Discovery & Voting `w:15` 📊 40%
+## Phase 1 — Public Issue Discovery & Voting `w:15` 📊 53%
 
 Goal: Anyone (logged-in or not) can browse listed issues, see detail, and — once authenticated — vote.
 
@@ -124,14 +124,16 @@ Goal: Anyone (logged-in or not) can browse listed issues, see detail, and — on
   - [x] 1.1.3 Empty / loading / error states (no mock fallback) `w:1` ← done: 2026-05-25
 - [x] 1.2 Issue detail `/issues/[id]` `w:3` ← done: 2026-05-25
   - [x] 1.2.1 Description, location, evidence gallery `w:1` ← done: 2026-05-25
-  - [ ] 1.2.2 Vote action + live count `w:1` *(Block B; visible-but-disabled in Block A with "Sign in to vote" tooltip)*
+  - [!] 1.2.2 Vote action + live count `w:1` ← blocked: needs Phase 2.1 member auth *(Block A shipped: vote button is visible-but-disabled on `/issues/[id]`; un-authed click routes to `/login`. Block B activation waits on member signup.)*
   - [x] 1.2.3 Related / nearby issues `w:1` ← done: 2026-05-25
 - [ ] 1.3 Map view with pins `w:2` *(optional v1.1)*
-- [ ] 1.4 Public sharing — OG tags + share button `w:2`
-- [ ] 1.5 Voting wired end-to-end `w:4`
-  - [ ] 1.5.1 `POST /issues/{id}/vote` + `DELETE` un-vote `w:1`
-  - [ ] 1.5.2 Optimistic UI + auth gating (prompt sign-in) `w:2`
-  - [ ] 1.5.3 Voter role tagging (volunteer / donor / etc.) `w:1`
+- [x] 1.4 Public sharing `w:2` ← done: 2026-05-27
+  - [x] 1.4.1 Share buttons (Facebook / Twitter / WhatsApp / Telegram / LinkedIn + copy link) on `/issues/[id]` `w:1` ← done: 2026-05-26 *(`IssueShareRow` via `react-share`; wired into issue detail page.)*
+  - [x] 1.4.2 OG tags + `generateMetadata` on `/issues/[id]` for rich link previews `w:1` ← done: 2026-05-27 *(`src/app/issues/[id]/layout.js` server layout; openGraph + twitter card with cover image; 5-min revalidation cache.)*
+- [!] 1.5 Voting wired end-to-end `w:4` ← blocked: needs Phase 2.1 member auth
+  - [!] 1.5.1 `POST /issues/{id}/vote` + `DELETE` un-vote `w:1` ← blocked: needs Phase 2.1 member auth
+  - [!] 1.5.2 Optimistic UI + auth gating (prompt sign-in) `w:2` ← blocked: needs Phase 2.1 member auth
+  - [!] 1.5.3 Voter role tagging (volunteer / donor / etc.) `w:1` ← blocked: needs Phase 2.1 member auth
 
 ## Phase 2 — Member Portal `/app` (Mobile-style Web Shell) `w:18` 📊 0%
 
@@ -276,7 +278,7 @@ Weighted across all phases (sum of phase weights = 125):
 | Phase | Weight | Progress |
 | --- | --- | --- |
 | 0 Foundation | 10 | 100% |
-| 1 Public Issue Discovery & Voting | 15 | 40% |
+| 1 Public Issue Discovery & Voting | 15 | 53% |
 | 2 Member Portal `/app` | 18 | 0% |
 | 3 Campaign Execution | 15 | 5% |
 | 4 Operational Safety | 8 | 0% |
@@ -289,7 +291,7 @@ Weighted across all phases (sum of phase weights = 125):
 | 11 Cross-cutting | 10 | 25% |
 | 12 Documentation & Community | 5 | 40% |
 
-**Overall: ≈ 21%** (weighted sum / total weight; recompute on every edit, and redraw the [Overall Progress](#overall-progress--21) bar near the top of this file in the same edit).
+**Overall: ≈ 23%** (weighted sum / total weight; recompute on every edit, and redraw the [Overall Progress](#overall-progress--23) bar near the top of this file in the same edit).
 
 # How To Update This Document
 
