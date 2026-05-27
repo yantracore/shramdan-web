@@ -6,10 +6,10 @@
 >
 > **Companion doc:** improvements to *already-shipped* features live in [00-polish-backlog.md](00-polish-backlog.md), not here. The roadmap is for discrete ship work; polish is continuous and tracked separately so this file stays focused.
 
-## Overall Progress — 25%
+## Overall Progress — 24%
 
 ```
-0% [=========================---------------------------------------------------------------------------] 100%
+0% [========================----------------------------------------------------------------------------] 100%
 ```
 
 The bar is 100 characters wide so each `=` equals exactly one percentage point. Recompute and redraw the bar in the same edit that changes any phase percentage — see [Aggregate Progress](#aggregate-progress) for the per-phase breakdown that feeds this number.
@@ -84,11 +84,12 @@ If the user gives a high-level instruction like "let's continue", read this file
 
 Use this section as a short-lived hint of what would be a sensible next step *right now*. Agents may rewrite this list freely as priorities shift. Keep to 3-5 items, ordered. When proposing "what's next", agents must also consult open `P1` items in [00-polish-backlog.md](00-polish-backlog.md) and mix them in here when they outweigh a fresh ship leaf.
 
-1. Phase 2.1 phone+OTP member signup — biggest unlock; without member auth, 1.5 voting and `/app` dashboard stay blocked. Needs Phase 2 stack decision in the same swing.
-2. Decide stack for member portal `/app` (Phase 2) — Expo / Capacitor / Next-only — feeds into 2.1.
-3. Phase 3.2 public campaign detail page — backend `GET /events/{id}` is ready; sensible next read-only public surface after issues. *(Deferred per user 2026-05-27 — revisit later.)*
-4. Triage Phase 9.5 issues CRUD against [09-backend-admin-gaps.md](09-backend-admin-gaps.md) — confirm which mutation endpoints have landed since the admin create page was added.
-5. Set `metadataBase` in root layout + sitemap.xml + robots.txt (Phase 11.4 SEO leaf) — small, complements 1.4.2 OG work.
+1. Phase 9.11.1 EN+NE field pairs on admin `IssueForm` — frontend-only slice the user flagged 2026-05-27; unblocks bilingual public issue copy without waiting on the translation API (9.11.2 stays blocked).
+2. Phase 2.1 phone+OTP member signup — biggest unlock; without member auth, 1.5 voting and `/app` dashboard stay blocked. Needs Phase 2 stack decision in the same swing.
+3. Decide stack for member portal `/app` (Phase 2) — Expo / Capacitor / Next-only — feeds into 2.1.
+4. Phase 3.2 public campaign detail page — backend `GET /events/{id}` is ready; sensible next read-only public surface after issues. *(Deferred per user 2026-05-27 — revisit later.)*
+5. Triage Phase 9.5 issues CRUD against [09-backend-admin-gaps.md](09-backend-admin-gaps.md) — confirm which mutation endpoints have landed since the admin create page was added.
+6. Set `metadataBase` in root layout + sitemap.xml + robots.txt (Phase 11.4 SEO leaf) — small, complements 1.4.2 OG work.
 
 ---
 
@@ -225,7 +226,7 @@ Goal: Safety leads, medical professionals, and admins can manage real-world risk
 - [ ] 8.3 PWA push notifications `w:1`
 - [ ] 8.4 AI assistant on WhatsApp / Messenger / IG `w:2` *(future / Meta API)*
 
-## Phase 9 — Admin Control Center Expansion `w:10` 📊 55%
+## Phase 9 — Admin Control Center Expansion `w:10` 📊 57%
 
 Goal: Every public-facing entity has an admin counterpart with full CRUD + audit, gated by role.
 
@@ -241,6 +242,13 @@ Goal: Every public-facing entity has an admin counterpart with full CRUD + audit
 - [ ] 9.8 Notifications admin (templates + queue) `w:1`
 - [ ] 9.9 Audit log + activity feed `w:1`
 - [x] 9.10 Users browse list (`/admin/users`, read-only) `w:1` ← done: 2026-05-25 *(UI ready; staging `GET /users` returns 500 due to backend `take` Int cast bug — see [09-backend-admin-gaps.md](09-backend-admin-gaps.md))*
+- [ ] 9.11 Bilingual issue creation (admin EN+NE fields) `w:2` *(Admin shell stays EN-only, but free-text content authored here surfaces on the bilingual public site, so it must be captured in both languages at creation time. Today `IssueForm` accepts one language only and the public detail/list pages render whatever string was saved — there is no `np` / `en` split for issue records. See [project_language_scope](../../../.claude/projects/c--Users---------Desktop-Shramdan-apps-shramdan-web/memory/project_language_scope.md).)*
+  - [ ] 9.11.1 EN + NE input pairs on `/admin/issues/create` + `/admin/issues/[id]/edit` for free-text fields (title, description, location label; category stays a dropdown) `w:1`
+  - [!] 9.11.2 Translation API auto-suggest (NE ↔ EN on blur, editable) `w:1` ← blocked: backend translation endpoint not yet shipped
+  - [ ] 9.11.3 Public `/issues` list + detail consume bilingual fields via existing `copy[language]` switch `w:0` *(downstream of 9.11.1 landing on backend; tracked here so it isn't forgotten — flip to a real weight once the data shape lands)*
+- [x] 9.12 Admin reports analytics page + dashboard overhaul `w:2` ← done: 2026-05-27 *(Wires the admin-only `GET /api/v1/reports` aggregated endpoint into the control center. Public-facing counterpart for citizens lives in Phase 13, not here.)*
+  - [x] 9.12.1 `/admin/reports` page — filter bar (date range, bucket, top-N, sections, geography, advanced per-domain) + 9 section panels (Overview / Users / Issues / Events / Engagement / Feedback / Applications / Uploads / Geographic) via `@ant-design/charts` `w:1` ← done: 2026-05-27
+  - [x] 9.12.2 `/admin` dashboard rewrite — hero + quick actions + overview KPIs + "Needs attention" shortcuts + community pulse + key panels + jump-links (replaces the static module-card grid) `w:1` ← done: 2026-05-27
 
 ## Phase 10 — Native Mobile App `w:5` 📊 0%
 
@@ -269,11 +277,23 @@ Goal: Ship native iOS + Android once `/app` web shell is stable. Reuse the same 
 - [ ] 12.3 Public FAQ on website `w:1`
 - [ ] 12.4 Decision log / ADRs `w:1`
 
+## Phase 13 — Public Reports & Transparency Surface `w:6` 📊 0%
+
+Goal: Surface a *public-safe* analytics layer across the website so citizens and members can see the community's footprint at a glance — how many issues, where they are, what's pending. Most numbers double as deep-links into filtered list pages, so a reader can click "Pending issues: 86" and land on `/issues?status=OPEN` ready to act. Distinct from Phase 9.12 (admin-only `/admin/reports`), which is operational and reveals admin-sensitive data. Pre-implementation: confirm the backend public-reports endpoint name and exactly which fields are public-safe (no PII, no admin-only counts) before wiring any UI.
+
+- [!] 13.1 Public reports API client + bilingual labels `w:1` ← blocked: awaiting backend `GET /api/v1/public-reports` (name TBD) — confirm shape and the public-safe field allowlist before building the client
+- [ ] 13.2 Dedicated public reports page (`/reports` or `/impact`, route TBD) `w:2`
+  - [ ] 13.2.1 Page route + bilingual EN+NE shell + SEO meta `w:1` *(must ship with `np` + `en` copy per the standing rule in 11.3)*
+  - [ ] 13.2.2 Headline KPIs + geographic distribution + issue/event mix + simple time-series (read-only; no admin filters, no PII) `w:1`
+- [ ] 13.3 Homepage embed — community pulse strip `w:1` *(2–4 hero KPIs near the existing hero — e.g. issues reported, events held, volunteers active — each linking to its filtered list page; reuses chart-light primitives so it stays lightweight)*
+- [ ] 13.4 Deep-link convention from KPIs → filtered list pages `w:1` *("Pending issues: N" → `/issues?status=OPEN`, "This week's events" → `/events?range=week`, etc. Spec the URL query contract once in [10-frontend-api-usage.md](10-frontend-api-usage.md) and reuse for every KPI link. Needs `/issues` (and eventually `/events`) to honor the listed query params.)*
+- [ ] 13.5 Bilingual EN+NE copy across all public report surfaces `w:1` *(Brand stays श्रमदान in NE; numbers stay Latin digits unless we make a deliberate choice otherwise — open question.)*
+
 ---
 
 # Aggregate Progress
 
-Weighted across all phases (sum of phase weights = 125):
+Weighted across all phases (sum of phase weights = 131):
 
 | Phase | Weight | Progress |
 | --- | --- | --- |
@@ -286,12 +306,13 @@ Weighted across all phases (sum of phase weights = 125):
 | 6 Transparency & Ledger | 8 | 0% |
 | 7 Impact Stories | 5 | 0% |
 | 8 Notifications & Outreach | 6 | 0% |
-| 9 Admin Control Center | 10 | 55% |
+| 9 Admin Control Center | 10 | 57% |
 | 10 Native Mobile App | 5 | 0% |
 | 11 Cross-cutting | 10 | 25% |
 | 12 Documentation & Community | 5 | 40% |
+| 13 Public Reports & Transparency Surface | 6 | 0% |
 
-**Overall: ≈ 25%** (weighted sum / total weight; recompute on every edit, and redraw the [Overall Progress](#overall-progress--25) bar near the top of this file in the same edit).
+**Overall: ≈ 24%** (weighted sum / total weight; recompute on every edit, and redraw the [Overall Progress](#overall-progress--24) bar near the top of this file in the same edit).
 
 # How To Update This Document
 
