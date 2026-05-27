@@ -2,9 +2,12 @@
 
 import {
   ApiOutlined,
+  AppstoreOutlined,
   ArrowRightOutlined,
   BankOutlined,
+  BarChartOutlined,
   BgColorsOutlined,
+  BuildOutlined,
   BugOutlined,
   CalendarOutlined,
   CheckCircleOutlined,
@@ -12,20 +15,31 @@ import {
   CodeOutlined,
   DatabaseOutlined,
   EditOutlined,
+  EnvironmentOutlined,
   FilePptOutlined,
   FileTextOutlined,
   GithubOutlined,
+  GlobalOutlined,
   HeartOutlined,
+  HomeOutlined,
+  LikeOutlined,
   LineChartOutlined,
+  LoadingOutlined,
   MessageOutlined,
+  MobileOutlined,
   PlayCircleOutlined,
   RocketOutlined,
+  SafetyOutlined,
+  ShareAltOutlined,
   TeamOutlined,
   ToolOutlined,
+  TranslationOutlined,
+  UnorderedListOutlined,
+  UserOutlined,
   VideoCameraOutlined,
   YoutubeOutlined
 } from "@ant-design/icons";
-import { Button, Progress, Tag } from "antd";
+import { Button, Progress } from "antd";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { SiteShell } from "@/components/SiteShell";
@@ -93,12 +107,106 @@ const workflowStepIcons = {
   results: LineChartOutlined
 };
 
+const buildingNowIconByKey = {
+  vote: LikeOutlined,
+  share: ShareAltOutlined,
+  page: FileTextOutlined,
+  list: UnorderedListOutlined,
+  roadmap: BuildOutlined,
+  home: HomeOutlined,
+  auth: UserOutlined,
+  campaign: TeamOutlined,
+  mobile: MobileOutlined,
+  translate: TranslationOutlined,
+  report: BarChartOutlined,
+  safety: SafetyOutlined,
+  api: ApiOutlined,
+  location: EnvironmentOutlined,
+  notify: MessageOutlined,
+  global: GlobalOutlined
+};
+
+const buildingNowIconByPhase = {
+  0: HomeOutlined,
+  1: LikeOutlined,
+  2: MobileOutlined,
+  3: TeamOutlined,
+  4: SafetyOutlined,
+  5: HeartOutlined,
+  6: GlobalOutlined,
+  7: FileTextOutlined,
+  8: MessageOutlined,
+  10: MobileOutlined,
+  13: BarChartOutlined,
+  14: BuildOutlined
+};
+
+function pickBuildingNowIcon(iconKey, phaseNumber) {
+  return (
+    buildingNowIconByKey[iconKey] ||
+    buildingNowIconByPhase[phaseNumber] ||
+    AppstoreOutlined
+  );
+}
+
+function relativeShippedLabel(doneAt, t) {
+  const today = new Date();
+  const todayUtc = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate());
+  const doneUtc = Date.parse(`${doneAt}T00:00:00Z`);
+  if (Number.isNaN(doneUtc)) return null;
+  const days = Math.max(0, Math.round((todayUtc - doneUtc) / (1000 * 60 * 60 * 24)));
+  if (days === 0) return t.buildInPublic.relativeToday;
+  if (days === 1) return t.buildInPublic.relativeYesterday;
+  return t.buildInPublic.relativeDaysAgo.replace("{n}", String(days));
+}
+
+function buildBuildingNowItems({ inProgress, recentlyDone, t, maxCards = 6 }) {
+  const overrides = t.buildInPublic.taskOverrides || {};
+  const cards = [];
+  for (const item of inProgress) {
+    const o = overrides[item.id];
+    if (!o) continue;
+    cards.push({
+      key: `active-${item.id}`,
+      status: "active",
+      statusLabel: t.buildInPublic.statusActive,
+      id: item.id,
+      title: o.title,
+      blurb: o.blurb || t.buildInPublic.fallbackBlurb,
+      iconKey: o.iconKey,
+      phaseNumber: item.phaseNumber,
+      meta: null
+    });
+  }
+  for (const item of recentlyDone) {
+    if (cards.length >= maxCards) break;
+    const o = overrides[item.id];
+    if (!o) continue;
+    cards.push({
+      key: `shipped-${item.id}`,
+      status: "shipped",
+      statusLabel: t.buildInPublic.statusShipped,
+      id: item.id,
+      title: o.title,
+      blurb: o.blurb || t.buildInPublic.fallbackBlurb,
+      iconKey: o.iconKey,
+      phaseNumber: item.phaseNumber,
+      meta: relativeShippedLabel(item.doneAt, t)
+    });
+  }
+  return cards.slice(0, maxCards);
+}
+
 export default function HomeClient({ summary }) {
   const { language } = usePreferences();
   const t = copy[language];
   const isLiveNow = useIsLiveNow();
   const overallPercent = summary?.overallPercent ?? null;
-  const inProgress = summary?.inProgress ?? [];
+  const buildingNowCards = buildBuildingNowItems({
+    inProgress: summary?.inProgress ?? [],
+    recentlyDone: summary?.recentlyDone ?? [],
+    t
+  });
   const featuredResources = t.heroPanel.resources.map((resource) => {
     const item = t.resources.items.find((candidate) => candidate.id === resource.id);
     const Icon = resourceIcons[resource.id] ?? FileTextOutlined;
@@ -190,7 +298,7 @@ export default function HomeClient({ summary }) {
         </aside>
       </section>
 
-      {inProgress.length > 0 ? (
+      {buildingNowCards.length > 0 ? (
         <section className="building-now-section" aria-labelledby="building-now-title">
           <div className="building-now-heading">
             <span className="eyebrow">{t.buildInPublic.sectionEyebrow}</span>
@@ -198,16 +306,47 @@ export default function HomeClient({ summary }) {
             <p>{t.buildInPublic.sectionIntro}</p>
           </div>
           <div className="building-now-grid">
-            {inProgress.map((item) => (
-              <article className="building-now-card" key={item.id}>
-                <div className="building-now-card-top">
-                  <Tag color="#176b5c">{`${t.buildInPublic.phaseLabel} ${item.phaseNumber}`}</Tag>
-                  <span className="building-now-id">{item.id}</span>
-                </div>
-                <h3>{item.label}</h3>
-                <p className="building-now-phase">{item.phaseTitle}</p>
-              </article>
-            ))}
+            {buildingNowCards.map((card) => {
+              const Icon = pickBuildingNowIcon(card.iconKey, card.phaseNumber);
+              const isActive = card.status === "active";
+              return (
+                <article
+                  className={`building-now-card building-now-card--${card.status}`}
+                  key={card.key}
+                >
+                  <div className="building-now-card-head">
+                    <span
+                      className={`building-now-thumb building-now-thumb--${card.status}`}
+                      aria-hidden="true"
+                    >
+                      <Icon />
+                    </span>
+                    <div className="building-now-status-stack">
+                      <span className={`building-now-status building-now-status--${card.status}`}>
+                        {isActive ? (
+                          <LoadingOutlined aria-hidden="true" spin />
+                        ) : (
+                          <CheckCircleOutlined aria-hidden="true" />
+                        )}
+                        {card.statusLabel}
+                      </span>
+                      <span className="building-now-phase-tag">
+                        {`${t.buildInPublic.phaseLabel} ${card.phaseNumber}`}
+                        <span className="building-now-id">· {card.id}</span>
+                      </span>
+                    </div>
+                  </div>
+                  <h3>{card.title}</h3>
+                  <p className="building-now-blurb">{card.blurb}</p>
+                  {card.meta ? (
+                    <span className="building-now-meta">
+                      <CalendarOutlined aria-hidden="true" />
+                      {card.meta}
+                    </span>
+                  ) : null}
+                </article>
+              );
+            })}
           </div>
           <a
             className="building-now-cta"

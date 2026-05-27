@@ -5,14 +5,24 @@ const ROADMAP_PATH = path.join(process.cwd(), "docs", "00-master-roadmap.md");
 const OVERALL_RE = /^## Overall Progress\s*—\s*(\d+)%/;
 const PHASE_RE = /^## Phase\s+(\d+)\s*—\s*(.+?)\s*`w:(\d+)`\s*📊\s*(\d+)%\s*$/;
 const LEAF_RE = /^(\s*)-\s*\[([ x~!\-])\]\s*([\d.]+[a-z]?)\s+(.+?)\s*$/;
+const DONE_DATE_RE = /←\s*done:\s*(\d{4}-\d{2}-\d{2})/;
+
+const HIDDEN_PHASES = new Set([9, 11, 12]);
+const RECENT_WINDOW_DAYS = 14;
+const RECENT_DONE_CAP = 8;
 
 function cleanLabel(rest) {
   return rest
     .replace(/\s*`w:\d+`\s*/g, " ")
     .replace(/\s*←\s*.+$/, "")
     .replace(/\s*\*\([\s\S]+?\)\*\s*$/, "")
+    .replace(/`([^`]+)`/g, "$1")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+function topId(id) {
+  return id.split(".")[0];
 }
 
 let cached = null;
@@ -26,7 +36,10 @@ export function getRoadmapSummary() {
   let overallPercent = null;
   const phases = [];
   const inProgressAll = [];
+  const doneRecent = [];
   let currentPhase = null;
+
+  const cutoffMs = Date.now() - RECENT_WINDOW_DAYS * 24 * 60 * 60 * 1000;
 
   for (const line of lines) {
     const overall = line.match(OVERALL_RE);
@@ -48,22 +61,44 @@ export function getRoadmapSummary() {
     }
 
     const leaf = line.match(LEAF_RE);
-    if (leaf && currentPhase && leaf[2] === "~") {
-      inProgressAll.push({
-        id: leaf[3],
-        label: cleanLabel(leaf[4]),
-        depth: leaf[1].length,
-        phaseNumber: currentPhase.number,
-        phaseTitle: currentPhase.title
-      });
+    if (!leaf || !currentPhase) continue;
+
+    const status = leaf[2];
+    const id = leaf[3];
+    const rest = leaf[4];
+    const base = {
+      id,
+      label: cleanLabel(rest),
+      depth: leaf[1].length,
+      phaseNumber: currentPhase.number,
+      phaseTitle: currentPhase.title
+    };
+
+    if (status === "~") {
+      inProgressAll.push(base);
+    } else if (status === "x") {
+      const dateMatch = rest.match(DONE_DATE_RE);
+      if (!dateMatch) continue;
+      if (HIDDEN_PHASES.has(currentPhase.number)) continue;
+      const ts = Date.parse(`${dateMatch[1]}T00:00:00Z`);
+      if (Number.isNaN(ts) || ts < cutoffMs) continue;
+      doneRecent.push({ ...base, doneAt: dateMatch[1] });
     }
   }
 
-  const ids = new Set(inProgressAll.map((i) => i.id));
+  const activeIds = new Set(inProgressAll.map((i) => i.id));
   const inProgress = inProgressAll.filter(
-    (item) => ![...ids].some((other) => other !== item.id && other.startsWith(`${item.id}.`))
+    (item) => ![...activeIds].some((other) => other !== item.id && other.startsWith(`${item.id}.`))
   );
 
-  cached = { overallPercent, phases, inProgress };
+  const doneIds = new Set(doneRecent.map((d) => d.id));
+  const recentlyDone = doneRecent
+    .filter((item) => ![...doneIds].some((other) => other !== item.id && item.id.startsWith(`${other}.`)))
+    .sort((a, b) => (a.doneAt < b.doneAt ? 1 : a.doneAt > b.doneAt ? -1 : 0))
+    .slice(0, RECENT_DONE_CAP);
+
+  cached = { overallPercent, phases, inProgress, recentlyDone };
   return cached;
 }
+
+export { topId };

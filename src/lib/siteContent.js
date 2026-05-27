@@ -65,11 +65,99 @@ export const copy = {
       roadmapCta: "विस्तृत रोडम्याप हेर्नुहोस्",
       roadmapHref: "https://github.com/yantracore/shramdan-web/blob/main/docs/00-master-roadmap.md",
       phaseLabel: "चरण",
-      sectionEyebrow: "अहिले बनाइँदै",
-      sectionTitle: "अहिले हामी के बनाउँदैछौँ",
+      sectionEyebrow: "अहिले के भइरहेको छ",
+      sectionTitle: "श्रमदान एपमा हालैको प्रगति",
       sectionIntro:
-        "हाम्रो दैनिक १२ बजेको लाइभ स्ट्रिममा सक्रिय रहेका कामहरू। यो सूची रोडम्यापबाटै सिधै आउँछ - काम अघि बढ्दै जाँदा यहीँ अपडेट हुन्छ।",
-      fullRoadmapCta: "सबै काम र प्रगति रोडम्यापमा हेर्नुहोस्"
+        "हाम्रो दैनिक १२ बजेको लाइभ स्ट्रिममा सक्रिय रहेका कामहरू र भर्खर तयार भएका सुविधाहरू। यो सूची रोडम्यापबाटै सिधै आउँछ - काम अघि बढ्दै जाँदा यहीँ आफै अपडेट हुन्छ।",
+      statusActive: "अहिले बनाइँदै",
+      statusShipped: "भर्खर तयार",
+      relativeToday: "आज तयार",
+      relativeYesterday: "हिजो तयार",
+      relativeDaysAgo: "{n} दिनअघि तयार",
+      fallbackBlurb: "रोडम्यापको यो खण्डमा सक्रिय काम; पूर्ण विवरण रोडम्यापमा हेर्नुहोस्।",
+      fullRoadmapCta: "सबै काम र प्रगति रोडम्यापमा हेर्नुहोस्",
+      taskOverrides: {
+        "1.5.1": {
+          title: "इश्युमा भोट हाल्ने सुविधा",
+          blurb:
+            "लगइन गरेका सदस्यले समस्यालाई एक क्लिकमा समर्थन गर्न पाउँछन्। भोट फिर्ता लिने विकल्प पनि चाँडै आउँदै।",
+          iconKey: "vote"
+        },
+        "1.5.3": {
+          title: "भोट दिँदा आफ्नो भूमिका छनोट",
+          blurb: "स्वयंसेवक, दाता, चासो राख्ने - कुन रूपमा समर्थन गर्ने भनी छनोट गर्ने सुविधा।",
+          iconKey: "auth"
+        },
+        "14.1": {
+          title: "लाइभ निर्माण प्रगति होमपेजमै",
+          blurb:
+            "तपाईंले अहिले हेरिरहनुभएको यो खण्ड - रोडम्यापबाटै सिधै आउँछ, हाम्रो दैनिक कामसँगै अपडेट हुन्छ।",
+          iconKey: "roadmap"
+        },
+        "1.5.2": {
+          title: "भोटमा तत्काल प्रतिक्रिया",
+          blurb: "क्लिक गर्नासाथ गणना बढ्ने, लगइन नभए सिधै लगइन पृष्ठमा लैजाने।",
+          iconKey: "vote"
+        },
+        "1.4": {
+          title: "इश्यु शेयरिङ + लिङ्क प्रिभ्यु",
+          blurb:
+            "Facebook, X (Twitter), WhatsApp र Telegram मा शेयर गर्न मिल्ने, साथमा सुन्दर लिङ्क प्रिभ्यु पनि।",
+          iconKey: "share"
+        },
+        "1.2": {
+          title: "इश्यु विस्तृत पृष्ठ",
+          blurb: "हरेक समस्याको पूर्ण विवरण, स्थान, साक्षी फोटो र समर्थक संख्या एकै ठाउँमा।",
+          iconKey: "page"
+        },
+        "1.1": {
+          title: "सार्वजनिक इश्यु सूची",
+          blurb:
+            "सबैले हेर्न मिल्ने समस्याहरूको सूची - स्थिति, श्रेणी र भोटका आधारमा फिल्टर तथा क्रमबद्ध गर्न मिल्ने।",
+          iconKey: "list"
+        },
+        "0.3": {
+          title: "होमपेज + परिचय",
+          blurb:
+            "श्रमदानको अभियान, सहभागिताका तरिकाहरू र स्वयंसेवक भूमिकाहरू एकै पृष्ठमा। यो नै तपाईंको प्रवेश-द्वार हो।",
+          iconKey: "home"
+        },
+        "0.5": {
+          title: "लगइन + व्यवस्थापन शेल",
+          blurb: "टोकनमा आधारित लगइन र भूमिका-आधारित admin control center भित्र पहुँच।",
+          iconKey: "auth"
+        },
+        "0.7": {
+          title: "नेपाली + English द्विभाषिक कभरेज",
+          blurb: "सम्पूर्ण सार्वजनिक पृष्ठहरू दुवै भाषामा - माथिको भाषा बटनबाट तुरुन्तै बदल्न मिल्ने।",
+          iconKey: "translate"
+        },
+        "3.2": {
+          title: "अभियानको सार्वजनिक पृष्ठ",
+          blurb: "प्रत्येक सफाइ अभियानको मिति, स्थान, लक्ष्य र चाहिने सहयोग एकै ठाउँमा।",
+          iconKey: "campaign"
+        },
+        "2.1": {
+          title: "फोन + OTP बाट सदस्यता",
+          blurb: "इमेल नचाहिने, फोन नम्बरबाटै सदस्य बन्न मिल्ने - मोबाइलमा सजिलो।",
+          iconKey: "mobile"
+        },
+        "13.2": {
+          title: "सामुदायिक प्रभाव रिपोर्ट",
+          blurb: "कति इश्यु, कति अभियान, कति स्वयंसेवक - सबैले हेर्न मिल्ने सार्वजनिक तथ्याङ्क।",
+          iconKey: "report"
+        },
+        "14.2": {
+          title: "समर्पित निर्माण प्रगति पृष्ठ",
+          blurb: "रोडम्यापको पूरा विवरण - कुन चरण कति प्रतिशत सकियो, कुन कुरा अहिले बनाइँदै।",
+          iconKey: "roadmap"
+        },
+        "14.3": {
+          title: "सार्वजनिक भोटिङ (Polls)",
+          blurb: "कुन फिचर पहिले बनाउने भन्ने निर्णय समुदायले गर्ने - भोट गरेर रोडम्याप आकार दिनुहोस्।",
+          iconKey: "vote"
+        }
+      }
     },
     cleanupAreas: {
       eyebrow: "के सफा गर्ने?",
@@ -703,11 +791,107 @@ export const copy = {
       roadmapCta: "See Detailed Roadmap",
       roadmapHref: "https://github.com/yantracore/shramdan-web/blob/main/docs/00-master-roadmap.md",
       phaseLabel: "Phase",
-      sectionEyebrow: "Building Now",
-      sectionTitle: "What We're Building Right Now",
+      sectionEyebrow: "What's Happening Now",
+      sectionTitle: "Recent Progress on the Shramdan App",
       sectionIntro:
-        "Tasks actively in progress in our daily 12 PM live stream. This list comes straight from the roadmap and updates as work moves forward.",
-      fullRoadmapCta: "See All Tasks & Progress on the Roadmap"
+        "Work actively underway in our daily 12 PM live stream, alongside features that just shipped. This list comes straight from the roadmap and updates itself as work moves forward.",
+      statusActive: "In Progress",
+      statusShipped: "Just Shipped",
+      relativeToday: "Shipped today",
+      relativeYesterday: "Shipped yesterday",
+      relativeDaysAgo: "Shipped {n} days ago",
+      fallbackBlurb: "Active work in this part of the roadmap; full detail on the roadmap.",
+      fullRoadmapCta: "See All Tasks & Progress on the Roadmap",
+      taskOverrides: {
+        "1.5.1": {
+          title: "Vote on community issues",
+          blurb:
+            "Signed-in members can support an issue with one tap. The option to withdraw a vote is coming soon.",
+          iconKey: "vote"
+        },
+        "1.5.3": {
+          title: "Pick your role when voting",
+          blurb:
+            "Volunteer, donor, or just interested — choose how you're backing this issue when you cast a vote.",
+          iconKey: "auth"
+        },
+        "14.1": {
+          title: "Live build progress on the homepage",
+          blurb:
+            "The section you're looking at right now — pulled straight from the roadmap, updates as daily work moves.",
+          iconKey: "roadmap"
+        },
+        "1.5.2": {
+          title: "Instant feedback when you vote",
+          blurb:
+            "The count moves the moment you tap. If you aren't signed in, we take you straight to the sign-in page.",
+          iconKey: "vote"
+        },
+        "1.4": {
+          title: "Issue sharing + rich link previews",
+          blurb:
+            "Share any issue to Facebook, X (Twitter), WhatsApp, or Telegram — with a clean preview attached.",
+          iconKey: "share"
+        },
+        "1.2": {
+          title: "Full issue detail page",
+          blurb:
+            "Every issue gets its own page — full story, location, evidence photos, and supporter count in one place.",
+          iconKey: "page"
+        },
+        "1.1": {
+          title: "Public issues list",
+          blurb:
+            "Browse every reported issue. Filter and sort by status, category, or most-supported — all in the open.",
+          iconKey: "list"
+        },
+        "0.3": {
+          title: "Homepage + intro",
+          blurb:
+            "The Shramdan mission, ways to participate, and volunteer roles — all on one page. Your entry point.",
+          iconKey: "home"
+        },
+        "0.5": {
+          title: "Login + admin shell",
+          blurb: "Token-based sign-in and a role-gated admin control center for moderators.",
+          iconKey: "auth"
+        },
+        "0.7": {
+          title: "Nepali + English bilingual coverage",
+          blurb:
+            "Every public page reads in both languages — flip with the language toggle at the top.",
+          iconKey: "translate"
+        },
+        "3.2": {
+          title: "Public campaign page",
+          blurb:
+            "Each cleanup campaign gets a page with date, location, goal, and what kind of help is needed.",
+          iconKey: "campaign"
+        },
+        "2.1": {
+          title: "Phone + OTP signup",
+          blurb: "Sign up with just a phone number — no email required. Made for mobile-first onboarding.",
+          iconKey: "mobile"
+        },
+        "13.2": {
+          title: "Community impact reports",
+          blurb:
+            "Public dashboard with issue counts, events run, and volunteers active — open numbers, nothing hidden.",
+          iconKey: "report"
+        },
+        "14.2": {
+          title: "Dedicated build-progress page",
+          blurb:
+            "A full view of the roadmap — every phase, every task, every percentage — for anyone who wants the detail.",
+          iconKey: "roadmap"
+        },
+        "14.3": {
+          title: "Public voting on features (Polls)",
+          blurb:
+            "When we have to choose between options, the community votes. You help shape the roadmap.",
+          iconKey: "vote"
+        }
+      }
     },
     cleanupAreas: {
       eyebrow: "What we clean",
