@@ -1,7 +1,7 @@
 "use client";
 
 import { LeftOutlined, ReloadOutlined, RightOutlined } from "@ant-design/icons";
-import { Button, Empty, Pagination, Select } from "antd";
+import { Button, Empty, Select } from "antd";
 import { useCallback, useEffect, useState } from "react";
 import {
   PublicIssueCard,
@@ -19,9 +19,7 @@ const SORT_OPTIONS = [
   { value: "voteCount", labelKey: "sortMostVotes" },
   { value: "createdAt", labelKey: "sortNewest" }
 ];
-const FETCH_LIMIT = 100;
-const PAGE_SIZE = 20;
-const SKELETON_COUNT = 8;
+const PAGE_SIZE = 3;
 
 function isPublicIssue(issue) {
   return PUBLIC_ISSUE_STATUSES.includes(issue?.status);
@@ -32,7 +30,8 @@ export default function IssuesListPage() {
   const t = copy[language];
   const content = t.issues;
 
-  const [issues, setIssues] = useState([]);
+  const [pages, setPages] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [filters, setFilters] = useState({
@@ -40,39 +39,51 @@ export default function IssuesListPage() {
     category: undefined,
     sort: "voteCount"
   });
-  const [currentPage, setCurrentPage] = useState(1);
 
-  const fetchIssues = useCallback(async () => {
-    setLoading(true);
-    setError("");
-
-    try {
+  const fetchPage = useCallback(
+    async (cursor) => {
       const response = await getJson("/issues", {
         params: {
           status: filters.status,
           category: filters.category,
           sort: filters.sort,
-          limit: FETCH_LIMIT
+          limit: PAGE_SIZE,
+          cursor
         }
       });
-      const list = getListItems(response).filter(isPublicIssue);
-      setIssues(list);
-    } catch (fetchError) {
-      setIssues([]);
-      setError(fetchError?.message || content.states.errorBody);
-    } finally {
-      setLoading(false);
-    }
-  }, [filters, content.states.errorBody]);
+      const items = getListItems(response).filter(isPublicIssue);
+      const nextCursor = response?.data?.nextCursor || null;
+      return { items, nextCursor };
+    },
+    [filters]
+  );
 
   useEffect(() => {
+    let cancelled = false;
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchIssues();
-  }, [fetchIssues]);
+    setLoading(true);
+    setError("");
+    (async () => {
+      try {
+        const page = await fetchPage();
+        if (cancelled) return;
+        setPages([page]);
+        setCurrentPage(1);
+      } catch (fetchError) {
+        if (cancelled) return;
+        setPages([]);
+        setError(fetchError?.message || content.states.errorBody);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [fetchPage, content.states.errorBody]);
 
   const setFilter = (key, value) => {
     setFilters((current) => ({ ...current, [key]: value }));
-    setCurrentPage(1);
   };
 
   const statusOptions = PUBLIC_ISSUE_STATUSES.map((value) => ({
@@ -90,45 +101,78 @@ export default function IssuesListPage() {
     label: content.filters[option.labelKey]
   }));
 
-  const totalIssues = issues.length;
-  const totalPages = Math.max(1, Math.ceil(totalIssues / PAGE_SIZE));
-  const safePage = Math.min(Math.max(1, currentPage), totalPages);
-  const pageStart = (safePage - 1) * PAGE_SIZE;
-  const visibleIssues = issues.slice(pageStart, pageStart + PAGE_SIZE);
+  const knownPages = pages.length;
+  const currentItems = pages[currentPage - 1]?.items || [];
+  const isOnLastCachedPage = currentPage >= knownPages;
+  const lastCursorAvailable = Boolean(pages[currentPage - 1]?.nextCursor);
+  const canGoNext = !loading && (isOnLastCachedPage ? lastCursorAvailable : true);
+  const canGoPrev = !loading && currentPage > 1;
 
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
+  const scrollTop = () => {
     if (typeof window !== "undefined") {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
-  const renderPaginationItem = (page, type, originalElement) => {
-    if (type === "prev") {
-      return (
-        <button className="public-issues-pagination-nav" type="button">
-          <LeftOutlined />
-          <span>{content.pagination.previous}</span>
-        </button>
-      );
-    }
-    if (type === "next") {
-      return (
-        <button className="public-issues-pagination-nav" type="button">
-          <span>{content.pagination.next}</span>
-          <RightOutlined />
-        </button>
-      );
-    }
-    if (type === "page") {
-      return <a>{toLocalDigits(page, language)}</a>;
-    }
-    return originalElement;
+  const handlePrev = () => {
+    if (!canGoPrev) return;
+    setCurrentPage((p) => p - 1);
+    scrollTop();
   };
 
-  const showEmpty = !loading && !error && issues.length === 0;
+  const handleNext = async () => {
+    if (!canGoNext) return;
+    if (currentPage < knownPages) {
+      setCurrentPage((p) => p + 1);
+      scrollTop();
+      return;
+    }
+    const cursor = pages[currentPage - 1]?.nextCursor;
+    if (!cursor) return;
+    setLoading(true);
+    setError("");
+    try {
+      const page = await fetchPage(cursor);
+      setPages((prev) => [...prev, page]);
+      setCurrentPage((p) => p + 1);
+      scrollTop();
+    } catch (fetchError) {
+      setError(fetchError?.message || content.states.errorBody);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleJump = (n) => {
+    if (loading || n < 1 || n > knownPages || n === currentPage) return;
+    setCurrentPage(n);
+    scrollTop();
+  };
+
+  const handleRetry = () => {
+    setLoading(true);
+    setError("");
+    (async () => {
+      try {
+        const page = await fetchPage();
+        setPages([page]);
+        setCurrentPage(1);
+      } catch (fetchError) {
+        setPages([]);
+        setError(fetchError?.message || content.states.errorBody);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  };
+
+  const totalCachedItems = pages.reduce((sum, p) => sum + p.items.length, 0);
   const showError = !loading && Boolean(error);
-  const showResults = !loading && !error && totalIssues > 0;
+  const showEmpty =
+    !loading && !error && pages.length > 0 && totalCachedItems === 0;
+  const showResults = !error && currentItems.length > 0;
+  const showPagination =
+    !error && pages.length > 0 && (knownPages > 1 || lastCursorAvailable);
 
   return (
     <SiteShell>
@@ -139,7 +183,11 @@ export default function IssuesListPage() {
           <p>{content.list.intro}</p>
         </div>
 
-        <div className="public-issues-filters" role="group" aria-label={content.filters.statusLabel}>
+        <div
+          className="public-issues-filters"
+          role="group"
+          aria-label={content.filters.statusLabel}
+        >
           <Select
             allowClear
             aria-label={content.filters.statusLabel}
@@ -171,7 +219,7 @@ export default function IssuesListPage() {
             className="public-issues-grid public-issues-grid-skeleton"
             role="status"
           >
-            {Array.from({ length: SKELETON_COUNT }).map((_, index) => (
+            {Array.from({ length: PAGE_SIZE }).map((_, index) => (
               <PublicIssueCardSkeleton key={index} />
             ))}
           </div>
@@ -181,7 +229,7 @@ export default function IssuesListPage() {
           <div className="public-issues-error" role="alert">
             <h2>{content.states.errorTitle}</h2>
             <p>{content.states.errorBody}</p>
-            <Button icon={<ReloadOutlined />} onClick={fetchIssues} type="primary">
+            <Button icon={<ReloadOutlined />} onClick={handleRetry} type="primary">
               {content.states.retry}
             </Button>
           </div>
@@ -200,33 +248,58 @@ export default function IssuesListPage() {
         ) : null}
 
         {showResults ? (
-          <>
-            <div className="public-issues-grid">
-              {visibleIssues.map((issue) => (
-                <PublicIssueCard
-                  key={issue.id}
-                  issue={issue}
-                  content={content}
-                  language={language}
-                />
-              ))}
-            </div>
-            {totalPages > 1 ? (
-              <nav
-                aria-label={content.pagination.ariaLabel}
-                className="public-issues-pagination"
-              >
-                <Pagination
-                  current={safePage}
-                  itemRender={renderPaginationItem}
-                  onChange={handlePageChange}
-                  pageSize={PAGE_SIZE}
-                  showSizeChanger={false}
-                  total={totalIssues}
-                />
-              </nav>
-            ) : null}
-          </>
+          <div className="public-issues-grid">
+            {currentItems.map((issue) => (
+              <PublicIssueCard
+                key={issue.id}
+                issue={issue}
+                content={content}
+                language={language}
+              />
+            ))}
+          </div>
+        ) : null}
+
+        {showPagination ? (
+          <nav
+            aria-label={content.pagination.ariaLabel}
+            className="public-issues-pagination"
+          >
+            <button
+              className="public-issues-pagination-nav"
+              disabled={!canGoPrev}
+              onClick={handlePrev}
+              type="button"
+            >
+              <LeftOutlined />
+              <span>{content.pagination.previous}</span>
+            </button>
+            {Array.from({ length: knownPages }).map((_, index) => {
+              const num = index + 1;
+              const active = num === currentPage;
+              return (
+                <button
+                  aria-current={active ? "page" : undefined}
+                  className={`public-issues-pagination-page${active ? " is-active" : ""}`}
+                  disabled={loading || active}
+                  key={num}
+                  onClick={() => handleJump(num)}
+                  type="button"
+                >
+                  {toLocalDigits(num, language)}
+                </button>
+              );
+            })}
+            <button
+              className="public-issues-pagination-nav"
+              disabled={!canGoNext}
+              onClick={handleNext}
+              type="button"
+            >
+              <span>{content.pagination.next}</span>
+              <RightOutlined />
+            </button>
+          </nav>
         ) : null}
       </section>
     </SiteShell>

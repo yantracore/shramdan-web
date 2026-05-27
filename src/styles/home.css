@@ -3520,74 +3520,63 @@
 
 .public-issues-pagination {
   display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
   justify-content: center;
   padding-top: 8px;
 }
 
-.public-issues-pagination .ant-pagination {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
+.public-issues-pagination-nav,
+.public-issues-pagination-page {
+  display: inline-flex;
   align-items: center;
-}
-
-.public-issues-pagination .ant-pagination-item,
-.public-issues-pagination .ant-pagination-prev,
-.public-issues-pagination .ant-pagination-next,
-.public-issues-pagination .ant-pagination-jump-prev,
-.public-issues-pagination .ant-pagination-jump-next {
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+  padding: 0 12px;
   border: 1px solid var(--line);
   border-radius: 6px;
   background: var(--surface);
-  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
-}
-
-.public-issues-pagination .ant-pagination-item a {
-  color: var(--text);
-  font-weight: 600;
-}
-
-.public-issues-pagination .ant-pagination-item:hover,
-.public-issues-pagination .ant-pagination-prev:hover,
-.public-issues-pagination .ant-pagination-next:hover {
-  border-color: var(--accent);
-}
-
-.public-issues-pagination .ant-pagination-item:hover a {
-  color: var(--accent);
-}
-
-.public-issues-pagination .ant-pagination-item-active {
-  border-color: var(--accent);
-  background: color-mix(in srgb, var(--accent) 12%, var(--surface));
-}
-
-.public-issues-pagination .ant-pagination-item-active a {
-  color: var(--accent);
-}
-
-.public-issues-pagination-nav {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 0 12px;
-  height: 100%;
-  background: transparent;
-  border: 0;
   color: var(--text);
   font-weight: 600;
   font-size: 14px;
+  line-height: 1;
   cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
 }
 
-.public-issues-pagination .ant-pagination-disabled .public-issues-pagination-nav {
+.public-issues-pagination-nav {
+  gap: 6px;
+}
+
+.public-issues-pagination-nav:not(:disabled):hover,
+.public-issues-pagination-page:not(:disabled):not(.is-active):hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.public-issues-pagination-page.is-active {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+  color: var(--accent);
+  cursor: default;
+}
+
+.public-issues-pagination-nav:disabled,
+.public-issues-pagination-page:disabled:not(.is-active) {
   color: var(--muted);
   cursor: not-allowed;
+  opacity: 0.7;
 }
 
 @media (max-width: 540px) {
   .public-issues-pagination-nav span {
     display: none;
+  }
+  .public-issues-pagination-nav {
+    padding: 0 10px;
+    min-width: 36px;
   }
 }
 
