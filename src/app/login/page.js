@@ -48,7 +48,7 @@ const loginCopy = {
 };
 
 function redirectPathForUser(user) {
-  return isAdminUser(user) ? "/admin" : "/me";
+  return isAdminUser(user) ? "/admin" : "/issues";
 }
 
 export default function LoginPage() {

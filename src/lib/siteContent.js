@@ -556,7 +556,12 @@ export const copy = {
         supportersMany: "{n} समर्थक",
         viewDetail: "विस्तृत",
         voteAction: "समर्थन गर्नुहोस्",
-        voteDisabledTooltip: "समर्थन गर्न साइन इन गर्नुहोस्"
+        voteActionDone: "समर्थन गरियो",
+        voteDisabledTooltip: "समर्थन गर्न साइन इन गर्नुहोस्",
+        voteSuccess: "तपाईंको समर्थन रेकर्ड भयो।",
+        voteAlreadyVoted: "तपाईंले पहिले नै यो समस्यामा समर्थन गर्नुभएको छ।",
+        voteForbidden: "समर्थन गर्न खाता प्रमाणित गर्न आवश्यक छ।",
+        voteError: "समर्थन रेकर्ड गर्न सकिएन। कृपया फेरि प्रयास गर्नुहोस्।"
       },
       states: {
         loading: "समस्याहरू लोड हुँदै...",
@@ -1177,7 +1182,12 @@ export const copy = {
         supportersMany: "{n} supporters",
         viewDetail: "Details",
         voteAction: "Support",
-        voteDisabledTooltip: "Sign in to vote"
+        voteActionDone: "Supported",
+        voteDisabledTooltip: "Sign in to vote",
+        voteSuccess: "Your support has been recorded.",
+        voteAlreadyVoted: "You have already supported this issue.",
+        voteForbidden: "Your account needs to be verified to vote.",
+        voteError: "Could not record your support. Please try again."
       },
       states: {
         loading: "Loading issues...",

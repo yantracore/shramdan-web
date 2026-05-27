@@ -6,10 +6,10 @@
 >
 > **Companion doc:** improvements to *already-shipped* features live in [00-polish-backlog.md](00-polish-backlog.md), not here. The roadmap is for discrete ship work; polish is continuous and tracked separately so this file stays focused.
 
-## Overall Progress — 23%
+## Overall Progress — 25%
 
 ```
-0% [=======================-----------------------------------------------------------------------------] 100%
+0% [=========================---------------------------------------------------------------------------] 100%
 ```
 
 The bar is 100 characters wide so each `=` equals exactly one percentage point. Recompute and redraw the bar in the same edit that changes any phase percentage — see [Aggregate Progress](#aggregate-progress) for the per-phase breakdown that feeds this number.
@@ -114,7 +114,7 @@ Goal: A live public site, deployable, with the basic surfaces users currently se
 - [x] 0.6 Docs 01–10 set authored `w:1` ← done: 2026-05-20
 - [x] 0.7 Bilingual EN/NE on every existing public surface `w:1` ← done: 2026-05-25 *(homepage, `/join`, `/feedback`, public footer, form validation, error toasts — all wired through `copy[language]` in `src/lib/siteContent.js`. Admin shell stays EN-only per product decision. New public pages must add `np` + `en` entries when built; tracked under their own phases, not here.)*
 
-## Phase 1 — Public Issue Discovery & Voting `w:15` 📊 53%
+## Phase 1 — Public Issue Discovery & Voting `w:15` 📊 73%
 
 Goal: Anyone (logged-in or not) can browse listed issues, see detail, and — once authenticated — vote.
 
@@ -124,16 +124,16 @@ Goal: Anyone (logged-in or not) can browse listed issues, see detail, and — on
   - [x] 1.1.3 Empty / loading / error states (no mock fallback) `w:1` ← done: 2026-05-25
 - [x] 1.2 Issue detail `/issues/[id]` `w:3` ← done: 2026-05-25
   - [x] 1.2.1 Description, location, evidence gallery `w:1` ← done: 2026-05-25
-  - [!] 1.2.2 Vote action + live count `w:1` ← blocked: needs Phase 2.1 member auth *(Block A shipped: vote button is visible-but-disabled on `/issues/[id]`; un-authed click routes to `/login`. Block B activation waits on member signup.)*
+  - [x] 1.2.2 Vote action + live count `w:1` ← done: 2026-05-27 *(POST `/issues/{id}/vote` wired via shared `IssueVoteButton` + `useIssueVote` hook; optimistic count++ on click, button flips to "Supported" on success, un-authed click routes to `/login`. Hardcodes `voterRole: "INTERESTED"` — role picker UI deferred to 1.5.3. "Already voted on load" state check pending backend `votedByMe` flag.)*
   - [x] 1.2.3 Related / nearby issues `w:1` ← done: 2026-05-25
 - [ ] 1.3 Map view with pins `w:2` *(optional v1.1)*
 - [x] 1.4 Public sharing `w:2` ← done: 2026-05-27
   - [x] 1.4.1 Share buttons (Facebook / Twitter / WhatsApp / Telegram / LinkedIn + copy link) on `/issues/[id]` `w:1` ← done: 2026-05-26 *(`IssueShareRow` via `react-share`; wired into issue detail page.)*
   - [x] 1.4.2 OG tags + `generateMetadata` on `/issues/[id]` for rich link previews `w:1` ← done: 2026-05-27 *(`src/app/issues/[id]/layout.js` server layout; openGraph + twitter card with cover image; 5-min revalidation cache.)*
-- [!] 1.5 Voting wired end-to-end `w:4` ← blocked: needs Phase 2.1 member auth
-  - [!] 1.5.1 `POST /issues/{id}/vote` + `DELETE` un-vote `w:1` ← blocked: needs Phase 2.1 member auth
-  - [!] 1.5.2 Optimistic UI + auth gating (prompt sign-in) `w:2` ← blocked: needs Phase 2.1 member auth
-  - [!] 1.5.3 Voter role tagging (volunteer / donor / etc.) `w:1` ← blocked: needs Phase 2.1 member auth
+- [~] 1.5 Voting wired end-to-end `w:4` *(POST + optimistic UI live for any logged-in user against existing `/login` email+password flow; DELETE un-vote and `votedByMe` initial-state check still pending backend.)*
+  - [~] 1.5.1 `POST /issues/{id}/vote` + `DELETE` un-vote `w:1` *(POST shipped; DELETE UI pending — needs "I'm withdrawing support" affordance once initial voted state is readable.)*
+  - [x] 1.5.2 Optimistic UI + auth gating (prompt sign-in) `w:2` ← done: 2026-05-27 *(`useIssueVote` increments optimistically, rolls back on error; un-auth click pushes `/login`; post-login redirect now lands non-admin users on `/issues`.)*
+  - [ ] 1.5.3 Voter role tagging (volunteer / donor / etc.) `w:1` *(Backend accepts `voterRole` enum but frontend hardcodes `INTERESTED`; needs a picker on the vote button or a modal before commit.)*
 
 ## Phase 2 — Member Portal `/app` (Mobile-style Web Shell) `w:18` 📊 0%
 
@@ -278,7 +278,7 @@ Weighted across all phases (sum of phase weights = 125):
 | Phase | Weight | Progress |
 | --- | --- | --- |
 | 0 Foundation | 10 | 100% |
-| 1 Public Issue Discovery & Voting | 15 | 53% |
+| 1 Public Issue Discovery & Voting | 15 | 73% |
 | 2 Member Portal `/app` | 18 | 0% |
 | 3 Campaign Execution | 15 | 5% |
 | 4 Operational Safety | 8 | 0% |
@@ -291,7 +291,7 @@ Weighted across all phases (sum of phase weights = 125):
 | 11 Cross-cutting | 10 | 25% |
 | 12 Documentation & Community | 5 | 40% |
 
-**Overall: ≈ 23%** (weighted sum / total weight; recompute on every edit, and redraw the [Overall Progress](#overall-progress--23) bar near the top of this file in the same edit).
+**Overall: ≈ 25%** (weighted sum / total weight; recompute on every edit, and redraw the [Overall Progress](#overall-progress--25) bar near the top of this file in the same edit).
 
 # How To Update This Document
 

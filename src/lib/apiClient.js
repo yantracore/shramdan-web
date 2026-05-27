@@ -172,3 +172,7 @@ export function updateMe(values) {
 export function changePassword(values) {
   return postJson("/auth/change-password", values, { requireAuth: true });
 }
+
+export function voteOnIssue(issueId, voterRole = "INTERESTED") {
+  return postJson(`/issues/${issueId}/vote`, { voterRole }, { requireAuth: true });
+}

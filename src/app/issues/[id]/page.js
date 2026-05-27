@@ -3,23 +3,22 @@
 import {
   ArrowLeftOutlined,
   CalendarOutlined,
-  EnvironmentOutlined,
-  LikeOutlined
+  EnvironmentOutlined
 } from "@ant-design/icons";
-import { Button, Empty, Skeleton, Tag, Tooltip } from "antd";
+import { Button, Empty, Skeleton, Tag } from "antd";
 import Image from "next/image";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
-import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
+import { useParams } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
 import { IssueLocationCard } from "@/components/IssueLocationCard";
 import { IssuePhotoGallery } from "@/components/IssuePhotoGallery";
 import { IssueShareRow } from "@/components/IssueShareRow";
 import { IssueStatusTimeline } from "@/components/IssueStatusTimeline";
+import { IssueVoteButton } from "@/components/IssueVoteButton";
 import { PublicIssueCard, formatSupporters } from "@/components/PublicIssueCard";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
 import { getJson } from "@/lib/apiClient";
-import { getAuthSession, subscribeAuthSession } from "@/lib/authSession";
 import { copy } from "@/lib/siteContent";
 import {
   ISSUE_STATUS_COLORS,
@@ -50,13 +49,10 @@ function formatIssueDate(value, language) {
 
 export default function IssueDetailPage() {
   const params = useParams();
-  const router = useRouter();
   const issueId = params?.id;
   const { language } = usePreferences();
   const t = copy[language];
   const content = t.issues;
-  const session = useSyncExternalStore(subscribeAuthSession, getAuthSession, () => null);
-  const isAuthenticated = Boolean(session?.user);
 
   const [issue, setIssue] = useState(null);
   const [related, setRelated] = useState([]);
@@ -195,17 +191,14 @@ export default function IssueDetailPage() {
                   <span className="public-issue-detail-supporters">
                     {formatSupporters(issue.voteCount, content, language)}
                   </span>
-                  <Tooltip title={isAuthenticated ? "" : content.card.voteDisabledTooltip}>
-                    <Button
-                      disabled={isAuthenticated}
-                      icon={<LikeOutlined />}
-                      onClick={isAuthenticated ? undefined : () => router.push("/login")}
-                      size="large"
-                      type="primary"
-                    >
-                      {content.card.voteAction}
-                    </Button>
-                  </Tooltip>
+                  <IssueVoteButton
+                    content={content}
+                    initialVoteCount={issue.voteCount}
+                    issueId={issue.id}
+                    language={language}
+                    showCount={false}
+                    size="large"
+                  />
                 </div>
               </div>
 

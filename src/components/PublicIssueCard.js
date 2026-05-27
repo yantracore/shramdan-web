@@ -1,13 +1,11 @@
 "use client";
 
-import { ArrowRightOutlined, LikeOutlined } from "@ant-design/icons";
-import { Button, Tag, Tooltip } from "antd";
+import { ArrowRightOutlined } from "@ant-design/icons";
+import { Tag } from "antd";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useSyncExternalStore } from "react";
+import { IssueVoteButton } from "@/components/IssueVoteButton";
 import { ISSUE_STATUS_COLORS, getIssueCoverImageUrl } from "@/lib/adminUtils";
-import { getAuthSession, subscribeAuthSession } from "@/lib/authSession";
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 
@@ -25,19 +23,9 @@ export function formatSupporters(count, content, language) {
 }
 
 export function PublicIssueCard({ issue, content, language }) {
-  const router = useRouter();
-  const session = useSyncExternalStore(subscribeAuthSession, getAuthSession, () => null);
-  const isAuthenticated = Boolean(session?.user);
   const statusLabel = content.statusLabels[issue.status] || issue.status;
   const categoryLabel = content.categoryLabels[issue.category] || issue.category;
   const coverImageUrl = getIssueCoverImageUrl(issue);
-
-  const handleSupportClick = (event) => {
-    event.preventDefault();
-    if (!isAuthenticated) {
-      router.push("/login");
-    }
-  };
 
   return (
     <article className="content-card public-issue-card">
@@ -70,21 +58,14 @@ export function PublicIssueCard({ issue, content, language }) {
         {issue.addressText ? <span>{issue.addressText}</span> : null}
       </div>
       <div className="public-issue-card-actions">
-        <Tooltip title={isAuthenticated ? "" : content.card.voteDisabledTooltip}>
-          <Button
-            aria-disabled={isAuthenticated ? "true" : undefined}
-            className="public-issue-card-support"
-            icon={<LikeOutlined />}
-            onClick={handleSupportClick}
-          >
-            <span className="public-issue-card-support-count">
-              {toLocalDigits(issue.voteCount ?? 0, language)}
-            </span>
-            <span className="public-issue-card-support-label">
-              {content.card.voteAction}
-            </span>
-          </Button>
-        </Tooltip>
+        <IssueVoteButton
+          className="public-issue-card-support"
+          content={content}
+          initialVoteCount={issue.voteCount}
+          issueId={issue.id}
+          language={language}
+          type={undefined}
+        />
         <Link className="card-link" href={`/issues/${issue.id}`}>
           {content.card.viewDetail} <ArrowRightOutlined />
         </Link>
