@@ -121,7 +121,7 @@ export function Providers({ children }) {
   return (
     <PreferenceContext.Provider value={value}>
       <ConfigProvider theme={theme}>
-        <AntdApp component={false}>{children}</AntdApp>
+        <AntdApp>{children}</AntdApp>
       </ConfigProvider>
     </PreferenceContext.Provider>
   );
