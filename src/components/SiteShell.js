@@ -64,6 +64,13 @@ export function SiteShell({ children }) {
     router.replace("/login");
   };
 
+  const handleBrandClick = (event) => {
+    if (pathname === "/" && typeof window !== "undefined" && window.scrollY > 0) {
+      event.preventDefault();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
   const userMenu = isAuthenticated
     ? {
         items: [
@@ -153,7 +160,7 @@ export function SiteShell({ children }) {
         className={`topbar${isHeaderVisible ? "" : " topbar-hidden"}`}
         aria-label={t.ariaLabels.nav}
       >
-        <Link className="brand" href="/" aria-label={t.ariaLabels.home}>
+        <Link className="brand" href="/" aria-label={t.ariaLabels.home} onClick={handleBrandClick}>
           <span className="brand-mark">
             <Image alt="" height={96} priority src="/images/logo.png" width={96} />
           </span>
@@ -269,7 +276,7 @@ export function SiteShell({ children }) {
 
       <footer className="footer" aria-label={t.footer.ariaLabel}>
         <div className="footer-brand">
-          <Link className="footer-logo" href="/" aria-label={t.ariaLabels.home}>
+          <Link className="footer-logo" href="/" aria-label={t.ariaLabels.home} onClick={handleBrandClick}>
             <span className="brand-mark footer-brand-mark">
               <Image alt="" height={96} src="/images/logo.png" width={96} />
             </span>
