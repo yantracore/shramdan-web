@@ -4794,3 +4794,139 @@
     font-size: 22px;
   }
 }
+
+.hero-panel-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: rgba(23, 107, 92, 0.12);
+  border: 1px solid rgba(23, 107, 92, 0.25);
+  margin-top: 12px;
+}
+
+.hero-panel-progress-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--text-primary, #1d2a26);
+}
+
+.hero-panel-progress-row strong {
+  font-size: 18px;
+  color: #176b5c;
+  font-variant-numeric: tabular-nums;
+}
+
+.hero-panel-progress-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #176b5c;
+  text-decoration: none;
+  margin-top: 2px;
+}
+
+.hero-panel-progress-link:hover {
+  text-decoration: underline;
+}
+
+.building-now-section {
+  padding: 56px 24px;
+  max-width: 1180px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.building-now-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 720px;
+}
+
+.building-now-heading h2 {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.25;
+}
+
+.building-now-heading p {
+  margin: 0;
+  color: var(--text-secondary, #4a5a55);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.building-now-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.building-now-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px 20px;
+  border-radius: 12px;
+  background: var(--surface-elevated, #ffffff);
+  border: 1px solid rgba(23, 107, 92, 0.18);
+  box-shadow: 0 1px 2px rgba(15, 32, 28, 0.04);
+}
+
+.building-now-card-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.building-now-id {
+  font-family: var(--font-nunito), ui-monospace, monospace;
+  font-size: 12px;
+  color: var(--text-tertiary, #6b7c77);
+  font-variant-numeric: tabular-nums;
+}
+
+.building-now-card h3 {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.4;
+  color: var(--text-primary, #1d2a26);
+}
+
+.building-now-phase {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-secondary, #4a5a55);
+}
+
+.building-now-cta {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #176b5c;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.building-now-cta:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 620px) {
+  .building-now-section {
+    padding: 40px 20px;
+  }
+
+  .building-now-heading h2 {
+    font-size: 22px;
+  }
+}

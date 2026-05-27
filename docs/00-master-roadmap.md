@@ -6,10 +6,10 @@
 >
 > **Companion doc:** improvements to *already-shipped* features live in [00-polish-backlog.md](00-polish-backlog.md), not here. The roadmap is for discrete ship work; polish is continuous and tracked separately so this file stays focused.
 
-## Overall Progress — 24%
+## Overall Progress — 25%
 
 ```
-0% [========================----------------------------------------------------------------------------] 100%
+0% [=========================---------------------------------------------------------------------------] 100%
 ```
 
 The bar is 100 characters wide so each `=` equals exactly one percentage point. Recompute and redraw the bar in the same edit that changes any phase percentage — see [Aggregate Progress](#aggregate-progress) for the per-phase breakdown that feeds this number.
@@ -289,11 +289,27 @@ Goal: Surface a *public-safe* analytics layer across the website so citizens and
 - [ ] 13.4 Deep-link convention from KPIs → filtered list pages `w:1` *("Pending issues: N" → `/issues?status=OPEN`, "This week's events" → `/events?range=week`, etc. Spec the URL query contract once in [10-frontend-api-usage.md](10-frontend-api-usage.md) and reuse for every KPI link. Needs `/issues` (and eventually `/events`) to honor the listed query params.)*
 - [ ] 13.5 Bilingual EN+NE copy across all public report surfaces `w:1` *(Brand stays श्रमदान in NE; numbers stay Latin digits unless we make a deliberate choice otherwise — open question.)*
 
+## Phase 14 — Building in Public (Process Transparency) `w:6` 📊 33%
+
+Goal: Surface app *development* progress publicly and invite community votes on open feature decisions, so steering is transparent and shared rather than owner-driven. Sibling to Phase 13 (which surfaces community-impact analytics) — this one is about how the platform itself is being built. New in-progress surfaces ship to staging first; production gets only completed slices once a staging environment is split out.
+
+- [x] 14.1 Homepage build-in-public surface `w:2` ← done: 2026-05-27
+  - [x] 14.1.1 Hero panel progress strip rendering overall % parsed from this roadmap `w:1` ← done: 2026-05-27 *(Server Component `src/app/page.js` reads this file via `src/lib/roadmap.js` and passes `summary` into the existing client `HomeClient.js`; Ant `<Progress />` sits inside the `.hero-panel` aside; bilingual copy under `t.buildInPublic`.)*
+  - [x] 14.1.2 "What we're building right now" homepage section listing `[~]` leaves `w:1` ← done: 2026-05-27 *(New `.building-now-section` between hero and core-idea; dedupes parent `[~]` when a child is also `[~]`; phase badge + cleaned label per card; CTA links to the GitHub-hosted roadmap until 14.2.1 ships.)*
+- [ ] 14.2 `/development` dedicated public page `w:2`
+  - [ ] 14.2.1 Layer 1 — markdown render of this roadmap + parsed phase summary table at the top `w:1`
+  - [ ] 14.2.2 Layer 2 — structured tree view (Ant `Tree` / `Collapse` / `Progress` per node, slot for vote affordance on leaves with attached polls) `w:1`
+  - [ ] 14.2.3 Staging-only env gate (`NEXT_PUBLIC_SHOW_DEVELOPMENT`) `w:0` *(404 in production until polished; completed surfaces migrate to public-facing roadmap views, in-progress work stays staging.)*
+- [ ] 14.3 Public voting system (Polls) `w:2`
+  - [!] 14.3.1 Backend `Poll` resource + endpoints (`GET /polls`, `GET /polls/{slug}`, `POST /polls/{slug}/votes`; authenticated; one vote per user; `myVote` echo) `w:1` ← blocked: awaiting backend developer to ship the contract — generic `Poll` resource kept separate from `issues/{id}/vote`, slug-routed, scope enum `feature` / `design` / `policy` / `other`, optional `roadmapNodeId` loose link, bilingual `title_en` / `title_ne` and option labels
+  - [ ] 14.3.2 Frontend `PollCard` + `/polls/[slug]` (list, detail, cast vote, show tallies, `myVote` echo, un-auth click → `/login`) `w:1`
+  - [ ] 14.3.3 Roadmap leaf → poll convention (`← poll: <slug>` inline tag + parser + "Vote" button on `/development` for leaves with an attached poll) `w:0`
+
 ---
 
 # Aggregate Progress
 
-Weighted across all phases (sum of phase weights = 131):
+Weighted across all phases (sum of phase weights = 137):
 
 | Phase | Weight | Progress |
 | --- | --- | --- |
@@ -311,8 +327,9 @@ Weighted across all phases (sum of phase weights = 131):
 | 11 Cross-cutting | 10 | 25% |
 | 12 Documentation & Community | 5 | 40% |
 | 13 Public Reports & Transparency Surface | 6 | 0% |
+| 14 Building in Public (Process Transparency) | 6 | 33% |
 
-**Overall: ≈ 24%** (weighted sum / total weight; recompute on every edit, and redraw the [Overall Progress](#overall-progress--24) bar near the top of this file in the same edit).
+**Overall: ≈ 25%** (weighted sum / total weight; recompute on every edit, and redraw the [Overall Progress](#overall-progress--25) bar near the top of this file in the same edit).
 
 # How To Update This Document
 

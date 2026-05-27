@@ -59,6 +59,18 @@ export const copy = {
         }
       ]
     },
+    buildInPublic: {
+      heroLabel: "एप निर्माण प्रगति",
+      heroAria: "एप निर्माण समग्र प्रगति",
+      roadmapCta: "विस्तृत रोडम्याप हेर्नुहोस्",
+      roadmapHref: "https://github.com/yantracore/shramdan-web/blob/main/docs/00-master-roadmap.md",
+      phaseLabel: "चरण",
+      sectionEyebrow: "अहिले बनाइँदै",
+      sectionTitle: "अहिले हामी के बनाउँदैछौँ",
+      sectionIntro:
+        "हाम्रो दैनिक १२ बजेको लाइभ स्ट्रिममा सक्रिय रहेका कामहरू। यो सूची रोडम्यापबाटै सिधै आउँछ - काम अघि बढ्दै जाँदा यहीँ अपडेट हुन्छ।",
+      fullRoadmapCta: "सबै काम र प्रगति रोडम्यापमा हेर्नुहोस्"
+    },
     cleanupAreas: {
       eyebrow: "के सफा गर्ने?",
       title: "सुरुवातका सफाइ क्षेत्रहरू",
@@ -684,6 +696,18 @@ export const copy = {
           label: "Chat, ask, and follow updates"
         }
       ]
+    },
+    buildInPublic: {
+      heroLabel: "App Build Progress",
+      heroAria: "Overall app build progress",
+      roadmapCta: "See Detailed Roadmap",
+      roadmapHref: "https://github.com/yantracore/shramdan-web/blob/main/docs/00-master-roadmap.md",
+      phaseLabel: "Phase",
+      sectionEyebrow: "Building Now",
+      sectionTitle: "What We're Building Right Now",
+      sectionIntro:
+        "Tasks actively in progress in our daily 12 PM live stream. This list comes straight from the roadmap and updates as work moves forward.",
+      fullRoadmapCta: "See All Tasks & Progress on the Roadmap"
     },
     cleanupAreas: {
       eyebrow: "What we clean",
