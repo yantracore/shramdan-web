@@ -3311,6 +3311,12 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 20px;
+  transition: opacity 0.2s ease;
+}
+
+.public-issues-grid.is-navigating {
+  opacity: 0.55;
+  pointer-events: none;
 }
 
 .public-issue-card {

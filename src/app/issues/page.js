@@ -19,7 +19,7 @@ const SORT_OPTIONS = [
   { value: "voteCount", labelKey: "sortMostVotes" },
   { value: "createdAt", labelKey: "sortNewest" }
 ];
-const PAGE_SIZE = 3;
+const PAGE_SIZE = 8;
 
 function isPublicIssue(issue) {
   return PUBLIC_ISSUE_STATUSES.includes(issue?.status);
@@ -167,6 +167,8 @@ export default function IssuesListPage() {
   };
 
   const totalCachedItems = pages.reduce((sum, p) => sum + p.items.length, 0);
+  const isInitialLoad = loading && pages.length === 0;
+  const isNavigating = loading && pages.length > 0;
   const showError = !loading && Boolean(error);
   const showEmpty =
     !loading && !error && pages.length > 0 && totalCachedItems === 0;
@@ -212,7 +214,7 @@ export default function IssuesListPage() {
           />
         </div>
 
-        {loading ? (
+        {isInitialLoad ? (
           <div
             aria-busy="true"
             aria-label={content.states.loading}
@@ -248,7 +250,10 @@ export default function IssuesListPage() {
         ) : null}
 
         {showResults ? (
-          <div className="public-issues-grid">
+          <div
+            aria-busy={isNavigating ? "true" : undefined}
+            className={`public-issues-grid${isNavigating ? " is-navigating" : ""}`}
+          >
             {currentItems.map((issue) => (
               <PublicIssueCard
                 key={issue.id}
