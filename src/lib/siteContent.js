@@ -708,7 +708,31 @@ export const copy = {
         photoCount: "{n} तस्वीर",
         rejectedNote: "यो समस्या अस्वीकृत गरिएको छ।",
         duplicateNote: "यो समस्या डुप्लिकेट रिपोर्ट हो।"
+      },
+      map: {
+        title: "नेपालभरका समस्याहरू",
+        note:
+          "स्थान भएका समस्याहरू मात्र नक्सामा देखिन्छन्। अहिले परीक्षण मुख्यतः काठमाडौँ र पोखरामा भइरहेको छ - समय बित्दै जाँदा देशभर फैलिँदै जान्छ।",
+        regionLabel: "समस्याहरूको नक्सा",
+        viewList: "सूची",
+        viewMap: "नक्सा",
+        toggleLabel: "सूची वा नक्सा छनोट गर्नुहोस्",
+        markerCount: "नक्सामा {n} समस्या"
       }
+    },
+    liveIssues: {
+      eyebrow: "सक्रिय समस्याहरू",
+      title: "अहिले समुदायले उठाएका समस्याहरू",
+      intro:
+        "सदस्यहरूले हालै रिपोर्ट गरेका, समर्थन बटुलिरहेका र अभियानको तयारीमा रहेका समस्याहरू। नक्सामा क्लिक गरेर वा सूचीमा गएर पूर्ण विवरण हेर्नुहोस्।",
+      viewAll: "सबै समस्या हेर्नुहोस्",
+      statIssues: "सक्रिय समस्या",
+      statLocations: "ठाउँ",
+      statVotes: "जम्मा समर्थन",
+      statsAria: "सक्रिय समस्याहरूको सारांश",
+      mapAria: "समस्या नक्सा खोल्नुहोस्",
+      mapPill: "नक्सामा अन्वेषण गर्नुहोस्",
+      topTitle: "अहिले सबैभन्दा बढी समर्थन पाएका"
     },
     footer: {
       brand: "श्रमदान",
@@ -1449,7 +1473,31 @@ export const copy = {
         photoCount: "{n} photo",
         rejectedNote: "This issue has been rejected.",
         duplicateNote: "This issue is a duplicate report."
+      },
+      map: {
+        title: "Issues Across Nepal",
+        note:
+          "Pins show only issues with a known location. Most testing is happening in Kathmandu and Pokhara right now — coverage will spread across the country over time.",
+        regionLabel: "Issues map",
+        viewList: "List",
+        viewMap: "Map",
+        toggleLabel: "Switch between list and map",
+        markerCount: "{n} on map"
       }
+    },
+    liveIssues: {
+      eyebrow: "Active Issues",
+      title: "What the community is flagging right now",
+      intro:
+        "Recently reported problems gathering support and getting ready for cleanup campaigns. Click a pin on the map or open the list for full details.",
+      viewAll: "View All Issues",
+      statIssues: "Active issues",
+      statLocations: "Locations",
+      statVotes: "Total support",
+      statsAria: "Active issues summary",
+      mapAria: "Open issues map",
+      mapPill: "Explore on the map",
+      topTitle: "Most-supported right now"
     },
     footer: {
       brand: "Shramdan",

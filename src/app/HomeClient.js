@@ -42,12 +42,37 @@ import {
 } from "@ant-design/icons";
 import { Button, Progress } from "antd";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
+import IssueMapBlock from "@/components/IssueMapBlock";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
+import { getJson } from "@/lib/apiClient";
+import { ISSUE_STATUS_COLORS, getListItems } from "@/lib/adminUtils";
 import { copy } from "@/lib/siteContent";
 
 const LIVE_RESOURCE_IDS = new Set(["participate", "watchLive"]);
+const ACTIVE_ISSUE_STATUSES = new Set(["OPEN", "EVENT_SCHEDULED"]);
+const ACTIVE_ISSUES_LIMIT = 100;
+const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
+
+function localizeDigits(value, language) {
+  const str = String(value ?? "");
+  if (language !== "np") return str;
+  return str.replace(/\d/g, (d) => NP_DIGITS[Number(d)]);
+}
+
+function deriveLocationKey(issue) {
+  const lat = Number(issue?.latitude);
+  const lng = Number(issue?.longitude);
+  if (Number.isFinite(lat) && Number.isFinite(lng)) {
+    return `${lat.toFixed(2)},${lng.toFixed(2)}`;
+  }
+  if (issue?.addressText) {
+    return issue.addressText.split(",")[0].trim().toLowerCase();
+  }
+  return null;
+}
 
 function isNowLiveNpt(now = new Date()) {
   const parts = new Intl.DateTimeFormat("en-US", {
@@ -237,6 +262,65 @@ export default function HomeClient({ summary }) {
     };
   });
 
+  const [activeIssues, setActiveIssues] = useState([]);
+  const [activeIssuesLoaded, setActiveIssuesLoaded] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const response = await getJson("/issues", {
+          params: { sort: "voteCount", limit: ACTIVE_ISSUES_LIMIT }
+        });
+        const items = getListItems(response).filter((issue) =>
+          ACTIVE_ISSUE_STATUSES.has(issue?.status)
+        );
+        if (!cancelled) {
+          setActiveIssues(items);
+          setActiveIssuesLoaded(true);
+        }
+      } catch {
+        if (!cancelled) {
+          setActiveIssues([]);
+          setActiveIssuesLoaded(true);
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const activeIssuesStats = useMemo(() => {
+    const totalVotes = activeIssues.reduce(
+      (sum, issue) => sum + (Number(issue.voteCount) || 0),
+      0
+    );
+    const locationKeys = new Set();
+    activeIssues.forEach((issue) => {
+      const key = deriveLocationKey(issue);
+      if (key) locationKeys.add(key);
+    });
+    return {
+      total: activeIssues.length,
+      locations: locationKeys.size,
+      votes: totalVotes
+    };
+  }, [activeIssues]);
+
+  const topIssues = useMemo(
+    () =>
+      [...activeIssues]
+        .sort((a, b) => (Number(b.voteCount) || 0) - (Number(a.voteCount) || 0))
+        .slice(0, 3),
+    [activeIssues]
+  );
+
+  const issueCopy = t.issues || {};
+  const liveIssuesCopy = t.liveIssues || {};
+  const showActiveIssuesSection =
+    activeIssuesLoaded && activeIssues.length > 0;
+
   return (
     <SiteShell>
       <section id="top" className="hero-section">
@@ -312,6 +396,118 @@ export default function HomeClient({ summary }) {
           </div>
         </aside>
       </section>
+
+      {showActiveIssuesSection ? (
+        <section
+          className="live-issues-section"
+          aria-labelledby="live-issues-title"
+        >
+          <div className="live-issues-header">
+            <div className="live-issues-heading">
+              <span className="eyebrow">
+                {liveIssuesCopy.eyebrow || "Active Issues"}
+              </span>
+              <h2 id="live-issues-title">
+                {liveIssuesCopy.title || "What the community is flagging"}
+              </h2>
+              <p>{liveIssuesCopy.intro}</p>
+            </div>
+            <Link className="live-issues-cta" href="/issues">
+              {liveIssuesCopy.viewAll || "View All Issues"}
+              <ArrowRightOutlined aria-hidden="true" />
+            </Link>
+          </div>
+
+          <dl className="live-issues-stats" aria-label={liveIssuesCopy.statsAria}>
+            <div className="live-issues-stat">
+              <dt>{liveIssuesCopy.statIssues || "Active issues"}</dt>
+              <dd>{localizeDigits(activeIssuesStats.total, language)}</dd>
+            </div>
+            <div className="live-issues-stat">
+              <dt>{liveIssuesCopy.statLocations || "Locations"}</dt>
+              <dd>{localizeDigits(activeIssuesStats.locations, language)}</dd>
+            </div>
+            <div className="live-issues-stat">
+              <dt>{liveIssuesCopy.statVotes || "Total support"}</dt>
+              <dd>{localizeDigits(activeIssuesStats.votes, language)}</dd>
+            </div>
+          </dl>
+
+          <Link
+            className="live-issues-map-link"
+            href="/issues"
+            aria-label={liveIssuesCopy.mapAria || "Open issues map"}
+          >
+            <IssueMapBlock
+              issues={activeIssues}
+              content={issueCopy}
+              language={language}
+              height={320}
+              interactive={false}
+            />
+            <span className="live-issues-map-overlay" aria-hidden="true">
+              <span className="live-issues-map-pill">
+                <EnvironmentOutlined aria-hidden="true" />
+                {liveIssuesCopy.mapPill || "Explore on the map"}
+              </span>
+            </span>
+          </Link>
+
+          {topIssues.length > 0 ? (
+            <div className="live-issues-top">
+              <h3 className="live-issues-top-title">
+                {liveIssuesCopy.topTitle || "Most-supported right now"}
+              </h3>
+              <ul className="live-issues-top-list">
+                {topIssues.map((issue) => {
+                  const statusLabel =
+                    issueCopy.statusLabels?.[issue.status] || issue.status;
+                  const categoryLabel =
+                    issueCopy.categoryLabels?.[issue.category] || issue.category;
+                  const votes = Number(issue.voteCount) || 0;
+                  const voteText =
+                    votes === 1
+                      ? issueCopy.card?.supportersOne || "1 supporter"
+                      : (
+                          issueCopy.card?.supportersMany || "{n} supporters"
+                        ).replace("{n}", localizeDigits(votes, language));
+                  return (
+                    <li key={issue.id}>
+                      <Link
+                        className="live-issues-top-card"
+                        href={`/issues/${issue.id}`}
+                      >
+                        <div className="live-issues-top-meta">
+                          <span
+                            className={`live-issues-top-status live-issues-top-status--${issue.status}`}
+                            data-tone={ISSUE_STATUS_COLORS[issue.status]}
+                          >
+                            {statusLabel}
+                          </span>
+                          <span className="live-issues-top-category">
+                            {categoryLabel}
+                          </span>
+                        </div>
+                        <h4>{issue.title}</h4>
+                        {issue.addressText ? (
+                          <p className="live-issues-top-address">
+                            <EnvironmentOutlined aria-hidden="true" />
+                            {issue.addressText}
+                          </p>
+                        ) : null}
+                        <span className="live-issues-top-votes">
+                          <LikeOutlined aria-hidden="true" />
+                          {voteText}
+                        </span>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ) : null}
+        </section>
+      ) : null}
 
       {buildingNowCards.length > 0 ? (
         <section className="building-now-section" aria-labelledby="building-now-title">
