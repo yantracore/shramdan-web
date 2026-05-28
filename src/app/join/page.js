@@ -26,10 +26,12 @@ function JoinPageContent() {
       return true;
     }
 
+    const { consent: _consent, website: _website, ...payload } = values;
+
     setSubmitting(true);
 
     try {
-      await postJson("/applications", values);
+      await postJson("/applications", payload);
       messageApi.success(t.messages.join);
       return true;
     } catch (error) {

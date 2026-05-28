@@ -131,6 +131,14 @@ export function SiteShell({ children, pageTitle }) {
         { href: "/join", label: t.footer.links.contributor },
         { href: "/feedback", label: t.footer.links.feedback }
       ]
+    },
+    {
+      title: t.footer.columns.legal,
+      links: [
+        { href: "/terms", label: t.footer.links.terms },
+        { href: "/privacy", label: t.footer.links.privacy },
+        { href: "/code-of-conduct", label: t.footer.links.codeOfConduct }
+      ]
     }
   ];
 

@@ -1,7 +1,8 @@
 "use client";
 
 import { SendOutlined } from "@ant-design/icons";
-import { Button, Form, Input, Select } from "antd";
+import { Button, Checkbox, Form, Input, Select } from "antd";
+import Link from "next/link";
 import { useEffect } from "react";
 import { Honeypot } from "@/components/Honeypot";
 import { toSelectOptions } from "@/lib/siteContent";
@@ -76,6 +77,35 @@ export function ContributorForm({ content, eyebrow, title, intro, initialRole, o
           <Input.TextArea rows={3} maxLength={300} showCount placeholder={content.placeholders.additionalInfo} />
         </Form.Item>
       </div>
+      <Form.Item
+        name="consent"
+        valuePropName="checked"
+        className="form-consent"
+        rules={[
+          {
+            validator: (_rule, value) =>
+              value
+                ? Promise.resolve()
+                : Promise.reject(new Error(labels.consent.required))
+          }
+        ]}
+      >
+        <Checkbox>
+          {labels.consent.intro}{" "}
+          <Link href="/terms" target="_blank" rel="noopener noreferrer">
+            {labels.consent.terms}
+          </Link>
+          {labels.consent.divider}
+          <Link href="/privacy" target="_blank" rel="noopener noreferrer">
+            {labels.consent.privacy}
+          </Link>
+          {labels.consent.and}
+          <Link href="/code-of-conduct" target="_blank" rel="noopener noreferrer">
+            {labels.consent.codeOfConduct}
+          </Link>
+          {labels.consent.suffix}
+        </Checkbox>
+      </Form.Item>
       <Honeypot />
       <Button type="primary" htmlType="submit" size="large" icon={<SendOutlined />} loading={submitting} block>
         {labels.submit}

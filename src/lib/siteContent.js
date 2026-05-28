@@ -15,7 +15,10 @@ export const copy = {
       join: "जोडिनुहोस्",
       feedback: "प्रतिक्रिया",
       login: "लगइन",
-      me: "मेरो प्रोफाइल"
+      me: "मेरो प्रोफाइल",
+      terms: "उपयोग शर्तहरू",
+      privacy: "गोपनीयता नीति",
+      codeOfConduct: "आचारसंहिता"
     },
     ariaLabels: {
       home: "श्रमदान गृहपृष्ठ",
@@ -444,7 +447,17 @@ export const copy = {
       experience: "तपाईंको अनुभव",
       motivation: "तपाईं श्रमदानमा किन योगदान गर्न चाहनुहुन्छ?",
       additionalInfo: "थप जानकारी",
-      submit: "आवेदन पठाउनुहोस्"
+      submit: "आवेदन पठाउनुहोस्",
+      consent: {
+        intro: "म",
+        terms: "उपयोग शर्तहरू",
+        privacy: "गोपनीयता नीति",
+        codeOfConduct: "आचारसंहिता",
+        divider: ", ",
+        and: ", र ",
+        suffix: " स्वीकार गर्छु।",
+        required: "जारी राख्न शर्तहरूमा सहमत हुनुपर्छ।"
+      }
     },
     feedback: {
       eyebrow: "हामीलाई तपाईंको प्रतिक्रिया चाहिन्छ",
@@ -502,7 +515,8 @@ export const copy = {
       required: "यो विवरण आवश्यक छ।",
       email: "कृपया सही इमेल ठेगाना लेख्नुहोस्।",
       submitError: "पठाउन सकिएन। कृपया फेरि प्रयास गर्नुहोस्।",
-      sessionExpired: "तपाईंको session सकिएको छ। कृपया फेरि login गर्नुहोस्।"
+      sessionExpired: "तपाईंको session सकिएको छ। कृपया फेरि login गर्नुहोस्।",
+      consentRequired: "जारी राख्न शर्तहरूमा सहमत हुनुपर्छ।"
     },
     me: {
       title: "मेरो प्रोफाइल",
@@ -744,6 +758,176 @@ export const copy = {
       mapPill: "नक्सामा अन्वेषण गर्नुहोस्",
       topTitle: "अहिले सबैभन्दा बढी समर्थन पाएका"
     },
+    legal: {
+      terms: {
+        eyebrow: "कानुनी",
+        title: "उपयोग शर्तहरू",
+        lastUpdated: "अन्तिम अद्यावधिक: 2026-05-28। यो v1 draft हो — सार्वजनिक launch अघि परिमार्जन हुन सक्छ।",
+        intro: "श्रमदान नेपालमा नागरिक-नेतृत्वमा सामुदायिक सरसफाइ र सुधार कार्य आयोजना गर्ने platform हो। यो website प्रयोग गर्दा तपाईं तलका शर्तहरू स्वीकार गर्नुहुन्छ।",
+        sections: [
+          {
+            heading: "१. शर्त स्वीकृति",
+            paragraphs: [
+              "खाता बनाउनु, भोट दिनु, अभियानमा जोडिनु, वा कुनै सामग्री पेश गर्नु भनेको तपाईंले यी शर्तहरू पढेर सहमति जनाउनुभएको हो। यदि सहमत हुनुहुन्न भने कृपया platform प्रयोग नगर्नुहोस्।"
+            ]
+          },
+          {
+            heading: "२. तपाईंको खाता र सामग्री",
+            paragraphs: [
+              "तपाईंको खाताका विवरण सही राख्ने र login credentials गोप्य राख्ने जिम्मेवारी तपाईंकै हो।",
+              "तपाईंले पेश गर्ने issue, फोटो, टिप्पणी, र अन्य सामग्रीको स्वामित्व तपाईंकै हुन्छ। पेश गर्दा श्रमदानलाई सामुदायिक काम आयोजना गर्ने उद्देश्यले platform मा देखाउने/वितरण गर्ने non-exclusive license दिनुहुन्छ।",
+              "तपाईंलाई share गर्ने अधिकार नभएको सामग्री, अरूको नाममा बहाना गर्ने सामग्री, वा आचारसंहिता उल्लङ्घन गर्ने सामग्री पेश गर्नु हुँदैन।"
+            ]
+          },
+          {
+            heading: "३. वास्तविक कार्यक्रमहरू",
+            paragraphs: [
+              "श्रमदानमा सूचीबद्ध कुनै पनि सरसफाइ, मर्मत, वा सामुदायिक कार्यक्रममा सहभागिता स्वैच्छिक हो। प्रत्येक सहभागी आफ्नो र वरपरकाहरूको सुरक्षाप्रति जिम्मेवार हुनुपर्छ।",
+              "श्रमदानले सूचना र समन्वय व्यवस्था गर्छ — वास्तविक कार्यक्रम सामुदायिक leader र सहभागीहरूले सञ्चालन गर्छन्। Leader को निर्देशन पालना गर्नुहोस्, आवश्यक सुरक्षा सामग्री प्रयोग गर्नुहोस्, र सही निर्णय लिनुहोस्।",
+              "वास्तविक कार्यक्रममा भएको चोटपटक, क्षति, वा हानिको दायित्व श्रमदानले लिँदैन।"
+            ]
+          },
+          {
+            heading: "४. खाता निलम्बन र हटाउने",
+            paragraphs: [
+              "Platform दुरुपयोग, अरू सदस्यलाई हैरानी, झुटो वा भ्रामक सामग्री पेश, वा यी शर्त/आचारसंहिता उल्लङ्घन गर्ने खाताहरू श्रमदानले निलम्बन वा हटाउन सक्छ।"
+            ]
+          },
+          {
+            heading: "५. परिवर्तन",
+            paragraphs: [
+              "Platform बढ्दै जाँदा यी शर्तहरू अद्यावधिक हुन सक्छन्। महत्त्वपूर्ण परिवर्तन platform मा सूचना गरिनेछ। परिवर्तनपछि पनि प्रयोग गर्दा तपाईं नयाँ शर्त स्वीकार गरेको मानिनेछ।"
+            ]
+          },
+          {
+            heading: "६. कानूनी क्षेत्राधिकार",
+            paragraphs: [
+              "यी शर्तहरू नेपालको कानून अनुसार सञ्चालित हुन्छन्। कुनै विवाद उठ्यो भने पहिले हामीसँग तलका सम्पर्क च्यानलमार्फत उठाउनुहोस्।"
+            ]
+          },
+          {
+            heading: "७. सम्पर्क",
+            paragraphs: [
+              "यी शर्तसम्बन्धी प्रश्न? /feedback फारममार्फत वा footer मा रहेका social link मार्फत सम्पर्क गर्नुहोस्।"
+            ]
+          }
+        ],
+        footer: "यो v1 draft हो — platform को प्रारम्भिक release का लागि तयार पारिएको। आवश्यकता अनुसार कानूनी सल्लाहसहित अद्यावधिक गरिनेछ।"
+      },
+      privacy: {
+        eyebrow: "कानुनी",
+        title: "गोपनीयता नीति",
+        lastUpdated: "अन्तिम अद्यावधिक: 2026-05-28। यो v1 draft हो — सार्वजनिक launch अघि परिमार्जन हुन सक्छ।",
+        intro: "सामुदायिक काम आयोजना गर्न जति आवश्यक छ, त्यति मात्रै जानकारी सङ्कलन गर्छौं। हामीले के सङ्कलन गर्छौं, किन गर्छौं, र तपाईंले कसरी नियन्त्रण गर्न सक्नुहुन्छ — तल छ।",
+        sections: [
+          {
+            heading: "१. हामी के सङ्कलन गर्छौं",
+            paragraphs: [
+              "श्रमदान सदस्यका रूपमा दर्ता हुँदा: नाम, इमेल, वैकल्पिक फोन नम्बर, र भूमिका सङ्कलन गर्छौं।",
+              "Issue report गर्दा वा अभियानमा सहभागी हुँदा: वर्णन, स्थान, र संलग्न फोटोहरू।",
+              "तपाईंका भोट र सहभागिताको record राख्छौं।"
+            ]
+          },
+          {
+            heading: "२. कसरी प्रयोग गर्छौं",
+            paragraphs: [
+              "यो जानकारी platform सञ्चालन गर्न प्रयोग हुन्छ — सम्बन्धित अभियान देखाउन, सामुदायिक leader लाई कार्यक्रम आयोजना गर्न दिन, र तपाईं जोडिएका गतिविधिबारे सम्पर्क गर्न।",
+              "हामी तपाईंको डेटा कसैलाई बिक्री गर्दैनौं।"
+            ]
+          },
+          {
+            heading: "३. कोसँग share गर्छौं",
+            paragraphs: [
+              "अभियान leader को नाम, सार्वजनिक roster मा सहमत सहभागीहरू, र issue को स्थान/वर्णन सार्वजनिक site मा देखिन्छन्।",
+              "तपाईंको इमेल/फोन जस्ता private विवरण platform admin हरूले मात्र हेर्न पाउँछन्। कार्यक्रम leader ले आफूले नेतृत्व गरेको विशिष्ट कार्यक्रमका पुष्टि भएका सहभागीहरूको सम्पर्क हेर्न सक्छन्।"
+            ]
+          },
+          {
+            heading: "४. भण्डारण र सुरक्षा",
+            paragraphs: [
+              "खाता डेटा श्रमदान platform का backend server मा राखिन्छ।",
+              "प्राथमिकता (भाषा, theme) र login session तपाईंको browser को local storage मा राखिन्छन्।"
+            ]
+          },
+          {
+            heading: "५. तपाईंका अधिकार",
+            paragraphs: [
+              "/me पृष्ठमा profile हेर्न र अद्यावधिक गर्न सक्नुहुन्छ। खाता हटाउन वा आफ्नो डेटाको copy माग्न /feedback फारममार्फत सम्पर्क गर्नुहोस्।"
+            ]
+          },
+          {
+            heading: "६. नाबालिगहरू",
+            paragraphs: [
+              "श्रमदान वयस्क सदस्यका लागि बनेको हो। नाबालिगहरू अभिभावकको सहमति र निगरानीमा मात्र कार्यक्रममा सहभागी हुन सक्छन्।"
+            ]
+          },
+          {
+            heading: "७. Cookies र tracking",
+            paragraphs: [
+              "हामी तेस्रो-पक्ष विज्ञापन tracker प्रयोग गर्दैनौं। Browser storage मा भाषा प्राथमिकता, theme प्राथमिकता, र authentication session मात्र राखिन्छन् — अरू केही होइन।"
+            ]
+          },
+          {
+            heading: "८. सम्पर्क",
+            paragraphs: [
+              "गोपनीयतासम्बन्धी प्रश्न: /feedback फारम प्रयोग गर्नुहोस्।"
+            ]
+          }
+        ],
+        footer: "यो v1 draft हो — डेटा प्रथा विकसित हुँदै जाँदा अद्यावधिक गरिनेछ।"
+      },
+      codeOfConduct: {
+        eyebrow: "कानुनी",
+        title: "आचारसंहिता",
+        lastUpdated: "अन्तिम अद्यावधिक: 2026-05-28। यो v1 draft हो — सार्वजनिक launch अघि परिमार्जन हुन सक्छ।",
+        intro: "श्रमदान सफा, राम्रो टोलका लागि मिलेर काम गर्ने नागरिकहरूको समुदाय हो। तलका मापदण्ड सबैलाई — सदस्य, leader, र admin — समानरूपमा लागू हुन्छन्।",
+        sections: [
+          {
+            heading: "१. एकअर्कालाई आदर गर्नुहोस्",
+            paragraphs: [
+              "सभ्य बन्नुहोस्। मतभेद हुन सक्छ — व्यक्तिमा होइन, विषयमा छलफल गर्नुहोस्। अरूको कुरा ध्यान दिएर सुन्नुहोस्। नयाँ सदस्यलाई स्वागत गर्नुहोस्।"
+            ]
+          },
+          {
+            heading: "२. हैरानीप्रति शून्य सहनशीलता",
+            paragraphs: [
+              "हैरानी, घृणाजन्य भाषण, वा भेदभाव गर्न पाइँदैन — जात, जाति, धर्म, लिङ्ग, यौन रुचि, अपाङ्गता, उमेर, भाषा, वा राजनीतिक आस्थाका आधारमा।",
+              "व्यक्तिगत आक्रमण, धम्की, र निरन्तर अवांछित सम्पर्क अनुमत छैनन्।"
+            ]
+          },
+          {
+            heading: "३. आफ्नो कामबारे इमानदार हुनुहोस्",
+            paragraphs: [
+              "Issue बनावटी नबनाउनुहोस्, भोट manipulate नगर्नुहोस्, वा झुटो प्रमाण नपेश गर्नुहोस्।",
+              "अरू सदस्यको नाममा बहाना नगर्नुहोस् वा आफूले नगरेको कामको श्रेय नलिनुहोस्।"
+            ]
+          },
+          {
+            heading: "४. वास्तविक कार्यक्रममा सुरक्षा पहिले",
+            paragraphs: [
+              "कुनै वास्तविक कार्यक्रममा सहभागी हुँदा leader को निर्देशन पालना गर्नुहोस्।",
+              "आवश्यक भएमा सुरक्षात्मक सामग्री प्रयोग गर्नुहोस्। असुरक्षित स्थिति देख्नासाथ रोकेर रिपोर्ट गर्नुहोस्।",
+              "उत्पादक देखिन आफूलाई वा अरूलाई जोखिममा नराख्नुहोस्।"
+            ]
+          },
+          {
+            heading: "५. गोपनीयता र सहमति",
+            paragraphs: [
+              "अरू सहभागीको सहमतिविना तस्बिर/भिडियो नखिच्नुहोस् वा share नगर्नुहोस्।",
+              "नजिक काम गर्दा निजी सम्पत्तिको सम्मान गर्नुहोस्। अरू सदस्यको सम्पर्क विवरण share नगर्नुहोस्।"
+            ]
+          },
+          {
+            heading: "६. रिपोर्टिङ र परिणाम",
+            paragraphs: [
+              "यो आचारसंहिता उल्लङ्घन हुने व्यवहार देख्नुभयो भने /feedback फारममार्फत वा सिधै श्रमदान admin लाई रिपोर्ट गर्नुहोस्।",
+              "रिपोर्टको गम्भीरता हेरेर चेतावनी, खाता निलम्बन, वा platform बाट हटाउने कारबाही हुन सक्छ।"
+            ]
+          }
+        ],
+        footer: "यो आचारसंहिता समुदायसँगै विकसित हुन्छ। सुधारका सुझाव /feedback मार्फत स्वागत छ।"
+      }
+    },
     footer: {
       brand: "श्रमदान",
       ariaLabel: "श्रमदान footer",
@@ -752,11 +936,15 @@ export const copy = {
       columns: {
         quickLinks: "द्रुत लिंकहरू",
         getInvolved: "सहभागी हुनुहोस्",
+        legal: "कानुनी",
         social: "सामाजिक सञ्जाल"
       },
       links: {
         contributor: "योगदान गर्नुहोस्",
-        feedback: "प्रतिक्रिया दिनुहोस्"
+        feedback: "प्रतिक्रिया दिनुहोस्",
+        terms: "उपयोग शर्तहरू",
+        privacy: "गोपनीयता नीति",
+        codeOfConduct: "आचारसंहिता"
       },
       social: [
         { id: "facebook", label: "फेसबुकमा श्रमदान", href: "https://www.facebook.com/profile.php?id=61589961623195" },
@@ -782,7 +970,10 @@ export const copy = {
       join: "Join",
       feedback: "Feedback",
       login: "Login",
-      me: "My profile"
+      me: "My profile",
+      terms: "Terms of Use",
+      privacy: "Privacy Policy",
+      codeOfConduct: "Code of Conduct"
     },
     ariaLabels: {
       home: "Shramdan home",
@@ -1219,7 +1410,17 @@ export const copy = {
       experience: "Your experience",
       motivation: "Why do you want to contribute to Shramdan?",
       additionalInfo: "Additional information",
-      submit: "Submit Application"
+      submit: "Submit Application",
+      consent: {
+        intro: "I agree to the",
+        terms: "Terms of Use",
+        privacy: "Privacy Policy",
+        codeOfConduct: "Code of Conduct",
+        divider: ", ",
+        and: ", and ",
+        suffix: ".",
+        required: "You must agree to the terms to continue."
+      }
     },
     feedback: {
       eyebrow: "We need your feedback",
@@ -1277,7 +1478,8 @@ export const copy = {
       required: "This field is required.",
       email: "Please enter a valid email address.",
       submitError: "Could not submit. Please try again.",
-      sessionExpired: "Your session has expired. Please log in again."
+      sessionExpired: "Your session has expired. Please log in again.",
+      consentRequired: "You must agree to the terms to continue."
     },
     me: {
       title: "My profile",
@@ -1519,6 +1721,176 @@ export const copy = {
       mapPill: "Explore on the map",
       topTitle: "Most-supported right now"
     },
+    legal: {
+      terms: {
+        eyebrow: "Legal",
+        title: "Terms of Use",
+        lastUpdated: "Last updated: 2026-05-28. This is a v1 draft and may be revised before the public launch.",
+        intro: "Shramdan is a citizen-led platform for organizing community cleanup and improvement work in Nepal. By using this website you agree to the terms below.",
+        sections: [
+          {
+            heading: "1. Accepting these terms",
+            paragraphs: [
+              "Creating an account, voting, joining a campaign, or submitting any content on Shramdan means you have read and agreed to these terms. If you do not agree, please do not use the platform."
+            ]
+          },
+          {
+            heading: "2. Your account and content",
+            paragraphs: [
+              "You are responsible for keeping your account details accurate and your login credentials private.",
+              "You retain ownership of issues, photos, comments, and other content you submit. By submitting, you grant Shramdan a non-exclusive license to display and distribute that content on the platform for the purpose of organizing community work.",
+              "Do not submit content you do not have the right to share, content that impersonates others, or content that violates the Code of Conduct."
+            ]
+          },
+          {
+            heading: "3. Real-world events",
+            paragraphs: [
+              "Participation in any cleanup, repair, or community event listed on Shramdan is voluntary. Each participant is responsible for their own safety and the safety of those around them.",
+              "Shramdan organizes information and coordination — the actual event is run by the community leader and participants. Follow the leader's instructions, use appropriate safety equipment, and exercise good judgment.",
+              "We are not liable for injury, loss, or damage arising from participation in real-world events."
+            ]
+          },
+          {
+            heading: "4. Account suspension and removal",
+            paragraphs: [
+              "We may suspend or remove accounts that abuse the platform, harass other members, submit false or misleading content, or otherwise violate these terms or the Code of Conduct."
+            ]
+          },
+          {
+            heading: "5. Changes",
+            paragraphs: [
+              "We may update these terms as the platform grows. Material changes will be announced on the platform. Continued use after a change means you accept the updated terms."
+            ]
+          },
+          {
+            heading: "6. Governing law",
+            paragraphs: [
+              "These terms are governed by the laws of Nepal. Any dispute should first be raised with us through the contact channels below."
+            ]
+          },
+          {
+            heading: "7. Contact",
+            paragraphs: [
+              "Questions about these terms? Reach us through the /feedback form or the social channels listed in the footer."
+            ]
+          }
+        ],
+        footer: "This is a v1 draft prepared for the platform's initial release. We will update it with input from legal counsel as needed."
+      },
+      privacy: {
+        eyebrow: "Legal",
+        title: "Privacy Policy",
+        lastUpdated: "Last updated: 2026-05-28. This is a v1 draft and may be revised before the public launch.",
+        intro: "We collect only the information needed to run a community-organizing platform. Here is what we collect, why, and how you can control it.",
+        sections: [
+          {
+            heading: "1. What we collect",
+            paragraphs: [
+              "When you sign up as a Shramdan Member: name, email, optional phone number, and the role you applied for.",
+              "When you report an issue or join a campaign: description, location, and any photos you attach.",
+              "We also keep a record of your votes and participation."
+            ]
+          },
+          {
+            heading: "2. How we use it",
+            paragraphs: [
+              "We use this information to run the platform — show you relevant campaigns, let community leaders organize events, and contact you about activities you joined.",
+              "We do not sell your data to anyone."
+            ]
+          },
+          {
+            heading: "3. Who we share with",
+            paragraphs: [
+              "Names of campaign leaders, participants who opt in to public rosters, and the locations/descriptions of issues are visible on the public site.",
+              "Private details (your email, phone) are visible only to platform admins. Event leaders see the contact info of confirmed participants for the specific event they lead."
+            ]
+          },
+          {
+            heading: "4. Storage and security",
+            paragraphs: [
+              "Account data is stored on the Shramdan platform's backend servers.",
+              "Preferences (language, theme) and your active session are kept in your browser's local storage."
+            ]
+          },
+          {
+            heading: "5. Your rights",
+            paragraphs: [
+              "You can view and update your profile at /me. To delete your account or request a copy of your data, contact us through the /feedback form."
+            ]
+          },
+          {
+            heading: "6. Children",
+            paragraphs: [
+              "Shramdan is intended for adult members. Minors may participate in events only with the consent and supervision of a parent or guardian."
+            ]
+          },
+          {
+            heading: "7. Cookies and tracking",
+            paragraphs: [
+              "We do not use third-party advertising trackers. Browser storage holds only your language preference, theme preference, and authentication session — nothing else."
+            ]
+          },
+          {
+            heading: "8. Contact",
+            paragraphs: [
+              "Privacy questions: use the /feedback form."
+            ]
+          }
+        ],
+        footer: "This is a v1 draft prepared for the platform's initial release. We will update it as data practices evolve."
+      },
+      codeOfConduct: {
+        eyebrow: "Legal",
+        title: "Code of Conduct",
+        lastUpdated: "Last updated: 2026-05-28. This is a v1 draft and may be revised before the public launch.",
+        intro: "Shramdan is a community of citizens working together for cleaner, better neighborhoods. The standards below apply to everyone — members, leaders, and admins alike.",
+        sections: [
+          {
+            heading: "1. Treat each other with respect",
+            paragraphs: [
+              "Be civil. Disagreements happen — discuss the issue, not the person. Listen carefully to others. Help newcomers feel welcome."
+            ]
+          },
+          {
+            heading: "2. Zero tolerance for harassment",
+            paragraphs: [
+              "No harassment, hate speech, or discrimination — including based on caste, ethnicity, religion, gender, sexual orientation, disability, age, language, or political belief.",
+              "Personal attacks, threats, and persistent unwanted contact are not allowed."
+            ]
+          },
+          {
+            heading: "3. Be honest about your work",
+            paragraphs: [
+              "Don't fabricate issues, manipulate votes, or submit false evidence.",
+              "Don't impersonate other community members or claim credit for work you didn't do."
+            ]
+          },
+          {
+            heading: "4. Safety first at real events",
+            paragraphs: [
+              "When you participate in a real-world event, follow the leader's instructions.",
+              "Use protective equipment when needed. Stop and report any unsafe condition immediately.",
+              "Do not endanger yourself or others just to look productive."
+            ]
+          },
+          {
+            heading: "5. Privacy and consent",
+            paragraphs: [
+              "Don't photograph or share images of other participants without their consent.",
+              "Respect private property when working in or near it. Don't share other members' contact information."
+            ]
+          },
+          {
+            heading: "6. Reporting and consequences",
+            paragraphs: [
+              "If you see behavior that violates this Code, report it through the /feedback form or directly to a Shramdan admin.",
+              "Depending on the severity, we may issue warnings, suspend accounts, or remove members from the platform."
+            ]
+          }
+        ],
+        footer: "This Code evolves with the community. Suggestions for improvement are welcome through /feedback."
+      }
+    },
     footer: {
       brand: "Shramdan",
       ariaLabel: "Shramdan footer",
@@ -1527,11 +1899,15 @@ export const copy = {
       columns: {
         quickLinks: "Quick Links",
         getInvolved: "Get Involved",
+        legal: "Legal",
         social: "Social"
       },
       links: {
         contributor: "Contribute",
-        feedback: "Share feedback"
+        feedback: "Share feedback",
+        terms: "Terms of Use",
+        privacy: "Privacy Policy",
+        codeOfConduct: "Code of Conduct"
       },
       social: [
         { id: "facebook", label: "Shramdan on Facebook", href: "https://www.facebook.com/profile.php?id=61589961623195" },

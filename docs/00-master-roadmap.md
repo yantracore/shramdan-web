@@ -130,7 +130,7 @@ If the user gives a high-level instruction like "let's continue", read this file
 
 This is the active end of the [Launch Critical Path](#launch-critical-path--tier-0). Items collapse forward as Tier 0 sequence steps complete — agents may rewrite this list freely but must keep it consistent with the Tier 0 ladder above. When proposing "what's next", agents must also consult open `P1` items in [00-polish-backlog.md](00-polish-backlog.md) and prefer Tier-0-tagged polish over fresh feature leaves.
 
-1. **Security + Legal trio** — honeypot on `/join` + `/feedback`, token-expiry UX fix, draft T&C / Privacy / Code of Conduct pages, baseline security pass. Parallel-safe; the legal copy can be drafted while the code patches land.
+1. **11.7 Security baseline audit** — final piece of the Security + Legal batch; XSS / CSRF / secret handling / rate-limit sweep over existing surfaces. Honeypot, token-expiry UX, and the T&C / Privacy / Code of Conduct legal trio are already in.
 2. **1.6 Citizen public issue submission** — `/issues/new` route + form using existing `POST /issues`; un-auth click pushes `/join`.
 3. **3.3 Issue → Campaign promotion** — admin button on issue detail that calls the event-create endpoint.
 
@@ -307,7 +307,7 @@ Goal: Ship native iOS + Android once `/app` web shell is stable. Reuse the same 
 - [ ] 10.3 Push notification cert + storefront prep `w:1`
 - [ ] 10.4 App Store + Play Store submission `w:1`
 
-## Phase 11 — Cross-cutting Concerns `w:10` 📊 25%
+## Phase 11 — Cross-cutting Concerns `w:10` 📊 40%
 
 - [x] 11.1 Responsive admin list pattern (`AdminResponsiveList`) `w:1` ← done: 2026-05-20
 - [ ] 11.2 Accessibility audit (WCAG AA) `w:2`
@@ -316,7 +316,9 @@ Goal: Ship native iOS + Android once `/app` web shell is stable. Reuse the same 
 - [ ] 11.5 Analytics + observability `w:1`
 - [ ] 11.6 Performance (Lighthouse mobile > 90) `w:1`
 - [ ] 11.7 Security review (XSS, CSRF, secret handling, rate limits) `w:1`
-- [ ] 11.8 Legal: org registration, T&C, privacy, code of conduct `w:1`
+- [~] 11.8 Legal foundation `w:1` *(split 2026-05-28)*
+  - [x] 11.8.1 T&C / Privacy Policy / Code of Conduct public pages + consent gate on `/join` `w:1` ← done: 2026-05-28 *(shared `LegalPage` component renders bilingual content from `siteContent.legal.{terms,privacy,codeOfConduct}`. Routes: `/terms`, `/privacy`, `/code-of-conduct`. SiteShell footer adds a "Legal" column. `ContributorForm` adds a required consent checkbox linking to all three pages. Content is a v1 draft clearly marked as such — to be reviewed with legal counsel before public launch.)*
+  - [ ] 11.8.2 Org registration (offline / non-code) `w:0` *(tracked here so it isn't lost, but does not block ship work)*
 
 ## Phase 12 — Documentation & Community `w:5` 📊 40%
 
@@ -372,7 +374,7 @@ Weighted across all phases (sum of phase weights = 137):
 | 8 Notifications & Outreach | 6 | 0% |
 | 9 Admin Control Center | 10 | 67% |
 | 10 Native Mobile App | 5 | 0% |
-| 11 Cross-cutting | 10 | 25% |
+| 11 Cross-cutting | 10 | 40% |
 | 12 Documentation & Community | 5 | 40% |
 | 13 Public Reports & Transparency Surface | 6 | 0% |
 | 14 Building in Public (Process Transparency) | 6 | 33% |
