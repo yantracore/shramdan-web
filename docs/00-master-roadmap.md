@@ -6,10 +6,10 @@
 >
 > **Companion doc:** improvements to *already-shipped* features live in [00-polish-backlog.md](00-polish-backlog.md), not here. The roadmap is for discrete ship work; polish is continuous and tracked separately so this file stays focused.
 
-## Overall Progress — 25%
+## Overall Progress — 27%
 
 ```
-0% [=========================---------------------------------------------------------------------------] 100%
+0% [===========================-------------------------------------------------------------------------] 100%
 ```
 
 The bar is 100 characters wide so each `=` equals exactly one percentage point. Recompute and redraw the bar in the same edit that changes any phase percentage — see [Aggregate Progress](#aggregate-progress) for the per-phase breakdown that feeds this number.
@@ -130,9 +130,9 @@ If the user gives a high-level instruction like "let's continue", read this file
 
 This is the active end of the [Launch Critical Path](#launch-critical-path--tier-0). Items collapse forward as Tier 0 sequence steps complete — agents may rewrite this list freely but must keep it consistent with the Tier 0 ladder above. When proposing "what's next", agents must also consult open `P1` items in [00-polish-backlog.md](00-polish-backlog.md) and prefer Tier-0-tagged polish over fresh feature leaves.
 
-1. **11.7 Security baseline audit** — final piece of the Security + Legal batch; XSS / CSRF / secret handling / rate-limit sweep over existing surfaces. Honeypot, token-expiry UX, and the T&C / Privacy / Code of Conduct legal trio are already in.
-2. **1.6 Citizen public issue submission** — `/issues/new` route + form using existing `POST /issues`; un-auth click pushes `/join`.
-3. **3.3 Issue → Campaign promotion** — admin button on issue detail that calls the event-create endpoint.
+1. **11.7 Security baseline audit** — final piece of the Security + Legal batch; XSS / CSRF / secret handling / rate-limit sweep over existing surfaces. Honeypot, token-expiry UX, the T&C / Privacy / Code of Conduct legal trio, and citizen issue submission are already in.
+2. **3.3 Issue → Campaign promotion** — admin button on issue detail that calls the existing `POST /api/v1/issues/{id}/convert-to-event` endpoint (backend already shipped).
+3. **3.2 Public campaign detail page** — `/events/[id]` rendering `GET /events/{id}` once 3.3 starts producing campaigns.
 
 *Earlier suggestions (9.11.1, Phase 2 stack decision, 3.2 deferral) superseded by the 2026-05-28 reorganization. Phase 2 stack decision moves to Tier 1; 9.11.1 cancelled.*
 
@@ -160,7 +160,7 @@ Goal: A live public site, deployable, with the basic surfaces users currently se
 - [x] 0.6 Docs 01–10 set authored `w:1` ← done: 2026-05-20
 - [x] 0.7 Bilingual EN/NE on every existing public surface `w:1` ← done: 2026-05-25 *(homepage, `/join`, `/feedback`, public footer, form validation, error toasts — all wired through `copy[language]` in `src/lib/siteContent.js`. Admin shell stays EN-only per product decision. New public pages must add `np` + `en` entries when built; tracked under their own phases, not here.)*
 
-## Phase 1 — Public Issue Discovery & Voting `w:15` 📊 65%
+## Phase 1 — Public Issue Discovery & Voting `w:15` 📊 77%
 
 Goal: Anyone (logged-in or not) can browse listed issues, see detail, and — once authenticated — vote.
 
@@ -180,9 +180,9 @@ Goal: Anyone (logged-in or not) can browse listed issues, see detail, and — on
   - [~] 1.5.1 `POST /issues/{id}/vote` + `DELETE` un-vote `w:1` *(POST shipped; DELETE UI pending — needs "I'm withdrawing support" affordance once initial voted state is readable.)*
   - [x] 1.5.2 Optimistic UI + auth gating (prompt sign-in) `w:2` ← done: 2026-05-27 *(`useIssueVote` increments optimistically, rolls back on error; un-auth click pushes `/login`; post-login redirect now lands non-admin users on `/issues`.)*
   - [ ] 1.5.3 Voter role tagging (volunteer / donor / etc.) `w:1` *(Backend accepts `voterRole` enum but frontend hardcodes `INTERESTED`; needs a picker on the vote button or a modal before commit.)*
-- [ ] 1.6 Citizen public issue submission `w:2` *(**Tier 0 launch-critical.** Public `/issues/new` form on the website using the existing `POST /issues` endpoint. `/join` Volunteer = Shramdan Member entry point already qualifies as a verified user. Phase 2.4's `/app` mobile-style submission flow stays Tier 1 — this is the website shortcut so the first event isn't blocked on the member portal.)*
-  - [ ] 1.6.1 `/issues/new` route + form (title, description, category, location, cover image via existing presign flow) `w:1`
-  - [ ] 1.6.2 Auth gating + post-submit redirect (un-auth click pushes `/join`; post-submit lands on the new issue's detail page) `w:1`
+- [x] 1.6 Citizen public issue submission `w:2` ← done: 2026-05-28 *(**Tier 0 launch-critical.** Public `/issues/new` form on the website using the existing `POST /issues` endpoint. Reuses the admin `IssueCoverUpload` (R2 presign flow). Form has citizen-friendly bilingual labels under `siteContent.issueNew`, browser-geolocation "Use my location" button with manual coord fallback, category dropdown with localized labels, and a CTA button on the `/issues` list header.)*
+  - [x] 1.6.1 `/issues/new` route + form (title, description, category, location, cover image via existing presign flow) `w:1` ← done: 2026-05-28
+  - [x] 1.6.2 Auth gating + post-submit redirect (un-auth click pushes `/login?next=/issues/new`; post-submit lands on the new issue's detail page) `w:1` ← done: 2026-05-28
 
 ## Phase 2 — Member Portal `/app` (Mobile-style Web Shell) `w:18` 📊 0%
 
@@ -364,7 +364,7 @@ Weighted across all phases (sum of phase weights = 137):
 | Phase | Weight | Progress |
 | --- | --- | --- |
 | 0 Foundation | 10 | 100% |
-| 1 Public Issue Discovery & Voting | 15 | 65% |
+| 1 Public Issue Discovery & Voting | 15 | 77% |
 | 2 Member Portal `/app` | 18 | 0% |
 | 3 Campaign Execution | 15 | 5% |
 | 4 Operational Safety | 8 | 0% |
@@ -379,7 +379,7 @@ Weighted across all phases (sum of phase weights = 137):
 | 13 Public Reports & Transparency Surface | 6 | 0% |
 | 14 Building in Public (Process Transparency) | 6 | 33% |
 
-**Overall: ≈ 25%** (weighted sum / total weight; recompute on every edit, and redraw the [Overall Progress](#overall-progress--25) bar near the top of this file in the same edit).
+**Overall: ≈ 27%** (weighted sum / total weight; recompute on every edit, and redraw the [Overall Progress](#overall-progress--27) bar near the top of this file in the same edit).
 
 # How To Update This Document
 

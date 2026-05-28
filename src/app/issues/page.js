@@ -3,11 +3,13 @@
 import {
   EnvironmentOutlined,
   LeftOutlined,
+  PlusOutlined,
   ReloadOutlined,
   RightOutlined,
   UnorderedListOutlined
 } from "@ant-design/icons";
 import { Button, Empty, Select } from "antd";
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import IssueMapBlock from "@/components/IssueMapBlock";
 import {
@@ -235,10 +237,17 @@ export default function IssuesListPage() {
   return (
     <SiteShell pageTitle={t.pageTitles.issues}>
       <section className="page-section public-issues-section">
-        <div className="section-heading">
-          <span className="eyebrow">{content.list.eyebrow}</span>
-          <h1>{content.list.title}</h1>
-          <p>{content.list.intro}</p>
+        <div className="section-heading section-heading-with-cta">
+          <div className="section-heading-body">
+            <span className="eyebrow">{content.list.eyebrow}</span>
+            <h1>{content.list.title}</h1>
+            <p>{content.list.intro}</p>
+          </div>
+          <Link className="section-heading-cta" href="/issues/new">
+            <Button type="primary" icon={<PlusOutlined />} size="large">
+              {t.issueNew.cta.list}
+            </Button>
+          </Link>
         </div>
 
         <div className="public-issues-toolbar">

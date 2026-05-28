@@ -18,7 +18,8 @@ export const copy = {
       me: "मेरो प्रोफाइल",
       terms: "उपयोग शर्तहरू",
       privacy: "गोपनीयता नीति",
-      codeOfConduct: "आचारसंहिता"
+      codeOfConduct: "आचारसंहिता",
+      newIssue: "नयाँ समस्या रिपोर्ट गर्नुहोस्"
     },
     ariaLabels: {
       home: "श्रमदान गृहपृष्ठ",
@@ -928,6 +929,56 @@ export const copy = {
         footer: "यो आचारसंहिता समुदायसँगै विकसित हुन्छ। सुधारका सुझाव /feedback मार्फत स्वागत छ।"
       }
     },
+    issueNew: {
+      eyebrow: "समस्या रिपोर्ट",
+      title: "नयाँ समस्या रिपोर्ट गर्नुहोस्",
+      intro: "तपाईंको टोल वा आसपासको कुनै समस्या समुदायलाई बताउनुहोस् — समुदायले भोट दिएर अभियानमा परिणत गर्नेछ।",
+      submit: "रिपोर्ट पठाउनुहोस्",
+      successMessage: "तपाईंको रिपोर्ट सफलतापूर्वक पठाइयो।",
+      authRequiredMessage: "रिपोर्ट गर्न पहिले login गर्नुहोस्।",
+      cta: {
+        list: "नयाँ समस्या रिपोर्ट गर्नुहोस्"
+      },
+      fields: {
+        cover: "मुख्य फोटो",
+        coverRequired: "मुख्य फोटो आवश्यक छ।",
+        title: "शीर्षक",
+        titlePlaceholder: "छोटो र स्पष्ट विवरण",
+        titleRequired: "शीर्षक आवश्यक छ।",
+        description: "विवरण",
+        descriptionPlaceholder: "के भइरहेको छ, कसलाई असर परेको छ, के परिवर्तन चाहिन्छ?",
+        descriptionRequired: "विवरण आवश्यक छ।",
+        category: "श्रेणी",
+        categoryPlaceholder: "श्रेणी छान्नुहोस्",
+        categoryRequired: "श्रेणी आवश्यक छ।",
+        address: "ठेगाना",
+        addressPlaceholder: "जस्तै: लेकसाइड, पोखरा",
+        addressRequired: "ठेगाना आवश्यक छ।",
+        location: "स्थान",
+        locationRequired: "स्थान आवश्यक छ।",
+        locationDetect: "मेरो स्थान प्रयोग गर्नुहोस्",
+        locationDetecting: "खोजी गर्दैछ...",
+        locationDetected: "स्थान सेट भयो",
+        locationManualToggle: "वा coordinates आफै राख्नुहोस्",
+        locationDenied: "Browser ले permission दिएन — तल coordinates आफै राख्नुहोस्।",
+        locationUnsupported: "तपाईंको browser ले location सेवा समर्थन गर्दैन — coordinates आफै राख्नुहोस्।",
+        latitude: "Latitude",
+        longitude: "Longitude",
+        latitudeRequired: "Latitude आवश्यक छ।",
+        longitudeRequired: "Longitude आवश्यक छ।",
+        latitudeRange: "Latitude -90 देखि 90 बीचमा हुनुपर्छ।",
+        longitudeRange: "Longitude -180 देखि 180 बीचमा हुनुपर्छ।"
+      },
+      categories: {
+        ROADSIDE: "सडककाँठ",
+        VACANT_LAND: "खाली जमीन",
+        RIVERBANK: "खोला किनार",
+        DRAINAGE: "ढल",
+        PARK_PUBLIC_SPACE: "पार्क / सार्वजनिक स्थल",
+        HIKING_TRAIL: "हाइकिङ बाटो",
+        OTHER: "अन्य"
+      }
+    },
     footer: {
       brand: "श्रमदान",
       ariaLabel: "श्रमदान footer",
@@ -973,7 +1024,8 @@ export const copy = {
       me: "My profile",
       terms: "Terms of Use",
       privacy: "Privacy Policy",
-      codeOfConduct: "Code of Conduct"
+      codeOfConduct: "Code of Conduct",
+      newIssue: "Report a New Issue"
     },
     ariaLabels: {
       home: "Shramdan home",
@@ -1889,6 +1941,56 @@ export const copy = {
           }
         ],
         footer: "This Code evolves with the community. Suggestions for improvement are welcome through /feedback."
+      }
+    },
+    issueNew: {
+      eyebrow: "Issue report",
+      title: "Report a New Issue",
+      intro: "Tell the community about a problem in your neighborhood — the community will vote on it and turn it into a campaign.",
+      submit: "Submit Report",
+      successMessage: "Your report was submitted successfully.",
+      authRequiredMessage: "Please log in to report an issue.",
+      cta: {
+        list: "Report a New Issue"
+      },
+      fields: {
+        cover: "Cover photo",
+        coverRequired: "A cover photo is required.",
+        title: "Title",
+        titlePlaceholder: "A short, clear summary",
+        titleRequired: "Title is required.",
+        description: "Description",
+        descriptionPlaceholder: "What is happening, who is affected, and what needs to change?",
+        descriptionRequired: "Description is required.",
+        category: "Category",
+        categoryPlaceholder: "Select a category",
+        categoryRequired: "Category is required.",
+        address: "Address",
+        addressPlaceholder: "e.g. Lakeside, Pokhara",
+        addressRequired: "Address is required.",
+        location: "Location",
+        locationRequired: "Location is required.",
+        locationDetect: "Use my location",
+        locationDetecting: "Detecting...",
+        locationDetected: "Location set",
+        locationManualToggle: "Or enter coordinates manually",
+        locationDenied: "Browser denied permission — please enter coordinates below.",
+        locationUnsupported: "Your browser does not support location services — please enter coordinates below.",
+        latitude: "Latitude",
+        longitude: "Longitude",
+        latitudeRequired: "Latitude is required.",
+        longitudeRequired: "Longitude is required.",
+        latitudeRange: "Latitude must be between -90 and 90.",
+        longitudeRange: "Longitude must be between -180 and 180."
+      },
+      categories: {
+        ROADSIDE: "Roadside",
+        VACANT_LAND: "Vacant land",
+        RIVERBANK: "Riverbank",
+        DRAINAGE: "Drainage",
+        PARK_PUBLIC_SPACE: "Park / Public space",
+        HIKING_TRAIL: "Hiking trail",
+        OTHER: "Other"
       }
     },
     footer: {

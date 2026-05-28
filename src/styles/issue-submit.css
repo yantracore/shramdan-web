@@ -1,0 +1,73 @@
+.new-issue-section {
+  padding-bottom: 64px;
+}
+
+.new-issue-form {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 32px;
+  display: grid;
+  gap: 8px;
+}
+
+.new-issue-form .ant-form-item {
+  margin-bottom: 18px;
+}
+
+.new-issue-location-block {
+  margin-bottom: 14px;
+}
+
+.new-issue-location-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.new-issue-location-header label {
+  color: var(--text);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.new-issue-location-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.new-issue-location-error {
+  margin: 8px 0 0;
+  color: var(--accent);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.new-issue-coords-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+@media (max-width: 540px) {
+  .new-issue-coords-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.section-heading-with-cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.section-heading-with-cta .section-heading-body {
+  flex: 1 1 320px;
+}
+
+.section-heading-cta {
+  flex: 0 0 auto;
+}
