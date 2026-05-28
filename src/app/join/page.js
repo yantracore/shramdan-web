@@ -3,6 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { ContributorForm } from "@/components/ContributorForm";
+import { isHoneypotTriggered } from "@/components/Honeypot";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
 import { postJson } from "@/lib/apiClient";
@@ -20,6 +21,11 @@ function JoinPageContent() {
   const initialRole = allowedRoles.has(selectedRole) ? selectedRole : undefined;
 
   const handleSubmit = async (values) => {
+    if (isHoneypotTriggered(values)) {
+      messageApi.success(t.messages.join);
+      return true;
+    }
+
     setSubmitting(true);
 
     try {

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { FeedbackForm } from "@/components/FeedbackForm";
+import { isHoneypotTriggered } from "@/components/Honeypot";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
 import { postJson } from "@/lib/apiClient";
@@ -15,6 +16,11 @@ export default function FeedbackPage() {
   const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async (values) => {
+    if (isHoneypotTriggered(values)) {
+      messageApi.success(t.messages.feedback);
+      return true;
+    }
+
     setSubmitting(true);
 
     try {

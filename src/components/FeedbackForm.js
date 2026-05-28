@@ -2,6 +2,7 @@
 
 import { MessageOutlined } from "@ant-design/icons";
 import { Button, Form, Input, Rate, Select } from "antd";
+import { Honeypot } from "@/components/Honeypot";
 import { toSelectOptions } from "@/lib/siteContent";
 
 export function FeedbackForm({ content, eyebrow, title, intro, onSubmit, submitting = false }) {
@@ -53,6 +54,7 @@ export function FeedbackForm({ content, eyebrow, title, intro, onSubmit, submitt
           <Input placeholder={content.placeholders.screenshot} />
         </Form.Item>
       </div>
+      <Honeypot />
       <Button type="primary" htmlType="submit" size="large" icon={<MessageOutlined />} loading={submitting} block>
         {labels.submit}
       </Button>

@@ -3,6 +3,7 @@
 import { SendOutlined } from "@ant-design/icons";
 import { Button, Form, Input, Select } from "antd";
 import { useEffect } from "react";
+import { Honeypot } from "@/components/Honeypot";
 import { toSelectOptions } from "@/lib/siteContent";
 
 export function ContributorForm({ content, eyebrow, title, intro, initialRole, onSubmit, submitting = false }) {
@@ -75,6 +76,7 @@ export function ContributorForm({ content, eyebrow, title, intro, initialRole, o
           <Input.TextArea rows={3} maxLength={300} showCount placeholder={content.placeholders.additionalInfo} />
         </Form.Item>
       </div>
+      <Honeypot />
       <Button type="primary" htmlType="submit" size="large" icon={<SendOutlined />} loading={submitting} block>
         {labels.submit}
       </Button>
