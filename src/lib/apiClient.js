@@ -1,4 +1,4 @@
-import { clearAuthSession, getStoredAccessToken } from "@/lib/authSession";
+import { expireAuthSession, getStoredAccessToken } from "@/lib/authSession";
 
 const FALLBACK_API_BASE_URL = "https://backend.shramdan.org/api/v1";
 
@@ -128,7 +128,7 @@ export async function apiRequest(path, options = {}) {
     const errorCode = getApiErrorCode(data);
 
     if (shouldClearSession(errorCode, response.status)) {
-      clearAuthSession();
+      expireAuthSession();
     }
 
     throw new ApiError(getApiErrorMessage(data, response.status), {
@@ -175,4 +175,11 @@ export function changePassword(values) {
 
 export function voteOnIssue(issueId, voterRole = "INTERESTED") {
   return postJson(`/issues/${issueId}/vote`, { voterRole }, { requireAuth: true });
+}
+
+export function fetchMyVotes({ cursor, limit, voterRole } = {}) {
+  return getJson("/issues/me/votes", {
+    params: { cursor, limit, voterRole },
+    requireAuth: true
+  });
 }

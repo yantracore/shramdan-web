@@ -62,7 +62,7 @@ When you (the coding agent) are working in this repo:
 - [ ] P3 [from 0.3] Subtle scroll-reveal animation on homepage sections — effort:M
 - [x] P1 [from 0.4.1] Honeypot / spam protection on `/join` and `/feedback` — effort:S ← done: 2026-05-28 *(shared `Honeypot` component renders an off-screen `website` field with `tabIndex={-1}` + `autoComplete="off"`; page-level submit silently returns success without calling the API when the field is filled)*
 - [ ] P3 [from 0.4] Success state with shareable confirmation link — effort:S
-- [ ] P1 [from 0.5.1] Token-expiry / refresh UX (currently a stale token can hit 401 silently) — effort:M **(Tier 0 launch-critical)**
+- [x] P1 [from 0.5.1] Token-expiry / refresh UX (currently a stale token can hit 401 silently) — effort:M ← done: 2026-05-28 *(new `AUTH_SESSION_EXPIRED_EVENT` fires from `apiClient` on 401 / INVALID_TOKEN / AUTH_REQUIRED; global `SessionExpirationWatcher` mounted inside `Providers` shows a bilingual "session expired" toast and replaces the route to `/login?next=<currentPath>`; login page consumes `?next=` to bounce the user back where they were)*
 - [ ] P3 [from 0.7] Smoother visual transition on language switch — effort:S
 - [ ] P3 [from 0.3.2] Post-launch: add Mobile App Dev, Translator (EN↔NE), Social Media, Photographer/Videographer, Event Coordinator roles to the volunteer invite — effort:S *(deferred until app release; current dev-phase roles are sufficient)*
 - [ ] P2 [from 0.3.2] Backend `applicationRoles` enum must accept `QA_ENGINEER`, `DEVOPS_ENGINEER`, `CONTENT_WRITER` — frontend cards link to `/join?role=` with these values but the API still rejects them (see [09-backend-admin-gaps.md](09-backend-admin-gaps.md)) — effort:S

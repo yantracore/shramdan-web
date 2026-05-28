@@ -1,6 +1,7 @@
 const AUTH_SESSION_STORAGE_KEY = "shramdan.auth.session";
 
 export const AUTH_SESSION_EVENT = "shramdan-auth-session-change";
+export const AUTH_SESSION_EXPIRED_EVENT = "shramdan-auth-session-expired";
 
 let cachedRawSession = null;
 let cachedSession = null;
@@ -101,6 +102,14 @@ export function clearAuthSession() {
   emitSessionChange();
 }
 
+export function expireAuthSession() {
+  clearAuthSession();
+
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event(AUTH_SESSION_EXPIRED_EVENT));
+  }
+}
+
 export function subscribeAuthSession(callback) {
   if (typeof window === "undefined") {
     return () => {};
@@ -112,6 +121,18 @@ export function subscribeAuthSession(callback) {
   return () => {
     window.removeEventListener(AUTH_SESSION_EVENT, callback);
     window.removeEventListener("storage", callback);
+  };
+}
+
+export function subscribeAuthSessionExpired(callback) {
+  if (typeof window === "undefined") {
+    return () => {};
+  }
+
+  window.addEventListener(AUTH_SESSION_EXPIRED_EVENT, callback);
+
+  return () => {
+    window.removeEventListener(AUTH_SESSION_EXPIRED_EVENT, callback);
   };
 }
 

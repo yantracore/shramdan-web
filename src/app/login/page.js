@@ -3,8 +3,8 @@
 import { LockOutlined, MailOutlined } from "@ant-design/icons";
 import { Button, Form, Input } from "antd";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
 import { usePreferences } from "@/app/providers";
 import { SiteShell } from "@/components/SiteShell";
 import { loginWithPassword } from "@/lib/apiClient";
@@ -47,12 +47,22 @@ const loginCopy = {
   }
 };
 
-function redirectPathForUser(user) {
+function isSafeRelativePath(path) {
+  return typeof path === "string" && path.startsWith("/") && !path.startsWith("//");
+}
+
+function redirectPathForUser(user, nextParam) {
+  if (isSafeRelativePath(nextParam)) {
+    return nextParam;
+  }
+
   return isAdminUser(user) ? "/admin" : "/issues";
 }
 
-export default function LoginPage() {
+function LoginPageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const nextParam = searchParams.get("next");
   const { language } = usePreferences();
   const t = loginCopy[language] ?? loginCopy.np;
   const globalCopy = copy[language] ?? copy.np;
@@ -64,9 +74,9 @@ export default function LoginPage() {
     const session = getAuthSession();
 
     if (session?.user) {
-      router.replace(redirectPathForUser(session.user));
+      router.replace(redirectPathForUser(session.user, nextParam));
     }
-  }, [router]);
+  }, [router, nextParam]);
 
   const handleLogin = async (values) => {
     setSubmitting(true);
@@ -76,7 +86,7 @@ export default function LoginPage() {
       const session = setAuthSession(response.data);
 
       messageApi.success(t.success);
-      router.replace(redirectPathForUser(session?.user));
+      router.replace(redirectPathForUser(session?.user, nextParam));
     } catch (error) {
       messageApi.error(error.message || globalCopy.messages.submitError);
     } finally {
@@ -130,5 +140,13 @@ export default function LoginPage() {
         </div>
       </section>
     </SiteShell>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginPageContent />
+    </Suspense>
   );
 }

@@ -8,6 +8,15 @@ export const copy = {
       feedback: "प्रतिक्रिया",
       login: "लगइन"
     },
+    pageTitles: {
+      brandSuffix: "श्रमदान | Shramdan",
+      home: "हाम्रो श्रम, हाम्रो समाज, हाम्रो भविष्य।",
+      issues: "समस्याहरू",
+      join: "जोडिनुहोस्",
+      feedback: "प्रतिक्रिया",
+      login: "लगइन",
+      me: "मेरो प्रोफाइल"
+    },
     ariaLabels: {
       home: "श्रमदान गृहपृष्ठ",
       nav: "मुख्य नेभिगेसन",
@@ -492,7 +501,8 @@ export const copy = {
       feedback: "प्रतिक्रिया API मा पठाइयो।",
       required: "यो विवरण आवश्यक छ।",
       email: "कृपया सही इमेल ठेगाना लेख्नुहोस्।",
-      submitError: "पठाउन सकिएन। कृपया फेरि प्रयास गर्नुहोस्।"
+      submitError: "पठाउन सकिएन। कृपया फेरि प्रयास गर्नुहोस्।",
+      sessionExpired: "तपाईंको session सकिएको छ। कृपया फेरि login गर्नुहोस्।"
     },
     me: {
       title: "मेरो प्रोफाइल",
@@ -764,6 +774,15 @@ export const copy = {
       join: "Join",
       feedback: "Feedback",
       login: "Login"
+    },
+    pageTitles: {
+      brandSuffix: "श्रमदान | Shramdan",
+      home: "Our labor, our society, our future.",
+      issues: "Issues",
+      join: "Join",
+      feedback: "Feedback",
+      login: "Login",
+      me: "My profile"
     },
     ariaLabels: {
       home: "Shramdan home",
@@ -1257,7 +1276,8 @@ export const copy = {
       feedback: "Feedback was sent to the API.",
       required: "This field is required.",
       email: "Please enter a valid email address.",
-      submitError: "Could not submit. Please try again."
+      submitError: "Could not submit. Please try again.",
+      sessionExpired: "Your session has expired. Please log in again."
     },
     me: {
       title: "My profile",
