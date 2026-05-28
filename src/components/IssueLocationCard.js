@@ -1,18 +1,7 @@
 "use client";
 
 import { EnvironmentOutlined, ExportOutlined } from "@ant-design/icons";
-
-function buildOsmEmbedUrl(latitude, longitude) {
-  const lat = Number(latitude);
-  const lng = Number(longitude);
-  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
-  const delta = 0.005;
-  const bbox = [lng - delta, lat - delta, lng + delta, lat + delta]
-    .map((n) => n.toFixed(6))
-    .join(",");
-  const marker = `${lat.toFixed(6)},${lng.toFixed(6)}`;
-  return `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${marker}`;
-}
+import IssueMapBlock from "@/components/IssueMapBlock";
 
 function buildMapsLink(addressText, latitude, longitude) {
   const lat = Number(latitude);
@@ -26,11 +15,34 @@ function buildMapsLink(addressText, latitude, longitude) {
   return null;
 }
 
-export function IssueLocationCard({ addressText, latitude, longitude, content }) {
-  if (!addressText && latitude == null && longitude == null) return null;
+export function IssueLocationCard({
+  issue,
+  addressText,
+  latitude,
+  longitude,
+  content,
+  language = "en"
+}) {
+  const address = addressText ?? issue?.addressText;
+  const lat = Number(latitude ?? issue?.latitude);
+  const lng = Number(longitude ?? issue?.longitude);
+  const hasCoords = Number.isFinite(lat) && Number.isFinite(lng);
 
-  const embedUrl = buildOsmEmbedUrl(latitude, longitude);
-  const mapsLink = buildMapsLink(addressText, latitude, longitude);
+  if (!address && !hasCoords) return null;
+
+  const mapsLink = buildMapsLink(address, lat, lng);
+  const mapIssue = hasCoords
+    ? {
+        id: issue?.id ?? "self",
+        title: issue?.title,
+        status: issue?.status,
+        category: issue?.category,
+        addressText: address,
+        latitude: lat,
+        longitude: lng,
+        voteCount: issue?.voteCount
+      }
+    : null;
 
   return (
     <section className="public-issue-location-card" id="issue-location">
@@ -47,18 +59,20 @@ export function IssueLocationCard({ addressText, latitude, longitude, content })
           </a>
         ) : null}
       </div>
-      {addressText ? (
+      {address ? (
         <p className="public-issue-location-address">
-          <EnvironmentOutlined /> {addressText}
+          <EnvironmentOutlined /> {address}
         </p>
       ) : null}
-      {embedUrl ? (
+      {mapIssue ? (
         <div className="public-issue-location-map">
-          <iframe
-            title={content.detail.locationTitle}
-            src={embedUrl}
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
+          <IssueMapBlock
+            issues={[mapIssue]}
+            content={content}
+            language={language}
+            height={280}
+            interactive
+            showPopup={false}
           />
         </div>
       ) : null}

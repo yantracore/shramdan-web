@@ -250,10 +250,9 @@ export default function IssueDetailPage() {
               ) : null}
 
               <IssueLocationCard
-                addressText={issue.addressText}
-                latitude={issue.latitude}
-                longitude={issue.longitude}
+                issue={issue}
                 content={content}
+                language={language}
               />
             </div>
           </article>

@@ -298,10 +298,8 @@ export default function AdminIssueViewPage() {
               ) : null}
 
               <IssueLocationCard
-                addressText={issue.addressText}
+                issue={issue}
                 content={ADMIN_ISSUE_CONTENT}
-                latitude={issue.latitude}
-                longitude={issue.longitude}
               />
             </div>
           </article>
