@@ -9,11 +9,22 @@ This map is maintained by hand. Do **not** auto-generate it from the OpenAPI spe
 The backend deploys outside our working hours, so the local `docs/07-api-reference.json` can be stale at the start of a new working session. Agents enforce freshness via a 6-hour TTL stored in `docs/07-api-reference.meta.json`:
 
 - Before consulting `07-api-reference.json` or citing any endpoint contract, read `07-api-reference.meta.json` and compare `lastFetchedAt` (NPT, UTC+05:45) against the current time.
-- If the gap is **≥ `stalenessThresholdHours`** (currently 6), silently run the `fetchCommand` (`curl -fsSL https://backend.shramdan.org/api-docs.json -o docs/07-api-reference.json`), then update `lastFetchedAt` + `lastFetchedAtDisplay` in the meta file to the new fetch moment, and announce the refresh in one line (`API docs were Xh stale — refreshed from backend.`).
-- Inside the 6h window, trust the local copy and skip the network call.
-- Do not prompt the user; freshness is automatic. An explicit "update the API docs" from the user still triggers an immediate fetch regardless of the timestamp.
+- If the gap is **≥ `stalenessThresholdHours`** (currently 6), run the `fetchCommand` (`node scripts/refresh-api-docs.mjs`). That single command does everything: backs up the current spec to `07-api-reference.prev.json`, fetches the new spec into `07-api-reference.json`, writes a shape-level diff to `07-api-reference.changes.json`, and rewrites the `lastFetchedAt` + `lastFetchedAtDisplay` fields in the meta file. Agents do **not** hand-edit those timestamp fields anymore.
+- Announce the refresh in one line, with the diff totals folded in: `API docs were Xh stale — refreshed (+A new endpoints, -R removed, ~M modified).`
+- Inside the 6h window, trust the local copy and skip the refresh.
+- Do not prompt the user; freshness is automatic. An explicit "update the API docs" from the user still triggers an immediate refresh regardless of the timestamp.
 
 The 6h threshold lives in the meta file, not in code, so it can be adjusted in one place.
+
+### What the diff captures
+
+`docs/07-api-reference.changes.json` is rewritten on every refresh. Shape comparison is done at the `METHOD /path` level. An endpoint is flagged `modified` when any of these change between refreshes: parameter count, presence of a request body, set of response status codes, or auth requirement. Deep request/response body field renames are **not** tracked — by design, to keep noise low. Three buckets:
+
+- `added` — endpoints that exist now but did not before.
+- `removed` — endpoints that existed before but no longer do.
+- `modified` — endpoints whose shape (per the rules above) shifted, each row carries the specific `params N→M`, `requestBody true→false`, `responses […]→[…]`, or `auth false→true` notes.
+
+The `acknowledgedAt` field starts as `null` after a refresh. The agent surfaces the diff in its next start-of-day briefing (or current reply if a refresh fires mid-session), then writes an ISO timestamp into `acknowledgedAt` so it doesn't get re-announced on every subsequent message inside the same TTL window. The next refresh resets it to `null` again.
 
 ## API Client
 
