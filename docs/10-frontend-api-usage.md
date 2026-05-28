@@ -26,6 +26,16 @@ The 6h threshold lives in the meta file, not in code, so it can be adjusted in o
 
 The `acknowledgedAt` field starts as `null` after a refresh. The agent surfaces the diff in its next start-of-day briefing (or current reply if a refresh fires mid-session), then writes an ISO timestamp into `acknowledgedAt` so it doesn't get re-announced on every subsequent message inside the same TTL window. The next refresh resets it to `null` again.
 
+### How the diff lands in the briefing
+
+Each diff entry is surfaced with an *actionable* hint — not a raw list. Before writing the briefing, the agent cross-references every endpoint in the diff against the consumer map in this file (the tables below). Both path forms are checked (`POST /applications` and `POST /api/v1/applications`) because this file lists endpoints relative to the apiClient base URL while the OpenAPI spec uses the absolute form.
+
+- **`added`** — if no caller is found here, the entry is labelled `not yet wired` with a suggested call-site path based on the URL segment (e.g. `/admin/foo` → `src/app/admin/foo/page.js`). If a caller already exists (the frontend was anticipating it), the entry is labelled `wired in <file> (now unblocked)`.
+- **`removed`** — if a caller exists here, the entry is labelled `WILL BREAK <file>` so the user can decide to update or remove that consumer. If no caller, `no current consumers`.
+- **`modified`** — if a caller exists, the entry is labelled with the change list and the affected file(s): `consumers in <file> may need updates: params 1→2`. If no caller, `not yet wired (no callers to update)`.
+
+The diff section ends with a one-line next-step prompt when anything is `added` (unwired) or `removed` (breaking), inviting the user to wire it up or fix the break. The agent never silently drops `removed` entries from the briefing, even if the bucket overflows the scannability cap — those are the riskiest.
+
 ## API Client
 
 All requests go through `src/lib/apiClient.js`:
