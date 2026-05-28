@@ -60,9 +60,9 @@ When you (the coding agent) are working in this repo:
 
 - [ ] P2 [from 0.3.3] Playlist autoplay-next when a video ends — effort:S
 - [ ] P3 [from 0.3] Subtle scroll-reveal animation on homepage sections — effort:M
-- [ ] P2 [from 0.4.1] Honeypot / spam protection on `/join` and `/feedback` — effort:S
+- [ ] P1 [from 0.4.1] Honeypot / spam protection on `/join` and `/feedback` — effort:S **(Tier 0 launch-critical — bumped P2→P1 on 2026-05-28; see [00-master-roadmap.md § Launch Critical Path](00-master-roadmap.md#launch-critical-path--tier-0))**
 - [ ] P3 [from 0.4] Success state with shareable confirmation link — effort:S
-- [ ] P1 [from 0.5.1] Token-expiry / refresh UX (currently a stale token can hit 401 silently) — effort:M
+- [ ] P1 [from 0.5.1] Token-expiry / refresh UX (currently a stale token can hit 401 silently) — effort:M **(Tier 0 launch-critical)**
 - [ ] P3 [from 0.7] Smoother visual transition on language switch — effort:S
 - [ ] P3 [from 0.3.2] Post-launch: add Mobile App Dev, Translator (EN↔NE), Social Media, Photographer/Videographer, Event Coordinator roles to the volunteer invite — effort:S *(deferred until app release; current dev-phase roles are sufficient)*
 - [ ] P2 [from 0.3.2] Backend `applicationRoles` enum must accept `QA_ENGINEER`, `DEVOPS_ENGINEER`, `CONTENT_WRITER` — frontend cards link to `/join?role=` with these values but the API still rejects them (see [09-backend-admin-gaps.md](09-backend-admin-gaps.md)) — effort:S

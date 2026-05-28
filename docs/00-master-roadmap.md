@@ -80,16 +80,61 @@ When you are working on a task that appears in this roadmap, you MUST:
 
 If the user gives a high-level instruction like "let's continue", read this file first, pick the highest-leverage unblocked `[ ]` leaf, announce what you're starting, flip it to `[~]`, and proceed.
 
+## Launch Critical Path — Tier 0
+
+> **The finish line:** the platform can host the first real-world श्रमदान event end-to-end — citizen reports an issue, community votes, admin promotes to a campaign, leader schedules, volunteers join, leader marks complete. Every leaf in Tier 0 below is a literal blocker for that milestone.
+>
+> Work outside this list is **Tier 1** (ship soon after first event) or **Tier 2** (later). Agents picking up "what's next?" must choose `[ ]` work from this list before reaching for anything outside it, unless the user explicitly redirects.
+>
+> *Reorganized 2026-05-28. The underlying weighted phase tree is unchanged; this section is a curated cross-cut over the same leaves.*
+
+**Tier 0 sequence — dependency-aware, smallest-blocker-first**
+
+1. **Security + Legal trio** *(parallel batch — none block each other)*
+   - Honeypot on `/join` and `/feedback` *(polish 0.4.1, bumped P2→P1)*
+   - Token-expiry / refresh UX — kill silent 401 *(polish 0.5.1 P1)*
+   - 11.8 Legal trio — T&C, Privacy Policy, Code of Conduct + waiver/consent surface in `/join`
+   - 11.7 Security review baseline — XSS, CSRF, secret handling, rate-limit sweep on existing surfaces
+2. **1.6 Citizen public issue submission** — new leaf below; minimal `/issues/new` form. Logged-in via `/join` (Volunteer = Shramdan Member entry point — rename deferred to Tier 1).
+3. **3.3 Issue → Campaign promotion** — admin button on issue detail to create the event record.
+4. **3.2 Public campaign detail page** — `/events/[id]` against existing `GET /events/{id}`.
+5. **3.6 Volunteer join + roster** — "I'm joining" button + roster list on the campaign page.
+6. **3.5.1 Leader schedule UI** — leader can `PATCH /events/{id}/schedule`.
+7. **4.6 Pre-event safety checklist gate** — simplest form, leader ticks N boxes before the event publishes.
+8. **3.5.2 Leader mark complete** — leader can `POST /events/{id}/complete`.
+
+**Tier 1 — ship soon after first event** *(intentionally deferred from Tier 0)*
+
+- 2.1 Phone+OTP signup (replaces email+password as Shramdan Member auth)
+- 2.2–2.7 Full member portal `/app` (mobile-style web shell)
+- "Volunteer → Shramdan Member" rename across `/join` + admin
+- 8.1 / 8.2 Email + SMS reminders
+- 3.4.2 Member-side leader nomination + 3.4.3 tie-break
+- 1.5.3 Voter role tagging
+- 11.4 SEO + sitemap.xml + robots.txt + metadataBase
+- 11.2 WCAG AA accessibility audit
+- Phase 13 Public reports surface
+
+**Tier 2 — later (donation / scale phase)**
+
+- Phase 5 Donations (Esewa, Khalti, bank, foreign)
+- Phase 6 Transparency ledger + receipts
+- Phase 4 Full incidents system (beyond 4.6 checklist)
+- Phase 10 Native mobile (iOS / Android)
+- Phase 7 Impact stories surface
+- Phase 14.2 + 14.3 `/development` page + public polls
+- 9.6 onward — admin polish expansions
+- 9.11 Admin bilingual issue fields *(cancelled — backend pipeline handles translation)*
+
 ## Currently Suggested Next Up
 
-Use this section as a short-lived hint of what would be a sensible next step *right now*. Agents may rewrite this list freely as priorities shift. Keep to 3-5 items, ordered. When proposing "what's next", agents must also consult open `P1` items in [00-polish-backlog.md](00-polish-backlog.md) and mix them in here when they outweigh a fresh ship leaf.
+This is the active end of the [Launch Critical Path](#launch-critical-path--tier-0). Items collapse forward as Tier 0 sequence steps complete — agents may rewrite this list freely but must keep it consistent with the Tier 0 ladder above. When proposing "what's next", agents must also consult open `P1` items in [00-polish-backlog.md](00-polish-backlog.md) and prefer Tier-0-tagged polish over fresh feature leaves.
 
-1. Phase 9.11.1 EN+NE field pairs on admin `IssueForm` — frontend-only slice the user flagged 2026-05-27; unblocks bilingual public issue copy without waiting on the translation API (9.11.2 stays blocked).
-2. Phase 2.1 phone+OTP member signup — biggest unlock; without member auth, 1.5 voting and `/app` dashboard stay blocked. Needs Phase 2 stack decision in the same swing.
-3. Decide stack for member portal `/app` (Phase 2) — Expo / Capacitor / Next-only — feeds into 2.1.
-4. Phase 3.2 public campaign detail page — backend `GET /events/{id}` is ready; sensible next read-only public surface after issues. *(Deferred per user 2026-05-27 — revisit later.)*
-5. Triage Phase 9.5 issues CRUD against [09-backend-admin-gaps.md](09-backend-admin-gaps.md) — confirm which mutation endpoints have landed since the admin create page was added.
-6. Set `metadataBase` in root layout + sitemap.xml + robots.txt (Phase 11.4 SEO leaf) — small, complements 1.4.2 OG work.
+1. **Security + Legal trio** — honeypot on `/join` + `/feedback`, token-expiry UX fix, draft T&C / Privacy / Code of Conduct pages, baseline security pass. Parallel-safe; the legal copy can be drafted while the code patches land.
+2. **1.6 Citizen public issue submission** — `/issues/new` route + form using existing `POST /issues`; un-auth click pushes `/join`.
+3. **3.3 Issue → Campaign promotion** — admin button on issue detail that calls the event-create endpoint.
+
+*Earlier suggestions (9.11.1, Phase 2 stack decision, 3.2 deferral) superseded by the 2026-05-28 reorganization. Phase 2 stack decision moves to Tier 1; 9.11.1 cancelled.*
 
 ---
 
@@ -115,7 +160,7 @@ Goal: A live public site, deployable, with the basic surfaces users currently se
 - [x] 0.6 Docs 01–10 set authored `w:1` ← done: 2026-05-20
 - [x] 0.7 Bilingual EN/NE on every existing public surface `w:1` ← done: 2026-05-25 *(homepage, `/join`, `/feedback`, public footer, form validation, error toasts — all wired through `copy[language]` in `src/lib/siteContent.js`. Admin shell stays EN-only per product decision. New public pages must add `np` + `en` entries when built; tracked under their own phases, not here.)*
 
-## Phase 1 — Public Issue Discovery & Voting `w:15` 📊 73%
+## Phase 1 — Public Issue Discovery & Voting `w:15` 📊 65%
 
 Goal: Anyone (logged-in or not) can browse listed issues, see detail, and — once authenticated — vote.
 
@@ -135,6 +180,9 @@ Goal: Anyone (logged-in or not) can browse listed issues, see detail, and — on
   - [~] 1.5.1 `POST /issues/{id}/vote` + `DELETE` un-vote `w:1` *(POST shipped; DELETE UI pending — needs "I'm withdrawing support" affordance once initial voted state is readable.)*
   - [x] 1.5.2 Optimistic UI + auth gating (prompt sign-in) `w:2` ← done: 2026-05-27 *(`useIssueVote` increments optimistically, rolls back on error; un-auth click pushes `/login`; post-login redirect now lands non-admin users on `/issues`.)*
   - [ ] 1.5.3 Voter role tagging (volunteer / donor / etc.) `w:1` *(Backend accepts `voterRole` enum but frontend hardcodes `INTERESTED`; needs a picker on the vote button or a modal before commit.)*
+- [ ] 1.6 Citizen public issue submission `w:2` *(**Tier 0 launch-critical.** Public `/issues/new` form on the website using the existing `POST /issues` endpoint. `/join` Volunteer = Shramdan Member entry point already qualifies as a verified user. Phase 2.4's `/app` mobile-style submission flow stays Tier 1 — this is the website shortcut so the first event isn't blocked on the member portal.)*
+  - [ ] 1.6.1 `/issues/new` route + form (title, description, category, location, cover image via existing presign flow) `w:1`
+  - [ ] 1.6.2 Auth gating + post-submit redirect (un-auth click pushes `/join`; post-submit lands on the new issue's detail page) `w:1`
 
 ## Phase 2 — Member Portal `/app` (Mobile-style Web Shell) `w:18` 📊 0%
 
@@ -226,7 +274,7 @@ Goal: Safety leads, medical professionals, and admins can manage real-world risk
 - [ ] 8.3 PWA push notifications `w:1`
 - [ ] 8.4 AI assistant on WhatsApp / Messenger / IG `w:2` *(future / Meta API)*
 
-## Phase 9 — Admin Control Center Expansion `w:10` 📊 57%
+## Phase 9 — Admin Control Center Expansion `w:10` 📊 67%
 
 Goal: Every public-facing entity has an admin counterpart with full CRUD + audit, gated by role.
 
@@ -242,10 +290,10 @@ Goal: Every public-facing entity has an admin counterpart with full CRUD + audit
 - [ ] 9.8 Notifications admin (templates + queue) `w:1`
 - [ ] 9.9 Audit log + activity feed `w:1`
 - [x] 9.10 Users browse list (`/admin/users`, read-only) `w:1` ← done: 2026-05-25 *(UI ready; staging `GET /users` returns 500 due to backend `take` Int cast bug — see [09-backend-admin-gaps.md](09-backend-admin-gaps.md))*
-- [ ] 9.11 Bilingual issue creation (admin EN+NE fields) `w:2` *(Admin shell stays EN-only, but free-text content authored here surfaces on the bilingual public site, so it must be captured in both languages at creation time. Today `IssueForm` accepts one language only and the public detail/list pages render whatever string was saved — there is no `np` / `en` split for issue records. See [project_language_scope](../../../.claude/projects/c--Users---------Desktop-Shramdan-apps-shramdan-web/memory/project_language_scope.md).)*
-  - [ ] 9.11.1 EN + NE input pairs on `/admin/issues/create` + `/admin/issues/[id]/edit` for free-text fields (title, description, location label; category stays a dropdown) `w:1`
-  - [!] 9.11.2 Translation API auto-suggest (NE ↔ EN on blur, editable) `w:1` ← blocked: backend translation endpoint not yet shipped
-  - [ ] 9.11.3 Public `/issues` list + detail consume bilingual fields via existing `copy[language]` switch `w:0` *(downstream of 9.11.1 landing on backend; tracked here so it isn't forgotten — flip to a real weight once the data shape lands)*
+- [-] 9.11 Bilingual issue creation (admin EN+NE fields) `w:2` *(Cancelled 2026-05-28 — backend will handle EN↔NE translation behind the scenes via an API-level pipeline. The admin `IssueForm` keeps a single-language input. Public site consumes the translated field through the existing `copy[language]` switch once the backend exposes both languages on read; that downstream surface work is tracked under the backend translation initiative, not the frontend roadmap.)*
+  - [-] 9.11.1 EN + NE input pairs on admin `IssueForm` `w:1` *(superseded — single-language input stays)*
+  - [-] 9.11.2 Frontend translation auto-suggest `w:1` *(superseded — backend pipeline)*
+  - [-] 9.11.3 Public surfaces consume bilingual fields `w:0` *(moves to the backend translation initiative)*
 - [x] 9.12 Admin reports analytics page + dashboard overhaul `w:2` ← done: 2026-05-27 *(Wires the admin-only `GET /api/v1/reports` aggregated endpoint into the control center. Public-facing counterpart for citizens lives in Phase 13, not here.)*
   - [x] 9.12.1 `/admin/reports` page — filter bar (date range, bucket, top-N, sections, geography, advanced per-domain) + 9 section panels (Overview / Users / Issues / Events / Engagement / Feedback / Applications / Uploads / Geographic) via `@ant-design/charts` `w:1` ← done: 2026-05-27
   - [x] 9.12.2 `/admin` dashboard rewrite — hero + quick actions + overview KPIs + "Needs attention" shortcuts + community pulse + key panels + jump-links (replaces the static module-card grid) `w:1` ← done: 2026-05-27
@@ -314,7 +362,7 @@ Weighted across all phases (sum of phase weights = 137):
 | Phase | Weight | Progress |
 | --- | --- | --- |
 | 0 Foundation | 10 | 100% |
-| 1 Public Issue Discovery & Voting | 15 | 73% |
+| 1 Public Issue Discovery & Voting | 15 | 65% |
 | 2 Member Portal `/app` | 18 | 0% |
 | 3 Campaign Execution | 15 | 5% |
 | 4 Operational Safety | 8 | 0% |
@@ -322,7 +370,7 @@ Weighted across all phases (sum of phase weights = 137):
 | 6 Transparency & Ledger | 8 | 0% |
 | 7 Impact Stories | 5 | 0% |
 | 8 Notifications & Outreach | 6 | 0% |
-| 9 Admin Control Center | 10 | 57% |
+| 9 Admin Control Center | 10 | 67% |
 | 10 Native Mobile App | 5 | 0% |
 | 11 Cross-cutting | 10 | 25% |
 | 12 Documentation & Community | 5 | 40% |
