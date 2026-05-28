@@ -109,7 +109,7 @@ export function AdminShell({ children, title }) {
 
   useEffect(() => {
     if (!title) return;
-    document.title = `${title} - Shramdan Control Center`;
+    document.title = `${title} · श्रमदान Control Center`;
   }, [title]);
 
   const handleLogout = () => {

@@ -122,7 +122,7 @@ export default function IssueDetailPage() {
   };
 
   return (
-    <SiteShell>
+    <SiteShell pageTitle={issue?.title || content.detail.notFoundTitle}>
       <section className="page-section public-issue-detail-section">
         <Link className="public-issue-back-link" href="/issues">
           <ArrowLeftOutlined /> {content.detail.backToList}

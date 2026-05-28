@@ -95,7 +95,7 @@ function LoginPageContent() {
   };
 
   return (
-    <SiteShell>
+    <SiteShell pageTitle={globalCopy.pageTitles.login}>
       <section className="page-section login-section">
         <div className="content-card login-card">
           <header className="form-card-heading">

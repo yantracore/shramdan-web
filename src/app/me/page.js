@@ -230,7 +230,7 @@ export default function MePage() {
 
   if (!session || loadingProfile) {
     return (
-      <SiteShell>
+      <SiteShell pageTitle={globalCopy.pageTitles.me}>
         <section className="page-section me-section">
           <div className="me-loading">
             <Spin size="large" />
@@ -242,7 +242,7 @@ export default function MePage() {
 
   if (loadError) {
     return (
-      <SiteShell>
+      <SiteShell pageTitle={globalCopy.pageTitles.me}>
         <section className="page-section me-section">
           <Alert
             type="error"
@@ -265,7 +265,7 @@ export default function MePage() {
   const showPasswordSection = !profile?.isOAuthUser;
 
   return (
-    <SiteShell>
+    <SiteShell pageTitle={globalCopy.pageTitles.me}>
       <section className="page-section me-section">
         <div className="section-heading">
           <h1>{t.title}</h1>

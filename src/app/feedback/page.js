@@ -36,7 +36,7 @@ export default function FeedbackPage() {
   };
 
   return (
-    <SiteShell>
+    <SiteShell pageTitle={t.pageTitles.feedback}>
       <section className="page-section form-section">
         <FeedbackForm
           content={t}

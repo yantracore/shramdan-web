@@ -233,7 +233,7 @@ export default function IssuesListPage() {
   const mappableCount = mapIssues.length;
 
   return (
-    <SiteShell>
+    <SiteShell pageTitle={t.pageTitles.issues}>
       <section className="page-section public-issues-section">
         <div className="section-heading">
           <span className="eyebrow">{content.list.eyebrow}</span>

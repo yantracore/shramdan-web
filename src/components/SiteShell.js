@@ -39,13 +39,21 @@ const socialIcons = {
   youtube: FaYoutube
 };
 
-export function SiteShell({ children }) {
+export function SiteShell({ children, pageTitle }) {
   const { language, mode, toggleLanguage, toggleMode } = usePreferences();
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
   const pathname = usePathname();
   const router = useRouter();
   const session = useSyncExternalStore(subscribeAuthSession, getAuthSession, () => null);
   const t = copy[language];
+  const titles = t.pageTitles;
+  const documentTitle = pageTitle
+    ? `${pageTitle} · ${titles.brandSuffix}`
+    : `${titles.brandSuffix} · ${titles.home}`;
+
+  useEffect(() => {
+    document.title = documentTitle;
+  }, [documentTitle]);
   const activePath = pathname === "/" ? "/" : `/${pathname.split("/").filter(Boolean)[0]}`;
   const isAuthenticated = Boolean(session?.user);
   const isAdmin = isAuthenticated && isAdminUser(session.user);

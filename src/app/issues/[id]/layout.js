@@ -37,7 +37,7 @@ export async function generateMetadata({ params }) {
     };
   }
 
-  const title = `${issue.title} — ${BRAND}`;
+  const title = `${issue.title} · ${BRAND}`;
   const description = truncate(issue.description || FALLBACK_DESCRIPTION);
   const image = getIssueCoverImageUrl(issue);
   const ogImages = image ? [{ url: image, alt: issue.title }] : undefined;

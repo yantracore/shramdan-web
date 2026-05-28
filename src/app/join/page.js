@@ -41,7 +41,7 @@ function JoinPageContent() {
   };
 
   return (
-    <SiteShell>
+    <SiteShell pageTitle={t.pageTitles.join}>
       <section className="page-section form-section">
         <ContributorForm
           content={t}
