@@ -111,8 +111,9 @@ Uses the same `IssueForm` component as the create page (see "One shared form com
 
 | Page | Method + path | apiClient fn | Notes |
 | --- | --- | --- | --- |
-| `src/app/issues/page.js` | `GET /issues` | `getJson` | Anonymous; params: `status`, `category`, `sort`, `limit=50`; client-side filters out non-public statuses |
-| `src/app/issues/[id]/page.js` | `GET /issues/{id}` | `getJson` | Anonymous; loads detail + a second `GET /issues` call (by category) for "Other issues in this category" |
+| `src/app/issues/page.js` | `GET /issues` | `getJson` | Anonymous; params: `status`, `category`, `sort`, `limit=50`; client-side filters out non-public statuses. When the user is logged in, `apiClient` attaches the bearer token automatically and the response includes a per-issue `isVoted` boolean used to seed the "already supported" state |
+| `src/app/issues/[id]/page.js` | `GET /issues/{id}` | `getJson` | Anonymous; loads detail + a second `GET /issues` call (by category) for "Other issues in this category". `isVoted` is **not** returned on this endpoint today — see `docs/09-backend-admin-gaps.md` |
+| `src/components/IssueVoteButton.js` (via `useIssueVote`) | `POST /issues/{id}/vote` | `voteOnIssue` | Authenticated; verified users only; hard-coded `voterRole: "INTERESTED"`; flips local `voted` state on success/409 |
 
 ### `src/app/admin/events/page.js`
 

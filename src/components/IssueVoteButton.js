@@ -15,6 +15,7 @@ function toLocalDigits(value, language) {
 export function IssueVoteButton({
   issueId,
   initialVoteCount,
+  initialVoted,
   content,
   language,
   size,
@@ -27,6 +28,7 @@ export function IssueVoteButton({
     useIssueVote({
       issueId,
       initialVoteCount,
+      initialVoted,
       content: content.card
     });
 

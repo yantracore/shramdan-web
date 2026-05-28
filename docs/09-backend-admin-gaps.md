@@ -34,6 +34,26 @@ The `/admin/issues` page is otherwise read-only because the API does not yet pro
 - `DELETE /issues/{id}` — remove spam, abusive, or duplicate reports
 - Optional: `GET /issues/{id}/votes` — list voters with their `voterRole` so admins can plan event roles
 
+### `isVoted` missing on `GET /issues/{id}`
+
+When the caller sends a bearer token, `GET /issues` (list) returns a per-issue
+`isVoted` boolean — used by `IssueVoteButton` to render the "already supported"
+state without a separate round-trip. The detail endpoint `GET /issues/{id}` does
+not include this field even when authenticated, so the issue-detail page falls
+back to `voted=false` until the user clicks and the `POST /issues/{id}/vote` 409
+handler flips the state. Add `isVoted` to the detail response for parity.
+
+### Response shape change: `translations[]` instead of top-level `title`/`description`
+
+The live `/issues` and `/issues/{id}` responses now nest title/description inside
+a `translations: [{ locale, title, description }]` array per locale (`en`, `ne`),
+instead of returning them at the top level. `docs/07-api-reference.json` was
+regenerated 2026-05-28 but still shows the old top-level shape, so this is a
+spec-vs-backend drift the OpenAPI export needs to pick up. Frontend currently
+reads `issue.title` directly (see `PublicIssueCard`, `IssueDetailPage`) and will
+need a small helper (`pickIssueTranslation(issue, language)`) once we adopt the
+new shape.
+
 When these arrive, mirror the patterns already in `src/app/admin/applications/page.js` and `src/app/admin/feedback/page.js`:
 
 - Status `Select` per row using `patchJson(`/issues/${id}/status`, { status })`

@@ -6,7 +6,12 @@ import { voteOnIssue } from "@/lib/apiClient";
 import { getAuthSession, subscribeAuthSession } from "@/lib/authSession";
 import { useToast } from "@/lib/toast";
 
-export function useIssueVote({ issueId, initialVoteCount, content }) {
+export function useIssueVote({
+  issueId,
+  initialVoteCount,
+  initialVoted,
+  content
+}) {
   const router = useRouter();
   const messageApi = useToast();
   const session = useSyncExternalStore(
@@ -16,7 +21,7 @@ export function useIssueVote({ issueId, initialVoteCount, content }) {
   );
   const isAuthenticated = Boolean(session?.user);
 
-  const [voted, setVoted] = useState(false);
+  const [voted, setVoted] = useState(Boolean(initialVoted));
   const [voting, setVoting] = useState(false);
   const [voteCount, setVoteCount] = useState(initialVoteCount ?? 0);
 

@@ -3,7 +3,6 @@
 import { App as AntdApp, ConfigProvider, theme as antdTheme } from "antd";
 import { createContext, useCallback, useContext, useEffect, useMemo, useSyncExternalStore } from "react";
 import { SessionExpirationWatcher } from "@/components/SessionExpirationWatcher";
-import { initVotedIssuesStore } from "@/lib/votedIssues";
 
 const PreferenceContext = createContext(null);
 const THEME_STORAGE_KEY = "shramdan-theme";
@@ -92,10 +91,6 @@ export function Providers({ children }) {
     },
     [updatePreference]
   );
-
-  useEffect(() => {
-    initVotedIssuesStore();
-  }, []);
 
   useEffect(() => {
     document.documentElement.dataset.theme = mode;

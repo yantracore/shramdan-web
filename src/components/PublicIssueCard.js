@@ -70,6 +70,7 @@ export function PublicIssueCard({ issue, content, language }) {
           className="public-issue-card-support"
           content={content}
           initialVoteCount={issue.voteCount}
+          initialVoted={issue.isVoted}
           issueId={issue.id}
           language={language}
         />

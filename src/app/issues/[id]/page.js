@@ -194,6 +194,7 @@ export default function IssueDetailPage() {
                   <IssueVoteButton
                     content={content}
                     initialVoteCount={issue.voteCount}
+                    initialVoted={issue.isVoted}
                     issueId={issue.id}
                     language={language}
                     showCount={false}

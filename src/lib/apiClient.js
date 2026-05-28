@@ -176,10 +176,3 @@ export function changePassword(values) {
 export function voteOnIssue(issueId, voterRole = "INTERESTED") {
   return postJson(`/issues/${issueId}/vote`, { voterRole }, { requireAuth: true });
 }
-
-export function fetchMyVotes({ cursor, limit, voterRole } = {}) {
-  return getJson("/issues/me/votes", {
-    params: { cursor, limit, voterRole },
-    requireAuth: true
-  });
-}
