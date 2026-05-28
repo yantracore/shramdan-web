@@ -677,10 +677,12 @@
 
 .cleanup-area-card h3 {
   margin: 0;
+  padding: 8px 12px;
   color: var(--text);
   font-size: clamp(17px, 1.4vw, 21px);
   line-height: 1.16;
   letter-spacing: 0;
+  text-align: center;
   overflow-wrap: anywhere;
 }
 
