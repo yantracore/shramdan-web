@@ -70,7 +70,7 @@ export function IssueLocationCard({
             issues={[mapIssue]}
             content={content}
             language={language}
-            height={280}
+            height={360}
             interactive
             showPopup={false}
           />
