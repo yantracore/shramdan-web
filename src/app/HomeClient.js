@@ -397,6 +397,222 @@ export default function HomeClient({ summary }) {
         </aside>
       </section>
 
+      <section className="event-types-section" aria-labelledby="event-types-title">
+        <div className="event-types-heading">
+          <span className="eyebrow">{t.eventTypes.eyebrow}</span>
+          <div>
+            <h2 id="event-types-title">{t.eventTypes.title}</h2>
+            <p>{t.eventTypes.intro}</p>
+          </div>
+        </div>
+
+        <div className="event-types-grid">
+          {t.eventTypes.items.map((item) => (
+            <article
+              className={`event-type-card event-type-card--${item.status}`}
+              data-event-type={item.id}
+              key={item.id}
+            >
+              <div className="event-type-image">
+                <Image
+                  alt={item.imageAlt}
+                  fill
+                  sizes="(max-width: 620px) calc(100vw - 56px), (max-width: 1180px) 45vw, 280px"
+                  src={item.image}
+                />
+              </div>
+              <div className="event-type-body">
+                <span className={`event-type-badge event-type-badge--${item.status}`}>
+                  {item.status === "current"
+                    ? t.eventTypes.badgeCurrent
+                    : t.eventTypes.badgeFuture}
+                </span>
+                <h3>{item.title}</h3>
+                <p>{item.body}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+
+        <div className="event-types-actions">
+          <Button
+            type="primary"
+            size="large"
+            href={t.eventTypes.seeAllHref}
+            icon={<ArrowRightOutlined />}
+          >
+            {t.eventTypes.seeAll}
+          </Button>
+        </div>
+
+        <p className="phase-note">
+          <span aria-hidden="true">
+            <Image alt="" height={96} src="/images/logo.png" width={96} />
+          </span>
+          {t.eventTypes.phaseNote}
+        </p>
+      </section>
+
+      <section className="cleanup-areas-section" aria-labelledby="cleanup-areas-title">
+        <div className="cleanup-areas-heading">
+          <span className="eyebrow">{t.cleanupAreas.eyebrow}</span>
+          <div>
+            <h2 id="cleanup-areas-title">{t.cleanupAreas.title}</h2>
+            <p>{t.cleanupAreas.intro}</p>
+          </div>
+        </div>
+
+        <div className="cleanup-areas-grid">
+          {t.cleanupAreas.items.map((area) => (
+            <article className="cleanup-area-card" data-area={area.id} key={area.id}>
+              <div className="cleanup-area-image">
+                <Image
+                  alt={area.imageAlt}
+                  fill
+                  sizes="(max-width: 620px) calc(100vw - 56px), (max-width: 1180px) 30vw, 380px"
+                  src={area.image}
+                />
+              </div>
+              <h3>{area.title}</h3>
+              <p>{area.body}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="core-idea-section" aria-labelledby="core-idea-title">
+        <div className="core-idea-hero">
+          <div className="core-idea-copy">
+            <span className="core-idea-eyebrow">
+              <span aria-hidden="true">
+                <Image alt="" height={96} src="/images/logo.png" width={96} />
+              </span>
+              {t.coreIdea.eyebrow}
+            </span>
+            <h2 id="core-idea-title">{t.coreIdea.title}</h2>
+          </div>
+          <div className="core-idea-landscape" aria-hidden="true" />
+        </div>
+
+        <div className="workflow-grid">
+          {t.coreIdea.steps.map((step, index) => {
+            const Icon = workflowStepIcons[step.id] ?? FileTextOutlined;
+            const isLastStep = index === t.coreIdea.steps.length - 1;
+
+            return (
+              <div className="workflow-item" key={step.id}>
+                <article className="workflow-card" data-step={step.id}>
+                  <div className="workflow-card-heading">
+                    <span className="workflow-number">{index + 1}</span>
+                    <h3>{step.title}</h3>
+                    <span className="workflow-icon" aria-hidden="true">
+                      <Icon />
+                    </span>
+                  </div>
+                  <div className="workflow-visual">
+                    <Image
+                      alt={step.imageAlt}
+                      fill
+                      sizes="(max-width: 620px) calc(100vw - 56px), (max-width: 980px) 45vw, 220px"
+                      src={step.image}
+                    />
+                  </div>
+                  <p>{step.body}</p>
+                </article>
+                {!isLastStep ? (
+                  <span className="workflow-arrow" aria-hidden="true">
+                    <ArrowRightOutlined />
+                  </span>
+                ) : null}
+              </div>
+            );
+          })}
+        </div>
+
+      </section>
+
+      <section className="volunteer-invite-section" aria-labelledby="volunteer-invite-title">
+        <div className="volunteer-visual">
+          <div className="volunteer-brand-card glass-panel">
+            <span className="volunteer-logo">
+              <Image alt="" height={96} src="/images/logo.png" width={96} />
+            </span>
+            <span>{t.volunteerInvite.brandLine}</span>
+          </div>
+          <div className="volunteer-copy-block">
+            <span className="eyebrow">{t.volunteerInvite.eyebrow}</span>
+            <h2 id="volunteer-invite-title">
+              <span>{t.volunteerInvite.titleLead}</span>
+              {language === "np" ? (
+                <>
+                  <span>{t.volunteerInvite.titleTrail}</span>
+                  <strong>{t.volunteerInvite.titleStrong}</strong>
+                </>
+              ) : (
+                <>
+                  <strong>{t.volunteerInvite.titleStrong}</strong>
+                  <span>{t.volunteerInvite.titleTrail}</span>
+                </>
+              )}
+            </h2>
+            <p>{t.volunteerInvite.intro}</p>
+            <div className="volunteer-actions">
+              <Button type="primary" size="large" href="/join" icon={<HeartOutlined />}>
+                {t.volunteerInvite.primaryCta}
+              </Button>
+              <Button size="large" href="/feedback" icon={<ArrowRightOutlined />}>
+                {t.volunteerInvite.secondaryCta}
+              </Button>
+            </div>
+          </div>
+
+          <aside className="volunteer-goal-card glass-panel">
+            <span className="volunteer-goal-icon" aria-hidden="true">
+              <TeamOutlined />
+            </span>
+            <div>
+              <h3>{t.volunteerInvite.goal.title}</h3>
+              <p>{t.volunteerInvite.goal.body}</p>
+            </div>
+          </aside>
+        </div>
+
+        <div className="volunteer-roles-panel" id="we-need-you">
+          <div className="volunteer-panel-heading">
+            <span className="eyebrow">{t.volunteerInvite.panelEyebrow}</span>
+            <h2>{t.volunteerInvite.panelTitle}</h2>
+            <p>{t.volunteerInvite.panelIntro}</p>
+          </div>
+
+          <div className="volunteer-role-grid">
+            {t.volunteerInvite.roles.map((role) => {
+              const Icon = volunteerRoleIcons[role.id] ?? TeamOutlined;
+
+              return (
+                <article className="volunteer-role-card" data-role={role.id} key={role.id}>
+                  <span className="volunteer-role-icon" aria-hidden="true">
+                    <Icon />
+                  </span>
+                  <div className="volunteer-role-body">
+                    <h3>{role.title}</h3>
+                    <p>{role.description}</p>
+                  </div>
+                  <Button
+                    href={`/join?role=${encodeURIComponent(role.value)}`}
+                    size="small"
+                    type="text"
+                    icon={<ArrowRightOutlined />}
+                  >
+                    {t.volunteerInvite.cardCta}
+                  </Button>
+                </article>
+              );
+            })}
+          </div>
+        </div>
+
+      </section>
+
       {showActiveIssuesSection ? (
         <section
           className="live-issues-section"
@@ -573,172 +789,6 @@ export default function HomeClient({ summary }) {
           </div>
         </section>
       ) : null}
-
-      <section className="core-idea-section" aria-labelledby="core-idea-title">
-        <div className="core-idea-hero">
-          <div className="core-idea-copy">
-            <span className="core-idea-eyebrow">
-              <span aria-hidden="true">
-                <Image alt="" height={96} src="/images/logo.png" width={96} />
-              </span>
-              {t.coreIdea.eyebrow}
-            </span>
-            <h2 id="core-idea-title">{t.coreIdea.title}</h2>
-          </div>
-          <div className="core-idea-landscape" aria-hidden="true" />
-        </div>
-
-        <div className="workflow-grid">
-          {t.coreIdea.steps.map((step, index) => {
-            const Icon = workflowStepIcons[step.id] ?? FileTextOutlined;
-            const isLastStep = index === t.coreIdea.steps.length - 1;
-
-            return (
-              <div className="workflow-item" key={step.id}>
-                <article className="workflow-card" data-step={step.id}>
-                  <div className="workflow-card-heading">
-                    <span className="workflow-number">{index + 1}</span>
-                    <h3>{step.title}</h3>
-                    <span className="workflow-icon" aria-hidden="true">
-                      <Icon />
-                    </span>
-                  </div>
-                  <div className="workflow-visual">
-                    <Image
-                      alt={step.imageAlt}
-                      fill
-                      sizes="(max-width: 620px) calc(100vw - 56px), (max-width: 980px) 45vw, 220px"
-                      src={step.image}
-                    />
-                  </div>
-                  <p>{step.body}</p>
-                </article>
-                {!isLastStep ? (
-                  <span className="workflow-arrow" aria-hidden="true">
-                    <ArrowRightOutlined />
-                  </span>
-                ) : null}
-              </div>
-            );
-          })}
-        </div>
-
-        <p className="phase-note">
-          <span aria-hidden="true">
-            <Image alt="" height={96} src="/images/logo.png" width={96} />
-          </span>
-          {t.coreIdea.phaseNote}
-        </p>
-      </section>
-
-      <section className="cleanup-areas-section" aria-labelledby="cleanup-areas-title">
-        <div className="cleanup-areas-heading">
-          <span className="eyebrow">{t.cleanupAreas.eyebrow}</span>
-          <div>
-            <h2 id="cleanup-areas-title">{t.cleanupAreas.title}</h2>
-            <p>{t.cleanupAreas.intro}</p>
-          </div>
-        </div>
-
-        <div className="cleanup-areas-grid">
-          {t.cleanupAreas.items.map((area) => (
-            <article className="cleanup-area-card" data-area={area.id} key={area.id}>
-              <div className="cleanup-area-image">
-                <Image
-                  alt={area.imageAlt}
-                  fill
-                  sizes="(max-width: 620px) calc(100vw - 56px), (max-width: 1180px) 30vw, 380px"
-                  src={area.image}
-                />
-              </div>
-              <h3>{area.title}</h3>
-              <p>{area.body}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="volunteer-invite-section" aria-labelledby="volunteer-invite-title">
-        <div className="volunteer-visual">
-          <div className="volunteer-brand-card glass-panel">
-            <span className="volunteer-logo">
-              <Image alt="" height={96} src="/images/logo.png" width={96} />
-            </span>
-            <span>{t.volunteerInvite.brandLine}</span>
-          </div>
-          <div className="volunteer-copy-block">
-            <span className="eyebrow">{t.volunteerInvite.eyebrow}</span>
-            <h2 id="volunteer-invite-title">
-              <span>{t.volunteerInvite.titleLead}</span>
-              {language === "np" ? (
-                <>
-                  <span>{t.volunteerInvite.titleTrail}</span>
-                  <strong>{t.volunteerInvite.titleStrong}</strong>
-                </>
-              ) : (
-                <>
-                  <strong>{t.volunteerInvite.titleStrong}</strong>
-                  <span>{t.volunteerInvite.titleTrail}</span>
-                </>
-              )}
-            </h2>
-            <p>{t.volunteerInvite.intro}</p>
-            <div className="volunteer-actions">
-              <Button type="primary" size="large" href="/join" icon={<HeartOutlined />}>
-                {t.volunteerInvite.primaryCta}
-              </Button>
-              <Button size="large" href="/feedback" icon={<ArrowRightOutlined />}>
-                {t.volunteerInvite.secondaryCta}
-              </Button>
-            </div>
-          </div>
-
-          <aside className="volunteer-goal-card glass-panel">
-            <span className="volunteer-goal-icon" aria-hidden="true">
-              <TeamOutlined />
-            </span>
-            <div>
-              <h3>{t.volunteerInvite.goal.title}</h3>
-              <p>{t.volunteerInvite.goal.body}</p>
-            </div>
-          </aside>
-        </div>
-
-        <div className="volunteer-roles-panel" id="we-need-you">
-          <div className="volunteer-panel-heading">
-            <span className="eyebrow">{t.volunteerInvite.panelEyebrow}</span>
-            <h2>{t.volunteerInvite.panelTitle}</h2>
-            <p>{t.volunteerInvite.panelIntro}</p>
-          </div>
-
-          <div className="volunteer-role-grid">
-            {t.volunteerInvite.roles.map((role) => {
-              const Icon = volunteerRoleIcons[role.id] ?? TeamOutlined;
-
-              return (
-                <article className="volunteer-role-card" data-role={role.id} key={role.id}>
-                  <span className="volunteer-role-icon" aria-hidden="true">
-                    <Icon />
-                  </span>
-                  <div className="volunteer-role-body">
-                    <h3>{role.title}</h3>
-                    <p>{role.description}</p>
-                  </div>
-                  <Button
-                    href={`/join?role=${encodeURIComponent(role.value)}`}
-                    size="small"
-                    type="text"
-                    icon={<ArrowRightOutlined />}
-                  >
-                    {t.volunteerInvite.cardCta}
-                  </Button>
-                </article>
-              );
-            })}
-          </div>
-        </div>
-
-      </section>
 
       <section className="page-section resources-section" aria-labelledby="resources-title">
         <div className="section-heading resources-heading">

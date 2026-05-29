@@ -172,6 +172,186 @@ export const copy = {
         }
       }
     },
+    eventTypes: {
+      eyebrow: "के-कस्तो काम?",
+      title: "श्रमदान कुन-कुन सामुदायिक काममा प्रयोग हुनसक्छ",
+      intro:
+        "नागरिक-नेतृत्वमा मिलेर गर्न सकिने कामको बृहत् दायरा। पहिलो चरणमा सरसफाइबाट सुरु — क्रमशः अरू क्षेत्रमा विस्तार हुँदै।",
+      phaseNote: "पहिलो चरणमा हामी सामुदायिक सरसफाइबाट मात्र सुरु गर्छौं।",
+      badgeCurrent: "अहिले बन्दैछ",
+      badgeFuture: "आउँदै",
+      seeAll: "सबै कार्य-प्रकार हेर्नुहोस्",
+      seeAllHref: "/event-types",
+      items: [
+        {
+          id: "cleanup",
+          status: "current",
+          image: "/images/event-types/cleanup.jpg",
+          imageAlt: "सरसफाइ अभियानमा सहभागी स्वयंसेवकहरू",
+          imagePrompt:
+            "A group of Nepali community volunteers in safety vests cleaning a public street or riverbank in Nepal, holding brooms, gloves and trash bags, visible piles of collected waste, daylight, active and hopeful mood, Kathmandu Valley urban setting with familiar Nepali street elements.",
+          title: "सरसफाइ",
+          body: "सडक, खाली जग्गा, खोला किनार, ढल-नाला, पार्क र हाइकिङ ट्रेलमा फोहोर हटाएर समुदायलाई सफा र सुरक्षित बनाउने।"
+        },
+        {
+          id: "afforestation",
+          status: "future",
+          image: "/images/event-types/afforestation.jpg",
+          imageAlt: "वृक्षारोपण कार्यक्रममा बिरुवा रोप्दै सहभागीहरू",
+          imagePrompt:
+            "Nepali community volunteers planting saplings on a Himalayan hillside or community land, holding shovels and sapling pots, terraced fields or forested slopes in the background, golden-hour lighting, sense of hope and continuity.",
+          title: "वृक्षारोपण",
+          body: "खाली ढिक्का, पहिरो जोखिमयुक्त भिराला, सडक छेउ र सामुदायिक जग्गामा बिरुवा रोपेर हरियाली बढाउने।"
+        },
+        {
+          id: "beautification",
+          status: "future",
+          image: "/images/event-types/beautification.jpg",
+          imageAlt: "सहर सौन्दर्यीकरणका लागि भित्तामा कला सिर्जना गर्दै कलाकार",
+          imagePrompt:
+            "A local Nepali artist painting a colorful mural on a previously blank concrete wall or under a flyover in a Nepali city, with bystanders watching, paint cans and ladders around, bright and creative atmosphere, urban Kathmandu or Pokhara backdrop.",
+          title: "सौन्दर्यीकरण",
+          body: "कलाकारहरूले अनुमति लिएर खाली भित्ता, पुलमुनिका ठाउँ, सार्वजनिक स्थानमा कला उतार्ने — सहर र गाउँ दुवै सुन्दर बनाउने।"
+        },
+        {
+          id: "trail",
+          status: "future",
+          image: "/images/event-types/trail.jpg",
+          imageAlt: "हाइकिङ ट्रेलमा मर्मत र मार्कर लगाउँदै सहभागीहरू",
+          imagePrompt:
+            "Nepali volunteers maintaining a mountain hiking trail in Nepal — clearing fallen rocks, repairing erosion damage with stone work, placing wooden trail markers and signage, surrounded by forested or terraced mountain landscape, daylight, practical working scene.",
+          title: "ट्रेल मर्मत",
+          body: "गाउँ-गोरेटो र हाइकिङ ट्रेलमा मार्कर, सानो मर्मत, इरोसन नियन्त्रण, ढुङ्गा मिलाउने — पर्यटन र स्थानीय जीवन दुवैलाई सहयोग।"
+        },
+        {
+          id: "dam",
+          status: "future",
+          image: "/images/event-types/dam.jpg",
+          imageAlt: "बाटो छेउमा गेबियन र पुस्ता निर्माण गर्दै समुदाय",
+          imagePrompt:
+            "Nepali community workers building a small check dam, gabion wall, or retaining wall along a mountain road or stream in Nepal — wire mesh filled with stones, slope reinforcement with stone work, hillside landscape with monsoon greenery, technical supervisor visible.",
+          title: "ड्याम निर्माण",
+          body: "बाटो छेउमा गेबियन-पर्खाल, खोलामा चेक ड्याम, पहिरो रोक्न पुस्ता — पानी र पहिरो नियन्त्रणका साना संरचना।"
+        },
+        {
+          id: "infrastructure",
+          status: "future",
+          image: "/images/event-types/infrastructure.jpg",
+          imageAlt: "स्कुलको भित्ता रंग्याउँदै र मर्मत गर्दै स्वयंसेवकहरू",
+          imagePrompt:
+            "Nepali community volunteers helping at a rural school or hospital in Nepal — painting classroom walls, installing library shelves, fixing school furniture, with children or staff visible in background, bright cheerful colors, sense of community support.",
+          title: "संस्था सहयोग",
+          body: "स्कुल, अस्पताल, सामुदायिक संस्था र सङ्गठनमा पेन्ट, मर्मत, पुस्तकालय, खानेपानी जस्ता आधारभूत पूर्वाधार सहयोग।"
+        },
+        {
+          id: "seasonal",
+          status: "future",
+          image: "/images/event-types/seasonal.jpg",
+          imageAlt: "तराईमा शीतलहर पीडितलाई न्यानो कपडा वितरण",
+          imagePrompt:
+            "Nepali volunteers distributing blankets, warm clothes, or cool drinking water to community members during seasonal extreme weather in Nepal — winter Terai cold-wave with blankets and a small fire, or summer heat-wave with water distribution, compassionate scene.",
+          title: "मौसमी राहत",
+          body: "तराईको शीतलहर र तापलहर, मनसुनी पूर्व-तयारी — पूर्वानुमान गर्न सकिने मौसमी कठिनाइमा समुदायलाई राहत।"
+        },
+        {
+          id: "disaster",
+          status: "future",
+          image: "/images/event-types/disaster.jpg",
+          imageAlt: "विपद् पछिको राहत र खोज-उद्धार कार्यमा सहभागीहरू",
+          imagePrompt:
+            "Nepali community emergency response volunteers in high-visibility vests coordinating after an earthquake, flood, or landslide in Nepal — distributing relief supplies, search and rescue activity with ropes and stretchers, damaged buildings or muddy terrain in background, serious yet hopeful tone.",
+          title: "विपद् प्रतिक्रिया",
+          body: "भुकम्प, बाढी, पहिरो, दावानल पछिको खोज-उद्धार, राहत वितरण र समुदाय समन्वय — स्थानीय आपतकालमा छिटो जवाफ।"
+        }
+      ],
+      page: {
+        pageTitle: "श्रमदानको कार्य-दायरा",
+        eyebrow: "कार्य-प्रकार",
+        title: "श्रमदान कुन-कुन सामुदायिक काममा प्रयोग हुनसक्छ",
+        intro:
+          "श्रमदान केवल सरसफाइको मञ्च मात्र होइन — यो नागरिक-नेतृत्वमा सामुदायिक काम जुटाउने सामान्य ढाँचा हो। तल अहिलेसम्म पहिचान भएका कार्य-प्रकारहरू देखाइएको छ। पहिलो चरण सरसफाइबाट सुरु, बाँकी क्रमशः थपिँदै जानेछन्।",
+        primaryHeading: "मूल कार्य-प्रकार",
+        primaryIntro: "होमपेजमा पनि देखाइएका मुख्य आठ कार्य-प्रकार।",
+        additionalHeading: "थप सम्भावित क्षेत्रहरू",
+        additionalIntro:
+          "मुख्य आठ बाहेक पनि श्रमदानको ढाँचा यी क्षेत्रहरूमा उपयोगी हुनसक्छ। समुदायको आवश्यकता र क्षमताको आधारमा क्रमशः अघि बढाइनेछ।",
+        suggestCta: {
+          eyebrow: "अर्को idea छ?",
+          title: "तपाईंलाई लाग्ने थप कार्य-प्रकार सुझाउनुहोस्",
+          body: "नेपालमै काम लाग्ने अरू सामुदायिक कार्य-क्षेत्र तपाईंलाई थाहा छ भने feedback मार्फत हामीलाई बताउनुहोस्।",
+          buttonLabel: "सुझाव दिनुहोस्",
+          href: "/feedback"
+        },
+        backToHome: "गृहपृष्ठमा फर्किनुहोस्",
+        additionalItems: [
+          {
+            id: "search-rescue",
+            title: "खोज र उद्धार",
+            body: "विपद् पछि हराएका मानिस खोज्ने, स्थानीय भूगोल जान्ने स्वयंसेवक परिचालन र professional rescue team सँग समन्वय।"
+          },
+          {
+            id: "forest-fire",
+            title: "दावानल नियन्त्रण",
+            body: "चैत-वैशाखको सुख्खा मौसममा जंगलको आगो रोक्न र पीडित बस्तीलाई सहयोग — स्थानीय अग्निशमन समन्वय सहित।"
+          },
+          {
+            id: "river-restoration",
+            title: "खोला र नदी पुनरुत्थान",
+            body: "Bagmati, Bishnumati, Rapti जस्ता खोलाको silt हटाउने, किनार सुधार, र दीर्घकालीन सरसफाइ अभियान।"
+          },
+          {
+            id: "heritage",
+            title: "मन्दिर र पाटी संरक्षण",
+            body: "गाउँ-शहरका traditional मन्दिर, पाटी, dharmashala मा सानो मर्मत, सरसफाइ र वरपरको परिवेश सुधार।"
+          },
+          {
+            id: "dhunge-dhara",
+            title: "ढुङ्गेधारा सरसफाइ",
+            body: "Kathmandu Valley र पुराना शहरका traditional water spout वरिपरि सरसफाइ, approach मर्मत, र सामुदायिक चेतना।"
+          },
+          {
+            id: "drainage",
+            title: "मनसुनी पूर्व-नाला सफाई",
+            body: "वर्षायाम सुरु हुनुअघि सहरी ढल-नाला, गल्ली-सडकको पानी निकास सफा गर्ने वार्षिक अभियान।"
+          },
+          {
+            id: "public-toilet",
+            title: "सार्वजनिक शौचालय निर्माण-मर्मत",
+            body: "सहर, बजार र पर्यटन क्षेत्रमा सार्वजनिक शौचालयको निर्माण, सफाइ र maintenance।"
+          },
+          {
+            id: "festival-cleanup",
+            title: "चाडपर्व पछिको सफाई",
+            body: "Dashain, Tihar, Indra Jatra, Bisket Jatra जस्ता ठूला चाडपर्व पछिको ramificiations-cleanup।"
+          },
+          {
+            id: "blood-donation",
+            title: "रक्तदान अभियान",
+            body: "Red Cross र अस्पतालसँग partner गरेर सामुदायिक रक्तदान शिविर आयोजना।"
+          },
+          {
+            id: "animal-care",
+            title: "सडक पशु स्याहार",
+            body: "सडक कुकुर खोप अभियान, sterilization, सामुदायिक स्तरमा animal welfare drive।"
+          },
+          {
+            id: "elderly-care",
+            title: "गाउँमा ज्येष्ठ नागरिक हेरचाह",
+            body: "पलायन बढेका गाउँमा छुटेका ज्येष्ठ नागरिकलाई periodic check-in, सामग्री ल्याइदिने, सामूहिक भेला।"
+          },
+          {
+            id: "first-aid-training",
+            title: "First-aid र विपद् तयारी तालिम",
+            body: "समुदायमा आधारभूत first-aid, CPR, विपद् पूर्व-तयारी तालिम-शिविर।"
+          },
+          {
+            id: "digital-literacy",
+            title: "Digital literacy शिविर",
+            body: "ज्येष्ठ नागरिक, गृहिणी र गाउँले समुदायलाई smartphone, online सेवा र साइबर सुरक्षा सिकाउने।"
+          }
+        ]
+      }
+    },
     cleanupAreas: {
       eyebrow: "के सफा गर्ने?",
       title: "सुरुवातका सफाइ क्षेत्रहरू",
@@ -226,7 +406,6 @@ export const copy = {
       eyebrow: "मुख्य विचार",
       title:
         "श्रमदान एपले स्थानीय समस्यालाई सूचना, मतदान र श्रम योगदानमार्फत सामुदायिक कार्यक्रममा बदल्छ।",
-      phaseNote: "पहिलो चरणमा हामी सामुदायिक सरसफाइबाट मात्र सुरु गर्छौं।",
       steps: [
         {
           id: "listing",
@@ -1233,6 +1412,186 @@ export const copy = {
         }
       }
     },
+    eventTypes: {
+      eyebrow: "What we work on",
+      title: "What kinds of community work Shramdan can power",
+      intro:
+        "A broad range of citizen-led community work that we can take on together. We start with cleanup, then steadily expand into other areas.",
+      phaseNote: "In the first phase, we start with community cleanup only.",
+      badgeCurrent: "Currently Building",
+      badgeFuture: "Coming",
+      seeAll: "See All Event Types",
+      seeAllHref: "/event-types",
+      items: [
+        {
+          id: "cleanup",
+          status: "current",
+          image: "/images/event-types/cleanup.jpg",
+          imageAlt: "Volunteers participating in a community cleanup drive",
+          imagePrompt:
+            "A group of Nepali community volunteers in safety vests cleaning a public street or riverbank in Nepal, holding brooms, gloves and trash bags, visible piles of collected waste, daylight, active and hopeful mood, Kathmandu Valley urban setting with familiar Nepali street elements.",
+          title: "Cleanup",
+          body: "Remove litter from roads, vacant land, riverbanks, drains, parks, and hiking trails to keep communities clean and safe."
+        },
+        {
+          id: "afforestation",
+          status: "future",
+          image: "/images/event-types/afforestation.jpg",
+          imageAlt: "Participants planting saplings during a reforestation drive",
+          imagePrompt:
+            "Nepali community volunteers planting saplings on a Himalayan hillside or community land, holding shovels and sapling pots, terraced fields or forested slopes in the background, golden-hour lighting, sense of hope and continuity.",
+          title: "Afforestation",
+          body: "Plant saplings on barren slopes, landslide-prone hillsides, roadsides, and community land to grow greener neighborhoods."
+        },
+        {
+          id: "beautification",
+          status: "future",
+          image: "/images/event-types/beautification.jpg",
+          imageAlt: "An artist painting a mural to beautify a public wall",
+          imagePrompt:
+            "A local Nepali artist painting a colorful mural on a previously blank concrete wall or under a flyover in a Nepali city, with bystanders watching, paint cans and ladders around, bright and creative atmosphere, urban Kathmandu or Pokhara backdrop.",
+          title: "Beautification",
+          body: "Artists, with permission, turn blank walls, underpasses, and public spaces into murals — making cities and villages more beautiful."
+        },
+        {
+          id: "trail",
+          status: "future",
+          image: "/images/event-types/trail.jpg",
+          imageAlt: "Volunteers maintaining a hiking trail and placing markers",
+          imagePrompt:
+            "Nepali volunteers maintaining a mountain hiking trail in Nepal — clearing fallen rocks, repairing erosion damage with stone work, placing wooden trail markers and signage, surrounded by forested or terraced mountain landscape, daylight, practical working scene.",
+          title: "Trail Maintenance",
+          body: "Maintain village footpaths and hiking trails with markers, minor repair, erosion control, and stonework — supporting tourism and daily life."
+        },
+        {
+          id: "dam",
+          status: "future",
+          image: "/images/event-types/dam.jpg",
+          imageAlt: "Community building gabion walls and retaining structures along a road",
+          imagePrompt:
+            "Nepali community workers building a small check dam, gabion wall, or retaining wall along a mountain road or stream in Nepal — wire mesh filled with stones, slope reinforcement with stone work, hillside landscape with monsoon greenery, technical supervisor visible.",
+          title: "Dam Building",
+          body: "Roadside gabion walls, small check dams in streams, slope-stabilizing retaining structures — small-scale water and landslide control."
+        },
+        {
+          id: "infrastructure",
+          status: "future",
+          image: "/images/event-types/infrastructure.jpg",
+          imageAlt: "Volunteers painting and repairing a community school",
+          imagePrompt:
+            "Nepali community volunteers helping at a rural school or hospital in Nepal — painting classroom walls, installing library shelves, fixing school furniture, with children or staff visible in background, bright cheerful colors, sense of community support.",
+          title: "Institution Support",
+          body: "Paint, repair, library, water, and basic infrastructure support for schools, hospitals, and community institutions."
+        },
+        {
+          id: "seasonal",
+          status: "future",
+          image: "/images/event-types/seasonal.jpg",
+          imageAlt: "Volunteers distributing warm clothes to families during a Terai cold-wave",
+          imagePrompt:
+            "Nepali volunteers distributing blankets, warm clothes, or cool drinking water to community members during seasonal extreme weather in Nepal — winter Terai cold-wave with blankets and a small fire, or summer heat-wave with water distribution, compassionate scene.",
+          title: "Seasonal Relief",
+          body: "Terai cold-wave and heat-wave relief, pre-monsoon preparation — community support for predictable seasonal hardships."
+        },
+        {
+          id: "disaster",
+          status: "future",
+          image: "/images/event-types/disaster.jpg",
+          imageAlt: "Community emergency response after a disaster, with search and rescue underway",
+          imagePrompt:
+            "Nepali community emergency response volunteers in high-visibility vests coordinating after an earthquake, flood, or landslide in Nepal — distributing relief supplies, search and rescue activity with ropes and stretchers, damaged buildings or muddy terrain in background, serious yet hopeful tone.",
+          title: "Disaster Response",
+          body: "Post-disaster search-and-rescue, relief distribution, and community coordination for earthquakes, floods, landslides, and wildfires."
+        }
+      ],
+      page: {
+        pageTitle: "What Shramdan can do",
+        eyebrow: "Event types",
+        title: "What kinds of community work Shramdan can power",
+        intro:
+          "Shramdan is more than a cleanup platform — it is a general framework for citizen-led community work. Below are the event types we have mapped so far. We start with cleanup; the rest will be added step by step.",
+        primaryHeading: "Core event types",
+        primaryIntro: "The eight main event types also featured on the homepage.",
+        additionalHeading: "More possibilities",
+        additionalIntro:
+          "Beyond the core eight, the Shramdan framework can extend into these areas as community capacity grows.",
+        suggestCta: {
+          eyebrow: "Have another idea?",
+          title: "Suggest a new event type",
+          body: "Know another kind of community work that fits Nepal? Send it to us via feedback.",
+          buttonLabel: "Share Suggestion",
+          href: "/feedback"
+        },
+        backToHome: "Back to Home",
+        additionalItems: [
+          {
+            id: "search-rescue",
+            title: "Search & Rescue",
+            body: "Find missing people after a disaster, mobilize local-knowledge volunteers, and coordinate with professional rescue teams."
+          },
+          {
+            id: "forest-fire",
+            title: "Forest Fire Response",
+            body: "Help contain dry-season forest fires (Chaitra–Baisakh) and support affected settlements — coordinated with local fire response."
+          },
+          {
+            id: "river-restoration",
+            title: "River & Khola Restoration",
+            body: "Long-term restoration of Bagmati, Bishnumati, Rapti and other waterways — silt removal, bank repair, sustained cleanup drives."
+          },
+          {
+            id: "heritage",
+            title: "Heritage Restoration",
+            body: "Minor repair, cleaning, and surroundings improvement for village and urban temples, paati, and traditional dharmashala."
+          },
+          {
+            id: "dhunge-dhara",
+            title: "Dhunge Dhara Cleanup",
+            body: "Cleaning and approach repair around the traditional stone water spouts of Kathmandu Valley and older cities, with community awareness."
+          },
+          {
+            id: "drainage",
+            title: "Pre-monsoon Drainage Clearance",
+            body: "Annual community drive to clear urban drains, gullies, and street runoff channels before the rainy season."
+          },
+          {
+            id: "public-toilet",
+            title: "Public Toilet Build & Repair",
+            body: "Construction, cleaning, and maintenance of public toilets in cities, bazaars, and tourist areas."
+          },
+          {
+            id: "festival-cleanup",
+            title: "Festival Cleanup",
+            body: "Coordinated cleanup after large festivals like Dashain, Tihar, Indra Jatra, and Bisket Jatra."
+          },
+          {
+            id: "blood-donation",
+            title: "Blood Donation Drive",
+            body: "Community blood donation camps in partnership with the Red Cross and local hospitals."
+          },
+          {
+            id: "animal-care",
+            title: "Street Animal Care",
+            body: "Stray dog vaccination, sterilization, and other community-level animal welfare drives."
+          },
+          {
+            id: "elderly-care",
+            title: "Elderly Care in Villages",
+            body: "Periodic check-ins, errands, and group gatherings for elderly residents left behind in migration-affected villages."
+          },
+          {
+            id: "first-aid-training",
+            title: "First-aid & Disaster Prep Training",
+            body: "Community workshops on basic first-aid, CPR, and disaster preparedness."
+          },
+          {
+            id: "digital-literacy",
+            title: "Digital Literacy Camps",
+            body: "Teach elders, homemakers, and rural community members smartphone basics, online services, and cyber safety."
+          }
+        ]
+      }
+    },
     cleanupAreas: {
       eyebrow: "What we clean",
       title: "Cleanup Areas We Start With",
@@ -1287,7 +1646,6 @@ export const copy = {
       eyebrow: "Core Idea",
       title:
         "Shramdan App turns local problems into community events through reporting, voting, and labour contribution.",
-      phaseNote: "In the first phase, we start with community cleanup only.",
       steps: [
         {
           id: "listing",
