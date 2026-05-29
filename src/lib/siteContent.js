@@ -986,6 +986,7 @@ export const copy = {
       fields: {
         cover: "मुख्य फोटो",
         coverRequired: "मुख्य फोटो आवश्यक छ।",
+        additionalImages: "थप फोटोहरू (वैकल्पिक)",
         title: "शीर्षक",
         titlePlaceholder: "छोटो र स्पष्ट विवरण",
         titleRequired: "शीर्षक आवश्यक छ।",
@@ -2046,6 +2047,7 @@ export const copy = {
       fields: {
         cover: "Cover photo",
         coverRequired: "A cover photo is required.",
+        additionalImages: "Additional Photos (Optional)",
         title: "Title",
         titlePlaceholder: "A short, clear summary",
         titleRequired: "Title is required.",

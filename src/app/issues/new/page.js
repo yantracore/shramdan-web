@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { usePreferences } from "@/app/providers";
 import { IssueCoverUpload } from "@/components/admin/IssueCoverUpload";
+import { IssueImagesUpload } from "@/components/admin/IssueImagesUpload";
 import IssueLocationPickerBlock from "@/components/IssueLocationPickerBlock";
 import { SiteShell } from "@/components/SiteShell";
 import { postJson } from "@/lib/apiClient";
@@ -80,6 +81,9 @@ export default function NewIssuePage() {
   const handleSubmit = async (values) => {
     const cover = values.cover;
     const location = values.location || {};
+    const additionalImages = Array.isArray(values.additionalImages)
+      ? values.additionalImages
+      : [];
     const payload = {
       title: values.title,
       description: values.description,
@@ -89,6 +93,9 @@ export default function NewIssuePage() {
       longitude: location.lng,
       coverImageId: cover.id
     };
+    if (additionalImages.length) {
+      payload.uploadIds = additionalImages.map((image) => image.id);
+    }
 
     setSubmitting(true);
 
@@ -145,6 +152,14 @@ export default function NewIssuePage() {
             rules={[{ validator: coverImageValidator(fields.coverRequired) }]}
           >
             <IssueCoverUpload />
+          </Form.Item>
+
+          <Form.Item
+            name="additionalImages"
+            label={fields.additionalImages}
+            valuePropName="value"
+          >
+            <IssueImagesUpload />
           </Form.Item>
 
           <Form.Item
