@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import {
   AppstoreOutlined,
   LogoutOutlined,
@@ -45,6 +45,17 @@ export function SiteShell({ children, pageTitle }) {
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
   const pathname = usePathname();
   const router = useRouter();
+  const mobileMenuRef = useRef(null);
+
+  const closeMobileMenu = () => {
+    if (mobileMenuRef.current) {
+      mobileMenuRef.current.open = false;
+    }
+  };
+
+  useEffect(() => {
+    closeMobileMenu();
+  }, [pathname]);
   const session = useSyncExternalStore(subscribeAuthSession, getAuthSession, () => null);
   const t = copy[language];
   const titles = t.pageTitles;
@@ -244,7 +255,7 @@ export function SiteShell({ children, pageTitle }) {
           )}
         </div>
 
-        <details className="mobile-menu">
+        <details className="mobile-menu" ref={mobileMenuRef}>
           <summary aria-label={t.ariaLabels.openMenu}>
             <MenuOutlined />
           </summary>
@@ -258,6 +269,7 @@ export function SiteShell({ children, pageTitle }) {
                   className={isActive ? "is-active" : undefined}
                   href={item.href}
                   key={item.href}
+                  onClick={closeMobileMenu}
                 >
                   {item.label}
                 </Link>
@@ -268,19 +280,42 @@ export function SiteShell({ children, pageTitle }) {
                 aria-current={activePath === "/admin" ? "page" : undefined}
                 className={activePath === "/admin" ? "is-active" : undefined}
                 href="/admin"
+                onClick={closeMobileMenu}
               >
                 {t.me.menu.adminCenter}
               </Link>
             ) : null}
             <div className="mobile-menu-preferences" aria-label={t.ariaLabels.preferences}>
-              <button type="button" aria-label={t.controls.themeTooltip} title={t.controls.themeTooltip} onClick={toggleMode}>
+              <button
+                type="button"
+                aria-label={t.controls.themeTooltip}
+                title={t.controls.themeTooltip}
+                onClick={() => {
+                  toggleMode();
+                  closeMobileMenu();
+                }}
+              >
                 {mode === "light" ? t.controls.darkTheme : t.controls.lightTheme}
               </button>
-              <button type="button" aria-label={t.controls.languageTooltip} title={t.controls.languageTooltip} onClick={toggleLanguage}>
+              <button
+                type="button"
+                aria-label={t.controls.languageTooltip}
+                title={t.controls.languageTooltip}
+                onClick={() => {
+                  toggleLanguage();
+                  closeMobileMenu();
+                }}
+              >
                 {t.controls.language}
               </button>
               {isAuthenticated ? (
-                <button type="button" onClick={handleLogout}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    closeMobileMenu();
+                    handleLogout();
+                  }}
+                >
                   {t.me.menu.logout}
                 </button>
               ) : null}
