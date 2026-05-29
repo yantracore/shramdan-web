@@ -27,7 +27,7 @@ const SORT_OPTIONS = [
   { value: "createdAt", labelKey: "sortNewest" }
 ];
 const PAGE_SIZE = 12;
-const MAP_FETCH_LIMIT = 200;
+const MAP_FETCH_LIMIT = 100;
 
 function isPublicIssue(issue) {
   return PUBLIC_ISSUE_STATUSES.includes(issue?.status);
