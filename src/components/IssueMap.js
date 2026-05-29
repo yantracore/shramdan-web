@@ -2,9 +2,10 @@
 
 import "leaflet/dist/leaflet.css";
 import "leaflet.markercluster/dist/MarkerCluster.css";
+import { CloseOutlined, FullscreenOutlined } from "@ant-design/icons";
 import L from "leaflet";
 import Link from "next/link";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 
@@ -65,6 +66,17 @@ function FitView({ focus }) {
     // Fit on mount only — re-centering on every change would fight user pan/zoom.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map]);
+  return null;
+}
+
+function InvalidateOnResize({ trigger }) {
+  const map = useMap();
+  useEffect(() => {
+    const id = window.setTimeout(() => {
+      map.invalidateSize();
+    }, 250);
+    return () => window.clearTimeout(id);
+  }, [trigger, map]);
   return null;
 }
 
@@ -143,8 +155,26 @@ export default function IssueMap({
   showPopup = true,
   content,
   language = "en",
-  cluster = true
+  cluster = true,
+  enableFullscreen = false,
+  fullscreenLabel = "Fullscreen",
+  exitFullscreenLabel = "Exit fullscreen"
 }) {
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+    if (!isFullscreen) return undefined;
+    const onKey = (event) => {
+      if (event.key === "Escape") setIsFullscreen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [isFullscreen]);
   const validIssues = useMemo(
     () =>
       (issues || []).filter((issue) => {
@@ -178,11 +208,18 @@ export default function IssueMap({
     />
   ));
 
+  const wrapClass = [
+    "issue-map-wrap",
+    interactive ? "" : "issue-map-wrap--static",
+    isFullscreen ? "issue-map-wrap--fullscreen" : ""
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const wrapStyle = isFullscreen ? undefined : { height: `${height}px` };
+
   return (
-    <div
-      className={`issue-map-wrap${interactive ? "" : " issue-map-wrap--static"}`}
-      style={{ height: `${height}px` }}
-    >
+    <div className={wrapClass} style={wrapStyle}>
       <MapContainer
         bounds={focus ? undefined : NEPAL_BOUNDS}
         center={focus ? [focus.lat, focus.lng] : undefined}
@@ -205,6 +242,7 @@ export default function IssueMap({
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         <FitView focus={focus} />
+        <InvalidateOnResize trigger={isFullscreen} />
         {useCluster ? (
           <MarkerClusterGroup
             chunkedLoading
@@ -219,6 +257,21 @@ export default function IssueMap({
           markers
         )}
       </MapContainer>
+      {enableFullscreen ? (
+        <button
+          type="button"
+          className="issue-map-fullscreen-btn"
+          aria-label={isFullscreen ? exitFullscreenLabel : fullscreenLabel}
+          aria-pressed={isFullscreen}
+          onClick={() => setIsFullscreen((v) => !v)}
+        >
+          {isFullscreen ? (
+            <CloseOutlined aria-hidden="true" />
+          ) : (
+            <FullscreenOutlined aria-hidden="true" />
+          )}
+        </button>
+      ) : null}
     </div>
   );
 }

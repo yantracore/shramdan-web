@@ -433,25 +433,18 @@ export default function HomeClient({ summary }) {
             </div>
           </dl>
 
-          <Link
-            className="live-issues-map-link"
-            href="/issues"
-            aria-label={liveIssuesCopy.mapAria || "Open issues map"}
-          >
+          <div className="live-issues-map-frame">
             <IssueMapBlock
               issues={activeIssues}
               content={issueCopy}
               language={language}
-              height={320}
-              interactive={false}
+              height={360}
+              interactive
+              enableFullscreen
+              fullscreenLabel={liveIssuesCopy.fullscreenOpen || "Open fullscreen map"}
+              exitFullscreenLabel={liveIssuesCopy.fullscreenClose || "Close fullscreen map"}
             />
-            <span className="live-issues-map-overlay" aria-hidden="true">
-              <span className="live-issues-map-pill">
-                <EnvironmentOutlined aria-hidden="true" />
-                {liveIssuesCopy.mapPill || "Explore on the map"}
-              </span>
-            </span>
-          </Link>
+          </div>
 
           {topIssues.length > 0 ? (
             <div className="live-issues-top">

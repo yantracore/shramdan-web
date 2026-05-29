@@ -757,7 +757,9 @@ export const copy = {
       statsAria: "सक्रिय समस्याहरूको सारांश",
       mapAria: "समस्या नक्सा खोल्नुहोस्",
       mapPill: "नक्सामा अन्वेषण गर्नुहोस्",
-      topTitle: "अहिले सबैभन्दा बढी समर्थन पाएका"
+      topTitle: "अहिले सबैभन्दा बढी समर्थन पाएका",
+      fullscreenOpen: "नक्सा पूरा स्क्रिनमा खोल्नुहोस्",
+      fullscreenClose: "पूरा स्क्रिन बन्द गर्नुहोस्"
     },
     legal: {
       terms: {
@@ -1771,7 +1773,9 @@ export const copy = {
       statsAria: "Active issues summary",
       mapAria: "Open issues map",
       mapPill: "Explore on the map",
-      topTitle: "Most-supported right now"
+      topTitle: "Most-supported right now",
+      fullscreenOpen: "Open map fullscreen",
+      fullscreenClose: "Close fullscreen map"
     },
     legal: {
       terms: {
