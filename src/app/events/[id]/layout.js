@@ -1,6 +1,12 @@
 import { API_BASE_URL } from "@/lib/apiClient";
 import { getResponseData } from "@/lib/adminUtils";
-import { buildMetadata, BRAND } from "@/lib/seo";
+import {
+  articleSchema,
+  breadcrumbSchema,
+  buildMetadata,
+  BRAND
+} from "@/lib/seo";
+import { JsonLd } from "@/components/JsonLd";
 
 async function fetchEvent(id) {
   try {
@@ -50,6 +56,36 @@ export async function generateMetadata({ params }) {
   });
 }
 
-export default function EventDetailLayout({ children }) {
-  return children;
+export default async function EventDetailLayout({ children, params }) {
+  const { id } = await params;
+  const event = await fetchEvent(id);
+
+  if (!event) return children;
+
+  const path = `/events/${id}`;
+  const title = event.title || event.name || "Shramdan campaign";
+
+  const breadcrumb = breadcrumbSchema([
+    { name: "श्रमदान", path: "/" },
+    { name: "Issues", path: "/issues" },
+    { name: title, path }
+  ]);
+
+  const article = articleSchema({
+    headline: title,
+    description: event.description || event.summary || "",
+    path,
+    image: firstImageUrl(event),
+    imageAlt: title,
+    datePublished: event.scheduledAt || event.createdAt || event.created_at,
+    dateModified: event.updatedAt || event.updated_at,
+    inLanguage: "ne"
+  });
+
+  return (
+    <>
+      <JsonLd data={[breadcrumb, article]} />
+      {children}
+    </>
+  );
 }

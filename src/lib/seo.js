@@ -96,3 +96,88 @@ export function buildMetadata({
 }
 
 export { absoluteUrl, truncate };
+
+const ORGANIZATION_SAME_AS = [
+  "https://www.facebook.com/profile.php?id=61589961623195"
+];
+
+export function organizationSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": `${SITE_URL}/#organization`,
+    name: "श्रमदान",
+    alternateName: "Shramdan",
+    url: SITE_URL,
+    logo: {
+      "@type": "ImageObject",
+      url: absoluteUrl("/branding/favicon/android-chrome-512x512.png"),
+      width: 512,
+      height: 512
+    },
+    image: absoluteUrl(DEFAULT_OG_IMAGE.url),
+    description: DEFAULT_DESCRIPTION,
+    sameAs: ORGANIZATION_SAME_AS,
+    areaServed: {
+      "@type": "Country",
+      name: "Nepal"
+    }
+  };
+}
+
+export function websiteSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": `${SITE_URL}/#website`,
+    name: "श्रमदान | Shramdan",
+    url: SITE_URL,
+    description: DEFAULT_DESCRIPTION,
+    inLanguage: ["ne-NP", "en-US"],
+    publisher: { "@id": `${SITE_URL}/#organization` }
+  };
+}
+
+export function breadcrumbSchema(trail) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: trail.map((entry, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: entry.name,
+      item: absoluteUrl(entry.path)
+    }))
+  };
+}
+
+export function articleSchema({
+  headline,
+  description,
+  path,
+  image,
+  imageAlt,
+  datePublished,
+  dateModified,
+  inLanguage = "ne"
+}) {
+  const url = absoluteUrl(path);
+  const imageUrl = image
+    ? absoluteUrl(image)
+    : absoluteUrl(DEFAULT_OG_IMAGE.url);
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: truncate(headline, 110),
+    description: truncate(description, 250),
+    image: [{ "@type": "ImageObject", url: imageUrl, caption: imageAlt || headline }],
+    url,
+    mainEntityOfPage: { "@type": "WebPage", "@id": url },
+    inLanguage,
+    datePublished: datePublished || undefined,
+    dateModified: dateModified || datePublished || undefined,
+    publisher: { "@id": `${SITE_URL}/#organization` },
+    isPartOf: { "@id": `${SITE_URL}/#website` }
+  };
+}

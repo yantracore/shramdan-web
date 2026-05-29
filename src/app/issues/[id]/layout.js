@@ -1,6 +1,12 @@
 import { API_BASE_URL } from "@/lib/apiClient";
 import { getIssueCoverImageUrl, getResponseData } from "@/lib/adminUtils";
-import { buildMetadata, BRAND } from "@/lib/seo";
+import {
+  articleSchema,
+  breadcrumbSchema,
+  buildMetadata,
+  BRAND
+} from "@/lib/seo";
+import { JsonLd } from "@/components/JsonLd";
 
 async function fetchIssue(id) {
   try {
@@ -40,6 +46,34 @@ export async function generateMetadata({ params }) {
   });
 }
 
-export default function IssueDetailLayout({ children }) {
-  return children;
+export default async function IssueDetailLayout({ children, params }) {
+  const { id } = await params;
+  const issue = await fetchIssue(id);
+
+  if (!issue) return children;
+
+  const path = `/issues/${id}`;
+  const breadcrumb = breadcrumbSchema([
+    { name: "श्रमदान", path: "/" },
+    { name: "Issues", path: "/issues" },
+    { name: issue.title || id, path }
+  ]);
+
+  const article = articleSchema({
+    headline: issue.title,
+    description: issue.description,
+    path,
+    image: getIssueCoverImageUrl(issue),
+    imageAlt: issue.title,
+    datePublished: issue.createdAt || issue.created_at,
+    dateModified: issue.updatedAt || issue.updated_at,
+    inLanguage: "ne"
+  });
+
+  return (
+    <>
+      <JsonLd data={[breadcrumb, article]} />
+      {children}
+    </>
+  );
 }

@@ -6,8 +6,11 @@ import {
   DEFAULT_DESCRIPTION,
   DEFAULT_KEYWORDS,
   DEFAULT_OG_IMAGE,
-  SITE_URL
+  SITE_URL,
+  organizationSchema,
+  websiteSchema
 } from "@/lib/seo";
+import { JsonLd } from "@/components/JsonLd";
 
 const nunito = Nunito({
   subsets: ["latin"],
@@ -98,6 +101,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`${nunito.variable} ${baloo2.variable}`}>
+        <JsonLd data={[organizationSchema(), websiteSchema()]} />
         <Providers>{children}</Providers>
       </body>
     </html>
