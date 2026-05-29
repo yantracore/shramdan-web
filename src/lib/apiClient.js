@@ -1,4 +1,10 @@
-import { expireAuthSession, getStoredAccessToken } from "@/lib/authSession";
+import {
+  clearAuthSession,
+  expireAuthSession,
+  getStoredAccessToken,
+  getStoredRefreshToken,
+  setAuthSession
+} from "@/lib/authSession";
 
 const FALLBACK_API_BASE_URL = "https://backend.shramdan.org/api/v1";
 
@@ -73,6 +79,65 @@ function shouldClearSession(errorCode, status) {
   return errorCode === "INVALID_TOKEN" || errorCode === "AUTH_REQUIRED" || status === 401;
 }
 
+const REFRESH_PATH = "/auth/refresh";
+const LOGOUT_PATH = "/auth/logout";
+
+let inFlightRefresh = null;
+
+async function performRefresh(refreshToken) {
+  const url = createApiUrl(REFRESH_PATH);
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ refreshToken })
+  });
+  const data = await parseResponse(response);
+
+  if (!response.ok || data?.success === false) {
+    const errorCode = getApiErrorCode(data);
+    throw new ApiError(getApiErrorMessage(data, response.status), {
+      errorCode,
+      status: response.status,
+      data
+    });
+  }
+
+  const next = data?.data ?? data;
+  if (!next?.accessToken) {
+    throw new ApiError("Refresh response missing access token.", {
+      errorCode: "REFRESH_FAILED",
+      status: 500
+    });
+  }
+
+  setAuthSession({
+    accessToken: next.accessToken,
+    refreshToken: next.refreshToken ?? null
+  });
+
+  return next.accessToken;
+}
+
+function refreshAccessToken() {
+  if (inFlightRefresh) return inFlightRefresh;
+
+  const refreshToken = getStoredRefreshToken();
+  if (!refreshToken) {
+    return Promise.reject(
+      new ApiError("No refresh token available.", {
+        errorCode: "NO_REFRESH_TOKEN",
+        status: 401
+      })
+    );
+  }
+
+  inFlightRefresh = performRefresh(refreshToken).finally(() => {
+    inFlightRefresh = null;
+  });
+
+  return inFlightRefresh;
+}
+
 async function parseResponse(response) {
   const responseText = await response.text();
 
@@ -94,7 +159,8 @@ export async function apiRequest(path, options = {}) {
     method = "GET",
     params,
     requireAuth = false,
-    token = getStoredAccessToken()
+    token = getStoredAccessToken(),
+    _isRetry = false
   } = options;
 
   const requestHeaders = {
@@ -126,8 +192,29 @@ export async function apiRequest(path, options = {}) {
 
   if (!response.ok || data?.success === false) {
     const errorCode = getApiErrorCode(data);
+    const sessionLikelyDead = shouldClearSession(errorCode, response.status);
+    const canRefresh =
+      sessionLikelyDead &&
+      !_isRetry &&
+      path !== REFRESH_PATH &&
+      path !== LOGOUT_PATH &&
+      Boolean(getStoredRefreshToken());
 
-    if (shouldClearSession(errorCode, response.status)) {
+    if (canRefresh) {
+      try {
+        const newAccessToken = await refreshAccessToken();
+        return apiRequest(path, { ...options, token: newAccessToken, _isRetry: true });
+      } catch {
+        expireAuthSession();
+        throw new ApiError(getApiErrorMessage(data, response.status), {
+          errorCode,
+          status: response.status,
+          data
+        });
+      }
+    }
+
+    if (sessionLikelyDead) {
       expireAuthSession();
     }
 
@@ -159,6 +246,19 @@ export function deleteJson(path, options) {
 
 export function loginWithPassword(credentials) {
   return postJson("/auth/login", credentials);
+}
+
+export async function logoutAndClearSession() {
+  const refreshToken = getStoredRefreshToken();
+  if (refreshToken) {
+    try {
+      await postJson(LOGOUT_PATH, { refreshToken });
+    } catch {
+      // best-effort: if the server can't revoke (network, already revoked),
+      // still clear local storage so the client is logged out.
+    }
+  }
+  clearAuthSession();
 }
 
 export function fetchMe() {

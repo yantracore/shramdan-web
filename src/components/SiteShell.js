@@ -18,7 +18,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { FaFacebookF, FaTiktok, FaXTwitter, FaYoutube } from "react-icons/fa6";
 import { usePreferences } from "@/app/providers";
 import { copy } from "@/lib/siteContent";
-import { clearAuthSession, getAuthSession, isAdminUser, subscribeAuthSession } from "@/lib/authSession";
+import { getAuthSession, isAdminUser, subscribeAuthSession } from "@/lib/authSession";
+import { logoutAndClearSession } from "@/lib/apiClient";
 
 function getInitials(user) {
   const source = user?.name || user?.username || user?.email || "";
@@ -67,8 +68,8 @@ export function SiteShell({ children, pageTitle }) {
       : { href: "/login", label: t.nav.login }
   ];
 
-  const handleLogout = () => {
-    clearAuthSession();
+  const handleLogout = async () => {
+    await logoutAndClearSession();
     router.replace("/login");
   };
 

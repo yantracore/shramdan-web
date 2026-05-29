@@ -61,6 +61,7 @@ export function getAuthSession() {
     cachedRawSession = rawSession;
     cachedSession = {
       accessToken: session.accessToken,
+      refreshToken: session.refreshToken ?? null,
       user: normalizeUser(session.user)
     };
 
@@ -78,8 +79,11 @@ export function setAuthSession(session) {
     return null;
   }
 
+  const previous = getAuthSession();
   const nextSession = {
     accessToken: session.accessToken,
+    refreshToken:
+      session.refreshToken !== undefined ? session.refreshToken : previous?.refreshToken ?? null,
     user: normalizeUser(session.user)
   };
 
@@ -138,6 +142,10 @@ export function subscribeAuthSessionExpired(callback) {
 
 export function getStoredAccessToken() {
   return getAuthSession()?.accessToken ?? null;
+}
+
+export function getStoredRefreshToken() {
+  return getAuthSession()?.refreshToken ?? null;
 }
 
 export function getStoredUser() {

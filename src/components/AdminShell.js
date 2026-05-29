@@ -21,6 +21,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { usePreferences } from "@/app/providers";
 import { clearAuthSession, getAuthSession, isAdminUser, subscribeAuthSession } from "@/lib/authSession";
+import { logoutAndClearSession } from "@/lib/apiClient";
 
 function getUserInitials(name, email) {
   const source = (name || "").trim();
@@ -112,8 +113,8 @@ export function AdminShell({ children, title }) {
     document.title = `${title} · श्रमदान Control Center`;
   }, [title]);
 
-  const handleLogout = () => {
-    clearAuthSession();
+  const handleLogout = async () => {
+    await logoutAndClearSession();
     router.replace("/login");
   };
 
