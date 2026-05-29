@@ -95,7 +95,7 @@ If the user gives a high-level instruction like "let's continue", read this file
 2. ~~**1.6 Citizen public issue submission**~~ ✅ *(shipped 2026-05-28 — `/issues/new`)*
 3. ~~**3.3 Issue → Campaign promotion**~~ ✅ *(shipped 2026-05-26 — admin force-convert button on `/admin/issues/[id]/view`)*
 4. **3.2 Public campaign detail page** — `/events/[id]` against existing `GET /events/{id}`. *(3.2.1 shipped 2026-05-29; 3.2.2 + 3.2.3 deferred until backend `rolesNeeded` shape and roster endpoint exist.)*
-5. **3.6 Volunteer join + roster** — "I'm joining" button + roster list on the campaign page. **← next blocker**
+5. **3.6 Volunteer join + roster** — "I'm joining" button + roster list on the campaign page. **← blocked on backend (see [09-backend-admin-gaps.md](09-backend-admin-gaps.md)); 3.5.1 is the next implementable Tier 0 step in the meantime**
 6. **3.5.1 Leader schedule UI** — leader can `PATCH /events/{id}/schedule`.
 7. **4.6 Pre-event safety checklist gate** — simplest form, leader ticks N boxes before the event publishes.
 8. **3.5.2 Leader mark complete** — leader can `POST /events/{id}/complete`.
@@ -127,9 +127,10 @@ If the user gives a high-level instruction like "let's continue", read this file
 
 This is the active end of the [Launch Critical Path](#launch-critical-path--tier-0). Items collapse forward as Tier 0 sequence steps complete — agents may rewrite this list freely but must keep it consistent with the Tier 0 ladder above. When proposing "what's next", agents must also consult open `P1` items in [00-polish-backlog.md](00-polish-backlog.md) and prefer Tier-0-tagged polish over fresh feature leaves.
 
-1. **3.6 Volunteer join + roster** — "I'm joining" button + roster on the campaign page. The biggest remaining missing piece for hosting the first real event: a promoted campaign needs a way for volunteers to commit and for the leader to see who's coming.
-2. **3.2.2 / 3.2.3 progress indicators** — currently blocked. 3.2.2 wants a backend `rolesNeeded` shape on the event resource; 3.2.3 wants a volunteer count (waits on 3.6 roster) and funds/materials totals (Phase 5).
-3. **11.7 Security baseline audit** — XSS / CSRF / secret handling / rate-limit sweep over existing surfaces. Non-blocking but should land before first real event.
+1. **3.6 Volunteer join + roster** — **`[!]` BLOCKED on backend**. No participation endpoints exist (`POST/DELETE /events/{id}/join`, `GET /events/{id}/participants`). Backend gap logged in [09-backend-admin-gaps.md](09-backend-admin-gaps.md). When unblocked, this is the next Tier 0 piece.
+2. **3.5.1 Leader schedule UI** — `PATCH /events/{id}/schedule` is already exposed. Leader-only frontend for editing scheduledAt, duration, meetup point, planning notes. Unblocked and the next implementable Tier 0 step while 3.6 waits on backend.
+3. **3.2.2 / 3.2.3 progress indicators** — blocked alongside 3.6 (need `rolesNeeded` shape + participants endpoint).
+4. **11.7 Security baseline audit** — non-blocking but should land before first real event.
 
 *Earlier suggestions (9.11.1, Phase 2 stack decision, 3.2 deferral, 3.3 promotion, 3.2.1) superseded as work ships. Phase 2 stack decision moves to Tier 1; 9.11.1 cancelled.*
 
@@ -223,7 +224,7 @@ Goal: A promoted issue becomes a real-world campaign with leader, schedule, rost
 - [ ] 3.5 Scheduling + completion (leader-only) `w:3`
   - [ ] 3.5.1 Leader UI for `PATCH /events/{id}/schedule` `w:2`
   - [ ] 3.5.2 Leader UI for `POST /events/{id}/complete` `w:1`
-- [ ] 3.6 Participation roster — volunteer / cameraman `w:2`
+- [!] 3.6 Participation roster — volunteer / cameraman `w:2` ← blocked: needs `POST/DELETE /events/{id}/join`, `GET /events/{id}/participants`, and ideally `myParticipation` echo on `GET /events/{id}` (see [09-backend-admin-gaps.md](09-backend-admin-gaps.md))
 - [ ] 3.7 Reminder cadence: 3d / 24h / 1h `w:1`
 
 ## Phase 4 — Operational Safety & Incidents `w:8` 📊 0%

@@ -112,6 +112,56 @@ list on success. Do not surface the action for the currently-logged-in admin
 (the backend forbids self-role-change anyway, but hiding the control avoids a
 confusing error).
 
+## Events
+
+### Missing: volunteer join + roster endpoints (blocks roadmap 3.6)
+
+The public campaign detail page at `/events/[id]` (shipped 2026-05-29 for 3.2.1)
+has nowhere to send a "I'm joining" click and nothing to render as a roster,
+because the API currently exposes no participation endpoints. The only
+volunteer-side surface is `GET /api/v1/events/me`, which lists events the
+authenticated user is *already* involved in — there is no way to *become*
+involved.
+
+Specifically needed before 3.6 can ship:
+
+- `POST /api/v1/events/{id}/join` — current authenticated user opts in as a
+  volunteer; may take an optional `role` (e.g. `VOLUNTEER`, `CAMERAMAN`,
+  `MEDIC`, `SAFETY_LEAD`) and an optional `note`. Returns the participant
+  record. Idempotent (joining twice returns 200 with the existing record).
+- `DELETE /api/v1/events/{id}/join` — current authenticated user retracts
+  their commitment (or `DELETE /events/{id}/participants/me` if that reads
+  better).
+- `GET /api/v1/events/{id}/participants` — list of `{userId, name, role,
+  joinedAt, status}` for the campaign page roster. Public-readable, with
+  display-safe fields only (no phone/email). Cursor-paginated like other
+  list endpoints.
+- Optional: `myParticipation` field echoed on `GET /events/{id}` so the page
+  can render the join button's already-joined state without an extra
+  round-trip (mirrors the `isVoted` pattern on issues).
+
+Once these land, the campaign page can ship the join button + roster, and
+3.2.3 (volunteer-count progress indicator) becomes trivial — it just counts
+participants.
+
+### Missing: `rolesNeeded` shape on event resource (blocks roadmap 3.2.2)
+
+For the campaign detail page's "Help needed" breakdown (3.2.2), the event
+resource needs a structured way to express "we need N volunteers, M
+cameramen, L medics, etc." Currently nothing on the event distinguishes
+roles or counts. A minimal shape:
+
+```json
+"rolesNeeded": [
+  { "role": "VOLUNTEER", "count": 12, "filled": 4 },
+  { "role": "CAMERAMAN", "count": 2,  "filled": 0 }
+]
+```
+
+Filled-count would derive from `participants` if their `role` is recorded
+on join, so the join endpoint should accept and persist a `role` from a
+shared enum.
+
 ## Applications
 
 ### Application role enum expansion
