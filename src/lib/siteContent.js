@@ -271,7 +271,8 @@ export const copy = {
         intro:
           "श्रमदान केवल सरसफाइको मञ्च मात्र होइन — यो नागरिक-नेतृत्वमा सामुदायिक काम जुटाउने सामान्य ढाँचा हो। तल अहिलेसम्म पहिचान भएका कार्य-प्रकारहरू देखाइएको छ। पहिलो चरण सरसफाइबाट सुरु, बाँकी क्रमशः थपिँदै जानेछन्।",
         primaryHeading: "मूल कार्य-प्रकार",
-        primaryIntro: "गृहपृष्ठमा पनि देखाइएका मुख्य आठ कार्य-प्रकार।",
+        primaryIntro:
+          "नेपालको सन्दर्भमा सबैभन्दा छिटो र भरपर्दो रूपमा उठाउन सकिने भनेर छानिएका आठ कार्य-प्रकार — एउटा अहिले निर्माणाधीन छ, बाँकी क्रमशः थपिँदै।",
         additionalHeading: "थप सम्भावित क्षेत्रहरू",
         additionalIntro:
           "मुख्य आठ बाहेक पनि श्रमदानको ढाँचा यी क्षेत्रहरूमा उपयोगी हुनसक्छ। समुदायको आवश्यकता र क्षमताको आधारमा क्रमशः अघि बढाइनेछ।",
@@ -1511,7 +1512,8 @@ export const copy = {
         intro:
           "Shramdan is more than a cleanup platform — it is a general framework for citizen-led community work. Below are the event types we have mapped so far. We start with cleanup; the rest will be added step by step.",
         primaryHeading: "Core event types",
-        primaryIntro: "The eight main event types also featured on the homepage.",
+        primaryIntro:
+          "The eight event types we picked as the most actionable and reliable to mobilise for Nepal — one is being built now, the rest roll out next.",
         additionalHeading: "More possibilities",
         additionalIntro:
           "Beyond the core eight, the Shramdan framework can extend into these areas as community capacity grows.",
