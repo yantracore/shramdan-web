@@ -4,6 +4,7 @@ export const copy = {
     nav: {
       home: "गृहपृष्ठ",
       issues: "समस्याहरू",
+      eventTypes: "कार्य-प्रकार",
       join: "जोडिनुहोस्",
       feedback: "प्रतिक्रिया",
       login: "लगइन"
@@ -1525,6 +1526,7 @@ export const copy = {
     nav: {
       home: "Home",
       issues: "Issues",
+      eventTypes: "Event Types",
       join: "Join",
       feedback: "Feedback",
       login: "Login"

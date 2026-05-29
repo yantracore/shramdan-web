@@ -147,10 +147,18 @@ export function SiteShell({ children, pageTitle }) {
         ]
       }
     : null;
+  const quickLinks = [
+    { href: "/", label: t.nav.home },
+    { href: "/issues", label: t.nav.issues },
+    { href: "/event-types", label: t.nav.eventTypes },
+    isAuthenticated
+      ? { href: "/me", label: t.me.navLabel }
+      : { href: "/login", label: t.nav.login }
+  ];
   const footerLinks = [
     {
       title: t.footer.columns.quickLinks,
-      links: navItems
+      links: quickLinks
     },
     {
       title: t.footer.columns.getInvolved,
