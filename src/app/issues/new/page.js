@@ -1,11 +1,12 @@
 "use client";
 
-import { EnvironmentOutlined, SendOutlined } from "@ant-design/icons";
-import { Button, Form, Input, InputNumber, Select, Spin, Tag } from "antd";
+import { SendOutlined } from "@ant-design/icons";
+import { Button, Form, Input, Select, Spin } from "antd";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePreferences } from "@/app/providers";
 import { IssueCoverUpload } from "@/components/admin/IssueCoverUpload";
+import IssueLocationPickerBlock from "@/components/IssueLocationPickerBlock";
 import { SiteShell } from "@/components/SiteShell";
 import { postJson } from "@/lib/apiClient";
 import { ISSUE_CATEGORIES } from "@/lib/adminUtils";
@@ -18,20 +19,36 @@ const NEW_ISSUE_PATH = "/issues/new";
 const coverImageValidator = (message) => (_rule, cover) =>
   cover?.id ? Promise.resolve() : Promise.reject(new Error(message));
 
+const locationValidator = (message) => (_rule, location) => {
+  if (
+    location &&
+    Number.isFinite(location.lat) &&
+    Number.isFinite(location.lng)
+  ) {
+    return Promise.resolve();
+  }
+  return Promise.reject(new Error(message));
+};
+
+function FormLocationField({ value, onChange, ...rest }) {
+  return (
+    <IssueLocationPickerBlock value={value} onChange={onChange} {...rest} />
+  );
+}
+
 export default function NewIssuePage() {
   const router = useRouter();
   const { language } = usePreferences();
   const t = copy[language] ?? copy.np;
   const labels = t.issueNew;
   const fields = labels.fields;
+  const pickerLabels = fields.picker;
   const messageApi = useToast();
   const [form] = Form.useForm();
   const [authChecked, setAuthChecked] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [detecting, setDetecting] = useState(false);
-  const [locationDetected, setLocationDetected] = useState(false);
   const [locationError, setLocationError] = useState(null);
-  const [showManualCoords, setShowManualCoords] = useState(false);
+  const addressTouchedRef = useRef(false);
 
   useEffect(() => {
     const session = getAuthSession();
@@ -50,43 +67,26 @@ export default function NewIssuePage() {
     label: labels.categories[value] ?? value
   }));
 
-  const handleDetectLocation = () => {
-    if (typeof window === "undefined" || !navigator?.geolocation) {
-      setLocationError(fields.locationUnsupported);
-      setShowManualCoords(true);
-      return;
-    }
+  const handleAddressSuggestion = (suggested) => {
+    if (addressTouchedRef.current) return;
+    if (!suggested) return;
+    form.setFieldsValue({ addressText: suggested });
+  };
 
-    setDetecting(true);
-    setLocationError(null);
-
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        form.setFieldsValue({
-          latitude: Number(position.coords.latitude.toFixed(6)),
-          longitude: Number(position.coords.longitude.toFixed(6))
-        });
-        setLocationDetected(true);
-        setDetecting(false);
-      },
-      () => {
-        setLocationError(fields.locationDenied);
-        setShowManualCoords(true);
-        setDetecting(false);
-      },
-      { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 }
-    );
+  const handleAddressFieldChange = () => {
+    addressTouchedRef.current = true;
   };
 
   const handleSubmit = async (values) => {
     const cover = values.cover;
+    const location = values.location || {};
     const payload = {
       title: values.title,
       description: values.description,
       category: values.category,
       addressText: values.addressText,
-      latitude: values.latitude,
-      longitude: values.longitude,
+      latitude: location.lat,
+      longitude: location.lng,
       coverImageId: cover.id
     };
 
@@ -177,68 +177,32 @@ export default function NewIssuePage() {
           </Form.Item>
 
           <Form.Item
+            name="location"
+            label={fields.location}
+            rules={[{ validator: locationValidator(fields.locationRequired) }]}
+          >
+            <FormLocationField
+              language={language}
+              labels={pickerLabels}
+              onAddressSuggestion={handleAddressSuggestion}
+              onLocationError={setLocationError}
+            />
+          </Form.Item>
+          {locationError ? (
+            <p className="new-issue-location-error">{locationError}</p>
+          ) : null}
+
+          <Form.Item
             name="addressText"
             label={fields.address}
+            extra={fields.addressFromMap}
             rules={[{ required: true, message: fields.addressRequired }]}
           >
-            <Input placeholder={fields.addressPlaceholder} />
+            <Input
+              placeholder={fields.addressPlaceholder}
+              onChange={handleAddressFieldChange}
+            />
           </Form.Item>
-
-          <div className="new-issue-location-block">
-            <div className="new-issue-location-header">
-              <span className="ant-form-item-label">
-                <label>{fields.location}</label>
-              </span>
-              {locationDetected ? (
-                <Tag color="green" icon={<EnvironmentOutlined />}>
-                  {fields.locationDetected}
-                </Tag>
-              ) : null}
-            </div>
-            <div className="new-issue-location-actions">
-              <Button
-                icon={<EnvironmentOutlined />}
-                loading={detecting}
-                onClick={handleDetectLocation}
-              >
-                {detecting ? fields.locationDetecting : fields.locationDetect}
-              </Button>
-              {!showManualCoords ? (
-                <Button type="link" onClick={() => setShowManualCoords(true)}>
-                  {fields.locationManualToggle}
-                </Button>
-              ) : null}
-            </div>
-            {locationError ? (
-              <p className="new-issue-location-error">{locationError}</p>
-            ) : null}
-          </div>
-
-          <div
-            className="new-issue-coords-grid"
-            style={{ display: showManualCoords || locationDetected ? "grid" : "none" }}
-          >
-            <Form.Item
-              name="latitude"
-              label={fields.latitude}
-              rules={[
-                { required: true, message: fields.latitudeRequired },
-                { type: "number", min: -90, max: 90, message: fields.latitudeRange }
-              ]}
-            >
-              <InputNumber style={{ width: "100%" }} step={0.0001} placeholder="28.2130" />
-            </Form.Item>
-            <Form.Item
-              name="longitude"
-              label={fields.longitude}
-              rules={[
-                { required: true, message: fields.longitudeRequired },
-                { type: "number", min: -180, max: 180, message: fields.longitudeRange }
-              ]}
-            >
-              <InputNumber style={{ width: "100%" }} step={0.0001} placeholder="83.9570" />
-            </Form.Item>
-          </div>
 
           <Button
             type="primary"
