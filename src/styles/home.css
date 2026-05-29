@@ -4801,7 +4801,7 @@
   align-items: baseline;
   justify-content: space-between;
   font-size: 13px;
-  color: var(--text-primary, #1d2a26);
+  color: var(--text);
 }
 
 .hero-panel-progress-row span {
@@ -4860,7 +4860,7 @@
 
 .building-now-heading p {
   margin: 0;
-  color: var(--text-secondary, #4a5a55);
+  color: var(--text);
   font-size: 15px;
   line-height: 1.6;
 }
@@ -4971,7 +4971,7 @@
 
 .building-now-phase-tag {
   font-size: 12px;
-  color: var(--text-tertiary, #6b7c77);
+  color: var(--muted);
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -4980,7 +4980,7 @@
 .building-now-id {
   font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
   font-size: 11px;
-  color: var(--text-tertiary, #6b7c77);
+  color: var(--muted);
   font-variant-numeric: tabular-nums;
 }
 
@@ -4988,14 +4988,14 @@
   margin: 0;
   font-size: 17px;
   line-height: 1.35;
-  color: var(--text-primary, #1d2a26);
+  color: var(--text);
 }
 
 .building-now-blurb {
   margin: 0;
   font-size: 14px;
   line-height: 1.55;
-  color: var(--text-secondary, #4a5a55);
+  color: var(--text);
 }
 
 .building-now-meta {
@@ -5004,7 +5004,7 @@
   align-items: center;
   gap: 6px;
   font-size: 12px;
-  color: var(--text-tertiary, #6b7c77);
+  color: var(--muted);
   padding-top: 4px;
 }
 
