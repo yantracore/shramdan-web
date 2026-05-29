@@ -6430,3 +6430,77 @@
     min-height: 240px;
   }
 }
+
+/* ---- Leader schedule banner on event detail ---- */
+
+.leader-schedule-banner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  margin: 16px 0 8px;
+  padding: 16px 18px;
+  border: 1px dashed color-mix(in srgb, var(--primary) 38%, var(--line));
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--primary) 6%, var(--surface));
+}
+
+.leader-schedule-banner-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1 1 280px;
+  min-width: 0;
+}
+
+.leader-schedule-banner-copy .eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+
+.leader-schedule-banner-copy p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text);
+}
+
+.leader-schedule-cta {
+  flex-shrink: 0;
+}
+
+[data-theme="dark"] .leader-schedule-banner {
+  background: color-mix(in srgb, var(--primary) 10%, var(--surface));
+  border-color: color-mix(in srgb, var(--primary) 50%, var(--line));
+}
+
+/* ---- Schedule modal form ---- */
+
+.leader-schedule-intro {
+  margin: 0 0 16px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.leader-schedule-form .leader-schedule-coords {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.leader-schedule-use-issue {
+  margin: -8px 0 8px;
+  padding: 0;
+  height: auto;
+}
+
+@media (max-width: 540px) {
+  .leader-schedule-form .leader-schedule-coords {
+    grid-template-columns: 1fr;
+  }
+}

@@ -128,11 +128,11 @@ If the user gives a high-level instruction like "let's continue", read this file
 This is the active end of the [Launch Critical Path](#launch-critical-path--tier-0). Items collapse forward as Tier 0 sequence steps complete — agents may rewrite this list freely but must keep it consistent with the Tier 0 ladder above. When proposing "what's next", agents must also consult open `P1` items in [00-polish-backlog.md](00-polish-backlog.md) and prefer Tier-0-tagged polish over fresh feature leaves.
 
 1. **3.6 Volunteer join + roster** — **`[!]` BLOCKED on backend**. No participation endpoints exist (`POST/DELETE /events/{id}/join`, `GET /events/{id}/participants`). Backend gap logged in [09-backend-admin-gaps.md](09-backend-admin-gaps.md). When unblocked, this is the next Tier 0 piece.
-2. **3.5.1 Leader schedule UI** — `PATCH /events/{id}/schedule` is already exposed. Leader-only frontend for editing scheduledAt, duration, meetup point, planning notes. Unblocked and the next implementable Tier 0 step while 3.6 waits on backend.
+2. **3.5.2 Leader completion UI** — `POST /events/{id}/complete` already exposed. Now that 3.5.1 has shipped a leader-only modal pattern on `/events/[id]`, the same shell can carry a "Mark complete" affordance for `SCHEDULED/ACTIVE` events with `resultSummary` + attendee count.
 3. **3.2.2 / 3.2.3 progress indicators** — blocked alongside 3.6 (need `rolesNeeded` shape + participants endpoint).
 4. **11.7 Security baseline audit** — non-blocking but should land before first real event.
 
-*Earlier suggestions (9.11.1, Phase 2 stack decision, 3.2 deferral, 3.3 promotion, 3.2.1) superseded as work ships. Phase 2 stack decision moves to Tier 1; 9.11.1 cancelled.*
+*Earlier suggestions (9.11.1, Phase 2 stack decision, 3.2 deferral, 3.3 promotion, 3.2.1, 3.5.1) superseded as work ships. Phase 2 stack decision moves to Tier 1; 9.11.1 cancelled.*
 
 ---
 
@@ -221,8 +221,8 @@ Goal: A promoted issue becomes a real-world campaign with leader, schedule, rost
   - [x] 3.4.1 Admin leader assignment (exists in `/admin/events`) ← done: 2026-05-19
   - [ ] 3.4.2 Member nomination flow on `/app` `w:1`
   - [ ] 3.4.3 Member-side tie-break + settle surface `w:1`
-- [ ] 3.5 Scheduling + completion (leader-only) `w:3`
-  - [ ] 3.5.1 Leader UI for `PATCH /events/{id}/schedule` `w:2`
+- [~] 3.5 Scheduling + completion (leader-only) `w:3`
+  - [x] 3.5.1 Leader UI for `PATCH /events/{id}/schedule` `w:2` ← done: 2026-05-29 *(`LeaderScheduleEditor` component renders a leader-only banner + Ant Design Modal on `/events/[id]` when the current user matches `eventLeaderId` AND status is `DRAFT`. Form covers `scheduledAt` (DatePicker showTime, future-only), `durationMinutes` (15-min steps), `meetupAddress`, `meetupNotes`, `meetupLatitude/Longitude` (with "Use issue location" shortcut prefilled from linked issue), and `planningNotes`. Submits via `patchJson('/events/${id}/schedule', payload, { requireAuth: true })`; surfaces 403 / 409 / generic toasts. Verified end-to-end with Playwright as admin-leader: DRAFT → SCHEDULED transition, banner auto-hides afterward.)*
   - [ ] 3.5.2 Leader UI for `POST /events/{id}/complete` `w:1`
 - [!] 3.6 Participation roster — volunteer / cameraman `w:2` ← blocked: needs `POST/DELETE /events/{id}/join`, `GET /events/{id}/participants`, and ideally `myParticipation` echo on `GET /events/{id}` (see [09-backend-admin-gaps.md](09-backend-admin-gaps.md))
 - [ ] 3.7 Reminder cadence: 3d / 24h / 1h `w:1`

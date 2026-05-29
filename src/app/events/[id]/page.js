@@ -12,12 +12,14 @@ import {
 import { Button, Empty, Skeleton, Tag } from "antd";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import IssueMapBlock from "@/components/IssueMapBlock";
 import { IssuePhotoGallery } from "@/components/IssuePhotoGallery";
+import { LeaderScheduleEditor } from "@/components/LeaderScheduleEditor";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
 import { getJson } from "@/lib/apiClient";
+import { getAuthSession, subscribeAuthSession } from "@/lib/authSession";
 import { copy } from "@/lib/siteContent";
 import {
   EVENT_RISK_COLORS,
@@ -116,8 +118,14 @@ export default function EventDetailPage() {
     fetchEvent();
   }, [fetchEvent]);
 
+  const session = useSyncExternalStore(subscribeAuthSession, getAuthSession, () => null);
   const linkedIssue = eventData?.issue ?? null;
   const leader = eventData?.eventLeader ?? null;
+  const isLeader = Boolean(
+    session?.user?.id && eventData?.eventLeaderId && session.user.id === eventData.eventLeaderId
+  );
+  const canScheduleEvent = isLeader && eventData?.status === "DRAFT";
+  const leaderScheduleCopy = content.detail.leaderSchedule;
   const uploads = Array.isArray(eventData?.uploads) ? eventData.uploads : [];
   const imageUploads = uploads.filter(isImageUpload);
 
@@ -212,6 +220,20 @@ export default function EventDetailPage() {
                   {leader?.name || content.detail.leaderUnassigned}
                 </span>
               </div>
+
+              {canScheduleEvent ? (
+                <div className="leader-schedule-banner">
+                  <div className="leader-schedule-banner-copy">
+                    <span className="eyebrow">{leaderScheduleCopy.eyebrow}</span>
+                    <p>{leaderScheduleCopy.intro}</p>
+                  </div>
+                  <LeaderScheduleEditor
+                    event={eventData}
+                    content={leaderScheduleCopy}
+                    onSaved={fetchEvent}
+                  />
+                </div>
+              ) : null}
 
               {linkedIssue?.description ? (
                 <section className="public-issue-detail-section-block">
