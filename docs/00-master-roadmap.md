@@ -94,8 +94,8 @@ If the user gives a high-level instruction like "let's continue", read this file
    - 11.7 Security review baseline — XSS, CSRF, secret handling, rate-limit sweep on existing surfaces
 2. ~~**1.6 Citizen public issue submission**~~ ✅ *(shipped 2026-05-28 — `/issues/new`)*
 3. ~~**3.3 Issue → Campaign promotion**~~ ✅ *(shipped 2026-05-26 — admin force-convert button on `/admin/issues/[id]/view`)*
-4. **3.2 Public campaign detail page** — `/events/[id]` against existing `GET /events/{id}`. **← next blocker**
-5. **3.6 Volunteer join + roster** — "I'm joining" button + roster list on the campaign page.
+4. **3.2 Public campaign detail page** — `/events/[id]` against existing `GET /events/{id}`. *(3.2.1 shipped 2026-05-29; 3.2.2 + 3.2.3 deferred until backend `rolesNeeded` shape and roster endpoint exist.)*
+5. **3.6 Volunteer join + roster** — "I'm joining" button + roster list on the campaign page. **← next blocker**
 6. **3.5.1 Leader schedule UI** — leader can `PATCH /events/{id}/schedule`.
 7. **4.6 Pre-event safety checklist gate** — simplest form, leader ticks N boxes before the event publishes.
 8. **3.5.2 Leader mark complete** — leader can `POST /events/{id}/complete`.
@@ -127,11 +127,11 @@ If the user gives a high-level instruction like "let's continue", read this file
 
 This is the active end of the [Launch Critical Path](#launch-critical-path--tier-0). Items collapse forward as Tier 0 sequence steps complete — agents may rewrite this list freely but must keep it consistent with the Tier 0 ladder above. When proposing "what's next", agents must also consult open `P1` items in [00-polish-backlog.md](00-polish-backlog.md) and prefer Tier-0-tagged polish over fresh feature leaves.
 
-1. **3.2 Public campaign detail page** — `/events/[id]` rendering `GET /events/{id}`. With 3.3 already producing campaigns, this is the next blocker on the Tier 0 path — once it ships, promoted issues have a destination page citizens and volunteers can actually open.
-2. **3.6 Volunteer join + roster** — "I'm joining" button + roster on the campaign page. Naturally pairs with 3.2 since both live on `/events/[id]`.
-3. **11.7 Security baseline audit** — final piece of the Security + Legal batch; XSS / CSRF / secret handling / rate-limit sweep over existing surfaces. Non-blocking but should land before first real event.
+1. **3.6 Volunteer join + roster** — "I'm joining" button + roster on the campaign page. The biggest remaining missing piece for hosting the first real event: a promoted campaign needs a way for volunteers to commit and for the leader to see who's coming.
+2. **3.2.2 / 3.2.3 progress indicators** — currently blocked. 3.2.2 wants a backend `rolesNeeded` shape on the event resource; 3.2.3 wants a volunteer count (waits on 3.6 roster) and funds/materials totals (Phase 5).
+3. **11.7 Security baseline audit** — XSS / CSRF / secret handling / rate-limit sweep over existing surfaces. Non-blocking but should land before first real event.
 
-*Earlier suggestions (9.11.1, Phase 2 stack decision, 3.2 deferral, 3.3 promotion) superseded as work ships. Phase 2 stack decision moves to Tier 1; 9.11.1 cancelled.*
+*Earlier suggestions (9.11.1, Phase 2 stack decision, 3.2 deferral, 3.3 promotion, 3.2.1) superseded as work ships. Phase 2 stack decision moves to Tier 1; 9.11.1 cancelled.*
 
 ---
 
@@ -204,15 +204,15 @@ Goal: Authenticated member experience that ships before the native mobile app an
 - [ ] 2.7 Profile + settings `w:1`
 - [ ] 2.8 KYC submission flow (prospective leaders) `w:1`
 
-## Phase 3 — Campaign / Event Execution `w:15` 📊 20%
+## Phase 3 — Campaign / Event Execution `w:15` 📊 27%
 
 Goal: A promoted issue becomes a real-world campaign with leader, schedule, roster, and completion.
 
 - [x] 3.1 Admin events list (read) `w:1` ← done: 2026-05-19
-- [ ] 3.2 Public campaign detail page `w:3`
-  - [ ] 3.2.1 Date, time, meeting point, goal `w:1`
-  - [ ] 3.2.2 Help-needed breakdown `w:1`
-  - [ ] 3.2.3 Progress indicators (volunteers, funds, materials) `w:1`
+- [~] 3.2 Public campaign detail page `w:3`
+  - [x] 3.2.1 Date, time, meeting point, goal `w:1` ← done: 2026-05-29 *(`/events/[id]` ships scheduled time, duration, meetup point + map, linked-issue goal/description, leader, risk badge, photo gallery, completion summary; bilingual EN+NE)*
+  - [ ] 3.2.2 Help-needed breakdown `w:1` *(blocked on backend: event resource needs a `rolesNeeded` shape — count by skill/role — before frontend can render it)*
+  - [ ] 3.2.3 Progress indicators (volunteers, funds, materials) `w:1` *(waits on 3.6 roster endpoint for volunteer count; funds/materials need Phase 5 contribution channels)*
 - [x] 3.3 Issue → campaign promotion `w:2` ← done: 2026-05-26
   - [x] 3.3.1 Vote-threshold rule + admin trigger `w:1` ← done: 2026-05-26 *(admin force-convert button on `/admin/issues/[id]/view` calls `POST /issues/{id}/convert-to-event`; backend owns the vote-threshold auto-promote rule)*
   - [x] 3.3.2 Auto-create campaign record on promote `w:1` ← done: 2026-05-26 *(backend `convert-to-event` endpoint creates the event record server-side; frontend trigger shipped in e776f29)*
@@ -363,7 +363,7 @@ Weighted across all phases (sum of phase weights = 137):
 | 0 Foundation | 10 | 100% |
 | 1 Public Issue Discovery & Voting | 15 | 77% |
 | 2 Member Portal `/app` | 18 | 0% |
-| 3 Campaign Execution | 15 | 20% |
+| 3 Campaign Execution | 15 | 27% |
 | 4 Operational Safety | 8 | 0% |
 | 5 Contribution Channels | 10 | 0% |
 | 6 Transparency & Ledger | 8 | 0% |
