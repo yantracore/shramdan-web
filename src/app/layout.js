@@ -18,7 +18,23 @@ export const metadata = {
   title:
     "श्रमदान: हाम्रो श्रम, हाम्रो समाज, हाम्रो भविष्य। | Shramdan: Our labor, our society, our future.",
   description:
-    "देशका हरेक समस्या सरकारको प्रतीक्षा गरेर समाधान हुँदैन। हामी नागरिकहरू आफैं मिलेर सरसफाइ, मर्मत, वृक्षारोपण, टोल सुधार जस्ता आधारभूत काम अघि बढाउन सक्छौँ। श्रमदान त्यही सामूहिक जिम्मेवारीको सुरुवात हो। साना साना हातहरू मिलेर ठूला परिवर्तन सम्भव हुन्छ। आज हाम्रो श्रमदान, भोलि सुन्दर समाजको निर्माण।"
+    "देशका हरेक समस्या सरकारको प्रतीक्षा गरेर समाधान हुँदैन। हामी नागरिकहरू आफैं मिलेर सरसफाइ, मर्मत, वृक्षारोपण, टोल सुधार जस्ता आधारभूत काम अघि बढाउन सक्छौँ। श्रमदान त्यही सामूहिक जिम्मेवारीको सुरुवात हो। साना साना हातहरू मिलेर ठूला परिवर्तन सम्भव हुन्छ। आज हाम्रो श्रमदान, भोलि सुन्दर समाजको निर्माण।",
+  icons: {
+    icon: [
+      { url: "/branding/favicon/favicon.ico", sizes: "any" },
+      { url: "/branding/favicon/favicon-16x16.png", type: "image/png", sizes: "16x16" },
+      { url: "/branding/favicon/favicon-32x32.png", type: "image/png", sizes: "32x32" }
+    ],
+    apple: [{ url: "/branding/favicon/apple-touch-icon.png", sizes: "180x180" }]
+  },
+  manifest: "/branding/favicon/site.webmanifest"
+};
+
+export const viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#176b5c" },
+    { media: "(prefers-color-scheme: dark)", color: "#0f4f44" }
+  ]
 };
 
 export default function RootLayout({ children }) {
