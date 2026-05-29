@@ -1,0 +1,318 @@
+"use client";
+
+import {
+  ArrowLeftOutlined,
+  CalendarOutlined,
+  ClockCircleOutlined,
+  EnvironmentOutlined,
+  ExportOutlined,
+  TeamOutlined,
+  WarningOutlined
+} from "@ant-design/icons";
+import { Button, Empty, Skeleton, Tag } from "antd";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
+import IssueMapBlock from "@/components/IssueMapBlock";
+import { IssuePhotoGallery } from "@/components/IssuePhotoGallery";
+import { SiteShell } from "@/components/SiteShell";
+import { usePreferences } from "@/app/providers";
+import { getJson } from "@/lib/apiClient";
+import { copy } from "@/lib/siteContent";
+import {
+  EVENT_RISK_COLORS,
+  EVENT_STATUS_COLORS,
+  formatEnum,
+  getResponseData,
+  isImageUpload
+} from "@/lib/adminUtils";
+
+function formatScheduledAt(value, language) {
+  if (!value) return "";
+  try {
+    const date = new Date(value);
+    const locale = language === "np" ? "ne-NP" : "en-US";
+    return date.toLocaleString(locale, {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit"
+    });
+  } catch {
+    return String(value);
+  }
+}
+
+function formatCompletedAt(value, language) {
+  if (!value) return "";
+  try {
+    const date = new Date(value);
+    const locale = language === "np" ? "ne-NP" : "en-US";
+    return date.toLocaleDateString(locale, {
+      year: "numeric",
+      month: "long",
+      day: "numeric"
+    });
+  } catch {
+    return String(value);
+  }
+}
+
+function buildMapsLink(addressText, latitude, longitude) {
+  const lat = Number(latitude);
+  const lng = Number(longitude);
+  if (Number.isFinite(lat) && Number.isFinite(lng)) {
+    return `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+  }
+  if (addressText) {
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addressText)}`;
+  }
+  return null;
+}
+
+export default function EventDetailPage() {
+  const params = useParams();
+  const eventId = params?.id;
+  const { language } = usePreferences();
+  const t = copy[language];
+  const content = t.events;
+  const issueContent = t.issues;
+
+  const [eventData, setEventData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [notFound, setNotFound] = useState(false);
+
+  const fetchEvent = useCallback(async () => {
+    if (!eventId) return;
+    setLoading(true);
+    setError("");
+    setNotFound(false);
+
+    try {
+      const response = await getJson(`/events/${eventId}`);
+      const data = getResponseData(response, null);
+      if (!data) {
+        setNotFound(true);
+        setEventData(null);
+        return;
+      }
+      setEventData(data);
+    } catch (fetchError) {
+      if (fetchError?.status === 404) {
+        setNotFound(true);
+        setEventData(null);
+      } else {
+        setError(fetchError?.message || content.detail.errorBody);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [eventId, content.detail.errorBody]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchEvent();
+  }, [fetchEvent]);
+
+  const linkedIssue = eventData?.issue ?? null;
+  const leader = eventData?.eventLeader ?? null;
+  const uploads = Array.isArray(eventData?.uploads) ? eventData.uploads : [];
+  const imageUploads = uploads.filter(isImageUpload);
+
+  const meetupLat = Number(eventData?.meetupLatitude ?? linkedIssue?.latitude);
+  const meetupLng = Number(eventData?.meetupLongitude ?? linkedIssue?.longitude);
+  const hasCoords = Number.isFinite(meetupLat) && Number.isFinite(meetupLng);
+  const meetupAddress = eventData?.meetupAddress || linkedIssue?.addressText || "";
+  const mapsLink = buildMapsLink(meetupAddress, meetupLat, meetupLng);
+
+  const pageTitle =
+    eventData && (linkedIssue?.title || eventData.meetupAddress || content.detail.defaultTitle);
+
+  return (
+    <SiteShell pageTitle={pageTitle || content.detail.defaultTitle}>
+      <section className="page-section public-issue-detail-section">
+        <Link className="public-issue-back-link" href="/issues">
+          <ArrowLeftOutlined /> {content.detail.backToIssues}
+        </Link>
+
+        {loading ? (
+          <article
+            aria-live="polite"
+            className="content-card public-issue-detail public-issue-detail-skeleton"
+            role="status"
+          >
+            <Skeleton.Button active size="small" style={{ width: 140 }} />
+            <Skeleton active paragraph={{ rows: 1, width: ["40%"] }} title={{ width: "70%" }} />
+            <Skeleton active paragraph={{ rows: 3 }} />
+          </article>
+        ) : null}
+
+        {!loading && error ? (
+          <div className="public-issues-error" role="alert">
+            <h2>{content.detail.errorTitle}</h2>
+            <p>{content.detail.errorBody}</p>
+            <Button onClick={fetchEvent} type="primary">
+              {content.detail.retry}
+            </Button>
+          </div>
+        ) : null}
+
+        {!loading && notFound ? (
+          <Empty
+            className="public-issues-empty"
+            description={
+              <>
+                <strong>{content.detail.notFoundTitle}</strong>
+                <p>{content.detail.notFoundBody}</p>
+              </>
+            }
+          >
+            <Link href="/issues">
+              <Button type="primary">{content.detail.backToIssues}</Button>
+            </Link>
+          </Empty>
+        ) : null}
+
+        {!loading && !error && !notFound && eventData ? (
+          <article className="content-card public-issue-detail">
+            <div className="public-issue-detail-body">
+              <div className="public-issue-detail-topline">
+                <div className="public-issue-detail-topline-tags">
+                  <Tag color={EVENT_STATUS_COLORS[eventData.status] || "default"}>
+                    {content.statusLabels[eventData.status] || formatEnum(eventData.status)}
+                  </Tag>
+                  {eventData.riskLevel ? (
+                    <Tag color={EVENT_RISK_COLORS[eventData.riskLevel] || "default"}>
+                      <WarningOutlined aria-hidden="true" />{" "}
+                      {content.riskLabels[eventData.riskLevel] || formatEnum(eventData.riskLevel)}
+                    </Tag>
+                  ) : null}
+                </div>
+              </div>
+
+              <h1>{linkedIssue?.title || eventData.meetupAddress || content.detail.defaultTitle}</h1>
+
+              <div className="public-issue-detail-meta">
+                <span>
+                  <CalendarOutlined />{" "}
+                  {eventData.scheduledAt
+                    ? `${content.detail.scheduledOn}: ${formatScheduledAt(eventData.scheduledAt, language)}`
+                    : content.detail.notScheduled}
+                </span>
+                {eventData.durationMinutes ? (
+                  <span>
+                    <ClockCircleOutlined /> {content.detail.duration}:{" "}
+                    {content.detail.durationMinutes.replace("{n}", eventData.durationMinutes)}
+                  </span>
+                ) : null}
+                <span>
+                  <TeamOutlined /> {content.detail.leaderLabel}:{" "}
+                  {leader?.name || content.detail.leaderUnassigned}
+                </span>
+              </div>
+
+              {linkedIssue?.description ? (
+                <section className="public-issue-detail-section-block">
+                  <h2>{content.detail.goalTitle}</h2>
+                  <p>{linkedIssue.description}</p>
+                </section>
+              ) : (
+                <section className="public-issue-detail-section-block">
+                  <h2>{content.detail.goalTitle}</h2>
+                  <p className="public-issue-detail-muted">{content.detail.goalEmpty}</p>
+                </section>
+              )}
+
+              {meetupAddress || eventData.meetupNotes ? (
+                <section className="public-issue-detail-section-block">
+                  <h2>{content.detail.meetupTitle}</h2>
+                  {meetupAddress ? (
+                    <p>
+                      <EnvironmentOutlined /> {meetupAddress}
+                    </p>
+                  ) : null}
+                  {eventData.meetupNotes ? <p>{eventData.meetupNotes}</p> : null}
+                </section>
+              ) : null}
+
+              {eventData.completedAt || eventData.resultSummary ? (
+                <section className="public-issue-detail-section-block">
+                  <h2>{content.detail.completedAt}</h2>
+                  {eventData.completedAt ? (
+                    <p>{formatCompletedAt(eventData.completedAt, language)}</p>
+                  ) : null}
+                  {eventData.resultSummary ? (
+                    <>
+                      <h3>{content.detail.resultSummary}</h3>
+                      <p>{eventData.resultSummary}</p>
+                    </>
+                  ) : null}
+                </section>
+              ) : null}
+
+              {imageUploads.length > 0 ? (
+                <section className="public-issue-detail-section-block">
+                  <h2>{content.detail.photosTitle}</h2>
+                  <IssuePhotoGallery
+                    content={issueContent}
+                    images={imageUploads}
+                    title={linkedIssue?.title || content.detail.defaultTitle}
+                  />
+                </section>
+              ) : null}
+
+              {hasCoords ? (
+                <section className="public-issue-location-card" id="event-location">
+                  <div className="public-issue-location-header">
+                    <h2>{content.detail.locationTitle}</h2>
+                    {mapsLink ? (
+                      <a
+                        className="public-issue-location-open-link"
+                        href={mapsLink}
+                        rel="noreferrer"
+                        target="_blank"
+                      >
+                        {content.detail.openInMaps} <ExportOutlined />
+                      </a>
+                    ) : null}
+                  </div>
+                  <div className="public-issue-location-map">
+                    <IssueMapBlock
+                      content={issueContent}
+                      height={360}
+                      interactive
+                      issues={[
+                        {
+                          id: eventData.id,
+                          title: linkedIssue?.title || meetupAddress,
+                          status: linkedIssue?.status || "EVENT_SCHEDULED",
+                          category: linkedIssue?.category,
+                          addressText: meetupAddress,
+                          latitude: meetupLat,
+                          longitude: meetupLng,
+                          voteCount: linkedIssue?.voteCount
+                        }
+                      ]}
+                      language={language}
+                      showPopup={false}
+                    />
+                  </div>
+                </section>
+              ) : null}
+
+              {linkedIssue?.id ? (
+                <div className="public-issue-detail-actions-bar">
+                  <Link href={`/issues/${linkedIssue.id}`}>
+                    <Button icon={<ArrowLeftOutlined />}>{content.detail.backToIssue}</Button>
+                  </Link>
+                </div>
+              ) : null}
+            </div>
+          </article>
+        ) : null}
+      </section>
+    </SiteShell>
+  );
+}

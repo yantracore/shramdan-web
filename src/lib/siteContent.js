@@ -761,6 +761,48 @@ export const copy = {
       fullscreenOpen: "नक्सा पूरा स्क्रिनमा खोल्नुहोस्",
       fullscreenClose: "पूरा स्क्रिन बन्द गर्नुहोस्"
     },
+    events: {
+      detail: {
+        backToIssues: "सबै समस्यामा फर्किनुहोस्",
+        backToIssue: "मूल समस्या हेर्नुहोस्",
+        scheduledOn: "तय मिति",
+        notScheduled: "अहिलेसम्म मिति तय भएको छैन",
+        duration: "अवधि",
+        durationMinutes: "{n} मिनेट",
+        leaderLabel: "अभियान संयोजक",
+        leaderUnassigned: "अभियान संयोजक तय हुनै बाँकी",
+        riskLabel: "जोखिम स्तर",
+        meetupTitle: "भेला हुने स्थान",
+        meetupNotes: "थप जानकारी",
+        goalTitle: "अभियानको लक्ष्य",
+        goalEmpty: "विवरण थप हुनै बाँकी।",
+        locationTitle: "स्थान",
+        openInMaps: "नक्सामा खोल्नुहोस्",
+        completedAt: "सम्पन्न मिति",
+        resultSummary: "नतिजा",
+        photosTitle: "तस्वीर र प्रमाण",
+        notFoundTitle: "अभियान भेटिएन",
+        notFoundBody: "यो अभियान हटाइएको वा लिङ्क गलत हुनसक्छ।",
+        errorTitle: "अभियान लोड गर्न सकिएन",
+        errorBody: "केही गडबड भयो। केही क्षणपछि फेरि प्रयास गर्नुहोस्।",
+        retry: "फेरि प्रयास गर्नुहोस्",
+        loading: "अभियान लोड हुँदै...",
+        defaultTitle: "श्रमदान अभियान"
+      },
+      statusLabels: {
+        DRAFT: "मस्यौदा",
+        SCHEDULED: "तय भएको",
+        ACTIVE: "सञ्चालनमा",
+        PAUSED: "रोकिएको",
+        COMPLETED: "सम्पन्न",
+        CANCELLED: "रद्द"
+      },
+      riskLabels: {
+        NORMAL: "सामान्य",
+        ELEVATED: "बढी सतर्कता",
+        HIGH: "उच्च जोखिम"
+      }
+    },
     legal: {
       terms: {
         eyebrow: "कानुनी",
@@ -1776,6 +1818,48 @@ export const copy = {
       topTitle: "Most-supported right now",
       fullscreenOpen: "Open map fullscreen",
       fullscreenClose: "Close fullscreen map"
+    },
+    events: {
+      detail: {
+        backToIssues: "Back to All Issues",
+        backToIssue: "View Source Issue",
+        scheduledOn: "Scheduled for",
+        notScheduled: "Schedule not set yet",
+        duration: "Duration",
+        durationMinutes: "{n} min",
+        leaderLabel: "Campaign Lead",
+        leaderUnassigned: "Lead not yet assigned",
+        riskLabel: "Risk level",
+        meetupTitle: "Meetup Point",
+        meetupNotes: "Notes",
+        goalTitle: "Campaign Goal",
+        goalEmpty: "Details coming soon.",
+        locationTitle: "Location",
+        openInMaps: "Open in Maps",
+        completedAt: "Completed on",
+        resultSummary: "Outcome",
+        photosTitle: "Photos and Evidence",
+        notFoundTitle: "Campaign not found",
+        notFoundBody: "This campaign may have been removed, or the link is incorrect.",
+        errorTitle: "Could not load campaign",
+        errorBody: "Something went wrong. Please try again in a moment.",
+        retry: "Try Again",
+        loading: "Loading campaign...",
+        defaultTitle: "Shramdan campaign"
+      },
+      statusLabels: {
+        DRAFT: "Draft",
+        SCHEDULED: "Scheduled",
+        ACTIVE: "Underway",
+        PAUSED: "Paused",
+        COMPLETED: "Completed",
+        CANCELLED: "Cancelled"
+      },
+      riskLabels: {
+        NORMAL: "Normal",
+        ELEVATED: "Elevated caution",
+        HIGH: "High risk"
+      }
     },
     legal: {
       terms: {
