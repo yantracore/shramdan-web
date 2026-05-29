@@ -182,6 +182,20 @@ export const copy = {
       badgeFuture: "आउँदै",
       seeAll: "सबै कार्य-प्रकार हेर्नुहोस्",
       seeAllHref: "/event-types",
+      detail: {
+        eyebrow: "कार्य-प्रकार विवरण",
+        overviewHeading: "के बारेमा",
+        scopeHeading: "कस्तो-कस्तो काम पर्छ",
+        whoHeading: "को सहयोग गर्न सक्नुहुन्छ",
+        whereHeading: "कहाँ-कहाँ",
+        impactHeading: "अपेक्षित प्रभाव",
+        statusHeading: "अहिलेको स्थिति",
+        relatedHeading: "सम्बन्धित कार्य-प्रकार",
+        backToList: "सबै कार्य-प्रकारमा फर्किनुहोस्",
+        backToHome: "गृहपृष्ठमा फर्किनुहोस्",
+        notFoundTitle: "कार्य-प्रकार भेटिएन",
+        notFoundBody: "यो कार्य-प्रकार हटाइएको वा लिङ्क गलत हुनसक्छ।"
+      },
       items: [
         {
           id: "cleanup",
@@ -191,7 +205,42 @@ export const copy = {
           imagePrompt:
             "A group of Nepali community volunteers in safety vests cleaning a public street or riverbank in Nepal, holding brooms, gloves and trash bags, visible piles of collected waste, daylight, active and hopeful mood, Kathmandu Valley urban setting with familiar Nepali street elements.",
           title: "सरसफाइ",
-          body: "सडक, खाली जग्गा, खोला किनार, ढल-नाला, पार्क र हाइकिङ ट्रेलमा फोहोर हटाएर समुदायलाई सफा र सुरक्षित बनाउने।"
+          tagline: "हाम्रो टोल, हाम्रो सडक, हाम्रो जिम्मेवारी।",
+          body: "सडक, खाली जग्गा, खोला किनार, ढल-नाला, पार्क र हाइकिङ ट्रेलमा फोहोर हटाएर समुदायलाई सफा र सुरक्षित बनाउने।",
+          overview:
+            "सडक छेउमा फोहोर देखेर सरकारको पर्खाइमा बस्नुभन्दा छिमेकीसँग मिलेर सफा गर्न सकिन्छ। सरसफाइ श्रमदानको पहिलो कार्य-क्षेत्र हो — आँखाले तुरुन्तै देख्न सकिने, सानै टोलीले सुरु गर्न सकिने, अनि पहिलो दिनै परिणाम देखाउन सकिने।",
+          scope: [
+            "सडक, फुटपाथ र गल्लीको फोहोर हटाउने",
+            "खाली जमिन र बेवास्ता गरिएका प्लटको सरसफाइ",
+            "खोला, नदी र ताल किनारको सरसफाइ",
+            "ढल-नाला र पानी निकासी जाम सफा गर्ने",
+            "पार्क, चौक, बस-स्टप जस्ता सार्वजनिक स्थान",
+            "हाइकिङ ट्रेल र प्रकृति मार्गमा फोहोर हटाउने",
+            "फोहोर पुनः नहोस् भन्ने सामुदायिक चेतना अभियान"
+          ],
+          whoCanHelp: [
+            "स्थानीय बासिन्दा र विद्यार्थी स्वयंसेवक",
+            "अभियान संयोजक — समय र समन्वय दिने स्थानीय अगुवा",
+            "सामग्री दाता — झोला, पन्जा, फोहोर ट्रक, खाजा",
+            "फोटोग्राफर र कन्टेन्ट लेखक — पहिले/पछि प्रमाण र कथा"
+          ],
+          whereItHappens: [
+            "सहर र बजार क्षेत्र",
+            "गाउँ-टोल",
+            "पर्यटन मार्ग र दृश्यावलोकन स्थल",
+            "नदी किनार र जलमार्ग"
+          ],
+          impact: [
+            "तुरुन्तै देखिने सफा वातावरण",
+            "स्थानीय गौरव र साझा जिम्मेवारी",
+            "रोग संक्रमणको जोखिम कमी, विशेष गरी मनसुनपूर्व",
+            "समुदायमा सामूहिक कार्यको पहिलो अनुभव"
+          ],
+          statusNote:
+            "अहिले श्रमदान एपको पहिलो चरणमा सक्रिय कार्य-क्षेत्र। तपाईंले समस्या रिपोर्ट गर्न, समर्थन जनाउन र अभियानमा सहभागी हुन सक्नुहुन्छ।",
+          relatedIds: ["afforestation", "trail", "beautification"],
+          ctaLabel: "नयाँ समस्या रिपोर्ट गर्नुहोस्",
+          ctaHref: "/issues/new"
         },
         {
           id: "afforestation",
@@ -201,7 +250,41 @@ export const copy = {
           imagePrompt:
             "Nepali community volunteers planting saplings on a Himalayan hillside or community land, holding shovels and sapling pots, terraced fields or forested slopes in the background, golden-hour lighting, sense of hope and continuity.",
           title: "वृक्षारोपण",
-          body: "खाली ढिक्का, पहिरो जोखिमयुक्त भिराला, सडक छेउ र सामुदायिक जग्गामा बिरुवा रोपेर हरियाली बढाउने।"
+          tagline: "एउटा बिरुवा, एउटा सास।",
+          body: "खाली ढिक्का, पहिरो जोखिमयुक्त भिराला, सडक छेउ र सामुदायिक जग्गामा बिरुवा रोपेर हरियाली बढाउने।",
+          overview:
+            "बाँझो जमिन, खस्ने भिर, र हराउँदै गएको हरियाली — वृक्षारोपणले यी तीनैलाई एकैसाथ सम्बोधन गर्न सक्छ। नेपालको पहिरो जोखिम र जलवायु संकटको सामुदायिक प्रत्युत्तर।",
+          scope: [
+            "सडक छेउ र सार्वजनिक भिरालो जमिनमा बिरुवा रोप्ने",
+            "स्कुल-कलेज प्राङ्गण र अस्पताल वरिपरि हरियाली",
+            "खोला किनारको bioengineering र bank stabilization",
+            "सामुदायिक वन उपभोक्ता समूहसँग सहकार्य",
+            "रोपिएका बिरुवाको दीर्घकालीन हेरचाह र निगरानी"
+          ],
+          whoCanHelp: [
+            "स्वयंसेवक र विद्यार्थी",
+            "नर्सरी सञ्चालक र कृषि विज्ञ",
+            "सामुदायिक वन उपभोक्ता समूह",
+            "बिरुवा, औजार र पानी दाता",
+            "स्थानीय वडा र नगरपालिका (अनुमति र समर्थन)"
+          ],
+          whereItHappens: [
+            "बाँझो डाँडा र भिर",
+            "पहिरो जोखिम क्षेत्र",
+            "सडक र नदी किनार",
+            "स्कुल र सार्वजनिक संस्थाको प्राङ्गण"
+          ],
+          impact: [
+            "पहिरो र माटो क्षयको रोकथाम",
+            "जैविक विविधताको पुनरुत्थान",
+            "हरियाली वृद्धि र तापक्रम नियन्त्रण",
+            "भविष्यका पुस्तालाई छहारी"
+          ],
+          statusNote:
+            "अहिले रोडम्यापमा। पहिलो चरण (सरसफाइ) स्थिर भएपछि क्रमशः ल्याइनेछ। तपाईंले आफ्नो क्षेत्रमा सम्भावित स्थान सुझाउन सक्नुहुन्छ।",
+          relatedIds: ["trail", "dam", "cleanup"],
+          ctaLabel: "अभियान सुरु भएपछि सूचित गराउनुहोस्",
+          ctaHref: "/feedback"
         },
         {
           id: "beautification",
@@ -211,7 +294,40 @@ export const copy = {
           imagePrompt:
             "A local Nepali artist painting a colorful mural on a previously blank concrete wall or under a flyover in a Nepali city, with bystanders watching, paint cans and ladders around, bright and creative atmosphere, urban Kathmandu or Pokhara backdrop.",
           title: "सौन्दर्यीकरण",
-          body: "कलाकारहरूले अनुमति लिएर खाली भित्ता, पुलमुनिका ठाउँ, सार्वजनिक स्थानमा कला उतार्ने — सहर र गाउँ दुवै सुन्दर बनाउने।"
+          tagline: "खाली भित्ता, खुला क्यानभास।",
+          body: "कलाकारहरूले अनुमति लिएर खाली भित्ता, पुलमुनिका ठाउँ, सार्वजनिक स्थानमा कला उतार्ने — सहर र गाउँ दुवै सुन्दर बनाउने।",
+          overview:
+            "सहरका भित्ता, फ्लाई-ओभर र खाली पर्खाल कलाकारको हातमा परे भने पहिचान, गौरव र आकर्षण थपिन्छ। अनुमति लिएर गरिने सामुदायिक कलाले सहरलाई सुन्दर बनाउनुका साथै कलाकारलाई सार्वजनिक मञ्च पनि दिन्छ।",
+          scope: [
+            "अनुमति लिएर भित्ता र फ्लाई-ओभरमा भित्ते-चित्र (mural)",
+            "स्कुल र सामुदायिक स्थानमा रंगिचित्र",
+            "चाडपर्व विशेष सजावट (तिहार, बिस्केट जात्रा आदि)",
+            "वडा वा नगरको पहिचान विशेष कला",
+            "अनधिकृत ग्राफिटी हटाएर सकारात्मक कलाले प्रतिस्थापन"
+          ],
+          whoCanHelp: [
+            "चित्रकार, ग्राफिक डिजाइनर र विद्यार्थी कलाकार",
+            "रंग, ब्रश र मचान दाता",
+            "स्थानीय वडा र नगरपालिका (अनुमति समन्वय)",
+            "फोटोग्राफर र भिडियोग्राफर"
+          ],
+          whereItHappens: [
+            "सहरी भित्ता र पर्खाल",
+            "फ्लाई-ओभर मुनिका ठाउँ",
+            "स्कुल-कलेज प्राङ्गण",
+            "बजार र पर्यटन क्षेत्र"
+          ],
+          impact: [
+            "सहरको दृश्य-गुणस्तर सुधार",
+            "स्थानीय कलाकारलाई सार्वजनिक मञ्च",
+            "नागरिक गौरव र पहिचान",
+            "अनधिकृत ग्राफिटीको स्वाभाविक प्रतिस्थापन"
+          ],
+          statusNote:
+            "अहिले रोडम्यापमा। कलाकार रोस्टर र अनुमति प्रक्रिया तयार भएपछि पहिलो अभियान घोषणा हुनेछ।",
+          relatedIds: ["cleanup", "infrastructure"],
+          ctaLabel: "कलाकार वा संयोजक हुन इच्छुक? सुझाव दिनुहोस्",
+          ctaHref: "/feedback"
         },
         {
           id: "trail",
@@ -221,7 +337,41 @@ export const copy = {
           imagePrompt:
             "Nepali volunteers maintaining a mountain hiking trail in Nepal — clearing fallen rocks, repairing erosion damage with stone work, placing wooden trail markers and signage, surrounded by forested or terraced mountain landscape, daylight, practical working scene.",
           title: "ट्रेल मर्मत",
-          body: "गाउँ-गोरेटो र हाइकिङ ट्रेलमा मार्कर, सानो मर्मत, इरोसन नियन्त्रण, ढुङ्गा मिलाउने — पर्यटन र स्थानीय जीवन दुवैलाई सहयोग।"
+          tagline: "हजार गाउँ जोड्ने गोरेटो, हजार पाइला यात्राको मार्ग।",
+          body: "गाउँ-गोरेटो र हाइकिङ ट्रेलमा मार्कर, सानो मर्मत, इरोसन नियन्त्रण, ढुङ्गा मिलाउने — पर्यटन र स्थानीय जीवन दुवैलाई सहयोग।",
+          overview:
+            "हजारौँ गाउँ अझै पनि गोरेटो र हाइकिङ ट्रेलले जोडिएका छन्। मनसुनले बिगारेको बाटो, हराएको मार्ग-चिह्न, खस्ने ढुङ्गा — सबै सानै सामुदायिक श्रमबाट सम्बोधन गर्न सकिन्छ। पर्यटन र दैनिक जीवन दुवैका लागि।",
+          scope: [
+            "ट्रेल मार्कर र दिशा-सूचक स्थापना र मर्मत",
+            "इरोसन मर्मत र पानी निकास",
+            "खस्ने ढुङ्गा हटाउने र सुरक्षित पारेर मिलाउने",
+            "ट्रेलमा फोहोर हटाउने (पर्यटन ट्रेल विशेष)",
+            "जोखिमपूर्ण मोडमा रेलिङ वा संकेत",
+            "ट्रेल नक्सा र प्रोफाइल अद्यावधिक"
+          ],
+          whoCanHelp: [
+            "स्थानीय बासिन्दा (भूगोल जान्ने)",
+            "हाइकर र पर्यटन व्यवसायी",
+            "ट्रेकिङ एजेन्सी र गाइड",
+            "जियो-टेक्निकल सल्लाहकार",
+            "ढुङ्गा, सिमेन्ट र मार्कर सामग्री दाता"
+          ],
+          whereItHappens: [
+            "गाउँ-गोरेटो (हजारौँ गाउँको जीवन-रेखा)",
+            "लोकप्रिय हाइकिङ ट्रेल (EBC, ABC, मर्दी, मोहरे आदि)",
+            "तीर्थ-मार्ग र धार्मिक यात्रा-पथ"
+          ],
+          impact: [
+            "मनसुनपछिको पहुँच बहाली",
+            "पर्यटनबाट स्थानीय आय निरन्तरता",
+            "दुर्घटना र भिर-खसाइको जोखिम कमी",
+            "गाउँ-शहर सम्बन्धमा सहजता"
+          ],
+          statusNote:
+            "अहिले रोडम्यापमा। पहिलो pilot ट्रेल कुन हुने भन्ने तय हुन बाँकी — तपाईंले सम्भावित ठाउँ सुझाउन सक्नुहुन्छ।",
+          relatedIds: ["dam", "afforestation", "disaster"],
+          ctaLabel: "तपाईंको स्थानीय ट्रेल सुझाउनुहोस्",
+          ctaHref: "/feedback"
         },
         {
           id: "dam",
@@ -231,7 +381,41 @@ export const copy = {
           imagePrompt:
             "Nepali community workers building a small check dam, gabion wall, or retaining wall along a mountain road or stream in Nepal — wire mesh filled with stones, slope reinforcement with stone work, hillside landscape with monsoon greenery, technical supervisor visible.",
           title: "ड्याम निर्माण",
-          body: "बाटो छेउमा गेबियन-पर्खाल, खोलामा चेक ड्याम, पहिरो रोक्न पुस्ता — पानी र पहिरो नियन्त्रणका साना संरचना।"
+          tagline: "साना संरचना, ठूलो सुरक्षा।",
+          body: "बाटो छेउमा गेबियन-पर्खाल, खोलामा चेक ड्याम, पहिरो रोक्न पुस्ता — पानी र पहिरो नियन्त्रणका साना संरचना।",
+          overview:
+            "बाटो छेउमा खस्ने ढुङ्गा, बर्षात पछिको मुड-फ्लो, सडक मुनि निदाएको पहिरो — साना गेबियन-पर्खाल, चेक ड्याम र पुस्ताले धेरै यस्ता समस्या रोक्न सक्छन्। प्राविधिक सुपरिवेक्षण सहितको सामुदायिक श्रम।",
+          scope: [
+            "सडक छेउ गेबियन पर्खाल निर्माण",
+            "खोला र कुलोमा चेक ड्याम (एनिकट)",
+            "भिरालोमा पुस्ता र bioengineering (jute net + vetiver)",
+            "रिटेनिङ वाल मर्मत र विस्तार",
+            "ड्रेनेज culvert सफा र सुधार"
+          ],
+          whoCanHelp: [
+            "सिभिल इन्जिनियर र प्राविधिक सुपरिवेक्षक",
+            "तालिम प्राप्त राजमिस्त्री र शिल्पी",
+            "श्रम योगदान दिने स्वयंसेवक",
+            "ढुङ्गा, तार-जाली, सिमेन्ट दाता",
+            "स्थानीय निकाय र सडक डिभिजन (समन्वय)"
+          ],
+          whereItHappens: [
+            "मनसुन-पीडित सडक खण्ड",
+            "पहिरो जोखिम भिरालो",
+            "खोला र कुलोको माथिल्लो भाग",
+            "गाउँ-जोड्ने सडकको कमजोर क्षेत्र"
+          ],
+          impact: [
+            "मनसुनमा सडक खुल्ला रहने",
+            "माटो र पहिरोको नियन्त्रण",
+            "खोलाको गाद र बहाव व्यवस्थापन",
+            "स्थानीय रोजगार र शिल्प हस्तान्तरण"
+          ],
+          statusNote:
+            "अहिले रोडम्यापमा। प्राविधिक भागीदार र पहिलो pilot site तय हुने काम बाँकी।",
+          relatedIds: ["trail", "afforestation", "disaster"],
+          ctaLabel: "जोखिम क्षेत्र सुझाउनुहोस्",
+          ctaHref: "/feedback"
         },
         {
           id: "infrastructure",
@@ -241,7 +425,41 @@ export const copy = {
           imagePrompt:
             "Nepali community volunteers helping at a rural school or hospital in Nepal — painting classroom walls, installing library shelves, fixing school furniture, with children or staff visible in background, bright cheerful colors, sense of community support.",
           title: "संस्था सहयोग",
-          body: "स्कुल, अस्पताल, सामुदायिक संस्था र सङ्गठनमा पेन्ट, मर्मत, पुस्तकालय, खानेपानी जस्ता आधारभूत पूर्वाधार सहयोग।"
+          tagline: "स्कुल, अस्पताल, संस्था — समुदायको हात।",
+          body: "स्कुल, अस्पताल, सामुदायिक संस्था र सङ्गठनमा पेन्ट, मर्मत, पुस्तकालय, खानेपानी जस्ता आधारभूत पूर्वाधार सहयोग।",
+          overview:
+            "गाउँका स्कुलमा रंग खुइलिएको छ, अस्पतालमा बेन्च भाँचिएको, सामुदायिक संस्थामा पुस्तकालय छैन — सरकारी बजेटले समेट्न नसकेका साना तर महत्त्वपूर्ण कुरामा समुदायले मिलेर हात बढाउन सक्छ।",
+          scope: [
+            "स्कुल-अस्पतालका भित्तामा पेन्ट र मर्मत",
+            "पुस्तकालय र शिक्षण सामग्री स्थापना",
+            "शौचालय र खानेपानी सुधार",
+            "बेन्च, टेबल, उपकरण मर्मत",
+            "बगैँचा र हरियाली सिर्जना",
+            "साइनबोर्ड र सूचना पाटी अद्यावधिक"
+          ],
+          whoCanHelp: [
+            "पेन्टर, बढाई, इलेक्ट्रिसियन",
+            "शिक्षक र स्वास्थ्यकर्मी स्वयंसेवक",
+            "पुस्तक, उपकरण, फर्निचर दाता",
+            "स्थानीय अभिभावक र पूर्व-छात्र"
+          ],
+          whereItHappens: [
+            "गाउँका सरकारी स्कुल",
+            "स्वास्थ्य चौकी र अस्पताल",
+            "सामुदायिक भवन र संस्थाहरू",
+            "पाटी, धर्मशाला, सार्वजनिक सभा-स्थल"
+          ],
+          impact: [
+            "विद्यार्थी र बिरामीको गरिमामय अनुभव",
+            "स्थानीय संस्थाहरूमा गौरव",
+            "अभिभावक र पूर्व-छात्रको पुनः सम्बन्ध",
+            "साना सुधारबाट दिगो प्रभाव"
+          ],
+          statusNote:
+            "अहिले रोडम्यापमा। पहिलो pilot का लागि कुन संस्था र क्षेत्र चयन गर्ने भन्ने तय हुन बाँकी।",
+          relatedIds: ["cleanup", "beautification"],
+          ctaLabel: "तपाईंको क्षेत्रको संस्था सुझाउनुहोस्",
+          ctaHref: "/feedback"
         },
         {
           id: "seasonal",
@@ -251,7 +469,41 @@ export const copy = {
           imagePrompt:
             "Nepali volunteers distributing blankets, warm clothes, or cool drinking water to community members during seasonal extreme weather in Nepal — winter Terai cold-wave with blankets and a small fire, or summer heat-wave with water distribution, compassionate scene.",
           title: "मौसमी राहत",
-          body: "तराईको शीतलहर र तापलहर, मनसुनी पूर्व-तयारी — पूर्वानुमान गर्न सकिने मौसमी कठिनाइमा समुदायलाई राहत।"
+          tagline: "हरेक मौसमको कठिनाइ, सामूहिक राहत।",
+          body: "तराईको शीतलहर र तापलहर, मनसुनी पूर्व-तयारी — पूर्वानुमान गर्न सकिने मौसमी कठिनाइमा समुदायलाई राहत।",
+          overview:
+            "तराईमा हरेक माघ शीतलहरले मानिस मार्छ, गर्मी पिकमा तापलहर बढ्दैछ, मनसुनले बर्षेनी डुबाउँछ। यी कठिनाइ पूर्वानुमान गर्न सकिने हुन् — त्यसैले पूर्व-तयारी र छिटो राहतले धेरै जीवन बचाउन सक्छ।",
+          scope: [
+            "शीतलहर: ब्ल्याङ्केट, न्यानो कपडा, आगो र आश्रय",
+            "तापलहर: चिसो पानी, छाँया, ओआरएस वितरण",
+            "मनसुन: नाला र ढल पूर्व-सरसफाइ र निकासी",
+            "अनावृष्टि क्षेत्रमा पानी टैंकरिङ",
+            "जोखिममा रहेकाहरूको पहिचान र पहुँच"
+          ],
+          whoCanHelp: [
+            "ब्ल्याङ्केट, कपडा र खाद्यान्न दाता",
+            "वितरण स्वयंसेवक र स्थानीय अगुवा",
+            "स्वास्थ्यकर्मी (स्वास्थ्य चौकी)",
+            "रेडक्रस, सहयोगी संस्था र स्थानीय निकाय",
+            "लजिस्टिक्स र यातायात दाता"
+          ],
+          whereItHappens: [
+            "तराई जिल्ला (शीतलहर र तापलहर)",
+            "सहरी झुपडपट्टी",
+            "मनसुन-जोखिम उपत्यका र छाङ",
+            "सुक्खा प्रभावित मध्य-पहाड क्षेत्र"
+          ],
+          impact: [
+            "पूर्वानुमान गर्न सकिने मृत्यु कम",
+            "स्थानीय राहत प्रणालीमा भरोसा",
+            "विपद् प्रतिक्रियासँग एकीकृत",
+            "नियमित मौसमी चक्रमा सजग समुदाय"
+          ],
+          statusNote:
+            "अहिले रोडम्यापमा। पहिलो अभियान हिउँदको शीतलहर मौसममा सुरु गर्ने योजना।",
+          relatedIds: ["disaster", "infrastructure"],
+          ctaLabel: "स्थानीय जोखिम क्षेत्र सुझाउनुहोस्",
+          ctaHref: "/feedback"
         },
         {
           id: "disaster",
@@ -261,7 +513,43 @@ export const copy = {
           imagePrompt:
             "Nepali community emergency response volunteers in high-visibility vests coordinating after an earthquake, flood, or landslide in Nepal — distributing relief supplies, search and rescue activity with ropes and stretchers, damaged buildings or muddy terrain in background, serious yet hopeful tone.",
           title: "विपद् प्रतिक्रिया",
-          body: "भुकम्प, बाढी, पहिरो, दावानल पछिको खोज-उद्धार, राहत वितरण र समुदाय समन्वय — स्थानीय आपतकालमा छिटो जवाफ।"
+          tagline: "विपद् पछिको पहिलो प्रतिक्रिया — समुदाय आफैँबाट।",
+          body: "भुकम्प, बाढी, पहिरो, दावानल पछिको खोज-उद्धार, राहत वितरण र समुदाय समन्वय — स्थानीय आपतकालमा छिटो जवाफ।",
+          overview:
+            "नेपाल भूकम्पीय क्षेत्रमा छ, मनसुनमा बाढी-पहिरो आउँछ, हिमाली क्षेत्रमा हिमताल-विस्फोट (GLOF) जोखिम बढ्दैछ। पहिलो ७२ घण्टामा स्थानीय समुदायले गर्ने प्रतिक्रियाले धेरै जीवन बचाउँछ — २०१५ को भूकम्पले यो स्पष्ट देखायो।",
+          scope: [
+            "खोज र उद्धार सहयोग (स्थानीय भूगोल चिनेका टोली)",
+            "तत्काल राहत वितरण समन्वय",
+            "हराएका मानिस र परिवारको सञ्चार जोड्ने",
+            "अस्थायी आश्रय र खाद्य व्यवस्था",
+            "दावानल नियन्त्रणमा सहयोग",
+            "विपद् पछिको मानसिक स्वास्थ्य सहयोग"
+          ],
+          whoCanHelp: [
+            "तालिम प्राप्त प्रथम-प्रतिक्रियाकर्ता",
+            "स्थानीय अगुवा र समुदाय नेता",
+            "स्वास्थ्यकर्मी र मानसिक स्वास्थ्य परामर्शदाता",
+            "यातायात र लजिस्टिक्स दाता",
+            "सञ्चार र अनुवाद स्वयंसेवक",
+            "रेडक्रस, सेना, प्रहरीसँग समन्वय गर्ने व्यक्ति"
+          ],
+          whereItHappens: [
+            "भूकम्प-जोखिम क्षेत्र (विशेष गरी मध्य-पहाड र काठमाडौँ उपत्यका)",
+            "मनसुनमा बाढी-पहिरो प्रभावित क्षेत्र",
+            "हिमाली GLOF जोखिमको तल्लो उपत्यका",
+            "दावानल जोखिम भएको जंगल किनार"
+          ],
+          impact: [
+            "पहिलो ७२ घण्टामा छिटो प्रतिक्रिया",
+            "द्वितीयक हताहती न्यूनीकरण",
+            "पारदर्शी राहत समन्वय",
+            "विपद् पछिको पुनर्निर्माणको आधार"
+          ],
+          statusNote:
+            "उच्च-प्राथमिकताको कार्य-प्रकार तर बढी इन्जिनियरिङ चाहिने (real-time alert, geo-radius notification)। सरल कार्य-प्रकार स्थिर भएपछि सुरु हुनेछ।",
+          relatedIds: ["seasonal", "trail", "dam"],
+          ctaLabel: "प्रथम-प्रतिक्रियाकर्ताका रूपमा सूचीकृत हुनुहोस्",
+          ctaHref: "/feedback"
         }
       ],
       page: {
@@ -1423,6 +1711,20 @@ export const copy = {
       badgeFuture: "Coming",
       seeAll: "See All Event Types",
       seeAllHref: "/event-types",
+      detail: {
+        eyebrow: "Event Type Detail",
+        overviewHeading: "About",
+        scopeHeading: "What the work looks like",
+        whoHeading: "Who can contribute",
+        whereHeading: "Where it happens",
+        impactHeading: "Expected impact",
+        statusHeading: "Status today",
+        relatedHeading: "Related event types",
+        backToList: "All Event Types",
+        backToHome: "Back to Home",
+        notFoundTitle: "Event type not found",
+        notFoundBody: "This event type may have been removed or the link is wrong."
+      },
       items: [
         {
           id: "cleanup",
@@ -1432,7 +1734,42 @@ export const copy = {
           imagePrompt:
             "A group of Nepali community volunteers in safety vests cleaning a public street or riverbank in Nepal, holding brooms, gloves and trash bags, visible piles of collected waste, daylight, active and hopeful mood, Kathmandu Valley urban setting with familiar Nepali street elements.",
           title: "Cleanup",
-          body: "Remove litter from roads, vacant land, riverbanks, drains, parks, and hiking trails to keep communities clean and safe."
+          tagline: "Our neighborhood, our streets, our responsibility.",
+          body: "Remove litter from roads, vacant land, riverbanks, drains, parks, and hiking trails to keep communities clean and safe.",
+          overview:
+            "Instead of waiting for the government to clear that trash you walk past, do it with your neighbours. Cleanup is Shramdan's first focus area — visible, low-friction to start, and showing results on day one.",
+          scope: [
+            "Litter along roads, footpaths, and alleys",
+            "Vacant land and neglected plots",
+            "Riverbanks, streams, and ponds",
+            "Drains, gullies, and waterlogged corners",
+            "Parks, squares, bus stops, and public spaces",
+            "Hiking trails and nature routes",
+            "Awareness drives so the area stays clean afterward"
+          ],
+          whoCanHelp: [
+            "Local residents and student volunteers",
+            "Campaign organizers — locals who give time and coordination",
+            "Material donors — bags, gloves, trucks, refreshments",
+            "Photographers and writers — before/after evidence and stories"
+          ],
+          whereItHappens: [
+            "City and market areas",
+            "Rural town communities",
+            "Tourism routes and viewpoints",
+            "Riverbanks and waterways"
+          ],
+          impact: [
+            "Visibly cleaner environment, right away",
+            "Local pride and shared ownership",
+            "Lower disease risk — especially pre-monsoon",
+            "First experience of collective work for the community"
+          ],
+          statusNote:
+            "Cleanup is the active focus area in Shramdan's first phase. You can report issues, vote support, and join campaigns.",
+          relatedIds: ["afforestation", "trail", "beautification"],
+          ctaLabel: "Report a New Issue",
+          ctaHref: "/issues/new"
         },
         {
           id: "afforestation",
@@ -1442,7 +1779,41 @@ export const copy = {
           imagePrompt:
             "Nepali community volunteers planting saplings on a Himalayan hillside or community land, holding shovels and sapling pots, terraced fields or forested slopes in the background, golden-hour lighting, sense of hope and continuity.",
           title: "Afforestation",
-          body: "Plant saplings on barren slopes, landslide-prone hillsides, roadsides, and community land to grow greener neighborhoods."
+          tagline: "One sapling, one breath.",
+          body: "Plant saplings on barren slopes, landslide-prone hillsides, roadsides, and community land to grow greener neighborhoods.",
+          overview:
+            "Barren land, eroding slopes, and shrinking green cover — afforestation tackles all three at once. With Nepal's landslide risk and climate stress, community-led planting is not optional.",
+          scope: [
+            "Saplings along roadsides and public slope land",
+            "Greenery on school, college, and hospital grounds",
+            "Riverbank bio-engineering and bank stabilization",
+            "Partnership with Community Forest User Groups",
+            "Long-term care and monitoring of planted saplings"
+          ],
+          whoCanHelp: [
+            "Volunteers and students",
+            "Nursery operators and agriculture experts",
+            "Community Forest User Groups",
+            "Donors of saplings, digging tools, and water",
+            "Local ward office (for permission and support)"
+          ],
+          whereItHappens: [
+            "Barren hillsides and slopes",
+            "Landslide-prone zones",
+            "Roadside and riverbank strips",
+            "School and public institution grounds"
+          ],
+          impact: [
+            "Landslide and soil-erosion prevention",
+            "Biodiversity recovery",
+            "More green cover, gentler temperatures",
+            "Shade for future generations"
+          ],
+          statusNote:
+            "On the roadmap. It will roll out once cleanup (phase one) stabilizes. You can suggest sites and partners in your area.",
+          relatedIds: ["trail", "dam", "cleanup"],
+          ctaLabel: "Notify Me When This Starts",
+          ctaHref: "/feedback"
         },
         {
           id: "beautification",
@@ -1452,7 +1823,40 @@ export const copy = {
           imagePrompt:
             "A local Nepali artist painting a colorful mural on a previously blank concrete wall or under a flyover in a Nepali city, with bystanders watching, paint cans and ladders around, bright and creative atmosphere, urban Kathmandu or Pokhara backdrop.",
           title: "Beautification",
-          body: "Artists, with permission, turn blank walls, underpasses, and public spaces into murals — making cities and villages more beautiful."
+          tagline: "Blank wall, open canvas.",
+          body: "Artists, with permission, turn blank walls, underpasses, and public spaces into murals — making cities and villages more beautiful.",
+          overview:
+            "Walls, flyovers, and empty barriers become identity, pride, and joy when artists step in. Permitted community art makes cities more beautiful and gives local artists a public stage.",
+          scope: [
+            "Murals on permitted walls and flyovers",
+            "Color and art at schools and community spaces",
+            "Festival decoration (Tihar, Bisket Jatra, etc.)",
+            "Ward- or city-specific identity art",
+            "Replacing unwanted graffiti with positive art"
+          ],
+          whoCanHelp: [
+            "Painters, graphic designers, student artists",
+            "Donors of paint, brushes, and scaffolding",
+            "Local ward and municipality (permission coordinator)",
+            "Photographers and videographers"
+          ],
+          whereItHappens: [
+            "Urban walls and barriers",
+            "Spaces under flyovers",
+            "School and college grounds",
+            "Markets and tourism areas"
+          ],
+          impact: [
+            "Visibly better-looking neighbourhoods",
+            "A public stage for local artists",
+            "Civic pride and place identity",
+            "Organic replacement of unwanted graffiti"
+          ],
+          statusNote:
+            "On the roadmap. The first campaign will launch once the artist roster and permission process are ready.",
+          relatedIds: ["cleanup", "infrastructure"],
+          ctaLabel: "Artist or Organizer? Drop a Suggestion",
+          ctaHref: "/feedback"
         },
         {
           id: "trail",
@@ -1462,7 +1866,41 @@ export const copy = {
           imagePrompt:
             "Nepali volunteers maintaining a mountain hiking trail in Nepal — clearing fallen rocks, repairing erosion damage with stone work, placing wooden trail markers and signage, surrounded by forested or terraced mountain landscape, daylight, practical working scene.",
           title: "Trail Maintenance",
-          body: "Maintain village footpaths and hiking trails with markers, minor repair, erosion control, and stonework — supporting tourism and daily life."
+          tagline: "Trails that connect a thousand villages, paths that carry a thousand journeys.",
+          body: "Maintain village footpaths and hiking trails with markers, minor repair, erosion control, and stonework — supporting tourism and daily life.",
+          overview:
+            "Thousands of villages in Nepal are still connected by footpaths and hiking trails. Monsoon-damaged routes, missing markers, and rockfall — all addressable with modest community labor. For tourism and daily life alike.",
+          scope: [
+            "Trail markers and direction signs (install and maintain)",
+            "Erosion repair and water drainage on trail",
+            "Removing and re-setting fall-risk rocks",
+            "Trash removal on trails (especially tourist trails)",
+            "Railings or warning signs at risky bends",
+            "Updating trail maps and elevation profiles"
+          ],
+          whoCanHelp: [
+            "Local residents (terrain knowledge)",
+            "Hikers and tourism operators",
+            "Trekking agencies and guides",
+            "Geotechnical advisors",
+            "Donors of stones, cement, and marker material"
+          ],
+          whereItHappens: [
+            "Village footpaths (lifeline of thousands of villages)",
+            "Popular hiking trails (EBC, ABC, Mardi, Mohare etc.)",
+            "Pilgrim routes and religious walking paths"
+          ],
+          impact: [
+            "Restored access after monsoon damage",
+            "Sustained local income from tourism",
+            "Lower accident and rockfall risk",
+            "Smoother village-town connections"
+          ],
+          statusNote:
+            "On the roadmap. Which trail will be the first pilot — share your suggestion via feedback.",
+          relatedIds: ["dam", "afforestation", "disaster"],
+          ctaLabel: "Suggest Your Local Trail",
+          ctaHref: "/feedback"
         },
         {
           id: "dam",
@@ -1472,7 +1910,41 @@ export const copy = {
           imagePrompt:
             "Nepali community workers building a small check dam, gabion wall, or retaining wall along a mountain road or stream in Nepal — wire mesh filled with stones, slope reinforcement with stone work, hillside landscape with monsoon greenery, technical supervisor visible.",
           title: "Dam Building",
-          body: "Roadside gabion walls, small check dams in streams, slope-stabilizing retaining structures — small-scale water and landslide control."
+          tagline: "Small structures, big safety.",
+          body: "Roadside gabion walls, small check dams in streams, slope-stabilizing retaining structures — small-scale water and landslide control.",
+          overview:
+            "Falling rocks on the roadside, monsoon mudflows, landslides slumbering under highways — modest gabion walls, check dams, and slope reinforcements stop a lot of this. Community labor with technical supervision.",
+          scope: [
+            "Roadside gabion wall construction",
+            "Check dams in streams and irrigation channels",
+            "Slope reinforcement with bio-engineering (jute net + vetiver)",
+            "Repair and extension of retaining walls",
+            "Cleaning and improving drainage culverts"
+          ],
+          whoCanHelp: [
+            "Civil engineers and technical supervisors",
+            "Trained masons and stoneworkers",
+            "Volunteers contributing labor",
+            "Donors of stones, wire mesh, cement",
+            "Local authority and road division (coordination)"
+          ],
+          whereItHappens: [
+            "Monsoon-damaged road segments",
+            "Landslide-prone slopes",
+            "Upper reaches of streams and channels",
+            "Weak points along village-connecting roads"
+          ],
+          impact: [
+            "Roads stay open through monsoon",
+            "Soil and landslide control",
+            "Stream sediment and flow management",
+            "Local jobs and skill transfer"
+          ],
+          statusNote:
+            "On the roadmap. Technical partners and the first pilot site are still to be confirmed.",
+          relatedIds: ["trail", "afforestation", "disaster"],
+          ctaLabel: "Suggest a Risk Zone",
+          ctaHref: "/feedback"
         },
         {
           id: "infrastructure",
@@ -1482,7 +1954,41 @@ export const copy = {
           imagePrompt:
             "Nepali community volunteers helping at a rural school or hospital in Nepal — painting classroom walls, installing library shelves, fixing school furniture, with children or staff visible in background, bright cheerful colors, sense of community support.",
           title: "Institution Support",
-          body: "Paint, repair, library, water, and basic infrastructure support for schools, hospitals, and community institutions."
+          tagline: "Schools, hospitals, community institutions — a hand from the neighbourhood.",
+          body: "Paint, repair, library, water, and basic infrastructure support for schools, hospitals, and community institutions.",
+          overview:
+            "Faded paint in village schools, broken benches in hospitals, missing libraries in community centers — small but important gaps that government budgets don't reach. Communities can step in together.",
+          scope: [
+            "Paint and repair on school and hospital walls",
+            "Setting up libraries and teaching material",
+            "Improving toilets and water access",
+            "Repairing benches, desks, and equipment",
+            "Gardens and greenery setup",
+            "Updating signboards and notice boards"
+          ],
+          whoCanHelp: [
+            "Painters, carpenters, electricians",
+            "Teacher and health-worker volunteers",
+            "Donors of books, equipment, and furniture",
+            "Local parents and alumni"
+          ],
+          whereItHappens: [
+            "Rural government schools",
+            "Health posts and hospitals",
+            "Community halls and institutions",
+            "Paati, dharmashala, and public gathering places"
+          ],
+          impact: [
+            "Dignified experience for students and patients",
+            "Pride in local institutions",
+            "Renewed parent and alumni engagement",
+            "Lasting impact from small improvements"
+          ],
+          statusNote:
+            "On the roadmap. The first pilot institution and area are yet to be chosen.",
+          relatedIds: ["cleanup", "beautification"],
+          ctaLabel: "Suggest an Institution",
+          ctaHref: "/feedback"
         },
         {
           id: "seasonal",
@@ -1492,7 +1998,41 @@ export const copy = {
           imagePrompt:
             "Nepali volunteers distributing blankets, warm clothes, or cool drinking water to community members during seasonal extreme weather in Nepal — winter Terai cold-wave with blankets and a small fire, or summer heat-wave with water distribution, compassionate scene.",
           title: "Seasonal Relief",
-          body: "Terai cold-wave and heat-wave relief, pre-monsoon preparation — community support for predictable seasonal hardships."
+          tagline: "Every season's hardship, met collectively.",
+          body: "Terai cold-wave and heat-wave relief, pre-monsoon preparation — community support for predictable seasonal hardships.",
+          overview:
+            "Terai cold-wave kills people every January, summer heat-wave is rising, and monsoon floods come every year. These hardships are predictable — preparation and quick relief can save many lives.",
+          scope: [
+            "Cold-wave: blankets, warm clothes, fire and shelter",
+            "Heat-wave: cool water, shade, and ORS",
+            "Monsoon: pre-season drainage clearance",
+            "Water tankering in drought-affected areas",
+            "Identifying and reaching the most vulnerable"
+          ],
+          whoCanHelp: [
+            "Donors of blankets, clothing, and food",
+            "Distribution volunteers and local leaders",
+            "Health workers (Health Post staff)",
+            "Red Cross, partner NGOs, and local government",
+            "Logistics and transport partners"
+          ],
+          whereItHappens: [
+            "Terai districts (cold and heat extremes)",
+            "Urban slum areas",
+            "Monsoon-prone valleys and floodplains",
+            "Drought-affected mid-hill regions"
+          ],
+          impact: [
+            "Fewer predictable, preventable deaths",
+            "Trust in local relief systems",
+            "Integrated with disaster response",
+            "Communities prepared for the seasonal cycle"
+          ],
+          statusNote:
+            "On the roadmap. The first campaign is planned for the winter cold-wave season.",
+          relatedIds: ["disaster", "infrastructure"],
+          ctaLabel: "Suggest a Vulnerable Area",
+          ctaHref: "/feedback"
         },
         {
           id: "disaster",
@@ -1502,7 +2042,43 @@ export const copy = {
           imagePrompt:
             "Nepali community emergency response volunteers in high-visibility vests coordinating after an earthquake, flood, or landslide in Nepal — distributing relief supplies, search and rescue activity with ropes and stretchers, damaged buildings or muddy terrain in background, serious yet hopeful tone.",
           title: "Disaster Response",
-          body: "Post-disaster search-and-rescue, relief distribution, and community coordination for earthquakes, floods, landslides, and wildfires."
+          tagline: "First response after a disaster — from the community itself.",
+          body: "Post-disaster search-and-rescue, relief distribution, and community coordination for earthquakes, floods, landslides, and wildfires.",
+          overview:
+            "Nepal sits on a seismic fault, monsoons bring floods and landslides, and GLOF risk is rising in the Himalayas. The first 72 hours of community-led response save lives — the 2015 earthquake made that obvious.",
+          scope: [
+            "Search-and-rescue support (teams who know the local terrain)",
+            "Immediate relief distribution coordination",
+            "Connecting separated families and missing-person tracking",
+            "Temporary shelter and food coordination",
+            "Forest fire response support",
+            "Mental health support after the disaster"
+          ],
+          whoCanHelp: [
+            "Trained first responders",
+            "Local leaders and community heads",
+            "Health workers and mental-health counsellors",
+            "Transport and logistics donors",
+            "Communication and translation volunteers",
+            "Coordinators with Red Cross, Army, Police"
+          ],
+          whereItHappens: [
+            "Seismic-risk zones (especially mid-hills and Kathmandu Valley)",
+            "Monsoon flood and landslide zones",
+            "Lower valleys with GLOF risk",
+            "Forest edges with wildfire risk"
+          ],
+          impact: [
+            "Faster response in the critical first 72 hours",
+            "Fewer secondary casualties",
+            "Transparent relief coordination",
+            "Foundation for post-disaster rebuilding"
+          ],
+          statusNote:
+            "High priority, but needs more engineering (real-time alerts, geo-radius notification). Will start after simpler event types stabilise.",
+          relatedIds: ["seasonal", "trail", "dam"],
+          ctaLabel: "Sign Up as a First Responder",
+          ctaHref: "/feedback"
         }
       ],
       page: {

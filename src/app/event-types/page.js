@@ -35,9 +35,10 @@ export default function EventTypesPage() {
 
           <div className="event-types-grid event-types-grid--page">
             {eventTypes.items.map((item) => (
-              <article
+              <Link
                 className={`event-type-card event-type-card--${item.status}`}
                 data-event-type={item.id}
+                href={`/event-types/${item.id}`}
                 key={item.id}
               >
                 <div className="event-type-image">
@@ -57,7 +58,7 @@ export default function EventTypesPage() {
                   <h3>{item.title}</h3>
                   <p>{item.body}</p>
                 </div>
-              </article>
+              </Link>
             ))}
           </div>
         </section>
