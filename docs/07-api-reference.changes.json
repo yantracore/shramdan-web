@@ -1,0 +1,17 @@
+{
+  "previousFetchedAt": "2026-05-28T12:02:40+05:45",
+  "currentFetchedAt": "2026-05-29T12:03:42+05:45",
+  "comparedAt": "2026-05-29T06:18:42.873Z",
+  "totals": {
+    "added": 2,
+    "removed": 0,
+    "modified": 0
+  },
+  "added": [
+    "POST /api/v1/auth/logout",
+    "POST /api/v1/auth/refresh"
+  ],
+  "removed": [],
+  "modified": [],
+  "acknowledgedAt": null
+}
