@@ -56,6 +56,21 @@ export function SiteShell({ children, pageTitle }) {
   useEffect(() => {
     closeMobileMenu();
   }, [pathname]);
+
+  useEffect(() => {
+    const handlePointerDown = (event) => {
+      const node = mobileMenuRef.current;
+      if (!node || !node.open) {
+        return;
+      }
+      if (!node.contains(event.target)) {
+        node.open = false;
+      }
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => document.removeEventListener("pointerdown", handlePointerDown);
+  }, []);
   const session = useSyncExternalStore(subscribeAuthSession, getAuthSession, () => null);
   const t = copy[language];
   const titles = t.pageTitles;
