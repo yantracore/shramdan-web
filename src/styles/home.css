@@ -5702,6 +5702,25 @@
   pointer-events: none;
 }
 
+/* NEXT — the on-deck card, between Currently Building and Planned */
+.event-type-card--next {
+  border-color: color-mix(in srgb, var(--accent) 38%, var(--line));
+  box-shadow:
+    0 14px 38px rgba(155, 100, 23, 0.14),
+    inset 0 0 0 1px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+.event-type-card--next::after {
+  position: absolute;
+  inset: -1px;
+  z-index: 0;
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--accent) 7%, transparent), transparent 60%);
+  content: "";
+  pointer-events: none;
+}
+
 .event-type-card > * {
   position: relative;
   z-index: 1;
@@ -5777,10 +5796,30 @@
   box-shadow: 0 6px 18px rgba(23, 107, 92, 0.22);
 }
 
+.event-type-badge--next {
+  background: color-mix(in srgb, var(--accent) 92%, var(--surface));
+  color: var(--surface);
+  box-shadow: 0 6px 18px rgba(155, 100, 23, 0.22);
+}
+
 .event-type-badge--future {
   border: 1px solid color-mix(in srgb, var(--accent) 36%, var(--line));
   background: color-mix(in srgb, var(--accent) 12%, var(--surface));
   color: var(--accent);
+}
+
+/* Badge overlay on image — saves vertical space in cards */
+.event-type-image > .event-type-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  backdrop-filter: blur(6px) saturate(120%);
+  -webkit-backdrop-filter: blur(6px) saturate(120%);
+}
+
+.event-type-image > .event-type-badge--future {
+  background: color-mix(in srgb, var(--accent) 18%, rgba(255, 255, 255, 0.85));
 }
 
 .event-types-actions {

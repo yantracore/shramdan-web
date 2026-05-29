@@ -73,7 +73,9 @@ export default function EventTypeDetailPage() {
           >
             {item.status === "current"
               ? eventTypes.badgeCurrent
-              : eventTypes.badgeFuture}
+              : item.status === "next"
+                ? eventTypes.badgeNext
+                : eventTypes.badgeFuture}
           </span>
         </header>
 
@@ -196,6 +198,15 @@ export default function EventTypeDetailPage() {
                   key={rel.id}
                 >
                   <div className="event-type-image">
+                    <span
+                      className={`event-type-badge event-type-badge--${rel.status}`}
+                    >
+                      {rel.status === "current"
+                        ? eventTypes.badgeCurrent
+                        : rel.status === "next"
+                          ? eventTypes.badgeNext
+                          : eventTypes.badgeFuture}
+                    </span>
                     <Image
                       alt={rel.imageAlt}
                       fill
@@ -204,13 +215,6 @@ export default function EventTypeDetailPage() {
                     />
                   </div>
                   <div className="event-type-body">
-                    <span
-                      className={`event-type-badge event-type-badge--${rel.status}`}
-                    >
-                      {rel.status === "current"
-                        ? eventTypes.badgeCurrent
-                        : eventTypes.badgeFuture}
-                    </span>
                     <h3>{rel.title}</h3>
                     <p>{rel.body}</p>
                   </div>

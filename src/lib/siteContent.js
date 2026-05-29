@@ -180,7 +180,8 @@ export const copy = {
         "नागरिक-नेतृत्वमा मिलेर गर्न सकिने कामको बृहत् दायरा। पहिलो चरणमा सरसफाइबाट सुरु — क्रमशः अरू क्षेत्रमा विस्तार हुँदै।",
       phaseNote: "पहिलो चरणमा हामी सामुदायिक सरसफाइबाट मात्र सुरु गर्छौं।",
       badgeCurrent: "अहिले बन्दैछ",
-      badgeFuture: "आउँदै",
+      badgeNext: "अर्को",
+      badgeFuture: "योजनामा",
       seeAll: "सबै कार्य-प्रकार हेर्नुहोस्",
       seeAllHref: "/event-types",
       detail: {
@@ -245,7 +246,7 @@ export const copy = {
         },
         {
           id: "afforestation",
-          status: "future",
+          status: "next",
           image: "/images/event-types/afforestation.jpg",
           imageAlt: "वृक्षारोपण कार्यक्रममा बिरुवा रोप्दै सहभागीहरू",
           imagePrompt:
@@ -1710,7 +1711,8 @@ export const copy = {
         "A broad range of citizen-led community work that we can take on together. We start with cleanup, then steadily expand into other areas.",
       phaseNote: "In the first phase, we start with community cleanup only.",
       badgeCurrent: "Currently Building",
-      badgeFuture: "Coming",
+      badgeNext: "Next",
+      badgeFuture: "Planned",
       seeAll: "See All Event Types",
       seeAllHref: "/event-types",
       detail: {
@@ -1775,7 +1777,7 @@ export const copy = {
         },
         {
           id: "afforestation",
-          status: "future",
+          status: "next",
           image: "/images/event-types/afforestation.jpg",
           imageAlt: "Participants planting saplings during a reforestation drive",
           imagePrompt:

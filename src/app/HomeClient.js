@@ -415,6 +415,13 @@ export default function HomeClient({ summary }) {
               key={item.id}
             >
               <div className="event-type-image">
+                <span className={`event-type-badge event-type-badge--${item.status}`}>
+                  {item.status === "current"
+                    ? t.eventTypes.badgeCurrent
+                    : item.status === "next"
+                      ? t.eventTypes.badgeNext
+                      : t.eventTypes.badgeFuture}
+                </span>
                 <Image
                   alt={item.imageAlt}
                   fill
@@ -423,11 +430,6 @@ export default function HomeClient({ summary }) {
                 />
               </div>
               <div className="event-type-body">
-                <span className={`event-type-badge event-type-badge--${item.status}`}>
-                  {item.status === "current"
-                    ? t.eventTypes.badgeCurrent
-                    : t.eventTypes.badgeFuture}
-                </span>
                 <h3>{item.title}</h3>
                 <p>{item.body}</p>
               </div>

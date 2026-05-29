@@ -42,6 +42,13 @@ export default function EventTypesPage() {
                 key={item.id}
               >
                 <div className="event-type-image">
+                  <span className={`event-type-badge event-type-badge--${item.status}`}>
+                    {item.status === "current"
+                      ? eventTypes.badgeCurrent
+                      : item.status === "next"
+                        ? eventTypes.badgeNext
+                        : eventTypes.badgeFuture}
+                  </span>
                   <Image
                     alt={item.imageAlt}
                     fill
@@ -50,11 +57,6 @@ export default function EventTypesPage() {
                   />
                 </div>
                 <div className="event-type-body">
-                  <span className={`event-type-badge event-type-badge--${item.status}`}>
-                    {item.status === "current"
-                      ? eventTypes.badgeCurrent
-                      : eventTypes.badgeFuture}
-                  </span>
                   <h3>{item.title}</h3>
                   <p>{item.body}</p>
                 </div>
