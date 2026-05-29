@@ -1,10 +1,11 @@
 "use client";
 
 import { SendOutlined } from "@ant-design/icons";
-import { Button, Form, Input, Select, Spin } from "antd";
+import { Button, Input, Select, Spin } from "antd";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { usePreferences } from "@/app/providers";
+import { Form } from "@/components/AppForm";
 import { IssueCoverUpload } from "@/components/admin/IssueCoverUpload";
 import { IssueImagesUpload } from "@/components/admin/IssueImagesUpload";
 import IssueLocationPickerBlock from "@/components/IssueLocationPickerBlock";

@@ -1,9 +1,10 @@
 "use client";
 
 import { SendOutlined } from "@ant-design/icons";
-import { Button, Checkbox, Form, Input, Select } from "antd";
+import { Button, Checkbox, Input, Select } from "antd";
 import Link from "next/link";
 import { useEffect } from "react";
+import { Form } from "@/components/AppForm";
 import { Honeypot } from "@/components/Honeypot";
 import { toSelectOptions } from "@/lib/siteContent";
 

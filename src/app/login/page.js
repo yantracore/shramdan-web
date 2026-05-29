@@ -1,11 +1,12 @@
 "use client";
 
 import { LockOutlined, MailOutlined } from "@ant-design/icons";
-import { Button, Form, Input } from "antd";
+import { Button, Input } from "antd";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { usePreferences } from "@/app/providers";
+import { Form } from "@/components/AppForm";
 import { SiteShell } from "@/components/SiteShell";
 import { loginWithPassword } from "@/lib/apiClient";
 import { getAuthSession, isAdminUser, setAuthSession } from "@/lib/authSession";

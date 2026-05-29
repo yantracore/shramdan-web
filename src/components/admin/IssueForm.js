@@ -1,9 +1,10 @@
 "use client";
 
 import { SaveOutlined } from "@ant-design/icons";
-import { Button, Form, Input, InputNumber, Select } from "antd";
+import { Button, Input, InputNumber, Select } from "antd";
 import Link from "next/link";
 import { useEffect, useMemo } from "react";
+import { Form } from "@/components/AppForm";
 import { IssueCoverUpload } from "@/components/admin/IssueCoverUpload";
 import { IssueImagesUpload } from "@/components/admin/IssueImagesUpload";
 import { ISSUE_CATEGORIES, buildEnumOptions } from "@/lib/adminUtils";

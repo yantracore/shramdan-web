@@ -9,10 +9,12 @@ import {
   UploadOutlined,
   UserOutlined
 } from "@ant-design/icons";
-import { Alert, Avatar, Button, Form, Input, Spin, Tag } from "antd";
+import { Alert, Avatar, Button, Input, Spin, Tag } from "antd";
 import { usePreferences } from "@/app/providers";
+import { Form } from "@/components/AppForm";
 import { SiteShell } from "@/components/SiteShell";
 import { changePassword, fetchMe, updateMe } from "@/lib/apiClient";
+import { setFieldErrorsAndScroll } from "@/lib/formErrors";
 import {
   getAuthSession,
   setAuthSession,
@@ -148,7 +150,7 @@ export default function MePage() {
       messageApi.success(t.success.profileSaved);
     } catch (error) {
       if (error?.errorCode === "USERNAME_TAKEN") {
-        profileForm.setFields([
+        setFieldErrorsAndScroll(profileForm, [
           { name: "username", errors: [t.errors.usernameTaken] }
         ]);
       } else {
@@ -213,11 +215,11 @@ export default function MePage() {
       messageApi.success(t.success.passwordChanged);
     } catch (error) {
       if (error?.errorCode === "WRONG_CURRENT_PASSWORD") {
-        passwordForm.setFields([
+        setFieldErrorsAndScroll(passwordForm, [
           { name: "currentPassword", errors: [t.errors.wrongCurrentPassword] }
         ]);
       } else if (error?.errorCode === "SAME_PASSWORD") {
-        passwordForm.setFields([
+        setFieldErrorsAndScroll(passwordForm, [
           { name: "newPassword", errors: [t.errors.samePassword] }
         ]);
       } else {

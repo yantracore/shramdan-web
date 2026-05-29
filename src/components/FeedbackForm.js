@@ -1,7 +1,8 @@
 "use client";
 
 import { MessageOutlined } from "@ant-design/icons";
-import { Button, Form, Input, Rate, Select } from "antd";
+import { Button, Input, Rate, Select } from "antd";
+import { Form } from "@/components/AppForm";
 import { Honeypot } from "@/components/Honeypot";
 import { toSelectOptions } from "@/lib/siteContent";
 

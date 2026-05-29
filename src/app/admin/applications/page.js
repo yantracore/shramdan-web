@@ -1,9 +1,10 @@
 "use client";
 
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
-import { Button, Empty, Form, Input, Modal, Popconfirm, Select, Table, Tag } from "antd";
+import { Button, Empty, Input, Modal, Popconfirm, Select, Table, Tag } from "antd";
 import { useMemo } from "react";
 import { AdminResponsiveList } from "@/components/AdminResponsiveList";
+import { Form } from "@/components/AppForm";
 import { AdminShell } from "@/components/AdminShell";
 import { AdminFilters } from "@/components/admin/AdminFilters";
 import { AdminListCard } from "@/components/admin/AdminListCard";
