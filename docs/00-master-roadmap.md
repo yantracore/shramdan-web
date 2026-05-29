@@ -6,10 +6,10 @@
 >
 > **Companion doc:** improvements to *already-shipped* features live in [00-polish-backlog.md](00-polish-backlog.md), not here. The roadmap is for discrete ship work; polish is continuous and tracked separately so this file stays focused.
 
-## Overall Progress — 27%
+## Overall Progress — 29%
 
 ```
-0% [===========================-------------------------------------------------------------------------] 100%
+0% [=============================-----------------------------------------------------------------------] 100%
 ```
 
 The bar is 100 characters wide so each `=` equals exactly one percentage point. Recompute and redraw the bar in the same edit that changes any phase percentage — see [Aggregate Progress](#aggregate-progress) for the per-phase breakdown that feeds this number.
@@ -90,14 +90,11 @@ If the user gives a high-level instruction like "let's continue", read this file
 
 **Tier 0 sequence — dependency-aware, smallest-blocker-first**
 
-1. **Security + Legal trio** *(parallel batch — none block each other)*
-   - Honeypot on `/join` and `/feedback` *(polish 0.4.1, bumped P2→P1)*
-   - Token-expiry / refresh UX — kill silent 401 *(polish 0.5.1 P1)*
-   - 11.8 Legal trio — T&C, Privacy Policy, Code of Conduct + waiver/consent surface in `/join`
+1. ~~**Security + Legal trio** *(parallel batch — none block each other)*~~ ✅ *(honeypot, token-expiry UX, and legal trio all shipped 2026-05-28; 11.7 security baseline audit is the only remaining piece)*
    - 11.7 Security review baseline — XSS, CSRF, secret handling, rate-limit sweep on existing surfaces
-2. **1.6 Citizen public issue submission** — new leaf below; minimal `/issues/new` form. Logged-in via `/join` (Volunteer = Shramdan Member entry point — rename deferred to Tier 1).
-3. **3.3 Issue → Campaign promotion** — admin button on issue detail to create the event record.
-4. **3.2 Public campaign detail page** — `/events/[id]` against existing `GET /events/{id}`.
+2. ~~**1.6 Citizen public issue submission**~~ ✅ *(shipped 2026-05-28 — `/issues/new`)*
+3. ~~**3.3 Issue → Campaign promotion**~~ ✅ *(shipped 2026-05-26 — admin force-convert button on `/admin/issues/[id]/view`)*
+4. **3.2 Public campaign detail page** — `/events/[id]` against existing `GET /events/{id}`. **← next blocker**
 5. **3.6 Volunteer join + roster** — "I'm joining" button + roster list on the campaign page.
 6. **3.5.1 Leader schedule UI** — leader can `PATCH /events/{id}/schedule`.
 7. **4.6 Pre-event safety checklist gate** — simplest form, leader ticks N boxes before the event publishes.
@@ -130,11 +127,11 @@ If the user gives a high-level instruction like "let's continue", read this file
 
 This is the active end of the [Launch Critical Path](#launch-critical-path--tier-0). Items collapse forward as Tier 0 sequence steps complete — agents may rewrite this list freely but must keep it consistent with the Tier 0 ladder above. When proposing "what's next", agents must also consult open `P1` items in [00-polish-backlog.md](00-polish-backlog.md) and prefer Tier-0-tagged polish over fresh feature leaves.
 
-1. **11.7 Security baseline audit** — final piece of the Security + Legal batch; XSS / CSRF / secret handling / rate-limit sweep over existing surfaces. Honeypot, token-expiry UX, the T&C / Privacy / Code of Conduct legal trio, and citizen issue submission are already in.
-2. **3.3 Issue → Campaign promotion** — admin button on issue detail that calls the existing `POST /api/v1/issues/{id}/convert-to-event` endpoint (backend already shipped).
-3. **3.2 Public campaign detail page** — `/events/[id]` rendering `GET /events/{id}` once 3.3 starts producing campaigns.
+1. **3.2 Public campaign detail page** — `/events/[id]` rendering `GET /events/{id}`. With 3.3 already producing campaigns, this is the next blocker on the Tier 0 path — once it ships, promoted issues have a destination page citizens and volunteers can actually open.
+2. **3.6 Volunteer join + roster** — "I'm joining" button + roster on the campaign page. Naturally pairs with 3.2 since both live on `/events/[id]`.
+3. **11.7 Security baseline audit** — final piece of the Security + Legal batch; XSS / CSRF / secret handling / rate-limit sweep over existing surfaces. Non-blocking but should land before first real event.
 
-*Earlier suggestions (9.11.1, Phase 2 stack decision, 3.2 deferral) superseded by the 2026-05-28 reorganization. Phase 2 stack decision moves to Tier 1; 9.11.1 cancelled.*
+*Earlier suggestions (9.11.1, Phase 2 stack decision, 3.2 deferral, 3.3 promotion) superseded as work ships. Phase 2 stack decision moves to Tier 1; 9.11.1 cancelled.*
 
 ---
 
@@ -207,7 +204,7 @@ Goal: Authenticated member experience that ships before the native mobile app an
 - [ ] 2.7 Profile + settings `w:1`
 - [ ] 2.8 KYC submission flow (prospective leaders) `w:1`
 
-## Phase 3 — Campaign / Event Execution `w:15` 📊 5%
+## Phase 3 — Campaign / Event Execution `w:15` 📊 20%
 
 Goal: A promoted issue becomes a real-world campaign with leader, schedule, roster, and completion.
 
@@ -216,9 +213,9 @@ Goal: A promoted issue becomes a real-world campaign with leader, schedule, rost
   - [ ] 3.2.1 Date, time, meeting point, goal `w:1`
   - [ ] 3.2.2 Help-needed breakdown `w:1`
   - [ ] 3.2.3 Progress indicators (volunteers, funds, materials) `w:1`
-- [ ] 3.3 Issue → campaign promotion `w:2`
-  - [ ] 3.3.1 Vote-threshold rule + admin trigger `w:1`
-  - [ ] 3.3.2 Auto-create campaign record on promote `w:1`
+- [x] 3.3 Issue → campaign promotion `w:2` ← done: 2026-05-26
+  - [x] 3.3.1 Vote-threshold rule + admin trigger `w:1` ← done: 2026-05-26 *(admin force-convert button on `/admin/issues/[id]/view` calls `POST /issues/{id}/convert-to-event`; backend owns the vote-threshold auto-promote rule)*
+  - [x] 3.3.2 Auto-create campaign record on promote `w:1` ← done: 2026-05-26 *(backend `convert-to-event` endpoint creates the event record server-side; frontend trigger shipped in e776f29)*
 - [ ] 3.4 Leader nomination + voting `w:3`
   - [x] 3.4.1 Admin leader assignment (exists in `/admin/events`) ← done: 2026-05-19
   - [ ] 3.4.2 Member nomination flow on `/app` `w:1`
@@ -366,7 +363,7 @@ Weighted across all phases (sum of phase weights = 137):
 | 0 Foundation | 10 | 100% |
 | 1 Public Issue Discovery & Voting | 15 | 77% |
 | 2 Member Portal `/app` | 18 | 0% |
-| 3 Campaign Execution | 15 | 5% |
+| 3 Campaign Execution | 15 | 20% |
 | 4 Operational Safety | 8 | 0% |
 | 5 Contribution Channels | 10 | 0% |
 | 6 Transparency & Ledger | 8 | 0% |
@@ -379,7 +376,7 @@ Weighted across all phases (sum of phase weights = 137):
 | 13 Public Reports & Transparency Surface | 6 | 0% |
 | 14 Building in Public (Process Transparency) | 6 | 33% |
 
-**Overall: ≈ 27%** (weighted sum / total weight; recompute on every edit, and redraw the [Overall Progress](#overall-progress--27) bar near the top of this file in the same edit).
+**Overall: ≈ 29%** (weighted sum / total weight; recompute on every edit, and redraw the [Overall Progress](#overall-progress--29) bar near the top of this file in the same edit).
 
 # How To Update This Document
 
