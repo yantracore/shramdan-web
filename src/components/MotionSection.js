@@ -1,81 +1,99 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+// Phase 8 motion grammar — revised after user feedback (2026-06-01):
+// "homepage animations are too fast — make them much slower. and don't
+//  reveal whole section at a time. when scrolled, reveal animation
+//  should work from smaller components level for better UX."
+//
+// MotionSection is now a thin IntersectionObserver wrapper. The actual
+// fade-up + per-child stagger is CSS-driven (see design-tokens.css for
+// the .motion-aware rules + per-grid stagger). This keeps each child
+// fading in individually rather than the whole section ghosting in.
+//
+// Reduced-motion + the user's entranceAnimation toggle still gate the
+// animation off. When disabled, children render at full opacity with
+// no transform — no flash of invisible content.
+
+import { useEffect, useRef, useState } from "react";
 import { usePreferences } from "@/app/providers";
-import {
-  fadeUpInView,
-  staggerContainer,
-  staggerItem
-} from "@/lib/motion";
 
-function useShouldAnimate() {
-  const reduceMotion = useReducedMotion();
-  const { entranceAnimation } = usePreferences();
-  return !reduceMotion && entranceAnimation;
+function usePrefersReducedMotion() {
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReduced(mq.matches);
+    const handler = (e) => setReduced(e.matches);
+    mq.addEventListener?.("change", handler);
+    return () => mq.removeEventListener?.("change", handler);
+  }, []);
+  return reduced;
 }
 
-// Section wrapper — fades up + translates 12px when it enters the viewport.
-// Honors prefers-reduced-motion by skipping the animation entirely.
-//
-// Usage:
-//   <MotionSection as="section" className="event-types-section" ...>
-//     <div>section content</div>
-//   </MotionSection>
-//
-// The `as` prop chooses the rendered HTML tag (section / div / article).
 export function MotionSection({ as = "section", children, className, ...rest }) {
-  const shouldAnimate = useShouldAnimate();
-  if (!shouldAnimate) {
-    const Tag = as;
-    return (
-      <Tag className={className} {...rest}>
-        {children}
-      </Tag>
+  const { entranceAnimation } = usePreferences();
+  const reduceMotion = usePrefersReducedMotion();
+  const shouldAnimate = entranceAnimation && !reduceMotion;
+  const ref = useRef(null);
+  // When animation is off, render in the "in view" final state from the
+  // start so children are immediately visible.
+  const [inView, setInView] = useState(!shouldAnimate);
+
+  useEffect(() => {
+    if (!shouldAnimate) {
+      setInView(true);
+      return;
+    }
+    if (!ref.current) return;
+    const el = ref.current;
+    setInView(false); // reset to initial state when animation enabled
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setInView(true);
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: "0px 0px -8% 0px" }
     );
-  }
-  const Comp = motion[as] ?? motion.section;
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [shouldAnimate]);
+
+  const Tag = as;
+  const classes = ["motion-aware", className].filter(Boolean).join(" ");
   return (
-    <Comp className={className} {...rest} {...fadeUpInView}>
+    <Tag
+      ref={ref}
+      className={classes}
+      data-in-view={inView ? "true" : "false"}
+      {...rest}
+    >
       {children}
-    </Comp>
+    </Tag>
   );
 }
 
-// Grid / list wrapper — each direct child fades + stagger-rises as the
-// container enters the viewport. Pair with <StaggerItem> for each child.
-export function StaggerList({ as = "div", children, className, ...rest }) {
-  const shouldAnimate = useShouldAnimate();
-  if (!shouldAnimate) {
-    const Tag = as;
-    return (
-      <Tag className={className} {...rest}>
-        {children}
-      </Tag>
-    );
-  }
-  const Comp = motion[as] ?? motion.div;
+// StaggerList / StaggerItem are kept as no-op wrappers for backward
+// compat with any caller that imported them; the new CSS-driven model
+// staggers via :nth-child inside .motion-aware automatically, so callers
+// don't need to opt-in per child.
+export function StaggerList({ as = "div", className, children, ...rest }) {
+  const Tag = as;
   return (
-    <Comp className={className} {...rest} {...staggerContainer}>
+    <Tag className={className} {...rest}>
       {children}
-    </Comp>
+    </Tag>
   );
 }
 
-// Direct child of StaggerList. Acts as a plain wrapper under reduced motion.
-export function StaggerItem({ as = "div", children, className, ...rest }) {
-  const shouldAnimate = useShouldAnimate();
-  if (!shouldAnimate) {
-    const Tag = as;
-    return (
-      <Tag className={className} {...rest}>
-        {children}
-      </Tag>
-    );
-  }
-  const Comp = motion[as] ?? motion.div;
+export function StaggerItem({ as = "div", className, children, ...rest }) {
+  const Tag = as;
   return (
-    <Comp className={className} {...rest} {...staggerItem}>
+    <Tag className={className} {...rest}>
       {children}
-    </Comp>
+    </Tag>
   );
 }

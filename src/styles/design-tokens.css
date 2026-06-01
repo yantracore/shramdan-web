@@ -46,6 +46,14 @@
   --duration-base: 250ms;
   --duration-slow: 450ms;
   --stagger-default: 60ms;
+  /* Entrance grammar (scroll-triggered fade-ups). Revised slower per
+     user feedback 2026-06-01 — too snappy at 450ms / 60ms stagger.
+     Now reveals feel like breath, with each child sliding into place
+     individually rather than the whole section ghosting in at once. */
+  --duration-entrance: 900ms;
+  --duration-entrance-child: 720ms;
+  --stagger-entrance: 110ms;
+  --stagger-entrance-grid: 90ms;
 
   /* --- Z-layers ------------------------------------------------------- */
   /* Cheap registry so layers compose predictably. */
@@ -97,6 +105,139 @@
   }
   .pressable:active {
     transform: none;
+  }
+}
+
+/* --- Entrance grammar: per-child scroll-triggered fade-ups -----------
+ *
+ * Sections wrapped in <MotionSection> (src/components/MotionSection.js)
+ * get the .motion-aware class. IntersectionObserver flips
+ * data-in-view="true" once 12% of the section is visible. Each direct
+ * child of the section fades up individually with a staggered delay —
+ * NOT the whole section at once. Cards inside known grid containers
+ * also fade in one at a time when their parent section enters view.
+ *
+ * Reduced-motion + the user's entranceAnimation toggle both gate this:
+ * MotionSection skips the IntersectionObserver and renders inView=true
+ * immediately, so the styles below become a no-op (initial state never
+ * applies because data-in-view starts at "true").
+ */
+
+.motion-aware > * {
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity var(--duration-entrance) var(--ease-out-soft),
+    transform var(--duration-entrance) var(--ease-out-soft);
+  transition-delay: calc(var(--stagger-index, 0) * var(--stagger-entrance));
+  will-change: opacity, transform;
+}
+
+.motion-aware[data-in-view="true"] > * {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.motion-aware > *:nth-child(1)  { --stagger-index: 0; }
+.motion-aware > *:nth-child(2)  { --stagger-index: 1; }
+.motion-aware > *:nth-child(3)  { --stagger-index: 2; }
+.motion-aware > *:nth-child(4)  { --stagger-index: 3; }
+.motion-aware > *:nth-child(5)  { --stagger-index: 4; }
+.motion-aware > *:nth-child(6)  { --stagger-index: 5; }
+.motion-aware > *:nth-child(n+7) { --stagger-index: 6; }
+
+/* Grid children — known grids inside motion-aware sections.
+ * Their own children fade in one-by-one as well, with a slightly
+ * faster sub-stagger so the cumulative time stays bounded. */
+.motion-aware .event-types-grid > *,
+.motion-aware .cleanup-areas-grid > *,
+.motion-aware .workflow-grid > *,
+.motion-aware .volunteer-role-grid > *,
+.motion-aware .building-now-grid > *,
+.motion-aware .resources-grid > *,
+.motion-aware .live-events-rail-list > * {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity var(--duration-entrance-child) var(--ease-out-soft),
+    transform var(--duration-entrance-child) var(--ease-out-soft);
+  transition-delay: calc(var(--grid-stagger-index, 0) * var(--stagger-entrance-grid));
+  will-change: opacity, transform;
+}
+
+.motion-aware[data-in-view="true"] .event-types-grid > *,
+.motion-aware[data-in-view="true"] .cleanup-areas-grid > *,
+.motion-aware[data-in-view="true"] .workflow-grid > *,
+.motion-aware[data-in-view="true"] .volunteer-role-grid > *,
+.motion-aware[data-in-view="true"] .building-now-grid > *,
+.motion-aware[data-in-view="true"] .resources-grid > *,
+.motion-aware[data-in-view="true"] .live-events-rail-list > * {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.motion-aware .event-types-grid > *:nth-child(1),
+.motion-aware .cleanup-areas-grid > *:nth-child(1),
+.motion-aware .workflow-grid > *:nth-child(1),
+.motion-aware .volunteer-role-grid > *:nth-child(1),
+.motion-aware .building-now-grid > *:nth-child(1),
+.motion-aware .resources-grid > *:nth-child(1),
+.motion-aware .live-events-rail-list > *:nth-child(1) { --grid-stagger-index: 0; }
+.motion-aware .event-types-grid > *:nth-child(2),
+.motion-aware .cleanup-areas-grid > *:nth-child(2),
+.motion-aware .workflow-grid > *:nth-child(2),
+.motion-aware .volunteer-role-grid > *:nth-child(2),
+.motion-aware .building-now-grid > *:nth-child(2),
+.motion-aware .resources-grid > *:nth-child(2),
+.motion-aware .live-events-rail-list > *:nth-child(2) { --grid-stagger-index: 1; }
+.motion-aware .event-types-grid > *:nth-child(3),
+.motion-aware .cleanup-areas-grid > *:nth-child(3),
+.motion-aware .workflow-grid > *:nth-child(3),
+.motion-aware .volunteer-role-grid > *:nth-child(3),
+.motion-aware .building-now-grid > *:nth-child(3),
+.motion-aware .resources-grid > *:nth-child(3),
+.motion-aware .live-events-rail-list > *:nth-child(3) { --grid-stagger-index: 2; }
+.motion-aware .event-types-grid > *:nth-child(4),
+.motion-aware .cleanup-areas-grid > *:nth-child(4),
+.motion-aware .workflow-grid > *:nth-child(4),
+.motion-aware .volunteer-role-grid > *:nth-child(4),
+.motion-aware .building-now-grid > *:nth-child(4),
+.motion-aware .resources-grid > *:nth-child(4),
+.motion-aware .live-events-rail-list > *:nth-child(4) { --grid-stagger-index: 3; }
+.motion-aware .event-types-grid > *:nth-child(5),
+.motion-aware .cleanup-areas-grid > *:nth-child(5),
+.motion-aware .workflow-grid > *:nth-child(5),
+.motion-aware .volunteer-role-grid > *:nth-child(5),
+.motion-aware .building-now-grid > *:nth-child(5),
+.motion-aware .resources-grid > *:nth-child(5),
+.motion-aware .live-events-rail-list > *:nth-child(5) { --grid-stagger-index: 4; }
+.motion-aware .event-types-grid > *:nth-child(6),
+.motion-aware .cleanup-areas-grid > *:nth-child(6),
+.motion-aware .workflow-grid > *:nth-child(6),
+.motion-aware .volunteer-role-grid > *:nth-child(6),
+.motion-aware .building-now-grid > *:nth-child(6),
+.motion-aware .resources-grid > *:nth-child(6),
+.motion-aware .live-events-rail-list > *:nth-child(6) { --grid-stagger-index: 5; }
+.motion-aware .event-types-grid > *:nth-child(n+7),
+.motion-aware .cleanup-areas-grid > *:nth-child(n+7),
+.motion-aware .workflow-grid > *:nth-child(n+7),
+.motion-aware .volunteer-role-grid > *:nth-child(n+7),
+.motion-aware .building-now-grid > *:nth-child(n+7),
+.motion-aware .resources-grid > *:nth-child(n+7),
+.motion-aware .live-events-rail-list > *:nth-child(n+7) { --grid-stagger-index: 6; }
+
+@media (prefers-reduced-motion: reduce) {
+  .motion-aware > *,
+  .motion-aware .event-types-grid > *,
+  .motion-aware .cleanup-areas-grid > *,
+  .motion-aware .workflow-grid > *,
+  .motion-aware .volunteer-role-grid > *,
+  .motion-aware .building-now-grid > *,
+  .motion-aware .resources-grid > *,
+  .motion-aware .live-events-rail-list > * {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
   }
 }
 
