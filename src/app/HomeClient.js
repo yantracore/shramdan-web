@@ -618,7 +618,8 @@ export default function HomeClient({ summary }) {
       </MotionSection>
 
       {showActiveIssuesSection ? (
-        <section
+        <MotionSection
+          as="section"
           className="live-issues-section"
           aria-labelledby="live-issues-title"
         >

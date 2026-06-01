@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-const ROADMAP_PATH = path.join(process.cwd(), "docs", "00-master-roadmap.md");
+const ROADMAP_PATH = path.join(process.cwd(), "docs", "ops", "00-master-roadmap.md");
 const OVERALL_RE = /^## Overall Progress\s*—\s*(\d+)%/;
 const PHASE_RE = /^## Phase\s+(\d+)\s*—\s*(.+?)\s*`w:(\d+)`\s*📊\s*(\d+)%\s*$/;
 const LEAF_RE = /^(\s*)-\s*\[([ x~!\-])\]\s*([\d.]+[a-z]?)\s+(.+?)\s*$/;
