@@ -319,6 +319,9 @@ export default function EventDetailPage() {
                       ]}
                       language={language}
                       showPopup={false}
+                      enableFullscreen
+                      fullscreenLabel={issueContent?.detail?.fullscreenOpen || "Open fullscreen map"}
+                      exitFullscreenLabel={issueContent?.detail?.fullscreenClose || "Close fullscreen map"}
                     />
                   </div>
                 </section>

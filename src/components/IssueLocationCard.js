@@ -73,6 +73,9 @@ export function IssueLocationCard({
             height={360}
             interactive
             showPopup={false}
+            enableFullscreen
+            fullscreenLabel={content?.detail?.fullscreenOpen || "Open fullscreen map"}
+            exitFullscreenLabel={content?.detail?.fullscreenClose || "Close fullscreen map"}
           />
         </div>
       ) : null}
