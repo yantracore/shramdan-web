@@ -38,7 +38,9 @@
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
 }
 
-.learn-index-link {
+.learn-index-link,
+.learn-index-link:visited,
+.learn-index-link:hover {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -51,6 +53,15 @@
     box-shadow var(--duration-base) var(--ease-out-soft),
     transform var(--duration-fast) var(--ease-out-soft);
   text-decoration: none;
+  color: var(--text);
+}
+
+.learn-index-link:hover {
+  box-shadow: var(--shadow-2);
+  transform: translateY(-2px);
+}
+
+.learn-index-link .learn-index-title {
   color: var(--text);
 }
 

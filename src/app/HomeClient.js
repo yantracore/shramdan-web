@@ -356,6 +356,7 @@ export default function HomeClient({ summary }) {
                 size="small"
                 strokeColor="#176b5c"
                 railColor="rgba(255, 255, 255, 0.25)"
+                aria-label={t.buildInPublic.heroAria}
               />
               <a
                 className="hero-panel-progress-link"

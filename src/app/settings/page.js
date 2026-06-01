@@ -152,6 +152,7 @@ export default function SettingsPage() {
               <Switch
                 checked={entranceAnimation}
                 onChange={(checked) => setEntranceAnimation(checked)}
+                aria-label={t.motion.entrance.label}
               />
             }
           />
