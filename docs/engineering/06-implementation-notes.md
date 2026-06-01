@@ -62,7 +62,7 @@ Use a small, consistent set of statuses for version 1.0:
 
 Status tags should stay consistent across cards, detail pages, filters, and story sections.
 
-Do not encode every safety or operational case as another primary lifecycle status. Use a separate incident/risk model for injury, conflict, theft, land-permission, weather, flood, legal, or urgent safety scenarios. See `docs/08-operational-safety-and-event-model.md`.
+Do not encode every safety or operational case as another primary lifecycle status. Use a separate incident/risk model for injury, conflict, theft, land-permission, weather, flood, legal, or urgent safety scenarios. See `../ops/08-operational-safety-and-event-model.md`.
 
 ## Frontend Interaction Rules
 
@@ -80,7 +80,7 @@ Do not build production payment, notification, authentication, or moderation flo
 
 ## API Integration Guidance
 
-Use `docs/07-api-reference.json` (OpenAPI 3.0 spec) as the source of truth for backend endpoint contracts when replacing simulated frontend actions with API-backed submissions. See `docs/10-frontend-api-usage.md` for the page-to-endpoint usage map.
+Use `07-api-reference.json` (OpenAPI 3.0 spec) as the source of truth for backend endpoint contracts when replacing simulated frontend actions with API-backed submissions. See `10-frontend-api-usage.md` for the page-to-endpoint usage map.
 
 Current API assumptions:
 
@@ -89,29 +89,29 @@ Current API assumptions:
 - Auth and admin routes are now scoped for version 1.0. Use `/login` as the authentication entry point, store `accessToken` plus a minimal `user` object in `localStorage`, attach `Authorization: Bearer <accessToken>` to protected requests, and clear the session on `INVALID_TOKEN` or `AUTH_REQUIRED`.
 - Route authenticated admins to `/admin`. If the logged-in user is not `role === "ADMIN"`, show an admin-access-required state until the future `/app` route is implemented for normal authenticated users.
 - Build the admin control center with participation applications first (`GET /applications`, status updates, admin notes, delete), then feedback management. Keep issue, event/campaign, incident, role assignment, and notification administration out of scope until their backend contracts are finalized.
-- Event/campaign, incident, role assignment, and notification APIs are not yet finalized. When they arrive, align implementation with `docs/08-operational-safety-and-event-model.md` before wiring UI behavior.
+- Event/campaign, incident, role assignment, and notification APIs are not yet finalized. When they arrive, align implementation with `../ops/08-operational-safety-and-event-model.md` before wiring UI behavior.
 - Keep existing simulated form behavior as a graceful fallback while API integration is incomplete or unavailable.
 
 ## Documentation Rules For Future Threads
 
 Before implementing Shramdaan work, future threads should read:
 
-- `docs/00-master-roadmap.md` for the live weighted task tree, current progress, and the next-up queue. **This is the first file to read each session** and the file you must keep in sync as you work — see "Roadmap Maintenance" below.
-- `docs/01-project-summary.md` for mission and philosophy.
-- `docs/02-product-plan.md` for current feature scope.
-- `docs/03-user-journeys.md` for user intent.
-- `docs/04-website-structure.md` for page structure.
-- `docs/05-design-language-guide.md` for tone and UI direction.
-- `docs/06-implementation-notes.md` for technical guardrails.
-- `docs/07-api-reference.json` for backend endpoint contracts (OpenAPI 3.0 spec).
-- `docs/08-operational-safety-and-event-model.md` for event/campaign modeling, safety incidents, roles, risk levels, and notification planning.
-- `docs/10-frontend-api-usage.md` for the page-to-endpoint usage map.
+- `../ops/00-master-roadmap.md` for the live weighted task tree, current progress, and the next-up queue. **This is the first file to read each session** and the file you must keep in sync as you work — see "Roadmap Maintenance" below.
+- `../product/01-project-summary.md` for mission and philosophy.
+- `../product/02-product-plan.md` for current feature scope.
+- `../product/03-user-journeys.md` for user intent.
+- `../product/04-website-structure.md` for page structure.
+- `../design/05-design-language-guide.md` for tone and UI direction.
+- `06-implementation-notes.md` for technical guardrails.
+- `07-api-reference.json` for backend endpoint contracts (OpenAPI 3.0 spec).
+- `../ops/08-operational-safety-and-event-model.md` for event/campaign modeling, safety incidents, roles, risk levels, and notification planning.
+- `10-frontend-api-usage.md` for the page-to-endpoint usage map.
 
 When product behavior changes, update the relevant document in the same change.
 
 ## Roadmap Maintenance
 
-`docs/00-master-roadmap.md` is the single source of truth for "what is left to build" and "how far along we are". Treat its maintenance as part of every change, not a separate chore:
+`../ops/00-master-roadmap.md` is the single source of truth for "what is left to build" and "how far along we are". Treat its maintenance as part of every change, not a separate chore:
 
 - Before you start a leaf task, flip its marker from `[ ]` to `[~]` and announce briefly what you're starting.
 - The instant a leaf is fully done (merged or build/tests green for in-progress branches), flip to `[x]`. Do not batch completions.

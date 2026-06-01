@@ -1,12 +1,12 @@
 # Frontend API Usage Map
 
-The authoritative source for backend endpoint contracts (request bodies, response shapes, status codes, auth) is `docs/07-api-reference.json` — the OpenAPI 3.0 spec generated from the backend. This document is the consumer-side index: which frontend page or component calls which endpoint, and through which `apiClient` helper.
+The authoritative source for backend endpoint contracts (request bodies, response shapes, status codes, auth) is `07-api-reference.json` — the OpenAPI 3.0 spec generated from the backend. This document is the consumer-side index: which frontend page or component calls which endpoint, and through which `apiClient` helper.
 
 This map is maintained by hand. Do **not** auto-generate it from the OpenAPI spec — the value here is showing real call sites, which the spec cannot describe.
 
 ## Freshness protocol
 
-The backend deploys outside our working hours, so the local `docs/07-api-reference.json` can be stale at the start of a new working session. Agents enforce freshness via a 6-hour TTL stored in `docs/07-api-reference.meta.json`:
+The backend deploys outside our working hours, so the local `07-api-reference.json` can be stale at the start of a new working session. Agents enforce freshness via a 6-hour TTL stored in `07-api-reference.meta.json`:
 
 - Before consulting `07-api-reference.json` or citing any endpoint contract, read `07-api-reference.meta.json` and compare `lastFetchedAt` (NPT, UTC+05:45) against the current time.
 - If the gap is **≥ `stalenessThresholdHours`** (currently 6), run the `fetchCommand` (`node scripts/refresh-api-docs.mjs`). That single command does everything: backs up the current spec to `07-api-reference.prev.json`, fetches the new spec into `07-api-reference.json`, writes a shape-level diff to `07-api-reference.changes.json`, and rewrites the `lastFetchedAt` + `lastFetchedAtDisplay` fields in the meta file. Agents do **not** hand-edit those timestamp fields anymore.
@@ -18,7 +18,7 @@ The 6h threshold lives in the meta file, not in code, so it can be adjusted in o
 
 ### What the diff captures
 
-`docs/07-api-reference.changes.json` is rewritten on every refresh. Shape comparison is done at the `METHOD /path` level. An endpoint is flagged `modified` when any of these change between refreshes: parameter count, presence of a request body, set of response status codes, or auth requirement. Deep request/response body field renames are **not** tracked — by design, to keep noise low. Three buckets:
+`07-api-reference.changes.json` is rewritten on every refresh. Shape comparison is done at the `METHOD /path` level. An endpoint is flagged `modified` when any of these change between refreshes: parameter count, presence of a request body, set of response status codes, or auth requirement. Deep request/response body field renames are **not** tracked — by design, to keep noise low. Three buckets:
 
 - `added` — endpoints that exist now but did not before.
 - `removed` — endpoints that existed before but no longer do.
@@ -85,7 +85,7 @@ All admin requests are sent with `requireAuth: true`.
 
 ### `src/app/admin/issues/page.js`
 
-Mutations beyond create/edit (status change, notes, delete) are still blocked by missing backend endpoints — see `docs/09-backend-admin-gaps.md`.
+Mutations beyond create/edit (status change, notes, delete) are still blocked by missing backend endpoints — see `09-backend-admin-gaps.md`.
 
 | Method + path | apiClient fn | Trigger |
 | --- | --- | --- |
@@ -100,19 +100,19 @@ Mutations beyond create/edit (status change, notes, delete) are still blocked by
 
 ### `src/app/admin/issues/[id]/edit/page.js`
 
-Uses the same `IssueForm` component as the create page (see "One shared form component per entity" in `docs/05-design-language-guide.md`).
+Uses the same `IssueForm` component as the create page (see "One shared form component per entity" in `../design/05-design-language-guide.md`).
 
 | Method + path | apiClient fn | Trigger |
 | --- | --- | --- |
 | `GET /issues/{id}` | `getJson` | Initial load to populate `initialValues` |
-| `PATCH /issues/{id}` | `patchJson` | Submit of the shared `IssueForm` — currently blocked by missing backend endpoint, see `docs/09-backend-admin-gaps.md` |
+| `PATCH /issues/{id}` | `patchJson` | Submit of the shared `IssueForm` — currently blocked by missing backend endpoint, see `09-backend-admin-gaps.md` |
 
 ### Public issue pages
 
 | Page | Method + path | apiClient fn | Notes |
 | --- | --- | --- | --- |
 | `src/app/issues/page.js` | `GET /issues` | `getJson` | Anonymous; params: `status`, `category`, `sort`, `limit=50`; client-side filters out non-public statuses. When the user is logged in, `apiClient` attaches the bearer token automatically and the response includes a per-issue `isVoted` boolean used to seed the "already supported" state |
-| `src/app/issues/[id]/page.js` | `GET /issues/{id}` | `getJson` | Anonymous; loads detail + a second `GET /issues` call (by category) for "Other issues in this category". `isVoted` is **not** returned on this endpoint today — see `docs/09-backend-admin-gaps.md` |
+| `src/app/issues/[id]/page.js` | `GET /issues/{id}` | `getJson` | Anonymous; loads detail + a second `GET /issues` call (by category) for "Other issues in this category". `isVoted` is **not** returned on this endpoint today — see `09-backend-admin-gaps.md` |
 | `src/components/IssueVoteButton.js` (via `useIssueVote`) | `POST /issues/{id}/vote` | `voteOnIssue` | Authenticated; verified users only; hard-coded `voterRole: "INTERESTED"`; flips local `voted` state on success/409 |
 
 ### `src/app/admin/events/page.js`
@@ -134,7 +134,7 @@ Scheduling (`PATCH /events/{id}/schedule`) and completion (`POST /events/{id}/co
 When you add a page or component that calls a backend endpoint:
 
 1. Append a row to the relevant section above with the file path, HTTP method + path, `apiClient` function, and a one-line trigger description.
-2. If the endpoint is not yet present in `docs/07-api-reference.json`, also list it in `docs/09-backend-admin-gaps.md` so the gap is tracked.
+2. If the endpoint is not yet present in `07-api-reference.json`, also list it in `09-backend-admin-gaps.md` so the gap is tracked.
 3. Do not regenerate this file from the OpenAPI spec. The OpenAPI spec describes the backend surface; this map describes which frontend call sites use that surface. Both are needed.
 
-When an endpoint is renamed or removed on the backend, update both `docs/07-api-reference.json` (via the backend export) and the matching rows here.
+When an endpoint is renamed or removed on the backend, update both `07-api-reference.json` (via the backend export) and the matching rows here.

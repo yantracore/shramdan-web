@@ -4,7 +4,7 @@
 
 This document captures planning decisions for turning supported issues into real cleanup events or campaigns while handling safety, legal, medical, conflict, and urgent operational cases.
 
-Use this document before implementing event/campaign APIs, incident reporting, volunteer role assignment, or notification workflows. `docs/07-api-reference.md` remains the source of truth for exact API contracts once those endpoints exist.
+Use this document before implementing event/campaign APIs, incident reporting, volunteer role assignment, or notification workflows. `../engineering/07-api-reference.json` remains the source of truth for exact API contracts once those endpoints exist.
 
 ## Core Recommendation
 

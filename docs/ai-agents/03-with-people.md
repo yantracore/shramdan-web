@@ -215,8 +215,8 @@ Each will get explicit scope, tone calibration, and failure-mode docs at the tim
 
 - [`01-shramesh.md`](./01-shramesh.md) — character canon
 - [`02-with-developers.md`](./02-with-developers.md) — Mode A
-- `../00-master-roadmap.md` — surface schedules
-- `../05-design-language-guide.md` — visual language pairings
+- `../ops/00-master-roadmap.md` — surface schedules
+- `../design/05-design-language-guide.md` — visual language pairings
 
 Memory layer (binding at runtime):
 - [[feedback-persona-shramesh]]

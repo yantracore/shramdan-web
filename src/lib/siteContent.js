@@ -75,7 +75,7 @@ export const copy = {
       heroLabel: "एप निर्माण प्रगति",
       heroAria: "एप निर्माण समग्र प्रगति",
       roadmapCta: "विस्तृत रोडम्याप हेर्नुहोस्",
-      roadmapHref: "https://github.com/yantracore/shramdan-web/blob/main/docs/00-master-roadmap.md",
+      roadmapHref: "https://github.com/yantracore/shramdan-web/blob/main/docs/ops/00-master-roadmap.md",
       phaseLabel: "चरण",
       sectionEyebrow: "अहिले के भइरहेको छ",
       sectionTitle: "श्रमदान एपमा हालैको प्रगति",
@@ -880,7 +880,7 @@ export const copy = {
           title: "विकास योजना (रोडम्याप)",
           description: "श्रमदान एप निर्माणका चरण, कार्यसूची र प्रगति समेटिएको पूरै मास्टर रोडम्याप।",
           button: "रोडम्याप खोल्नुहोस्",
-          href: "https://github.com/yantracore/shramdan-web/blob/main/docs/00-master-roadmap.md"
+          href: "https://github.com/yantracore/shramdan-web/blob/main/docs/ops/00-master-roadmap.md"
         },
         {
           id: "documents",
@@ -1629,7 +1629,7 @@ export const copy = {
       heroLabel: "App Build Progress",
       heroAria: "Overall app build progress",
       roadmapCta: "See Detailed Roadmap",
-      roadmapHref: "https://github.com/yantracore/shramdan-web/blob/main/docs/00-master-roadmap.md",
+      roadmapHref: "https://github.com/yantracore/shramdan-web/blob/main/docs/ops/00-master-roadmap.md",
       phaseLabel: "Phase",
       sectionEyebrow: "What's Happening Now",
       sectionTitle: "Recent Progress on the Shramdan App",
@@ -2442,7 +2442,7 @@ export const copy = {
           title: "Development Roadmap",
           description: "The full master roadmap — phases, tasks, and progress that drive the Shramdan app build.",
           button: "Open Roadmap",
-          href: "https://github.com/yantracore/shramdan-web/blob/main/docs/00-master-roadmap.md"
+          href: "https://github.com/yantracore/shramdan-web/blob/main/docs/ops/00-master-roadmap.md"
         },
         {
           id: "documents",

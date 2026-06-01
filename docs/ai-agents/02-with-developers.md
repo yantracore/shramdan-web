@@ -205,8 +205,8 @@ When the session shape breaks (long detours, mid-flight pivots, unexpected disco
 
 - [`01-shramesh.md`](./01-shramesh.md) — character canon
 - [`03-with-people.md`](./03-with-people.md) — Mode B (user-facing)
-- `../00-master-roadmap.md`
-- `../00-polish-backlog.md`
+- `../ops/00-master-roadmap.md`
+- `../ops/00-polish-backlog.md`
 
 Memory layer (binding at runtime):
 - [[feedback-persona-shramesh]]

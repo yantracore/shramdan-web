@@ -4,7 +4,7 @@
 
 Version 1.0 is the first cleanup campaign's complete visible feature set: from issue listing to publishing the final campaign results.
 
-See [00-master-roadmap.md](00-master-roadmap.md) for the live phase-by-phase progress and the prioritized next-up queue. This document defines *what* the v1.0 feature set is; the roadmap tracks *how complete* each piece is.
+See [00-master-roadmap.md](../ops/00-master-roadmap.md) for the live phase-by-phase progress and the prioritized next-up queue. This document defines *what* the v1.0 feature set is; the roadmap tracks *how complete* each piece is.
 
 ## Product Goal
 
@@ -44,7 +44,7 @@ Issues should move through a simple visible lifecycle:
 
 The initial frontend may represent this lifecycle with sample data and clear status labels.
 
-Issue lifecycle status should describe the public product flow only. Do not overload it with safety incidents, medical events, conflict reports, land-permission disputes, weather emergencies, or legal concerns. Those operational concerns should be tracked through the safety and incident model in `docs/08-operational-safety-and-event-model.md`.
+Issue lifecycle status should describe the public product flow only. Do not overload it with safety incidents, medical events, conflict reports, land-permission disputes, weather emergencies, or legal concerns. Those operational concerns should be tracked through the safety and incident model in `../ops/08-operational-safety-and-event-model.md`.
 
 ## Contribution Model
 

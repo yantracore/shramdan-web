@@ -36,7 +36,7 @@ Each polish item is a single-line entry under a phase section:
 ### Scope rules
 
 - **Only for shipped features.** If the underlying leaf in the roadmap is not `[x]` yet, finish shipping first. Don't pre-load polish for unshipped work.
-- **Not for backend dependencies.** Items waiting on a backend endpoint belong in [09-backend-admin-gaps.md](09-backend-admin-gaps.md), not here. This file is for things we can ship from the web app alone.
+- **Not for backend dependencies.** Items waiting on a backend endpoint belong in [09-backend-admin-gaps.md](../engineering/09-backend-admin-gaps.md), not here. This file is for things we can ship from the web app alone.
 - **Cancel freely.** If a P3 sits untouched for ~60 days and nobody has pushed for it, mark `[-]` with a one-line reason. Polish that nobody misses isn't real polish.
 
 ## Agent Update Protocol
@@ -66,7 +66,7 @@ When you (the coding agent) are working in this repo:
 - [x] P2 [from 0.5.1] Silent access-token refresh via `POST /auth/refresh` + server-side revoke via `POST /auth/logout` — effort:M ← done: 2026-05-29 *(`authSession` now persists `refreshToken` alongside `accessToken`; `apiClient.apiRequest` intercepts 401 / INVALID_TOKEN / AUTH_REQUIRED, calls a deduped `refreshAccessToken()` singleton, stores the rotated token pair atomically, and retries the original request once — the session-expired toast now only fires when refresh itself fails. `logoutAndClearSession()` posts to `/auth/logout` to revoke the refresh token server-side before clearing storage; SiteShell and AdminShell logout handlers use it)*
 - [ ] P3 [from 0.7] Smoother visual transition on language switch — effort:S
 - [ ] P3 [from 0.3.2] Post-launch: add Mobile App Dev, Translator (EN↔NE), Social Media, Photographer/Videographer, Event Coordinator roles to the volunteer invite — effort:S *(deferred until app release; current dev-phase roles are sufficient)*
-- [ ] P2 [from 0.3.2] Backend `applicationRoles` enum must accept `QA_ENGINEER`, `DEVOPS_ENGINEER`, `CONTENT_WRITER` — frontend cards link to `/join?role=` with these values but the API still rejects them (see [09-backend-admin-gaps.md](09-backend-admin-gaps.md)) — effort:S
+- [ ] P2 [from 0.3.2] Backend `applicationRoles` enum must accept `QA_ENGINEER`, `DEVOPS_ENGINEER`, `CONTENT_WRITER` — frontend cards link to `/join?role=` with these values but the API still rejects them (see [09-backend-admin-gaps.md](../engineering/09-backend-admin-gaps.md)) — effort:S
 
 ## Phase 1 — Public Issue Discovery & Voting
 

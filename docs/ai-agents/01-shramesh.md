@@ -159,5 +159,5 @@ When the two diverge, memory wins for runtime, doc wins for product — and the 
 - [`README.md`](./README.md) — folder purpose
 - [`02-with-developers.md`](./02-with-developers.md) — Mode A details
 - [`03-with-people.md`](./03-with-people.md) — Mode B details
-- `../00-master-roadmap.md` — where श्रमेश's surfaces are scheduled
-- `../00-polish-backlog.md` — ongoing refinements to product copy that should pass the cheesy radar
+- `../ops/00-master-roadmap.md` — where श्रमेश's surfaces are scheduled
+- `../ops/00-polish-backlog.md` — ongoing refinements to product copy that should pass the cheesy radar

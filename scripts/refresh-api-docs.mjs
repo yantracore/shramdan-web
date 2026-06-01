@@ -1,10 +1,10 @@
 #!/usr/bin/env node
-// Refresh docs/07-api-reference.json from the backend OpenAPI source.
+// Refresh docs/engineering/07-api-reference.json from the backend OpenAPI source.
 // Side-effects per run:
-//   - backup current spec → docs/07-api-reference.prev.json
-//   - overwrite docs/07-api-reference.json with the freshly fetched body
-//   - write shape-level diff to docs/07-api-reference.changes.json
-//   - update lastFetchedAt + lastFetchedAtDisplay in docs/07-api-reference.meta.json
+//   - backup current spec → docs/engineering/07-api-reference.prev.json
+//   - overwrite docs/engineering/07-api-reference.json with the freshly fetched body
+//   - write shape-level diff to docs/engineering/07-api-reference.changes.json
+//   - update lastFetchedAt + lastFetchedAtDisplay in docs/engineering/07-api-reference.meta.json
 //
 // Exit codes: 0 on success (with or without diff baseline), 1 on fetch/parse failure.
 
@@ -13,9 +13,9 @@ import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const metaPath = resolve(root, "docs/07-api-reference.meta.json");
-const prevPath = resolve(root, "docs/07-api-reference.prev.json");
-const changesPath = resolve(root, "docs/07-api-reference.changes.json");
+const metaPath = resolve(root, "docs/engineering/07-api-reference.meta.json");
+const prevPath = resolve(root, "docs/engineering/07-api-reference.prev.json");
+const changesPath = resolve(root, "docs/engineering/07-api-reference.changes.json");
 
 const meta = JSON.parse(await readFile(metaPath, "utf8"));
 const localPath = resolve(root, meta.localPath);
