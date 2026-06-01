@@ -42,7 +42,7 @@ export const copy = {
       eyebrow: "",
       title: "श्रमदान",
       subtitle: "हाम्रो श्रम, हाम्रो समाज, हाम्रो भविष्य।",
-      support: "देशका हरेक समस्या सरकारको प्रतीक्षा गरेर समाधान हुँदैन। हामी नागरिकहरू आफैं मिलेर सरसफाइ, मर्मत, वृक्षारोपण, टोल सुधार जस्ता आधारभूत काम अघि बढाउन सक्छौँ। श्रमदान त्यही सामूहिक जिम्मेवारीको सुरुवात हो। साना साना हातहरू मिलेर ठूला परिवर्तन सम्भव हुन्छ। आज हाम्रो श्रमदान, भोलि सुन्दर समाजको निर्माण।",
+      support: "देशका हरेक समस्या समाधानका लागि सरकारको प्रतीक्षा गरेर हुँदैन। हामी नागरिकहरू आफैं मिलेर सरसफाइ, मर्मत, वृक्षारोपण, टोल सुधार जस्ता आधारभूत काम गर्न सक्छौँ। श्रमदान यही सामूहिक जिम्मेवारीको सुरुवात हो। स-साना हातहरू मिलेर ठूला परिवर्तन सम्भव हुन्छ। आज हाम्रो सामूहिक श्रमदान, भोलि सुन्दर समाजको निर्माण।",
       join: "योगदान गर्नुहोस्"
     },
     heroPanel: {
@@ -742,10 +742,10 @@ export const copy = {
       titleStrong: "श्रमदान गरौँ",
       titleTrail: "आफ्नो देशका लागि",
       intro:
-        "यो समुदायबाट चल्ने मञ्च सबैका लागि खुला छ। आफ्नो सीप, समय वा सम्पर्क प्रयोग गरेर टोली बनाउनुहोस्, भूमिका लिनुहोस्, र स्थानीय परिवर्तन सुरु गर्नुहोस्।",
+        "यो समुदायबाट चल्ने मञ्च सबैका लागि खुला छ। आफ्नो सीप, समय वा सम्पर्क लिएर आफ्नो टोलीमा जोडिनुहोस्, सिक्दै सिकाउँदै भूमिका लिनुहोस्, र स्थानीय परिवर्तन सुरु गर्नुहोस्।",
       primaryCta: "स्वयंसेवक बन्नुहोस्",
       secondaryCta: "सुझाव दिनुहोस्",
-      panelEyebrow: "हामीलाई तपाईं चाहिन्छ",
+      panelEyebrow: "तपाईंको आवश्यकता छ",
       panelTitle: "कुनै पनि भूमिका लिनुहोस् र एप विकासमा श्रमदान गर्नुहोस्।",
       panelIntro:
         "प्रविधि, डिजाइन, कानुन, वित्त, सहयोग वा स्थानीय नेतृत्व - श्रमदानमा योगदान गर्ने बाटो सबैका लागि छ।",
@@ -2304,7 +2304,7 @@ export const copy = {
       titleStrong: "Shramdan with us",
       titleTrail: "for Nepal",
       intro:
-        "Shramdan is a community-driven platform open to everyone. Bring your skill, time, or network, build your team, and start local impact.",
+        "Shramdan is a community-driven platform open to everyone. Bring your skill, time, or network, join your team to learn while you teach, and start local impact.",
       primaryCta: "Become a Volunteer",
       secondaryCta: "Share Feedback",
       panelEyebrow: "We need you",
