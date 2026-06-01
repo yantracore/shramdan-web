@@ -355,7 +355,7 @@ export default function HomeClient({ summary }) {
                 showInfo={false}
                 size="small"
                 strokeColor="#176b5c"
-                trailColor="rgba(255, 255, 255, 0.25)"
+                railColor="rgba(255, 255, 255, 0.25)"
               />
               <a
                 className="hero-panel-progress-link"
