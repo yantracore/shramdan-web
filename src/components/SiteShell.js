@@ -6,6 +6,7 @@ import {
   LogoutOutlined,
   MenuOutlined,
   MoonOutlined,
+  SettingOutlined,
   SunOutlined,
   TranslationOutlined,
   UserAddOutlined,
@@ -86,7 +87,9 @@ export function SiteShell({ children, pageTitle }) {
   const isAdmin = isAuthenticated && isAdminUser(session.user);
   const navItems = [
     { href: "/", label: t.nav.home },
+    { href: "/intro", label: t.nav.intro },
     { href: "/issues", label: t.nav.issues },
+    { href: "/learn", label: t.nav.learn },
     { href: "/join", label: t.nav.join },
     { href: "/feedback", label: t.nav.feedback },
     isAuthenticated
@@ -149,8 +152,11 @@ export function SiteShell({ children, pageTitle }) {
     : null;
   const quickLinks = [
     { href: "/", label: t.nav.home },
+    { href: "/intro", label: t.nav.intro },
+    { href: "/learn", label: t.nav.learn },
     { href: "/issues", label: t.nav.issues },
     { href: "/event-types", label: t.nav.eventTypes },
+    { href: "/settings", label: t.nav.settings },
     isAuthenticated
       ? { href: "/me", label: t.me.navLabel }
       : { href: "/login", label: t.nav.login }
@@ -252,6 +258,13 @@ export function SiteShell({ children, pageTitle }) {
               >
                 {t.controls.language}
               </Button>
+            </Tooltip>
+            <Tooltip title={t.nav.settings}>
+              <Button
+                aria-label={t.nav.settings}
+                icon={<SettingOutlined />}
+                href="/settings"
+              />
             </Tooltip>
           </div>
           {isAuthenticated ? (

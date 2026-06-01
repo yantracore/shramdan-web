@@ -7,7 +7,10 @@ export const copy = {
       eventTypes: "कार्य-प्रकार",
       join: "जोडिनुहोस्",
       feedback: "प्रतिक्रिया",
-      login: "लगइन"
+      login: "लगइन",
+      intro: "परिचय",
+      learn: "Learn",
+      settings: "सेटिङ्स"
     },
     pageTitles: {
       brandSuffix: "श्रमदान | Shramdan",
@@ -1579,7 +1582,10 @@ export const copy = {
       eventTypes: "Event Types",
       join: "Join",
       feedback: "Feedback",
-      login: "Login"
+      login: "Login",
+      intro: "Intro",
+      learn: "Learn",
+      settings: "Settings"
     },
     pageTitles: {
       brandSuffix: "श्रमदान | Shramdan",
