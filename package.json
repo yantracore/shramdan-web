@@ -13,6 +13,7 @@
     "@ant-design/icons": "latest",
     "antd": "latest",
     "framer-motion": "^12.40.0",
+    "gsap": "^3.15.0",
     "leaflet": "^1.9.4",
     "marked": "^18.0.4",
     "next": "latest",
