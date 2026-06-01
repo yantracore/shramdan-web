@@ -45,6 +45,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import IssueMapBlock from "@/components/IssueMapBlock";
+import { MotionSection } from "@/components/MotionSection";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
 import { getJson } from "@/lib/apiClient";
@@ -323,7 +324,7 @@ export default function HomeClient({ summary }) {
 
   return (
     <SiteShell>
-      <section id="top" className="hero-section">
+      <MotionSection as="section" id="top" className="hero-section">
         <div className="hero-copy">
           {t.hero.eyebrow ? <span className="eyebrow">{t.hero.eyebrow}</span> : null}
           <h1>{t.hero.title}</h1>
@@ -395,9 +396,9 @@ export default function HomeClient({ summary }) {
             })}
           </div>
         </aside>
-      </section>
+      </MotionSection>
 
-      <section className="event-types-section" aria-labelledby="event-types-title">
+      <MotionSection as="section" className="event-types-section" aria-labelledby="event-types-title">
         <div className="event-types-heading">
           <span className="eyebrow">{t.eventTypes.eyebrow}</span>
           <div>
@@ -454,9 +455,9 @@ export default function HomeClient({ summary }) {
           </span>
           {t.eventTypes.phaseNote}
         </p>
-      </section>
+      </MotionSection>
 
-      <section className="cleanup-areas-section" aria-labelledby="cleanup-areas-title">
+      <MotionSection as="section" className="cleanup-areas-section" aria-labelledby="cleanup-areas-title">
         <div className="cleanup-areas-heading">
           <span className="eyebrow">{t.cleanupAreas.eyebrow}</span>
           <div>
@@ -481,9 +482,9 @@ export default function HomeClient({ summary }) {
             </article>
           ))}
         </div>
-      </section>
+      </MotionSection>
 
-      <section className="core-idea-section" aria-labelledby="core-idea-title">
+      <MotionSection as="section" className="core-idea-section" aria-labelledby="core-idea-title">
         <div className="core-idea-hero">
           <div className="core-idea-copy">
             <span className="core-idea-eyebrow">
@@ -532,9 +533,9 @@ export default function HomeClient({ summary }) {
           })}
         </div>
 
-      </section>
+      </MotionSection>
 
-      <section className="volunteer-invite-section" aria-labelledby="volunteer-invite-title">
+      <MotionSection as="section" className="volunteer-invite-section" aria-labelledby="volunteer-invite-title">
         <div className="volunteer-visual">
           <div className="volunteer-brand-card glass-panel">
             <span className="volunteer-logo">
@@ -614,7 +615,7 @@ export default function HomeClient({ summary }) {
           </div>
         </div>
 
-      </section>
+      </MotionSection>
 
       {showActiveIssuesSection ? (
         <section
@@ -718,11 +719,11 @@ export default function HomeClient({ summary }) {
               </ul>
             </div>
           ) : null}
-        </section>
+        </MotionSection>
       ) : null}
 
       {buildingNowCards.length > 0 ? (
-        <section className="building-now-section" aria-labelledby="building-now-title">
+        <MotionSection as="section" className="building-now-section" aria-labelledby="building-now-title">
           <div className="building-now-header">
             <div className="building-now-heading">
               <span className="eyebrow">{t.buildInPublic.sectionEyebrow}</span>
@@ -790,10 +791,10 @@ export default function HomeClient({ summary }) {
               );
             })}
           </div>
-        </section>
+        </MotionSection>
       ) : null}
 
-      <section className="page-section resources-section" aria-labelledby="resources-title">
+      <MotionSection as="section" className="page-section resources-section" aria-labelledby="resources-title">
         <div className="section-heading resources-heading">
           <span className="eyebrow">{t.resources.eyebrow}</span>
           <h2 id="resources-title">{t.resources.title}</h2>
@@ -851,7 +852,7 @@ export default function HomeClient({ summary }) {
             );
           })}
         </div>
-      </section>
+      </MotionSection>
     </SiteShell>
   );
 }
