@@ -216,12 +216,12 @@
   position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(390px, 0.55fr);
-  gap: 48px;
+  gap: 40px;
   align-items: center;
   width: 100%;
-  min-height: calc(100vh - 70px);
+  min-height: 520px;
   margin: 0 auto;
-  padding: 64px max(16px, calc((100% - 1180px) / 2)) 72px;
+  padding: 40px max(16px, calc((100% - 1180px) / 2)) 48px;
   overflow: hidden;
 }
 
@@ -542,16 +542,18 @@
 .page-section {
   width: min(1180px, calc(100% - 32px));
   margin: 0 auto;
-  padding: 46px 0 0;
+  padding: 40px 0 0;
+  border-top: 1px solid var(--line);
 }
 
 .cleanup-areas-section {
   position: relative;
   display: grid;
-  gap: 26px;
+  gap: 22px;
   width: min(1180px, calc(100% - 32px));
   margin: 0 auto;
-  padding-top: 92px;
+  padding-top: 56px;
+  border-top: 1px solid var(--line);
 }
 
 .cleanup-areas-heading,
@@ -732,10 +734,11 @@
 .core-idea-section {
   position: relative;
   display: grid;
-  gap: 24px;
+  gap: 22px;
   width: min(1180px, calc(100% - 32px));
   margin: 0 auto;
-  padding-top: 92px;
+  padding-top: 56px;
+  border-top: 1px solid var(--line);
 }
 
 .core-idea-hero {
@@ -1004,7 +1007,8 @@
   gap: 22px;
   width: min(1180px, calc(100% - 32px));
   margin: 0 auto;
-  padding-top: 92px;
+  padding-top: 56px;
+  border-top: 1px solid var(--line);
 }
 
 .volunteer-visual,
@@ -4829,12 +4833,13 @@
 }
 
 .building-now-section {
-  padding: 64px 24px 0;
+  padding: 48px 24px 0;
   max-width: 1180px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 26px;
+  border-top: 1px solid var(--line);
 }
 
 .building-now-header {
@@ -5342,12 +5347,13 @@
 /* Homepage — Live Issues section */
 
 .live-issues-section {
-  padding: 56px 24px 0;
+  padding: 48px 24px 0;
   max-width: 1240px;
   margin: 0 auto;
   width: 100%;
   display: grid;
-  gap: 24px;
+  gap: 20px;
+  border-top: 1px solid var(--line);
 }
 
 .live-issues-header {
@@ -5580,10 +5586,11 @@
 .event-types-section {
   position: relative;
   display: grid;
-  gap: 26px;
+  gap: 22px;
   width: min(1180px, calc(100% - 32px));
   margin: 0 auto;
-  padding-top: 92px;
+  padding-top: 56px;
+  border-top: 1px solid var(--line);
 }
 
 .event-types-heading {
