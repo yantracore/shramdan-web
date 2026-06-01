@@ -1,11 +1,18 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
+import { usePreferences } from "@/app/providers";
 import {
   fadeUpInView,
   staggerContainer,
   staggerItem
 } from "@/lib/motion";
+
+function useShouldAnimate() {
+  const reduceMotion = useReducedMotion();
+  const { entranceAnimation } = usePreferences();
+  return !reduceMotion && entranceAnimation;
+}
 
 // Section wrapper — fades up + translates 12px when it enters the viewport.
 // Honors prefers-reduced-motion by skipping the animation entirely.
@@ -17,8 +24,8 @@ import {
 //
 // The `as` prop chooses the rendered HTML tag (section / div / article).
 export function MotionSection({ as = "section", children, className, ...rest }) {
-  const reduceMotion = useReducedMotion();
-  if (reduceMotion) {
+  const shouldAnimate = useShouldAnimate();
+  if (!shouldAnimate) {
     const Tag = as;
     return (
       <Tag className={className} {...rest}>
@@ -37,8 +44,8 @@ export function MotionSection({ as = "section", children, className, ...rest }) 
 // Grid / list wrapper — each direct child fades + stagger-rises as the
 // container enters the viewport. Pair with <StaggerItem> for each child.
 export function StaggerList({ as = "div", children, className, ...rest }) {
-  const reduceMotion = useReducedMotion();
-  if (reduceMotion) {
+  const shouldAnimate = useShouldAnimate();
+  if (!shouldAnimate) {
     const Tag = as;
     return (
       <Tag className={className} {...rest}>
@@ -56,8 +63,8 @@ export function StaggerList({ as = "div", children, className, ...rest }) {
 
 // Direct child of StaggerList. Acts as a plain wrapper under reduced motion.
 export function StaggerItem({ as = "div", children, className, ...rest }) {
-  const reduceMotion = useReducedMotion();
-  if (reduceMotion) {
+  const shouldAnimate = useShouldAnimate();
+  if (!shouldAnimate) {
     const Tag = as;
     return (
       <Tag className={className} {...rest}>

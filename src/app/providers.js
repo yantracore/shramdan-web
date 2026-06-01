@@ -7,6 +7,8 @@ import { SessionExpirationWatcher } from "@/components/SessionExpirationWatcher"
 const PreferenceContext = createContext(null);
 const THEME_STORAGE_KEY = "shramdan-theme";
 const LANGUAGE_STORAGE_KEY = "shramdan-language";
+const ENTRANCE_ANIMATION_STORAGE_KEY = "shramdan-entrance-animation";
+const LIVE_ICON_SIZE_STORAGE_KEY = "shramdan-live-icon-size";
 const PREFERENCE_EVENT = "shramdan-preferences";
 
 const getStoredMode = () => {
@@ -25,6 +27,22 @@ const getStoredLanguage = () => {
 
   const savedLanguage = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
   return savedLanguage === "en" || savedLanguage === "np" ? savedLanguage : "np";
+};
+
+const getStoredEntranceAnimation = () => {
+  if (typeof window === "undefined") {
+    return true;
+  }
+  const saved = window.localStorage.getItem(ENTRANCE_ANIMATION_STORAGE_KEY);
+  return saved === "off" ? false : true;
+};
+
+const getStoredLiveIconSize = () => {
+  if (typeof window === "undefined") {
+    return "md";
+  }
+  const saved = window.localStorage.getItem(LIVE_ICON_SIZE_STORAGE_KEY);
+  return saved === "sm" || saved === "md" || saved === "lg" ? saved : "md";
 };
 
 const subscribePreferences = (callback) => {
@@ -64,6 +82,16 @@ const baseTheme = {
 export function Providers({ children }) {
   const mode = useSyncExternalStore(subscribePreferences, getStoredMode, () => "light");
   const language = useSyncExternalStore(subscribePreferences, getStoredLanguage, () => "np");
+  const entranceAnimation = useSyncExternalStore(
+    subscribePreferences,
+    getStoredEntranceAnimation,
+    () => true
+  );
+  const liveIconSize = useSyncExternalStore(
+    subscribePreferences,
+    getStoredLiveIconSize,
+    () => "md"
+  );
 
   const updatePreference = useCallback((key, value) => {
     window.localStorage.setItem(key, value);
@@ -92,6 +120,26 @@ export function Providers({ children }) {
     [updatePreference]
   );
 
+  const setEntranceAnimation = useCallback(
+    (nextValue) => {
+      const value =
+        typeof nextValue === "function" ? nextValue(getStoredEntranceAnimation()) : nextValue;
+      updatePreference(ENTRANCE_ANIMATION_STORAGE_KEY, value ? "on" : "off");
+    },
+    [updatePreference]
+  );
+
+  const setLiveIconSize = useCallback(
+    (nextValue) => {
+      const value =
+        typeof nextValue === "function" ? nextValue(getStoredLiveIconSize()) : nextValue;
+      if (value === "sm" || value === "md" || value === "lg") {
+        updatePreference(LIVE_ICON_SIZE_STORAGE_KEY, value);
+      }
+    },
+    [updatePreference]
+  );
+
   useEffect(() => {
     document.documentElement.dataset.theme = mode;
   }, [mode]);
@@ -104,11 +152,26 @@ export function Providers({ children }) {
     () => ({
       language,
       mode,
+      entranceAnimation,
+      liveIconSize,
       setLanguage,
+      setMode,
+      setEntranceAnimation,
+      setLiveIconSize,
       toggleLanguage: () => setLanguage((current) => (current === "np" ? "en" : "np")),
-      toggleMode: () => setMode((current) => (current === "light" ? "dark" : "light"))
+      toggleMode: () => setMode((current) => (current === "light" ? "dark" : "light")),
+      toggleEntranceAnimation: () => setEntranceAnimation((current) => !current)
     }),
-    [language, mode, setLanguage, setMode]
+    [
+      language,
+      mode,
+      entranceAnimation,
+      liveIconSize,
+      setLanguage,
+      setMode,
+      setEntranceAnimation,
+      setLiveIconSize
+    ]
   );
 
   const theme = useMemo(
