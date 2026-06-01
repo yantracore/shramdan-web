@@ -1,0 +1,119 @@
+/* design-tokens.css — Phase 7 foundation.
+ *
+ * The one place where shadows, glass, motion timing, radii, and z-layers
+ * are declared. Every component (Ant Design overrides, custom CSS,
+ * Tailwind-style utility classes if we add them later) reads from here.
+ *
+ * Principle: pleasing to use. Soft, predictable, slightly futuristic.
+ * Apps optimize for "efficient"; we optimize for "pleasant."
+ *
+ * Color tokens (--bg, --surface, --primary, etc.) live in globals.css
+ * because they predate this file. Future cleanup may centralize them
+ * here.
+ */
+
+:root {
+  /* --- Depth (shadows) ------------------------------------------------ */
+  /* Three soft levels. No hard drop-shadows; always with green-gray tint
+     that matches the brand. Use shadow-1 for resting cards, shadow-2
+     for hover/active, shadow-3 for floating chrome (modals, dropdowns). */
+  --shadow-1: 0 1px 2px rgba(23, 33, 28, 0.04), 0 2px 6px rgba(23, 33, 28, 0.05);
+  --shadow-2: 0 4px 12px rgba(23, 33, 28, 0.08), 0 1px 3px rgba(23, 33, 28, 0.05);
+  --shadow-3: 0 12px 32px rgba(23, 33, 28, 0.12), 0 4px 10px rgba(23, 33, 28, 0.07);
+  --shadow-hero: 0 24px 70px rgba(23, 33, 28, 0.1);
+
+  /* --- Glass ---------------------------------------------------------- */
+  /* Light + dark variants. Use for chrome (nav, panels, side rails).
+     Never for content blocks — glass on glass is a fog. */
+  --glass-bg: rgba(255, 255, 255, 0.62);
+  --glass-border: rgba(255, 255, 255, 0.78);
+  --glass-blur: 14px;
+  --glass-saturate: 1.4;
+
+  /* --- Radii ---------------------------------------------------------- */
+  /* Four sizes. Default to --radius-md for cards / panels. */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-pill: 999px;
+
+  /* --- Motion --------------------------------------------------------- */
+  /* One easing curve for the whole app — soft ease-out, no overshoot.
+     Animations should feel like breath, not bounce. */
+  --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --duration-slow: 450ms;
+  --stagger-default: 60ms;
+
+  /* --- Z-layers ------------------------------------------------------- */
+  /* Cheap registry so layers compose predictably. */
+  --z-base: 1;
+  --z-elevated: 10;
+  --z-sticky: 100;
+  --z-overlay: 1000;
+  --z-modal: 1100;
+  --z-toast: 1200;
+}
+
+:root[data-theme="dark"] {
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 6px rgba(0, 0, 0, 0.25);
+  --shadow-2: 0 4px 12px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.25);
+  --shadow-3: 0 12px 32px rgba(0, 0, 0, 0.5), 0 4px 10px rgba(0, 0, 0, 0.3);
+  --shadow-hero: 0 24px 70px rgba(0, 0, 0, 0.4);
+
+  --glass-bg: rgba(23, 33, 31, 0.55);
+  --glass-border: rgba(255, 255, 255, 0.08);
+}
+
+/* --- Glass utility class ----------------------------------------------- */
+/* Apply to chrome elements (nav, panels, side rails). */
+.glass-panel {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-2);
+}
+
+/* --- Pressable utility (buttons, clickable cards) --------------------- */
+/* Subtle scale-down on press. Composes with Ant Design's button without
+   overriding its border / fill colors. */
+.pressable {
+  transition: transform var(--duration-fast) var(--ease-out-soft),
+              box-shadow var(--duration-base) var(--ease-out-soft);
+}
+
+.pressable:active {
+  transform: scale(0.98);
+}
+
+/* --- Reduced motion respects user preference ------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .pressable {
+    transition: none;
+  }
+  .pressable:active {
+    transform: none;
+  }
+}
+
+/* --- Ant Design button transition override --------------------------- */
+/* Make AntD buttons obey our motion grammar: ease-out-soft, base
+   duration. Color transitions stay AntD's default since they're tied
+   to theme. Only the timing function is unified. */
+.ant-btn {
+  transition-timing-function: var(--ease-out-soft) !important;
+}
+
+.ant-btn:active {
+  transform: scale(0.98);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ant-btn:active {
+    transform: none;
+  }
+}
