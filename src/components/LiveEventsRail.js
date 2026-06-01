@@ -1,7 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { usePreferences } from "@/app/providers";
 import { staggerContainer, staggerItem } from "@/lib/motion";
 
@@ -72,9 +73,18 @@ function LiveEventCard({ event, copy, animated = false }) {
   const startedAt = event?.liveStream?.startedAt;
   const durationLabel = formatLiveDuration(startedAt, copy);
   const viewers = event?.liveStream?.viewerCount;
+  const previewUrl = event?.liveStream?.previewEmbedUrl || event?.liveStream?.streamUrl;
+  const [isHovered, setIsHovered] = useState(false);
+  const reduceMotion = useReducedMotion();
+  const showPreview = isHovered && previewUrl && !reduceMotion;
 
   return (
-    <Wrapper className="live-events-rail-card" {...wrapperProps}>
+    <Wrapper
+      className="live-events-rail-card"
+      {...wrapperProps}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <Link href={`/events/${event.id}`} className="live-events-rail-card-link">
         <div className="live-events-rail-thumb">
           {event?.liveStream?.thumbnailUrl ? (
@@ -89,6 +99,29 @@ function LiveEventCard({ event, copy, animated = false }) {
               <span>श्रमदान</span>
             </div>
           )}
+
+          <AnimatePresence>
+            {showPreview ? (
+              <motion.div
+                key="preview"
+                className="live-events-rail-preview"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                aria-hidden="true"
+              >
+                <iframe
+                  src={previewUrl}
+                  title={`${event.title} live preview`}
+                  allow="autoplay; encrypted-media"
+                  loading="lazy"
+                  frameBorder="0"
+                />
+              </motion.div>
+            ) : null}
+          </AnimatePresence>
+
           <span className="live-events-rail-badge">
             <span className="live-dot" aria-hidden="true" />
             LIVE

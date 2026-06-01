@@ -160,6 +160,29 @@
   border-radius: var(--radius-sm);
   font-size: 11px;
   font-weight: 600;
+  z-index: 2;
+}
+
+/* Hover preview iframe overlay (Phase 14) */
+.live-events-rail-preview {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  z-index: 1;
+}
+
+.live-events-rail-preview iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+/* Hide preview on devices without hover (mobile/touch). */
+@media (hover: none) {
+  .live-events-rail-preview {
+    display: none;
+  }
 }
 
 .live-events-rail-meta {
