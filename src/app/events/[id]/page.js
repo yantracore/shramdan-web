@@ -13,12 +13,14 @@ import { Button, Empty, Skeleton, Tag } from "antd";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
+import { EventLiveStreamPlayer } from "@/components/EventLiveStreamPlayer";
 import IssueMapBlock from "@/components/IssueMapBlock";
 import { IssuePhotoGallery } from "@/components/IssuePhotoGallery";
 import { LeaderScheduleEditor } from "@/components/LeaderScheduleEditor";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
 import { getJson } from "@/lib/apiClient";
+import { getDemoEventById, injectMockLiveStream } from "@/lib/devMockData";
 import { getAuthSession, subscribeAuthSession } from "@/lib/authSession";
 import { copy } from "@/lib/siteContent";
 import {
@@ -92,6 +94,17 @@ export default function EventDetailPage() {
     setError("");
     setNotFound(false);
 
+    // Dev mock: demo-* IDs short-circuit the backend so the live-stream
+    // UX can be demoed without backend support. See src/lib/devMockData.js.
+    if (typeof eventId === "string" && eventId.startsWith("demo-")) {
+      const demoEvent = getDemoEventById(eventId);
+      if (demoEvent) {
+        setEventData(demoEvent);
+        setLoading(false);
+        return;
+      }
+    }
+
     try {
       const response = await getJson(`/events/${eventId}`);
       const data = getResponseData(response, null);
@@ -100,7 +113,9 @@ export default function EventDetailPage() {
         setEventData(null);
         return;
       }
-      setEventData(data);
+      // Dev mock: pin a liveStream onto fetched real events so the
+      // player block visually appears. No-op in production builds.
+      setEventData(injectMockLiveStream(eventId, data));
     } catch (fetchError) {
       if (fetchError?.status === 404) {
         setNotFound(true);
@@ -181,6 +196,18 @@ export default function EventDetailPage() {
               <Button type="primary">{content.detail.backToIssues}</Button>
             </Link>
           </Empty>
+        ) : null}
+
+        {!loading && !error && !notFound && eventData?.liveStream?.isActive ? (
+          <EventLiveStreamPlayer
+            liveStream={eventData.liveStream}
+            eventTitle={linkedIssue?.title || eventData.meetupAddress || "श्रमदान"}
+            copy={{
+              liveAria: language === "np" ? "लाइभ प्रसारण" : "Live broadcast",
+              durationSuffix: language === "np" ? "देखि लाइभ" : "live",
+              viewersSuffix: language === "np" ? " जना हेर्दैछन्" : " watching"
+            }}
+          />
         ) : null}
 
         {!loading && !error && !notFound && eventData ? (

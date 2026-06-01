@@ -48,6 +48,7 @@ import IssueMapBlock from "@/components/IssueMapBlock";
 import { LiveEventsRail } from "@/components/LiveEventsRail";
 import { MotionSection } from "@/components/MotionSection";
 import { SiteShell } from "@/components/SiteShell";
+import { getDemoLiveEvents } from "@/lib/devMockData";
 import { usePreferences } from "@/app/providers";
 import { getJson } from "@/lib/apiClient";
 import { ISSUE_STATUS_COLORS, getListItems } from "@/lib/adminUtils";
@@ -403,7 +404,7 @@ export default function HomeClient({ summary }) {
         </aside>
       </MotionSection>
 
-      <LiveEventsRail liveEvents={[]} copy={t.liveEventsRail} />
+      <LiveEventsRail liveEvents={getDemoLiveEvents()} copy={t.liveEventsRail} />
 
       <MotionSection as="section" className="event-types-section" aria-labelledby="event-types-title">
         <div className="event-types-heading">
