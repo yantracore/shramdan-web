@@ -146,6 +146,22 @@
 .motion-aware > *:nth-child(6)  { --stagger-index: 5; }
 .motion-aware > *:nth-child(n+7) { --stagger-index: 6; }
 
+/* Direct-child grid containers themselves don't fade as a block — only
+ * their inner cards stagger individually. This avoids the opacity-
+ * multiplication problem where the wrapper's fade hides the
+ * already-staggering cards inside.
+ */
+.motion-aware > .event-types-grid,
+.motion-aware > .cleanup-areas-grid,
+.motion-aware > .workflow-grid,
+.motion-aware > .building-now-grid,
+.motion-aware > .resources-grid,
+.motion-aware > .live-events-rail-list {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+
 /* Grid children — known grids inside motion-aware sections.
  * Their own children fade in one-by-one as well, with a slightly
  * faster sub-stagger so the cumulative time stays bounded. */
