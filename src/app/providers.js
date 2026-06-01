@@ -148,6 +148,10 @@ export function Providers({ children }) {
     document.documentElement.lang = language === "np" ? "ne" : "en";
   }, [language]);
 
+  useEffect(() => {
+    document.documentElement.dataset.liveIcon = liveIconSize;
+  }, [liveIconSize]);
+
   const value = useMemo(
     () => ({
       language,

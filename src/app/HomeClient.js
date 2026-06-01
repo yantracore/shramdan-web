@@ -45,6 +45,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import IssueMapBlock from "@/components/IssueMapBlock";
+import { LiveEventsRail } from "@/components/LiveEventsRail";
 import { MotionSection } from "@/components/MotionSection";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
@@ -397,6 +398,8 @@ export default function HomeClient({ summary }) {
           </div>
         </aside>
       </MotionSection>
+
+      <LiveEventsRail liveEvents={[]} copy={t.liveEventsRail} />
 
       <MotionSection as="section" className="event-types-section" aria-labelledby="event-types-title">
         <div className="event-types-heading">

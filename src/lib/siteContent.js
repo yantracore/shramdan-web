@@ -1219,6 +1219,18 @@ export const copy = {
         markerCount: "नक्सामा {n} समस्या"
       }
     },
+    liveEventsRail: {
+      eyebrow: "अहिले लाइभ",
+      title: "अहिले चलिरहेका events",
+      subtitle:
+        "श्रमदान सदस्यहरूले YouTube Live मार्फत प्रसारण गरिरहेका सम्म कार्यक्रमहरू। थम्बनेल मा click गर्नुहोस्।",
+      emptyMessage:
+        "अहिले कुनै live event छैन। जब कुनै शुरू हुन्छ, श्रमेश यहीँ देखाउनेछ।",
+      viewersPrefix: "",
+      viewersSuffix: " जना हेर्दैछन्",
+      justStarted: "भर्खर सुरु",
+      durationLive: "देखि लाइभ"
+    },
     liveIssues: {
       eyebrow: "सक्रिय समस्याहरू",
       title: "अहिले समुदायले उठाएका समस्याहरू",
@@ -2786,6 +2798,18 @@ export const copy = {
         toggleLabel: "Switch between list and map",
         markerCount: "{n} on map"
       }
+    },
+    liveEventsRail: {
+      eyebrow: "On now",
+      title: "Currently live",
+      subtitle:
+        "Shramdan members livestreaming events via YouTube Live. Click a thumbnail to watch.",
+      emptyMessage:
+        "No event is live right now. श्रमेश will surface them here when they start.",
+      viewersPrefix: "",
+      viewersSuffix: " watching",
+      justStarted: "Just started",
+      durationLive: "live"
     },
     liveIssues: {
       eyebrow: "Active Issues",
