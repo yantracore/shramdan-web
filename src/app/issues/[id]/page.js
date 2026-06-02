@@ -15,7 +15,7 @@ import { IssuePhotoGallery } from "@/components/IssuePhotoGallery";
 import { IssueShareRow } from "@/components/IssueShareRow";
 import { IssueStatusTimeline } from "@/components/IssueStatusTimeline";
 import { IssueVoteButton } from "@/components/IssueVoteButton";
-import { IssueComments } from "@/components/IssueComments";
+import { CommentSection } from "@/components/comments";
 import { IssueReactions } from "@/components/IssueReactions";
 import { PublicIssueCard, formatSupporters } from "@/components/PublicIssueCard";
 import { VoteSparkline } from "@/components/VoteSparkline";
@@ -337,7 +337,11 @@ export default function IssueDetailPage() {
                 heading={language === "np" ? "तपाईंको प्रतिक्रिया" : "Your reaction"}
               />
 
-              <IssueComments issueId={issue.id} language={language} />
+              <CommentSection
+                targetType="issue"
+                targetId={issue.id}
+                language={language}
+              />
             </div>
           </article>
         ) : null}

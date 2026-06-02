@@ -904,17 +904,117 @@ export function getDemoActivityTicker() {
   return DEMO_ACTIVITY_TICKER;
 }
 
-// --- Issue comments mock --------------------------------------------
-// Deterministic per-issue comment thread. We hash the issue id into a
-// stable seed so the same issue always shows the same comments — but
-// different issues show different sets and counts.
-const DEMO_COMMENT_POOL = [
-  { name: "कमला अधिकारी", role: "स्थानीय बासिन्दा", text: "यो ठाउँ अब फेरि सफा देख्ने आशा गरेँ। कुनै मद्दत चाहिए मलाई पनि भन्नुहोला।" },
-  { name: "हरि श्रेष्ठ", role: "स्वयंसेवक", text: "मेरो टोलले सुक्रबार बेलुका २ घण्टा निकाल्न सक्छ। औजार पनि छ।" },
-  { name: "रिता पाण्डे", role: "नगर वार्ड समर्थक", text: "वडा कार्यालयलाई औपचारिक खबर पठाएको छु — फोहोर ट्रकको व्यवस्था हुनेछ।" },
-  { name: "स्मिता शर्मा", role: "शिक्षक", text: "विद्यार्थीहरूलाई पनि ल्याउने तरिका सोचौँ — सिकाइको पाठ पनि हुन्छ।" },
-  { name: "प्रदीप तामाङ", role: "पुरानो सहभागी", text: "अघिको अभियानमा प्रयोग गरेको रजिस्टर र चेकलिस्ट छन्। चाहिए शेयर गरौँला।" },
-  { name: "रोहित कार्की", role: "नक्शा र समन्वय", text: "ड्रोन तस्बिर अघि र पछिको — मसँग छ। प्रमाण कागजमा राख्न सजिलो।" }
+// --- Threaded comments mock -----------------------------------------
+// Deterministic per-target comment thread, shared shape for issues and
+// events. Each pool entry is a node tree (author + text + optional
+// `replies` recursing up to 3 levels). getDemoComments() picks 2-4
+// threads per target keyed off the targetId hash and emits the flat
+// canonical shape consumed by [src/lib/comments.js](src/lib/comments.js):
+//   { id, targetType, targetId, parentId, depth, author:{id,name,role},
+//     text, mentions, reactions, createdAt }
+// Same hashed seed → same thread set forever; different ids → different
+// sets, so /issues/a and /issues/b never look identical.
+
+const DEMO_ISSUE_THREAD_POOL = [
+  {
+    author: { name: "कमला अधिकारी", role: "स्थानीय बासिन्दा" },
+    text: "यो ठाउँ अब फेरि सफा देख्ने आशा गरेँ। कुनै मद्दत चाहिए मलाई पनि भन्नुहोला।",
+    replies: [
+      {
+        author: { name: "हरि श्रेष्ठ", role: "स्वयंसेवक" },
+        text: "मेरो टोलले सुक्रबार बेलुका २ घण्टा निकाल्न सक्छ। औजार पनि छ।",
+        replies: [
+          {
+            author: { name: "कमला अधिकारी", role: "स्थानीय बासिन्दा" },
+            text: "धन्यवाद! साथीहरूलाई पनि सुनाउँछु। ४ बजे भेला हुने त?"
+          }
+        ]
+      },
+      {
+        author: { name: "रोहित कार्की", role: "नक्शा र समन्वय" },
+        text: "ड्रोन तस्बिर अघि र पछिको — मसँग छ। प्रमाण कागजमा राख्न सजिलो।"
+      }
+    ]
+  },
+  {
+    author: { name: "रिता पाण्डे", role: "नगर वार्ड समर्थक" },
+    text: "वडा कार्यालयलाई औपचारिक खबर पठाएको छु — फोहोर ट्रकको व्यवस्था हुनेछ।",
+    replies: [
+      {
+        author: { name: "स्मिता शर्मा", role: "शिक्षक" },
+        text: "विद्यार्थीहरूलाई पनि ल्याउने तरिका सोचौँ — सिकाइको पाठ पनि हुन्छ।"
+      }
+    ]
+  },
+  {
+    author: { name: "प्रदीप तामाङ", role: "पुरानो सहभागी" },
+    text: "अघिको अभियानमा प्रयोग गरेको रजिस्टर र चेकलिस्ट छन्। चाहिए शेयर गरौँला।"
+  },
+  {
+    author: { name: "बिनिता थापा", role: "स्थानीय व्यवसायी" },
+    text: "मेरो पसलबाट चिया र पानीको बन्दोबस्त मिल्छ। दिन निश्चित भएपछि भन्नुहोला।",
+    replies: [
+      {
+        author: { name: "रिता पाण्डे", role: "नगर वार्ड समर्थक" },
+        text: "धन्यवाद! आइतबार बिहान ७ बजेबाट सुरु गर्ने सोचमा छौँ।"
+      }
+    ]
+  },
+  {
+    author: { name: "गणेश राई", role: "फोटोग्राफर" },
+    text: "अघि-पछिको तस्बिरका लागि म नि:शुल्क सेवा दिन्छु। तपाईंहरूको कामलाई दस्तावेजीकरण गर्न सकिन्छ।"
+  }
+];
+
+const DEMO_EVENT_THREAD_POOL = [
+  {
+    author: { name: "हरि श्रेष्ठ", role: "स्वयंसेवक" },
+    text: "मलाई पुर्ण समय आउन मिल्ने भयो। औजार आफूसँग ल्याउनुपर्ने हो?",
+    replies: [
+      {
+        author: { name: "कमला अधिकारी", role: "संयोजक" },
+        text: "पन्जा र मास्क लिएर आउनुहोस् — बाँकी टोलीले व्यवस्था गर्छ।",
+        replies: [
+          {
+            author: { name: "हरि श्रेष्ठ", role: "स्वयंसेवक" },
+            text: "ठिक छ, धन्यवाद!"
+          }
+        ]
+      },
+      {
+        author: { name: "सुनिल मगर", role: "स्वयंसेवक" },
+        text: "मलाई पनि अभियानमा सहभागी हुनु छ। नयाँ हुँ — पहिलो पटक।"
+      }
+    ]
+  },
+  {
+    author: { name: "रोहित कार्की", role: "नक्शा र समन्वय" },
+    text: "भेला हुने ठाउँ देखि कार्य स्थलसम्म कति टाढा हो? पैदल मिल्छ?",
+    replies: [
+      {
+        author: { name: "कमला अधिकारी", role: "संयोजक" },
+        text: "१० मिनेट पैदल — सबै सँगै हिँड्छौँ। हराउने डर छैन।"
+      }
+    ]
+  },
+  {
+    author: { name: "स्मिता शर्मा", role: "शिक्षक" },
+    text: "विद्यालयका ८ जना विद्यार्थी पनि ल्याउँदै छु। सहभागिता प्रमाणपत्र पाइन्छ कि?"
+  },
+  {
+    author: { name: "गणेश राई", role: "फोटोग्राफर" },
+    text: "लाइभ-स्ट्रीम र फोटो डकुमेन्टेशन मसँग छ। बिहान ६:४५ मा पुग्छु — सेटअपका लागि।",
+    replies: [
+      {
+        author: { name: "अमित गुरुङ", role: "लाइभस्ट्रिमर" },
+        text: "म पनि त्यही समय। सँगै सेटअप गरौँ।"
+      }
+    ]
+  },
+  {
+    author: { name: "मञ्जु तामाङ", role: "स्वयंसेवक" },
+    text: "मेरो साथमा सानो ट्रक छ — सामान ओसार्न मद्दत गर्न सक्छु।"
+  }
 ];
 
 function hashStringToInt(s) {
@@ -1044,19 +1144,79 @@ export function getDemoVoteHistory(issueId) {
   return points;
 }
 
-export function getDemoIssueComments(issueId) {
+// Walk a seed thread node into the flat canonical comment shape.
+// `idPath` segments are joined with "-" → comment ids are stable per
+// (targetType, targetId, threadIdx, nesting path), so the same target
+// always renders the same tree, including reply ordering.
+function flattenSeedThread({ node, parentId, depth, targetType, targetId, idPath, headMinAgo }) {
+  if (!node || typeof node !== "object") return [];
+  const id = `${targetType}:${targetId}:s-${idPath}`;
+  const out = [
+    {
+      id,
+      targetType,
+      targetId,
+      parentId,
+      depth,
+      author: {
+        // Seed comments belong to no real user → id namespaced so the
+        // canEdit/canDelete checks never accidentally treat them as
+        // owned by the current viewer.
+        id: `seed:${node.author?.name || "anon"}`,
+        name: node.author?.name || "—",
+        role: node.author?.role || null
+      },
+      text: node.text || "",
+      mentions: [],
+      reactions: {},
+      createdAt: minutesAgoIso(Math.max(1, headMinAgo))
+    }
+  ];
+  const replies = Array.isArray(node.replies) ? node.replies : [];
+  // Each reply lags its parent by 4-12 minutes so the transcript reads
+  // naturally and "Newest" sort (Phase 3) does the right thing.
+  replies.forEach((reply, i) => {
+    out.push(
+      ...flattenSeedThread({
+        node: reply,
+        parentId: id,
+        depth: Math.min(depth + 1, 2),
+        targetType,
+        targetId,
+        idPath: `${idPath}-${i}`,
+        headMinAgo: headMinAgo - (4 + i * 8)
+      })
+    );
+  });
+  return out;
+}
+
+// Returns a flat list of canonical comments for the given target. The
+// list is intentionally NOT sorted — `buildTree()` in
+// [src/lib/comments.js](src/lib/comments.js) handles ordering per depth.
+export function getDemoComments({ targetType, targetId } = {}) {
   if (!isDev()) return [];
-  const h = hashStringToInt(issueId);
-  const count = 2 + (h % 4); // 2-5 comments per issue
-  const start = h % DEMO_COMMENT_POOL.length;
-  const comments = [];
-  for (let i = 0; i < count; i += 1) {
-    const base = DEMO_COMMENT_POOL[(start + i) % DEMO_COMMENT_POOL.length];
-    comments.push({
-      id: `${issueId}-c${i}`,
-      ...base,
-      createdAt: minutesAgoIso(15 + i * 90 + (h % 30))
-    });
+  if (!targetType || !targetId) return [];
+  const pool = targetType === "event" ? DEMO_EVENT_THREAD_POOL : DEMO_ISSUE_THREAD_POOL;
+  if (!pool.length) return [];
+  const h = hashStringToInt(`${targetType}:${targetId}`);
+  const threadCount = 2 + (h % 3); // 2-4 threads per target
+  const start = h % pool.length;
+  const flat = [];
+  for (let i = 0; i < threadCount; i += 1) {
+    const node = pool[(start + i) % pool.length];
+    const headMinAgo = 15 + i * 95 + (h % 30);
+    flat.push(
+      ...flattenSeedThread({
+        node,
+        parentId: null,
+        depth: 0,
+        targetType,
+        targetId,
+        idPath: `${i}`,
+        headMinAgo
+      })
+    );
   }
-  return comments;
+  return flat;
 }

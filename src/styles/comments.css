@@ -1,0 +1,369 @@
+/* --- Comment system (issues + events) ----------------------------------
+ *
+ * Shared comment surface used by /issues/[id] and /events/[id]. Component
+ * tree:
+ *   .comment-section
+ *     .comment-section-header   ← icon + heading + count chip
+ *     .comment-section-intro
+ *     .comment-composer-top     ← top-level composer (or login wall)
+ *     .comment-list             ← <ul> per depth, recursive
+ *       .comment-node            ← <li> grid: avatar | body
+ *         .comment-body
+ *           .comment-attrib
+ *           .comment-text
+ *           .comment-actions    ← Reply / Edit / Delete
+ *           .comment-reply-composer
+ *           .comment-children   ← nested .comment-list one depth deeper
+ *
+ * Depth modifiers (`.comment-depth-0/1/2`) drive indentation + the left
+ * connector line on depth >0.
+ * ------------------------------------------------------------------- */
+
+.comment-section {
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+
+.comment-section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.comment-section-header h2 {
+  margin: 0;
+  font-size: clamp(20px, 2.2vw, 24px);
+}
+
+.comment-section-count {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.comment-section-intro {
+  margin: 0 0 14px;
+  color: var(--muted);
+  font-size: 13.5px;
+}
+
+/* --- Lists / nesting --------------------------------------------------- */
+
+.comment-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Top-level list gets a bit more breathing room from the composer above. */
+.comment-list-depth-0 {
+  margin-top: 14px;
+}
+
+/* Nested children: tighter gap so the thread reads as one block. */
+.comment-children .comment-list {
+  margin-top: 10px;
+  gap: 10px;
+}
+
+/* --- Single comment node ---------------------------------------------- */
+
+.comment-node {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: 12px;
+  padding: 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  position: relative;
+}
+
+.comment-node.is-deleted {
+  opacity: 0.78;
+}
+
+/* Visual connector for depth >0 — subtle vertical hint of nesting. */
+.comment-depth-1,
+.comment-depth-2 {
+  border-left: 3px solid color-mix(in srgb, var(--primary) 22%, transparent);
+}
+
+/* Stronger color for the deepest visible level so it stands out as the
+ * cap and the reader knows further replies become siblings. */
+.comment-depth-2 {
+  border-left-color: color-mix(in srgb, var(--accent) 36%, transparent);
+}
+
+.comment-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), color-mix(in srgb, var(--primary) 60%, var(--accent)));
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.comment-avatar-skeleton {
+  background: var(--line);
+  animation: comment-skel 1.2s ease-in-out infinite;
+}
+
+@keyframes comment-skel {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 0.95; }
+}
+
+.comment-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.comment-attrib {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.comment-author-name {
+  font-weight: 700;
+}
+
+.comment-author-role {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.comment-time {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.comment-edited-pill {
+  font-size: 11px;
+  color: var(--muted);
+  background: color-mix(in srgb, var(--muted) 12%, var(--surface));
+  border: 1px solid var(--line);
+  padding: 1px 7px;
+  border-radius: 999px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.comment-text {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.comment-text-deleted {
+  font-style: italic;
+  color: var(--muted);
+}
+
+/* --- Action row -------------------------------------------------------- */
+
+.comment-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin-top: 2px;
+}
+
+.comment-actions .ant-btn {
+  font-size: 12.5px;
+  color: var(--muted);
+  padding-inline: 8px;
+}
+
+.comment-actions .ant-btn:hover {
+  color: var(--primary-dark);
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
+}
+
+.comment-actions .ant-btn .anticon {
+  font-size: 13px;
+}
+
+/* --- Reply / edit composer inside a node ------------------------------- */
+
+.comment-reply-composer {
+  margin-top: 8px;
+}
+
+.comment-children {
+  margin-top: 12px;
+}
+
+/* --- Composer (top / reply / edit) ------------------------------------ */
+
+.comment-composer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+}
+
+.comment-composer-reply,
+.comment-composer-edit {
+  padding: 10px;
+}
+
+.comment-composer-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.comment-composer-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.comment-composer-spacer {
+  display: inline-block;
+  min-height: 1px;
+}
+
+.comment-composer-error {
+  font-size: 12px;
+  color: #b42318;
+}
+
+/* --- Login wall (replaces top composer when logged out) ---------------- */
+
+.comment-login-wall {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 16px;
+  background: color-mix(in srgb, var(--primary) 5%, var(--surface));
+  border: 1px dashed color-mix(in srgb, var(--primary) 35%, var(--line));
+  border-radius: var(--radius-md);
+}
+
+.comment-login-wall-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.comment-login-wall-body strong {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.comment-login-wall-body p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* --- Empty state ------------------------------------------------------- */
+
+.comment-empty {
+  margin: 18px 0 6px;
+  padding: 18px;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+
+.comment-empty strong {
+  display: block;
+  font-size: 14.5px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.comment-empty p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* --- Skeleton ---------------------------------------------------------- */
+
+.comment-list-skeleton {
+  margin-top: 14px;
+}
+
+/* --- Dark theme tweaks -------------------------------------------------
+ * The CSS vars already shift on `[data-theme="dark"]` (defined in
+ * design-tokens.css). What we adjust here is the dashed/translucent
+ * surfaces that read too light on dark.
+ * --------------------------------------------------------------------- */
+[data-theme="dark"] .comment-login-wall {
+  background: color-mix(in srgb, var(--primary) 14%, var(--surface));
+}
+
+[data-theme="dark"] .comment-edited-pill {
+  background: color-mix(in srgb, var(--muted) 18%, var(--surface));
+}
+
+/* --- Responsive: tighten indentation on small screens ----------------- */
+@media (max-width: 640px) {
+  .comment-node {
+    grid-template-columns: 32px minmax(0, 1fr);
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .comment-avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 13px;
+  }
+
+  .comment-children .comment-list {
+    margin-top: 8px;
+    gap: 8px;
+  }
+
+  .comment-login-wall {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: left;
+  }
+}
+
+/* --- Reduced-motion: kill skeleton pulse -------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .comment-avatar-skeleton {
+    animation: none;
+  }
+}
