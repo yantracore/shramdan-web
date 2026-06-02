@@ -49,7 +49,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .live-events-rail-eyebrow .live-dot,
-  .live-events-rail-badge .live-dot {
+  .live-events-rail-badge,
+  .event-live-badge {
     animation: none;
   }
 }
@@ -129,23 +130,24 @@
 
 .live-events-rail-badge {
   position: absolute;
-  top: 10px;
-  left: 10px;
+  top: 8px;
+  left: 8px;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  background: rgba(210, 54, 11, 0.95);
+  gap: 4px;
+  background: rgba(210, 54, 11, 0.92);
   color: #fff;
-  padding: 4px 10px;
+  padding: 2px 7px;
   border-radius: var(--radius-pill);
-  font-size: 11px;
+  font-size: 9px;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
+  animation: live-badge-blink 2.4s ease-in-out infinite;
 }
 
 .live-events-rail-badge .live-dot {
-  width: 6px;
-  height: 6px;
+  width: 4px;
+  height: 4px;
   background: #fff;
   border-radius: 50%;
 }
@@ -222,23 +224,27 @@
 .event-live-badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  background: rgba(210, 54, 11, 0.95);
+  gap: 4px;
+  background: rgba(210, 54, 11, 0.92);
   color: #fff;
-  padding: 4px 12px;
+  padding: 2px 8px;
   border-radius: var(--radius-pill);
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
+  animation: live-badge-blink 2.4s ease-in-out infinite;
 }
 
 .event-live-badge .live-dot {
-  width: 7px;
-  height: 7px;
+  width: 4px;
+  height: 4px;
   background: #fff;
   border-radius: 50%;
-  box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.6);
-  animation: live-dot-pulse 1.6s ease-out infinite;
+}
+
+@keyframes live-badge-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
 }
 
 .event-live-duration,
@@ -309,16 +315,16 @@
 
 /* LIVE icon size preference (Phase 9 → Phase 13/14 wiring) */
 :root[data-live-icon="sm"] .live-events-rail-badge {
-  padding: 3px 8px;
-  font-size: 10px;
+  padding: 1px 6px;
+  font-size: 8px;
 }
 
 :root[data-live-icon="lg"] .live-events-rail-badge {
-  padding: 6px 14px;
-  font-size: 13px;
+  padding: 4px 10px;
+  font-size: 11px;
 }
 
 :root[data-live-icon="lg"] .live-events-rail-badge .live-dot {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
