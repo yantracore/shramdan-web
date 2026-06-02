@@ -102,8 +102,16 @@ function IssueMarker({ issue, interactive, showPopup, content, language }) {
           toLocalDigits(votes, language)
         );
 
+  const markerLabel = issue.title || issue.addressText || statusLabel || "Map marker";
+
   return (
-    <Marker position={[lat, lng]} icon={getPinIcon(issue.status)}>
+    <Marker
+      position={[lat, lng]}
+      icon={getPinIcon(issue.status)}
+      title={markerLabel}
+      alt={markerLabel}
+      keyboard
+    >
       {interactive && showPopup ? (
         <Popup>
           <div className="issue-map-popup">

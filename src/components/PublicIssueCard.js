@@ -26,17 +26,19 @@ export function PublicIssueCard({ issue, content, language }) {
   const statusLabel = content.statusLabels[issue.status] || issue.status;
   const categoryLabel = content.categoryLabels[issue.category] || issue.category;
   const coverImageUrl = getIssueCoverImageUrl(issue);
+  const accessibleLabel =
+    issue.title || issue.addressText || categoryLabel || statusLabel || content.card.viewDetail;
 
   return (
     <article className="content-card public-issue-card">
       {coverImageUrl ? (
         <Link
-          aria-label={issue.title}
+          aria-label={accessibleLabel}
           className="public-issue-card-cover"
           href={`/issues/${issue.id}`}
         >
           <Image
-            alt={issue.title}
+            alt={accessibleLabel}
             height={240}
             sizes="(max-width: 720px) 100vw, 360px"
             src={coverImageUrl}
@@ -46,7 +48,7 @@ export function PublicIssueCard({ issue, content, language }) {
         </Link>
       ) : (
         <Link
-          aria-label={issue.title}
+          aria-label={accessibleLabel}
           className="public-issue-card-cover public-issue-card-cover-placeholder"
           href={`/issues/${issue.id}`}
         >
@@ -59,7 +61,7 @@ export function PublicIssueCard({ issue, content, language }) {
       </div>
       <h3>
         <Link className="public-issue-card-title" href={`/issues/${issue.id}`}>
-          {issue.title}
+          {issue.title || accessibleLabel}
         </Link>
       </h3>
       <div className="meta-list">

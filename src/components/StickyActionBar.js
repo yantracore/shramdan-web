@@ -46,11 +46,16 @@ export function StickyActionBar({
       className="sticky-action-bar"
       data-visible={visible ? "true" : "false"}
       aria-hidden={!visible}
+      inert={!visible || undefined}
     >
       {children ? (
         children
       ) : (
-        <Link href={href || "#"} className="sticky-action-bar-cta">
+        <Link
+          href={href || "#"}
+          className="sticky-action-bar-cta"
+          tabIndex={visible ? 0 : -1}
+        >
           {icon ? <span className="sticky-action-bar-icon" aria-hidden="true">{icon}</span> : null}
           <span>{label}</span>
         </Link>
