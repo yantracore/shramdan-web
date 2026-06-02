@@ -16,7 +16,6 @@
 .events-home-rail {
   width: 100%;
   padding: 48px 0;
-  overflow: hidden; /* contain the full-bleed track + edge fades */
 }
 
 .events-home-rail-shell {
@@ -82,44 +81,31 @@
   animation: live-dot-pulse 1.6s ease-out infinite;
 }
 
-/* Track wrap = full-viewport-width band that holds the scrolling track
- * + the overlay arrows. Edge-fade mask softens cards trailing under the
- * arrows. */
+/* Track wrap = constrained to the same 1180px shell as the header so
+ * the rail sits inside the page gutter, not against the viewport edge.
+ * Position: relative anchors the overlay arrows to its corners. */
 .events-home-rail-track-wrap {
   position: relative;
-  width: 100%;
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
   /* Vertical breathing room so the hover-expand scale doesn't clip */
   padding-block: 12px;
-  --rail-pad-inline: max(16px, calc(50vw - 590px + 16px));
-  -webkit-mask-image: linear-gradient(
-    to right,
-    transparent 0,
-    #000 36px,
-    #000 calc(100% - 36px),
-    transparent 100%
-  );
-  mask-image: linear-gradient(
-    to right,
-    transparent 0,
-    #000 36px,
-    #000 calc(100% - 36px),
-    transparent 100%
-  );
 }
 
-/* The actual scrolling list. Padding-inline aligns the first card with
- * the heading start at all widths while bleeding past the viewport edges. */
+/* The actual scrolling list. Small inline padding gives the hover-scale
+ * outline room to breathe; cards stay inside the 1180px container. */
 .events-home-rail-track {
   list-style: none;
   margin: 0;
-  padding: 18px var(--rail-pad-inline) 22px;
+  padding: 18px 4px 22px;
   display: flex;
   gap: 16px;
   overflow-x: auto;
   overflow-y: visible;
-  scroll-snap-type: x mandatory;
-  scroll-padding-inline: var(--rail-pad-inline);
-  scroll-behavior: smooth;
+  /* proximity (not mandatory) — mandatory hijacks rAF tweens mid-flight
+   * and reads as instant jumps in Chromium. */
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: 4px;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }

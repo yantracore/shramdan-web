@@ -63,6 +63,46 @@ function formatScheduledPill(iso, language) {
 
 const CARD_PEEK_PX = 40;
 const HOVER_INTENT_MS = 450;
+const SCROLL_DURATION_MS = 620;
+
+// rAF-driven smooth horizontal scroll with ease-out-expo curve. Native
+// scrollTo({ behavior: 'smooth' }) interacts badly with
+// scroll-snap-type: mandatory in Chromium — it snaps mid-animation and
+// reads as an instant jump. This helper drives scrollLeft frame-by-frame
+// and ignores snap during the animation.
+function easeOutExpo(t) {
+  return t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
+}
+
+function animateScrollLeft(el, target, duration, onDone) {
+  const start = el.scrollLeft;
+  const max = el.scrollWidth - el.clientWidth;
+  const clampedTarget = Math.max(0, Math.min(max, target));
+  const distance = clampedTarget - start;
+  if (Math.abs(distance) < 1) {
+    onDone?.();
+    return () => {};
+  }
+  const startTs = performance.now();
+  let rafId = 0;
+  let cancelled = false;
+  const step = (now) => {
+    if (cancelled) return;
+    const elapsed = now - startTs;
+    const t = Math.min(1, elapsed / duration);
+    el.scrollLeft = start + distance * easeOutExpo(t);
+    if (t < 1) {
+      rafId = requestAnimationFrame(step);
+    } else {
+      onDone?.();
+    }
+  };
+  rafId = requestAnimationFrame(step);
+  return () => {
+    cancelled = true;
+    if (rafId) cancelAnimationFrame(rafId);
+  };
+}
 
 export function EventsHomeRail({
   liveEvents = [],
@@ -126,10 +166,36 @@ export function EventsHomeRail({
 function HomeRailTrack({ items, copy, language, animationsOn }) {
   const trackRef = useRef(null);
   const hoverTimer = useRef(null);
+  const cancelScrollRef = useRef(null);
   const [atStart, setAtStart] = useState(true);
   const [atEnd, setAtEnd] = useState(false);
   const [expandedId, setExpandedId] = useState(null);
   const [pageRange, setPageRange] = useState({ start: 1, end: Math.min(4, items.length) });
+
+  const scrollTrackTo = useCallback(
+    (target) => {
+      const el = trackRef.current;
+      if (!el) return;
+      cancelScrollRef.current?.();
+      if (!animationsOn) {
+        el.scrollLeft = target;
+        return;
+      }
+      // Suspend snap during the animation so mandatory-snap doesn't
+      // hijack the rAF tween. Restore after.
+      const prevSnap = el.style.scrollSnapType;
+      el.style.scrollSnapType = "none";
+      cancelScrollRef.current = animateScrollLeft(
+        el,
+        target,
+        SCROLL_DURATION_MS,
+        () => {
+          el.style.scrollSnapType = prevSnap;
+        }
+      );
+    },
+    [animationsOn]
+  );
 
   const updateEdges = useCallback(() => {
     const el = trackRef.current;
@@ -187,12 +253,9 @@ function HomeRailTrack({ items, copy, language, animationsOn }) {
       const el = trackRef.current;
       if (!el) return;
       const step = Math.max(el.clientWidth - CARD_PEEK_PX, 200);
-      el.scrollTo({
-        left: el.scrollLeft + direction * step,
-        behavior: animationsOn ? "smooth" : "instant"
-      });
+      scrollTrackTo(el.scrollLeft + direction * step);
     },
-    [animationsOn]
+    [scrollTrackTo]
   );
 
   const handleKeyDown = useCallback(
@@ -206,11 +269,11 @@ function HomeRailTrack({ items, copy, language, animationsOn }) {
         const target = cards[idx];
         if (!target) return;
         target.focus({ preventScroll: true });
-        target.closest("[data-rail-card]")?.scrollIntoView({
-          behavior: animationsOn ? "smooth" : "instant",
-          inline: "start",
-          block: "nearest"
-        });
+        const cardEl = target.closest("[data-rail-card]");
+        if (cardEl) {
+          const desiredLeft = cardEl.offsetLeft - el.offsetLeft;
+          scrollTrackTo(desiredLeft);
+        }
       };
 
       if (e.key === "ArrowRight") {
@@ -227,8 +290,10 @@ function HomeRailTrack({ items, copy, language, animationsOn }) {
         focusCard(cards.length - 1);
       }
     },
-    [animationsOn]
+    [scrollTrackTo]
   );
+
+  useEffect(() => () => cancelScrollRef.current?.(), []);
 
   const clearHoverTimer = () => {
     if (hoverTimer.current) {
