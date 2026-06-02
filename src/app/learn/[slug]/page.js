@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SiteShell } from "@/components/SiteShell";
 import { MarkdownReader } from "@/components/MarkdownReader";
+import { ScrollProgressBar } from "@/components/ScrollProgressBar";
 import { getPublicDoc, listPublicDocs } from "@/lib/docs";
 
 export async function generateStaticParams() {
@@ -46,6 +47,7 @@ export default async function LearnDocPage({ params }) {
 
   return (
     <SiteShell>
+      <ScrollProgressBar />
       <article className="page-section learn-section learn-reader">
         <nav className="learn-breadcrumb">
           <Link href="/learn">

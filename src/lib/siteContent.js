@@ -1573,9 +1573,7 @@ export const copy = {
       },
       social: [
         { id: "facebook", label: "फेसबुकमा श्रमदान", href: "https://www.facebook.com/profile.php?id=61589961623195" },
-        { id: "twitter", label: "ट्विटर/एक्समा श्रमदान", href: "#" },
-        { id: "tiktok", label: "टिकटकमा श्रमदान", href: "#" },
-        { id: "youtube", label: "युट्युबमा श्रमदान", href: "#" }
+        { id: "youtube", label: "युट्युबमा श्रमदान", href: "https://www.youtube.com/@yantracore" }
       ]
     }
   },
@@ -3161,9 +3159,7 @@ export const copy = {
       },
       social: [
         { id: "facebook", label: "Shramdan on Facebook", href: "https://www.facebook.com/profile.php?id=61589961623195" },
-        { id: "twitter", label: "Shramdan on Twitter/X", href: "#" },
-        { id: "tiktok", label: "Shramdan on TikTok", href: "#" },
-        { id: "youtube", label: "Shramdan on YouTube", href: "#" }
+        { id: "youtube", label: "Shramdan on YouTube", href: "https://www.youtube.com/@yantracore" }
       ]
     }
   }
