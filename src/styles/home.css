@@ -1442,6 +1442,93 @@
   outline-offset: 2px;
 }
 
+/* --- 404 / not-found page --------------------------------------------- */
+.not-found-section {
+  width: min(680px, calc(100% - 32px));
+  margin: 80px auto;
+  padding: 56px 32px;
+  text-align: center;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.not-found-eyebrow {
+  font-size: 56px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: var(--primary);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.not-found-title {
+  margin: 0;
+  font-size: clamp(24px, 3vw, 32px);
+  line-height: 1.25;
+  max-width: 22ch;
+}
+
+.not-found-body {
+  margin: 0;
+  color: var(--muted);
+  max-width: 48ch;
+  line-height: 1.55;
+}
+
+.not-found-actions {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 320px;
+}
+
+.not-found-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--bg);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text);
+  transition: background 160ms ease, transform 120ms ease;
+}
+
+.not-found-action:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+:root[data-theme="dark"] .not-found-action:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.not-found-action-primary {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+.not-found-action-primary:hover {
+  background: var(--primary);
+  filter: brightness(1.08);
+}
+
+.not-found-action:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
 .section-heading {
   position: sticky;
   top: 0;
