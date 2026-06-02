@@ -2519,6 +2519,19 @@
   color: var(--muted);
 }
 
+.me-preview-stat-delta {
+  margin-top: 4px;
+  display: inline-block;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #166534;
+  background: color-mix(in srgb, #16a34a 12%, var(--surface));
+  border: 1px solid color-mix(in srgb, #16a34a 30%, transparent);
+  padding: 1px 8px;
+  border-radius: 999px;
+  letter-spacing: 0.02em;
+}
+
 .me-preview-badges-grid {
   list-style: none;
   margin: 0;

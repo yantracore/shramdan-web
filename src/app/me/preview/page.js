@@ -8,6 +8,7 @@
 import {
   CalendarOutlined,
   CheckCircleOutlined,
+  ClockCircleOutlined,
   CopyOutlined,
   FireFilled,
   HeartFilled,
@@ -101,6 +102,8 @@ const COPY = {
     stat1Label: "अभियानमा सहभागी",
     stat2Label: "समर्थन गरिएको समस्या",
     stat3Label: "अभियान संयोजन",
+    stat4Label: "स्वयंसेवा घण्टा",
+    stat4Delta: "+{n} यो महिना",
     badgesTitle: "उपलब्धि",
     badgesLockedHint: "अब आउने",
     heatmapTitle: "गतिविधि नक्सा",
@@ -141,6 +144,8 @@ const COPY = {
     stat1Label: "Events joined",
     stat2Label: "Issues supported",
     stat3Label: "Events coordinated",
+    stat4Label: "Volunteer hours",
+    stat4Delta: "+{n} this month",
     badgesTitle: "Achievements",
     badgesLockedHint: "Coming up",
     heatmapTitle: "Activity map",
@@ -180,7 +185,13 @@ export default function MeProfilePreview() {
   const stats = [
     { value: 5, label: t.stat1Label, icon: TeamOutlined },
     { value: 12, label: t.stat2Label, icon: LikeOutlined },
-    { value: 1, label: t.stat3Label, icon: CheckCircleOutlined }
+    { value: 1, label: t.stat3Label, icon: CheckCircleOutlined },
+    {
+      value: "14.5",
+      label: t.stat4Label,
+      icon: ClockCircleOutlined,
+      delta: t.stat4Delta.replace("{n}", localizeDigits("2.5", language))
+    }
   ];
 
   const handleCopyInvite = async () => {
@@ -267,7 +278,7 @@ export default function MeProfilePreview() {
             {t.statsTitle}
           </h2>
           <div className="me-preview-stats-grid">
-            {stats.map(({ value, label, icon: Icon }, i) => (
+            {stats.map(({ value, label, icon: Icon, delta }, i) => (
               <article key={i} className="me-preview-stat-card">
                 <span className="me-preview-stat-icon" aria-hidden="true">
                   <Icon />
@@ -276,6 +287,9 @@ export default function MeProfilePreview() {
                   {localizeDigits(value, language)}
                 </strong>
                 <span className="me-preview-stat-label">{label}</span>
+                {delta ? (
+                  <span className="me-preview-stat-delta">{delta}</span>
+                ) : null}
               </article>
             ))}
           </div>
