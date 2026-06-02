@@ -1,6 +1,12 @@
 "use client";
 
-import { LockOutlined, MailOutlined } from "@ant-design/icons";
+import {
+  CheckCircleOutlined,
+  FlagOutlined,
+  LockOutlined,
+  MailOutlined,
+  TeamOutlined
+} from "@ant-design/icons";
 import { Button, Input } from "antd";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -28,7 +34,14 @@ const loginCopy = {
     emailInvalid: "कृपया सही इमेल ठेगाना लेख्नुहोस्।",
     success: "लगइन सफल भयो।",
     joinPrompt: "श्रमदानको सदस्य हुनुहुन्न?",
-    joinCta: "सदस्य बन्नुहोस्"
+    joinCta: "सदस्य बन्नुहोस्",
+    forgot: "पासवर्ड बिर्सनुभयो?",
+    benefitsTitle: "सदस्यले के गर्न पाउँछन्",
+    benefits: [
+      { icon: FlagOutlined, text: "स्थानीय समस्या रिपोर्ट गर्न र समर्थन जुटाउन" },
+      { icon: TeamOutlined, text: "सरसफाइ अभियानमा भूमिका छानेर सहभागी हुन" },
+      { icon: CheckCircleOutlined, text: "समुदायको प्राथमिकतामा भोट दिन" }
+    ]
   },
   en: {
     eyebrow: "Member access",
@@ -44,7 +57,14 @@ const loginCopy = {
     emailInvalid: "Please enter a valid email address.",
     success: "Login successful.",
     joinPrompt: "Not a member?",
-    joinCta: "Become a Member"
+    joinCta: "Become a Member",
+    forgot: "Forgot password?",
+    benefitsTitle: "What members can do",
+    benefits: [
+      { icon: FlagOutlined, text: "Report local issues and rally support" },
+      { icon: TeamOutlined, text: "Pick a role and join nearby cleanup events" },
+      { icon: CheckCircleOutlined, text: "Vote on community priorities" }
+    ]
   }
 };
 
@@ -98,46 +118,67 @@ function LoginPageContent() {
   return (
     <SiteShell pageTitle={globalCopy.pageTitles.login}>
       <section className="page-section login-section">
-        <div className="content-card login-card">
-          <header className="form-card-heading">
-            <span className="eyebrow">{t.eyebrow}</span>
-            <h1>{t.title}</h1>
-            <p>{t.intro}</p>
-          </header>
-          <Form form={form} layout="vertical" onFinish={handleLogin} requiredMark={false}>
-            <Form.Item
-              label={t.email}
-              name="email"
-              rules={[
-                { required: true, message: t.required },
-                { type: "email", message: t.emailInvalid }
-              ]}
-            >
-              <Input autoComplete="email" placeholder={t.emailPlaceholder} prefix={<MailOutlined />} />
-            </Form.Item>
+        <div className="login-layout">
+          <aside className="login-benefits" aria-labelledby="login-benefits-title">
+            <h2 id="login-benefits-title" className="login-benefits-title">
+              {t.benefitsTitle}
+            </h2>
+            <ul className="login-benefits-list">
+              {t.benefits.map(({ icon: Icon, text }, i) => (
+                <li key={i}>
+                  <span className="login-benefit-icon" aria-hidden="true">
+                    <Icon />
+                  </span>
+                  <span>{text}</span>
+                </li>
+              ))}
+            </ul>
+          </aside>
+          <div className="content-card login-card">
+            <header className="form-card-heading">
+              <span className="eyebrow">{t.eyebrow}</span>
+              <h1>{t.title}</h1>
+              <p>{t.intro}</p>
+            </header>
+            <Form form={form} layout="vertical" onFinish={handleLogin} requiredMark={false}>
+              <Form.Item
+                label={t.email}
+                name="email"
+                rules={[
+                  { required: true, message: t.required },
+                  { type: "email", message: t.emailInvalid }
+                ]}
+              >
+                <Input autoComplete="email" placeholder={t.emailPlaceholder} prefix={<MailOutlined />} />
+              </Form.Item>
 
-            <Form.Item
-              label={t.password}
-              name="password"
-              rules={[{ required: true, message: t.required }]}
-            >
-              <Input.Password
-                autoComplete="current-password"
-                placeholder={t.passwordPlaceholder}
-                prefix={<LockOutlined />}
-              />
-            </Form.Item>
+              <Form.Item
+                label={t.password}
+                name="password"
+                rules={[{ required: true, message: t.required }]}
+              >
+                <Input.Password
+                  autoComplete="current-password"
+                  placeholder={t.passwordPlaceholder}
+                  prefix={<LockOutlined />}
+                />
+              </Form.Item>
 
-            <div className="login-actions">
-              <Button block htmlType="submit" loading={submitting} type="primary">
-                {t.submit}
-              </Button>
-            </div>
-          </Form>
-          <p className="login-join-prompt">
-            {t.joinPrompt}{" "}
-            <Link href="/join">{t.joinCta}</Link>
-          </p>
+              <div className="login-forgot">
+                <Link href="/feedback?type=ACCOUNT">{t.forgot}</Link>
+              </div>
+
+              <div className="login-actions">
+                <Button block htmlType="submit" loading={submitting} type="primary">
+                  {t.submit}
+                </Button>
+              </div>
+            </Form>
+            <p className="login-join-prompt">
+              {t.joinPrompt}{" "}
+              <Link href="/join">{t.joinCta}</Link>
+            </p>
+          </div>
         </div>
       </section>
     </SiteShell>
