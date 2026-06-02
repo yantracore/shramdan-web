@@ -17,6 +17,7 @@ import { IssueStatusTimeline } from "@/components/IssueStatusTimeline";
 import { IssueVoteButton } from "@/components/IssueVoteButton";
 import { PublicIssueCard, formatSupporters } from "@/components/PublicIssueCard";
 import { SiteShell } from "@/components/SiteShell";
+import { StickyActionBar } from "@/components/StickyActionBar";
 import { usePreferences } from "@/app/providers";
 import { getJson } from "@/lib/apiClient";
 import { getDemoSupporters } from "@/lib/devMockData";
@@ -226,7 +227,7 @@ export default function IssueDetailPage() {
                   </Tag>
                   <Tag>{content.categoryLabels[issue.category] || issue.category}</Tag>
                 </div>
-                <div className="public-issue-detail-support">
+                <div className="public-issue-detail-support" id="issue-vote">
                   <span className="public-issue-detail-supporters">
                     {formatSupporters(issue.voteCount, content, language)}
                   </span>
@@ -301,6 +302,13 @@ export default function IssueDetailPage() {
               />
             </div>
           </article>
+        ) : null}
+
+        {!loading && !error && !notFound && issue ? (
+          <StickyActionBar
+            label={language === "np" ? "हाल समर्थन गर्नुहोस्" : "Support this issue"}
+            href="#issue-vote"
+          />
         ) : null}
 
         {!loading && !error && !notFound && issue ? (

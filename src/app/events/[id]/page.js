@@ -16,6 +16,7 @@ import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import { EventLiveStreamPlayer } from "@/components/EventLiveStreamPlayer";
 import { EventRosterPanel } from "@/components/EventRosterPanel";
 import IssueMapBlock from "@/components/IssueMapBlock";
+import { StickyActionBar } from "@/components/StickyActionBar";
 import { IssuePhotoGallery } from "@/components/IssuePhotoGallery";
 import { LeaderScheduleEditor } from "@/components/LeaderScheduleEditor";
 import { SiteShell } from "@/components/SiteShell";
@@ -372,6 +373,13 @@ export default function EventDetailPage() {
               ) : null}
             </div>
           </article>
+        ) : null}
+
+        {!loading && !error && !notFound && eventData ? (
+          <StickyActionBar
+            label={language === "np" ? "जोडिनुहोस्" : "Join this event"}
+            href={`/join?event=${encodeURIComponent(eventData.id)}`}
+          />
         ) : null}
       </section>
     </SiteShell>
