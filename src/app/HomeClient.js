@@ -186,13 +186,30 @@ const UPCOMING_HOME_COPY = {
   }
 };
 
+const NP_MONTHS_SHORT = [
+  "जनवरी", "फेब्रुअरी", "मार्च", "अप्रिल", "मे", "जुन",
+  "जुलाई", "अगस्ट", "सेप्टेम्बर", "अक्टोबर", "नोभेम्बर", "डिसेम्बर"
+];
+const NP_WEEKDAYS_SHORT = ["आइत", "सोम", "मंगल", "बुध", "बिहि", "शुक्र", "शनि"];
+
+// Manual NP composition — Chromium's Intl "ne-NP" emits Latin digits and
+// inconsistent abbreviations, and the SSR/CSR pair produced hydration warnings.
 function formatScheduledPill(iso, language) {
   if (!iso) return "";
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return "";
-  const locale = language === "np" ? "ne-NP" : "en-US";
+
+  if (language === "np") {
+    const weekday = NP_WEEKDAYS_SHORT[date.getDay()];
+    const month = NP_MONTHS_SHORT[date.getMonth()];
+    const day = localizeDigits(date.getDate(), "np");
+    const hour = localizeDigits(date.getHours(), "np");
+    const minute = localizeDigits(String(date.getMinutes()).padStart(2, "0"), "np");
+    return `${weekday}, ${month} ${day}, ${hour}:${minute}`;
+  }
+
   try {
-    return new Intl.DateTimeFormat(locale, {
+    return new Intl.DateTimeFormat("en-US", {
       weekday: "short",
       month: "short",
       day: "numeric",

@@ -115,22 +115,40 @@ function timeFromNow(iso, language) {
   return `${localizeDigits(days, language)} ${language === "np" ? "दिन" : "d"}`;
 }
 
+const NP_MONTHS_SHORT = [
+  "जनवरी", "फेब्रुअरी", "मार्च", "अप्रिल", "मे", "जुन",
+  "जुलाई", "अगस्ट", "सेप्टेम्बर", "अक्टोबर", "नोभेम्बर", "डिसेम्बर"
+];
+const NP_WEEKDAYS_SHORT = ["आइत", "सोम", "मंगल", "बुध", "बिहि", "शुक्र", "शनि"];
+
 // Date pill — full readable date + time for upcoming events.
-// "मंगल · २१ जेठ · २:३० बेलुका" / "Tue · Jun 4 · 2:30 PM"
+// NP: "बिहि, जुन ४, २:३०"  /  EN: "Thu, Jun 4, 2:30 PM"
+//
+// We build the NP string manually because Chromium's Intl support for
+// "ne-NP" emits Latin digits and inconsistent abbreviations across systems,
+// and the SSR/CSR pair produced hydration warnings.
 function formatSchedulePill(iso, language) {
   if (!iso) return "";
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return "";
-  const locale = language === "np" ? "ne-NP" : "en-US";
+
+  if (language === "np") {
+    const weekday = NP_WEEKDAYS_SHORT[date.getDay()];
+    const month = NP_MONTHS_SHORT[date.getMonth()];
+    const day = localizeDigits(date.getDate(), "np");
+    const hour = localizeDigits(date.getHours(), "np");
+    const minute = localizeDigits(String(date.getMinutes()).padStart(2, "0"), "np");
+    return `${weekday}, ${month} ${day}, ${hour}:${minute}`;
+  }
+
   try {
-    const fmt = new Intl.DateTimeFormat(locale, {
+    return new Intl.DateTimeFormat("en-US", {
       weekday: "short",
       month: "short",
       day: "numeric",
       hour: "numeric",
       minute: "2-digit"
     }).format(date);
-    return fmt;
   } catch {
     return date.toLocaleString();
   }
