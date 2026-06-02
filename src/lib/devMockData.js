@@ -903,3 +903,46 @@ export function getDemoActivityTicker() {
   if (!isDev()) return [];
   return DEMO_ACTIVITY_TICKER;
 }
+
+// --- Issue comments mock --------------------------------------------
+// Deterministic per-issue comment thread. We hash the issue id into a
+// stable seed so the same issue always shows the same comments — but
+// different issues show different sets and counts.
+const DEMO_COMMENT_POOL = [
+  { name: "कमला अधिकारी", role: "स्थानीय बासिन्दा", text: "यो ठाउँ अब फेरि सफा देख्ने आशा गरेँ। कुनै मद्दत चाहिए मलाई पनि भन्नुहोला।" },
+  { name: "हरि श्रेष्ठ", role: "स्वयंसेवक", text: "मेरो टोलले सुक्रबार बेलुका २ घण्टा निकाल्न सक्छ। औजार पनि छ।" },
+  { name: "रिता पाण्डे", role: "नगर वार्ड समर्थक", text: "वडा कार्यालयलाई औपचारिक खबर पठाएको छु — फोहोर ट्रकको व्यवस्था हुनेछ।" },
+  { name: "स्मिता शर्मा", role: "शिक्षक", text: "विद्यार्थीहरूलाई पनि ल्याउने तरिका सोचौँ — सिकाइको पाठ पनि हुन्छ।" },
+  { name: "प्रदीप तामाङ", role: "पुरानो सहभागी", text: "अघिको अभियानमा प्रयोग गरेको रजिस्टर र चेकलिस्ट छन्। चाहिए शेयर गरौँला।" },
+  { name: "रोहित कार्की", role: "नक्शा र समन्वय", text: "ड्रोन तस्बिर अघि र पछिको — मसँग छ। प्रमाण कागजमा राख्न सजिलो।" }
+];
+
+function hashStringToInt(s) {
+  let h = 0;
+  const str = String(s || "");
+  for (let i = 0; i < str.length; i += 1) {
+    h = (h * 31 + str.charCodeAt(i)) | 0;
+  }
+  return Math.abs(h);
+}
+
+function minutesAgoIso(min) {
+  return new Date(Date.now() - min * 60_000).toISOString();
+}
+
+export function getDemoIssueComments(issueId) {
+  if (!isDev()) return [];
+  const h = hashStringToInt(issueId);
+  const count = 2 + (h % 4); // 2-5 comments per issue
+  const start = h % DEMO_COMMENT_POOL.length;
+  const comments = [];
+  for (let i = 0; i < count; i += 1) {
+    const base = DEMO_COMMENT_POOL[(start + i) % DEMO_COMMENT_POOL.length];
+    comments.push({
+      id: `${issueId}-c${i}`,
+      ...base,
+      createdAt: minutesAgoIso(15 + i * 90 + (h % 30))
+    });
+  }
+  return comments;
+}

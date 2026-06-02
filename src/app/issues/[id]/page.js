@@ -15,6 +15,7 @@ import { IssuePhotoGallery } from "@/components/IssuePhotoGallery";
 import { IssueShareRow } from "@/components/IssueShareRow";
 import { IssueStatusTimeline } from "@/components/IssueStatusTimeline";
 import { IssueVoteButton } from "@/components/IssueVoteButton";
+import { IssueComments } from "@/components/IssueComments";
 import { PublicIssueCard, formatSupporters } from "@/components/PublicIssueCard";
 import { ScrollProgressBar } from "@/components/ScrollProgressBar";
 import { SiteShell } from "@/components/SiteShell";
@@ -312,6 +313,8 @@ export default function IssueDetailPage() {
                 content={content}
                 language={language}
               />
+
+              <IssueComments issueId={issue.id} language={language} />
             </div>
           </article>
         ) : null}
