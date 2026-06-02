@@ -3,11 +3,25 @@
  * homepage. Cards retain the LiveEventCard styles; container scrolls.
  */
 
-.live-events-rail,
-.events-home-rail {
+/* Legacy LiveEventsRail container (no longer rendered, kept for any
+ * incidental usage of the bare class). */
+.live-events-rail {
   width: min(1180px, calc(100% - 32px));
   margin: 0 auto;
   padding: 48px 0;
+}
+
+/* --- EventsHomeRail (paged Netflix-style slider) ------------------- */
+
+.events-home-rail {
+  width: 100%;
+  padding: 48px 0;
+  overflow: hidden; /* contain the full-bleed track + edge fades */
+}
+
+.events-home-rail-shell {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
 }
 
 .events-home-rail-header {
@@ -68,46 +82,180 @@
   animation: live-dot-pulse 1.6s ease-out infinite;
 }
 
-/* Horizontal scrollable list (Netflix style) */
-.events-home-rail-list {
+/* Track wrap = full-viewport-width band that holds the scrolling track
+ * + the overlay arrows. Edge-fade mask softens cards trailing under the
+ * arrows. */
+.events-home-rail-track-wrap {
+  position: relative;
+  width: 100%;
+  /* Vertical breathing room so the hover-expand scale doesn't clip */
+  padding-block: 12px;
+  --rail-pad-inline: max(16px, calc(50vw - 590px + 16px));
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 36px,
+    #000 calc(100% - 36px),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 36px,
+    #000 calc(100% - 36px),
+    transparent 100%
+  );
+}
+
+/* The actual scrolling list. Padding-inline aligns the first card with
+ * the heading start at all widths while bleeding past the viewport edges. */
+.events-home-rail-track {
   list-style: none;
   margin: 0;
-  padding: 4px 0 14px;
+  padding: 18px var(--rail-pad-inline) 22px;
   display: flex;
-  gap: 14px;
+  gap: 16px;
   overflow-x: auto;
-  overflow-y: hidden;
+  overflow-y: visible;
   scroll-snap-type: x mandatory;
-  scroll-padding-left: 4px;
+  scroll-padding-inline: var(--rail-pad-inline);
+  scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
+  scrollbar-width: none;
 }
 
-.events-home-rail-list::-webkit-scrollbar {
-  height: 8px;
+.events-home-rail-track::-webkit-scrollbar {
+  display: none;
 }
 
-.events-home-rail-list::-webkit-scrollbar-track {
-  background: transparent;
+@media (prefers-reduced-motion: reduce) {
+  .events-home-rail-track {
+    scroll-behavior: auto;
+  }
 }
 
-.events-home-rail-list::-webkit-scrollbar-thumb {
-  background: var(--line);
-  border-radius: 4px;
-}
-
-.events-home-rail-list::-webkit-scrollbar-thumb:hover {
-  background: var(--muted);
+.events-home-rail-track:focus-visible {
+  outline: none;
 }
 
 .events-home-rail-card {
-  flex: 0 0 300px;
+  flex: 0 0 clamp(240px, 22vw, 300px);
   scroll-snap-align: start;
+  scroll-snap-stop: always;
+  transition:
+    transform 0.32s var(--ease-out-soft),
+    box-shadow 0.32s var(--ease-out-soft);
+  will-change: transform;
+  transform-origin: center top;
 }
 
-@media (max-width: 620px) {
+@media (max-width: 720px) {
   .events-home-rail-card {
     flex-basis: 78vw;
+  }
+}
+
+/* Netflix "Big Card" — hover-intent driven by JS (data-expanded). */
+.events-home-rail-card[data-expanded="true"] {
+  transform: scale(1.08);
+  z-index: 3;
+  box-shadow: var(--shadow-hero, 0 18px 40px rgba(0, 0, 0, 0.25));
+}
+
+/* Adjacent cards slide aside subtly to make room. */
+.events-home-rail-card:has(+ .events-home-rail-card[data-expanded="true"]) {
+  transform: translateX(-12px);
+}
+.events-home-rail-card[data-expanded="true"] + .events-home-rail-card {
+  transform: translateX(12px);
+}
+
+@media (prefers-reduced-motion: reduce), (hover: none) {
+  .events-home-rail-card,
+  .events-home-rail-card[data-expanded="true"],
+  .events-home-rail-card:has(+ .events-home-rail-card[data-expanded="true"]),
+  .events-home-rail-card[data-expanded="true"] + .events-home-rail-card {
+    transform: none;
+    transition: none;
+    box-shadow: var(--shadow-1);
+  }
+}
+
+/* Overlay paging arrows — frosted glass, edge-anchored, fade on rail hover. */
+.events-home-rail-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 76px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(20, 20, 20, 0.55);
+  -webkit-backdrop-filter: blur(8px) saturate(140%);
+  backdrop-filter: blur(8px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #fff;
+  cursor: pointer;
+  font-size: 18px;
+  opacity: 0;
+  transition:
+    opacity 0.25s var(--ease-out-soft),
+    background 0.2s var(--ease-out-soft),
+    transform 0.2s var(--ease-out-soft);
+  z-index: 4;
+  padding: 0;
+}
+
+.events-home-rail-arrow:hover:not([disabled]) {
+  background: rgba(20, 20, 20, 0.75);
+  transform: translateY(-50%) scale(1.06);
+}
+
+.events-home-rail-arrow:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  opacity: 1;
+}
+
+.events-home-rail-arrow[disabled] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.events-home-rail:hover .events-home-rail-arrow:not([disabled]),
+.events-home-rail:focus-within .events-home-rail-arrow:not([disabled]) {
+  opacity: 1;
+}
+
+.events-home-rail-arrow--prev {
+  left: 0;
+  border-left: 0;
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+.events-home-rail-arrow--next {
+  right: 0;
+  border-right: 0;
+  border-radius: var(--radius-md) 0 0 var(--radius-md);
+}
+
+/* Hide arrows on touch — swipe is the natural gesture there. */
+@media (hover: none) {
+  .events-home-rail-arrow {
+    display: none;
+  }
+  .events-home-rail-track-wrap {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .events-home-rail-arrow,
+  .events-home-rail-arrow:hover:not([disabled]) {
+    transition: none;
+    transform: translateY(-50%);
   }
 }
 
@@ -128,11 +276,30 @@
   z-index: 2;
 }
 
-.events-home-rail-leader {
+.events-home-rail-leader,
+.events-home-rail-roles {
   font-size: 12px !important;
   display: inline-flex;
   align-items: center;
   gap: 4px;
+}
+
+.events-home-rail-roles {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* Visually hidden, screen-reader-only status. */
+.events-home-rail-sr-status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* Legacy live-rail header (kept for any non-home usage) */

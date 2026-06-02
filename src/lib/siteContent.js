@@ -1236,7 +1236,11 @@ export const copy = {
       viewersPrefix: "",
       viewersSuffix: " जना हेर्दैछन्",
       justStarted: "भर्खर सुरु",
-      durationLive: "देखि लाइभ"
+      durationLive: "देखि लाइभ",
+      ariaCarousel: "लाइभ र आउँदा अभियानहरूको स्लाइडर",
+      prevAria: "अघिल्ला अभियानहरू देखाउनुहोस्",
+      nextAria: "अरू अभियानहरू देखाउनुहोस्",
+      pageStatus: "{start}–{end} / {total}"
     },
     liveIssues: {
       eyebrow: "सक्रिय समस्याहरू",
@@ -2823,7 +2827,11 @@ export const copy = {
       viewersPrefix: "",
       viewersSuffix: " watching",
       justStarted: "Just started",
-      durationLive: "live"
+      durationLive: "live",
+      ariaCarousel: "Live and upcoming campaigns carousel",
+      prevAria: "Show previous campaigns",
+      nextAria: "Show next campaigns",
+      pageStatus: "{start}–{end} of {total}"
     },
     liveIssues: {
       eyebrow: "Active Issues",

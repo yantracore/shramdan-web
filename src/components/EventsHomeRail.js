@@ -1,11 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { CalendarOutlined, EnvironmentOutlined, TeamOutlined } from "@ant-design/icons";
+import {
+  CalendarOutlined,
+  EnvironmentOutlined,
+  LeftOutlined,
+  RightOutlined,
+  TeamOutlined
+} from "@ant-design/icons";
 import { usePreferences } from "@/app/providers";
 import { staggerContainer, staggerItem } from "@/lib/motion";
+
+// Unified home rail: one Netflix-style paged slider combining
+// currently-live and upcoming-scheduled events. Overlay arrows at the
+// viewport edges, hover-intent card expand, keyboard paging, full-bleed
+// track with constrained heading.
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 
@@ -50,6 +61,9 @@ function formatScheduledPill(iso, language) {
   }
 }
 
+const CARD_PEEK_PX = 40;
+const HOVER_INTENT_MS = 450;
+
 export function EventsHomeRail({
   liveEvents = [],
   upcomingEvents = [],
@@ -58,7 +72,7 @@ export function EventsHomeRail({
 }) {
   const reduceMotion = useReducedMotion();
   const { entranceAnimation } = usePreferences();
-  const shouldAnimate = !reduceMotion && entranceAnimation;
+  const animationsOn = !reduceMotion && entranceAnimation;
 
   const items = [
     ...liveEvents.map((event) => ({ kind: "live", event })),
@@ -67,73 +81,262 @@ export function EventsHomeRail({
   const isEmpty = items.length === 0;
 
   return (
-    <section className="events-home-rail" aria-labelledby="events-home-rail-title">
-      <header className="events-home-rail-header">
-        <div className="events-home-rail-header-text">
-          <span className="eyebrow events-home-rail-eyebrow">
-            <span className="live-dot" aria-hidden="true" />
-            {copy?.eyebrow}
-          </span>
-          <h2 id="events-home-rail-title">{copy?.title}</h2>
-          {copy?.subtitle ? <p>{copy.subtitle}</p> : null}
-        </div>
-        <Link href="/events" className="events-home-rail-view-all">
-          {copy?.viewAll}
-        </Link>
-      </header>
+    <section
+      className="events-home-rail"
+      role="region"
+      aria-roledescription="carousel"
+      aria-label={copy?.ariaCarousel || copy?.title}
+      aria-labelledby="events-home-rail-title"
+    >
+      <div className="events-home-rail-shell">
+        <header className="events-home-rail-header">
+          <div className="events-home-rail-header-text">
+            <span className="eyebrow events-home-rail-eyebrow">
+              <span className="live-dot" aria-hidden="true" />
+              {copy?.eyebrow}
+            </span>
+            <h2 id="events-home-rail-title">{copy?.title}</h2>
+            {copy?.subtitle ? <p>{copy.subtitle}</p> : null}
+          </div>
+          <Link href="/events" className="events-home-rail-view-all">
+            {copy?.viewAll}
+          </Link>
+        </header>
+      </div>
 
       {isEmpty ? (
-        <div className="live-events-rail-empty">
-          <span className="live-events-rail-empty-icon" aria-hidden="true">📺</span>
-          <p>{copy?.emptyMessage}</p>
+        <div className="events-home-rail-shell">
+          <div className="live-events-rail-empty">
+            <span className="live-events-rail-empty-icon" aria-hidden="true">📺</span>
+            <p>{copy?.emptyMessage}</p>
+          </div>
         </div>
-      ) : shouldAnimate ? (
-        <motion.ul className="events-home-rail-list" {...staggerContainer}>
-          {items.map((item) =>
-            item.kind === "live" ? (
-              <LiveCard key={item.event.id} event={item.event} copy={copy} animated />
-            ) : (
-              <UpcomingCard
-                key={item.event.id}
-                event={item.event}
-                language={language}
-                animated
-              />
-            )
-          )}
-        </motion.ul>
       ) : (
-        <ul className="events-home-rail-list">
-          {items.map((item) =>
-            item.kind === "live" ? (
-              <LiveCard key={item.event.id} event={item.event} copy={copy} />
-            ) : (
-              <UpcomingCard key={item.event.id} event={item.event} language={language} />
-            )
-          )}
-        </ul>
+        <HomeRailTrack
+          items={items}
+          copy={copy}
+          language={language}
+          animationsOn={animationsOn}
+        />
       )}
     </section>
   );
 }
 
-function LiveCard({ event, copy, animated = false }) {
+function HomeRailTrack({ items, copy, language, animationsOn }) {
+  const trackRef = useRef(null);
+  const hoverTimer = useRef(null);
+  const [atStart, setAtStart] = useState(true);
+  const [atEnd, setAtEnd] = useState(false);
+  const [expandedId, setExpandedId] = useState(null);
+  const [pageRange, setPageRange] = useState({ start: 1, end: Math.min(4, items.length) });
+
+  const updateEdges = useCallback(() => {
+    const el = trackRef.current;
+    if (!el) return;
+    setAtStart(el.scrollLeft <= 2);
+    setAtEnd(el.scrollLeft + el.clientWidth >= el.scrollWidth - 2);
+    // Compute visible card range for the aria-live status
+    const cards = Array.from(el.querySelectorAll("[data-rail-card]"));
+    if (!cards.length) return;
+    const viewLeft = el.scrollLeft;
+    const viewRight = viewLeft + el.clientWidth;
+    let firstVisible = -1;
+    let lastVisible = -1;
+    cards.forEach((card, i) => {
+      const cardLeft = card.offsetLeft;
+      const cardRight = cardLeft + card.offsetWidth;
+      const visible = cardRight > viewLeft + 8 && cardLeft < viewRight - 8;
+      if (visible) {
+        if (firstVisible === -1) firstVisible = i;
+        lastVisible = i;
+      }
+    });
+    if (firstVisible >= 0) {
+      setPageRange({ start: firstVisible + 1, end: lastVisible + 1 });
+    }
+  }, []);
+
+  useEffect(() => {
+    const el = trackRef.current;
+    if (!el) return;
+
+    let raf = 0;
+    const onScroll = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        updateEdges();
+      });
+    };
+    el.addEventListener("scroll", onScroll, { passive: true });
+
+    const ro = new ResizeObserver(updateEdges);
+    ro.observe(el);
+
+    updateEdges();
+    return () => {
+      el.removeEventListener("scroll", onScroll);
+      ro.disconnect();
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [updateEdges, items.length]);
+
+  const scrollByPage = useCallback(
+    (direction) => {
+      const el = trackRef.current;
+      if (!el) return;
+      const step = Math.max(el.clientWidth - CARD_PEEK_PX, 200);
+      el.scrollTo({
+        left: el.scrollLeft + direction * step,
+        behavior: animationsOn ? "smooth" : "instant"
+      });
+    },
+    [animationsOn]
+  );
+
+  const handleKeyDown = useCallback(
+    (e) => {
+      const el = trackRef.current;
+      if (!el) return;
+      const cards = Array.from(el.querySelectorAll("[data-rail-card] a"));
+      const currentIndex = cards.findIndex((c) => c === document.activeElement);
+
+      const focusCard = (idx) => {
+        const target = cards[idx];
+        if (!target) return;
+        target.focus({ preventScroll: true });
+        target.closest("[data-rail-card]")?.scrollIntoView({
+          behavior: animationsOn ? "smooth" : "instant",
+          inline: "start",
+          block: "nearest"
+        });
+      };
+
+      if (e.key === "ArrowRight") {
+        e.preventDefault();
+        focusCard(Math.min(cards.length - 1, Math.max(currentIndex + 1, 0)));
+      } else if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        focusCard(Math.max(0, currentIndex - 1));
+      } else if (e.key === "Home") {
+        e.preventDefault();
+        focusCard(0);
+      } else if (e.key === "End") {
+        e.preventDefault();
+        focusCard(cards.length - 1);
+      }
+    },
+    [animationsOn]
+  );
+
+  const clearHoverTimer = () => {
+    if (hoverTimer.current) {
+      clearTimeout(hoverTimer.current);
+      hoverTimer.current = null;
+    }
+  };
+
+  const handleCardEnter = (id) => {
+    if (!animationsOn) return;
+    clearHoverTimer();
+    hoverTimer.current = setTimeout(() => setExpandedId(id), HOVER_INTENT_MS);
+  };
+  const handleCardLeave = () => {
+    clearHoverTimer();
+    setExpandedId(null);
+  };
+
+  useEffect(() => () => clearHoverTimer(), []);
+
+  const statusTemplate = copy?.pageStatus || "{start}–{end} of {total}";
+  const statusText = statusTemplate
+    .replace("{start}", localizeDigits(pageRange.start, language))
+    .replace("{end}", localizeDigits(pageRange.end, language))
+    .replace("{total}", localizeDigits(items.length, language));
+
+  const ListTag = animationsOn ? motion.ul : "ul";
+  const listProps = animationsOn ? staggerContainer : {};
+
+  return (
+    <div className="events-home-rail-track-wrap">
+      <button
+        type="button"
+        className="events-home-rail-arrow events-home-rail-arrow--prev"
+        aria-label={copy?.prevAria || "Previous"}
+        onClick={() => scrollByPage(-1)}
+        disabled={atStart}
+      >
+        <LeftOutlined aria-hidden="true" />
+      </button>
+
+      <ListTag
+        ref={trackRef}
+        className="events-home-rail-track"
+        onKeyDown={handleKeyDown}
+        {...listProps}
+      >
+        {items.map((item) =>
+          item.kind === "live" ? (
+            <LiveCard
+              key={item.event.id}
+              event={item.event}
+              copy={copy}
+              animated={animationsOn}
+              isExpanded={expandedId === item.event.id}
+              onEnter={() => handleCardEnter(item.event.id)}
+              onLeave={handleCardLeave}
+            />
+          ) : (
+            <UpcomingCard
+              key={item.event.id}
+              event={item.event}
+              language={language}
+              animated={animationsOn}
+              isExpanded={expandedId === item.event.id}
+              onEnter={() => handleCardEnter(item.event.id)}
+              onLeave={handleCardLeave}
+            />
+          )
+        )}
+      </ListTag>
+
+      <button
+        type="button"
+        className="events-home-rail-arrow events-home-rail-arrow--next"
+        aria-label={copy?.nextAria || "Next"}
+        onClick={() => scrollByPage(1)}
+        disabled={atEnd}
+      >
+        <RightOutlined aria-hidden="true" />
+      </button>
+
+      <span className="events-home-rail-sr-status" aria-live="polite">
+        {animationsOn ? statusText : ""}
+      </span>
+    </div>
+  );
+}
+
+function LiveCard({ event, copy, animated, isExpanded, onEnter, onLeave }) {
   const Wrapper = animated ? motion.li : "li";
   const wrapperProps = animated ? staggerItem : {};
   const startedAt = event?.liveStream?.startedAt;
   const durationLabel = formatLiveDuration(startedAt, copy);
   const viewers = event?.liveStream?.viewerCount;
   const previewUrl = event?.liveStream?.previewEmbedUrl || event?.liveStream?.streamUrl;
-  const [isHovered, setIsHovered] = useState(false);
-  const reduceMotion = useReducedMotion();
-  const showPreview = isHovered && previewUrl && !reduceMotion;
+  const showPreview = isExpanded && previewUrl;
 
   return (
     <Wrapper
       className="events-home-rail-card live-events-rail-card"
+      data-rail-card
+      data-expanded={isExpanded ? "true" : undefined}
       {...wrapperProps}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseEnter={onEnter}
+      onMouseLeave={onLeave}
+      onFocus={onEnter}
+      onBlur={onLeave}
     >
       <Link href={`/events/${event.id}`} className="live-events-rail-card-link">
         <div className="live-events-rail-thumb">
@@ -192,12 +395,22 @@ function LiveCard({ event, copy, animated = false }) {
   );
 }
 
-function UpcomingCard({ event, language, animated = false }) {
+function UpcomingCard({ event, language, animated, isExpanded, onEnter, onLeave }) {
   const Wrapper = animated ? motion.li : "li";
   const wrapperProps = animated ? staggerItem : {};
+  const roleCount = Array.isArray(event?.rolesNeeded) ? event.rolesNeeded.length : 0;
 
   return (
-    <Wrapper className="events-home-rail-card live-events-rail-card" {...wrapperProps}>
+    <Wrapper
+      className="events-home-rail-card live-events-rail-card"
+      data-rail-card
+      data-expanded={isExpanded ? "true" : undefined}
+      {...wrapperProps}
+      onMouseEnter={onEnter}
+      onMouseLeave={onLeave}
+      onFocus={onEnter}
+      onBlur={onLeave}
+    >
       <Link href={`/events/${event.id}`} className="live-events-rail-card-link">
         <div className="live-events-rail-thumb">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -221,6 +434,13 @@ function UpcomingCard({ event, language, animated = false }) {
           {event.leaderName ? (
             <p className="events-home-rail-leader">
               <TeamOutlined aria-hidden="true" /> {event.leaderName}
+            </p>
+          ) : null}
+          {roleCount > 0 ? (
+            <p className="events-home-rail-roles">
+              {language === "np"
+                ? `${localizeDigits(roleCount, "np")} भूमिका खुला`
+                : `${roleCount} role${roleCount === 1 ? "" : "s"} open`}
             </p>
           ) : null}
         </div>
