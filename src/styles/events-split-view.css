@@ -364,7 +364,6 @@
 
 .event-preview-media {
   position: relative;
-  aspect-ratio: 16 / 9;
   background: color-mix(in srgb, var(--line) 60%, transparent);
   overflow: hidden;
   border-top-left-radius: 18px;
@@ -374,19 +373,21 @@
 .event-preview-media .event-live-player {
   display: block;
   width: 100%;
-  height: 100%;
   margin: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: #000;
 }
 
 .event-preview-media .event-live-player-frame {
-  position: absolute;
-  inset: 0;
+  position: relative;
+  aspect-ratio: 16 / 9;
   width: 100%;
-  height: 100%;
-  border-radius: 0;
 }
 
 .event-preview-media .event-live-player-frame iframe {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   border: 0;
@@ -394,21 +395,47 @@
 }
 
 .event-preview-media .event-live-player-meta {
-  position: absolute;
-  bottom: 10px;
-  left: 12px;
-  right: 12px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
-  z-index: 2;
-  pointer-events: none;
+  position: static;
+  padding: 8px 12px;
+  gap: 10px;
+  background: var(--surface);
+  font-size: 12px;
+}
+
+.event-preview-media .event-live-badge {
+  font-size: 9px;
+  padding: 2px 6px;
+  letter-spacing: 0.06em;
+}
+
+.event-preview-media .event-live-duration {
+  font-size: 12px;
+}
+
+.event-preview-media .event-live-viewers-big {
+  font-size: 12px;
+  gap: 5px;
+  animation: none;
+}
+
+.event-preview-media .event-live-viewers-icon {
+  font-size: 13px;
+  transform: none;
+}
+
+.event-preview-media .event-live-viewers-number {
+  font-size: 13px;
+  letter-spacing: 0;
+}
+
+.event-preview-media .event-live-viewers-label {
+  font-size: 11px;
+  letter-spacing: 0.02em;
 }
 
 .event-preview-media-hero {
   width: 100%;
-  height: 100%;
+  aspect-ratio: 16 / 9;
   object-fit: cover;
   display: block;
 }
