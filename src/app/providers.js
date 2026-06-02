@@ -9,7 +9,18 @@ const THEME_STORAGE_KEY = "shramdan-theme";
 const LANGUAGE_STORAGE_KEY = "shramdan-language";
 const ENTRANCE_ANIMATION_STORAGE_KEY = "shramdan-entrance-animation";
 const LIVE_ICON_SIZE_STORAGE_KEY = "shramdan-live-icon-size";
+const ACCENT_STORAGE_KEY = "shramdan-accent";
 const PREFERENCE_EVENT = "shramdan-preferences";
+
+export const ACCENT_PRESETS = {
+  ember: { name: "Ember", color: "#e75f1b" },
+  rose: { name: "Rose", color: "#d04668" },
+  azure: { name: "Azure", color: "#1d4ed8" },
+  violet: { name: "Violet", color: "#7b3fa0" },
+  amber: { name: "Amber", color: "#b7791f" }
+};
+
+const ACCENT_KEYS = Object.keys(ACCENT_PRESETS);
 
 const getStoredMode = () => {
   if (typeof window === "undefined") {
@@ -43,6 +54,12 @@ const getStoredLiveIconSize = () => {
   }
   const saved = window.localStorage.getItem(LIVE_ICON_SIZE_STORAGE_KEY);
   return saved === "sm" || saved === "md" || saved === "lg" ? saved : "md";
+};
+
+const getStoredAccent = () => {
+  if (typeof window === "undefined") return "ember";
+  const saved = window.localStorage.getItem(ACCENT_STORAGE_KEY);
+  return ACCENT_KEYS.includes(saved) ? saved : "ember";
 };
 
 const subscribePreferences = (callback) => {
@@ -91,6 +108,11 @@ export function Providers({ children }) {
     subscribePreferences,
     getStoredLiveIconSize,
     () => "md"
+  );
+  const accent = useSyncExternalStore(
+    subscribePreferences,
+    getStoredAccent,
+    () => "ember"
   );
 
   const updatePreference = useCallback((key, value) => {
@@ -159,6 +181,17 @@ export function Providers({ children }) {
     [updatePreference]
   );
 
+  const setAccent = useCallback(
+    (nextValue) => {
+      const value =
+        typeof nextValue === "function" ? nextValue(getStoredAccent()) : nextValue;
+      if (ACCENT_KEYS.includes(value)) {
+        updatePreference(ACCENT_STORAGE_KEY, value);
+      }
+    },
+    [updatePreference]
+  );
+
   useEffect(() => {
     document.documentElement.dataset.theme = mode;
   }, [mode]);
@@ -171,16 +204,24 @@ export function Providers({ children }) {
     document.documentElement.dataset.liveIcon = liveIconSize;
   }, [liveIconSize]);
 
+  useEffect(() => {
+    const preset = ACCENT_PRESETS[accent] || ACCENT_PRESETS.ember;
+    document.documentElement.style.setProperty("--accent", preset.color);
+    document.documentElement.dataset.accent = accent;
+  }, [accent]);
+
   const value = useMemo(
     () => ({
       language,
       mode,
       entranceAnimation,
       liveIconSize,
+      accent,
       setLanguage,
       setMode,
       setEntranceAnimation,
       setLiveIconSize,
+      setAccent,
       toggleLanguage: () => setLanguage((current) => (current === "np" ? "en" : "np")),
       toggleMode: () => setMode((current) => (current === "light" ? "dark" : "light")),
       toggleEntranceAnimation: () => setEntranceAnimation((current) => !current)
@@ -190,10 +231,12 @@ export function Providers({ children }) {
       mode,
       entranceAnimation,
       liveIconSize,
+      accent,
       setLanguage,
       setMode,
       setEntranceAnimation,
-      setLiveIconSize
+      setLiveIconSize,
+      setAccent
     ]
   );
 

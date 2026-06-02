@@ -3,7 +3,7 @@
 import { ReloadOutlined } from "@ant-design/icons";
 import { Button, Card, Popconfirm, Radio, Typography } from "antd";
 import { SiteShell } from "@/components/SiteShell";
-import { usePreferences } from "@/app/providers";
+import { ACCENT_PRESETS, usePreferences } from "@/app/providers";
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -31,6 +31,10 @@ const copy = {
         description: "Public surfaces मा प्रयोग हुने भाषा।",
         np: "नेपाली",
         en: "English"
+      },
+      accent: {
+        label: "एसेन्ट रङ",
+        description: "बटन, link र badge को secondary रङ।"
       }
     },
     note:
@@ -61,6 +65,10 @@ const copy = {
         description: "Used across public surfaces.",
         np: "नेपाली",
         en: "English"
+      },
+      accent: {
+        label: "Accent color",
+        description: "Secondary tint used by buttons, links, and badges."
       }
     },
     note: "These settings save locally in your browser. Account sync is planned for the future.",
@@ -77,12 +85,13 @@ const copy = {
 };
 
 export default function SettingsPage() {
-  const { language, mode, setLanguage, setMode } = usePreferences();
+  const { language, mode, accent, setLanguage, setMode, setAccent } = usePreferences();
   const t = copy[language];
 
   const handleReset = () => {
     setMode("light");
     setLanguage("np");
+    setAccent("ember");
   };
 
   return (
@@ -125,6 +134,27 @@ export default function SettingsPage() {
                     { label: t.appearance.language.en, value: "en" }
                   ]}
                 />
+              }
+            />
+            <SettingRow
+              label={t.appearance.accent.label}
+              description={t.appearance.accent.description}
+              control={
+                <div className="accent-swatch-row" role="radiogroup">
+                  {Object.entries(ACCENT_PRESETS).map(([key, preset]) => (
+                    <button
+                      key={key}
+                      type="button"
+                      role="radio"
+                      aria-checked={accent === key}
+                      aria-label={preset.name}
+                      title={preset.name}
+                      className={`accent-swatch${accent === key ? " is-active" : ""}`}
+                      style={{ background: preset.color }}
+                      onClick={() => setAccent(key)}
+                    />
+                  ))}
+                </div>
               }
             />
             <SettingRow
