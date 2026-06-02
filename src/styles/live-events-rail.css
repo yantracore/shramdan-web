@@ -104,8 +104,9 @@
 
 /* Coverflow needs explicit slide dimensions — aspect-ratio on the child
  * isn't read in time for Swiper's 3D layout math, which causes the
- * side slides to mis-position or collapse. */
-.events-home-rail-slide {
+ * side slides to mis-position or collapse. Specificity wins against
+ * Swiper's default `.swiper-slide { height: 100%; }`. */
+.events-home-rail-swiper .events-home-rail-slide.swiper-slide {
   width: clamp(220px, 22vw, 280px);
   height: clamp(275px, 27.5vw, 350px); /* 4:5 ratio, locked in pixels */
 }
