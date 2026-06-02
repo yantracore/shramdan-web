@@ -17,6 +17,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { FaFacebookF, FaTiktok, FaXTwitter, FaYoutube } from "react-icons/fa6";
+import { BackToTop } from "@/components/BackToTop";
 import { CommandPalette } from "@/components/CommandPalette";
 import { KeyboardShortcutsDialog } from "@/components/KeyboardShortcutsDialog";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
@@ -388,6 +389,7 @@ export function SiteShell({ children, pageTitle }) {
       </div>
 
       <QuickActionFab language={language} />
+      <BackToTop language={language} />
       <KeyboardShortcutsDialog language={language} />
       <OnboardingSpotlight language={language} />
       <MobileBottomNav
