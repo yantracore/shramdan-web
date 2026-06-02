@@ -17,6 +17,7 @@ import { BeforeAfterSlider } from "@/components/BeforeAfterSlider";
 import { EventLiveStreamPlayer } from "@/components/EventLiveStreamPlayer";
 import { EventRosterPanel } from "@/components/EventRosterPanel";
 import IssueMapBlock from "@/components/IssueMapBlock";
+import { PrintButton } from "@/components/PrintButton";
 import { StickyActionBar } from "@/components/StickyActionBar";
 import { IssuePhotoGallery } from "@/components/IssuePhotoGallery";
 import { LeaderScheduleEditor } from "@/components/LeaderScheduleEditor";
@@ -159,9 +160,12 @@ export default function EventDetailPage() {
   return (
     <SiteShell pageTitle={pageTitle || content.detail.defaultTitle}>
       <section className="page-section public-issue-detail-section">
-        <Link className="public-issue-back-link" href="/events">
-          <ArrowLeftOutlined /> {content.detail.backToEvents}
-        </Link>
+        <div className="public-issue-back-row">
+          <Link className="public-issue-back-link" href="/events">
+            <ArrowLeftOutlined /> {content.detail.backToEvents}
+          </Link>
+          <PrintButton language={language} />
+        </div>
 
         {loading ? (
           <article
