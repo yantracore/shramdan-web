@@ -12,7 +12,7 @@
 
 import { CheckCircleFilled, CopyOutlined } from "@ant-design/icons";
 import { useState } from "react";
-import { FaFacebookF, FaTelegramPlane, FaWhatsapp, FaXTwitter } from "react-icons/fa6";
+import { FaFacebookF, FaTelegram, FaWhatsapp, FaXTwitter } from "react-icons/fa6";
 
 const COPY = {
   np: {
@@ -40,7 +40,7 @@ function buildShareLinks({ url, text }) {
     { id: "facebook", label: "Share on Facebook", Icon: FaFacebookF, href: `https://www.facebook.com/sharer/sharer.php?u=${u}` },
     { id: "twitter", label: "Share on X", Icon: FaXTwitter, href: `https://twitter.com/intent/tweet?url=${u}&text=${t}` },
     { id: "whatsapp", label: "Share on WhatsApp", Icon: FaWhatsapp, href: `https://wa.me/?text=${t}%20${u}` },
-    { id: "telegram", label: "Share on Telegram", Icon: FaTelegramPlane, href: `https://t.me/share/url?url=${u}&text=${t}` }
+    { id: "telegram", label: "Share on Telegram", Icon: FaTelegram, href: `https://t.me/share/url?url=${u}&text=${t}` }
   ];
 }
 

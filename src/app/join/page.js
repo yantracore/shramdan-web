@@ -32,7 +32,6 @@ function JoinPageContent() {
 
   const handleSubmit = async (values) => {
     if (isHoneypotTriggered(values)) {
-      messageApi.success(t.messages.join);
       setSubmitted(true);
       return true;
     }
@@ -43,7 +42,6 @@ function JoinPageContent() {
 
     try {
       await postJson("/applications", payload);
-      messageApi.success(t.messages.join);
       setSubmitted(true);
       return true;
     } catch (error) {

@@ -19,7 +19,6 @@ export default function FeedbackPage() {
 
   const handleSubmit = async (values) => {
     if (isHoneypotTriggered(values)) {
-      messageApi.success(t.messages.feedback);
       setSubmitted(true);
       return true;
     }
@@ -28,7 +27,6 @@ export default function FeedbackPage() {
 
     try {
       await postJson("/feedback", values);
-      messageApi.success(t.messages.feedback);
       setSubmitted(true);
       return true;
     } catch (error) {
