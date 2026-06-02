@@ -332,29 +332,38 @@
 }
 .events-home-rail .swiper-button-next { left: auto; right: 20px; }
 
-/* CSS-drawn chevron: a square with two adjacent borders rotated 45°
- * produces a crisp chevron at any size, inherits currentColor, has no
- * font-family dependency, and dodges Swiper's default ::after sizing
- * rules entirely. !important wins against Swiper's font-icon CSS. */
+/* Swiper React 12+ injects a real `<svg class="swiper-navigation-icon">`
+ * as a child of the button. We style that SVG directly — sizing it
+ * up, recoloring to currentColor, and KILLING Swiper's default
+ * `::after` icon (which is a leftover from older versions and would
+ * otherwise stack a second chevron behind the SVG). */
 .events-home-rail .swiper-button-prev::after,
 .events-home-rail .swiper-button-next::after {
-  content: "" !important;
-  display: block;
-  width: clamp(10px, 0.95vw, 14px) !important;
-  height: clamp(10px, 0.95vw, 14px) !important;
-  border-top: 2.4px solid currentColor;
-  border-right: 2.4px solid currentColor;
-  border-radius: 1.5px;
-  font-size: 0 !important;
-  background: transparent;
+  content: none !important;
+  display: none !important;
 }
-.events-home-rail .swiper-button-prev::after {
-  /* Chevron pointing left — top+right borders, rotate -135° */
-  transform: translateX(2px) rotate(-135deg);
+
+.events-home-rail .swiper-navigation-icon {
+  width: clamp(14px, 1.1vw, 18px);
+  height: auto;
+  color: currentColor;
+  fill: currentColor;
+  flex: 0 0 auto;
+  /* Optical centering: chevrons feel off-center inside a circle until
+   * you nudge them ~1px toward the pointing direction. */
+  transition: transform 200ms var(--ease-out-soft);
 }
-.events-home-rail .swiper-button-next::after {
-  /* Chevron pointing right — top+right borders, rotate 45° */
-  transform: translateX(-2px) rotate(45deg);
+.events-home-rail .swiper-button-prev .swiper-navigation-icon {
+  transform: translateX(-1px);
+}
+.events-home-rail .swiper-button-next .swiper-navigation-icon {
+  transform: translateX(1px);
+}
+.events-home-rail .swiper-button-prev:hover .swiper-navigation-icon {
+  transform: translateX(-3px);
+}
+.events-home-rail .swiper-button-next:hover .swiper-navigation-icon {
+  transform: translateX(3px);
 }
 
 /* Reveal both buttons when the user hovers the rail OR focuses one via
