@@ -1,12 +1,18 @@
 "use client";
 
-import { ArrowRightOutlined, PictureOutlined } from "@ant-design/icons";
-import { Tag } from "antd";
+import {
+  ArrowRightOutlined,
+  HeartFilled,
+  HeartOutlined,
+  PictureOutlined
+} from "@ant-design/icons";
+import { Tag, Tooltip } from "antd";
 import Image from "next/image";
 import Link from "next/link";
 import { IssueMapThumb } from "@/components/IssueMapThumb";
 import { IssueVoteButton } from "@/components/IssueVoteButton";
 import { ISSUE_STATUS_COLORS, getIssueCoverImageUrl } from "@/lib/adminUtils";
+import { useSavedIssues } from "@/lib/useSavedIssues";
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 
@@ -29,6 +35,11 @@ export function PublicIssueCard({ issue, content, language }) {
   const coverImageUrl = getIssueCoverImageUrl(issue);
   const accessibleLabel =
     issue.title || issue.addressText || categoryLabel || statusLabel || content.card.viewDetail;
+  const { isSaved, toggle } = useSavedIssues();
+  const saved = isSaved(issue.id);
+  const saveLabel = language === "np"
+    ? saved ? "बुकमार्क हटाउनुहोस्" : "बुकमार्क गर्नुहोस्"
+    : saved ? "Remove bookmark" : "Bookmark";
   const descriptionPeek = issue.description
     ? issue.description.length > 110
       ? `${issue.description.slice(0, 110)}…`
@@ -37,6 +48,21 @@ export function PublicIssueCard({ issue, content, language }) {
 
   return (
     <article className="content-card public-issue-card public-issue-card-hoverable">
+      <Tooltip title={saveLabel}>
+        <button
+          type="button"
+          className={`public-issue-card-save${saved ? " is-saved" : ""}`}
+          aria-label={saveLabel}
+          aria-pressed={saved}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            toggle(issue.id);
+          }}
+        >
+          {saved ? <HeartFilled /> : <HeartOutlined />}
+        </button>
+      </Tooltip>
       {coverImageUrl ? (
         <Link
           aria-label={accessibleLabel}
