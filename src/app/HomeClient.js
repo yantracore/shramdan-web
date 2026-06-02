@@ -47,8 +47,10 @@ import { useEffect, useMemo, useState } from "react";
 import IssueMapBlock from "@/components/IssueMapBlock";
 import { ActivityTicker } from "@/components/ActivityTicker";
 import { EventsHomeRail } from "@/components/EventsHomeRail";
+import { FeaturedStoryPanel } from "@/components/FeaturedStoryPanel";
 import { LiveOnlineWidget } from "@/components/LiveOnlineWidget";
 import { MotionSection } from "@/components/MotionSection";
+import { TimeOfDayGreeting } from "@/components/TimeOfDayGreeting";
 import { SiteShell } from "@/components/SiteShell";
 import { getDemoLiveEvents, getDemoUpcomingEvents } from "@/lib/devMockData";
 import { usePreferences } from "@/app/providers";
@@ -330,7 +332,11 @@ export default function HomeClient({ summary }) {
     <SiteShell>
       <MotionSection as="section" id="top" className="hero-section">
         <div className="hero-copy">
-          {t.hero.eyebrow ? <span className="eyebrow">{t.hero.eyebrow}</span> : null}
+          {t.hero.eyebrow ? (
+            <span className="eyebrow">
+              <TimeOfDayGreeting language={language} /> {t.hero.eyebrow}
+            </span>
+          ) : null}
           <h1>{t.hero.title}</h1>
           <p className="hero-subtitle">{t.hero.subtitle}</p>
           <p>{t.hero.support}</p>
@@ -414,6 +420,8 @@ export default function HomeClient({ summary }) {
         copy={t.liveEventsRail}
         language={language}
       />
+
+      <FeaturedStoryPanel language={language} />
 
       <MotionSection as="section" className="event-types-section" aria-labelledby="event-types-title">
         <div className="event-types-heading">
