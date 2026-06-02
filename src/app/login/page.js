@@ -35,6 +35,7 @@ const loginCopy = {
     success: "लगइन सफल भयो।",
     joinPrompt: "श्रमदानको सदस्य हुनुहुन्न?",
     joinCta: "सदस्य बन्नुहोस्",
+    otpAlt: "वा OTP बाट द्रुत सदस्यता",
     forgot: "पासवर्ड बिर्सनुभयो?",
     benefitsTitle: "सदस्यले के गर्न पाउँछन्",
     benefits: [
@@ -58,6 +59,7 @@ const loginCopy = {
     success: "Login successful.",
     joinPrompt: "Not a member?",
     joinCta: "Become a Member",
+    otpAlt: "Or quick signup with OTP",
     forgot: "Forgot password?",
     benefitsTitle: "What members can do",
     benefits: [
@@ -178,6 +180,9 @@ function LoginPageContent() {
               {t.joinPrompt}{" "}
               <Link href="/join">{t.joinCta}</Link>
             </p>
+            <Link className="login-otp-link" href="/signup">
+              {t.otpAlt} →
+            </Link>
           </div>
         </div>
       </section>
