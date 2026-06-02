@@ -1,22 +1,27 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { useReducedMotion } from "framer-motion";
+import { CalendarOutlined, EnvironmentOutlined, TeamOutlined } from "@ant-design/icons";
+import { Swiper, SwiperSlide } from "swiper/react";
 import {
-  CalendarOutlined,
-  EnvironmentOutlined,
-  LeftOutlined,
-  RightOutlined,
-  TeamOutlined
-} from "@ant-design/icons";
+  A11y,
+  EffectCoverflow,
+  Keyboard,
+  Navigation,
+  Pagination
+} from "swiper/modules";
+import "swiper/css";
+import "swiper/css/effect-coverflow";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 import { usePreferences } from "@/app/providers";
-import { staggerContainer, staggerItem } from "@/lib/motion";
 
-// Unified home rail: one Netflix-style paged slider combining
-// currently-live and upcoming-scheduled events. Overlay arrows at the
-// viewport edges, hover-intent card expand, keyboard paging, full-bleed
-// track with constrained heading.
+// Unified home rail: Swiper EffectCoverflow slider combining
+// currently-live + upcoming-scheduled events. Center slide is upright;
+// side slides tilt back with depth. Each slide hosts the existing
+// thumbnail card markup unchanged.
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 
@@ -32,8 +37,6 @@ const NP_MONTHS_SHORT = [
 ];
 const NP_WEEKDAYS_SHORT = ["आइत", "सोम", "मंगल", "बुध", "बिहि", "शुक्र", "शनि"];
 
-// Chromium's Intl "ne-NP" emits Latin digits and inconsistent abbreviations,
-// and the SSR/CSR pair produced hydration warnings — so we compose NP manually.
 function formatScheduledPill(iso, language) {
   if (!iso) return "";
   const date = new Date(iso);
@@ -61,49 +64,6 @@ function formatScheduledPill(iso, language) {
   }
 }
 
-const CARD_PEEK_PX = 40;
-const HOVER_INTENT_MS = 450;
-const SCROLL_DURATION_MS = 620;
-
-// rAF-driven smooth horizontal scroll with ease-out-expo curve. Native
-// scrollTo({ behavior: 'smooth' }) interacts badly with
-// scroll-snap-type: mandatory in Chromium — it snaps mid-animation and
-// reads as an instant jump. This helper drives scrollLeft frame-by-frame
-// and ignores snap during the animation.
-function easeOutExpo(t) {
-  return t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
-}
-
-function animateScrollLeft(el, target, duration, onDone) {
-  const start = el.scrollLeft;
-  const max = el.scrollWidth - el.clientWidth;
-  const clampedTarget = Math.max(0, Math.min(max, target));
-  const distance = clampedTarget - start;
-  if (Math.abs(distance) < 1) {
-    onDone?.();
-    return () => {};
-  }
-  const startTs = performance.now();
-  let rafId = 0;
-  let cancelled = false;
-  const step = (now) => {
-    if (cancelled) return;
-    const elapsed = now - startTs;
-    const t = Math.min(1, elapsed / duration);
-    el.scrollLeft = start + distance * easeOutExpo(t);
-    if (t < 1) {
-      rafId = requestAnimationFrame(step);
-    } else {
-      onDone?.();
-    }
-  };
-  rafId = requestAnimationFrame(step);
-  return () => {
-    cancelled = true;
-    if (rafId) cancelAnimationFrame(rafId);
-  };
-}
-
 export function EventsHomeRail({
   liveEvents = [],
   upcomingEvents = [],
@@ -112,7 +72,7 @@ export function EventsHomeRail({
 }) {
   const reduceMotion = useReducedMotion();
   const { entranceAnimation } = usePreferences();
-  const animationsOn = !reduceMotion && entranceAnimation;
+  const coverflowOn = !reduceMotion && entranceAnimation;
 
   const items = [
     ...liveEvents.map((event) => ({ kind: "live", event })),
@@ -123,9 +83,6 @@ export function EventsHomeRail({
   return (
     <section
       className="events-home-rail"
-      role="region"
-      aria-roledescription="carousel"
-      aria-label={copy?.ariaCarousel || copy?.title}
       aria-labelledby="events-home-rail-title"
     >
       <div className="events-home-rail-shell">
@@ -146,262 +103,97 @@ export function EventsHomeRail({
 
       {isEmpty ? (
         <div className="events-home-rail-shell">
-          <div className="live-events-rail-empty">
-            <span className="live-events-rail-empty-icon" aria-hidden="true">📺</span>
+          <div className="events-home-rail-empty">
+            <span className="events-home-rail-empty-icon" aria-hidden="true">📺</span>
             <p>{copy?.emptyMessage}</p>
           </div>
         </div>
+      ) : coverflowOn ? (
+        <Swiper
+          className="events-home-rail-swiper"
+          effect="coverflow"
+          grabCursor
+          centeredSlides
+          slidesPerView="auto"
+          loop={items.length > 3}
+          keyboard={{ enabled: true }}
+          coverflowEffect={{
+            rotate: 35,
+            stretch: 0,
+            depth: 140,
+            modifier: 1,
+            slideShadows: false
+          }}
+          pagination={{ clickable: true }}
+          navigation
+          a11y={{
+            prevSlideMessage: copy?.prevAria,
+            nextSlideMessage: copy?.nextAria,
+            containerRoleDescriptionMessage: copy?.ariaCarousel
+          }}
+          modules={[EffectCoverflow, Pagination, Navigation, Keyboard, A11y]}
+        >
+          {items.map((item) => (
+            <SwiperSlide key={item.event.id} className="events-home-rail-slide">
+              {item.kind === "live" ? (
+                <LiveCard event={item.event} copy={copy} />
+              ) : (
+                <UpcomingCard event={item.event} language={language} />
+              )}
+            </SwiperSlide>
+          ))}
+        </Swiper>
       ) : (
-        <HomeRailTrack
-          items={items}
-          copy={copy}
-          language={language}
-          animationsOn={animationsOn}
-        />
+        <Swiper
+          className="events-home-rail-swiper events-home-rail-swiper--flat"
+          grabCursor
+          centeredSlides
+          slidesPerView={1.2}
+          spaceBetween={16}
+          loop={items.length > 3}
+          keyboard={{ enabled: true }}
+          pagination={{ clickable: true }}
+          navigation
+          a11y={{
+            prevSlideMessage: copy?.prevAria,
+            nextSlideMessage: copy?.nextAria,
+            containerRoleDescriptionMessage: copy?.ariaCarousel
+          }}
+          modules={[Pagination, Navigation, Keyboard, A11y]}
+        >
+          {items.map((item) => (
+            <SwiperSlide key={item.event.id} className="events-home-rail-slide">
+              {item.kind === "live" ? (
+                <LiveCard event={item.event} copy={copy} />
+              ) : (
+                <UpcomingCard event={item.event} language={language} />
+              )}
+            </SwiperSlide>
+          ))}
+        </Swiper>
       )}
     </section>
   );
 }
 
-function HomeRailTrack({ items, copy, language, animationsOn }) {
-  const trackRef = useRef(null);
-  const hoverTimer = useRef(null);
-  const cancelScrollRef = useRef(null);
-  const [atStart, setAtStart] = useState(true);
-  const [atEnd, setAtEnd] = useState(false);
-  const [expandedId, setExpandedId] = useState(null);
-  const [pageRange, setPageRange] = useState({ start: 1, end: Math.min(4, items.length) });
-
-  const scrollTrackTo = useCallback(
-    (target) => {
-      const el = trackRef.current;
-      if (!el) return;
-      cancelScrollRef.current?.();
-      if (!animationsOn) {
-        el.scrollLeft = target;
-        return;
-      }
-      // Suspend snap during the animation so mandatory-snap doesn't
-      // hijack the rAF tween. Restore after.
-      const prevSnap = el.style.scrollSnapType;
-      el.style.scrollSnapType = "none";
-      cancelScrollRef.current = animateScrollLeft(
-        el,
-        target,
-        SCROLL_DURATION_MS,
-        () => {
-          el.style.scrollSnapType = prevSnap;
-        }
-      );
-    },
-    [animationsOn]
-  );
-
-  const updateEdges = useCallback(() => {
-    const el = trackRef.current;
-    if (!el) return;
-    setAtStart(el.scrollLeft <= 2);
-    setAtEnd(el.scrollLeft + el.clientWidth >= el.scrollWidth - 2);
-    // Compute visible card range for the aria-live status
-    const cards = Array.from(el.querySelectorAll("[data-rail-card]"));
-    if (!cards.length) return;
-    const viewLeft = el.scrollLeft;
-    const viewRight = viewLeft + el.clientWidth;
-    let firstVisible = -1;
-    let lastVisible = -1;
-    cards.forEach((card, i) => {
-      const cardLeft = card.offsetLeft;
-      const cardRight = cardLeft + card.offsetWidth;
-      const visible = cardRight > viewLeft + 8 && cardLeft < viewRight - 8;
-      if (visible) {
-        if (firstVisible === -1) firstVisible = i;
-        lastVisible = i;
-      }
-    });
-    if (firstVisible >= 0) {
-      setPageRange({ start: firstVisible + 1, end: lastVisible + 1 });
-    }
-  }, []);
-
-  useEffect(() => {
-    const el = trackRef.current;
-    if (!el) return;
-
-    let raf = 0;
-    const onScroll = () => {
-      if (raf) return;
-      raf = requestAnimationFrame(() => {
-        raf = 0;
-        updateEdges();
-      });
-    };
-    el.addEventListener("scroll", onScroll, { passive: true });
-
-    const ro = new ResizeObserver(updateEdges);
-    ro.observe(el);
-
-    updateEdges();
-    return () => {
-      el.removeEventListener("scroll", onScroll);
-      ro.disconnect();
-      if (raf) cancelAnimationFrame(raf);
-    };
-  }, [updateEdges, items.length]);
-
-  const scrollByPage = useCallback(
-    (direction) => {
-      const el = trackRef.current;
-      if (!el) return;
-      const step = Math.max(el.clientWidth - CARD_PEEK_PX, 200);
-      scrollTrackTo(el.scrollLeft + direction * step);
-    },
-    [scrollTrackTo]
-  );
-
-  const handleKeyDown = useCallback(
-    (e) => {
-      const el = trackRef.current;
-      if (!el) return;
-      const cards = Array.from(el.querySelectorAll("[data-rail-card] a"));
-      const currentIndex = cards.findIndex((c) => c === document.activeElement);
-
-      const focusCard = (idx) => {
-        const target = cards[idx];
-        if (!target) return;
-        target.focus({ preventScroll: true });
-        const cardEl = target.closest("[data-rail-card]");
-        if (cardEl) {
-          const desiredLeft = cardEl.offsetLeft - el.offsetLeft;
-          scrollTrackTo(desiredLeft);
-        }
-      };
-
-      if (e.key === "ArrowRight") {
-        e.preventDefault();
-        focusCard(Math.min(cards.length - 1, Math.max(currentIndex + 1, 0)));
-      } else if (e.key === "ArrowLeft") {
-        e.preventDefault();
-        focusCard(Math.max(0, currentIndex - 1));
-      } else if (e.key === "Home") {
-        e.preventDefault();
-        focusCard(0);
-      } else if (e.key === "End") {
-        e.preventDefault();
-        focusCard(cards.length - 1);
-      }
-    },
-    [scrollTrackTo]
-  );
-
-  useEffect(() => () => cancelScrollRef.current?.(), []);
-
-  const clearHoverTimer = () => {
-    if (hoverTimer.current) {
-      clearTimeout(hoverTimer.current);
-      hoverTimer.current = null;
-    }
-  };
-
-  const handleCardEnter = (id) => {
-    if (!animationsOn) return;
-    clearHoverTimer();
-    hoverTimer.current = setTimeout(() => setExpandedId(id), HOVER_INTENT_MS);
-  };
-  const handleCardLeave = () => {
-    clearHoverTimer();
-    setExpandedId(null);
-  };
-
-  useEffect(() => () => clearHoverTimer(), []);
-
-  const statusTemplate = copy?.pageStatus || "{start}–{end} of {total}";
-  const statusText = statusTemplate
-    .replace("{start}", localizeDigits(pageRange.start, language))
-    .replace("{end}", localizeDigits(pageRange.end, language))
-    .replace("{total}", localizeDigits(items.length, language));
-
-  const ListTag = animationsOn ? motion.ul : "ul";
-  const listProps = animationsOn ? staggerContainer : {};
-
-  return (
-    <div className="events-home-rail-track-wrap">
-      <button
-        type="button"
-        className="events-home-rail-arrow events-home-rail-arrow--prev"
-        aria-label={copy?.prevAria || "Previous"}
-        onClick={() => scrollByPage(-1)}
-        disabled={atStart}
-      >
-        <LeftOutlined aria-hidden="true" />
-      </button>
-
-      <ListTag
-        ref={trackRef}
-        className="events-home-rail-track"
-        onKeyDown={handleKeyDown}
-        {...listProps}
-      >
-        {items.map((item) =>
-          item.kind === "live" ? (
-            <LiveCard
-              key={item.event.id}
-              event={item.event}
-              copy={copy}
-              animated={animationsOn}
-              isExpanded={expandedId === item.event.id}
-              onEnter={() => handleCardEnter(item.event.id)}
-              onLeave={handleCardLeave}
-            />
-          ) : (
-            <UpcomingCard
-              key={item.event.id}
-              event={item.event}
-              language={language}
-              animated={animationsOn}
-              isExpanded={expandedId === item.event.id}
-              onEnter={() => handleCardEnter(item.event.id)}
-              onLeave={handleCardLeave}
-            />
-          )
-        )}
-      </ListTag>
-
-      <button
-        type="button"
-        className="events-home-rail-arrow events-home-rail-arrow--next"
-        aria-label={copy?.nextAria || "Next"}
-        onClick={() => scrollByPage(1)}
-        disabled={atEnd}
-      >
-        <RightOutlined aria-hidden="true" />
-      </button>
-
-      <span className="events-home-rail-sr-status" aria-live="polite">
-        {animationsOn ? statusText : ""}
-      </span>
-    </div>
-  );
-}
-
-function LiveCard({ event, copy, animated, isExpanded, onEnter, onLeave }) {
-  const Wrapper = animated ? motion.li : "li";
-  const wrapperProps = animated ? staggerItem : {};
+function LiveCard({ event, copy }) {
   const startedAt = event?.liveStream?.startedAt;
   const durationLabel = formatLiveDuration(startedAt, copy);
   const viewers = event?.liveStream?.viewerCount;
   const previewUrl = event?.liveStream?.previewEmbedUrl || event?.liveStream?.streamUrl;
-  const showPreview = isExpanded && previewUrl;
+  const [isHovered, setIsHovered] = useState(false);
+  const reduceMotion = useReducedMotion();
+  // Only preview when this slide is the active (centered) one — Swiper
+  // sets aria-hidden="false" on the active slide; we don't depend on
+  // that here, but hover-only on a non-center slide is unlikely
+  // anyway since other slides are rotated out of pointer-reach.
+  const showPreview = isHovered && previewUrl && !reduceMotion;
 
   return (
-    <Wrapper
+    <article
       className="events-home-rail-card live-events-rail-card"
-      data-rail-card
-      data-expanded={isExpanded ? "true" : undefined}
-      {...wrapperProps}
-      onMouseEnter={onEnter}
-      onMouseLeave={onLeave}
-      onFocus={onEnter}
-      onBlur={onLeave}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       <Link href={`/events/${event.id}`} className="live-events-rail-card-link">
         <div className="live-events-rail-thumb">
@@ -414,27 +206,17 @@ function LiveCard({ event, copy, animated, isExpanded, onEnter, onLeave }) {
             </div>
           )}
 
-          <AnimatePresence>
-            {showPreview ? (
-              <motion.div
-                key="preview"
-                className="live-events-rail-preview"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                aria-hidden="true"
-              >
-                <iframe
-                  src={previewUrl}
-                  title={`${event.title} live preview`}
-                  allow="autoplay; encrypted-media"
-                  loading="lazy"
-                  frameBorder="0"
-                />
-              </motion.div>
-            ) : null}
-          </AnimatePresence>
+          {showPreview ? (
+            <div className="live-events-rail-preview" aria-hidden="true">
+              <iframe
+                src={previewUrl}
+                title={`${event.title} live preview`}
+                allow="autoplay; encrypted-media"
+                loading="lazy"
+                frameBorder="0"
+              />
+            </div>
+          ) : null}
 
           <span className="live-events-rail-badge">
             <span className="live-dot" aria-hidden="true" />
@@ -456,26 +238,15 @@ function LiveCard({ event, copy, animated, isExpanded, onEnter, onLeave }) {
           ) : null}
         </div>
       </Link>
-    </Wrapper>
+    </article>
   );
 }
 
-function UpcomingCard({ event, language, animated, isExpanded, onEnter, onLeave }) {
-  const Wrapper = animated ? motion.li : "li";
-  const wrapperProps = animated ? staggerItem : {};
+function UpcomingCard({ event, language }) {
   const roleCount = Array.isArray(event?.rolesNeeded) ? event.rolesNeeded.length : 0;
 
   return (
-    <Wrapper
-      className="events-home-rail-card live-events-rail-card"
-      data-rail-card
-      data-expanded={isExpanded ? "true" : undefined}
-      {...wrapperProps}
-      onMouseEnter={onEnter}
-      onMouseLeave={onLeave}
-      onFocus={onEnter}
-      onBlur={onLeave}
-    >
+    <article className="events-home-rail-card live-events-rail-card">
       <Link href={`/events/${event.id}`} className="live-events-rail-card-link">
         <div className="live-events-rail-thumb">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -510,7 +281,7 @@ function UpcomingCard({ event, language, animated, isExpanded, onEnter, onLeave 
           ) : null}
         </div>
       </Link>
-    </Wrapper>
+    </article>
   );
 }
 

@@ -81,168 +81,133 @@
   animation: live-dot-pulse 1.6s ease-out infinite;
 }
 
-/* Track wrap = constrained to the same 1180px shell as the header so
- * the rail sits inside the page gutter, not against the viewport edge.
- * Position: relative anchors the overlay arrows to its corners. */
-.events-home-rail-track-wrap {
-  position: relative;
+/* --- Swiper EffectCoverflow theme ---------------------------------- */
+
+.events-home-rail {
+  /* Swiper CSS variables (consumed by .swiper-button-prev/next,
+   * .swiper-pagination-bullet). Brand-aligned. */
+  --swiper-navigation-color: var(--text);
+  --swiper-navigation-size: 20px;
+  --swiper-pagination-color: var(--primary);
+  --swiper-pagination-bullet-inactive-color: var(--line);
+  --swiper-pagination-bullet-inactive-opacity: 1;
+  --swiper-pagination-bullet-size: 8px;
+  --swiper-pagination-bullet-horizontal-gap: 5px;
+}
+
+.events-home-rail-swiper {
   width: min(1180px, calc(100% - 32px));
   margin: 0 auto;
-  /* Vertical breathing room so the hover-expand scale doesn't clip */
-  padding-block: 12px;
+  padding-block: 56px 16px; /* room for tilted side slides + pagination */
+  overflow: visible !important; /* let prev/next slides extend outside */
 }
 
-/* The actual scrolling list. Small inline padding gives the hover-scale
- * outline room to breathe; cards stay inside the 1180px container. */
-.events-home-rail-track {
-  list-style: none;
-  margin: 0;
-  padding: 18px 4px 22px;
-  display: flex;
-  gap: 16px;
-  overflow-x: auto;
-  overflow-y: visible;
-  /* proximity (not mandatory) — mandatory hijacks rAF tweens mid-flight
-   * and reads as instant jumps in Chromium. */
-  scroll-snap-type: x proximity;
-  scroll-padding-inline: 4px;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-}
-
-.events-home-rail-track::-webkit-scrollbar {
-  display: none;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .events-home-rail-track {
-    scroll-behavior: auto;
-  }
-}
-
-.events-home-rail-track:focus-visible {
-  outline: none;
-}
-
-.events-home-rail-card {
-  flex: 0 0 clamp(240px, 22vw, 300px);
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
-  transition:
-    transform 0.32s var(--ease-out-soft),
-    box-shadow 0.32s var(--ease-out-soft);
-  will-change: transform;
-  transform-origin: center top;
-}
-
-@media (max-width: 720px) {
-  .events-home-rail-card {
-    flex-basis: 78vw;
-  }
-}
-
-/* Netflix "Big Card" — hover-intent driven by JS (data-expanded). */
-.events-home-rail-card[data-expanded="true"] {
-  transform: scale(1.08);
-  z-index: 3;
-  box-shadow: var(--shadow-hero, 0 18px 40px rgba(0, 0, 0, 0.25));
-}
-
-/* Adjacent cards slide aside subtly to make room. */
-.events-home-rail-card:has(+ .events-home-rail-card[data-expanded="true"]) {
-  transform: translateX(-12px);
-}
-.events-home-rail-card[data-expanded="true"] + .events-home-rail-card {
-  transform: translateX(12px);
-}
-
-@media (prefers-reduced-motion: reduce), (hover: none) {
-  .events-home-rail-card,
-  .events-home-rail-card[data-expanded="true"],
-  .events-home-rail-card:has(+ .events-home-rail-card[data-expanded="true"]),
-  .events-home-rail-card[data-expanded="true"] + .events-home-rail-card {
-    transform: none;
-    transition: none;
-    box-shadow: var(--shadow-1);
-  }
-}
-
-/* Overlay paging arrows — frosted glass, edge-anchored, fade on rail hover. */
-.events-home-rail-arrow {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 48px;
-  height: 76px;
-  display: inline-flex;
+.events-home-rail-swiper .swiper-wrapper {
   align-items: center;
-  justify-content: center;
-  background: rgba(20, 20, 20, 0.55);
-  -webkit-backdrop-filter: blur(8px) saturate(140%);
-  backdrop-filter: blur(8px) saturate(140%);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #fff;
-  cursor: pointer;
-  font-size: 18px;
-  opacity: 0;
+}
+
+.events-home-rail-slide {
+  width: clamp(240px, 24vw, 320px);
+  height: auto;
+  display: flex;
+}
+
+.events-home-rail-slide > .events-home-rail-card {
+  width: 100%;
+}
+
+/* Frosted-glass nav buttons. Swiper renders .swiper-button-prev/next
+ * as absolute pseudos already positioned at the slider edges. */
+.events-home-rail .swiper-button-prev,
+.events-home-rail .swiper-button-next {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-2);
+  color: var(--text);
   transition:
-    opacity 0.25s var(--ease-out-soft),
     background 0.2s var(--ease-out-soft),
     transform 0.2s var(--ease-out-soft);
-  z-index: 4;
-  padding: 0;
+  top: 50%;
+  margin-top: 0;
+  transform: translateY(-50%);
 }
 
-.events-home-rail-arrow:hover:not([disabled]) {
-  background: rgba(20, 20, 20, 0.75);
+.events-home-rail .swiper-button-prev::after,
+.events-home-rail .swiper-button-next::after {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.events-home-rail .swiper-button-prev:hover,
+.events-home-rail .swiper-button-next:hover {
+  background: var(--surface-soft);
   transform: translateY(-50%) scale(1.06);
 }
 
-.events-home-rail-arrow:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
-  opacity: 1;
-}
-
-.events-home-rail-arrow[disabled] {
+.events-home-rail .swiper-button-prev.swiper-button-disabled,
+.events-home-rail .swiper-button-next.swiper-button-disabled {
   opacity: 0;
   pointer-events: none;
 }
 
-.events-home-rail:hover .events-home-rail-arrow:not([disabled]),
-.events-home-rail:focus-within .events-home-rail-arrow:not([disabled]) {
-  opacity: 1;
+.events-home-rail .swiper-pagination {
+  position: relative;
+  margin-top: 18px;
+  bottom: auto;
 }
 
-.events-home-rail-arrow--prev {
-  left: 0;
-  border-left: 0;
-  border-radius: 0 var(--radius-md) var(--radius-md) 0;
-}
-
-.events-home-rail-arrow--next {
-  right: 0;
-  border-right: 0;
-  border-radius: var(--radius-md) 0 0 var(--radius-md);
-}
-
-/* Hide arrows on touch — swipe is the natural gesture there. */
-@media (hover: none) {
-  .events-home-rail-arrow {
-    display: none;
+@media (max-width: 720px) {
+  .events-home-rail-swiper {
+    padding-block: 36px 12px;
   }
-  .events-home-rail-track-wrap {
-    -webkit-mask-image: none;
-    mask-image: none;
+  .events-home-rail .swiper-button-prev,
+  .events-home-rail .swiper-button-next {
+    display: none; /* swipe is the natural gesture on touch */
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .events-home-rail-arrow,
-  .events-home-rail-arrow:hover:not([disabled]) {
-    transition: none;
-    transform: translateY(-50%);
-  }
+/* Card layout — width fills the slide; the rest (border, background,
+ * box-shadow) comes from the legacy .live-events-rail-card class which
+ * is also on the same node. Suppress its translateY hover here because
+ * it would fight the coverflow 3D transform. */
+.events-home-rail-card {
+  width: 100%;
+}
+
+.events-home-rail-swiper .live-events-rail-card:hover {
+  transform: none;
+}
+
+/* Active (centered) slide gets a stronger shadow — Swiper toggles
+ * .swiper-slide-active on the active slide automatically. */
+.events-home-rail-swiper .swiper-slide-active .events-home-rail-card {
+  box-shadow: var(--shadow-hero, 0 18px 40px rgba(0, 0, 0, 0.22));
+}
+
+.events-home-rail-empty {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 22px;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-soft);
+  color: var(--text);
+}
+
+.events-home-rail-empty-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+.events-home-rail-empty p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  opacity: 0.85;
 }
 
 .events-home-rail-scheduled-badge {
@@ -273,19 +238,6 @@
 .events-home-rail-roles {
   color: var(--primary);
   font-weight: 600;
-}
-
-/* Visually hidden, screen-reader-only status. */
-.events-home-rail-sr-status {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
 }
 
 /* Legacy live-rail header (kept for any non-home usage) */

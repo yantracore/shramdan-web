@@ -1239,8 +1239,7 @@ export const copy = {
       durationLive: "देखि लाइभ",
       ariaCarousel: "लाइभ र आउँदा अभियानहरूको स्लाइडर",
       prevAria: "अघिल्ला अभियानहरू देखाउनुहोस्",
-      nextAria: "अरू अभियानहरू देखाउनुहोस्",
-      pageStatus: "{start}–{end} / {total}"
+      nextAria: "अरू अभियानहरू देखाउनुहोस्"
     },
     liveIssues: {
       eyebrow: "सक्रिय समस्याहरू",
@@ -2830,8 +2829,7 @@ export const copy = {
       durationLive: "live",
       ariaCarousel: "Live and upcoming campaigns carousel",
       prevAria: "Show previous campaigns",
-      nextAria: "Show next campaigns",
-      pageStatus: "{start}–{end} of {total}"
+      nextAria: "Show next campaigns"
     },
     liveIssues: {
       eyebrow: "Active Issues",
