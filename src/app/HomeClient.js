@@ -336,9 +336,6 @@ export default function HomeClient({ summary }) {
             <Button type="primary" size="large" href="#we-need-you" icon={<HeartOutlined />}>
               {t.hero.join}
             </Button>
-            <Button size="large" href="/intro">
-              {t.hero.introLabel || (language === "np" ? "श्रमदान चिनौं →" : "Meet Shramdan →")}
-            </Button>
           </div>
         </div>
         <aside className="hero-panel glass-panel" aria-label={t.ariaLabels.heroPanel}>
