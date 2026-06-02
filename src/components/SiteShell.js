@@ -87,9 +87,7 @@ export function SiteShell({ children, pageTitle }) {
   const isAdmin = isAuthenticated && isAdminUser(session.user);
   const navItems = [
     { href: "/", label: t.nav.home },
-    { href: "/intro", label: t.nav.intro },
     { href: "/issues", label: t.nav.issues },
-    { href: "/learn", label: t.nav.learn },
     { href: "/join", label: t.nav.join },
     { href: "/feedback", label: t.nav.feedback },
     isAuthenticated
