@@ -154,6 +154,16 @@ export default function IssueDetailPage() {
   const imageUploads = uploads
     .filter(isImageUpload)
     .filter((upload) => upload.url !== coverImageUrl);
+  // Cover image alt fallback chain — Next.js Image strips the attribute
+  // when alt is undefined/empty, which produces "Image is missing required
+  // alt property" console errors on issues without a title yet.
+  const coverAlt =
+    issue?.title ||
+    issue?.addressText ||
+    (issue?.category && content.categoryLabels?.[issue.category]) ||
+    (issue?.status && content.statusLabels?.[issue.status]) ||
+    content.detail?.galleryAria ||
+    "Issue";
 
   const scrollToLocation = () => {
     const target = document.getElementById("issue-location");
@@ -210,7 +220,7 @@ export default function IssueDetailPage() {
             {coverImageUrl ? (
               <div className="public-issue-detail-cover">
                 <Image
-                  alt={issue.title}
+                  alt={coverAlt}
                   height={720}
                   src={coverImageUrl}
                   unoptimized
@@ -276,7 +286,7 @@ export default function IssueDetailPage() {
               {imageUploads.length > 0 ? (
                 <IssuePhotoGallery
                   images={imageUploads}
-                  title={issue.title}
+                  title={coverAlt}
                   content={content}
                 />
               ) : null}
