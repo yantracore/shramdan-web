@@ -95,6 +95,13 @@ When you (the coding agent) are working in this repo:
 
 - [x] P2 [from 8] Topbar notifications bell + dev-dummy inbox — effort:S ← done: 2026-06-02 *(new `NotificationsBell` + 5 sample notifications in `devMockData` covering vote / schedule / result / live / welcome kinds, each kind-tinted circular icon. Badge count localizes to Devanagari digits when language=np; "Mark all read" + per-item read-toggle in local state; backend swap-ready via getJson("/notifications").)*
 
+## Phase 14 — Build-in-Public surfaces (cont.)
+
+- [x] P2 [from 1.5.2] Vote count tick-up animation on `IssueVoteButton` — effort:S ← done: 2026-06-02 *(380ms spring-up via pulseKey state + CSS keyframes; reduced-motion safe)*
+- [x] P2 [from 14] BeforeAfterSlider on past event detail — effort:M ← done: 2026-06-02 *(new component: mouse / touch / arrow-key dragable divider, 16:9 aspect, BEFORE/AFTER chips; each demo past event now carries a `beforeAfter` photo pair piped through `getDemoEventById`)*
+- [x] P2 [from 2] `/me/preview` — auth-free profile stub — effort:S ← done: 2026-06-02 *(parallel route to the auth-gated /me; brand-gradient avatar, stat tiles, recent-activity timeline from `getDemoNotifications`, upcoming + past events; banner makes "demo" intent obvious; CTA back to `/signup`)*
+- [x] P2 [from 6] `/impact` aggregate page — effort:M ← done: 2026-06-02 *(sums devMockData past-events into 4 headline tiles, per-event list with 3-stat clusters, primary CTA card. UI-only; bilingual.)*
+
 ## Phase 11 — Cross-cutting
 
 - [ ] P2 [from 11.1] `AdminResponsiveList`: column-visibility toggle — effort:S
