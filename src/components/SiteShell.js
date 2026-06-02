@@ -215,6 +215,9 @@ export function SiteShell({ children, pageTitle }) {
 
   return (
     <main className="site-shell">
+      <a className="skip-to-main" href="#main-content">
+        {t.ariaLabels.skipToMain}
+      </a>
       <header
         className={`topbar${isHeaderVisible ? "" : " topbar-hidden"}`}
         aria-label={t.ariaLabels.nav}
@@ -362,7 +365,9 @@ export function SiteShell({ children, pageTitle }) {
         </details>
       </header>
 
-      {children}
+      <div id="main-content" tabIndex={-1}>
+        {children}
+      </div>
 
       <footer className="footer" aria-label={t.footer.ariaLabel}>
         <div className="footer-brand">

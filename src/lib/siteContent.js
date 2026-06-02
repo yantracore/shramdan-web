@@ -33,7 +33,8 @@ export const copy = {
       toggleTheme: "थिम बदल्नुहोस्",
       openMenu: "नेभिगेसन खोल्नुहोस्",
       heroPanel: "श्रमदान कार्य केन्द्र",
-      userMenu: "प्रयोगकर्ता मेनु"
+      userMenu: "प्रयोगकर्ता मेनु",
+      skipToMain: "मुख्य सामग्रीमा जानुहोस्"
     },
     controls: {
       language: "English",
@@ -846,7 +847,7 @@ export const copy = {
       playlist: {
         title: "श्रमदान विकास भिडियो शृङ्खला",
         description: "श्रमदानको विकास यात्रा, प्रत्यक्ष प्रसारण र परियोजनाको सन्दर्भ यहीँबाट सिधै हेर्न सकिन्छ।",
-        embedUrl: "https://www.youtube-nocookie.com/embed/videoseries?list=PLWkh0s4xHPcTF4FOcYjkdR3i97YbkSDGo",
+        embedUrl: "https://www.youtube-nocookie.com/embed/videoseries?list=PLWkh0s4xHPcTF4FOcYjkdR3i97YbkSDGo&rel=0&modestbranding=1",
         playlistUrl: "https://www.youtube.com/playlist?list=PLWkh0s4xHPcTF4FOcYjkdR3i97YbkSDGo",
         button: "युट्युबमा पूरै प्लेलिस्ट हेर्नुहोस्"
       },
@@ -1612,7 +1613,8 @@ export const copy = {
       toggleTheme: "Toggle theme",
       openMenu: "Open navigation",
       heroPanel: "Shramdan action hub",
-      userMenu: "User menu"
+      userMenu: "User menu",
+      skipToMain: "Skip to main content"
     },
     controls: {
       language: "नेपाली",
@@ -2433,7 +2435,7 @@ export const copy = {
       playlist: {
         title: "Shramdan development playlist",
         description: "Watch the Shramdan development walkthrough, livestream, and project context directly from this page.",
-        embedUrl: "https://www.youtube-nocookie.com/embed/videoseries?list=PLWkh0s4xHPcTF4FOcYjkdR3i97YbkSDGo",
+        embedUrl: "https://www.youtube-nocookie.com/embed/videoseries?list=PLWkh0s4xHPcTF4FOcYjkdR3i97YbkSDGo&rel=0&modestbranding=1",
         playlistUrl: "https://www.youtube.com/playlist?list=PLWkh0s4xHPcTF4FOcYjkdR3i97YbkSDGo",
         button: "Watch Full Playlist on YouTube"
       },
