@@ -101,18 +101,20 @@
   width: min(1180px, calc(100% - 32px));
   margin: 0 auto;
   padding-block: 56px 24px; /* room for tilted side slides + pagination */
-  overflow: visible !important; /* let prev/next slides extend outside */
+  /* Clip to the rail width — only the active slide + the two adjacent
+   * (left/right) slides are meant to be visible at any time. Without
+   * this, slides 4 and 5 leak into the page margins on wide viewports. */
+  overflow: hidden;
 }
 
-/* Coverflow needs explicit slide dimensions — aspect-ratio on the
- * child isn't read in time for Swiper's 3D layout math, which causes
- * the side slides to mis-position or collapse. !important locks the
- * geometry against any future Swiper version that might inline a
- * conflicting `width: 100%` on .swiper-slide. The slide is a fixed
- * 4:5 portrait — see DESIGN CONTRACT in EventsHomeRail.js. */
+/* Coverflow needs explicit slide HEIGHT so Swiper's 3D layout math has
+ * a measurable dimension before the browser paints. Width is intentionally
+ * NOT set here — Swiper controls it via the `slidesPerView` breakpoints
+ * declared in EventsHomeRail.js, so exactly 3 cards fit on desktop,
+ * 2 on tablet, 1.2 on mobile (the .2 peek hints at swipeability).
+ * See DESIGN CONTRACT in EventsHomeRail.js. */
 .events-home-rail-swiper .events-home-rail-slide.swiper-slide {
-  width: clamp(220px, 22vw, 280px) !important;
-  height: clamp(275px, 27.5vw, 350px) !important;
+  height: clamp(280px, 32vw, 460px) !important;
 }
 
 /* --- Netflix-poster card -------------------------------------------- */

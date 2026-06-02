@@ -7,12 +7,14 @@ import { CalendarOutlined, EyeOutlined, TeamOutlined } from "@ant-design/icons";
 import { Swiper, SwiperSlide } from "swiper/react";
 import {
   A11y,
+  Autoplay,
   EffectCoverflow,
   Keyboard,
   Navigation,
   Pagination
 } from "swiper/modules";
 import "swiper/css";
+import "swiper/css/autoplay";
 import "swiper/css/effect-coverflow";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
@@ -51,6 +53,21 @@ const COVERFLOW_PARAMS = Object.freeze({
 });
 const COVERFLOW_SPEED_DEFAULT = 900;
 const COVERFLOW_SPEED_REDUCED = 0;
+
+// Exactly 3 cards on desktop (1 active centered + 1 tilted on each side).
+// Breakpoints are min-width: at ≥1024px → 3, 640–1023px → 2, <640px → 1.2
+// (gives a small peek on mobile so the swipe gesture is discoverable).
+const SLIDES_BREAKPOINTS = Object.freeze({
+  0: { slidesPerView: 1.2, spaceBetween: 16 },
+  640: { slidesPerView: 2, spaceBetween: 20 },
+  1024: { slidesPerView: 3, spaceBetween: 24 }
+});
+
+const AUTOPLAY_OPTIONS = Object.freeze({
+  delay: 5000,
+  disableOnInteraction: false,
+  pauseOnMouseEnter: true
+});
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 
@@ -148,11 +165,12 @@ export function EventsHomeRail({
           effect="coverflow"
           grabCursor
           centeredSlides
-          slidesPerView="auto"
+          breakpoints={SLIDES_BREAKPOINTS}
+          loop={items.length > 3}
           speed={reduceMotion ? COVERFLOW_SPEED_REDUCED : COVERFLOW_SPEED_DEFAULT}
-          initialSlide={Math.floor(items.length / 2)}
           keyboard={{ enabled: true }}
           coverflowEffect={COVERFLOW_PARAMS}
+          autoplay={reduceMotion ? false : AUTOPLAY_OPTIONS}
           pagination={{ clickable: true }}
           navigation
           onSwiper={handleActive}
@@ -162,7 +180,7 @@ export function EventsHomeRail({
             nextSlideMessage: copy?.nextAria,
             containerRoleDescriptionMessage: copy?.ariaCarousel
           }}
-          modules={[EffectCoverflow, Pagination, Navigation, Keyboard, A11y]}
+          modules={[EffectCoverflow, Pagination, Navigation, Keyboard, A11y, Autoplay]}
         >
           {items.map((item, index) => {
             const isActive = index === activeIndex;
