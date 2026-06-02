@@ -5,10 +5,19 @@ import {
   CalendarOutlined,
   ClockCircleOutlined,
   EnvironmentOutlined,
-  EyeOutlined,
   TeamOutlined
 } from "@ant-design/icons";
 import { forwardRef } from "react";
+
+function computeParticipantCount(event) {
+  if (Number.isFinite(event?.participantCount)) return event.participantCount;
+  if (!Array.isArray(event?.rolesNeeded)) return null;
+  const sum = event.rolesNeeded.reduce(
+    (acc, r) => acc + (Number.isFinite(r?.filled) ? r.filled : 0),
+    0
+  );
+  return sum > 0 ? sum : null;
+}
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 
@@ -80,6 +89,8 @@ export const EventListCard = forwardRef(function EventListCard(
         ? t.filters.upcoming
         : t.filters.past;
 
+  const participantCount = computeParticipantCount(event);
+
   return (
     <li
       ref={ref}
@@ -107,9 +118,9 @@ export const EventListCard = forwardRef(function EventListCard(
             {t.meta.live}
           </span>
         ) : null}
-        {status === "live" && Number.isFinite(event.liveStream?.viewerCount) ? (
+        {status === "live" && Number.isFinite(participantCount) ? (
           <span className="event-list-card-viewers" aria-hidden="true">
-            {localizeDigits(event.liveStream.viewerCount, language)}
+            {localizeDigits(participantCount, language)}
           </span>
         ) : null}
       </div>
@@ -128,11 +139,10 @@ export const EventListCard = forwardRef(function EventListCard(
           </p>
         ) : null}
         <p className="event-list-card-meta-secondary">
-          {status === "live" && Number.isFinite(event.liveStream?.viewerCount) ? (
+          {status === "live" && Number.isFinite(participantCount) ? (
             <span>
-              <EyeOutlined aria-hidden="true" />
-              {localizeDigits(event.liveStream.viewerCount, language)}{" "}
-              {language === "np" ? "हेर्दैछन्" : "watching"}
+              <TeamOutlined aria-hidden="true" />
+              {localizeDigits(participantCount, language)} {t.meta.participants}
             </span>
           ) : null}
           {status === "upcoming" && event.scheduledAt ? (

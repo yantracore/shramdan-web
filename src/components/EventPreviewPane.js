@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ArrowLeftOutlined,
   ArrowRightOutlined,
@@ -79,26 +79,112 @@ export function EventPreviewPane({
   isMobileDrillActive
 }) {
   const [descExpanded, setDescExpanded] = useState(false);
+  const [isPinned, setIsPinned] = useState(false);
+  const [isChanging, setIsChanging] = useState(false);
+  const asideRef = useRef(null);
+  const sentinelRef = useRef(null);
+  const didResolveFirstEventRef = useRef(false);
 
-  // Reset clamp state when selection changes.
+  // Reset internal scroll + ensure the aside is visible + play a selection
+  // pulse, all keyed on event id. The visibility check matters when the
+  // list is long enough that `.events-split` ends before the user's scroll
+  // depth — the aside has natural-sticky un-stuck and is off-screen; on a
+  // selection from far down, we scroll it back into the sticky zone
+  // (scroll-margin-top on the aside handles the header offset).
   useEffect(() => {
     setDescExpanded(false);
+    if (!event?.id) return undefined;
+
+    const prefersReducedMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    asideRef.current?.scrollTo({
+      top: 0,
+      behavior: prefersReducedMotion ? "auto" : "smooth"
+    });
+
+    // Skip the visibility check on the first event resolved into the pane
+    // (initial mount / URL-driven deep-link). Page.js already handles the
+    // initial scroll for those cases via the selected card's scrollIntoView.
+    if (!didResolveFirstEventRef.current) {
+      didResolveFirstEventRef.current = true;
+    } else {
+      const node = asideRef.current;
+      if (node && typeof window !== "undefined") {
+        const rect = node.getBoundingClientRect();
+        const stickyTop =
+          (parseInt(
+            getComputedStyle(document.documentElement).getPropertyValue("--header-height") ||
+              "74",
+            10
+          ) || 74) + 14;
+        if (rect.top < stickyTop - 4 || rect.top > window.innerHeight - 120) {
+          node.scrollIntoView({
+            block: "start",
+            behavior: prefersReducedMotion ? "auto" : "smooth"
+          });
+        }
+      }
+    }
+
+    if (prefersReducedMotion) return undefined;
+    setIsChanging(true);
+    const timer = window.setTimeout(() => setIsChanging(false), 460);
+    return () => window.clearTimeout(timer);
   }, [event?.id]);
+
+  // Sentinel + IntersectionObserver to detect when the sticky aside is
+  // actually pinned. The sentinel sits just above the aside; once it
+  // crosses the top of the viewport (offset by the fixed header), the
+  // aside is stuck — flip `is-pinned` for a stronger shadow.
+  useEffect(() => {
+    const node = sentinelRef.current;
+    if (!node || typeof IntersectionObserver === "undefined") return undefined;
+    const headerHeight =
+      typeof window !== "undefined"
+        ? parseInt(
+            getComputedStyle(document.documentElement).getPropertyValue("--header-height") ||
+              "74",
+            10
+          ) || 74
+        : 74;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsPinned(!entry.isIntersecting && entry.boundingClientRect.top < 0);
+      },
+      { rootMargin: `-${headerHeight + 14}px 0px 0px 0px`, threshold: [0, 1] }
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
+  const asideClass = [
+    "events-split-preview",
+    isPinned ? "is-pinned" : "",
+    isChanging ? "is-changing" : ""
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   if (!event) {
     return (
-      <aside className="events-split-preview" aria-live="polite">
-        {isMobileDrillActive ? (
-          <button
-            type="button"
-            className="event-preview-back"
-            onClick={onBack}
-          >
-            <ArrowLeftOutlined aria-hidden="true" /> {t.preview.back}
-          </button>
-        ) : null}
-        <div className="event-preview-empty">{t.preview.empty}</div>
-      </aside>
+      <>
+        <div ref={sentinelRef} className="events-split-preview-sentinel" aria-hidden="true" />
+        <aside ref={asideRef} className={asideClass} aria-live="polite">
+          {isMobileDrillActive ? (
+            <button
+              type="button"
+              className="event-preview-back"
+              onClick={onBack}
+            >
+              <ArrowLeftOutlined aria-hidden="true" /> {t.preview.back}
+            </button>
+          ) : null}
+          <div className="event-preview-empty">{t.preview.empty}</div>
+        </aside>
+      </>
     );
   }
 
@@ -114,11 +200,14 @@ export function EventPreviewPane({
       : formatDateLong(event.scheduledAt || event.liveStream?.startedAt, language);
 
   return (
-    <aside
-      className="events-split-preview"
-      aria-live="polite"
-      aria-labelledby="event-preview-title"
-    >
+    <>
+      <div ref={sentinelRef} className="events-split-preview-sentinel" aria-hidden="true" />
+      <aside
+        ref={asideRef}
+        className={asideClass}
+        aria-live="polite"
+        aria-labelledby="event-preview-title"
+      >
       {isMobileDrillActive ? (
         <button
           type="button"
@@ -187,7 +276,11 @@ export function EventPreviewPane({
           ) : null}
         </div>
 
-        <h2 id="event-preview-title">{event.title}</h2>
+        <h2 id="event-preview-title">
+          <Link className="event-preview-title-link" href={`/events/${event.id}`}>
+            {event.title}
+          </Link>
+        </h2>
 
         <p className="event-preview-meta">
           {dateText ? (
@@ -317,6 +410,7 @@ export function EventPreviewPane({
           </Link>
         </div>
       </div>
-    </aside>
+      </aside>
+    </>
   );
 }
