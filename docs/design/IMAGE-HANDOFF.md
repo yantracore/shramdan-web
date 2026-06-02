@@ -1,8 +1,10 @@
 # Shramdan Image Handoff
 
-> ⚠️ **2026-06-02 reset.** The Tier 1 sections of this doc were written on a faulty assumption that `event-types/`, `homepage/cleanup-areas/`, and `homepage/core-idea/` were placeholder-only. They were not — all three folders had real, intentionally-shipped images already (May 14 / May 27 / May 29 commits by the project owner). A regeneration round was started and reverted; **do not regenerate Tier 1**. Only Tier 2 and Tier 3 are genuinely needed.
+> ⚠️ **2026-06-02 reset.** The Tier 1 sections of this doc were written on a faulty assumption that `event-types/`, `homepage/cleanup-areas/`, and `homepage/core-idea/` were placeholder-only. They were not — all three folders had real, intentionally-shipped images already (May 14 / May 27 / May 29 commits by the project owner). A regeneration round was started and reverted; **do not regenerate Tier 1**.
+>
+> **Active work today: Tier 2 only** (per-event demo thumbnails — a new path, no overwrites). Tier 3 is parked until the UI surfaces that would consume those assets are designed and wired.
 
-Copy-pasteable spec for image-generation work. Save every output at the exact file path listed. Next.js picks them up automatically — no code change required.
+Copy-pasteable spec for image-generation work. Save every output at the exact file path listed. After Tier 2 files land, the coding agent will update `src/lib/devMockData.js` to point each demo event at its dedicated thumbnail.
 
 ---
 
@@ -73,11 +75,13 @@ These are **diagrammatic illustrations, not photos.** They live in the "5-step h
 
 ---
 
-## Tier 2 — Per-event demo thumbnails (12 photos, optional but high impact)
+## Tier 2 — Per-event demo thumbnails (12 photos) — ✅ ACTIVE
 
-Currently the 12 demo events on `/events` and the homepage live rail all share the same 8 event-type photos. Distinct thumbnails per event would make the demo data feel much more real.
+The 12 demo events on `/events` and the homepage live rail currently all share the same 8 event-type photos (because `devMockData.js` points each event at `/images/event-types/<category>.jpg`). Distinct per-event thumbnails make demo data feel real and let presentation surfaces visually differentiate each event.
 
-**Spec:** 16:9 landscape, 1280×720 px, JPG, ~150–250 KB. Save under `public/images/demo-events/`. Then we'll update `src/lib/devMockData.js` to point each event at its dedicated file.
+**Status:** New path, no overwrites. After files land, the coding agent will update `src/lib/devMockData.js` to wire them up.
+
+**Spec:** 16:9 landscape, 1280×720 px, JPG, ~150–250 KB target. Save under `public/images/demo-events/` (the folder does not yet exist — create it).
 
 | File name | Prompt |
 |---|---|
@@ -96,14 +100,14 @@ Currently the 12 demo events on `/events` and the homepage live rail all share t
 
 ---
 
-## Tier 3 — Optional brand polish (4 images, nice-to-have)
+## Tier 3 — ⏸ PARKED
 
-| File path | Prompt |
-|---|---|
-| `public/images/hero-shramdaan-bg.png` *(already exists — replace only if upgrading)* | Full-bleed cinematic hero background for the homepage — a misty Himalayan dawn over the Kathmandu Valley, with subtle terraced hillsides and a barely-visible silhouette of volunteers working in the foreground. Painterly, soft, low contrast. 16:9 landscape, 2400×1350 px, PNG. |
-| `public/images/og-shramdan.jpg` *(already exists — replace only if upgrading)* | Open Graph share card. A clean composition: photo of Nepali community volunteers in action (cleanup or planting), with significant negative space at the top half where the brand "श्रमदान" can be overlaid in post. 1200×630 px, JPG. |
-| `public/images/shramesh-portrait.png` *(new — for /learn/shramesh page)* | A friendly, abstract portrait of "श्रमेश" — the AI shramdan member character. Not a literal person; a stylized abstract figure or geometric mascot suggesting helpfulness and quiet intelligence. Two-tone (primary green + orange accent), warm, with a transparent background. Headspace × Linear style, mobile-readable. 800×800 px, PNG. |
-| `public/images/intro-hero-bg.png` *(new — for /intro page hero)* | Cinematic opener for the /intro scrollable storytelling page — a wide misty valley dawn with a single distant figure silhouette walking toward sunrise, very subtle, painterly, low contrast so foreground text remains readable. 16:9 landscape, 2400×1350 px, PNG. |
+Not active. Two of the four items in earlier drafts overwrote already-real files (`hero-shramdaan-bg.png`, `og-shramdan.jpg`) — same lesson as Tier 1. The other two (`shramesh-portrait.png`, `intro-hero-bg.png`) are not referenced anywhere in code yet — the consuming UI surfaces (`/learn/shramesh` portrait slot, `/intro` background image) haven't been designed. Generating those assets now would mean files sitting around unused.
+
+Revisit only after a coding-side design decision answers:
+
+- Where on `/learn/shramesh` does the portrait go (hero band? side card? inline near "Meet श्रमेश"?), and what aspect ratio + size does that slot need?
+- Does `/intro` actually need a background image, or does the GSAP-driven type + accent shapes already carry the cinematic feel?
 
 ---
 
