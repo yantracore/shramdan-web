@@ -5,7 +5,14 @@
 // the issue id hash. Real /issues/:id/comments endpoint will swap in
 // the same shape (id, name, role, text, createdAt).
 
-import { MessageOutlined, SendOutlined } from "@ant-design/icons";
+import {
+  DislikeFilled,
+  DislikeOutlined,
+  LikeFilled,
+  LikeOutlined,
+  MessageOutlined,
+  SendOutlined
+} from "@ant-design/icons";
 import { Button, Input } from "antd";
 import { useMemo, useState } from "react";
 import { getDemoIssueComments } from "@/lib/devMockData";
@@ -28,7 +35,11 @@ const COPY = {
     submit: "पठाउनुहोस्",
     minutesAgo: "{n} मि. अघि",
     hoursAgo: "{n} घण्टा अघि",
-    daysAgo: "{n} दिन अघि"
+    daysAgo: "{n} दिन अघि",
+    helpful: "उपयोगी",
+    notHelpful: "उपयोगी छैन",
+    voteUpAria: "उपयोगी मान्नुहोस्",
+    voteDownAria: "उपयोगी छैन मान्नुहोस्"
   },
   en: {
     heading: "Discussion",
@@ -39,9 +50,24 @@ const COPY = {
     submit: "Post",
     minutesAgo: "{n} min ago",
     hoursAgo: "{n} h ago",
-    daysAgo: "{n} d ago"
+    daysAgo: "{n} d ago",
+    helpful: "Helpful",
+    notHelpful: "Not helpful",
+    voteUpAria: "Mark helpful",
+    voteDownAria: "Mark not helpful"
   }
 };
+
+// Deterministic vote seed so the first-render counts feel real and
+// don't change on re-mount. Cheap string-hash mod small ranges.
+function seedVotes(id) {
+  let h = 0;
+  for (let i = 0; i < id.length; i += 1) {
+    h = ((h << 5) - h + id.charCodeAt(i)) | 0;
+  }
+  const a = Math.abs(h);
+  return { up: 2 + (a % 14), down: a % 4 };
+}
 
 function initialOf(name) {
   if (!name) return "—";
@@ -65,9 +91,34 @@ export function IssueComments({ issueId, language = "np" }) {
   const seeded = useMemo(() => getDemoIssueComments(issueId), [issueId]);
   const [comments, setComments] = useState(seeded);
   const [draft, setDraft] = useState("");
+  const initialVotes = useMemo(() => {
+    const map = {};
+    for (const c of seeded) {
+      map[c.id] = { ...seedVotes(c.id), myVote: null };
+    }
+    return map;
+  }, [seeded]);
+  const [votes, setVotes] = useState(initialVotes);
 
   if (!issueId) return null;
   if (seeded.length === 0) return null;
+
+  const castVote = (commentId, direction) => {
+    setVotes((prev) => {
+      const current = prev[commentId] || {
+        ...seedVotes(commentId),
+        myVote: null
+      };
+      let { up, down } = current;
+      // Roll back any previous vote first.
+      if (current.myVote === "up") up = Math.max(0, up - 1);
+      else if (current.myVote === "down") down = Math.max(0, down - 1);
+      const myVote = current.myVote === direction ? null : direction;
+      if (myVote === "up") up += 1;
+      else if (myVote === "down") down += 1;
+      return { ...prev, [commentId]: { up, down, myVote } };
+    });
+  };
 
   const handleSubmit = (e) => {
     e?.preventDefault?.();
@@ -98,23 +149,66 @@ export function IssueComments({ issueId, language = "np" }) {
       <p className="issue-comments-intro">{t.intro}</p>
 
       <ul className="issue-comments-list">
-        {comments.map((c) => (
-          <li key={c.id} className="issue-comment">
-            <span className="issue-comment-avatar" aria-hidden="true">
-              {initialOf(c.name)}
-            </span>
-            <div className="issue-comment-body">
-              <div className="issue-comment-attrib">
-                <strong>{c.name}</strong>
-                <span className="issue-comment-role">{c.role}</span>
-                <span className="issue-comment-time">
-                  · {relativeTime(c.createdAt, t, language)}
-                </span>
+        {comments.map((c) => {
+          const v = votes[c.id] || { up: 0, down: 0, myVote: null };
+          const helpful = v.up - v.down >= 5;
+          return (
+            <li key={c.id} className="issue-comment">
+              <span className="issue-comment-avatar" aria-hidden="true">
+                {initialOf(c.name)}
+              </span>
+              <div className="issue-comment-body">
+                <div className="issue-comment-attrib">
+                  <strong>{c.name}</strong>
+                  <span className="issue-comment-role">{c.role}</span>
+                  <span className="issue-comment-time">
+                    · {relativeTime(c.createdAt, t, language)}
+                  </span>
+                  {helpful ? (
+                    <span className="issue-comment-helpful">
+                      <LikeFilled aria-hidden="true" /> {t.helpful}
+                    </span>
+                  ) : null}
+                </div>
+                <p className="issue-comment-text">{c.text}</p>
+                <div
+                  className="issue-comment-votes"
+                  role="group"
+                  aria-label={`${t.helpful} / ${t.notHelpful}`}
+                >
+                  <button
+                    type="button"
+                    className={`issue-comment-vote${v.myVote === "up" ? " is-on" : ""}`}
+                    onClick={() => castVote(c.id, "up")}
+                    aria-pressed={v.myVote === "up"}
+                    aria-label={t.voteUpAria}
+                  >
+                    {v.myVote === "up" ? (
+                      <LikeFilled aria-hidden="true" />
+                    ) : (
+                      <LikeOutlined aria-hidden="true" />
+                    )}
+                    <span>{localizeDigits(v.up, language)}</span>
+                  </button>
+                  <button
+                    type="button"
+                    className={`issue-comment-vote is-down${v.myVote === "down" ? " is-on" : ""}`}
+                    onClick={() => castVote(c.id, "down")}
+                    aria-pressed={v.myVote === "down"}
+                    aria-label={t.voteDownAria}
+                  >
+                    {v.myVote === "down" ? (
+                      <DislikeFilled aria-hidden="true" />
+                    ) : (
+                      <DislikeOutlined aria-hidden="true" />
+                    )}
+                    <span>{localizeDigits(v.down, language)}</span>
+                  </button>
+                </div>
               </div>
-              <p className="issue-comment-text">{c.text}</p>
-            </div>
-          </li>
-        ))}
+            </li>
+          );
+        })}
       </ul>
 
       <form className="issue-comments-composer" onSubmit={handleSubmit}>
