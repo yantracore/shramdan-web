@@ -695,3 +695,87 @@ export function injectMockLiveStream(eventId, realEvent) {
     rolesNeeded: realEvent.rolesNeeded?.length ? realEvent.rolesNeeded : DEMO_ROSTER
   };
 }
+
+// --- Notifications mock ----------------------------------------------
+// Five sample notifications shown in the topbar bell dropdown when the
+// real notifications API isn't wired yet. Each carries a stable ISO
+// timestamp relative to "now" so the relative-time display animates as
+// hours pass. The schema mirrors what we expect the real API to return:
+//   { id, kind, title, body, href, isRead, createdAt }
+// `kind` drives the per-item icon in NotificationsBell.
+function minutesAgo(min) {
+  return new Date(Date.now() - min * 60_000).toISOString();
+}
+
+const DEMO_NOTIFICATIONS = [
+  {
+    id: "n1",
+    kind: "vote",
+    title: { np: "नयाँ समर्थन", en: "New support" },
+    body: {
+      np: "बागमती किनार समस्यामा थप ३ जनाले समर्थन गरे।",
+      en: "3 more people supported the Bagmati riverbank issue."
+    },
+    href: "/issues",
+    isRead: false,
+    createdAt: minutesAgo(8)
+  },
+  {
+    id: "n2",
+    kind: "schedule",
+    title: { np: "नजिकैको अभियान", en: "Nearby campaign" },
+    body: {
+      np: "रत्नपार्क सरसफाइ अभियान बिहीबार ४ बजे तय भयो।",
+      en: "Ratnapark cleanup is scheduled for Thursday 4 PM."
+    },
+    href: "/events/demo-up-1",
+    isRead: false,
+    createdAt: minutesAgo(45)
+  },
+  {
+    id: "n3",
+    kind: "result",
+    title: { np: "अभियान सम्पन्न", en: "Campaign completed" },
+    body: {
+      np: "गुह्येश्वरी सरसफाइले २.८ टन फोहोर हटायो।",
+      en: "Guheshwari cleanup removed 2.8 tonnes of waste."
+    },
+    href: "/events/demo-past-1",
+    isRead: true,
+    createdAt: minutesAgo(180)
+  },
+  {
+    id: "n4",
+    kind: "live",
+    title: { np: "अहिले लाइभ", en: "Live now" },
+    body: {
+      np: "बागमती नदी सरसफाइ युट्युब लाइभमा प्रसारण भइरहेको छ।",
+      en: "Bagmati cleanup is streaming on YouTube Live."
+    },
+    href: "/events/demo-live-1",
+    isRead: true,
+    createdAt: minutesAgo(35)
+  },
+  {
+    id: "n5",
+    kind: "welcome",
+    title: { np: "स्वागत छ", en: "Welcome" },
+    body: {
+      np: "श्रमदान सदस्यका रूपमा तपाईंको खाता खुल्यो।",
+      en: "Your Shramdan member account is ready."
+    },
+    href: "/me",
+    isRead: true,
+    createdAt: minutesAgo(60 * 26)
+  }
+];
+
+export function getDemoNotifications() {
+  if (!isDev()) return [];
+  return DEMO_NOTIFICATIONS;
+}
+
+export function getDemoUnreadCount() {
+  if (!isDev()) return 0;
+  return DEMO_NOTIFICATIONS.filter((n) => !n.isRead).length;
+}

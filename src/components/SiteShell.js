@@ -17,6 +17,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { FaFacebookF, FaTiktok, FaXTwitter, FaYoutube } from "react-icons/fa6";
+import { NotificationsBell } from "@/components/NotificationsBell";
 import { usePreferences } from "@/app/providers";
 import { copy } from "@/lib/siteContent";
 import { getAuthSession, isAdminUser, subscribeAuthSession } from "@/lib/authSession";
@@ -271,6 +272,7 @@ export function SiteShell({ children, pageTitle }) {
                 href="/settings"
               />
             </Tooltip>
+            <NotificationsBell language={language} />
           </div>
           {isAuthenticated ? (
             <Dropdown menu={userMenu} placement="bottomRight" trigger={["click"]}>
