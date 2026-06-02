@@ -558,7 +558,6 @@
   width: min(1180px, calc(100% - 32px));
   margin: 0 auto;
   padding: 40px 0;
-  border-top: 1px solid var(--section-divider);
 }
 
 .cleanup-areas-section {
@@ -568,7 +567,6 @@
   width: min(1180px, calc(100% - 32px));
   margin: 0 auto;
   padding: 56px 0;
-  border-top: 1px solid var(--section-divider);
 }
 
 .cleanup-areas-heading,
@@ -753,7 +751,6 @@
   width: min(1180px, calc(100% - 32px));
   margin: 0 auto;
   padding: 56px 0;
-  border-top: 1px solid var(--section-divider);
 }
 
 .core-idea-hero {
@@ -1023,7 +1020,6 @@
   width: min(1180px, calc(100% - 32px));
   margin: 0 auto;
   padding: 56px 0;
-  border-top: 1px solid var(--section-divider);
 }
 
 .volunteer-visual,
@@ -4854,7 +4850,6 @@
   display: flex;
   flex-direction: column;
   gap: 26px;
-  border-top: 1px solid var(--section-divider);
 }
 
 .building-now-header {
@@ -5369,7 +5364,6 @@
   width: 100%;
   display: grid;
   gap: 20px;
-  border-top: 1px solid var(--section-divider);
 }
 
 .live-issues-header {
@@ -5606,7 +5600,6 @@
   width: min(1180px, calc(100% - 32px));
   margin: 0 auto;
   padding: 56px 0;
-  border-top: 1px solid var(--section-divider);
 }
 
 .event-types-heading {
@@ -6526,4 +6519,37 @@
   .leader-schedule-form .leader-schedule-coords {
     grid-template-columns: 1fr;
   }
+}
+
+/* Edge-to-edge homepage section dividers — the sections themselves are
+   constrained to ~1180px, so we draw the divider via a ::before that
+   extends to the viewport edges. */
+.page-section,
+.cleanup-areas-section,
+.core-idea-section,
+.volunteer-invite-section,
+.building-now-section,
+.live-issues-section,
+.event-types-section,
+.live-events-rail {
+  position: relative;
+}
+
+.page-section::before,
+.cleanup-areas-section::before,
+.core-idea-section::before,
+.volunteer-invite-section::before,
+.building-now-section::before,
+.live-issues-section::before,
+.event-types-section::before,
+.live-events-rail::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 100vw;
+  height: 1px;
+  margin-left: -50vw;
+  background: var(--section-divider);
+  pointer-events: none;
 }
