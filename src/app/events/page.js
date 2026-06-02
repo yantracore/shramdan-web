@@ -158,15 +158,50 @@ export default function EventsListPage() {
   const upcoming = useMemo(() => getDemoUpcomingEvents(), []);
   const past = useMemo(() => getDemoPastEvents(), []);
 
+  // ----- city filter ----------------------------------------------------
+  const initialCity = searchParams?.get("city") || "all";
+  const [city, setCity] = useState(initialCity);
+  useEffect(() => {
+    const c = searchParams?.get("city") || "all";
+    setCity((prev) => (prev === c ? prev : c));
+  }, [searchParams]);
+
+  const cityOptions = useMemo(() => {
+    const set = new Set();
+    [...live, ...upcoming, ...past].forEach((e) => {
+      const tail = (e.addressText || "").split(",").pop()?.trim();
+      if (tail) set.add(tail);
+    });
+    return Array.from(set).sort();
+  }, [live, upcoming, past]);
+
+  const updateCity = useCallback(
+    (next) => {
+      setCity(next);
+      const params = new URLSearchParams(searchParams?.toString() || "");
+      if (!next || next === "all") params.delete("city");
+      else params.set("city", next);
+      const query = params.toString();
+      router.replace(query ? `/events?${query}` : "/events", { scroll: false });
+    },
+    [router, searchParams]
+  );
+
   const orderedEvents = useMemo(() => {
     const items = [
       ...live.map((event) => ({ event, status: "live" })),
       ...[...upcoming].sort(byScheduledAsc).map((event) => ({ event, status: "upcoming" })),
       ...[...past].sort(byCompletedDesc).map((event) => ({ event, status: "past" }))
     ];
-    if (filter === "all") return items;
-    return items.filter((entry) => entry.status === filter);
-  }, [live, upcoming, past, filter]);
+    let filtered = filter === "all" ? items : items.filter((entry) => entry.status === filter);
+    if (city && city !== "all") {
+      filtered = filtered.filter((entry) => {
+        const tail = (entry.event.addressText || "").split(",").pop()?.trim();
+        return tail === city;
+      });
+    }
+    return filtered;
+  }, [live, upcoming, past, filter, city]);
 
   // ----- selection state --------------------------------------------------
   const [selectedId, setSelectedId] = useState(null);
@@ -457,6 +492,22 @@ export default function EventsListPage() {
                 options={statusOptions}
                 placeholder={t.filters.statusPlaceholder}
                 value={filter === "all" ? undefined : filter}
+              />
+            </div>
+            <div className="public-issues-filter-field">
+              <label
+                className="public-issues-filter-label"
+                htmlFor="events-filter-city"
+              >
+                {language === "np" ? "स्थान" : "City"}
+              </label>
+              <Select
+                id="events-filter-city"
+                allowClear
+                onChange={(value) => updateCity(value || "all")}
+                options={cityOptions.map((c) => ({ value: c, label: c }))}
+                placeholder={language === "np" ? "सबै स्थान" : "All cities"}
+                value={city === "all" ? undefined : city}
               />
             </div>
             <Link className="public-issues-filters-cta" href="/issues/new">
