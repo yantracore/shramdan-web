@@ -26,11 +26,16 @@ const ROLE_COLORS = {
   LOGISTICS: "#1d4ed8"
 };
 
+const MAX_VISIBLE_CHIPS = 3;
+
 const COPY = {
   np: {
     heading: "कसले-कसले जोडिँदै छन्",
     intro: "हरेक श्रमदानमा फरक-फरक भूमिकामा साथीहरू चाहिन्छन्। तपाईं पनि कुनै भूमिकामा जोडिनुहोस्।",
-    filledOf: "{filled} / {count} जना",
+    filledOf: "{filled} / {count}",
+    moreFilled: "+{n}",
+    openPill: "+{n} खाली",
+    fullPill: "पूरा",
     unfilled: "खाली",
     joinAs: "जोडिनुहोस्",
     roles: {
@@ -55,7 +60,10 @@ const COPY = {
   en: {
     heading: "Who's joining",
     intro: "Every shramdan needs different roles. Pick one and join.",
-    filledOf: "{filled} / {count} filled",
+    filledOf: "{filled} / {count}",
+    moreFilled: "+{n}",
+    openPill: "+{n} open",
+    fullPill: "Full",
     unfilled: "open",
     joinAs: "Join",
     roles: {
@@ -91,50 +99,60 @@ export function EventRosterPanel({ rolesNeeded, language = "np", eventId }) {
       </header>
 
       <ul className="event-roster-list">
-        {rolesNeeded.map((row) => (
-          <li key={row.role} className="event-roster-row">
-            <div className="event-roster-row-meta">
-              <div className="event-roster-row-title">
-                <span
-                  className="event-roster-role"
-                  style={{ "--role-color": ROLE_COLORS[row.role] || "#176b5c" }}
-                >
-                  {t.roles[row.role] || row.role}
-                </span>
-                <span className="event-roster-count">
-                  {t.filledOf.replace("{filled}", row.filled).replace("{count}", row.count)}
-                </span>
-              </div>
-              {t.roleDescriptions[row.role] ? (
-                <p className="event-roster-role-description">
-                  {t.roleDescriptions[row.role]}
-                </p>
-              ) : null}
-            </div>
-            <div className="event-roster-chips">
-              {row.filledNames?.map((name, i) => (
-                <span
-                  key={`${row.role}-${i}`}
-                  className="event-roster-chip event-roster-chip-filled"
-                  style={{ "--role-color": ROLE_COLORS[row.role] || "#176b5c" }}
-                  title={name}
-                >
-                  {getInitial(name)}
-                </span>
-              ))}
-              {Array.from({ length: Math.max(0, row.count - row.filled) }).map((_, i) => (
+        {rolesNeeded.map((row) => {
+          const roleColor = ROLE_COLORS[row.role] || "#176b5c";
+          const roleLabel = t.roles[row.role] || row.role;
+          const filledNames = Array.isArray(row.filledNames) ? row.filledNames : [];
+          const visibleNames = filledNames.slice(0, MAX_VISIBLE_CHIPS);
+          const hiddenCount = Math.max(0, filledNames.length - visibleNames.length);
+          const openCount = Math.max(0, row.count - row.filled);
+          const joinHref = `/join?role=${encodeURIComponent(row.role)}${eventId ? `&event=${eventId}` : ""}`;
+          return (
+            <li key={row.role} className="event-roster-row">
+              <span
+                className="event-roster-role"
+                style={{ "--role-color": roleColor }}
+                title={t.roleDescriptions[row.role] || undefined}
+              >
+                {roleLabel}
+              </span>
+              <span className="event-roster-count">
+                {t.filledOf.replace("{filled}", row.filled).replace("{count}", row.count)}
+              </span>
+              <span className="event-roster-chips" aria-hidden={filledNames.length === 0}>
+                {visibleNames.map((name, i) => (
+                  <span
+                    key={`${row.role}-${i}`}
+                    className="event-roster-chip event-roster-chip-filled"
+                    style={{ "--role-color": roleColor }}
+                    title={name}
+                  >
+                    {getInitial(name)}
+                  </span>
+                ))}
+                {hiddenCount > 0 ? (
+                  <span
+                    className="event-roster-chip event-roster-chip-more"
+                    title={filledNames.slice(MAX_VISIBLE_CHIPS).join(", ")}
+                  >
+                    {t.moreFilled.replace("{n}", hiddenCount)}
+                  </span>
+                ) : null}
+              </span>
+              {openCount > 0 ? (
                 <Link
-                  key={`${row.role}-empty-${i}`}
-                  className="event-roster-chip event-roster-chip-empty"
-                  href={`/join?role=${encodeURIComponent(row.role)}${eventId ? `&event=${eventId}` : ""}`}
-                  aria-label={`${t.joinAs} — ${t.roles[row.role] || row.role}`}
+                  className="event-roster-open-pill"
+                  href={joinHref}
+                  aria-label={`${t.joinAs} — ${roleLabel}`}
                 >
-                  +
+                  {t.openPill.replace("{n}", openCount)}
                 </Link>
-              ))}
-            </div>
-          </li>
-        ))}
+              ) : (
+                <span className="event-roster-full-pill">{t.fullPill}</span>
+              )}
+            </li>
+          );
+        })}
       </ul>
     </section>
   );
