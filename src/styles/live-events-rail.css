@@ -98,18 +98,16 @@
 .events-home-rail-swiper {
   width: min(1180px, calc(100% - 32px));
   margin: 0 auto;
-  padding-block: 56px 16px; /* room for tilted side slides + pagination */
+  padding-block: 56px 24px; /* room for tilted side slides + pagination */
   overflow: visible !important; /* let prev/next slides extend outside */
 }
 
-.events-home-rail-swiper .swiper-wrapper {
-  align-items: center;
-}
-
+/* Coverflow needs explicit slide dimensions — aspect-ratio on the child
+ * isn't read in time for Swiper's 3D layout math, which causes the
+ * side slides to mis-position or collapse. */
 .events-home-rail-slide {
-  width: clamp(240px, 24vw, 320px);
-  height: auto;
-  display: flex;
+  width: clamp(220px, 22vw, 280px);
+  height: clamp(275px, 27.5vw, 350px); /* 4:5 ratio, locked in pixels */
 }
 
 /* --- Netflix-poster card -------------------------------------------- */
@@ -117,7 +115,7 @@
 .events-home-rail-poster-card {
   position: relative;
   width: 100%;
-  aspect-ratio: 4 / 5;
+  height: 100%;
   border-radius: var(--radius-md);
   overflow: hidden;
   background: #111;

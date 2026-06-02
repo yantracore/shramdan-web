@@ -146,12 +146,12 @@ export function EventsHomeRail({
           grabCursor
           centeredSlides
           slidesPerView="auto"
-          loop={useLoop}
+          initialSlide={Math.floor(items.length / 2)}
           keyboard={{ enabled: true }}
           coverflowEffect={{
-            rotate: 35,
+            rotate: 50,
             stretch: 0,
-            depth: 140,
+            depth: 100,
             modifier: 1,
             slideShadows: false
           }}
