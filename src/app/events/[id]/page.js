@@ -19,6 +19,7 @@ import { EventRosterPanel } from "@/components/EventRosterPanel";
 import IssueMapBlock from "@/components/IssueMapBlock";
 import { PrintButton } from "@/components/PrintButton";
 import { StickyActionBar } from "@/components/StickyActionBar";
+import { TertiaryButton } from "@/components/TertiaryButton";
 import { IssuePhotoGallery } from "@/components/IssuePhotoGallery";
 import { LeaderScheduleEditor } from "@/components/LeaderScheduleEditor";
 import { CommentSection } from "@/components/comments";
@@ -173,9 +174,9 @@ export default function EventDetailPage() {
     <SiteShell pageTitle={pageTitle || content.detail.defaultTitle}>
       <section className="page-section public-issue-detail-section">
         <div className="public-issue-back-row">
-          <Link className="public-issue-back-link" href="/events">
-            <ArrowLeftOutlined /> {content.detail.backToEvents}
-          </Link>
+          <TertiaryButton href="/events" icon={<ArrowLeftOutlined />}>
+            {content.detail.backToEvents}
+          </TertiaryButton>
           <PrintButton language={language} />
         </div>
 

@@ -16,6 +16,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { SiteShell } from "@/components/SiteShell";
 import { StickyActionBar } from "@/components/StickyActionBar";
+import { TertiaryButton } from "@/components/TertiaryButton";
 import { usePreferences } from "@/app/providers";
 import { copy } from "@/lib/siteContent";
 import { getDemoEventTypeStats } from "@/lib/devMockData";
@@ -69,10 +70,9 @@ export default function EventTypeDetailPage() {
     <SiteShell pageTitle={`${item.title} | ${eventTypes.page.pageTitle}`}>
       <article className="event-type-detail">
         <header className="event-type-detail-header">
-          <Link className="event-type-detail-back" href="/event-types">
-            <ArrowLeftOutlined aria-hidden="true" />
+          <TertiaryButton href="/event-types" icon={<ArrowLeftOutlined />}>
             {detail.backToList}
-          </Link>
+          </TertiaryButton>
           <span className="eyebrow">{detail.eyebrow}</span>
           <h1>{item.title}</h1>
           {item.tagline ? (
@@ -253,10 +253,9 @@ export default function EventTypeDetailPage() {
         ) : null}
 
         <div className="event-type-detail-footer-actions">
-          <Link className="event-type-detail-back" href="/event-types">
-            <ArrowLeftOutlined aria-hidden="true" />
+          <TertiaryButton href="/event-types" icon={<ArrowLeftOutlined />}>
             {detail.backToList}
-          </Link>
+          </TertiaryButton>
         </div>
       </article>
 

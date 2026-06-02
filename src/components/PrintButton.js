@@ -1,13 +1,12 @@
 "use client";
 
-// Small button that triggers window.print(). On screen it's a discreet
-// outline pill; in @media print the rest of the chrome (header, FAB,
-// notifications etc.) is hidden via a print-only CSS rule so what
-// actually prints is just the main article. No PDF lib — we rely on
-// the browser's Save-as-PDF in the system print dialog.
+// Wraps the shared <TertiaryButton> with print-specific behavior:
+// click → window.print(). The browser's print dialog has a built-in
+// Save-as-PDF option, so we don't ship a PDF library.
 
 import { PrinterOutlined } from "@ant-design/icons";
 import { useCallback } from "react";
+import { TertiaryButton } from "@/components/TertiaryButton";
 
 const COPY = {
   np: { label: "PDF/प्रिन्ट" },
@@ -23,13 +22,13 @@ export function PrintButton({ language = "np", className = "" }) {
   }, []);
 
   return (
-    <button
-      type="button"
+    <TertiaryButton
       onClick={onClick}
-      className={`print-button${className ? ` ${className}` : ""}`}
+      className={className}
+      icon={<PrinterOutlined />}
       aria-label={t.label}
     >
-      <PrinterOutlined aria-hidden="true" /> {t.label}
-    </button>
+      {t.label}
+    </TertiaryButton>
   );
 }
