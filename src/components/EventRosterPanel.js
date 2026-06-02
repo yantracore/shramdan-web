@@ -30,8 +30,8 @@ const MAX_VISIBLE_CHIPS = 3;
 
 const COPY = {
   np: {
-    heading: "कसले-कसले जोडिँदै छन्",
-    intro: "हरेक श्रमदानमा फरक-फरक भूमिकामा साथीहरू चाहिन्छन्। तपाईं पनि कुनै भूमिकामा जोडिनुहोस्।",
+    heading: "सहभागीहरू",
+    intro: "हरेक श्रमदानमा विभिन्न तरिकाले साथीहरू सहभागी हुन्छन्। तपाईं पनि आफ्नो रुचि अनुसार जोडिनुहोस्।",
     filledOf: "{filled} / {count}",
     moreFilled: "+{n}",
     openPill: "+{n} खाली",
@@ -58,8 +58,8 @@ const COPY = {
     }
   },
   en: {
-    heading: "Who's joining",
-    intro: "Every shramdan needs different roles. Pick one and join.",
+    heading: "Participants",
+    intro: "Every shramdan welcomes participants in different ways. Pick one that fits you and join.",
     filledOf: "{filled} / {count}",
     moreFilled: "+{n}",
     openPill: "+{n} open",
