@@ -58,9 +58,9 @@ export async function generateMetadata({ params }) {
 
   if (!ctx) {
     return buildMetadata({
-      title: "कार्य-प्रकार भेटिएन | Event type not found",
+      title: "कार्यक्षेत्र भेटिएन | Event type not found",
       description:
-        "यो कार्य-प्रकार उपलब्ध छैन। श्रमदानको कार्य-दायरा हेर्नुहोस्। This event type is not available — browse what Shramdan can do.",
+        "यो कार्यक्षेत्र उपलब्ध छैन। श्रमदानको कार्यक्षेत्र हेर्नुहोस्। This event type is not available — browse what Shramdan can do.",
       path,
       noindex: true
     });
