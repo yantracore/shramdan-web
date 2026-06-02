@@ -89,10 +89,12 @@
   --swiper-navigation-color: var(--text);
   --swiper-navigation-size: 20px;
   --swiper-pagination-color: var(--primary);
-  --swiper-pagination-bullet-inactive-color: var(--line);
-  --swiper-pagination-bullet-inactive-opacity: 1;
-  --swiper-pagination-bullet-size: 8px;
-  --swiper-pagination-bullet-horizontal-gap: 5px;
+  /* --line is too faint on the light cream background — use --muted
+   * (mid-gray) for inactive bullets so they're visible on both themes. */
+  --swiper-pagination-bullet-inactive-color: var(--muted);
+  --swiper-pagination-bullet-inactive-opacity: 0.45;
+  --swiper-pagination-bullet-size: 9px;
+  --swiper-pagination-bullet-horizontal-gap: 6px;
 }
 
 .events-home-rail-swiper {
@@ -315,6 +317,22 @@
   position: relative;
   margin-top: 18px;
   bottom: auto;
+}
+
+.events-home-rail .swiper-pagination-bullet {
+  transition:
+    opacity 0.25s var(--ease-out-soft),
+    transform 0.25s var(--ease-out-soft),
+    background-color 0.25s var(--ease-out-soft);
+}
+
+.events-home-rail .swiper-pagination-bullet:hover {
+  opacity: 0.8;
+  transform: scale(1.15);
+}
+
+.events-home-rail .swiper-pagination-bullet-active {
+  transform: scale(1.2);
 }
 
 @media (max-width: 720px) {

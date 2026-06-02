@@ -146,6 +146,7 @@ export function EventsHomeRail({
           grabCursor
           centeredSlides
           slidesPerView="auto"
+          speed={900}
           initialSlide={Math.floor(items.length / 2)}
           keyboard={{ enabled: true }}
           coverflowEffect={{
