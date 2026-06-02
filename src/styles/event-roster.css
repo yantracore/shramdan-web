@@ -523,3 +523,52 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* --- Homepage upcoming events strip --------------------------------- */
+
+.home-upcoming-strip {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 24px 0;
+  border-top: 1px solid var(--line);
+}
+
+.home-upcoming-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.home-upcoming-header h2 {
+  font-size: clamp(22px, 2.4vw, 30px);
+  line-height: 1.2;
+  margin: 4px 0 6px;
+}
+
+.home-upcoming-header p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  max-width: 56ch;
+}
+
+.home-upcoming-view-all {
+  color: var(--primary);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.home-upcoming-view-all:hover {
+  text-decoration: underline;
+}
+
+.home-upcoming-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+}

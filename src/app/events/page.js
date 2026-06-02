@@ -100,6 +100,27 @@ function timeFromNow(iso, language) {
   return `${localizeDigits(days, language)} ${language === "np" ? "दिन" : "d"}`;
 }
 
+// Date pill — full readable date + time for upcoming events.
+// "मंगल · २१ जेठ · २:३० बेलुका" / "Tue · Jun 4 · 2:30 PM"
+function formatSchedulePill(iso, language) {
+  if (!iso) return "";
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return "";
+  const locale = language === "np" ? "ne-NP" : "en-US";
+  try {
+    const fmt = new Intl.DateTimeFormat(locale, {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit"
+    }).format(date);
+    return fmt;
+  } catch {
+    return date.toLocaleString();
+  }
+}
+
 function LiveCard({ event, t, language }) {
   return (
     <Link href={`/events/${event.id}`} className="events-card events-card-live">
@@ -129,14 +150,14 @@ function LiveCard({ event, t, language }) {
 }
 
 function UpcomingCard({ event, t, language }) {
-  const when = timeFromNow(event.scheduledAt, language);
+  const datePill = formatSchedulePill(event.scheduledAt, language);
   return (
     <Link href={`/events/${event.id}`} className="events-card events-card-upcoming">
       <div className="events-card-thumb">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={event.thumbnailUrl || "/images/event-types/cleanup.jpg"} alt={event.title} loading="lazy" />
         <span className="events-card-badge events-card-badge-upcoming">
-          <CalendarOutlined aria-hidden="true" /> {t.meta.in} {when}
+          <CalendarOutlined aria-hidden="true" /> {datePill}
         </span>
       </div>
       <div className="events-card-body">

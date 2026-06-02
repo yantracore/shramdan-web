@@ -49,6 +49,20 @@ export const DEMO_LIVE_EVENTS = [
     title: "बागमती नदी सरसफाइ",
     addressText: "तीनकुने पुल, ललितपुर",
     rolesNeeded: DEMO_ROSTER,
+    meetupNotes:
+      "तीनकुने पुलको दक्षिणी छेउमा भेला हुने। पार्किङ पुल छेउको खाली जग्गामा। पन्जा र मास्क लिएर आउनुहोस् — टीमले अरू सामग्री ल्याउँछ।",
+    linkedIssue: {
+      id: "demo-issue-bagmati-1",
+      title: "बागमती नदी किनार अव्यवस्थित फोहोर",
+      description:
+        "तीनकुने पुल अघिको ५०० मिटर खण्ड वर्षायाममा फोहोर र प्लास्टिकले भरिएको छ। नदी किनार सङ्ग दैनिक १,२०० भन्दा बढी हिँडुवा यात्रु; स्थानीय व्यवसायहरूले बढ्दो मच्छर र दुर्गन्धको गुनासो गरिरहेका छन्। आज को सरसफाइले प्लास्टिक छुट्याउने, अजैविक संकलन, र दीर्घकालीन निगरानीको आधार बनाउनेछ।",
+      category: "cleanup",
+      addressText: "तीनकुने पुल, ललितपुर",
+      latitude: 27.6749,
+      longitude: 85.3491,
+      voteCount: 89,
+      status: "EVENT_SCHEDULED"
+    },
     liveStream: {
       isActive: true,
       startedAt: new Date(Date.now() - 37 * 60_000).toISOString(),
@@ -64,6 +78,20 @@ export const DEMO_LIVE_EVENTS = [
     title: "स्कुल भित्ता पेन्ट + मर्मत",
     addressText: "श्री जनप्रिय मा.वि., काठमाडौँ",
     rolesNeeded: DEMO_ROSTER,
+    meetupNotes:
+      "स्कुलको मुख्य गेटबाट छिर्ने। प्रिन्सिपलको कार्यालयमा हाजिर। पुराना लुगा लगाएर आउनुहोस् — रङ बिग्रिनसक्छ।",
+    linkedIssue: {
+      id: "demo-issue-school-2",
+      title: "श्री जनप्रिय मा.वि. भित्ता पेन्ट र पुस्तकालय मर्मत",
+      description:
+        "विद्यालयको मुख्य भवनको भित्ता ८ वर्षदेखि पेन्ट नभएको। पुस्तकालयका ३ ओटा झ्याल टुटेका। ४८० विद्यार्थी प्रभावित। SMC ले सामग्री खर्च बेहोर्ने प्रतिबद्धता गरेको — हामी श्रम र समय जुटाउँछौं।",
+      category: "infrastructure",
+      addressText: "श्री जनप्रिय मा.वि., काठमाडौँ",
+      latitude: 27.7037,
+      longitude: 85.3346,
+      voteCount: 56,
+      status: "EVENT_SCHEDULED"
+    },
     liveStream: {
       isActive: true,
       startedAt: new Date(Date.now() - 8 * 60_000).toISOString(),
@@ -79,6 +107,20 @@ export const DEMO_LIVE_EVENTS = [
     title: "वृक्षारोपण अभियान — सूर्यविनायक",
     addressText: "सूर्यविनायक नगर, भक्तपुर",
     rolesNeeded: DEMO_ROSTER,
+    meetupNotes:
+      "सूर्यविनायक मन्दिर परिसरको पश्चिम गेटमा भेला। बिरुवा, चित्रकोलो, पानी, हलुका खाजा सब टीमले ल्याउँछ। आफ्नो पानीको बोतल लिएर आउनुहोस्।",
+    linkedIssue: {
+      id: "demo-issue-tree-3",
+      title: "सूर्यविनायक खाली ढिक्कामा वृक्षारोपण",
+      description:
+        "सूर्यविनायक मन्दिर पछाडिको खाली ढिक्का (०.८ हेक्टर) पहिरो जोखिममा। नगरपालिकाले निःशुल्क बिरुवा (चिलाउने, उत्तिस, अप्रिकोट) उपलब्ध गराउने भनेको। हाम्रो काम: रोप्ने, सुरक्षा घेरा हाल्ने, ३ महिनासम्म पानी हाल्ने प्रतिबद्धता।",
+      category: "afforestation",
+      addressText: "सूर्यविनायक नगर, भक्तपुर",
+      latitude: 27.6566,
+      longitude: 85.4366,
+      voteCount: 142,
+      status: "EVENT_SCHEDULED"
+    },
     liveStream: {
       isActive: true,
       startedAt: new Date(Date.now() - 102 * 60_000).toISOString(),
@@ -116,7 +158,21 @@ export const DEMO_UPCOMING_EVENTS = [
     meetupLongitude: 85.3148,
     leaderName: "रोहित कार्की",
     rolesNeeded: DEMO_ROSTER,
-    riskLevel: "NORMAL"
+    riskLevel: "NORMAL",
+    meetupNotes:
+      "रत्नपार्क मुख्य गेट छेउमा भेला। पन्जा र मास्क टीमले लिएर आउँछ; पानीको बोतल आफ्नै ल्याउनुहोस्।",
+    linkedIssue: {
+      id: "demo-issue-ratna-1",
+      title: "रत्नपार्क परिसर र सडक छेउ फोहोर समस्या",
+      description:
+        "रत्नपार्क सहर बीचको प्रमुख सार्वजनिक स्थल, तर परिसर र सडक छेउमा पन्ध्र दिनदेखि फोहोर थुप्रिएको। दैनिक १०,०००+ हिँडुवा। नगरले ट्रक उपलब्ध गराउने प्रतिबद्धता गरेको; हाम्रो काम छुट्याउने, ब्याग भर्ने र लोड गर्ने।",
+      category: "cleanup",
+      addressText: "रत्नपार्क, काठमाडौँ",
+      latitude: 27.7044,
+      longitude: 85.3148,
+      voteCount: 67,
+      status: "EVENT_SCHEDULED"
+    }
   },
   {
     id: "demo-up-2",
@@ -130,7 +186,21 @@ export const DEMO_UPCOMING_EVENTS = [
     meetupLongitude: 85.3128,
     leaderName: "बिनिता थापा",
     rolesNeeded: DEMO_ROSTER,
-    riskLevel: "NORMAL"
+    riskLevel: "NORMAL",
+    meetupNotes:
+      "त्रिपुरेश्वर पुल दक्षिणी छेउमा भेला। २०० बिरुवा रोप्ने लक्ष्य; गाड्ने तरिकाको छोटो प्रशिक्षण ८:३० मा।",
+    linkedIssue: {
+      id: "demo-issue-tripureshwar-2",
+      title: "त्रिपुरेश्वर पुल छेउ नदी किनार सम्भार",
+      description:
+        "त्रिपुरेश्वर पुलको दुवै छेउमा नदी किनार खुर्किएको — मनसुनमा पहिरो जोखिम। वन कार्यालयले ३०० बिरुवा (बकैनो, रिठ्ठा, अप्रिकोट) निःशुल्क उपलब्ध। हामी रोप्छौँ + ३ महिनासम्म पानी हाल्न लाइन तय गर्छौं।",
+      category: "afforestation",
+      addressText: "त्रिपुरेश्वर पुल, काठमाडौँ",
+      latitude: 27.6912,
+      longitude: 85.3128,
+      voteCount: 94,
+      status: "EVENT_SCHEDULED"
+    }
   },
   {
     id: "demo-up-3",
@@ -144,7 +214,21 @@ export const DEMO_UPCOMING_EVENTS = [
     meetupLongitude: 85.3922,
     leaderName: "स्मिता शर्मा",
     rolesNeeded: DEMO_ROSTER,
-    riskLevel: "WATCH"
+    riskLevel: "WATCH",
+    meetupNotes:
+      "गोकर्णेश्वर मन्दिर मुख्य गेट छेउ भेला। हाइकिङ बूट र पानीको बोतल अनिवार्य; टीमले हलुका खाजा र औजार ल्याउँछ। ३ घण्टा हिँड्ने तयारी।",
+    linkedIssue: {
+      id: "demo-issue-trail-3",
+      title: "गोकर्णेश्वर ट्रेल फोहोर, इरोसन, साइन गायब",
+      description:
+        "गोकर्णेश्वर देखि शिवपुरीसम्मको ४.२ किमी हिकिङ ट्रेलमा ३ मुख्य समस्या — साइन गायब (४ ठाउँ), डाँडामा इरोसन (२ ठाउँ), र पर्यटकले फालेको प्लास्टिक थुप्रिएको। यो दिन साइन फेरि लगाउने, ढुङ्गा मिलाउने, र फोहोर सङ्कलन।",
+      category: "trail",
+      addressText: "गोकर्णेश्वर ट्रेल, काठमाडौँ",
+      latitude: 27.7521,
+      longitude: 85.3922,
+      voteCount: 71,
+      status: "EVENT_SCHEDULED"
+    }
   },
   {
     id: "demo-up-4",
@@ -158,7 +242,21 @@ export const DEMO_UPCOMING_EVENTS = [
     meetupLongitude: 85.3469,
     leaderName: "गणेश राई",
     rolesNeeded: DEMO_ROSTER,
-    riskLevel: "NORMAL"
+    riskLevel: "NORMAL",
+    meetupNotes:
+      "स्कुलको मुख्य गेटमा हाजिर। SMC अध्यक्षले स्वागत गर्ने। पुरानो लुगा अनिवार्य; रङ बिग्रिनसक्छ।",
+    linkedIssue: {
+      id: "demo-issue-school-4",
+      title: "श्री दुर्गा देवी मा.वि. ३२० विद्यार्थीको स्कुल मर्मतयोग्य अवस्थामा",
+      description:
+        "विद्यालय भवनको भित्ता ६ वर्षदेखि पेन्ट नभएको; २ ओटा शौचालयको ढोका टुटेको; पुस्तकालय कक्षमा सिलिङ चुहिने। ३२० विद्यार्थी प्रभावित। SMC ले पेन्ट र निर्माण सामग्री खर्च बेहोर्ने तय। हामी श्रम र समन्वय जुटाउँछौँ।",
+      category: "infrastructure",
+      addressText: "श्री दुर्गा देवी मा.वि., गौशाला, काठमाडौँ",
+      latitude: 27.7081,
+      longitude: 85.3469,
+      voteCount: 112,
+      status: "EVENT_SCHEDULED"
+    }
   },
   {
     id: "demo-up-5",
@@ -172,7 +270,21 @@ export const DEMO_UPCOMING_EVENTS = [
     meetupLongitude: 85.3260,
     leaderName: "सुनिल मगर",
     rolesNeeded: DEMO_ROSTER,
-    riskLevel: "NORMAL"
+    riskLevel: "NORMAL",
+    meetupNotes:
+      "कमलपोखरी मन्दिर छेउ भेला। पैदलमार्गको दुई किनारका ८ ठाउँमा भित्ता चित्र। रङ टीमको, ब्रश आफ्नो लगे राम्रो।",
+    linkedIssue: {
+      id: "demo-issue-kamal-5",
+      title: "कमलपोखरी पैदलमार्ग भित्ता र साइनबोर्ड पुराना",
+      description:
+        "कमलपोखरी ५०० मि. पैदलमार्ग पुरानो र अदृश्य। नगरपालिकाले अनुमति दिएको; ८ भित्ता चित्र र ४ साइनबोर्ड नयाँ बनाउने। स्थानीय कलाकारहरूले डिजाइन तयार पारेका — सहभागीहरूले पेन्ट र चित्रकोलोले रङ हाल्ने।",
+      category: "beautification",
+      addressText: "कमलपोखरी पैदलमार्ग, काठमाडौँ",
+      latitude: 27.7155,
+      longitude: 85.3260,
+      voteCount: 38,
+      status: "EVENT_SCHEDULED"
+    }
   }
 ];
 
@@ -200,6 +312,20 @@ export const DEMO_PAST_EVENTS = [
     participantCount: 47,
     resultSummary:
       "२.८ टन फोहोर हटाइयो; ४७ जना सहभागी; नदी किनारको ३०० मिटर सफा। नगरपालिकाले अनुगमन गर्न प्रतिबद्धता जनायो।",
+    meetupNotes:
+      "गुह्येश्वरी मन्दिर मुख्य गेट छेउ भेला। पुजारी समितिले स्वागत; जलपानको प्रबन्ध।",
+    linkedIssue: {
+      id: "demo-issue-guhy-p1",
+      title: "गुह्येश्वरी मन्दिर परिसर र नदी किनार फोहोर",
+      description:
+        "गुह्येश्वरी मन्दिरमा दैनिक १५,०००+ श्रद्धालु आउँछन्; प्रसाद र पूजा सामग्रीको अव्यवस्थित विसर्जनले परिसर र नदी किनार दुवै फोहोर। मन्दिर समिति र नगरको साझेदारीमा यो सरसफाइ अभियान।",
+      category: "cleanup",
+      addressText: "गुह्येश्वरी, काठमाडौँ",
+      latitude: 27.7115,
+      longitude: 85.3608,
+      voteCount: 73,
+      status: "COMPLETED"
+    },
     photos: [
       "/images/event-types/cleanup.jpg",
       "/images/event-types/cleanup.jpg",
@@ -221,6 +347,20 @@ export const DEMO_PAST_EVENTS = [
     participantCount: 62,
     resultSummary:
       "४८० बिरुवा रोपिए — चिलाउने, उत्तिस र अप्रिकोट। ६२ सहभागी; निकुञ्ज प्रशासनको साझेदारीमा।",
+    meetupNotes:
+      "बुढानीलकण्ठ मुख्य गेटमा भेला; निकुञ्ज प्रशासन गाडीमा भित्र। बिरुवा र औजार त्यहीँ पुर्‍याइने।",
+    linkedIssue: {
+      id: "demo-issue-shivapuri-p2",
+      title: "शिवपुरी निकुञ्ज खाली भूमिमा वृक्षारोपणको आवश्यकता",
+      description:
+        "शिवपुरी निकुञ्जको दक्षिणी छेउ १.२ हेक्टर खाली; मनसुनमा पहिरो जोखिम। निकुञ्ज प्रशासनले बिरुवा र अनुमति दुवै उपलब्ध गराएको।",
+      category: "afforestation",
+      addressText: "शिवपुरी निकुञ्ज, बुढानीलकण्ठ",
+      latitude: 27.7717,
+      longitude: 85.3654,
+      voteCount: 118,
+      status: "COMPLETED"
+    },
     photos: ["/images/event-types/afforestation.jpg", "/images/event-types/afforestation.jpg"]
   },
   {
@@ -238,6 +378,20 @@ export const DEMO_PAST_EVENTS = [
     participantCount: 28,
     resultSummary:
       "१८० मिटर फुटपाथ मर्मत; ४ ल्याम्प पोस्ट पुनःस्थापना। २८ सहभागी। नगरबाट निर्माण सामग्री।",
+    meetupNotes:
+      "सिनामंगल चोकको सडक छेउमा हाजिर; नगरको ट्रकले सिमेन्ट र इँटा ल्याइदिने।",
+    linkedIssue: {
+      id: "demo-issue-sinamangal-p3",
+      title: "सिनामंगल फुटपाथ टुटेको र ल्याम्प पोस्ट ढलेका",
+      description:
+        "सिनामंगल चोकको पूर्व दिशा १८० मि. फुटपाथ टुटेर हिँडुवा सडकमा झर्ने अवस्था। ४ ओटा सडक बत्ती पोस्ट ढलेका।",
+      category: "infrastructure",
+      addressText: "सिनामंगल चोक, काठमाडौँ",
+      latitude: 27.7036,
+      longitude: 85.3527,
+      voteCount: 64,
+      status: "COMPLETED"
+    },
     photos: ["/images/event-types/infrastructure.jpg"]
   },
   {
@@ -255,6 +409,20 @@ export const DEMO_PAST_EVENTS = [
     participantCount: 54,
     resultSummary:
       "१.५ किमी खोला किनार सफा; ५४ सहभागी; ४.२ टन प्लास्टिक र अन्य अजैविक फोहोर सङ्कलन।",
+    meetupNotes:
+      "लोकन्थली पुल पूर्वी छेउ हाजिर। तीन टोलीमा बाँडिने; प्रत्येक टोलीले ५०० मि. लम्बाइ।",
+    linkedIssue: {
+      id: "demo-issue-hanumante-p4",
+      title: "हनुमन्ते खोला किनार वर्षायाममा प्लास्टिकले भरिएको",
+      description:
+        "हनुमन्ते खोलाको लोकन्थली पुल छेउ १.५ किमी खण्डमा वर्षाले बगाएर ल्याएको फोहोर थुप्रिएको। भक्तपुर नगरले ट्रक र अग्रिम छुट्याउने सहयोग गरेको।",
+      category: "cleanup",
+      addressText: "लोकन्थली पुल, भक्तपुर",
+      latitude: 27.6766,
+      longitude: 85.3804,
+      voteCount: 96,
+      status: "COMPLETED"
+    },
     photos: [
       "/images/event-types/cleanup.jpg",
       "/images/event-types/cleanup.jpg",
@@ -291,13 +459,15 @@ export function getDemoEventById(id) {
       title: live.title,
       status: "ACTIVE",
       meetupAddress: live.addressText,
-      meetupLatitude: 27.7172,
-      meetupLongitude: 85.3240,
+      meetupLatitude: live.linkedIssue?.latitude ?? 27.7172,
+      meetupLongitude: live.linkedIssue?.longitude ?? 85.3240,
+      meetupNotes: live.meetupNotes || null,
       scheduledAt: live.liveStream.startedAt,
       durationMinutes: 180,
-      planningNotes:
-        "Demo live event. Backend liveStream wiring not yet shipped; this payload comes from src/lib/devMockData.js.",
-      linkedIssue: null,
+      planningNotes: null,
+      issue: live.linkedIssue || null,
+      linkedIssue: live.linkedIssue || null,
+      eventLeader: { name: live.linkedIssue ? "टोली नेता" : null },
       eventLeaderId: null,
       uploads: [],
       photos: [],
@@ -316,10 +486,13 @@ export function getDemoEventById(id) {
       meetupAddress: upcoming.addressText,
       meetupLatitude: upcoming.meetupLatitude,
       meetupLongitude: upcoming.meetupLongitude,
+      meetupNotes: upcoming.meetupNotes || null,
       scheduledAt: upcoming.scheduledAt,
       durationMinutes: upcoming.durationMinutes,
-      planningNotes: `Demo upcoming event. Leader: ${upcoming.leaderName || "TBD"}.`,
-      linkedIssue: null,
+      planningNotes: null,
+      issue: upcoming.linkedIssue || null,
+      linkedIssue: upcoming.linkedIssue || null,
+      eventLeader: { name: upcoming.leaderName || null },
       eventLeaderId: null,
       uploads: [],
       photos: [],
@@ -338,11 +511,14 @@ export function getDemoEventById(id) {
       meetupAddress: past.addressText,
       meetupLatitude: past.meetupLatitude,
       meetupLongitude: past.meetupLongitude,
+      meetupNotes: past.meetupNotes || null,
       scheduledAt: past.scheduledAt,
       completedAt: past.completedAt,
       durationMinutes: past.durationMinutes,
-      planningNotes: `Demo past event. Led by ${past.leaderName || "टीम"}.`,
-      linkedIssue: null,
+      planningNotes: null,
+      issue: past.linkedIssue || null,
+      linkedIssue: past.linkedIssue || null,
+      eventLeader: { name: past.leaderName || null },
       eventLeaderId: null,
       uploads: (past.photos || []).map((url, i) => ({
         id: `${past.id}-photo-${i}`,
