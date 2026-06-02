@@ -330,6 +330,23 @@ export const DEMO_PAST_EVENTS = [
       "/images/event-types/cleanup.jpg",
       "/images/event-types/cleanup.jpg",
       "/images/event-types/cleanup.jpg"
+    ],
+    testimonials: [
+      {
+        name: "कमला अधिकारी",
+        role: "संयोजक",
+        quote: "मन्दिर परिसर अब सफा छ। पुजारी समितिले धन्यवाद दिए — अर्को महिनाको पूजासम्म यो स्वच्छता टिकाउने प्रतिबद्धता पनि जनाए।"
+      },
+      {
+        name: "रामकृष्ण कोइराला",
+        role: "स्थानीय व्यवसायी",
+        quote: "९ वर्षदेखि बस्दै आएको ठाउँ, पहिलो पटक हो — एकै दिनमा यति परिवर्तन देख्न पाएको।"
+      },
+      {
+        name: "मञ्जु तामाङ",
+        role: "सहभागी",
+        quote: "४७ जना मिलेर ३ घण्टामै सकियो। सोचेभन्दा सजिलो, सोचेभन्दा रमाइलो।"
+      }
     ]
   },
   {
@@ -361,7 +378,19 @@ export const DEMO_PAST_EVENTS = [
       voteCount: 118,
       status: "COMPLETED"
     },
-    photos: ["/images/event-types/afforestation.jpg", "/images/event-types/afforestation.jpg"]
+    photos: ["/images/event-types/afforestation.jpg", "/images/event-types/afforestation.jpg"],
+    testimonials: [
+      {
+        name: "हरि श्रेष्ठ",
+        role: "संयोजक",
+        quote: "४८० बिरुवा रोपियो। ५ वर्षपछि फेरि आउँदा यो भिर हराभरा देख्ने आशा छ।"
+      },
+      {
+        name: "पुष्पा मगर",
+        role: "सहभागी (परिवारसहित)",
+        quote: "बच्चाहरूले नर्सरी पहिलो पटक देखे — आमालाई फेरि देखाउन ल्याउने भनेका छन्।"
+      }
+    ]
   },
   {
     id: "demo-past-3",
@@ -392,7 +421,19 @@ export const DEMO_PAST_EVENTS = [
       voteCount: 64,
       status: "COMPLETED"
     },
-    photos: ["/images/event-types/infrastructure.jpg"]
+    photos: ["/images/event-types/infrastructure.jpg"],
+    testimonials: [
+      {
+        name: "रिता पाण्डे",
+        role: "संयोजक",
+        quote: "३ वर्षदेखि ढलेका ल्याम्प पोस्ट एकै दिनमा ठीक भयो। साँझ साँझ बत्ती बल्न थाल्यो।"
+      },
+      {
+        name: "दिनेश के.सी.",
+        role: "स्थानीय बासिन्दा",
+        quote: "हिँडेर अफिस जान सजिलो भयो। फुटपाथमै हिँड्न पाउँदा सडकको हर्न पनि कम सुनिन्छ।"
+      }
+    ]
   },
   {
     id: "demo-past-4",
@@ -428,6 +469,23 @@ export const DEMO_PAST_EVENTS = [
       "/images/event-types/cleanup.jpg",
       "/images/event-types/cleanup.jpg",
       "/images/event-types/cleanup.jpg"
+    ],
+    testimonials: [
+      {
+        name: "प्रदीप तामाङ",
+        role: "संयोजक",
+        quote: "४.२ टन प्लास्टिक हट्यो। यो खोलाले अब बर्षात स्वतन्त्र बग्न सक्छ — पुलमुनिको जाम पनि कम हुनेछ।"
+      },
+      {
+        name: "सुनिल थापा",
+        role: "सहभागी",
+        quote: "मेरो आमाले 'भोलि म पनि आउनुपर्थ्यो' भन्नुभयो। अर्को अभियानमा पूरा परिवार आउँछौँ।"
+      },
+      {
+        name: "स्मिता राई",
+        role: "भक्तपुर नगर समन्वयक",
+        quote: "स्थानीय निकायलाई पनि नमुना दियो — नगरले अब हरेक तीन महिनामा संयुक्त सरसफाइ राख्न मानेको छ।"
+      }
     ]
   }
 ];
@@ -529,6 +587,7 @@ export function getDemoEventById(id) {
       photos: past.photos || [],
       resultSummary: past.resultSummary,
       participantCount: past.participantCount,
+      testimonials: past.testimonials || [],
       rolesNeeded: DEMO_ROSTER
     };
   }

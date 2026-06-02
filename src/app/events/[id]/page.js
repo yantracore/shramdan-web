@@ -366,6 +366,34 @@ export default function EventDetailPage() {
                 />
               ) : null}
 
+              {Array.isArray(eventData.testimonials) && eventData.testimonials.length > 0 ? (
+                <section className="event-testimonials" aria-labelledby="event-testimonials-title">
+                  <header className="event-testimonials-header">
+                    <h2 id="event-testimonials-title">
+                      {language === "np" ? "दिनको आवाज" : "Voices from the day"}
+                    </h2>
+                    <p>
+                      {language === "np"
+                        ? "अभियानमा सहभागी भएकाहरूले के भने।"
+                        : "What people who showed up said."}
+                    </p>
+                  </header>
+                  <ul className="event-testimonials-list">
+                    {eventData.testimonials.map((entry, i) => (
+                      <li key={i} className="event-testimonial">
+                        <blockquote className="event-testimonial-quote">{entry.quote}</blockquote>
+                        <footer className="event-testimonial-attrib">
+                          <span className="event-testimonial-name">{entry.name}</span>
+                          {entry.role ? (
+                            <span className="event-testimonial-role">{entry.role}</span>
+                          ) : null}
+                        </footer>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ) : null}
+
               {linkedIssue?.id ? (
                 <div className="public-issue-detail-actions-bar">
                   <Link href={`/issues/${linkedIssue.id}`}>
