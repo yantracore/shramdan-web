@@ -9,8 +9,9 @@ import {
 import { Button, Empty, Select } from "antd";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import IssueMapBlock from "@/components/IssueMapBlock";
+import { NearMeFilter } from "@/components/NearMeFilter";
 import {
   PublicIssueCard,
   PublicIssueCardSkeleton,
@@ -65,6 +66,36 @@ export default function IssuesListPage() {
   const [error, setError] = useState("");
   const [filters, setFilters] = useState(() => readFiltersFromUrl());
   const [mapIssues, setMapIssues] = useState([]);
+  const [nearMe, setNearMe] = useState(null);
+
+  const sortedItems = useMemo(() => {
+    const items = pages[currentPage - 1]?.items || [];
+    if (!nearMe) return items;
+    const haversine = (lat1, lon1, lat2, lon2) => {
+      const toRad = (d) => (d * Math.PI) / 180;
+      const R = 6371;
+      const dLat = toRad(lat2 - lat1);
+      const dLon = toRad(lon2 - lon1);
+      const a =
+        Math.sin(dLat / 2) ** 2 +
+        Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+      return 2 * R * Math.asin(Math.sqrt(a));
+    };
+    return [...items].sort((a, b) => {
+      const aLat = Number(a.latitude);
+      const aLng = Number(a.longitude);
+      const bLat = Number(b.latitude);
+      const bLng = Number(b.longitude);
+      const aOk = Number.isFinite(aLat) && Number.isFinite(aLng);
+      const bOk = Number.isFinite(bLat) && Number.isFinite(bLng);
+      if (!aOk && !bOk) return 0;
+      if (!aOk) return 1;
+      if (!bOk) return -1;
+      const da = haversine(nearMe.lat, nearMe.lng, aLat, aLng);
+      const db = haversine(nearMe.lat, nearMe.lng, bLat, bLng);
+      return da - db;
+    });
+  }, [pages, currentPage, nearMe]);
 
   // Re-sync state from URL on back/forward navigation.
   useEffect(() => {
@@ -183,7 +214,7 @@ export default function IssuesListPage() {
   }));
 
   const knownPages = pages.length;
-  const currentItems = pages[currentPage - 1]?.items || [];
+  const currentItems = sortedItems;
   const isOnLastCachedPage = currentPage >= knownPages;
   const lastCursorAvailable = Boolean(pages[currentPage - 1]?.nextCursor);
   const canGoNext = !loading && (isOnLastCachedPage ? lastCursorAvailable : true);
@@ -268,6 +299,11 @@ export default function IssuesListPage() {
 
         <div className="public-issues-toolbar">
           <div className="public-issues-filters">
+            <NearMeFilter
+              language={language}
+              location={nearMe}
+              onLocation={setNearMe}
+            />
             <div className="public-issues-filter-field">
               <label
                 className="public-issues-filter-label"
