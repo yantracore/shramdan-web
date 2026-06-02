@@ -31,6 +31,15 @@ function localizeDigits(value, language) {
   return str.replace(/\d/g, (d) => NP_DIGITS[Number(d)]);
 }
 
+const ACHIEVEMENTS = [
+  { id: "first_vote", emoji: "👍", labelNp: "पहिलो समर्थन", labelEn: "First support", unlocked: true },
+  { id: "first_event", emoji: "🤝", labelNp: "पहिलो अभियान", labelEn: "First event", unlocked: true },
+  { id: "supporter", emoji: "💚", labelNp: "१० समर्थन", labelEn: "10 supports", unlocked: true },
+  { id: "joiner", emoji: "🎽", labelNp: "५ अभियान सहभागी", labelEn: "5 events joined", unlocked: true },
+  { id: "organizer", emoji: "⚡", labelNp: "पहिलो संयोजन", labelEn: "First organizer", unlocked: true },
+  { id: "monsoon", emoji: "🌧", labelNp: "मनसुन सरसफाइ", labelEn: "Monsoon cleanup", unlocked: false }
+];
+
 const COPY = {
   np: {
     pageTitle: "मेरो प्रोफाइल — झलक",
@@ -47,6 +56,8 @@ const COPY = {
     stat1Label: "अभियानमा सहभागी",
     stat2Label: "समर्थन गरिएको समस्या",
     stat3Label: "अभियान संयोजन",
+    badgesTitle: "उपलब्धि",
+    badgesLockedHint: "अब आउने",
     activityTitle: "हालैको गतिविधि",
     eventsTitle: "तपाईंका आगामी अभियानहरू",
     pastTitle: "तपाईं सहभागी भएका",
@@ -69,6 +80,8 @@ const COPY = {
     stat1Label: "Events joined",
     stat2Label: "Issues supported",
     stat3Label: "Events coordinated",
+    badgesTitle: "Achievements",
+    badgesLockedHint: "Coming up",
     activityTitle: "Recent activity",
     eventsTitle: "Your upcoming events",
     pastTitle: "Past events you joined",
@@ -151,6 +164,38 @@ export default function MeProfilePreview() {
               </article>
             ))}
           </div>
+        </section>
+
+        <section
+          className="me-preview-badges"
+          aria-labelledby="me-preview-badges-title"
+        >
+          <h2
+            id="me-preview-badges-title"
+            className="me-preview-section-title"
+          >
+            {t.badgesTitle}
+          </h2>
+          <ul className="me-preview-badges-grid">
+            {ACHIEVEMENTS.map((b) => (
+              <li
+                key={b.id}
+                className={`me-preview-badge-tile${b.unlocked ? "" : " is-locked"}`}
+              >
+                <span className="me-preview-badge-emoji" aria-hidden="true">
+                  {b.emoji}
+                </span>
+                <span className="me-preview-badge-label">
+                  {language === "np" ? b.labelNp : b.labelEn}
+                </span>
+                {!b.unlocked ? (
+                  <span className="me-preview-badge-locked">
+                    {t.badgesLockedHint}
+                  </span>
+                ) : null}
+              </li>
+            ))}
+          </ul>
         </section>
 
         {notifications.length > 0 ? (
