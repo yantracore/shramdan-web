@@ -105,7 +105,14 @@
 .events-home-rail-swiper {
   width: min(1920px, calc(100% - 32px));
   margin: 0 auto;
-  padding-block: 56px 24px; /* room for tilted side slides + pagination */
+  /* Top padding has to clear the projected "lift" of the tilted side
+   * cards: with rotate:50 + depth:100 + Swiper's 1200px perspective,
+   * the upper-back corner of each side card projects ~25% of the slide
+   * height above its natural top. At max slide height (560px) that's
+   * ~140px; bottom is symmetric for the foreshortened lower corner,
+   * plus a few px for the pagination row. clamp() scales both ends
+   * proportionally with the viewport width. */
+  padding-block: clamp(64px, 10vw, 160px) clamp(48px, 6vw, 96px);
   /* Clip to the rail width — only the active slide + the two adjacent
    * (left/right) slides are meant to be visible at any time. Without
    * this, slides 4 and 5 leak into the page margins on wide viewports. */

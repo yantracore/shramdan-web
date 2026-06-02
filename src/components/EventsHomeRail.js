@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useReducedMotion } from "framer-motion";
-import { CalendarOutlined, EyeOutlined, TeamOutlined } from "@ant-design/icons";
+import { CalendarOutlined, TeamOutlined } from "@ant-design/icons";
 import { Swiper, SwiperSlide } from "swiper/react";
 import {
   A11y,
@@ -36,12 +36,21 @@ import "swiper/css/pagination";
 //   Coverflow geometry is STATIC when idle (it only animates
 //   during user-initiated slide changes). For reduced-motion
 //   users we keep the geometry and just shorten the transition
-//   `speed` so swipes snap rather than glide. Auto-play of the
-//   centered LIVE preview iframe IS gated on reduced-motion.
+//   `speed` so swipes snap rather than glide, and disable
+//   autoplay so nothing moves without their input.
+//
+// No video preview:
+//   We intentionally do NOT auto-mount a live-stream iframe on
+//   the active LIVE card. The iframe player was a poor UX in a
+//   poster context — slow to load, audible cold-start, broke
+//   the slider's calm rhythm. The LIVE badge stays; the card
+//   shows the same poster image as any other slide. Clicking
+//   through to the detail page is where playback happens.
 //
 // If you must change this:
 //   Keep coverflow the only path. Tweak params (rotate/depth) —
-//   do not re-introduce a `slidesPerView`-based flat branch.
+//   do not re-introduce a `slidesPerView`-based flat branch or
+//   the autoplay iframe.
 // =============================================================
 
 const COVERFLOW_PARAMS = Object.freeze({
@@ -110,9 +119,25 @@ function formatScheduledPill(iso, language) {
   }
 }
 
-// Brief delay before mounting the live iframe so quick slide changes
-// don't flicker through multiple players.
-const ACTIVE_PREVIEW_DELAY_MS = 400;
+// Sum the `filled` field across an event's rolesNeeded array. This
+// is the count of humans who have actually signed up for a role
+// (NOT the number of role types). Returns null when there's no
+// roster data so the badge can be skipped instead of showing "0".
+function getParticipantCount(event) {
+  const roster = event?.rolesNeeded;
+  if (!Array.isArray(roster) || roster.length === 0) return null;
+  const total = roster.reduce(
+    (sum, role) => sum + (Number.isFinite(role?.filled) ? role.filled : 0),
+    0
+  );
+  return total > 0 ? total : null;
+}
+
+function formatParticipantsLabel(count, language, copy) {
+  if (!Number.isFinite(count) || count <= 0) return null;
+  const label = copy?.participantsLabel || (language === "np" ? "सहभागी" : "participants");
+  return `${localizeDigits(count, language)} ${label}`;
+}
 
 export function EventsHomeRail({
   liveEvents = [],
@@ -190,8 +215,8 @@ export function EventsHomeRail({
                   <LivePosterCard
                     event={item.event}
                     copy={copy}
+                    language={language}
                     isActive={isActive}
-                    allowAutoPreview={!reduceMotion}
                   />
                 ) : (
                   <UpcomingPosterCard
@@ -210,22 +235,15 @@ export function EventsHomeRail({
   );
 }
 
-function LivePosterCard({ event, copy, isActive, allowAutoPreview }) {
-  const previewUrl =
-    event?.liveStream?.previewEmbedUrl || event?.liveStream?.streamUrl;
+function LivePosterCard({ event, copy, language, isActive }) {
   const durationLabel = formatLiveDuration(event?.liveStream?.startedAt, copy);
-  const viewers = event?.liveStream?.viewerCount;
   const thumbnailUrl = event?.liveStream?.thumbnailUrl;
-
-  const [showLive, setShowLive] = useState(false);
-  useEffect(() => {
-    if (!isActive || !allowAutoPreview || !previewUrl) {
-      setShowLive(false);
-      return undefined;
-    }
-    const id = setTimeout(() => setShowLive(true), ACTIVE_PREVIEW_DELAY_MS);
-    return () => clearTimeout(id);
-  }, [isActive, allowAutoPreview, previewUrl]);
+  const participantsLabel = formatParticipantsLabel(
+    getParticipantCount(event),
+    language,
+    copy
+  );
+  void isActive;
 
   return (
     <article className="events-home-rail-poster-card events-home-rail-poster-card--live">
@@ -235,16 +253,7 @@ function LivePosterCard({ event, copy, isActive, allowAutoPreview }) {
         aria-label={event.title}
       >
         <div className="events-home-rail-poster">
-          {showLive ? (
-            <iframe
-              className="events-home-rail-poster-iframe"
-              src={previewUrl}
-              title={`${event.title} live preview`}
-              allow="autoplay; encrypted-media"
-              loading="lazy"
-              frameBorder="0"
-            />
-          ) : thumbnailUrl ? (
+          {thumbnailUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={thumbnailUrl} alt={event.title} loading="lazy" />
           ) : (
@@ -259,9 +268,9 @@ function LivePosterCard({ event, copy, isActive, allowAutoPreview }) {
                 <span className="live-dot" aria-hidden="true" />
                 {copy?.liveBadge || "LIVE"}
               </span>
-              {Number.isFinite(viewers) ? (
+              {participantsLabel ? (
                 <span className="events-home-rail-poster-badge events-home-rail-poster-badge--meta">
-                  <EyeOutlined aria-hidden="true" /> {viewers.toLocaleString()}
+                  <TeamOutlined aria-hidden="true" /> {participantsLabel}
                 </span>
               ) : null}
             </div>
@@ -277,17 +286,12 @@ function LivePosterCard({ event, copy, isActive, allowAutoPreview }) {
 }
 
 function UpcomingPosterCard({ event, language, copy, isActive }) {
-  const roleCount = Array.isArray(event?.rolesNeeded) ? event.rolesNeeded.length : 0;
   const dateLabel = formatScheduledPill(event.scheduledAt, language);
-  const rolesLabel =
-    roleCount > 0
-      ? language === "np"
-        ? `${localizeDigits(roleCount, "np")} भूमिका`
-        : `${roleCount} role${roleCount === 1 ? "" : "s"}`
-      : null;
-  // copy intentionally unused for upcoming variant — kept to keep both
-  // card signatures parallel, helps when iterating later.
-  void copy;
+  const participantsLabel = formatParticipantsLabel(
+    getParticipantCount(event),
+    language,
+    copy
+  );
   void isActive;
 
   return (
@@ -312,9 +316,9 @@ function UpcomingPosterCard({ event, language, copy, isActive }) {
                   <CalendarOutlined aria-hidden="true" /> {dateLabel}
                 </span>
               ) : null}
-              {rolesLabel ? (
+              {participantsLabel ? (
                 <span className="events-home-rail-poster-badge events-home-rail-poster-badge--meta">
-                  <TeamOutlined aria-hidden="true" /> {rolesLabel}
+                  <TeamOutlined aria-hidden="true" /> {participantsLabel}
                 </span>
               ) : null}
             </div>
