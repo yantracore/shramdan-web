@@ -139,6 +139,65 @@ export function getDemoSupporters(voteCount) {
   return DEMO_SUPPORTER_POOL.slice(0, slice);
 }
 
+// Demo stats per event-type for /event-types/[id]. Inert in production.
+// 4 stats per type: events held, participants, locations covered, impact unit.
+const DEMO_EVENT_TYPE_STATS = {
+  cleanup: [
+    { value: 24, unit: { np: "अभियान", en: "campaigns" } },
+    { value: 540, unit: { np: "सहभागी", en: "participants" } },
+    { value: 18, unit: { np: "वडा", en: "wards" } },
+    { value: 12, unit: { np: "टन फोहोर", en: "tons of waste" } }
+  ],
+  afforestation: [
+    { value: 8, unit: { np: "अभियान", en: "campaigns" } },
+    { value: 220, unit: { np: "सहभागी", en: "participants" } },
+    { value: 6, unit: { np: "वडा", en: "wards" } },
+    { value: 1200, unit: { np: "बिरुवा रोपिए", en: "trees planted" } }
+  ],
+  beautification: [
+    { value: 3, unit: { np: "अभियान", en: "campaigns" } },
+    { value: 80, unit: { np: "सहभागी", en: "participants" } },
+    { value: 3, unit: { np: "वडा", en: "wards" } },
+    { value: 12, unit: { np: "भित्ता", en: "walls painted" } }
+  ],
+  trail: [
+    { value: 5, unit: { np: "अभियान", en: "campaigns" } },
+    { value: 90, unit: { np: "सहभागी", en: "participants" } },
+    { value: 4, unit: { np: "ट्रेल", en: "trails" } },
+    { value: 18, unit: { np: "किमी मर्मत", en: "km repaired" } }
+  ],
+  dam: [
+    { value: 2, unit: { np: "अभियान", en: "campaigns" } },
+    { value: 45, unit: { np: "सहभागी", en: "participants" } },
+    { value: 2, unit: { np: "स्थान", en: "sites" } },
+    { value: 8, unit: { np: "संरचना", en: "structures" } }
+  ],
+  infrastructure: [
+    { value: 6, unit: { np: "अभियान", en: "campaigns" } },
+    { value: 130, unit: { np: "सहभागी", en: "participants" } },
+    { value: 5, unit: { np: "विद्यालय", en: "schools" } },
+    { value: 11, unit: { np: "सेवा थप", en: "facilities added" } }
+  ],
+  seasonal: [
+    { value: 4, unit: { np: "अभियान", en: "campaigns" } },
+    { value: 160, unit: { np: "सहभागी", en: "participants" } },
+    { value: 7, unit: { np: "वडा", en: "wards" } },
+    { value: 320, unit: { np: "घरधुरीलाई राहत", en: "households served" } }
+  ],
+  disaster: [
+    { value: 3, unit: { np: "अभियान", en: "campaigns" } },
+    { value: 95, unit: { np: "सहभागी", en: "participants" } },
+    { value: 3, unit: { np: "विपद् क्षेत्र", en: "disaster zones" } },
+    { value: 22, unit: { np: "घर पुनर्निर्माण", en: "homes rebuilt" } }
+  ]
+};
+
+export function getDemoEventTypeStats(eventTypeId) {
+  if (!isDev()) return [];
+  if (!eventTypeId) return [];
+  return DEMO_EVENT_TYPE_STATS[eventTypeId] || [];
+}
+
 // Helper for the event-detail page: when in dev mode AND the fetched
 // event has no liveStream, optionally pin one on for visual demo. Use
 // sparingly — only when explicitly asking for the autoplay demo.

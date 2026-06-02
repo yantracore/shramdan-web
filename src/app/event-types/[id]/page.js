@@ -15,8 +15,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { SiteShell } from "@/components/SiteShell";
+import { StickyActionBar } from "@/components/StickyActionBar";
 import { usePreferences } from "@/app/providers";
 import { copy } from "@/lib/siteContent";
+import { getDemoEventTypeStats } from "@/lib/devMockData";
 
 export default function EventTypeDetailPage() {
   const params = useParams();
@@ -55,6 +57,14 @@ export default function EventTypeDetailPage() {
     .map((rid) => eventTypes.items.find((entry) => entry.id === rid))
     .filter(Boolean);
 
+  const stats = getDemoEventTypeStats(item.id);
+  const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
+  const formatStatValue = (n) => {
+    const str = String(n);
+    if (language !== "np") return str;
+    return str.replace(/\d/g, (d) => NP_DIGITS[Number(d)]);
+  };
+
   return (
     <SiteShell pageTitle={`${item.title} | ${eventTypes.page.pageTitle}`}>
       <article className="event-type-detail">
@@ -78,6 +88,24 @@ export default function EventTypeDetailPage() {
                 : eventTypes.badgeFuture}
           </span>
         </header>
+
+        {stats.length > 0 ? (
+          <section
+            className="event-type-detail-stats"
+            aria-label={language === "np" ? "अहिलेसम्मको प्रभाव" : "Impact so far"}
+          >
+            {stats.map((stat, i) => (
+              <div className="event-type-detail-stat" key={i}>
+                <span className="event-type-detail-stat-value">
+                  {formatStatValue(stat.value)}
+                </span>
+                <span className="event-type-detail-stat-unit">
+                  {stat.unit?.[language] || stat.unit?.en || ""}
+                </span>
+              </div>
+            ))}
+          </section>
+        ) : null}
 
         <section
           className={`event-type-detail-hero event-type-detail-hero--${item.status}`}
@@ -231,6 +259,11 @@ export default function EventTypeDetailPage() {
           </Link>
         </div>
       </article>
+
+      <StickyActionBar
+        label={language === "np" ? "यस्तो समस्या रिपोर्ट गर्नुहोस्" : "Report this kind of problem"}
+        href={`/issues/new?category=${encodeURIComponent(item.id)}`}
+      />
     </SiteShell>
   );
 }

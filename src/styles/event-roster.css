@@ -241,3 +241,37 @@
     transform: none !important;
   }
 }
+
+/* --- /event-types/[id] stat strip ------------------------------------ */
+
+.event-type-detail-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 14px;
+  margin: 0 0 22px;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--surface) 0%, var(--surface-soft) 100%);
+  box-shadow: var(--shadow-1);
+}
+
+.event-type-detail-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.event-type-detail-stat-value {
+  font-size: clamp(24px, 2.6vw, 32px);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--primary);
+  letter-spacing: -0.01em;
+}
+
+.event-type-detail-stat-unit {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.3;
+}
