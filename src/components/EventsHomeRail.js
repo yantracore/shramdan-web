@@ -16,12 +16,41 @@ import "swiper/css";
 import "swiper/css/effect-coverflow";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-import { usePreferences } from "@/app/providers";
 
-// Unified home rail: Swiper EffectCoverflow slider combining
-// currently-live + upcoming-scheduled events as Netflix-poster cards.
-// Only the centered (active) LIVE slide auto-plays its preview iframe;
-// every other slide shows a static thumbnail.
+// =============================================================
+// DESIGN CONTRACT — DO NOT BRANCH THIS COMPONENT.
+// -------------------------------------------------------------
+// This rail has exactly ONE render path: Swiper EffectCoverflow.
+// There is no flat fallback. Coverflow geometry is the design.
+//
+// Why no fallback:
+//   Prior versions gated coverflow on `entranceAnimation` and
+//   `prefers-reduced-motion`. The flat fallback that resulted
+//   looked nothing like the intended slider, so any flip of those
+//   preferences silently "ruined" the homepage. Reported by the
+//   user as a recurring regression — locked here on 2026-06-02.
+//
+// Reduced-motion handling:
+//   Coverflow geometry is STATIC when idle (it only animates
+//   during user-initiated slide changes). For reduced-motion
+//   users we keep the geometry and just shorten the transition
+//   `speed` so swipes snap rather than glide. Auto-play of the
+//   centered LIVE preview iframe IS gated on reduced-motion.
+//
+// If you must change this:
+//   Keep coverflow the only path. Tweak params (rotate/depth) —
+//   do not re-introduce a `slidesPerView`-based flat branch.
+// =============================================================
+
+const COVERFLOW_PARAMS = Object.freeze({
+  rotate: 50,
+  stretch: 0,
+  depth: 100,
+  modifier: 1,
+  slideShadows: false
+});
+const COVERFLOW_SPEED_DEFAULT = 900;
+const COVERFLOW_SPEED_REDUCED = 0;
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 
@@ -75,41 +104,15 @@ export function EventsHomeRail({
   language = "np"
 }) {
   const reduceMotion = useReducedMotion();
-  const { entranceAnimation } = usePreferences();
-  const coverflowOn = !reduceMotion && entranceAnimation;
 
   const items = [
     ...liveEvents.map((event) => ({ kind: "live", event })),
     ...upcomingEvents.map((event) => ({ kind: "upcoming", event }))
   ];
   const isEmpty = items.length === 0;
-  const useLoop = items.length > 3;
 
   const [activeIndex, setActiveIndex] = useState(0);
   const handleActive = (swiper) => setActiveIndex(swiper.realIndex);
-
-  const renderSlide = (item, index) => {
-    const isActive = index === activeIndex;
-    return (
-      <SwiperSlide key={item.event.id} className="events-home-rail-slide">
-        {item.kind === "live" ? (
-          <LivePosterCard
-            event={item.event}
-            copy={copy}
-            isActive={isActive}
-            allowAutoPreview={coverflowOn}
-          />
-        ) : (
-          <UpcomingPosterCard
-            event={item.event}
-            language={language}
-            copy={copy}
-            isActive={isActive}
-          />
-        )}
-      </SwiperSlide>
-    );
-  };
 
   return (
     <section
@@ -139,23 +142,17 @@ export function EventsHomeRail({
             <p>{copy?.emptyMessage}</p>
           </div>
         </div>
-      ) : coverflowOn ? (
+      ) : (
         <Swiper
           className="events-home-rail-swiper"
           effect="coverflow"
           grabCursor
           centeredSlides
           slidesPerView="auto"
-          speed={900}
+          speed={reduceMotion ? COVERFLOW_SPEED_REDUCED : COVERFLOW_SPEED_DEFAULT}
           initialSlide={Math.floor(items.length / 2)}
           keyboard={{ enabled: true }}
-          coverflowEffect={{
-            rotate: 50,
-            stretch: 0,
-            depth: 100,
-            modifier: 1,
-            slideShadows: false
-          }}
+          coverflowEffect={COVERFLOW_PARAMS}
           pagination={{ clickable: true }}
           navigation
           onSwiper={handleActive}
@@ -167,29 +164,28 @@ export function EventsHomeRail({
           }}
           modules={[EffectCoverflow, Pagination, Navigation, Keyboard, A11y]}
         >
-          {items.map(renderSlide)}
-        </Swiper>
-      ) : (
-        <Swiper
-          className="events-home-rail-swiper events-home-rail-swiper--flat"
-          grabCursor
-          centeredSlides
-          slidesPerView={1.2}
-          spaceBetween={16}
-          loop={useLoop}
-          keyboard={{ enabled: true }}
-          pagination={{ clickable: true }}
-          navigation
-          onSwiper={handleActive}
-          onSlideChange={handleActive}
-          a11y={{
-            prevSlideMessage: copy?.prevAria,
-            nextSlideMessage: copy?.nextAria,
-            containerRoleDescriptionMessage: copy?.ariaCarousel
-          }}
-          modules={[Pagination, Navigation, Keyboard, A11y]}
-        >
-          {items.map(renderSlide)}
+          {items.map((item, index) => {
+            const isActive = index === activeIndex;
+            return (
+              <SwiperSlide key={item.event.id} className="events-home-rail-slide">
+                {item.kind === "live" ? (
+                  <LivePosterCard
+                    event={item.event}
+                    copy={copy}
+                    isActive={isActive}
+                    allowAutoPreview={!reduceMotion}
+                  />
+                ) : (
+                  <UpcomingPosterCard
+                    event={item.event}
+                    language={language}
+                    copy={copy}
+                    isActive={isActive}
+                  />
+                )}
+              </SwiperSlide>
+            );
+          })}
         </Swiper>
       )}
     </section>
