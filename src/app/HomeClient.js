@@ -45,6 +45,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import IssueMapBlock from "@/components/IssueMapBlock";
+import { ActivityTicker } from "@/components/ActivityTicker";
 import { EventsHomeRail } from "@/components/EventsHomeRail";
 import { MotionSection } from "@/components/MotionSection";
 import { SiteShell } from "@/components/SiteShell";
@@ -400,6 +401,8 @@ export default function HomeClient({ summary }) {
           </div>
         </aside>
       </MotionSection>
+
+      <ActivityTicker language={language} />
 
       <EventsHomeRail
         liveEvents={getDemoLiveEvents()}
