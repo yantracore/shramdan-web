@@ -29,9 +29,14 @@ export function PublicIssueCard({ issue, content, language }) {
   const coverImageUrl = getIssueCoverImageUrl(issue);
   const accessibleLabel =
     issue.title || issue.addressText || categoryLabel || statusLabel || content.card.viewDetail;
+  const descriptionPeek = issue.description
+    ? issue.description.length > 110
+      ? `${issue.description.slice(0, 110)}…`
+      : issue.description
+    : null;
 
   return (
-    <article className="content-card public-issue-card">
+    <article className="content-card public-issue-card public-issue-card-hoverable">
       {coverImageUrl ? (
         <Link
           aria-label={accessibleLabel}
@@ -69,6 +74,11 @@ export function PublicIssueCard({ issue, content, language }) {
           <PictureOutlined aria-hidden="true" />
         </Link>
       )}
+      {descriptionPeek ? (
+        <div className="public-issue-card-peek" aria-hidden="true">
+          <p>{descriptionPeek}</p>
+        </div>
+      ) : null}
       <div className="card-topline">
         <Tag color={ISSUE_STATUS_COLORS[issue.status]}>{statusLabel}</Tag>
         <Tag className="public-issue-card-category">{categoryLabel}</Tag>
