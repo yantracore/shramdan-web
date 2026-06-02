@@ -21,6 +21,7 @@ import { PrintButton } from "@/components/PrintButton";
 import { StickyActionBar } from "@/components/StickyActionBar";
 import { IssuePhotoGallery } from "@/components/IssuePhotoGallery";
 import { LeaderScheduleEditor } from "@/components/LeaderScheduleEditor";
+import { CommentSection } from "@/components/comments";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
 import { getJson } from "@/lib/apiClient";
@@ -216,85 +217,86 @@ export default function EventDetailPage() {
           </Empty>
         ) : null}
 
-        {!loading && !error && !notFound && eventData?.liveStream?.isActive ? (
-          <EventLiveStreamPlayer
-            language={language}
-            liveStream={eventData.liveStream}
-            eventTitle={linkedIssue?.title || eventData.meetupAddress || "श्रमदान"}
-            copy={{
-              liveAria: language === "np" ? "लाइभ प्रसारण" : "Live broadcast",
-              liveBadge: language === "np" ? "लाइभ" : "LIVE",
-              durationSuffix: language === "np" ? "देखि लाइभ" : "live",
-              viewersSuffix: language === "np" ? "जना हेर्दैछन्" : "watching"
-            }}
-          />
-        ) : null}
-
         {!loading && !error && !notFound && eventData ? (
-          <article className="content-card public-issue-detail">
-            <div className="public-issue-detail-body">
-              <div className="public-issue-detail-topline">
-                <div className="public-issue-detail-topline-tags">
-                  <Tag color={EVENT_STATUS_COLORS[eventData.status] || "default"}>
-                    {content.statusLabels[eventData.status] || formatEnum(eventData.status)}
-                  </Tag>
-                  {eventData.riskLevel ? (
-                    <Tag color={EVENT_RISK_COLORS[eventData.riskLevel] || "default"}>
-                      <WarningOutlined aria-hidden="true" />{" "}
-                      {content.riskLabels[eventData.riskLevel] || formatEnum(eventData.riskLevel)}
+          <article className="content-card public-issue-detail event-detail-card">
+            {eventData.liveStream?.isActive ? (
+              <EventLiveStreamPlayer
+                language={language}
+                liveStream={eventData.liveStream}
+                eventTitle={linkedIssue?.title || eventData.meetupAddress || "श्रमदान"}
+                copy={{
+                  liveAria: language === "np" ? "लाइभ प्रसारण" : "Live broadcast",
+                  liveBadge: language === "np" ? "लाइभ" : "LIVE",
+                  durationSuffix: language === "np" ? "देखि लाइभ" : "live",
+                  viewersSuffix: language === "np" ? "जना हेर्दैछन्" : "watching"
+                }}
+              />
+            ) : null}
+
+            <div className="public-issue-detail-body event-detail-body">
+              <div className="event-detail-main">
+                <div className="public-issue-detail-topline">
+                  <div className="public-issue-detail-topline-tags">
+                    <Tag color={EVENT_STATUS_COLORS[eventData.status] || "default"}>
+                      {content.statusLabels[eventData.status] || formatEnum(eventData.status)}
                     </Tag>
-                  ) : null}
-                </div>
-              </div>
-
-              <h1>{linkedIssue?.title || eventData.meetupAddress || content.detail.defaultTitle}</h1>
-
-              <div className="public-issue-detail-meta">
-                <span>
-                  <CalendarOutlined />{" "}
-                  {eventData.scheduledAt
-                    ? `${content.detail.scheduledOn}: ${formatScheduledAt(eventData.scheduledAt, language)}`
-                    : content.detail.notScheduled}
-                </span>
-                {eventData.durationMinutes ? (
-                  <span>
-                    <ClockCircleOutlined /> {content.detail.duration}:{" "}
-                    {content.detail.durationMinutes.replace("{n}", eventData.durationMinutes)}
-                  </span>
-                ) : null}
-                <span>
-                  <TeamOutlined /> {content.detail.leaderLabel}:{" "}
-                  {leader?.name || content.detail.leaderUnassigned}
-                </span>
-              </div>
-
-              {canScheduleEvent ? (
-                <div className="leader-schedule-banner">
-                  <div className="leader-schedule-banner-copy">
-                    <span className="eyebrow">{leaderScheduleCopy.eyebrow}</span>
-                    <p>{leaderScheduleCopy.intro}</p>
+                    {eventData.riskLevel ? (
+                      <Tag color={EVENT_RISK_COLORS[eventData.riskLevel] || "default"}>
+                        <WarningOutlined aria-hidden="true" />{" "}
+                        {content.riskLabels[eventData.riskLevel] || formatEnum(eventData.riskLevel)}
+                      </Tag>
+                    ) : null}
                   </div>
-                  <LeaderScheduleEditor
-                    event={eventData}
-                    content={leaderScheduleCopy}
-                    onSaved={fetchEvent}
-                  />
                 </div>
-              ) : null}
 
-              {linkedIssue?.description ? (
-                <section className="public-issue-detail-section-block">
-                  <h2>{content.detail.goalTitle}</h2>
-                  <p>{linkedIssue.description}</p>
-                </section>
-              ) : (
-                <section className="public-issue-detail-section-block">
-                  <h2>{content.detail.goalTitle}</h2>
-                  <p className="public-issue-detail-muted">{content.detail.goalEmpty}</p>
-                </section>
-              )}
+                <h1>{linkedIssue?.title || eventData.meetupAddress || content.detail.defaultTitle}</h1>
 
-              {meetupAddress || eventData.meetupNotes ? (
+                <div className="public-issue-detail-meta">
+                  <span>
+                    <CalendarOutlined />{" "}
+                    {eventData.scheduledAt
+                      ? `${content.detail.scheduledOn}: ${formatScheduledAt(eventData.scheduledAt, language)}`
+                      : content.detail.notScheduled}
+                  </span>
+                  {eventData.durationMinutes ? (
+                    <span>
+                      <ClockCircleOutlined /> {content.detail.duration}:{" "}
+                      {content.detail.durationMinutes.replace("{n}", eventData.durationMinutes)}
+                    </span>
+                  ) : null}
+                  <span>
+                    <TeamOutlined /> {content.detail.leaderLabel}:{" "}
+                    {leader?.name || content.detail.leaderUnassigned}
+                  </span>
+                </div>
+
+                {canScheduleEvent ? (
+                  <div className="leader-schedule-banner">
+                    <div className="leader-schedule-banner-copy">
+                      <span className="eyebrow">{leaderScheduleCopy.eyebrow}</span>
+                      <p>{leaderScheduleCopy.intro}</p>
+                    </div>
+                    <LeaderScheduleEditor
+                      event={eventData}
+                      content={leaderScheduleCopy}
+                      onSaved={fetchEvent}
+                    />
+                  </div>
+                ) : null}
+
+                {linkedIssue?.description ? (
+                  <section className="public-issue-detail-section-block">
+                    <h2>{content.detail.goalTitle}</h2>
+                    <p>{linkedIssue.description}</p>
+                  </section>
+                ) : (
+                  <section className="public-issue-detail-section-block">
+                    <h2>{content.detail.goalTitle}</h2>
+                    <p className="public-issue-detail-muted">{content.detail.goalEmpty}</p>
+                  </section>
+                )}
+
+                {meetupAddress || eventData.meetupNotes ? (
                 <section className="public-issue-detail-section-block">
                   <h2>{content.detail.meetupTitle}</h2>
                   {meetupAddress ? (
@@ -400,14 +402,6 @@ export default function EventDetailPage() {
                 </section>
               ) : null}
 
-              {Array.isArray(eventData.rolesNeeded) && eventData.rolesNeeded.length > 0 ? (
-                <EventRosterPanel
-                  rolesNeeded={eventData.rolesNeeded}
-                  language={language}
-                  eventId={eventData.id}
-                />
-              ) : null}
-
               {Array.isArray(eventData.testimonials) && eventData.testimonials.length > 0 ? (
                 <section className="event-testimonials" aria-labelledby="event-testimonials-title">
                   <header className="event-testimonials-header">
@@ -436,12 +430,29 @@ export default function EventDetailPage() {
                 </section>
               ) : null}
 
+              <CommentSection
+                targetType="event"
+                targetId={eventData.id}
+                language={language}
+              />
+
               {linkedIssue?.id ? (
                 <div className="public-issue-detail-actions-bar">
                   <Link href={`/issues/${linkedIssue.id}`}>
                     <Button icon={<ArrowLeftOutlined />}>{content.detail.backToIssue}</Button>
                   </Link>
                 </div>
+              ) : null}
+              </div>
+
+              {Array.isArray(eventData.rolesNeeded) && eventData.rolesNeeded.length > 0 ? (
+                <aside className="event-detail-side">
+                  <EventRosterPanel
+                    rolesNeeded={eventData.rolesNeeded}
+                    language={language}
+                    eventId={eventData.id}
+                  />
+                </aside>
               ) : null}
             </div>
           </article>

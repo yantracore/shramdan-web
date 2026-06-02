@@ -870,3 +870,100 @@
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 14px;
 }
+
+/* --- /events/[id] YouTube-style detail card ---------------------------
+ * One card containing the video player flush at top, then a two-column
+ * body on desktop: main content (title, meta, description, sections)
+ * on the left and the participant roster pinned in a sticky right rail.
+ * Mobile collapses to a single column with roster after the main flow. */
+
+.event-detail-card {
+  overflow: hidden;
+  padding: 0;
+}
+
+.event-detail-card > .event-live-player {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.event-detail-card > .event-live-player .event-live-player-meta {
+  border-bottom: 1px solid var(--line);
+}
+
+.event-detail-body {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+  padding: 22px 26px 28px;
+}
+
+.event-detail-main,
+.event-detail-side {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+}
+
+.event-detail-main > .public-issue-detail-topline {
+  margin-bottom: -6px;
+}
+
+.event-detail-main > h1 {
+  font-size: clamp(22px, 2.6vw, 30px);
+  line-height: 1.25;
+  margin: 0;
+}
+
+.event-detail-main > .public-issue-detail-meta {
+  font-size: 13.5px;
+}
+
+.event-detail-side .event-roster-panel {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.event-detail-side .event-roster-header h2 {
+  font-size: 18px;
+}
+
+.event-detail-side .event-roster-header p {
+  font-size: 13px;
+}
+
+.event-detail-side .event-roster-list {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 1024px) {
+  .event-detail-body {
+    grid-template-columns: minmax(0, 1fr) clamp(280px, 28%, 340px);
+    column-gap: 28px;
+    row-gap: 22px;
+    align-items: start;
+    padding: 24px 28px 30px;
+  }
+  .event-detail-side {
+    position: sticky;
+    top: calc(var(--header-height, 74px) + 14px);
+    max-height: calc(100vh - var(--header-height, 74px) - 28px);
+    overflow-y: auto;
+    padding-right: 4px;
+    gap: 14px;
+  }
+  .event-detail-main {
+    gap: 16px;
+  }
+}
+
+@media (max-width: 1023px) {
+  .event-detail-body {
+    padding: 18px 18px 22px;
+  }
+}
