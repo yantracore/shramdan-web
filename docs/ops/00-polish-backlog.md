@@ -118,6 +118,10 @@ When you (the coding agent) are working in this repo:
 - [x] P2 [from 11] Quick-action FAB — effort:S ← done: 2026-06-02 *(circular + button bottom-right with 3 expanded actions: report issue / join campaign / feedback; auto-hides on auth + admin + new-issue routes)*
 - [x] P3 [from 0.3] Time-of-day greeting in hero — effort:S ← done: 2026-06-02 *(शुभप्रभात / नमस्कार / शुभ साँझ / शुभरात्रि anchored to Asia/Kathmandu hour via Intl; SSR-safe)*
 - [x] P2 [from 11] Keyboard shortcuts dialog — effort:S ← done: 2026-06-02 *("?" opens centered Modal listing shortcuts across 4 groups; gated when an input is focused)*
+- [x] P2 [from 1.1] `/me/saved` bookmarks list — effort:S ← done: 2026-06-02 *(reads from useSavedIssues; empty state + count chip + per-row remove)*
+- [x] P2 [from 11] First-visit onboarding spotlight modal — effort:S ← done: 2026-06-02 *(localStorage-gated; 3 step rows; primary + secondary CTA + skip)*
+- [x] P2 [from 1.2] Emoji reactions row on /issues/[id] — effort:S ← done: 2026-06-02 *(5 reactions with seeded counts + per-issue localStorage picks)*
+- [x] P2 [from 12] `/resources` directory page — effort:M ← done: 2026-06-02 *(4 sections × 3 tiles, kind-tinted icons, bilingual; placeholder hrefs swap-ready)*
 
 ## Phase 11 — Cross-cutting
 
