@@ -61,10 +61,10 @@ When you (the coding agent) are working in this repo:
 - [ ] P2 [from 0.3.3] Playlist autoplay-next when a video ends — effort:S
 - [ ] P3 [from 0.3] Subtle scroll-reveal animation on homepage sections — effort:M
 - [x] P1 [from 0.4.1] Honeypot / spam protection on `/join` and `/feedback` — effort:S ← done: 2026-05-28 *(shared `Honeypot` component renders an off-screen `website` field with `tabIndex={-1}` + `autoComplete="off"`; page-level submit silently returns success without calling the API when the field is filled)*
-- [ ] P3 [from 0.4] Success state with shareable confirmation link — effort:S
+- [x] P3 [from 0.4] Success state with shareable confirmation link — effort:S ← done: 2026-06-02 *(new shared `SubmissionSuccessCard` replaces the form on /join and /feedback after submission — check seal, bilingual thank-you copy, Facebook/X/WhatsApp/Telegram + copy-link share row, and a "Submit another" reset. Soft entrance animation; share URL is window.location.origin-based.)*
 - [x] P1 [from 0.5.1] Token-expiry / refresh UX (currently a stale token can hit 401 silently) — effort:M ← done: 2026-05-28 *(new `AUTH_SESSION_EXPIRED_EVENT` fires from `apiClient` on 401 / INVALID_TOKEN / AUTH_REQUIRED; global `SessionExpirationWatcher` mounted inside `Providers` shows a bilingual "session expired" toast and replaces the route to `/login?next=<currentPath>`; login page consumes `?next=` to bounce the user back where they were)*
 - [x] P2 [from 0.5.1] Silent access-token refresh via `POST /auth/refresh` + server-side revoke via `POST /auth/logout` — effort:M ← done: 2026-05-29 *(`authSession` now persists `refreshToken` alongside `accessToken`; `apiClient.apiRequest` intercepts 401 / INVALID_TOKEN / AUTH_REQUIRED, calls a deduped `refreshAccessToken()` singleton, stores the rotated token pair atomically, and retries the original request once — the session-expired toast now only fires when refresh itself fails. `logoutAndClearSession()` posts to `/auth/logout` to revoke the refresh token server-side before clearing storage; SiteShell and AdminShell logout handlers use it)*
-- [ ] P3 [from 0.7] Smoother visual transition on language switch — effort:S
+- [x] P3 [from 0.7] Smoother visual transition on language switch — effort:S ← done: 2026-06-02 *(setLanguage in providers.js now sets `data-language-switching="true"` on <html>, waits 160ms, swaps state, then clears the flag 60ms after. CSS on `.site-shell` transitions opacity to 0.35 during the swap → looks like a soft dim-and-recover, not a content snap. Reduced-motion users skip the animation entirely.)*
 - [ ] P3 [from 0.3.2] Post-launch: add Mobile App Dev, Translator (EN↔NE), Social Media, Photographer/Videographer, Event Coordinator roles to the volunteer invite — effort:S *(deferred until app release; current dev-phase roles are sufficient)*
 - [ ] P2 [from 0.3.2] Backend `applicationRoles` enum must accept `QA_ENGINEER`, `DEVOPS_ENGINEER`, `CONTENT_WRITER` — frontend cards link to `/join?role=` with these values but the API still rejects them (see [09-backend-admin-gaps.md](../engineering/09-backend-admin-gaps.md)) — effort:S
 
@@ -96,6 +96,7 @@ When you (the coding agent) are working in this repo:
 ## Phase 13 — Live Events Rail
 
 - [x] P3 [from 13] Persist `/events` filter pill state in URL query (`?show=live|upcoming|past`) for shareable filtered views — effort:S ← done: 2026-06-02 *(reads `?show=` on mount, syncs state via `router.replace` on click, respects back/forward navigation; `all` is the implicit default and never written.)*
+- [x] P2 [from 13] `/events` and homepage upcoming date pills emitted Latin digits in NP — Chromium's Intl `ne-NP` locale never honoured Devanagari numerals and also produced SSR/CSR hydration mismatch — effort:S ← done: 2026-06-02 *(replaced `Intl.DateTimeFormat("ne-NP", ...)` calls in `src/app/events/page.js` and `src/app/HomeClient.js` with a manual composition using `NP_MONTHS_SHORT` + `NP_WEEKDAYS_SHORT` tables and `localizeDigits` so output reads "बिहि, जुन ४, ६:५४" — deterministic across server and client.)*
 
 ## Phase 14 — Live Event Detail
 
