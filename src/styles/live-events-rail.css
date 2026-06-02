@@ -293,35 +293,124 @@
   }
 }
 
-/* Frosted-glass nav buttons. Swiper renders .swiper-button-prev/next
- * as absolute pseudos already positioned at the slider edges. */
+/* --- Netflix-style nav buttons ------------------------------------- *
+ * Idle state: invisible. Mouse over the rail → both buttons fade in
+ * as glassmorphism circles centered on each side. Direct hover on a
+ * button deepens the glass + slight scale-up. Keyboard focus uses the
+ * same revealed state as rail hover so it stays discoverable for
+ * a11y. Touch devices show a calm always-visible state since `:hover`
+ * is meaningless there. We override Swiper's font-icon `::after` with
+ * an inline-SVG mask so the chevron is crisp at any size and inherits
+ * `currentColor` for the button's themed stroke. */
+
 .events-home-rail .swiper-button-prev,
 .events-home-rail .swiper-button-next {
-  width: 44px;
-  height: 44px;
+  width: clamp(44px, 3.4vw, 56px);
+  height: clamp(44px, 3.4vw, 56px);
   border-radius: 50%;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  box-shadow: var(--shadow-2);
-  color: var(--text);
-  transition:
-    background 0.2s var(--ease-out-soft),
-    transform 0.2s var(--ease-out-soft);
+  background: rgba(255, 255, 255, 0);
+  border: 1px solid rgba(255, 255, 255, 0);
+  box-shadow: none;
+  color: #fff;
+  opacity: 0;
   top: 50%;
   margin-top: 0;
-  transform: translateY(-50%);
+  transform: translateY(-50%) scale(0.88);
+  -webkit-backdrop-filter: blur(0);
+  backdrop-filter: blur(0);
+  transition:
+    opacity 320ms var(--ease-out-soft),
+    transform 320ms var(--ease-out-soft),
+    background-color 220ms var(--ease-out-soft),
+    border-color 220ms var(--ease-out-soft),
+    box-shadow 220ms var(--ease-out-soft),
+    backdrop-filter 260ms var(--ease-out-soft),
+    -webkit-backdrop-filter 260ms var(--ease-out-soft);
+  z-index: 5;
+  /* Bring the buttons slightly inward from the swiper edge */
+  left: 20px;
 }
+.events-home-rail .swiper-button-next { left: auto; right: 20px; }
 
+/* CSS-drawn chevron: a square with two adjacent borders rotated 45°
+ * produces a crisp chevron at any size, inherits currentColor, has no
+ * font-family dependency, and dodges Swiper's default ::after sizing
+ * rules entirely. !important wins against Swiper's font-icon CSS. */
 .events-home-rail .swiper-button-prev::after,
 .events-home-rail .swiper-button-next::after {
-  font-size: 16px;
-  font-weight: 700;
+  content: "" !important;
+  display: block;
+  width: clamp(10px, 0.95vw, 14px) !important;
+  height: clamp(10px, 0.95vw, 14px) !important;
+  border-top: 2.4px solid currentColor;
+  border-right: 2.4px solid currentColor;
+  border-radius: 1.5px;
+  font-size: 0 !important;
+  background: transparent;
+}
+.events-home-rail .swiper-button-prev::after {
+  /* Chevron pointing left — top+right borders, rotate -135° */
+  transform: translateX(2px) rotate(-135deg);
+}
+.events-home-rail .swiper-button-next::after {
+  /* Chevron pointing right — top+right borders, rotate 45° */
+  transform: translateX(-2px) rotate(45deg);
 }
 
+/* Reveal both buttons when the user hovers the rail OR focuses one via
+ * keyboard. The buttons themselves are still children of the section,
+ * so a `:focus-within` on the section catches keyboard focus too. */
+.events-home-rail:hover .swiper-button-prev,
+.events-home-rail:hover .swiper-button-next,
+.events-home-rail:focus-within .swiper-button-prev,
+.events-home-rail:focus-within .swiper-button-next {
+  opacity: 1;
+  transform: translateY(-50%) scale(1);
+  background: rgba(20, 22, 26, 0.42);
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow:
+    0 8px 28px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  backdrop-filter: blur(14px) saturate(140%);
+}
+
+/* Direct hover on the button — deeper glass + lift */
 .events-home-rail .swiper-button-prev:hover,
 .events-home-rail .swiper-button-next:hover {
-  background: var(--surface-soft);
-  transform: translateY(-50%) scale(1.06);
+  background: rgba(20, 22, 26, 0.62);
+  border-color: rgba(255, 255, 255, 0.35);
+  transform: translateY(-50%) scale(1.08);
+  box-shadow:
+    0 12px 36px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+/* Tap-down feedback */
+.events-home-rail .swiper-button-prev:active,
+.events-home-rail .swiper-button-next:active {
+  transform: translateY(-50%) scale(0.98);
+  transition-duration: 80ms;
+}
+
+/* Keyboard focus ring — primary color, never lost */
+.events-home-rail .swiper-button-prev:focus-visible,
+.events-home-rail .swiper-button-next:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+}
+
+/* Touch devices have no hover — show a calm always-visible state. */
+@media (hover: none) {
+  .events-home-rail .swiper-button-prev,
+  .events-home-rail .swiper-button-next {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+    background: rgba(20, 22, 26, 0.4);
+    border-color: rgba(255, 255, 255, 0.2);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
 }
 
 .events-home-rail .swiper-button-prev.swiper-button-disabled,
