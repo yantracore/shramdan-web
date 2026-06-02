@@ -27,6 +27,7 @@ import { getJson } from "@/lib/apiClient";
 import { getDemoEventById, injectMockLiveStream } from "@/lib/devMockData";
 import { getAuthSession, subscribeAuthSession } from "@/lib/authSession";
 import { copy } from "@/lib/siteContent";
+import { useTrackVisit } from "@/lib/useRecentlyViewed";
 import {
   EVENT_RISK_COLORS,
   EVENT_STATUS_COLORS,
@@ -156,6 +157,16 @@ export default function EventDetailPage() {
 
   const pageTitle =
     eventData && (linkedIssue?.title || eventData.meetupAddress || content.detail.defaultTitle);
+
+  useTrackVisit(
+    eventData && eventId
+      ? {
+          href: `/events/${eventId}`,
+          title: pageTitle || content.detail.defaultTitle,
+          subtitle: eventData.meetupAddress || null
+        }
+      : null
+  );
 
   return (
     <SiteShell pageTitle={pageTitle || content.detail.defaultTitle}>

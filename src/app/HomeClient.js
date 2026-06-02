@@ -50,6 +50,7 @@ import { EventsHomeRail } from "@/components/EventsHomeRail";
 import { FeaturedStoryPanel } from "@/components/FeaturedStoryPanel";
 import { LiveOnlineWidget } from "@/components/LiveOnlineWidget";
 import { MotionSection } from "@/components/MotionSection";
+import { RecentlyViewedStrip } from "@/components/RecentlyViewedStrip";
 import { TimeOfDayGreeting } from "@/components/TimeOfDayGreeting";
 import { SiteShell } from "@/components/SiteShell";
 import { getDemoLiveEvents, getDemoUpcomingEvents } from "@/lib/devMockData";
@@ -422,6 +423,8 @@ export default function HomeClient({ summary }) {
       />
 
       <FeaturedStoryPanel language={language} />
+
+      <RecentlyViewedStrip language={language} />
 
       <MotionSection as="section" className="event-types-section" aria-labelledby="event-types-title">
         <div className="event-types-heading">

@@ -26,6 +26,7 @@ import { usePreferences } from "@/app/providers";
 import { getJson } from "@/lib/apiClient";
 import { getDemoSupporters } from "@/lib/devMockData";
 import { copy } from "@/lib/siteContent";
+import { useTrackVisit } from "@/lib/useRecentlyViewed";
 import {
   ISSUE_STATUS_COLORS,
   getIssueCoverImageUrl,
@@ -174,6 +175,16 @@ export default function IssueDetailPage() {
       target.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   };
+
+  useTrackVisit(
+    issue && issue.id
+      ? {
+          href: `/issues/${issue.id}`,
+          title: issue.title || coverAlt,
+          subtitle: issue.addressText || null
+        }
+      : null
+  );
 
   return (
     <SiteShell pageTitle={issue?.title || content.detail.notFoundTitle}>
