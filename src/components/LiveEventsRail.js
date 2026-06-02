@@ -124,7 +124,7 @@ function LiveEventCard({ event, copy, animated = false }) {
 
           <span className="live-events-rail-badge">
             <span className="live-dot" aria-hidden="true" />
-            LIVE
+            {copy?.liveBadge || "LIVE"}
           </span>
           {durationLabel ? (
             <span className="live-events-rail-duration">{durationLabel}</span>

@@ -38,7 +38,7 @@ export function EventLiveStreamPlayer({ liveStream, eventTitle, copy }) {
       <div className="event-live-player-meta">
         <span className="event-live-badge">
           <span className="live-dot" aria-hidden="true" />
-          LIVE
+          {copy?.liveBadge || "LIVE"}
         </span>
         {duration ? (
           <span className="event-live-duration">

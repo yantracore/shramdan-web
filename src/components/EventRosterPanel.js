@@ -34,13 +34,13 @@ const COPY = {
     unfilled: "खाली",
     joinAs: "जोडिनुहोस्",
     roles: {
-      WORKER: "Worker Shramdan",
-      PHOTOGRAPHER: "Photographer Shramdan",
-      LIVESTREAMER: "Livestreamer Shramdan",
-      MEDIC: "Medic Shramdan",
-      SAFETY_LEAD: "Safety Lead Shramdan",
-      COORDINATOR: "Coordinator Shramdan",
-      LOGISTICS: "Logistics Shramdan"
+      WORKER: "कामदार",
+      PHOTOGRAPHER: "फोटोग्राफर",
+      LIVESTREAMER: "लाइभस्ट्रिमर",
+      MEDIC: "स्वास्थ्यकर्मी",
+      SAFETY_LEAD: "सुरक्षा प्रमुख",
+      COORDINATOR: "संयोजक",
+      LOGISTICS: "लजिस्टिक्स"
     }
   },
   en: {
@@ -50,13 +50,13 @@ const COPY = {
     unfilled: "open",
     joinAs: "Join",
     roles: {
-      WORKER: "Worker Shramdan",
-      PHOTOGRAPHER: "Photographer Shramdan",
-      LIVESTREAMER: "Livestreamer Shramdan",
-      MEDIC: "Medic Shramdan",
-      SAFETY_LEAD: "Safety Lead Shramdan",
-      COORDINATOR: "Coordinator Shramdan",
-      LOGISTICS: "Logistics Shramdan"
+      WORKER: "Worker",
+      PHOTOGRAPHER: "Photographer",
+      LIVESTREAMER: "Livestreamer",
+      MEDIC: "Medic",
+      SAFETY_LEAD: "Safety Lead",
+      COORDINATOR: "Coordinator",
+      LOGISTICS: "Logistics"
     }
   }
 };

@@ -20,8 +20,7 @@ function ytThumb(videoId) {
   return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
 }
 
-const isDev = () =>
-  typeof process !== "undefined" && process.env.NODE_ENV !== "production";
+const isDev = () => process.env.NODE_ENV !== "production";
 
 // Demo participant roster — shared shape that mock events can pin onto
 // themselves. Each entry is a role with how many slots are needed,
