@@ -1,10 +1,17 @@
 "use client";
 
-import { Card, Radio, Switch, Typography } from "antd";
+import { Card, Radio, Typography } from "antd";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
 
 const { Title, Paragraph, Text } = Typography;
+
+// Note: the "Motion" + "Live indicators" cards were removed by user
+// request on 2026-06-02 for now. The underlying preferences
+// (entranceAnimation, liveIconSize) are still tracked in providers.js
+// and consumed at runtime — only the UI controls are hidden. To bring
+// them back, restore the cards + Switch/Radio.Group blocks from
+// git history (last seen in commit 191eca6).
 
 const copy = {
   np: {
@@ -23,24 +30,6 @@ const copy = {
         description: "Public surfaces मा प्रयोग हुने भाषा।",
         np: "नेपाली",
         en: "English"
-      }
-    },
-    motion: {
-      title: "Motion",
-      entrance: {
-        label: "Entrance animations",
-        description:
-          "Sections र cards viewport मा आउँदा soft fade + slide। बन्द गर्नुभए सबै कुरा तुरुन्तै देखिनेछ।"
-      }
-    },
-    live: {
-      title: "Live indicators",
-      iconSize: {
-        label: "LIVE icon size",
-        description: "Event cards र thumbnails मा LIVE badge को आकार।",
-        sm: "सानो",
-        md: "मध्यम",
-        lg: "ठूलो"
       }
     },
     note:
@@ -64,39 +53,12 @@ const copy = {
         en: "English"
       }
     },
-    motion: {
-      title: "Motion",
-      entrance: {
-        label: "Entrance animations",
-        description:
-          "Sections and cards fade-and-slide softly as they enter the viewport. Turn off for instant content."
-      }
-    },
-    live: {
-      title: "Live indicators",
-      iconSize: {
-        label: "LIVE icon size",
-        description: "Size of the LIVE badge on event cards and thumbnails.",
-        sm: "Small",
-        md: "Medium",
-        lg: "Large"
-      }
-    },
     note: "These settings save locally in your browser. Account sync is planned for the future."
   }
 };
 
 export default function SettingsPage() {
-  const {
-    language,
-    mode,
-    entranceAnimation,
-    liveIconSize,
-    setLanguage,
-    setMode,
-    setEntranceAnimation,
-    setLiveIconSize
-  } = usePreferences();
+  const { language, mode, setLanguage, setMode } = usePreferences();
   const t = copy[language];
 
   return (
@@ -142,39 +104,6 @@ export default function SettingsPage() {
               }
             />
           </div>
-        </Card>
-
-        <Card title={t.motion.title} style={{ marginBottom: 16 }}>
-          <SettingRow
-            label={t.motion.entrance.label}
-            description={t.motion.entrance.description}
-            control={
-              <Switch
-                checked={entranceAnimation}
-                onChange={(checked) => setEntranceAnimation(checked)}
-                aria-label={t.motion.entrance.label}
-              />
-            }
-          />
-        </Card>
-
-        <Card title={t.live.title} style={{ marginBottom: 16 }}>
-          <SettingRow
-            label={t.live.iconSize.label}
-            description={t.live.iconSize.description}
-            control={
-              <Radio.Group
-                value={liveIconSize}
-                onChange={(e) => setLiveIconSize(e.target.value)}
-                optionType="button"
-                options={[
-                  { label: t.live.iconSize.sm, value: "sm" },
-                  { label: t.live.iconSize.md, value: "md" },
-                  { label: t.live.iconSize.lg, value: "lg" }
-                ]}
-              />
-            }
-          />
         </Card>
 
         <Text type="secondary" style={{ display: "block", marginTop: 16 }}>
