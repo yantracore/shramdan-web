@@ -243,6 +243,32 @@
   opacity: 0.35;
 }
 
+/* --- Page transitions (App Router) ------------------------------------ */
+/* SiteShell keys the children wrapper by pathname so React re-mounts it
+ * on route change. Each mount plays a small fade-up that overlaps the
+ * browser's paint of the new route — feels like an app, not a fresh load. */
+.page-transition {
+  animation: page-enter 320ms var(--ease-out-soft);
+  animation-fill-mode: backwards;
+}
+
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-transition {
+    animation: none;
+  }
+}
+
 .motion-aware .event-types-grid > *:nth-child(1),
 .motion-aware .cleanup-areas-grid > *:nth-child(1),
 .motion-aware .workflow-grid > *:nth-child(1),

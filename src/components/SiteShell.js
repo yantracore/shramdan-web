@@ -374,7 +374,9 @@ export function SiteShell({ children, pageTitle }) {
       </header>
 
       <div id="main-content" tabIndex={-1}>
-        {children}
+        <div key={pathname} className="page-transition">
+          {children}
+        </div>
       </div>
 
       <footer className="footer" aria-label={t.footer.ariaLabel}>
