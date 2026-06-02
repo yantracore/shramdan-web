@@ -119,6 +119,7 @@ When you (the coding agent) are working in this repo:
 
 - [x] P3 [from 0.7] Settings: reset-to-defaults button — effort:S ← done: 2026-06-02 *(Popconfirm-gated; flips theme→light, language→NP)*
 - [x] P2 [from 0.5] `/login` polish — two-column with member-benefits panel + forgot-password link — effort:S ← done: 2026-06-02 *(was the last pivot-untouched public surface; left-side panel lists 3 benefits with icons, right-side card carries the form; stacks at ≤820px)*
+- [x] P2 [from 11] Mobile menu missing Settings link — effort:S ← done: 2026-06-02 *(desktop toolbar gear icon hides under 980px; mobile menu now carries a Settings link between the Admin Center (admin only) and the preferences button row)*
 - [x] P2 [from 1.2] `/issues/[id]` hero cover image alt fallback chain — effort:S ← done: 2026-06-02 *(same Next.js Image strip-alt bug as PublicIssueCard; new coverAlt cascade — title → addressText → categoryLabel → statusLabel → galleryAria → "Issue" — also flows into IssuePhotoGallery so lightbox images inherit it)*
 
 ---
