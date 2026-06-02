@@ -4,6 +4,7 @@ import { ArrowRightOutlined, PictureOutlined } from "@ant-design/icons";
 import { Tag } from "antd";
 import Image from "next/image";
 import Link from "next/link";
+import { IssueMapThumb } from "@/components/IssueMapThumb";
 import { IssueVoteButton } from "@/components/IssueVoteButton";
 import { ISSUE_STATUS_COLORS, getIssueCoverImageUrl } from "@/lib/adminUtils";
 
@@ -44,6 +45,19 @@ export function PublicIssueCard({ issue, content, language }) {
             src={coverImageUrl}
             unoptimized
             width={360}
+          />
+        </Link>
+      ) : Number.isFinite(Number(issue.latitude)) &&
+        Number.isFinite(Number(issue.longitude)) ? (
+        <Link
+          aria-label={accessibleLabel}
+          className="public-issue-card-cover public-issue-card-cover-map"
+          href={`/issues/${issue.id}`}
+        >
+          <IssueMapThumb
+            latitude={issue.latitude}
+            longitude={issue.longitude}
+            alt={accessibleLabel}
           />
         </Link>
       ) : (
