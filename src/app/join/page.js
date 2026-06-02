@@ -5,6 +5,7 @@ import { Suspense, useState } from "react";
 import { ContributorForm } from "@/components/ContributorForm";
 import { isHoneypotTriggered } from "@/components/Honeypot";
 import { SiteShell } from "@/components/SiteShell";
+import { SubmissionSuccessCard } from "@/components/SubmissionSuccessCard";
 import { usePreferences } from "@/app/providers";
 import { postJson } from "@/lib/apiClient";
 import { copy } from "@/lib/siteContent";
@@ -16,6 +17,7 @@ function JoinPageContent() {
   const t = copy[language];
   const messageApi = useToast();
   const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
   const selectedRole = searchParams.get("role");
   const allowedRoles = new Set(t.options.applicationRoles.map((role) => role.value));
   const initialRole = allowedRoles.has(selectedRole) ? selectedRole : undefined;
@@ -31,6 +33,7 @@ function JoinPageContent() {
   const handleSubmit = async (values) => {
     if (isHoneypotTriggered(values)) {
       messageApi.success(t.messages.join);
+      setSubmitted(true);
       return true;
     }
 
@@ -41,6 +44,7 @@ function JoinPageContent() {
     try {
       await postJson("/applications", payload);
       messageApi.success(t.messages.join);
+      setSubmitted(true);
       return true;
     } catch (error) {
       messageApi.error(error.message || t.messages.submitError);
@@ -50,38 +54,67 @@ function JoinPageContent() {
     }
   };
 
+  const shareUrl =
+    typeof window !== "undefined" ? `${window.location.origin}/join` : "https://shramdan.org/join";
+
   return (
     <SiteShell pageTitle={t.pageTitles.join}>
       <section className="page-section form-section">
-        {matchedRole ? (
-          <aside
-            className="join-role-context"
-            aria-label={language === "np" ? "छानिएको भूमिका" : "Selected role"}
-          >
-            <span className="join-role-context-eyebrow">
-              {language === "np" ? "तपाईंले छान्नुभएको भूमिका" : "You're joining as"}
-            </span>
-            <h2>{matchedRole.title}</h2>
-            <p>{matchedRole.description}</p>
-            {matchedEventId ? (
-              <p className="join-role-context-event">
-                {language === "np"
-                  ? `अभियानका लागि: ${matchedEventId}`
-                  : `For event: ${matchedEventId}`}
-              </p>
+        {submitted ? (
+          <SubmissionSuccessCard
+            language={language}
+            title={
+              language === "np"
+                ? "तपाईंको योगदान आवेदन प्राप्त भयो।"
+                : "Your contribution application is in."
+            }
+            body={
+              language === "np"
+                ? "हाम्रो टोलीले छिट्टै इमेल वा फोनमार्फत सम्पर्क गर्नेछ।"
+                : "Our team will reach out by email or phone shortly."
+            }
+            shareUrl={shareUrl}
+            shareTitle={language === "np" ? "श्रमदानमा जोडिनुहोस्" : "Join Shramdan"}
+            shareText={
+              language === "np"
+                ? "श्रमदान — सामूहिक श्रमको मञ्च। तपाईं पनि जोडिनुहोस्।"
+                : "Shramdan — a platform for collective community work. Join us."
+            }
+            onReset={() => setSubmitted(false)}
+          />
+        ) : (
+          <>
+            {matchedRole ? (
+              <aside
+                className="join-role-context"
+                aria-label={language === "np" ? "छानिएको भूमिका" : "Selected role"}
+              >
+                <span className="join-role-context-eyebrow">
+                  {language === "np" ? "तपाईंले छान्नुभएको भूमिका" : "You're joining as"}
+                </span>
+                <h2>{matchedRole.title}</h2>
+                <p>{matchedRole.description}</p>
+                {matchedEventId ? (
+                  <p className="join-role-context-event">
+                    {language === "np"
+                      ? `अभियानका लागि: ${matchedEventId}`
+                      : `For event: ${matchedEventId}`}
+                  </p>
+                ) : null}
+              </aside>
             ) : null}
-          </aside>
-        ) : null}
 
-        <ContributorForm
-          content={t}
-          eyebrow={t.join.eyebrow}
-          title={t.join.title}
-          intro={t.join.intro}
-          initialRole={initialRole}
-          onSubmit={handleSubmit}
-          submitting={submitting}
-        />
+            <ContributorForm
+              content={t}
+              eyebrow={t.join.eyebrow}
+              title={t.join.title}
+              intro={t.join.intro}
+              initialRole={initialRole}
+              onSubmit={handleSubmit}
+              submitting={submitting}
+            />
+          </>
+        )}
       </section>
     </SiteShell>
   );
