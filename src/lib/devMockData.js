@@ -96,30 +96,268 @@ export function getDemoLiveEvents() {
   return DEMO_LIVE_EVENTS;
 }
 
+// --- Upcoming demo events (SCHEDULED) -------------------------------
+// scheduledAt in the future. No live stream yet. Photos empty (events
+// haven't happened). Each has rolesNeeded so the detail page roster
+// panel lights up.
+const inHours = (h) => new Date(Date.now() + h * 60 * 60_000).toISOString();
+const daysAgo = (d) => new Date(Date.now() - d * 24 * 60 * 60_000).toISOString();
+
+export const DEMO_UPCOMING_EVENTS = [
+  {
+    id: "demo-up-1",
+    title: "रत्नपार्क सरसफाइ अभियान",
+    addressText: "रत्नपार्क मुख्य गेट, काठमाडौँ",
+    category: "cleanup",
+    thumbnailUrl: "/images/event-types/cleanup.jpg",
+    scheduledAt: inHours(38),
+    durationMinutes: 180,
+    meetupLatitude: 27.7044,
+    meetupLongitude: 85.3148,
+    leaderName: "रोहित कार्की",
+    rolesNeeded: DEMO_ROSTER,
+    riskLevel: "NORMAL"
+  },
+  {
+    id: "demo-up-2",
+    title: "बागमती पुल छेउ वृक्षारोपण",
+    addressText: "त्रिपुरेश्वर पुल, काठमाडौँ",
+    category: "afforestation",
+    thumbnailUrl: "/images/event-types/afforestation.jpg",
+    scheduledAt: inHours(72),
+    durationMinutes: 240,
+    meetupLatitude: 27.6912,
+    meetupLongitude: 85.3128,
+    leaderName: "बिनिता थापा",
+    rolesNeeded: DEMO_ROSTER,
+    riskLevel: "NORMAL"
+  },
+  {
+    id: "demo-up-3",
+    title: "गोकर्णेश्वर ट्रेल मर्मत",
+    addressText: "गोकर्णेश्वर हाइकिङ ट्रेल, काठमाडौँ",
+    category: "trail",
+    thumbnailUrl: "/images/event-types/trail.jpg",
+    scheduledAt: inHours(120),
+    durationMinutes: 300,
+    meetupLatitude: 27.7521,
+    meetupLongitude: 85.3922,
+    leaderName: "स्मिता शर्मा",
+    rolesNeeded: DEMO_ROSTER,
+    riskLevel: "WATCH"
+  },
+  {
+    id: "demo-up-4",
+    title: "श्री दुर्गा देवी मा.वि. भित्ता पेन्ट",
+    addressText: "गौशाला, काठमाडौँ",
+    category: "infrastructure",
+    thumbnailUrl: "/images/event-types/infrastructure.jpg",
+    scheduledAt: inHours(196),
+    durationMinutes: 360,
+    meetupLatitude: 27.7081,
+    meetupLongitude: 85.3469,
+    leaderName: "गणेश राई",
+    rolesNeeded: DEMO_ROSTER,
+    riskLevel: "NORMAL"
+  },
+  {
+    id: "demo-up-5",
+    title: "कमलपोखरी सौन्दर्यीकरण",
+    addressText: "कमलपोखरी पैदलमार्ग, काठमाडौँ",
+    category: "beautification",
+    thumbnailUrl: "/images/event-types/beautification.jpg",
+    scheduledAt: inHours(264),
+    durationMinutes: 240,
+    meetupLatitude: 27.7155,
+    meetupLongitude: 85.3260,
+    leaderName: "सुनिल मगर",
+    rolesNeeded: DEMO_ROSTER,
+    riskLevel: "NORMAL"
+  }
+];
+
+export function getDemoUpcomingEvents() {
+  if (!isDev()) return [];
+  return DEMO_UPCOMING_EVENTS;
+}
+
+// --- Past demo events (COMPLETED) -----------------------------------
+// Have completedAt, resultSummary, participantCount, photos (using
+// event-type illustrations as placeholders for now).
+export const DEMO_PAST_EVENTS = [
+  {
+    id: "demo-past-1",
+    title: "गुह्येश्वरी मन्दिर परिसर सरसफाइ",
+    addressText: "गुह्येश्वरी, काठमाडौँ",
+    category: "cleanup",
+    thumbnailUrl: "/images/event-types/cleanup.jpg",
+    scheduledAt: daysAgo(14),
+    completedAt: daysAgo(14),
+    durationMinutes: 240,
+    meetupLatitude: 27.7115,
+    meetupLongitude: 85.3608,
+    leaderName: "कमला अधिकारी",
+    participantCount: 47,
+    resultSummary:
+      "२.८ टन फोहोर हटाइयो; ४७ जना सहभागी; नदी किनारको ३०० मिटर सफा। नगरपालिकाले अनुगमन गर्न प्रतिबद्धता जनायो।",
+    photos: [
+      "/images/event-types/cleanup.jpg",
+      "/images/event-types/cleanup.jpg",
+      "/images/event-types/cleanup.jpg"
+    ]
+  },
+  {
+    id: "demo-past-2",
+    title: "शिवपुरी राष्ट्रिय निकुञ्ज वृक्षारोपण",
+    addressText: "बुढानीलकण्ठ, काठमाडौँ",
+    category: "afforestation",
+    thumbnailUrl: "/images/event-types/afforestation.jpg",
+    scheduledAt: daysAgo(28),
+    completedAt: daysAgo(28),
+    durationMinutes: 360,
+    meetupLatitude: 27.7717,
+    meetupLongitude: 85.3654,
+    leaderName: "हरि श्रेष्ठ",
+    participantCount: 62,
+    resultSummary:
+      "४८० बिरुवा रोपिए — चिलाउने, उत्तिस र अप्रिकोट। ६२ सहभागी; निकुञ्ज प्रशासनको साझेदारीमा।",
+    photos: ["/images/event-types/afforestation.jpg", "/images/event-types/afforestation.jpg"]
+  },
+  {
+    id: "demo-past-3",
+    title: "सिनामंगल फुटपाथ मर्मत",
+    addressText: "सिनामंगल चोक, काठमाडौँ",
+    category: "infrastructure",
+    thumbnailUrl: "/images/event-types/infrastructure.jpg",
+    scheduledAt: daysAgo(45),
+    completedAt: daysAgo(45),
+    durationMinutes: 300,
+    meetupLatitude: 27.7036,
+    meetupLongitude: 85.3527,
+    leaderName: "रिता पाण्डे",
+    participantCount: 28,
+    resultSummary:
+      "१८० मिटर फुटपाथ मर्मत; ४ ल्याम्प पोस्ट पुनःस्थापना। २८ सहभागी। नगरबाट निर्माण सामग्री।",
+    photos: ["/images/event-types/infrastructure.jpg"]
+  },
+  {
+    id: "demo-past-4",
+    title: "हनुमन्ते खोला किनार सफाइ",
+    addressText: "लोकन्थली पुल, भक्तपुर",
+    category: "cleanup",
+    thumbnailUrl: "/images/event-types/cleanup.jpg",
+    scheduledAt: daysAgo(60),
+    completedAt: daysAgo(60),
+    durationMinutes: 300,
+    meetupLatitude: 27.6766,
+    meetupLongitude: 85.3804,
+    leaderName: "प्रदीप तामाङ",
+    participantCount: 54,
+    resultSummary:
+      "१.५ किमी खोला किनार सफा; ५४ सहभागी; ४.२ टन प्लास्टिक र अन्य अजैविक फोहोर सङ्कलन।",
+    photos: [
+      "/images/event-types/cleanup.jpg",
+      "/images/event-types/cleanup.jpg",
+      "/images/event-types/cleanup.jpg",
+      "/images/event-types/cleanup.jpg"
+    ]
+  }
+];
+
+export function getDemoPastEvents() {
+  if (!isDev()) return [];
+  return DEMO_PAST_EVENTS;
+}
+
+export function getDemoAllEvents() {
+  if (!isDev()) return { live: [], upcoming: [], past: [] };
+  return {
+    live: DEMO_LIVE_EVENTS,
+    upcoming: DEMO_UPCOMING_EVENTS,
+    past: DEMO_PAST_EVENTS
+  };
+}
+
 // Lookup for the event-detail page so demo-* IDs can resolve to a
-// payload without hitting the backend.
+// payload without hitting the backend. Handles live, upcoming, and
+// past demo events.
 export function getDemoEventById(id) {
   if (!isDev()) return null;
-  const found = DEMO_LIVE_EVENTS.find((event) => event.id === id);
-  if (!found) return null;
-  return {
-    id: found.id,
-    title: found.title,
-    status: "ACTIVE",
-    meetupAddress: found.addressText,
-    meetupLatitude: 27.7172,
-    meetupLongitude: 85.3240,
-    scheduledAt: found.liveStream.startedAt,
-    durationMinutes: 180,
-    planningNotes:
-      "Demo data while backend liveStream wiring lands. Replace via real /events/{id} response once the backend ships event.liveStream.",
-    linkedIssue: null,
-    eventLeaderId: null,
-    photos: [],
-    resultSummary: null,
-    liveStream: found.liveStream,
-    rolesNeeded: found.rolesNeeded
-  };
+
+  const live = DEMO_LIVE_EVENTS.find((event) => event.id === id);
+  if (live) {
+    return {
+      id: live.id,
+      title: live.title,
+      status: "ACTIVE",
+      meetupAddress: live.addressText,
+      meetupLatitude: 27.7172,
+      meetupLongitude: 85.3240,
+      scheduledAt: live.liveStream.startedAt,
+      durationMinutes: 180,
+      planningNotes:
+        "Demo live event. Backend liveStream wiring not yet shipped; this payload comes from src/lib/devMockData.js.",
+      linkedIssue: null,
+      eventLeaderId: null,
+      uploads: [],
+      photos: [],
+      resultSummary: null,
+      liveStream: live.liveStream,
+      rolesNeeded: live.rolesNeeded
+    };
+  }
+
+  const upcoming = DEMO_UPCOMING_EVENTS.find((event) => event.id === id);
+  if (upcoming) {
+    return {
+      id: upcoming.id,
+      title: upcoming.title,
+      status: "SCHEDULED",
+      meetupAddress: upcoming.addressText,
+      meetupLatitude: upcoming.meetupLatitude,
+      meetupLongitude: upcoming.meetupLongitude,
+      scheduledAt: upcoming.scheduledAt,
+      durationMinutes: upcoming.durationMinutes,
+      planningNotes: `Demo upcoming event. Leader: ${upcoming.leaderName || "TBD"}.`,
+      linkedIssue: null,
+      eventLeaderId: null,
+      uploads: [],
+      photos: [],
+      resultSummary: null,
+      riskLevel: upcoming.riskLevel,
+      rolesNeeded: upcoming.rolesNeeded
+    };
+  }
+
+  const past = DEMO_PAST_EVENTS.find((event) => event.id === id);
+  if (past) {
+    return {
+      id: past.id,
+      title: past.title,
+      status: "COMPLETED",
+      meetupAddress: past.addressText,
+      meetupLatitude: past.meetupLatitude,
+      meetupLongitude: past.meetupLongitude,
+      scheduledAt: past.scheduledAt,
+      completedAt: past.completedAt,
+      durationMinutes: past.durationMinutes,
+      planningNotes: `Demo past event. Led by ${past.leaderName || "टीम"}.`,
+      linkedIssue: null,
+      eventLeaderId: null,
+      uploads: (past.photos || []).map((url, i) => ({
+        id: `${past.id}-photo-${i}`,
+        url,
+        mimeType: "image/jpeg",
+        fileName: `${past.id}-${i}.jpg`
+      })),
+      photos: past.photos || [],
+      resultSummary: past.resultSummary,
+      participantCount: past.participantCount,
+      rolesNeeded: DEMO_ROSTER
+    };
+  }
+
+  return null;
 }
 
 // Demo issue supporters — short list of names used to populate the

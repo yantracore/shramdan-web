@@ -87,6 +87,7 @@ export function SiteShell({ children, pageTitle }) {
   const isAdmin = isAuthenticated && isAdminUser(session.user);
   const navItems = [
     { href: "/", label: t.nav.home },
+    { href: "/events", label: t.nav.events },
     { href: "/issues", label: t.nav.issues },
     { href: "/join", label: t.nav.join },
     { href: "/feedback", label: t.nav.feedback },
@@ -152,6 +153,7 @@ export function SiteShell({ children, pageTitle }) {
     { href: "/", label: t.nav.home },
     { href: "/intro", label: t.nav.intro },
     { href: "/learn", label: t.nav.learn },
+    { href: "/events", label: t.nav.events },
     { href: "/issues", label: t.nav.issues },
     { href: "/event-types", label: t.nav.eventTypes },
     { href: "/settings", label: t.nav.settings },
