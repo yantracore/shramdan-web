@@ -2,6 +2,7 @@
 
 import { CheckOutlined, LikeOutlined } from "@ant-design/icons";
 import { Button, Tooltip } from "antd";
+import { useEffect, useRef, useState } from "react";
 import { useIssueVote } from "@/lib/useIssueVote";
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
@@ -32,6 +33,17 @@ export function IssueVoteButton({
       content: content.card
     });
 
+  // Animate the count whenever it changes (after first render). Bumping
+  // pulseKey re-mounts the count span so the CSS tickup animation plays.
+  const previousCountRef = useRef(voteCount);
+  const [pulseKey, setPulseKey] = useState(0);
+  useEffect(() => {
+    if (previousCountRef.current !== voteCount) {
+      previousCountRef.current = voteCount;
+      setPulseKey((k) => k + 1);
+    }
+  }, [voteCount]);
+
   const label = voted ? content.card.voteActionDone : content.card.voteAction;
   const tooltipTitle = !isAuthenticated ? content.card.voteDisabledTooltip : "";
 
@@ -47,7 +59,10 @@ export function IssueVoteButton({
         type={voted ? "default" : type}
       >
         {showCount ? (
-          <span className="public-issue-card-support-count">
+          <span
+            key={pulseKey}
+            className="public-issue-card-support-count vote-tickup"
+          >
             {toLocalDigits(voteCount, language)}
           </span>
         ) : null}
