@@ -542,7 +542,7 @@
 .page-section {
   width: min(1180px, calc(100% - 32px));
   margin: 0 auto;
-  padding: 40px 0 0;
+  padding: 20px 0;
   border-top: 1px solid var(--line);
 }
 
@@ -552,7 +552,7 @@
   gap: 22px;
   width: min(1180px, calc(100% - 32px));
   margin: 0 auto;
-  padding-top: 56px;
+  padding: 28px 0;
   border-top: 1px solid var(--line);
 }
 
@@ -737,7 +737,7 @@
   gap: 22px;
   width: min(1180px, calc(100% - 32px));
   margin: 0 auto;
-  padding-top: 56px;
+  padding: 28px 0;
   border-top: 1px solid var(--line);
 }
 
@@ -1007,7 +1007,7 @@
   gap: 22px;
   width: min(1180px, calc(100% - 32px));
   margin: 0 auto;
-  padding-top: 56px;
+  padding: 28px 0;
   border-top: 1px solid var(--line);
 }
 
@@ -2932,12 +2932,12 @@
 
   .core-idea-section {
     gap: 16px;
-    padding-top: 56px;
+    padding: 28px 0;
   }
 
   .cleanup-areas-section {
     gap: 16px;
-    padding-top: 56px;
+    padding: 28px 0;
   }
 
   .cleanup-areas-heading {
@@ -3022,7 +3022,7 @@
 
   .volunteer-invite-section {
     gap: 14px;
-    padding-top: 56px;
+    padding: 28px 0;
   }
 
   .volunteer-visual,
@@ -4833,7 +4833,7 @@
 }
 
 .building-now-section {
-  padding: 48px 24px 0;
+  padding: 24px 24px;
   max-width: 1180px;
   margin: 0 auto;
   display: flex;
@@ -5061,7 +5061,7 @@
 
 @media (max-width: 620px) {
   .building-now-section {
-    padding: 44px 20px 0;
+    padding: 22px 20px;
     gap: 24px;
   }
 
@@ -5091,6 +5091,7 @@
 
 .issue-map-wrap {
   position: relative;
+  isolation: isolate;
   width: 100%;
   border-radius: 14px;
   overflow: hidden;
@@ -5347,7 +5348,7 @@
 /* Homepage — Live Issues section */
 
 .live-issues-section {
-  padding: 48px 24px 0;
+  padding: 24px 24px;
   max-width: 1240px;
   margin: 0 auto;
   width: 100%;
@@ -5545,7 +5546,7 @@
 
 @media (max-width: 720px) {
   .live-issues-section {
-    padding: 40px 20px 0;
+    padding: 20px 20px;
   }
 
   .live-issues-header {
@@ -5589,7 +5590,7 @@
   gap: 22px;
   width: min(1180px, calc(100% - 32px));
   margin: 0 auto;
-  padding-top: 56px;
+  padding: 28px 0;
   border-top: 1px solid var(--line);
 }
 
@@ -6044,7 +6045,7 @@
 
 @media (max-width: 620px) {
   .event-types-section {
-    padding-top: 64px;
+    padding: 32px 0;
     gap: 20px;
   }
 
