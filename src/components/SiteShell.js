@@ -19,6 +19,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { FaFacebookF, FaTiktok, FaXTwitter, FaYoutube } from "react-icons/fa6";
 import { CommandPalette } from "@/components/CommandPalette";
 import { KeyboardShortcutsDialog } from "@/components/KeyboardShortcutsDialog";
+import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { NotificationsBell } from "@/components/NotificationsBell";
 import { OnboardingSpotlight } from "@/components/OnboardingSpotlight";
 import { QuickActionFab } from "@/components/QuickActionFab";
@@ -389,6 +390,14 @@ export function SiteShell({ children, pageTitle }) {
       <QuickActionFab language={language} />
       <KeyboardShortcutsDialog language={language} />
       <OnboardingSpotlight language={language} />
+      <MobileBottomNav
+        language={language}
+        onMore={() => {
+          if (mobileMenuRef.current) {
+            mobileMenuRef.current.open = !mobileMenuRef.current.open;
+          }
+        }}
+      />
 
       <footer className="footer" aria-label={t.footer.ariaLabel}>
         <div className="footer-brand">
