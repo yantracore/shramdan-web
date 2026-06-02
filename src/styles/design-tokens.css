@@ -230,6 +230,19 @@
   }
 }
 
+/* --- Language switch crossfade ---------------------------------------- */
+/* When setLanguage runs (in providers.js), it sets
+ * data-language-switching="true" on <html> for ~220ms. The shell dims
+ * mid-swap so the content change feels intentional, not snap. Skipped
+ * automatically for reduced-motion users (providers.js short-circuits). */
+.site-shell {
+  transition: opacity 180ms var(--ease-out-soft);
+}
+
+:root[data-language-switching="true"] .site-shell {
+  opacity: 0.35;
+}
+
 .motion-aware .event-types-grid > *:nth-child(1),
 .motion-aware .cleanup-areas-grid > *:nth-child(1),
 .motion-aware .workflow-grid > *:nth-child(1),
