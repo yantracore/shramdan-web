@@ -4,7 +4,14 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { CalendarOutlined, ClockCircleOutlined, EnvironmentOutlined, TeamOutlined } from "@ant-design/icons";
+import {
+  CalendarOutlined,
+  ClockCircleOutlined,
+  EnvironmentOutlined,
+  PlusOutlined,
+  TeamOutlined
+} from "@ant-design/icons";
+import { Button, Select } from "antd";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
 import { copy } from "@/lib/siteContent";
@@ -55,7 +62,11 @@ const PAGE_COPY = {
       all: "सबै",
       live: "लाइभ",
       upcoming: "आउँदै",
-      past: "सम्पन्न"
+      past: "सम्पन्न",
+      statusLabel: "स्थिति",
+      statusPlaceholder: "सबै स्थिति",
+      eventTypeLabel: "अभियानको प्रकार",
+      eventTypeCleanup: "सरसफाइ"
     }
   },
   en: {
@@ -94,7 +105,11 @@ const PAGE_COPY = {
       all: "All",
       live: "Live",
       upcoming: "Upcoming",
-      past: "Past"
+      past: "Past",
+      statusLabel: "Status",
+      statusPlaceholder: "All Statuses",
+      eventTypeLabel: "Event Type",
+      eventTypeCleanup: "Cleanup"
     }
   }
 };
@@ -304,12 +319,18 @@ export default function EventsListPage() {
   const upcoming = useMemo(() => getDemoUpcomingEvents(), []);
   const past = useMemo(() => getDemoPastEvents(), []);
 
-  const filterOptions = [
-    { key: "all", label: t.filters.all, count: live.length + upcoming.length + past.length },
-    { key: "live", label: t.filters.live, count: live.length },
-    { key: "upcoming", label: t.filters.upcoming, count: upcoming.length },
-    { key: "past", label: t.filters.past, count: past.length }
+  const statusOptions = [
+    { value: "live", label: t.filters.live },
+    { value: "upcoming", label: t.filters.upcoming },
+    { value: "past", label: t.filters.past }
   ];
+
+  const eventTypeOptions = [
+    { value: "cleanup", label: t.filters.eventTypeCleanup }
+  ];
+
+  const localizedCopy = copy[language] || copy.np;
+  const reportIssueCtaLabel = localizedCopy?.issueNew?.cta?.list ?? "Report a New Issue";
 
   const showLive = filter === "all" || filter === "live";
   const showUpcoming = filter === "all" || filter === "upcoming";
@@ -324,29 +345,44 @@ export default function EventsListPage() {
           <p>{t.intro}</p>
         </header>
 
-        <div
-          className="events-filter-pills"
-          role="tablist"
-          aria-label={t.filters.ariaLabel}
-        >
-          {filterOptions.map((option) => {
-            const isActive = filter === option.key;
-            return (
-              <button
-                key={option.key}
-                type="button"
-                role="tab"
-                aria-selected={isActive}
-                className={`events-filter-pill${isActive ? " is-active" : ""}`}
-                onClick={() => updateFilter(option.key)}
+        <div className="public-issues-toolbar">
+          <div className="public-issues-filters">
+            <div className="public-issues-filter-field">
+              <label
+                className="public-issues-filter-label"
+                htmlFor="events-filter-status"
               >
-                <span className="events-filter-pill-label">{option.label}</span>
-                <span className="events-filter-pill-count">
-                  {localizeDigits(option.count, language)}
-                </span>
-              </button>
-            );
-          })}
+                {t.filters.statusLabel}
+              </label>
+              <Select
+                id="events-filter-status"
+                allowClear
+                onChange={(value) => updateFilter(value || "all")}
+                options={statusOptions}
+                placeholder={t.filters.statusPlaceholder}
+                value={filter === "all" ? undefined : filter}
+              />
+            </div>
+            <div className="public-issues-filter-field">
+              <label
+                className="public-issues-filter-label"
+                htmlFor="events-filter-type"
+              >
+                {t.filters.eventTypeLabel}
+              </label>
+              <Select
+                id="events-filter-type"
+                disabled
+                options={eventTypeOptions}
+                value="cleanup"
+              />
+            </div>
+            <Link className="public-issues-filters-cta" href="/issues/new">
+              <Button type="primary" icon={<PlusOutlined />} size="large">
+                {reportIssueCtaLabel}
+              </Button>
+            </Link>
+          </div>
         </div>
 
         {showLive ? (
