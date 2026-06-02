@@ -1,6 +1,7 @@
 "use client";
 
-import { Card, Radio, Typography } from "antd";
+import { ReloadOutlined } from "@ant-design/icons";
+import { Button, Card, Popconfirm, Radio, Typography } from "antd";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
 
@@ -33,7 +34,16 @@ const copy = {
       }
     },
     note:
-      "यी settings तपाईंको browser मा local रूपमा save हुन्छन्। भविष्यमा accounts सँग sync गर्ने योजना छ।"
+      "यी settings तपाईंको browser मा local रूपमा save हुन्छन्। भविष्यमा accounts सँग sync गर्ने योजना छ।",
+    reset: {
+      title: "Defaults मा फर्काउनुहोस्",
+      description: "थिम र भाषा पुनः default मा।",
+      cta: "Reset",
+      confirmTitle: "साँच्चै reset गर्ने?",
+      confirmBody: "थिम light मा, भाषा नेपाली मा फर्किनेछ। यो undo गर्न सकिँदैन।",
+      confirmOk: "हो, reset",
+      confirmCancel: "रद्द"
+    }
   },
   en: {
     pageTitle: "App Settings",
@@ -53,13 +63,27 @@ const copy = {
         en: "English"
       }
     },
-    note: "These settings save locally in your browser. Account sync is planned for the future."
+    note: "These settings save locally in your browser. Account sync is planned for the future.",
+    reset: {
+      title: "Reset to defaults",
+      description: "Theme and language go back to their initial values.",
+      cta: "Reset",
+      confirmTitle: "Reset preferences?",
+      confirmBody: "Theme returns to Light, language returns to नेपाली. This cannot be undone.",
+      confirmOk: "Yes, reset",
+      confirmCancel: "Cancel"
+    }
   }
 };
 
 export default function SettingsPage() {
   const { language, mode, setLanguage, setMode } = usePreferences();
   const t = copy[language];
+
+  const handleReset = () => {
+    setMode("light");
+    setLanguage("np");
+  };
 
   return (
     <SiteShell>
@@ -101,6 +125,22 @@ export default function SettingsPage() {
                     { label: t.appearance.language.en, value: "en" }
                   ]}
                 />
+              }
+            />
+            <SettingRow
+              label={t.reset.title}
+              description={t.reset.description}
+              control={
+                <Popconfirm
+                  title={t.reset.confirmTitle}
+                  description={t.reset.confirmBody}
+                  okText={t.reset.confirmOk}
+                  cancelText={t.reset.confirmCancel}
+                  onConfirm={handleReset}
+                  placement="topRight"
+                >
+                  <Button icon={<ReloadOutlined />}>{t.reset.cta}</Button>
+                </Popconfirm>
               }
             />
           </div>
