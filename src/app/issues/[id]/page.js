@@ -19,6 +19,7 @@ import { PublicIssueCard, formatSupporters } from "@/components/PublicIssueCard"
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
 import { getJson } from "@/lib/apiClient";
+import { getDemoSupporters } from "@/lib/devMockData";
 import { copy } from "@/lib/siteContent";
 import {
   ISSUE_STATUS_COLORS,
@@ -31,6 +32,44 @@ import {
 const PUBLIC_ISSUE_STATUSES = ["OPEN", "EVENT_SCHEDULED", "COMPLETED"];
 const RELATED_LIMIT = 6;
 const RELATED_DISPLAY = 3;
+
+const SUPPORTERS_COPY = {
+  np: {
+    title: "समर्थनकर्ता",
+    intro: "जसले अहिले सम्म यो समस्यालाई समर्थन गरेका छन्।",
+    more: "थप {n}"
+  },
+  en: {
+    title: "Supporters",
+    intro: "Who has backed this issue so far.",
+    more: "+{n} more"
+  }
+};
+
+function IssueSupportersChipRow({ voteCount, language }) {
+  const supporters = getDemoSupporters(voteCount);
+  if (!supporters.length) return null;
+  const t = SUPPORTERS_COPY[language] || SUPPORTERS_COPY.np;
+  const remaining = Math.max(0, (Number(voteCount) || 0) - supporters.length);
+  return (
+    <section className="public-issue-detail-section-block issue-supporters">
+      <h2>{t.title}</h2>
+      <p className="public-issue-detail-muted">{t.intro}</p>
+      <div className="issue-supporters-chips">
+        {supporters.map((name, i) => (
+          <span key={i} className="issue-supporters-chip" title={name}>
+            {Array.from(name.trim())[0] || "?"}
+          </span>
+        ))}
+        {remaining > 0 ? (
+          <span className="issue-supporters-chip issue-supporters-chip-more">
+            {t.more.replace("{n}", remaining)}
+          </span>
+        ) : null}
+      </div>
+    </section>
+  );
+}
 
 function formatIssueDate(value, language) {
   if (!value) return "";
@@ -238,6 +277,11 @@ export default function IssueDetailPage() {
                   content={content}
                 />
               ) : null}
+
+              <IssueSupportersChipRow
+                voteCount={issue.voteCount}
+                language={language}
+              />
 
               <section className="public-issue-detail-section-block public-issue-timeline-block">
                 <IssueStatusTimeline status={issue.status} content={content} />

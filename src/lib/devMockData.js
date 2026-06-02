@@ -123,6 +123,23 @@ export function getDemoEventById(id) {
   };
 }
 
+// Demo issue supporters — short list of names used to populate the
+// "who has supported this" chip row on /issues/[id] when the backend
+// doesn't yet expose a voters list. Returns a deterministic slice
+// based on voteCount so refresh doesn't flap.
+const DEMO_SUPPORTER_POOL = [
+  "राम", "सीता", "हरि", "गोमा", "सुनिल", "अमित", "रिता", "मञ्जु",
+  "सरोज", "बिनिता", "प्रदीप", "रोशन", "कमला", "रोहित", "स्मिता", "दिनेश"
+];
+
+export function getDemoSupporters(voteCount) {
+  if (!isDev()) return [];
+  const count = Number(voteCount) || 0;
+  if (count < 1) return [];
+  const slice = Math.min(count, DEMO_SUPPORTER_POOL.length);
+  return DEMO_SUPPORTER_POOL.slice(0, slice);
+}
+
 // Helper for the event-detail page: when in dev mode AND the fetched
 // event has no liveStream, optionally pin one on for visual demo. Use
 // sparingly — only when explicitly asking for the autoplay demo.
