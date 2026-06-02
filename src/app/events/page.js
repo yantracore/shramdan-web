@@ -350,6 +350,20 @@ export default function EventsListPage() {
             <div className="public-issues-filter-field">
               <label
                 className="public-issues-filter-label"
+                htmlFor="events-filter-type"
+              >
+                {t.filters.eventTypeLabel}
+              </label>
+              <Select
+                id="events-filter-type"
+                disabled
+                options={eventTypeOptions}
+                value="cleanup"
+              />
+            </div>
+            <div className="public-issues-filter-field">
+              <label
+                className="public-issues-filter-label"
                 htmlFor="events-filter-status"
               >
                 {t.filters.statusLabel}
@@ -361,20 +375,6 @@ export default function EventsListPage() {
                 options={statusOptions}
                 placeholder={t.filters.statusPlaceholder}
                 value={filter === "all" ? undefined : filter}
-              />
-            </div>
-            <div className="public-issues-filter-field">
-              <label
-                className="public-issues-filter-label"
-                htmlFor="events-filter-type"
-              >
-                {t.filters.eventTypeLabel}
-              </label>
-              <Select
-                id="events-filter-type"
-                disabled
-                options={eventTypeOptions}
-                value="cleanup"
               />
             </div>
             <Link className="public-issues-filters-cta" href="/issues/new">
