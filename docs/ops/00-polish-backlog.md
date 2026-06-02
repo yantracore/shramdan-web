@@ -109,6 +109,15 @@ When you (the coding agent) are working in this repo:
 ## Phase 15 — Event Detail Polish
 
 - [x] P2 [from 15] `EventRosterPanel`: each role row now carries a one-line description under the title so volunteers understand what the role entails before clicking — effort:S ← done: 2026-06-02 *(7 NP + 7 EN descriptions for WORKER/PHOTOGRAPHER/LIVESTREAMER/MEDIC/SAFETY_LEAD/COORDINATOR/LOGISTICS)*
+- [x] P2 [from 15] "दिनको आवाज / Voices from the day" testimonials section on past event detail — effort:S ← done: 2026-06-02 *(each demo past event now carries 2-3 testimonial entries; section gates on testimonials array length; responsive auto-fit grid of blockquote cards with opening quote glyph)*
+
+## Phase 3 — Learn / Docs
+
+- [x] P3 [from 3] Scroll-progress indicator on /learn/[slug] (parity with /issues/[id]) — effort:S ← done: 2026-06-02 *(reuses the same `ScrollProgressBar` component)*
+
+## Phase 0 — Foundation (cont.)
+
+- [x] P3 [from 0.7] Settings: reset-to-defaults button — effort:S ← done: 2026-06-02 *(Popconfirm-gated; flips theme→light, language→NP)*
 
 ---
 
