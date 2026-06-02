@@ -989,6 +989,45 @@ export function getDemoIssueById(id) {
 // Vote-count history mini-trend (8 data points). Used by the sparkline
 // on /issues/[id]. Deterministic from issue id so the curve doesn't
 // twitch between renders.
+// --- Demo applications mock ------------------------------------------
+// Shown on /me/applications as if the user has previously submitted
+// contribution applications through /join. Mix of statuses so the UI
+// shows the full set of badges.
+const DEMO_APPLICATIONS = [
+  {
+    id: "app-1",
+    role: "FRONTEND_DEVELOPER",
+    roleLabel: { np: "फ्रन्टएन्ड डेभलपर", en: "Frontend developer" },
+    status: "ACCEPTED",
+    submittedAt: minutesAgo(60 * 24 * 18),
+    decidedAt: minutesAgo(60 * 24 * 14),
+    note: { np: "स्वागत। पहिलो assignment इमेलमा पठाइनेछ।", en: "Welcome. First assignment will be emailed." }
+  },
+  {
+    id: "app-2",
+    role: "PHOTOGRAPHER",
+    roleLabel: { np: "फोटोग्राफर", en: "Photographer" },
+    status: "REVIEWING",
+    submittedAt: minutesAgo(60 * 24 * 4),
+    decidedAt: null,
+    note: null
+  },
+  {
+    id: "app-3",
+    role: "COMMUNITY_MANAGER",
+    roleLabel: { np: "सामुदायिक नेतृत्व", en: "Community manager" },
+    status: "SUBMITTED",
+    submittedAt: minutesAgo(60 * 6),
+    decidedAt: null,
+    note: null
+  }
+];
+
+export function getDemoApplications() {
+  if (!isDev()) return [];
+  return DEMO_APPLICATIONS;
+}
+
 export function getDemoVoteHistory(issueId) {
   if (!isDev()) return [];
   let h = 0;
