@@ -113,6 +113,11 @@ When you (the coding agent) are working in this repo:
 - [x] P2 [from 12] `/help` FAQ accordion page — effort:M ← done: 2026-06-02 *(12 Q&As / 4 sections / search filter / bilingual; native `<details>` so keyboard + no-JS work; "still stuck?" primary-gradient CTA card)*
 - [x] P2 [from 5] `/donate` amount picker + impact preview + dev success — effort:M ← done: 2026-06-02 *(preset NPR buttons + custom input + frequency toggle + impact translator (rupees → tools/water/rides); confetti success state with receipt number; backend swap-ready)*
 - [x] P3 [from 6] Activity heatmap on /me/preview — effort:S ← done: 2026-06-02 *(GitHub-style 12-week × 7-day grid with 5-step color scale)*
+- [x] P2 [from 7] Featured story panel on homepage — effort:S ← done: 2026-06-02 *(cinematic past-event card pulled from highest-participant demo event; cover + headline + quote + result + CTA)*
+- [x] P2 [from 1.1] Bookmark heart on issue cards — effort:S ← done: 2026-06-02 *(useSavedIssues hook with localStorage + useSyncExternalStore; backend swap-ready)*
+- [x] P2 [from 11] Quick-action FAB — effort:S ← done: 2026-06-02 *(circular + button bottom-right with 3 expanded actions: report issue / join campaign / feedback; auto-hides on auth + admin + new-issue routes)*
+- [x] P3 [from 0.3] Time-of-day greeting in hero — effort:S ← done: 2026-06-02 *(शुभप्रभात / नमस्कार / शुभ साँझ / शुभरात्रि anchored to Asia/Kathmandu hour via Intl; SSR-safe)*
+- [x] P2 [from 11] Keyboard shortcuts dialog — effort:S ← done: 2026-06-02 *("?" opens centered Modal listing shortcuts across 4 groups; gated when an input is focused)*
 
 ## Phase 11 — Cross-cutting
 
