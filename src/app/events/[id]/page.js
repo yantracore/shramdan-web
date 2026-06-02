@@ -158,8 +158,8 @@ export default function EventDetailPage() {
   return (
     <SiteShell pageTitle={pageTitle || content.detail.defaultTitle}>
       <section className="page-section public-issue-detail-section">
-        <Link className="public-issue-back-link" href="/issues">
-          <ArrowLeftOutlined /> {content.detail.backToIssues}
+        <Link className="public-issue-back-link" href="/events">
+          <ArrowLeftOutlined /> {content.detail.backToEvents}
         </Link>
 
         {loading ? (
@@ -194,8 +194,8 @@ export default function EventDetailPage() {
               </>
             }
           >
-            <Link href="/issues">
-              <Button type="primary">{content.detail.backToIssues}</Button>
+            <Link href="/events">
+              <Button type="primary">{content.detail.backToEvents}</Button>
             </Link>
           </Empty>
         ) : null}

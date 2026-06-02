@@ -1255,7 +1255,7 @@ export const copy = {
     },
     events: {
       detail: {
-        backToIssues: "सबै समस्यामा फर्किनुहोस्",
+        backToEvents: "सबै अभियानमा फर्किनुहोस्",
         backToIssue: "मूल समस्या हेर्नुहोस्",
         scheduledOn: "तय मिति",
         notScheduled: "अहिलेसम्म मिति तय भएको छैन",
@@ -2841,7 +2841,7 @@ export const copy = {
     },
     events: {
       detail: {
-        backToIssues: "Back to All Issues",
+        backToEvents: "Back to All Events",
         backToIssue: "View Source Issue",
         scheduledOn: "Scheduled for",
         notScheduled: "Schedule not set yet",
