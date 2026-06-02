@@ -18,6 +18,7 @@
   --primary-dark: #0f4f44;
   --accent: #e75f1b;
   --line: #dce5df;
+  --section-divider: rgba(0, 0, 0, 0.06);
 }
 
 :root[data-theme="dark"] {
@@ -31,6 +32,7 @@
   --primary-dark: #d9f4e8;
   --accent: #ff8b3d;
   --line: #2b3b36;
+  --section-divider: rgba(255, 255, 255, 0.06);
 }
 
 * {
