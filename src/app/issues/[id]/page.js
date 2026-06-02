@@ -18,6 +18,7 @@ import { IssueVoteButton } from "@/components/IssueVoteButton";
 import { IssueComments } from "@/components/IssueComments";
 import { IssueReactions } from "@/components/IssueReactions";
 import { PublicIssueCard, formatSupporters } from "@/components/PublicIssueCard";
+import { VoteSparkline } from "@/components/VoteSparkline";
 import { ScrollProgressBar } from "@/components/ScrollProgressBar";
 import { SiteShell } from "@/components/SiteShell";
 import { StickyActionBar } from "@/components/StickyActionBar";
@@ -292,6 +293,10 @@ export default function IssueDetailPage() {
                   content={content}
                 />
               ) : null}
+
+              <div className="public-issue-detail-trend">
+                <VoteSparkline issueId={issue.id} language={language} />
+              </div>
 
               <IssueSupportersChipRow
                 voteCount={issue.voteCount}
