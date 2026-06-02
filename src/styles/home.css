@@ -6507,9 +6507,9 @@
 }
 
 .building-now-section {
-  padding: 48px 24px;
-  max-width: 1180px;
+  width: min(1180px, calc(100% - 32px));
   margin: 0 auto;
+  padding: 48px 0;
   display: flex;
   flex-direction: column;
   gap: 26px;
@@ -6734,7 +6734,7 @@
 
 @media (max-width: 620px) {
   .building-now-section {
-    padding: 44px 20px;
+    padding: 44px 0;
     gap: 24px;
   }
 
@@ -7021,10 +7021,9 @@
 /* Homepage — Live Issues section */
 
 .live-issues-section {
-  padding: 48px 24px;
-  max-width: 1240px;
+  width: min(1180px, calc(100% - 32px));
   margin: 0 auto;
-  width: 100%;
+  padding: 48px 0;
   display: grid;
   gap: 20px;
 }
@@ -7218,7 +7217,7 @@
 
 @media (max-width: 720px) {
   .live-issues-section {
-    padding: 40px 20px;
+    padding: 40px 0;
   }
 
   .live-issues-header {
@@ -9898,9 +9897,10 @@
 }
 
 /* --- /resources directory page --------------------------------------- */
+/* Width inherits from .page-section (1180px max, 16px gutter) so this
+ * section aligns with all other sections on the homepage and on the
+ * dedicated /resources page. */
 .resources-section {
-  width: min(1060px, calc(100% - 32px));
-  margin-inline: auto;
   display: flex;
   flex-direction: column;
   gap: 28px;
