@@ -1820,6 +1820,64 @@
   display: grid;
 }
 
+/* --- Home pulse row (activity ticker + live online) ------------------ */
+.home-pulse-row {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.home-pulse-row .activity-ticker {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+}
+
+.live-online-widget {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 13px;
+  box-shadow: var(--shadow-1);
+  white-space: nowrap;
+}
+
+.live-online-widget strong {
+  font-weight: 800;
+  color: var(--primary-dark);
+  font-variant-numeric: tabular-nums;
+}
+
+.live-online-label {
+  color: var(--muted);
+}
+
+.live-online-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #2e7d32;
+  box-shadow: 0 0 0 0 rgba(46, 125, 50, 0.55);
+  animation: live-online-pulse 1.8s ease-out infinite;
+}
+
+@keyframes live-online-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(46, 125, 50, 0.55); }
+  70% { box-shadow: 0 0 0 8px rgba(46, 125, 50, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(46, 125, 50, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-online-dot { animation: none; }
+}
+
 /* --- Activity ticker (homepage hero strip) ---------------------------- */
 .activity-ticker {
   width: min(1180px, calc(100% - 32px));
@@ -8122,4 +8180,573 @@
   margin-left: -50vw;
   background: var(--section-divider);
   pointer-events: none;
+}
+
+/* --- Issue comments thread (/issues/[id]) ----------------------------- */
+.issue-comments {
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+
+.issue-comments-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.issue-comments-header h2 {
+  margin: 0;
+  font-size: clamp(20px, 2.2vw, 24px);
+}
+
+.issue-comments-count {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.issue-comments-intro {
+  margin: 0 0 14px;
+  color: var(--muted);
+  font-size: 13.5px;
+}
+
+.issue-comments-list {
+  list-style: none;
+  margin: 0 0 18px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.issue-comment {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: 12px;
+  padding: 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+}
+
+.issue-comment-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), color-mix(in srgb, var(--primary) 60%, var(--accent)));
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 15px;
+}
+
+.issue-comment-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.issue-comment-attrib {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.issue-comment-attrib strong {
+  font-weight: 700;
+}
+
+.issue-comment-role {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.issue-comment-time {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.issue-comment-text {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text);
+}
+
+.issue-comments-composer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+}
+
+.issue-comments-composer-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.issue-comments-composer-hint {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* --- /calendar -------------------------------------------------------- */
+.calendar-section {
+  width: min(1180px, calc(100% - 32px));
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.calendar-hero {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+}
+
+.calendar-hero h1 {
+  margin: 4px 0 0;
+  font-size: clamp(26px, 3vw, 36px);
+}
+
+.calendar-hero p {
+  margin: 0;
+  color: var(--muted);
+  max-width: 56ch;
+}
+
+.calendar-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+}
+
+.calendar-nav {
+  display: inline-flex;
+  width: 32px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.calendar-nav:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.calendar-month-label {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 8px;
+  min-width: 220px;
+  text-align: center;
+}
+
+.calendar-today {
+  margin-left: 4px;
+  background: var(--primary);
+  color: #fff;
+  border: 0;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.calendar-legend {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.calendar-legend-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-left: 8px;
+  margin-right: 4px;
+}
+
+.calendar-legend-dot.is-live { background: #d2360b; }
+.calendar-legend-dot.is-upcoming { background: var(--primary); }
+.calendar-legend-dot.is-past { background: var(--muted); }
+
+.calendar-grid-wrap {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 18px;
+  align-items: flex-start;
+}
+
+@media (max-width: 880px) {
+  .calendar-grid-wrap {
+    grid-template-columns: 1fr;
+  }
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 10px;
+}
+
+.calendar-weekday {
+  text-align: center;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 6px 0;
+}
+
+.calendar-cell {
+  aspect-ratio: 1 / 0.9;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  border: 1px solid transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 6px;
+  cursor: pointer;
+  font: inherit;
+  color: var(--text);
+  transition: background 140ms ease;
+}
+
+.calendar-cell:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.calendar-cell-blank {
+  pointer-events: none;
+}
+
+.calendar-cell-num {
+  font-size: 13px;
+  font-weight: 600;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.calendar-cell-dots {
+  margin-top: auto;
+  display: flex;
+  gap: 3px;
+  flex-wrap: wrap;
+}
+
+.calendar-cell-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.calendar-cell-dot.is-live { background: #d2360b; }
+.calendar-cell-dot.is-upcoming { background: var(--primary); }
+.calendar-cell-dot.is-past { background: var(--muted); }
+
+.calendar-cell.is-today {
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+.calendar-cell.is-today .calendar-cell-num {
+  color: var(--accent);
+  font-weight: 800;
+}
+
+.calendar-cell.is-selected {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+.calendar-cell.is-selected .calendar-cell-num {
+  color: #fff;
+}
+
+.calendar-cell.is-selected .calendar-cell-dot {
+  outline: 1px solid #fff;
+  outline-offset: 1px;
+}
+
+.calendar-day-panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  position: sticky;
+  top: 88px;
+}
+
+.calendar-day-panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 13.5px;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+}
+
+.calendar-day-panel-head strong {
+  font-size: 14.5px;
+  font-weight: 700;
+}
+
+.calendar-day-panel-head span {
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+.calendar-day-panel-empty {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.calendar-day-panel-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.calendar-day-event {
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+  background: var(--bg);
+}
+
+.calendar-day-event a {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  color: var(--text);
+}
+
+.calendar-day-event-kind {
+  display: inline-block;
+  width: max-content;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--primary);
+  color: #fff;
+}
+
+.calendar-day-event.is-live .calendar-day-event-kind { background: #d2360b; }
+.calendar-day-event.is-past .calendar-day-event-kind { background: var(--muted); }
+
+.calendar-day-event strong {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.calendar-day-event span {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+/* --- Command palette (cmd+K) ----------------------------------------- */
+.command-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 160ms ease;
+}
+
+.command-trigger:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+:root[data-theme="dark"] .command-trigger:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.command-palette-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 5000;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 14vh 14px 8vh;
+  animation: page-enter 200ms var(--ease-out-soft);
+}
+
+.command-palette {
+  width: min(620px, 100%);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-hero);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  max-height: 70vh;
+}
+
+.command-palette-input {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--line);
+  font-size: 16px;
+}
+
+.command-palette-input input {
+  flex: 1;
+  background: transparent;
+  border: 0;
+  outline: none;
+  font: inherit;
+  font-size: 16px;
+  color: var(--text);
+}
+
+.command-palette-input input::placeholder {
+  color: var(--muted);
+}
+
+.command-palette-input kbd {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 2px 6px;
+}
+
+.command-palette-empty {
+  margin: 0;
+  padding: 24px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 13.5px;
+}
+
+.command-palette-list {
+  list-style: none;
+  margin: 0;
+  padding: 8px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.command-palette-row {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  cursor: pointer;
+  color: var(--text);
+}
+
+.command-palette-row.is-active {
+  background: color-mix(in srgb, var(--primary) 14%, var(--surface));
+}
+
+.command-palette-row > .anticon {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.command-palette-row.is-active > .anticon {
+  color: var(--primary);
+}
+
+.command-palette-row-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.command-palette-row-text strong {
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.command-palette-row-text span {
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.command-palette-row-kind {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  text-transform: uppercase;
 }
