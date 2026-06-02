@@ -149,22 +149,24 @@ export function SiteShell({ children, pageTitle }) {
         ]
       }
     : null;
-  const quickLinks = [
+  const pagesLinks = [
     { href: "/", label: t.nav.home },
-    { href: "/intro", label: t.nav.intro },
-    { href: "/learn", label: t.nav.learn },
     { href: "/events", label: t.nav.events },
-    { href: "/issues", label: t.nav.issues },
+    { href: "/event-types", label: t.nav.eventTypes }
+  ];
+  const learnLinks = [
+    { href: "/intro", label: t.nav.intro },
     { href: "/event-types", label: t.nav.eventTypes },
-    { href: "/settings", label: t.nav.settings },
-    isAuthenticated
-      ? { href: "/me", label: t.me.navLabel }
-      : { href: "/login", label: t.nav.login }
+    { href: "/learn", label: t.footer.links.documents }
   ];
   const footerLinks = [
     {
-      title: t.footer.columns.quickLinks,
-      links: quickLinks
+      title: t.footer.columns.pages,
+      links: pagesLinks
+    },
+    {
+      title: t.footer.columns.learn,
+      links: learnLinks
     },
     {
       title: t.footer.columns.getInvolved,

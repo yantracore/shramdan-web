@@ -1556,7 +1556,8 @@ export const copy = {
       intro: "देशका हरेक समस्या सरकारको प्रतीक्षा गरेर समाधान हुँदैन। हामी नागरिकहरू आफैं मिलेर सरसफाइ, मर्मत, वृक्षारोपण, टोल सुधार जस्ता आधारभूत काम अघि बढाउन सक्छौँ। श्रमदान त्यही सामूहिक जिम्मेवारीको सुरुवात हो। साना साना हातहरू मिलेर ठूला परिवर्तन सम्भव हुन्छ। आज हाम्रो श्रमदान, भोलि सुन्दर समाजको निर्माण।",
       note: "हाम्रो श्रम, हाम्रो समाज, हाम्रो भविष्य।",
       columns: {
-        quickLinks: "द्रुत लिंकहरू",
+        pages: "पृष्ठहरू",
+        learn: "सिकौँ",
         getInvolved: "सहभागी हुनुहोस्",
         legal: "कानुनी",
         social: "सामाजिक सञ्जाल"
@@ -1564,6 +1565,7 @@ export const copy = {
       links: {
         contributor: "योगदान गर्नुहोस्",
         feedback: "प्रतिक्रिया दिनुहोस्",
+        documents: "दस्तावेजहरू",
         terms: "उपयोग शर्तहरू",
         privacy: "गोपनीयता नीति",
         codeOfConduct: "आचारसंहिता"
@@ -3141,7 +3143,8 @@ export const copy = {
       intro: "Not every problem in the country will be solved by waiting for the government. As citizens, we can come together to move basic work forward ourselves, from cleanups and repairs to tree planting and neighborhood improvement. Shramdan is the beginning of that shared responsibility. Small hands together can make big change possible. Our Shramdan today builds a better society tomorrow.",
       note: "Our labor, our society, our future.",
       columns: {
-        quickLinks: "Quick Links",
+        pages: "Pages",
+        learn: "Learn",
         getInvolved: "Get Involved",
         legal: "Legal",
         social: "Social"
@@ -3149,6 +3152,7 @@ export const copy = {
       links: {
         contributor: "Contribute",
         feedback: "Share feedback",
+        documents: "Documents",
         terms: "Terms of Use",
         privacy: "Privacy Policy",
         codeOfConduct: "Code of Conduct"
