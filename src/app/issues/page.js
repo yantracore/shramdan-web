@@ -8,6 +8,7 @@ import {
 } from "@ant-design/icons";
 import { Button, Empty, Select } from "antd";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import IssueMapBlock from "@/components/IssueMapBlock";
 import {
@@ -26,6 +27,8 @@ const SORT_OPTIONS = [
   { value: "voteCount", labelKey: "sortMostVotes" },
   { value: "createdAt", labelKey: "sortNewest" }
 ];
+const SORT_VALUES = new Set(SORT_OPTIONS.map((o) => o.value));
+const STATUS_VALUES = new Set(PUBLIC_ISSUE_STATUSES);
 const PAGE_SIZE = 12;
 const MAP_FETCH_LIMIT = 100;
 
@@ -39,16 +42,44 @@ export default function IssuesListPage() {
   const content = t.issues;
   const liveIssuesCopy = t.liveIssues || {};
 
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const categorySet = new Set(ISSUE_CATEGORIES);
+
+  const readFiltersFromUrl = useCallback(() => {
+    const statusParam = searchParams?.get("status");
+    const categoryParam = searchParams?.get("category");
+    const sortParam = searchParams?.get("sort");
+    return {
+      status: statusParam && STATUS_VALUES.has(statusParam) ? statusParam : undefined,
+      category: categoryParam && categorySet.has(categoryParam) ? categoryParam : undefined,
+      sort: sortParam && SORT_VALUES.has(sortParam) ? sortParam : "voteCount"
+    };
+    // categorySet is rebuilt from a stable constant each render — safe to omit.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
   const [pages, setPages] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [filters, setFilters] = useState({
-    status: undefined,
-    category: undefined,
-    sort: "voteCount"
-  });
+  const [filters, setFilters] = useState(() => readFiltersFromUrl());
   const [mapIssues, setMapIssues] = useState([]);
+
+  // Re-sync state from URL on back/forward navigation.
+  useEffect(() => {
+    const next = readFiltersFromUrl();
+    setFilters((prev) => {
+      if (
+        prev.status === next.status &&
+        prev.category === next.category &&
+        prev.sort === next.sort
+      ) {
+        return prev;
+      }
+      return next;
+    });
+  }, [readFiltersFromUrl]);
 
   const fetchPage = useCallback(
     async (cursor) => {
@@ -121,7 +152,19 @@ export default function IssuesListPage() {
   }, [filters.status, filters.category]);
 
   const setFilter = (key, value) => {
-    setFilters((current) => ({ ...current, [key]: value }));
+    setFilters((current) => {
+      const next = { ...current, [key]: value };
+      const params = new URLSearchParams(searchParams?.toString() || "");
+      if (next.status) params.set("status", next.status);
+      else params.delete("status");
+      if (next.category) params.set("category", next.category);
+      else params.delete("category");
+      if (next.sort && next.sort !== "voteCount") params.set("sort", next.sort);
+      else params.delete("sort");
+      const query = params.toString();
+      router.replace(query ? `/issues?${query}` : "/issues", { scroll: false });
+      return next;
+    });
   };
 
   const statusOptions = PUBLIC_ISSUE_STATUSES.map((value) => ({

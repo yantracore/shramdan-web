@@ -16,6 +16,7 @@ import { IssueShareRow } from "@/components/IssueShareRow";
 import { IssueStatusTimeline } from "@/components/IssueStatusTimeline";
 import { IssueVoteButton } from "@/components/IssueVoteButton";
 import { PublicIssueCard, formatSupporters } from "@/components/PublicIssueCard";
+import { ScrollProgressBar } from "@/components/ScrollProgressBar";
 import { SiteShell } from "@/components/SiteShell";
 import { StickyActionBar } from "@/components/StickyActionBar";
 import { usePreferences } from "@/app/providers";
@@ -163,6 +164,7 @@ export default function IssueDetailPage() {
 
   return (
     <SiteShell pageTitle={issue?.title || content.detail.notFoundTitle}>
+      <ScrollProgressBar />
       <section className="page-section public-issue-detail-section">
         <Link className="public-issue-back-link" href="/issues">
           <ArrowLeftOutlined /> {content.detail.backToList}
