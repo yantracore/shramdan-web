@@ -72,11 +72,11 @@ When you (the coding agent) are working in this repo:
 
 - [x] P1 [from 1.1] Skeleton loader on `/issues` list (currently just `<Spin />`) — effort:S ← done: 2026-06-02 *(`PublicIssueCardSkeleton` shimmer cards render inside a `role="status"` container while issues are loading; verified during light-mode a11y sweep)*
 - [x] P1 [from 1.1] Pagination / load-more beyond the initial 50 — effort:M ← done: 2026-06-02 *(`public-issues-pagination` nav with prev/next + numbered page buttons is in `/issues/page.js`; bilingual aria labels)*
-- [ ] P2 [from 1.1.2] Persist filters in URL query params (shareable filtered views) — effort:S
+- [x] P2 [from 1.1.2] Persist filters in URL query params (shareable filtered views) — effort:S ← done: 2026-06-02 *(`/issues` page: status / category / sort filters now read from `?status=&category=&sort=`; `router.replace` keeps URL in sync without scroll; back/forward re-syncs state. `voteCount` is the implicit default and never written.)*
 - [ ] P3 [from 1.1] Map-preview thumbnail on issue cards — effort:M
-- [ ] P2 [from 1.2.1] Lightbox / fullscreen for the evidence gallery — effort:S
+- [x] P2 [from 1.2.1] Lightbox / fullscreen for the evidence gallery — effort:S ← done: 2026-06-02 *(already shipped in `IssuePhotoGallery`: an Ant Design `Modal` with a Swiper inside opens on cover/slide click and supports keyboard navigation. Closing the polish item — was untracked in backlog.)*
 - [ ] P2 [from 1.2.3] Related-issues ranking weighted by geo-distance, not category alone — effort:M
-- [ ] P3 [from 1.2] Scroll-progress indicator on long issue descriptions — effort:S
+- [x] P3 [from 1.2] Scroll-progress indicator on long issue descriptions — effort:S ← done: 2026-06-02 *(new `ScrollProgressBar` component renders a fixed top bar with a primary→accent gradient that fills via `transform: scaleX(progress)`; rendered inside `/issues/[id]`; respects `prefers-reduced-motion`.)*
 - [x] P1 [from 1.1] Public issue card images had no alt fallback when `issue.title` was null — Next.js Image stripped the empty alt and headings rendered empty — effort:S ← done: 2026-06-02 *(`PublicIssueCard` now uses an `accessibleLabel` fallback chain: title → addressText → categoryLabel → statusLabel; applied to both `<Image alt>` and the `<h3>` link)*
 
 ## Phase 9 — Admin Control Center
@@ -95,12 +95,12 @@ When you (the coding agent) are working in this repo:
 
 ## Phase 13 — Live Events Rail
 
-- [ ] P3 [from 13] Persist `/events` filter pill state in URL query (`?show=live|upcoming|past`) for shareable filtered views — effort:S
+- [x] P3 [from 13] Persist `/events` filter pill state in URL query (`?show=live|upcoming|past`) for shareable filtered views — effort:S ← done: 2026-06-02 *(reads `?show=` on mount, syncs state via `router.replace` on click, respects back/forward navigation; `all` is the implicit default and never written.)*
 
 ## Phase 14 — Live Event Detail
 
 - [x] P2 [from 14] Promote viewer counter from muted inline span to prominent breathing counter + Devanagari digit localization on `EventLiveStreamPlayer` — effort:S ← done: 2026-06-02 *(big accent-coloured eye + clamp(22–30px) tabular-num number with 3.2s breathe; digit transform respects `language=np`; duration also localized; reduced-motion fallback)*
-- [ ] P2 [from 14] `/events/[id]` document title flashes "Event not found" during initial load before the event fetch resolves — effort:S *(title is computed from `eventData?.title` while it's still `undefined`; needs an explicit loading-state fallback in `SiteShell` pageTitle prop)*
+- [x] P2 [from 14] `/events/[id]` document title flashes "Event not found" during initial load before the event fetch resolves — effort:S ← done: 2026-06-02 *(root cause was server-side `generateMetadata` in `events/[id]/layout.js` falling into the `if (!event)` branch for `demo-*` IDs that only exist in client mock data. Now short-circuits demo IDs to a neutral "Shramdan campaign" title and skips the JSON-LD payload; production 404s still get the noindex'd "Event not found".)*
 
 ## Phase 15 — Event Detail Polish
 
