@@ -20,6 +20,14 @@ function JoinPageContent() {
   const allowedRoles = new Set(t.options.applicationRoles.map((role) => role.value));
   const initialRole = allowedRoles.has(selectedRole) ? selectedRole : undefined;
 
+  // When the user lands here via /join?role=<X>, surface a small context
+  // banner above the form so they see what they're signing up for before
+  // they fill in their details.
+  const matchedRole = initialRole
+    ? t.volunteerInvite.roles.find((role) => role.value === initialRole)
+    : null;
+  const matchedEventId = searchParams.get("event");
+
   const handleSubmit = async (values) => {
     if (isHoneypotTriggered(values)) {
       messageApi.success(t.messages.join);
@@ -45,6 +53,26 @@ function JoinPageContent() {
   return (
     <SiteShell pageTitle={t.pageTitles.join}>
       <section className="page-section form-section">
+        {matchedRole ? (
+          <aside
+            className="join-role-context"
+            aria-label={language === "np" ? "छानिएको भूमिका" : "Selected role"}
+          >
+            <span className="join-role-context-eyebrow">
+              {language === "np" ? "तपाईंले छान्नुभएको भूमिका" : "You're joining as"}
+            </span>
+            <h2>{matchedRole.title}</h2>
+            <p>{matchedRole.description}</p>
+            {matchedEventId ? (
+              <p className="join-role-context-event">
+                {language === "np"
+                  ? `अभियानका लागि: ${matchedEventId}`
+                  : `For event: ${matchedEventId}`}
+              </p>
+            ) : null}
+          </aside>
+        ) : null}
+
         <ContributorForm
           content={t}
           eyebrow={t.join.eyebrow}
