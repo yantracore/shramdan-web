@@ -254,33 +254,33 @@ export function EventPreviewPane({
       </div>
 
       <div className="event-preview-body">
-        <div className="event-preview-tags">
-          <span
-            className="event-list-card-status-pill"
-            data-status={status}
-          >
-            {status === "live"
-              ? t.filters.live
-              : status === "upcoming"
-                ? t.filters.upcoming
-                : t.filters.past}
-          </span>
-          {event.riskLevel ? (
-            <span
-              className="event-list-card-status-pill"
-              data-status="upcoming"
-            >
-              <WarningOutlined aria-hidden="true" />{" "}
-              {t.preview.risk?.[event.riskLevel] || event.riskLevel}
-            </span>
-          ) : null}
-        </div>
-
         <h2 id="event-preview-title">
           <Link className="event-preview-title-link" href={`/events/${event.id}`}>
             {event.title}
           </Link>
         </h2>
+
+        {(status !== "live" || event.riskLevel) ? (
+          <div className="event-preview-tags">
+            {status !== "live" ? (
+              <span
+                className="event-list-card-status-pill"
+                data-status={status}
+              >
+                {status === "upcoming" ? t.filters.upcoming : t.filters.past}
+              </span>
+            ) : null}
+            {event.riskLevel ? (
+              <span
+                className="event-list-card-status-pill"
+                data-status="upcoming"
+              >
+                <WarningOutlined aria-hidden="true" />{" "}
+                {t.preview.risk?.[event.riskLevel] || event.riskLevel}
+              </span>
+            ) : null}
+          </div>
+        ) : null}
 
         <p className="event-preview-meta">
           {dateText ? (
@@ -297,14 +297,14 @@ export function EventPreviewPane({
               )}
             </span>
           ) : null}
-          {event.leaderName ? (
-            <span>
-              <TeamOutlined aria-hidden="true" /> {event.leaderName}
-            </span>
-          ) : null}
           {event.addressText ? (
             <span>
               <EnvironmentOutlined aria-hidden="true" /> {event.addressText}
+            </span>
+          ) : null}
+          {event.leaderName ? (
+            <span>
+              <TeamOutlined aria-hidden="true" /> {event.leaderName}
             </span>
           ) : null}
           {status === "past" && Number.isFinite(event.participantCount) ? (

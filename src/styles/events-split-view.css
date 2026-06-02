@@ -396,10 +396,11 @@
 
 .event-preview-media .event-live-player-meta {
   position: static;
-  padding: 8px 12px;
-  gap: 10px;
+  padding: 10px 20px;
+  gap: 12px;
   background: var(--surface);
   font-size: 12px;
+  border-bottom: 1px solid var(--line);
 }
 
 .event-preview-media .event-live-badge {
