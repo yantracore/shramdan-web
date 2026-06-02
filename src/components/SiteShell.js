@@ -326,6 +326,14 @@ export function SiteShell({ children, pageTitle }) {
                 {t.me.menu.adminCenter}
               </Link>
             ) : null}
+            <Link
+              aria-current={activePath === "/settings" ? "page" : undefined}
+              className={activePath === "/settings" ? "is-active" : undefined}
+              href="/settings"
+              onClick={closeMobileMenu}
+            >
+              {t.nav.settings}
+            </Link>
             <div className="mobile-menu-preferences" aria-label={t.ariaLabels.preferences}>
               <button
                 type="button"
