@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 import { CalendarOutlined, ClockCircleOutlined, EnvironmentOutlined, TeamOutlined } from "@ant-design/icons";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
@@ -249,10 +250,37 @@ function Section({ section, children, isEmpty, emptyText }) {
   );
 }
 
+const FILTER_KEYS = new Set(["all", "live", "upcoming", "past"]);
+
 export default function EventsListPage() {
   const { language } = usePreferences();
   const t = PAGE_COPY[language] || PAGE_COPY.np;
-  const [filter, setFilter] = useState("all");
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const initialFilter = (() => {
+    const show = searchParams?.get("show");
+    return show && FILTER_KEYS.has(show) ? show : "all";
+  })();
+  const [filter, setFilter] = useState(initialFilter);
+
+  // Keep state in sync if the user navigates with back/forward.
+  useEffect(() => {
+    const show = searchParams?.get("show");
+    const next = show && FILTER_KEYS.has(show) ? show : "all";
+    setFilter((prev) => (prev === next ? prev : next));
+  }, [searchParams]);
+
+  const updateFilter = (next) => {
+    setFilter(next);
+    const params = new URLSearchParams(searchParams?.toString() || "");
+    if (next === "all") {
+      params.delete("show");
+    } else {
+      params.set("show", next);
+    }
+    const query = params.toString();
+    router.replace(query ? `/events?${query}` : "/events", { scroll: false });
+  };
 
   const live = useMemo(() => getDemoLiveEvents(), []);
   const upcoming = useMemo(() => getDemoUpcomingEvents(), []);
@@ -292,7 +320,7 @@ export default function EventsListPage() {
                 role="tab"
                 aria-selected={isActive}
                 className={`events-filter-pill${isActive ? " is-active" : ""}`}
-                onClick={() => setFilter(option.key)}
+                onClick={() => updateFilter(option.key)}
               >
                 <span className="events-filter-pill-label">{option.label}</span>
                 <span className="events-filter-pill-count">

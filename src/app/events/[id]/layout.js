@@ -31,10 +31,26 @@ function firstImageUrl(event) {
   return null;
 }
 
+function isDemoEventId(id) {
+  return typeof id === "string" && id.startsWith("demo-");
+}
+
 export async function generateMetadata({ params }) {
   const { id } = await params;
-  const event = await fetchEvent(id);
   const path = `/events/${id}`;
+
+  // Demo-* IDs only exist in client-side mock data, never in the backend.
+  // Don't pre-render a 'not found' title — the client will hydrate with the
+  // real event title once the mock resolves.
+  if (isDemoEventId(id)) {
+    return buildMetadata({
+      title: "Shramdan campaign",
+      description: "",
+      path
+    });
+  }
+
+  const event = await fetchEvent(id);
 
   if (!event) {
     return buildMetadata({
@@ -58,6 +74,11 @@ export async function generateMetadata({ params }) {
 
 export default async function EventDetailLayout({ children, params }) {
   const { id } = await params;
+
+  // Demo-* IDs only exist in client-side mock data — skip the backend fetch
+  // and the JSON-LD payload (the client will hydrate with the real data).
+  if (isDemoEventId(id)) return children;
+
   const event = await fetchEvent(id);
 
   if (!event) return children;
