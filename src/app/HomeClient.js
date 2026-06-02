@@ -47,6 +47,7 @@ import { useEffect, useMemo, useState } from "react";
 import IssueMapBlock from "@/components/IssueMapBlock";
 import { ActivityTicker } from "@/components/ActivityTicker";
 import { EventsHomeRail } from "@/components/EventsHomeRail";
+import { LiveOnlineWidget } from "@/components/LiveOnlineWidget";
 import { MotionSection } from "@/components/MotionSection";
 import { SiteShell } from "@/components/SiteShell";
 import { getDemoLiveEvents, getDemoUpcomingEvents } from "@/lib/devMockData";
@@ -402,7 +403,10 @@ export default function HomeClient({ summary }) {
         </aside>
       </MotionSection>
 
-      <ActivityTicker language={language} />
+      <div className="home-pulse-row">
+        <ActivityTicker language={language} />
+        <LiveOnlineWidget language={language} />
+      </div>
 
       <EventsHomeRail
         liveEvents={getDemoLiveEvents()}
