@@ -105,6 +105,10 @@ When you (the coding agent) are working in this repo:
 - [x] P3 [from 0.4] Confetti burst on submission success — effort:S ← done: 2026-06-02 *(new CSS-only ConfettiBurst on SubmissionSuccessCard + /signup done step; reduced-motion safe)*
 - [x] P3 [from 0.3] Activity ticker below homepage hero — effort:S ← done: 2026-06-02 *(rotating one-liner of dummy supporter/joiner/organizer activity every ~4.2s)*
 - [x] P3 [from 2] Achievement badges on /me/preview — effort:S ← done: 2026-06-02 *(6 emoji badge tiles with unlocked vs locked styling)*
+- [x] P2 [from 1.2] `IssueComments` thread on /issues/[id] — effort:S ← done: 2026-06-02 *(deterministic 2-5 comments per issue from DEMO_COMMENT_POOL keyed off issueId hash; local-state composer with "Dev mode" hint)*
+- [x] P2 [from 6] `/calendar` month-view of events — effort:M ← done: 2026-06-02 *(grid with kind-coded dots, prev/next/today nav, sticky day panel; bilingual NP weekdays/months)*
+- [x] P2 [from 11] Cmd+K command palette — effort:M ← done: 2026-06-02 *(spotlight-style search across 15 routes + all demo events; arrow keys + Enter; topbar magnifier as the visible trigger)*
+- [x] P3 [from 0.3] Live online widget — effort:S ← done: 2026-06-02 *(pulsing-dot chip with a drifting count in the 84-132 band; sits alongside ActivityTicker in a new home-pulse-row)*
 
 ## Phase 11 — Cross-cutting
 
