@@ -1225,13 +1225,14 @@ export const copy = {
       }
     },
     liveEventsRail: {
-      eyebrow: "अहिले लाइभ",
+      eyebrow: "लाइभ र आउँदा",
       liveBadge: "लाइभ",
-      title: "अहिले चलिरहेका अभियानहरू",
+      title: "लाइभ र आउँदा अभियानहरू",
       subtitle:
-        "श्रमदान सदस्यहरूले युट्युब लाइभमार्फत प्रत्यक्ष प्रसारण गरिरहेका अभियानहरू। थम्बनेलमा क्लिक गर्नुहोस्।",
+        "अहिले लाइभ हेर्नुहोस् वा आउँदा कुनै भूमिकामा अहिल्यै जोडिनुहोस्।",
+      viewAll: "सबै अभियान हेर्नुहोस् →",
       emptyMessage:
-        "अहिले कुनै लाइभ अभियान छैन। जब कुनै सुरु हुन्छ, श्रमेशले यहीँ देखाउनेछ।",
+        "अहिले कुनै अभियान छैन। जब कुनै सुरु हुन्छ, श्रमेशले यहीँ देखाउनेछ।",
       viewersPrefix: "",
       viewersSuffix: " जना हेर्दैछन्",
       justStarted: "भर्खर सुरु",
@@ -2811,13 +2812,14 @@ export const copy = {
       }
     },
     liveEventsRail: {
-      eyebrow: "On now",
+      eyebrow: "Live & upcoming",
       liveBadge: "LIVE",
-      title: "Currently live",
+      title: "Live and upcoming campaigns",
       subtitle:
-        "Shramdan members livestreaming events via YouTube Live. Click a thumbnail to watch.",
+        "Watch one running now or pick an upcoming role and join.",
+      viewAll: "View All Events →",
       emptyMessage:
-        "No event is live right now. श्रमेश will surface them here when they start.",
+        "No campaigns right now. श्रमेश will surface them here as they start.",
       viewersPrefix: "",
       viewersSuffix: " watching",
       justStarted: "Just started",

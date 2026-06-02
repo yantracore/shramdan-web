@@ -45,7 +45,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import IssueMapBlock from "@/components/IssueMapBlock";
-import { LiveEventsRail } from "@/components/LiveEventsRail";
+import { EventsHomeRail } from "@/components/EventsHomeRail";
 import { MotionSection } from "@/components/MotionSection";
 import { SiteShell } from "@/components/SiteShell";
 import { getDemoLiveEvents, getDemoUpcomingEvents } from "@/lib/devMockData";
@@ -170,113 +170,6 @@ const buildingNowIconByPhase = {
   13: BarChartOutlined,
   14: BuildOutlined
 };
-
-const UPCOMING_HOME_COPY = {
-  np: {
-    eyebrow: "आउँदै",
-    title: "तय भएका आउँदा अभियानहरू",
-    subtitle: "मिति र भूमिका तय भइसकेका। तपाईं पनि कुनै भूमिकामा अहिल्यै जोडिनुहोस्।",
-    viewAll: "सबै अभियान हेर्नुहोस् →"
-  },
-  en: {
-    eyebrow: "Upcoming",
-    title: "Scheduled campaigns coming up",
-    subtitle: "Dates set, roles open. Pick a role and join now.",
-    viewAll: "See all campaigns →"
-  }
-};
-
-const NP_MONTHS_SHORT = [
-  "जनवरी", "फेब्रुअरी", "मार्च", "अप्रिल", "मे", "जुन",
-  "जुलाई", "अगस्ट", "सेप्टेम्बर", "अक्टोबर", "नोभेम्बर", "डिसेम्बर"
-];
-const NP_WEEKDAYS_SHORT = ["आइत", "सोम", "मंगल", "बुध", "बिहि", "शुक्र", "शनि"];
-
-// Manual NP composition — Chromium's Intl "ne-NP" emits Latin digits and
-// inconsistent abbreviations, and the SSR/CSR pair produced hydration warnings.
-function formatScheduledPill(iso, language) {
-  if (!iso) return "";
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) return "";
-
-  if (language === "np") {
-    const weekday = NP_WEEKDAYS_SHORT[date.getDay()];
-    const month = NP_MONTHS_SHORT[date.getMonth()];
-    const day = localizeDigits(date.getDate(), "np");
-    const hour = localizeDigits(date.getHours(), "np");
-    const minute = localizeDigits(String(date.getMinutes()).padStart(2, "0"), "np");
-    return `${weekday}, ${month} ${day}, ${hour}:${minute}`;
-  }
-
-  try {
-    return new Intl.DateTimeFormat("en-US", {
-      weekday: "short",
-      month: "short",
-      day: "numeric",
-      hour: "numeric",
-      minute: "2-digit"
-    }).format(date);
-  } catch {
-    return date.toLocaleString();
-  }
-}
-
-function UpcomingEventsHomeStrip({ events, language }) {
-  if (!events || events.length === 0) return null;
-  const t = UPCOMING_HOME_COPY[language] || UPCOMING_HOME_COPY.np;
-  const limited = events.slice(0, 4);
-  return (
-    <section className="home-upcoming-strip" aria-labelledby="home-upcoming-title">
-      <header className="home-upcoming-header">
-        <div>
-          <span className="eyebrow">{t.eyebrow}</span>
-          <h2 id="home-upcoming-title">{t.title}</h2>
-          <p>{t.subtitle}</p>
-        </div>
-        <Link href="/events" className="home-upcoming-view-all">
-          {t.viewAll}
-        </Link>
-      </header>
-      <div className="home-upcoming-grid">
-        {limited.map((event) => (
-          <Link
-            key={event.id}
-            href={`/events/${event.id}`}
-            className="events-card events-card-upcoming"
-          >
-            <div className="events-card-thumb">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={event.thumbnailUrl || "/images/event-types/cleanup.jpg"}
-                alt={event.title}
-                loading="lazy"
-              />
-              <span className="events-card-badge events-card-badge-upcoming">
-                <CalendarOutlined aria-hidden="true" />{" "}
-                {formatScheduledPill(event.scheduledAt, language)}
-              </span>
-            </div>
-            <div className="events-card-body">
-              <h3>{event.title}</h3>
-              {event.addressText ? (
-                <p className="events-card-meta-row">
-                  <EnvironmentOutlined aria-hidden="true" /> {event.addressText}
-                </p>
-              ) : null}
-              <div className="events-card-meta-grid">
-                {event.leaderName ? (
-                  <span>
-                    <TeamOutlined aria-hidden="true" /> {event.leaderName}
-                  </span>
-                ) : null}
-              </div>
-            </div>
-          </Link>
-        ))}
-      </div>
-    </section>
-  );
-}
 
 function pickBuildingNowIcon(iconKey, phaseNumber) {
   return (
@@ -508,9 +401,12 @@ export default function HomeClient({ summary }) {
         </aside>
       </MotionSection>
 
-      <LiveEventsRail liveEvents={getDemoLiveEvents()} copy={t.liveEventsRail} />
-
-      <UpcomingEventsHomeStrip events={getDemoUpcomingEvents()} language={language} />
+      <EventsHomeRail
+        liveEvents={getDemoLiveEvents()}
+        upcomingEvents={getDemoUpcomingEvents()}
+        copy={t.liveEventsRail}
+        language={language}
+      />
 
       <MotionSection as="section" className="event-types-section" aria-labelledby="event-types-title">
         <div className="event-types-heading">

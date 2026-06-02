@@ -1,14 +1,141 @@
-/* LiveEventsRail (Phase 13) — TV-program-style horizontal strip of
- * currently-live shramdan events. Compact, app-feel, glass-tinted.
- * Empty state warm-and-quiet.
+/* EventsHomeRail (Phase 13/14) — unified Netflix-style horizontal strip
+ * combining currently-live + upcoming-scheduled shramdan events on the
+ * homepage. Cards retain the LiveEventCard styles; container scrolls.
  */
 
-.live-events-rail {
+.live-events-rail,
+.events-home-rail {
   width: min(1180px, calc(100% - 32px));
   margin: 0 auto;
   padding: 48px 0;
 }
 
+.events-home-rail-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.events-home-rail-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.events-home-rail-header h2 {
+  font-size: clamp(22px, 2.4vw, 30px);
+  line-height: 1.2;
+  margin: 0;
+}
+
+.events-home-rail-header p {
+  color: var(--muted);
+  margin: 0;
+  font-size: 14px;
+  max-width: 56ch;
+}
+
+.events-home-rail-view-all {
+  color: var(--primary);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.events-home-rail-view-all:hover {
+  text-decoration: underline;
+}
+
+.events-home-rail-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #d2360b;
+  font-weight: 600;
+}
+
+.events-home-rail-eyebrow .live-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #d2360b;
+  box-shadow: 0 0 0 0 rgba(210, 54, 11, 0.55);
+  animation: live-dot-pulse 1.6s ease-out infinite;
+}
+
+/* Horizontal scrollable list (Netflix style) */
+.events-home-rail-list {
+  list-style: none;
+  margin: 0;
+  padding: 4px 0 14px;
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-padding-left: 4px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.events-home-rail-list::-webkit-scrollbar {
+  height: 8px;
+}
+
+.events-home-rail-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.events-home-rail-list::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 4px;
+}
+
+.events-home-rail-list::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
+
+.events-home-rail-card {
+  flex: 0 0 300px;
+  scroll-snap-align: start;
+}
+
+@media (max-width: 620px) {
+  .events-home-rail-card {
+    flex-basis: 78vw;
+  }
+}
+
+.events-home-rail-scheduled-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: color-mix(in srgb, var(--primary) 92%, var(--text) 8%);
+  color: #fff;
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  z-index: 2;
+}
+
+.events-home-rail-leader {
+  font-size: 12px !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Legacy live-rail header (kept for any non-home usage) */
 .live-events-rail-header {
   display: flex;
   flex-direction: column;

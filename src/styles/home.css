@@ -3710,6 +3710,80 @@
   transition: opacity 0.2s ease, transform 0.3s ease;
 }
 
+/* --- Issue map thumbnail (no-cover fallback) -------------------------- */
+.public-issue-card-cover-map {
+  background: var(--surface);
+}
+
+.issue-map-thumb {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.issue-map-thumb-tile {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+  display: block;
+  filter: saturate(0.9);
+  transition: transform 0.3s ease;
+}
+
+.public-issue-card-cover-map:hover .issue-map-thumb-tile,
+.public-issue-card-cover-map:focus-visible .issue-map-thumb-tile {
+  transform: scale(1.03);
+}
+
+.issue-map-thumb-pin {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  transform: translate(-50%, -100%);
+  box-shadow:
+    0 0 0 3px rgba(255, 255, 255, 0.85),
+    0 4px 10px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.issue-map-thumb-pin::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border: 5px solid transparent;
+  border-top-color: var(--accent);
+  transform: translate(-50%, -3px);
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.25));
+}
+
+.issue-map-thumb-attribution {
+  position: absolute;
+  right: 6px;
+  bottom: 4px;
+  font-size: 9px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.55);
+  background: rgba(255, 255, 255, 0.7);
+  padding: 1px 5px;
+  border-radius: 3px;
+  pointer-events: none;
+  z-index: 2;
+  letter-spacing: 0.02em;
+}
+
+:root[data-theme="dark"] .issue-map-thumb-attribution {
+  color: rgba(255, 255, 255, 0.75);
+  background: rgba(0, 0, 0, 0.55);
+}
+
 .public-issue-card-cover-placeholder:hover .anticon,
 .public-issue-card-cover-placeholder:focus-visible .anticon {
   opacity: 0.8;
@@ -6872,7 +6946,8 @@
 .building-now-section,
 .live-issues-section,
 .event-types-section,
-.live-events-rail {
+.live-events-rail,
+.events-home-rail {
   position: relative;
 }
 
@@ -6883,7 +6958,8 @@
 .building-now-section::before,
 .live-issues-section::before,
 .event-types-section::before,
-.live-events-rail::before {
+.live-events-rail::before,
+.events-home-rail::before {
   content: "";
   position: absolute;
   top: 0;
