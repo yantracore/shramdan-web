@@ -31,6 +31,25 @@ function localizeDigits(value, language) {
   return str.replace(/\d/g, (d) => NP_DIGITS[Number(d)]);
 }
 
+// Deterministic 12-week × 7-day heatmap of dummy "activity intensity".
+// Values 0-4 derived from a tiny hash so the grid is stable across renders.
+function buildHeatmap() {
+  const weeks = 12;
+  const grid = [];
+  for (let w = 0; w < weeks; w += 1) {
+    const col = [];
+    for (let d = 0; d < 7; d += 1) {
+      // Bias the last 3 weeks to have higher activity.
+      const recencyBoost = w >= weeks - 3 ? 1 : 0;
+      const noise = ((w * 31 + d * 17 + 9) % 7);
+      const v = Math.min(4, Math.max(0, noise - 2 + recencyBoost));
+      col.push(v);
+    }
+    grid.push(col);
+  }
+  return grid;
+}
+
 const ACHIEVEMENTS = [
   { id: "first_vote", emoji: "👍", labelNp: "पहिलो समर्थन", labelEn: "First support", unlocked: true },
   { id: "first_event", emoji: "🤝", labelNp: "पहिलो अभियान", labelEn: "First event", unlocked: true },
@@ -58,6 +77,10 @@ const COPY = {
     stat3Label: "अभियान संयोजन",
     badgesTitle: "उपलब्धि",
     badgesLockedHint: "अब आउने",
+    heatmapTitle: "गतिविधि नक्सा",
+    heatmapHint: "गत १२ हप्ताको दैनिक योगदान",
+    heatmapLess: "कम",
+    heatmapMore: "धेरै",
     activityTitle: "हालैको गतिविधि",
     eventsTitle: "तपाईंका आगामी अभियानहरू",
     pastTitle: "तपाईं सहभागी भएका",
@@ -82,6 +105,10 @@ const COPY = {
     stat3Label: "Events coordinated",
     badgesTitle: "Achievements",
     badgesLockedHint: "Coming up",
+    heatmapTitle: "Activity map",
+    heatmapHint: "Daily contribution over the last 12 weeks",
+    heatmapLess: "Less",
+    heatmapMore: "More",
     activityTitle: "Recent activity",
     eventsTitle: "Your upcoming events",
     pastTitle: "Past events you joined",
@@ -108,6 +135,7 @@ export default function MeProfilePreview() {
   const past = useMemo(() => getDemoPastEvents().slice(0, 2), []);
   const notifications = useMemo(() => getDemoNotifications().slice(0, 4), []);
   const live = useMemo(() => getDemoLiveEvents().slice(0, 1), []);
+  const heatmap = useMemo(() => buildHeatmap(), []);
 
   const stats = [
     { value: 5, label: t.stat1Label, icon: TeamOutlined },
@@ -163,6 +191,43 @@ export default function MeProfilePreview() {
                 <span className="me-preview-stat-label">{label}</span>
               </article>
             ))}
+          </div>
+        </section>
+
+        <section
+          className="me-preview-heatmap"
+          aria-labelledby="me-preview-heatmap-title"
+        >
+          <header className="me-preview-heatmap-head">
+            <h2
+              id="me-preview-heatmap-title"
+              className="me-preview-section-title"
+            >
+              {t.heatmapTitle}
+            </h2>
+            <span className="me-preview-heatmap-hint">{t.heatmapHint}</span>
+          </header>
+          <div className="me-preview-heatmap-grid" aria-hidden="true">
+            {heatmap.map((col, ci) => (
+              <div key={ci} className="me-preview-heatmap-col">
+                {col.map((v, di) => (
+                  <span
+                    key={di}
+                    className="me-preview-heatmap-cell"
+                    data-intensity={v}
+                  />
+                ))}
+              </div>
+            ))}
+          </div>
+          <div className="me-preview-heatmap-legend">
+            <span>{t.heatmapLess}</span>
+            <span className="me-preview-heatmap-cell" data-intensity="0" />
+            <span className="me-preview-heatmap-cell" data-intensity="1" />
+            <span className="me-preview-heatmap-cell" data-intensity="2" />
+            <span className="me-preview-heatmap-cell" data-intensity="3" />
+            <span className="me-preview-heatmap-cell" data-intensity="4" />
+            <span>{t.heatmapMore}</span>
           </div>
         </section>
 
