@@ -8,13 +8,16 @@
 import {
   CalendarOutlined,
   CheckCircleOutlined,
+  CopyOutlined,
   FireFilled,
   HeartFilled,
   LikeOutlined,
+  ShareAltOutlined,
   TeamOutlined
 } from "@ant-design/icons";
+import { message } from "antd";
 import Link from "next/link";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
 import {
@@ -56,6 +59,12 @@ function buildHeatmap() {
 // joining an event, supporting an issue, commenting on a thread, etc.).
 const STREAK_DAYS = 8;
 
+// Dummy referral code. In production each user gets a deterministic code
+// from their userId on signup; new joiners who enter it on /signup link
+// back to the inviter for the "ambassador" badge.
+const REFERRAL_CODE = "VIVEK-K7M3";
+const REFERRAL_INVITES = 3;
+
 const ACHIEVEMENTS = [
   { id: "first_vote", emoji: "👍", labelNp: "पहिलो समर्थन", labelEn: "First support", unlocked: true },
   { id: "first_event", emoji: "🤝", labelNp: "पहिलो अभियान", labelEn: "First event", unlocked: true },
@@ -79,6 +88,15 @@ const COPY = {
     memberDate: "२०२६ असार २",
     streakLabel: "दिनदेखि निरन्तर सक्रिय",
     streakTooltip: "लगातार योगदान गरेका दिन",
+    inviteTitle: "साथी निम्त्याउनुहोस्",
+    inviteIntro: "तपाईंको कोड साझा गर्नुहोस् — साथीले सामेल हुँदा दुवैले विशेष ब्याज पाउनुहुनेछ।",
+    inviteCodeLabel: "तपाईंको कोड",
+    inviteCopy: "प्रतिलिपि",
+    inviteCopied: "कोड प्रतिलिपि भयो",
+    inviteShare: "साझा गर्नुहोस्",
+    inviteShareTitle: "श्रमदान सामुदायिक काममा सहभागी हुनुहोस्",
+    inviteShareText: "मेरो कोड {code} प्रयोग गरी श्रमदान मा सामेल हुनुहोस्।",
+    inviteStat: "साथी सामेल",
     statsTitle: "योगदान सारांश",
     stat1Label: "अभियानमा सहभागी",
     stat2Label: "समर्थन गरिएको समस्या",
@@ -110,6 +128,15 @@ const COPY = {
     streakLabel: "day streak",
     streakLabelPlural: "day streak",
     streakTooltip: "Consecutive days of contribution",
+    inviteTitle: "Invite a friend",
+    inviteIntro: "Share your code — when your friend joins, you both earn a special badge.",
+    inviteCodeLabel: "Your Code",
+    inviteCopy: "Copy",
+    inviteCopied: "Code copied",
+    inviteShare: "Share",
+    inviteShareTitle: "Join Shramdan for community work",
+    inviteShareText: "Use my code {code} to join Shramdan with me.",
+    inviteStat: "Friends joined",
     statsTitle: "Contribution summary",
     stat1Label: "Events joined",
     stat2Label: "Issues supported",
@@ -141,6 +168,8 @@ function initialsOf(name) {
 export default function MeProfilePreview() {
   const { language } = usePreferences();
   const t = COPY[language] || COPY.np;
+  const [messageApi, messageContextHolder] = message.useMessage();
+  const [copied, setCopied] = useState(false);
 
   const upcoming = useMemo(() => getDemoUpcomingEvents().slice(0, 2), []);
   const past = useMemo(() => getDemoPastEvents().slice(0, 2), []);
@@ -154,8 +183,46 @@ export default function MeProfilePreview() {
     { value: 1, label: t.stat3Label, icon: CheckCircleOutlined }
   ];
 
+  const handleCopyInvite = async () => {
+    const shareUrl =
+      typeof window !== "undefined"
+        ? `${window.location.origin}/signup?ref=${REFERRAL_CODE}`
+        : `/signup?ref=${REFERRAL_CODE}`;
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      messageApi.success(t.inviteCopied);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      messageApi.error(t.inviteCopied);
+    }
+  };
+
+  const handleShareInvite = async () => {
+    const shareUrl =
+      typeof window !== "undefined"
+        ? `${window.location.origin}/signup?ref=${REFERRAL_CODE}`
+        : `/signup?ref=${REFERRAL_CODE}`;
+    const text = t.inviteShareText.replace("{code}", REFERRAL_CODE);
+
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try {
+        await navigator.share({
+          title: t.inviteShareTitle,
+          text,
+          url: shareUrl
+        });
+        return;
+      } catch {
+        // user cancelled — fall through to copy
+      }
+    }
+    handleCopyInvite();
+  };
+
   return (
     <SiteShell pageTitle={t.pageTitle}>
+      {messageContextHolder}
       <section className="me-preview-section page-section">
         <aside className="me-preview-banner" role="status">
           <span>{t.devBanner}</span>
@@ -211,6 +278,50 @@ export default function MeProfilePreview() {
                 <span className="me-preview-stat-label">{label}</span>
               </article>
             ))}
+          </div>
+        </section>
+
+        <section
+          className="me-preview-invite content-card"
+          aria-labelledby="me-preview-invite-title"
+        >
+          <div className="me-preview-invite-body">
+            <h2
+              id="me-preview-invite-title"
+              className="me-preview-section-title"
+            >
+              {t.inviteTitle}
+            </h2>
+            <p className="me-preview-invite-intro">{t.inviteIntro}</p>
+            <div className="me-preview-invite-code-row">
+              <span className="me-preview-invite-code-label">
+                {t.inviteCodeLabel}
+              </span>
+              <code className="me-preview-invite-code">{REFERRAL_CODE}</code>
+              <span className="me-preview-invite-count">
+                <TeamOutlined aria-hidden="true" />
+                <strong>{localizeDigits(REFERRAL_INVITES, language)}</strong>
+                <span>{t.inviteStat}</span>
+              </span>
+            </div>
+            <div className="me-preview-invite-actions">
+              <button
+                type="button"
+                className={`me-preview-invite-btn${copied ? " is-copied" : ""}`}
+                onClick={handleCopyInvite}
+              >
+                <CopyOutlined aria-hidden="true" />
+                <span>{copied ? t.inviteCopied : t.inviteCopy}</span>
+              </button>
+              <button
+                type="button"
+                className="me-preview-invite-btn is-primary"
+                onClick={handleShareInvite}
+              >
+                <ShareAltOutlined aria-hidden="true" />
+                <span>{t.inviteShare}</span>
+              </button>
+            </div>
           </div>
         </section>
 
