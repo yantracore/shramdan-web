@@ -17,6 +17,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { FaFacebookF, FaTiktok, FaXTwitter, FaYoutube } from "react-icons/fa6";
+import { CommandPalette } from "@/components/CommandPalette";
 import { NotificationsBell } from "@/components/NotificationsBell";
 import { usePreferences } from "@/app/providers";
 import { copy } from "@/lib/siteContent";
@@ -272,6 +273,7 @@ export function SiteShell({ children, pageTitle }) {
                 href="/settings"
               />
             </Tooltip>
+            <CommandPalette language={language} />
             <NotificationsBell language={language} />
           </div>
           {isAuthenticated ? (
