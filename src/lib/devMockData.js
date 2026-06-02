@@ -796,3 +796,110 @@ export function getDemoUnreadCount() {
   if (!isDev()) return 0;
   return DEMO_NOTIFICATIONS.filter((n) => !n.isRead).length;
 }
+
+// --- Leaderboard mock ------------------------------------------------
+// Three buckets: most-supported issues filed, most cleanup events joined,
+// most events organized. Used by /leaderboard. Each entry: name + city +
+// metric + an optional badge string. Production swap-ready behind the
+// `getDemoLeaderboard()` export.
+const DEMO_LEADERBOARD = {
+  supporters: [
+    { name: "कमला अधिकारी", city: "काठमाडौँ", metric: 38, badge: "🌱" },
+    { name: "हरि श्रेष्ठ", city: "बुढानीलकण्ठ", metric: 31, badge: "🌱" },
+    { name: "रिता पाण्डे", city: "ललितपुर", metric: 28 },
+    { name: "प्रदीप तामाङ", city: "भक्तपुर", metric: 24 },
+    { name: "स्मिता शर्मा", city: "काठमाडौँ", metric: 22 },
+    { name: "रोहित कार्की", city: "पोखरा", metric: 19 },
+    { name: "बिनिता थापा", city: "हेटौँडा", metric: 17 },
+    { name: "गणेश राई", city: "धरान", metric: 14 },
+    { name: "सुनिल मगर", city: "बुटवल", metric: 12 },
+    { name: "मञ्जु तामाङ", city: "विराटनगर", metric: 10 }
+  ],
+  participants: [
+    { name: "हरि श्रेष्ठ", city: "बुढानीलकण्ठ", metric: 12, badge: "🏆" },
+    { name: "कमला अधिकारी", city: "काठमाडौँ", metric: 11, badge: "🏆" },
+    { name: "प्रदीप तामाङ", city: "भक्तपुर", metric: 9 },
+    { name: "गणेश राई", city: "धरान", metric: 8 },
+    { name: "रिता पाण्डे", city: "ललितपुर", metric: 7 },
+    { name: "स्मिता शर्मा", city: "काठमाडौँ", metric: 7 },
+    { name: "बिनिता थापा", city: "हेटौँडा", metric: 6 },
+    { name: "अमित गुरुङ", city: "पोखरा", metric: 5 },
+    { name: "सुनिल मगर", city: "बुटवल", metric: 5 },
+    { name: "रोशन के.सी.", city: "नेपालगन्ज", metric: 4 }
+  ],
+  organizers: [
+    { name: "कमला अधिकारी", city: "काठमाडौँ", metric: 4, badge: "⚡" },
+    { name: "रोहित कार्की", city: "पोखरा", metric: 3 },
+    { name: "हरि श्रेष्ठ", city: "बुढानीलकण्ठ", metric: 3 },
+    { name: "रिता पाण्डे", city: "ललितपुर", metric: 2 },
+    { name: "प्रदीप तामाङ", city: "भक्तपुर", metric: 2 },
+    { name: "स्मिता शर्मा", city: "काठमाडौँ", metric: 2 },
+    { name: "बिनिता थापा", city: "हेटौँडा", metric: 1 },
+    { name: "सुनिल मगर", city: "बुटवल", metric: 1 },
+    { name: "गणेश राई", city: "धरान", metric: 1 },
+    { name: "मञ्जु तामाङ", city: "विराटनगर", metric: 1 }
+  ]
+};
+
+export function getDemoLeaderboard() {
+  if (!isDev()) return { supporters: [], participants: [], organizers: [] };
+  return DEMO_LEADERBOARD;
+}
+
+// --- Activity ticker mock --------------------------------------------
+// Rolling one-liners shown in the homepage hero strip. Each carries
+// {actor, action: {np, en}, minutesAgo, href}. We rotate through them
+// with a CSS-driven crossfade; the timestamps re-derive on every render
+// so the page feels alive.
+const DEMO_ACTIVITY_TICKER = [
+  {
+    actor: "रिता पाण्डे",
+    action: {
+      np: "रत्नपार्क सरसफाइ अभियानमा सहभागी हुनुभयो।",
+      en: "joined Ratnapark cleanup."
+    },
+    minutesAgo: 4,
+    href: "/events/demo-up-1"
+  },
+  {
+    actor: "हरि श्रेष्ठ",
+    action: {
+      np: "बागमती किनार समस्यामा समर्थन गर्नुभयो।",
+      en: "supported the Bagmati riverbank issue."
+    },
+    minutesAgo: 12,
+    href: "/issues"
+  },
+  {
+    actor: "स्मिता शर्मा",
+    action: {
+      np: "गोकर्णेश्वर ट्रेल मर्मतमा संयोजक भएर जोडिनुभयो।",
+      en: "took the organizer role for Gokarneshwar trail."
+    },
+    minutesAgo: 27,
+    href: "/events/demo-up-3"
+  },
+  {
+    actor: "प्रदीप तामाङ",
+    action: {
+      np: "हनुमन्ते खोला सफाइ अभियानको परिणाम साझा गर्नुभयो।",
+      en: "shared the Hanumante cleanup result."
+    },
+    minutesAgo: 43,
+    href: "/events/demo-past-4"
+  },
+  {
+    actor: "रोहित कार्की",
+    action: {
+      np: "नयाँ ट्रेल मर्मत समस्या रिपोर्ट गर्नुभयो।",
+      en: "reported a new trail-repair issue."
+    },
+    minutesAgo: 58,
+    href: "/issues"
+  }
+];
+
+export function getDemoActivityTicker() {
+  if (!isDev()) return [];
+  return DEMO_ACTIVITY_TICKER;
+}
