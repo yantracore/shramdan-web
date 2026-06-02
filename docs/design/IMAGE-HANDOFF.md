@@ -21,7 +21,9 @@ Save every output as the exact file path listed (overwrite the current placehold
 
 These ship paths are already wired into the live UI. Replacing them upgrades the site instantly.
 
-### 1A. Event types (8 photos)
+### 1A. Event types (8 photos) — ✅ DONE 2026-06-02
+
+Shipped in commit `1b06d71`. All 8 files render correctly on `/event-types` and `/event-types/[id]`. Skip this section.
 
 **Spec:** 3:2 landscape, 1200×800 px, JPG, ~150–250 KB target. Photographic. Save under `public/images/event-types/`.
 
