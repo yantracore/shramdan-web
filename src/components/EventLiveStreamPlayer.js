@@ -4,12 +4,21 @@
 // Renders an embedded YouTube Live (or placeholder video) at the top
 // of the event detail page when the event has an active liveStream.
 //
-// Visible chrome: LIVE badge, viewer count, live duration. Player is
-// muted autoplay so the visit isn't a surprise sound-blast.
+// Visible chrome: LIVE badge, big pulsing viewer counter, live duration.
+// Player is muted autoplay so the visit isn't a surprise sound-blast.
 
+import { EyeOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 
-export function EventLiveStreamPlayer({ liveStream, eventTitle, copy }) {
+const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
+
+function toLocalDigits(value, language) {
+  const str = String(value ?? "");
+  if (language !== "np") return str;
+  return str.replace(/\d/g, (d) => NP_DIGITS[Number(d)]);
+}
+
+export function EventLiveStreamPlayer({ liveStream, eventTitle, copy, language = "en" }) {
   const [duration, setDuration] = useState(() =>
     computeDuration(liveStream?.startedAt)
   );
@@ -23,6 +32,11 @@ export function EventLiveStreamPlayer({ liveStream, eventTitle, copy }) {
   }, [liveStream?.startedAt]);
 
   if (!liveStream?.isActive || !liveStream?.streamUrl) return null;
+
+  const hasViewers = Number.isFinite(liveStream.viewerCount);
+  const viewerNumber = hasViewers
+    ? toLocalDigits(liveStream.viewerCount.toLocaleString("en-US"), language)
+    : null;
 
   return (
     <section className="event-live-player" aria-label={copy?.liveAria || "Live stream player"}>
@@ -42,13 +56,16 @@ export function EventLiveStreamPlayer({ liveStream, eventTitle, copy }) {
         </span>
         {duration ? (
           <span className="event-live-duration">
-            {duration} {copy?.durationSuffix || "live"}
+            {toLocalDigits(duration, language)} {copy?.durationSuffix || "live"}
           </span>
         ) : null}
-        {Number.isFinite(liveStream.viewerCount) ? (
-          <span className="event-live-viewers">
-            {liveStream.viewerCount.toLocaleString()}
-            {copy?.viewersSuffix || " watching"}
+        {hasViewers ? (
+          <span className="event-live-viewers-big" aria-live="polite">
+            <EyeOutlined aria-hidden="true" className="event-live-viewers-icon" />
+            <span className="event-live-viewers-number">{viewerNumber}</span>
+            <span className="event-live-viewers-label">
+              {(copy?.viewersSuffix || " watching").trim()}
+            </span>
           </span>
         ) : null}
         {liveStream.isMock ? (

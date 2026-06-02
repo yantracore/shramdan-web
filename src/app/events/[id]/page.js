@@ -202,13 +202,14 @@ export default function EventDetailPage() {
 
         {!loading && !error && !notFound && eventData?.liveStream?.isActive ? (
           <EventLiveStreamPlayer
+            language={language}
             liveStream={eventData.liveStream}
             eventTitle={linkedIssue?.title || eventData.meetupAddress || "श्रमदान"}
             copy={{
               liveAria: language === "np" ? "लाइभ प्रसारण" : "Live broadcast",
               liveBadge: language === "np" ? "लाइभ" : "LIVE",
               durationSuffix: language === "np" ? "देखि लाइभ" : "live",
-              viewersSuffix: language === "np" ? " जना हेर्दैछन्" : " watching"
+              viewersSuffix: language === "np" ? "जना हेर्दैछन्" : "watching"
             }}
           />
         ) : null}

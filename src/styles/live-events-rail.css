@@ -214,8 +214,8 @@
 .event-live-player-meta {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px 14px;
+  gap: 14px;
+  padding: 14px 18px;
   background: var(--surface);
   flex-wrap: wrap;
 }
@@ -252,8 +252,49 @@
   color: var(--muted);
 }
 
-.event-live-mock-flag {
+.event-live-viewers-big {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
   margin-left: auto;
+  color: var(--accent);
+  font-weight: 700;
+  animation: live-viewers-breathe 3.2s ease-in-out infinite;
+}
+
+.event-live-viewers-icon {
+  font-size: 18px;
+  transform: translateY(2px);
+  opacity: 0.9;
+}
+
+.event-live-viewers-number {
+  font-size: clamp(22px, 2.6vw, 30px);
+  line-height: 1;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+.event-live-viewers-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  text-transform: none;
+}
+
+@keyframes live-viewers-breathe {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.78; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .event-live-viewers-big {
+    animation: none;
+  }
+}
+
+.event-live-mock-flag {
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.08em;
