@@ -87,9 +87,14 @@ When you (the coding agent) are working in this repo:
 - [ ] P2 [from 9.5a] Auto-save draft on issue create / edit (avoid lost work on reload) — effort:M
 - [ ] P2 [from 9.10] Search + filter users by role / name — effort:S
 
+## Phase 2 — Member Portal (UI-only, pre-backend)
+
+- [x] P2 [from 2.1] Phone + OTP membership UI flow — effort:S ← done: 2026-06-02 *(new `/signup` page: 3-state machine (phone → otp → done), Nepali mobile validation, 6-digit OTP input, dev-dummy success path with ~500ms simulated delay; explicit "Dev mode" hint. Backend endpoints `/auth/otp/send` + `/auth/otp/verify` not wired yet — swap-ready. `/login` page links to it via a dashed accent-tinted CTA.)*
+
 ## Phase 11 — Cross-cutting
 
 - [ ] P2 [from 11.1] `AdminResponsiveList`: column-visibility toggle — effort:S
+- [x] P2 [from 11] Page transitions: route fade-up — effort:S ← done: 2026-06-02 *(SiteShell keys children by pathname; 320ms `page-enter` animation with `animation-fill-mode: backwards`; reduced-motion safe)*
 - [x] P1 [from 11] `StickyActionBar` was tab-reachable while visually hidden — effort:S ← done: 2026-06-02 *(added `tabIndex={visible ? 0 : -1}` to the inner Link and `inert={!visible || undefined}` on the wrapper, including the React 19 boolean-attribute correction)*
 - [x] P1 [from 11] Leaflet `Marker` pins had no accessible name (axe `name-role-value`) — effort:S ← done: 2026-06-02 *(`IssueMap.IssueMarker` now passes `title` + `alt` + `keyboard` derived from `issue.title || issue.addressText || statusLabel`)*
 - [x] P2 [from 11] Skip-to-main-content link (WCAG 2.1 SC 2.4.1 Bypass Blocks) — effort:S ← done: 2026-06-02 *(SiteShell now renders `<a class="skip-to-main">` as the first focusable element; visually hidden until Tab focus, targets a `tabIndex=-1` wrapper around children; bilingual label.)*
