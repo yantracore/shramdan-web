@@ -5566,18 +5566,10 @@
   font-size: 14px;
 }
 
-.public-issue-back-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--accent);
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.public-issue-back-link:hover {
-  text-decoration: underline;
-}
+/* .public-issue-back-link — removed 2026-06-03. The back-to-list
+ * affordance now uses <TertiaryButton>; if you see this class in
+ * markup again it's a regression. Same goes for .event-types-page-back
+ * and .event-type-detail-back below. */
 
 .public-issue-detail {
   display: flex;
@@ -7800,20 +7792,7 @@
   box-shadow: 0 14px 30px rgba(245, 143, 56, 0.2);
 }
 
-.event-types-page-back {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  width: fit-content;
-  color: var(--muted);
-  font-size: 14px;
-  font-weight: 700;
-  transition: color 160ms ease;
-}
-
-.event-types-page-back:hover {
-  color: var(--primary);
-}
+/* .event-types-page-back — removed; use <TertiaryButton> instead. */
 
 .event-types-page-group {
   display: grid;
@@ -8017,20 +7996,7 @@
   background-size: cover;
 }
 
-.event-type-detail-back {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  width: fit-content;
-  color: var(--muted);
-  font-size: 14px;
-  font-weight: 700;
-  transition: color 160ms ease;
-}
-
-.event-type-detail-back:hover {
-  color: var(--primary);
-}
+/* .event-type-detail-back — removed; use <TertiaryButton> instead. */
 
 .event-type-detail-header .eyebrow {
   width: fit-content;
@@ -10460,7 +10426,18 @@
   box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--text);
 }
 
-/* --- Print button + print styles ------------------------------------- */
+/* --- Tertiary button (utility actions) + print styles ----------------
+ *
+ * `.tertiary-button` is the canonical chassis for utility-tier
+ * actions across the public site — Back-to-X navigation, Print/Save
+ * PDF, Filter, Export, etc. It is NOT a screen-level CTA (those
+ * remain AntD `<Button type="primary">`). Rendered by the React
+ * `<TertiaryButton>` component (src/components/TertiaryButton.js).
+ *
+ * Discipline: any time you reach for a small outlined-pill action,
+ * use this. Adding a new one-off `.foo-back-link` style is the
+ * regression we are explicitly trying to prevent.
+ */
 .public-issue-back-row {
   display: flex;
   align-items: center;
@@ -10470,7 +10447,7 @@
   margin-bottom: 12px;
 }
 
-.print-button {
+.tertiary-button {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -10483,14 +10460,29 @@
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 160ms ease;
+  text-decoration: none;
+  transition: background 160ms ease, border-color 160ms ease, color 160ms ease;
 }
 
-.print-button:hover {
+.tertiary-button:hover {
   background: rgba(0, 0, 0, 0.04);
+  border-color: color-mix(in srgb, var(--line) 60%, var(--text));
+  color: var(--text);
+  text-decoration: none;
 }
 
-:root[data-theme="dark"] .print-button:hover {
+.tertiary-button:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.tertiary-button-icon {
+  display: inline-flex;
+  align-items: center;
+  font-size: 13px;
+}
+
+:root[data-theme="dark"] .tertiary-button:hover {
   background: rgba(255, 255, 255, 0.06);
 }
 
