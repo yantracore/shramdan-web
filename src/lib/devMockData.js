@@ -23,6 +23,25 @@ function ytThumb(videoId) {
 const isDev = () =>
   typeof process !== "undefined" && process.env.NODE_ENV !== "production";
 
+// Demo participant roster — shared shape that mock events can pin onto
+// themselves. Each entry is a role with how many slots are needed,
+// how many are filled, and names of the filled members. The component
+// EventRosterPanel renders these as chips.
+const DEMO_ROSTER = [
+  {
+    role: "WORKER",
+    count: 18,
+    filled: 12,
+    filledNames: ["राम", "सीता", "हरि", "गोमा", "सुनिल", "अमित", "रिता", "मञ्जु", "सरोज", "बिनिता", "प्रदीप", "रोशन"]
+  },
+  { role: "PHOTOGRAPHER", count: 2, filled: 1, filledNames: ["गणेश"] },
+  { role: "LIVESTREAMER", count: 1, filled: 1, filledNames: ["अमित"] },
+  { role: "MEDIC", count: 1, filled: 0, filledNames: [] },
+  { role: "SAFETY_LEAD", count: 1, filled: 1, filledNames: ["कमला"] },
+  { role: "COORDINATOR", count: 2, filled: 2, filledNames: ["रोहित", "स्मिता"] },
+  { role: "LOGISTICS", count: 2, filled: 1, filledNames: ["दिनेश"] }
+];
+
 // Demo live events for the homepage live-events rail.
 // IDs prefixed "demo-live-" so the event detail page can recognize them.
 export const DEMO_LIVE_EVENTS = [
@@ -30,6 +49,7 @@ export const DEMO_LIVE_EVENTS = [
     id: "demo-live-1",
     title: "बागमती नदी सरसफाइ",
     addressText: "तीनकुने पुल, ललितपुर",
+    rolesNeeded: DEMO_ROSTER,
     liveStream: {
       isActive: true,
       startedAt: new Date(Date.now() - 37 * 60_000).toISOString(),
@@ -44,6 +64,7 @@ export const DEMO_LIVE_EVENTS = [
     id: "demo-live-2",
     title: "स्कुल भित्ता पेन्ट + मर्मत",
     addressText: "श्री जनप्रिय मा.वि., काठमाडौँ",
+    rolesNeeded: DEMO_ROSTER,
     liveStream: {
       isActive: true,
       startedAt: new Date(Date.now() - 8 * 60_000).toISOString(),
@@ -58,6 +79,7 @@ export const DEMO_LIVE_EVENTS = [
     id: "demo-live-3",
     title: "वृक्षारोपण अभियान — सूर्यविनायक",
     addressText: "सूर्यविनायक नगर, भक्तपुर",
+    rolesNeeded: DEMO_ROSTER,
     liveStream: {
       isActive: true,
       startedAt: new Date(Date.now() - 102 * 60_000).toISOString(),
@@ -96,7 +118,8 @@ export function getDemoEventById(id) {
     eventLeaderId: null,
     photos: [],
     resultSummary: null,
-    liveStream: found.liveStream
+    liveStream: found.liveStream,
+    rolesNeeded: found.rolesNeeded
   };
 }
 
@@ -120,6 +143,7 @@ export function injectMockLiveStream(eventId, realEvent) {
       viewerCount: 42 + (eventId?.length ?? 0) * 3,
       videoId: YT_DEMO_ID,
       isMock: true
-    }
+    },
+    rolesNeeded: realEvent.rolesNeeded?.length ? realEvent.rolesNeeded : DEMO_ROSTER
   };
 }

@@ -14,6 +14,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import { EventLiveStreamPlayer } from "@/components/EventLiveStreamPlayer";
+import { EventRosterPanel } from "@/components/EventRosterPanel";
 import IssueMapBlock from "@/components/IssueMapBlock";
 import { IssuePhotoGallery } from "@/components/IssuePhotoGallery";
 import { LeaderScheduleEditor } from "@/components/LeaderScheduleEditor";
@@ -352,6 +353,14 @@ export default function EventDetailPage() {
                     />
                   </div>
                 </section>
+              ) : null}
+
+              {Array.isArray(eventData.rolesNeeded) && eventData.rolesNeeded.length > 0 ? (
+                <EventRosterPanel
+                  rolesNeeded={eventData.rolesNeeded}
+                  language={language}
+                  eventId={eventData.id}
+                />
               ) : null}
 
               {linkedIssue?.id ? (
