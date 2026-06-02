@@ -8,6 +8,7 @@
 import {
   CalendarOutlined,
   CheckCircleOutlined,
+  FireFilled,
   HeartFilled,
   LikeOutlined,
   TeamOutlined
@@ -50,6 +51,11 @@ function buildHeatmap() {
   return grid;
 }
 
+// Dummy daily-volunteer streak. In production this would be derived from
+// the check-in log on the user record (consecutive days with any activity:
+// joining an event, supporting an issue, commenting on a thread, etc.).
+const STREAK_DAYS = 8;
+
 const ACHIEVEMENTS = [
   { id: "first_vote", emoji: "👍", labelNp: "पहिलो समर्थन", labelEn: "First support", unlocked: true },
   { id: "first_event", emoji: "🤝", labelNp: "पहिलो अभियान", labelEn: "First event", unlocked: true },
@@ -71,6 +77,8 @@ const COPY = {
     location: "काठमाडौँ, नेपाल",
     memberSince: "सदस्यता मिति",
     memberDate: "२०२६ असार २",
+    streakLabel: "दिनदेखि निरन्तर सक्रिय",
+    streakTooltip: "लगातार योगदान गरेका दिन",
     statsTitle: "योगदान सारांश",
     stat1Label: "अभियानमा सहभागी",
     stat2Label: "समर्थन गरिएको समस्या",
@@ -99,6 +107,9 @@ const COPY = {
     location: "Kathmandu, Nepal",
     memberSince: "Member since",
     memberDate: "Jun 2, 2026",
+    streakLabel: "day streak",
+    streakLabelPlural: "day streak",
+    streakTooltip: "Consecutive days of contribution",
     statsTitle: "Contribution summary",
     stat1Label: "Events joined",
     stat2Label: "Issues supported",
@@ -168,6 +179,15 @@ export default function MeProfilePreview() {
               <p className="me-preview-meta">
                 <CalendarOutlined aria-hidden="true" /> {t.memberSince}: {t.memberDate}
               </p>
+              <span
+                className={`me-preview-streak${STREAK_DAYS >= 7 ? " is-hot" : ""}`}
+                title={t.streakTooltip}
+                aria-label={`${STREAK_DAYS} ${t.streakLabel}`}
+              >
+                <FireFilled aria-hidden="true" />
+                <strong>{localizeDigits(STREAK_DAYS, language)}</strong>
+                <span>{t.streakLabel}</span>
+              </span>
             </div>
           </header>
         </article>
