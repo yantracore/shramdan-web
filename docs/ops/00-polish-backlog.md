@@ -109,6 +109,10 @@ When you (the coding agent) are working in this repo:
 - [x] P2 [from 6] `/calendar` month-view of events — effort:M ← done: 2026-06-02 *(grid with kind-coded dots, prev/next/today nav, sticky day panel; bilingual NP weekdays/months)*
 - [x] P2 [from 11] Cmd+K command palette — effort:M ← done: 2026-06-02 *(spotlight-style search across 15 routes + all demo events; arrow keys + Enter; topbar magnifier as the visible trigger)*
 - [x] P3 [from 0.3] Live online widget — effort:S ← done: 2026-06-02 *(pulsing-dot chip with a drifting count in the 84-132 band; sits alongside ActivityTicker in a new home-pulse-row)*
+- [x] P2 [from 1.1] Hover preview on issue cards — effort:S ← done: 2026-06-02 *(description peek panel slides in on :hover/:focus-within; mobile + touch devices skip via @media (hover: hover); card lifts -3px to mirror event-card polish)*
+- [x] P2 [from 12] `/help` FAQ accordion page — effort:M ← done: 2026-06-02 *(12 Q&As / 4 sections / search filter / bilingual; native `<details>` so keyboard + no-JS work; "still stuck?" primary-gradient CTA card)*
+- [x] P2 [from 5] `/donate` amount picker + impact preview + dev success — effort:M ← done: 2026-06-02 *(preset NPR buttons + custom input + frequency toggle + impact translator (rupees → tools/water/rides); confetti success state with receipt number; backend swap-ready)*
+- [x] P3 [from 6] Activity heatmap on /me/preview — effort:S ← done: 2026-06-02 *(GitHub-style 12-week × 7-day grid with 5-step color scale)*
 
 ## Phase 11 — Cross-cutting
 
