@@ -3599,18 +3599,41 @@
 .public-issues-filters {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  align-items: center;
-  justify-content: flex-end;
-  padding: 14px 16px;
+  gap: 12px 16px;
+  align-items: flex-end;
+  justify-content: flex-start;
+  padding: 16px;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: color-mix(in srgb, var(--surface-soft) 85%, var(--surface));
   box-shadow: 0 6px 20px rgba(23, 33, 28, 0.04);
 }
 
+.public-issues-filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 200px;
+}
+
+.public-issues-filter-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  line-height: 1;
+}
+
+.public-issues-filters-cta {
+  margin-left: auto;
+  align-self: flex-end;
+  display: inline-flex;
+}
+
 .public-issues-filters .ant-select {
   min-width: 200px;
+  width: 100%;
 }
 
 .public-issues-filters .ant-select .ant-select-selection-placeholder,
@@ -4475,8 +4498,19 @@
 }
 
 @media (max-width: 620px) {
+  .public-issues-filter-field {
+    min-width: 0;
+    width: 100%;
+  }
   .public-issues-filters .ant-select {
     min-width: 0;
+    width: 100%;
+  }
+  .public-issues-filters-cta {
+    margin-left: 0;
+    width: 100%;
+  }
+  .public-issues-filters-cta .ant-btn {
     width: 100%;
   }
 

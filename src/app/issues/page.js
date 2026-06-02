@@ -260,47 +260,65 @@ export default function IssuesListPage() {
   return (
     <SiteShell pageTitle={t.pageTitles.issues}>
       <section className="page-section public-issues-section">
-        <div className="section-heading section-heading-with-cta">
-          <div className="section-heading-body">
-            <span className="eyebrow">{content.list.eyebrow}</span>
-            <h1>{content.list.title}</h1>
-            <p>{content.list.intro}</p>
-          </div>
-          <Link className="section-heading-cta" href="/issues/new">
-            <Button type="primary" icon={<PlusOutlined />} size="large">
-              {t.issueNew.cta.list}
-            </Button>
-          </Link>
+        <div className="section-heading">
+          <span className="eyebrow">{content.list.eyebrow}</span>
+          <h1>{content.list.title}</h1>
+          <p>{content.list.intro}</p>
         </div>
 
         <div className="public-issues-toolbar">
-          <div
-            className="public-issues-filters"
-            role="group"
-            aria-label={content.filters.statusLabel}
-          >
-            <Select
-              allowClear
-              aria-label={content.filters.statusLabel}
-              onChange={(value) => setFilter("status", value)}
-              options={statusOptions}
-              placeholder={content.filters.statusPlaceholder}
-              value={filters.status}
-            />
-            <Select
-              allowClear
-              aria-label={content.filters.categoryLabel}
-              onChange={(value) => setFilter("category", value)}
-              options={categoryOptions}
-              placeholder={content.filters.categoryPlaceholder}
-              value={filters.category}
-            />
-            <Select
-              aria-label={content.filters.sortLabel}
-              onChange={(value) => setFilter("sort", value)}
-              options={sortOptions}
-              value={filters.sort}
-            />
+          <div className="public-issues-filters">
+            <div className="public-issues-filter-field">
+              <label
+                className="public-issues-filter-label"
+                htmlFor="issues-filter-status"
+              >
+                {content.filters.statusLabel}
+              </label>
+              <Select
+                id="issues-filter-status"
+                allowClear
+                onChange={(value) => setFilter("status", value)}
+                options={statusOptions}
+                placeholder={content.filters.statusPlaceholder}
+                value={filters.status}
+              />
+            </div>
+            <div className="public-issues-filter-field">
+              <label
+                className="public-issues-filter-label"
+                htmlFor="issues-filter-category"
+              >
+                {content.filters.categoryLabel}
+              </label>
+              <Select
+                id="issues-filter-category"
+                allowClear
+                onChange={(value) => setFilter("category", value)}
+                options={categoryOptions}
+                placeholder={content.filters.categoryPlaceholder}
+                value={filters.category}
+              />
+            </div>
+            <div className="public-issues-filter-field">
+              <label
+                className="public-issues-filter-label"
+                htmlFor="issues-filter-sort"
+              >
+                {content.filters.sortLabel}
+              </label>
+              <Select
+                id="issues-filter-sort"
+                onChange={(value) => setFilter("sort", value)}
+                options={sortOptions}
+                value={filters.sort}
+              />
+            </div>
+            <Link className="public-issues-filters-cta" href="/issues/new">
+              <Button type="primary" icon={<PlusOutlined />} size="large">
+                {t.issueNew.cta.list}
+              </Button>
+            </Link>
           </div>
         </div>
 
