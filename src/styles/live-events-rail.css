@@ -23,18 +23,26 @@
   margin: 0 auto;
 }
 
+/* Centered header — the slider focuses on the middle card, so the
+ * eyebrow/title/subtitle block sits horizontally centered in the
+ * shell. The "View All" link is pinned absolutely to the right edge
+ * of the same shell, vertically aligned to the center of the text
+ * block. On narrow viewports the absolute positioning is dropped so
+ * the link doesn't overlap a multi-line title. */
 .events-home-rail-header {
+  position: relative;
   display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
+  justify-content: center;
+  align-items: center;
   gap: 16px;
   margin-bottom: 18px;
-  flex-wrap: wrap;
 }
 
 .events-home-rail-header-text {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  text-align: center;
   gap: 4px;
 }
 
@@ -52,6 +60,10 @@
 }
 
 .events-home-rail-view-all {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
   color: var(--primary);
   font-size: 14px;
   font-weight: 600;
@@ -61,6 +73,19 @@
 
 .events-home-rail-view-all:hover {
   text-decoration: underline;
+}
+
+/* On narrow viewports drop the link below the centered text block
+ * so it doesn't overlap a wrapped title. */
+@media (max-width: 720px) {
+  .events-home-rail-header {
+    flex-direction: column;
+    gap: 12px;
+  }
+  .events-home-rail-view-all {
+    position: static;
+    transform: none;
+  }
 }
 
 .events-home-rail-eyebrow {
