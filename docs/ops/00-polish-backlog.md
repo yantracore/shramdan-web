@@ -101,6 +101,10 @@ When you (the coding agent) are working in this repo:
 - [x] P2 [from 14] BeforeAfterSlider on past event detail — effort:M ← done: 2026-06-02 *(new component: mouse / touch / arrow-key dragable divider, 16:9 aspect, BEFORE/AFTER chips; each demo past event now carries a `beforeAfter` photo pair piped through `getDemoEventById`)*
 - [x] P2 [from 2] `/me/preview` — auth-free profile stub — effort:S ← done: 2026-06-02 *(parallel route to the auth-gated /me; brand-gradient avatar, stat tiles, recent-activity timeline from `getDemoNotifications`, upcoming + past events; banner makes "demo" intent obvious; CTA back to `/signup`)*
 - [x] P2 [from 6] `/impact` aggregate page — effort:M ← done: 2026-06-02 *(sums devMockData past-events into 4 headline tiles, per-event list with 3-stat clusters, primary CTA card. UI-only; bilingual.)*
+- [x] P2 [from 6] `/leaderboard` — top contributors across 3 buckets (supporters/participants/organizers) — effort:M ← done: 2026-06-02 *(tabbed switcher, 10 demo rows per bucket, top-3 highlighted with crown + accent gradient, mobile-collapsible badge column)*
+- [x] P3 [from 0.4] Confetti burst on submission success — effort:S ← done: 2026-06-02 *(new CSS-only ConfettiBurst on SubmissionSuccessCard + /signup done step; reduced-motion safe)*
+- [x] P3 [from 0.3] Activity ticker below homepage hero — effort:S ← done: 2026-06-02 *(rotating one-liner of dummy supporter/joiner/organizer activity every ~4.2s)*
+- [x] P3 [from 2] Achievement badges on /me/preview — effort:S ← done: 2026-06-02 *(6 emoji badge tiles with unlocked vs locked styling)*
 
 ## Phase 11 — Cross-cutting
 
