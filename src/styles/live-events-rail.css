@@ -112,8 +112,167 @@
   display: flex;
 }
 
-.events-home-rail-slide > .events-home-rail-card {
+/* --- Netflix-poster card -------------------------------------------- */
+
+.events-home-rail-poster-card {
+  position: relative;
   width: 100%;
+  aspect-ratio: 4 / 5;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: #111;
+  box-shadow: var(--shadow-1);
+  transition: box-shadow 0.3s var(--ease-out-soft);
+}
+
+.events-home-rail-swiper .swiper-slide-active .events-home-rail-poster-card {
+  box-shadow: var(--shadow-hero, 0 22px 48px rgba(0, 0, 0, 0.32));
+}
+
+.events-home-rail-poster-link {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  color: #fff;
+  text-decoration: none;
+}
+
+.events-home-rail-poster-link:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+}
+
+.events-home-rail-poster {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.events-home-rail-poster img,
+.events-home-rail-poster-iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border: 0;
+  display: block;
+  pointer-events: none; /* let the wrapping <Link> catch clicks */
+}
+
+.events-home-rail-poster-fallback {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #222 0%, #111 100%);
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.events-home-rail-poster-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 12px;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.78) 0%,
+      rgba(0, 0, 0, 0.48) 28%,
+      rgba(0, 0, 0, 0) 55%
+    ),
+    linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.30) 0%,
+      rgba(0, 0, 0, 0) 28%
+    );
+}
+
+.events-home-rail-poster-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.events-home-rail-poster-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.events-home-rail-poster-bottom h3 {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(15px, 1.5vw, 19px);
+  font-weight: 700;
+  line-height: 1.2;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+.events-home-rail-poster-bottom p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+.events-home-rail-poster-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 9px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  white-space: nowrap;
+}
+
+.events-home-rail-poster-badge--live {
+  background: rgba(210, 54, 11, 0.92);
+  animation: live-badge-blink 2.4s ease-in-out infinite;
+}
+
+.events-home-rail-poster-badge--live .live-dot {
+  width: 5px;
+  height: 5px;
+  background: #fff;
+  border-radius: 50%;
+}
+
+.events-home-rail-poster-badge--date {
+  background: color-mix(in srgb, var(--primary) 90%, #000 10%);
+}
+
+.events-home-rail-poster-badge--meta {
+  font-size: 10.5px;
+  letter-spacing: 0.02em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .events-home-rail-poster-badge--live {
+    animation: none;
+  }
 }
 
 /* Frosted-glass nav buttons. Swiper renders .swiper-button-prev/next
@@ -169,24 +328,6 @@
   }
 }
 
-/* Card layout — width fills the slide; the rest (border, background,
- * box-shadow) comes from the legacy .live-events-rail-card class which
- * is also on the same node. Suppress its translateY hover here because
- * it would fight the coverflow 3D transform. */
-.events-home-rail-card {
-  width: 100%;
-}
-
-.events-home-rail-swiper .live-events-rail-card:hover {
-  transform: none;
-}
-
-/* Active (centered) slide gets a stronger shadow — Swiper toggles
- * .swiper-slide-active on the active slide automatically. */
-.events-home-rail-swiper .swiper-slide-active .events-home-rail-card {
-  box-shadow: var(--shadow-hero, 0 18px 40px rgba(0, 0, 0, 0.22));
-}
-
 .events-home-rail-empty {
   display: flex;
   align-items: center;
@@ -208,36 +349,6 @@
   font-size: 14px;
   line-height: 1.5;
   opacity: 0.85;
-}
-
-.events-home-rail-scheduled-badge {
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  background: color-mix(in srgb, var(--primary) 92%, var(--text) 8%);
-  color: #fff;
-  padding: 3px 9px;
-  border-radius: var(--radius-pill);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  z-index: 2;
-}
-
-.events-home-rail-leader,
-.events-home-rail-roles {
-  font-size: 12px !important;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.events-home-rail-roles {
-  color: var(--primary);
-  font-weight: 600;
 }
 
 /* Legacy live-rail header (kept for any non-home usage) */

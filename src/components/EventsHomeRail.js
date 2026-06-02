@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useReducedMotion } from "framer-motion";
-import { CalendarOutlined, EnvironmentOutlined, TeamOutlined } from "@ant-design/icons";
+import { CalendarOutlined, EyeOutlined, TeamOutlined } from "@ant-design/icons";
 import { Swiper, SwiperSlide } from "swiper/react";
 import {
   A11y,
@@ -19,9 +19,9 @@ import "swiper/css/pagination";
 import { usePreferences } from "@/app/providers";
 
 // Unified home rail: Swiper EffectCoverflow slider combining
-// currently-live + upcoming-scheduled events. Center slide is upright;
-// side slides tilt back with depth. Each slide hosts the existing
-// thumbnail card markup unchanged.
+// currently-live + upcoming-scheduled events as Netflix-poster cards.
+// Only the centered (active) LIVE slide auto-plays its preview iframe;
+// every other slide shows a static thumbnail.
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 
@@ -64,6 +64,10 @@ function formatScheduledPill(iso, language) {
   }
 }
 
+// Brief delay before mounting the live iframe so quick slide changes
+// don't flicker through multiple players.
+const ACTIVE_PREVIEW_DELAY_MS = 400;
+
 export function EventsHomeRail({
   liveEvents = [],
   upcomingEvents = [],
@@ -79,6 +83,33 @@ export function EventsHomeRail({
     ...upcomingEvents.map((event) => ({ kind: "upcoming", event }))
   ];
   const isEmpty = items.length === 0;
+  const useLoop = items.length > 3;
+
+  const [activeIndex, setActiveIndex] = useState(0);
+  const handleActive = (swiper) => setActiveIndex(swiper.realIndex);
+
+  const renderSlide = (item, index) => {
+    const isActive = index === activeIndex;
+    return (
+      <SwiperSlide key={item.event.id} className="events-home-rail-slide">
+        {item.kind === "live" ? (
+          <LivePosterCard
+            event={item.event}
+            copy={copy}
+            isActive={isActive}
+            allowAutoPreview={coverflowOn}
+          />
+        ) : (
+          <UpcomingPosterCard
+            event={item.event}
+            language={language}
+            copy={copy}
+            isActive={isActive}
+          />
+        )}
+      </SwiperSlide>
+    );
+  };
 
   return (
     <section
@@ -115,7 +146,7 @@ export function EventsHomeRail({
           grabCursor
           centeredSlides
           slidesPerView="auto"
-          loop={items.length > 3}
+          loop={useLoop}
           keyboard={{ enabled: true }}
           coverflowEffect={{
             rotate: 35,
@@ -126,6 +157,8 @@ export function EventsHomeRail({
           }}
           pagination={{ clickable: true }}
           navigation
+          onSwiper={handleActive}
+          onSlideChange={handleActive}
           a11y={{
             prevSlideMessage: copy?.prevAria,
             nextSlideMessage: copy?.nextAria,
@@ -133,15 +166,7 @@ export function EventsHomeRail({
           }}
           modules={[EffectCoverflow, Pagination, Navigation, Keyboard, A11y]}
         >
-          {items.map((item) => (
-            <SwiperSlide key={item.event.id} className="events-home-rail-slide">
-              {item.kind === "live" ? (
-                <LiveCard event={item.event} copy={copy} />
-              ) : (
-                <UpcomingCard event={item.event} language={language} />
-              )}
-            </SwiperSlide>
-          ))}
+          {items.map(renderSlide)}
         </Swiper>
       ) : (
         <Swiper
@@ -150,10 +175,12 @@ export function EventsHomeRail({
           centeredSlides
           slidesPerView={1.2}
           spaceBetween={16}
-          loop={items.length > 3}
+          loop={useLoop}
           keyboard={{ enabled: true }}
           pagination={{ clickable: true }}
           navigation
+          onSwiper={handleActive}
+          onSlideChange={handleActive}
           a11y={{
             prevSlideMessage: copy?.prevAria,
             nextSlideMessage: copy?.nextAria,
@@ -161,124 +188,126 @@ export function EventsHomeRail({
           }}
           modules={[Pagination, Navigation, Keyboard, A11y]}
         >
-          {items.map((item) => (
-            <SwiperSlide key={item.event.id} className="events-home-rail-slide">
-              {item.kind === "live" ? (
-                <LiveCard event={item.event} copy={copy} />
-              ) : (
-                <UpcomingCard event={item.event} language={language} />
-              )}
-            </SwiperSlide>
-          ))}
+          {items.map(renderSlide)}
         </Swiper>
       )}
     </section>
   );
 }
 
-function LiveCard({ event, copy }) {
-  const startedAt = event?.liveStream?.startedAt;
-  const durationLabel = formatLiveDuration(startedAt, copy);
+function LivePosterCard({ event, copy, isActive, allowAutoPreview }) {
+  const previewUrl =
+    event?.liveStream?.previewEmbedUrl || event?.liveStream?.streamUrl;
+  const durationLabel = formatLiveDuration(event?.liveStream?.startedAt, copy);
   const viewers = event?.liveStream?.viewerCount;
-  const previewUrl = event?.liveStream?.previewEmbedUrl || event?.liveStream?.streamUrl;
-  const [isHovered, setIsHovered] = useState(false);
-  const reduceMotion = useReducedMotion();
-  // Only preview when this slide is the active (centered) one — Swiper
-  // sets aria-hidden="false" on the active slide; we don't depend on
-  // that here, but hover-only on a non-center slide is unlikely
-  // anyway since other slides are rotated out of pointer-reach.
-  const showPreview = isHovered && previewUrl && !reduceMotion;
+  const thumbnailUrl = event?.liveStream?.thumbnailUrl;
+
+  const [showLive, setShowLive] = useState(false);
+  useEffect(() => {
+    if (!isActive || !allowAutoPreview || !previewUrl) {
+      setShowLive(false);
+      return undefined;
+    }
+    const id = setTimeout(() => setShowLive(true), ACTIVE_PREVIEW_DELAY_MS);
+    return () => clearTimeout(id);
+  }, [isActive, allowAutoPreview, previewUrl]);
 
   return (
-    <article
-      className="events-home-rail-card live-events-rail-card"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      <Link href={`/events/${event.id}`} className="live-events-rail-card-link">
-        <div className="live-events-rail-thumb">
-          {event?.liveStream?.thumbnailUrl ? (
+    <article className="events-home-rail-poster-card events-home-rail-poster-card--live">
+      <Link
+        href={`/events/${event.id}`}
+        className="events-home-rail-poster-link"
+        aria-label={event.title}
+      >
+        <div className="events-home-rail-poster">
+          {showLive ? (
+            <iframe
+              className="events-home-rail-poster-iframe"
+              src={previewUrl}
+              title={`${event.title} live preview`}
+              allow="autoplay; encrypted-media"
+              loading="lazy"
+              frameBorder="0"
+            />
+          ) : thumbnailUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={event.liveStream.thumbnailUrl} alt={event.title} loading="lazy" />
+            <img src={thumbnailUrl} alt={event.title} loading="lazy" />
           ) : (
-            <div className="live-events-rail-thumb-fallback" aria-hidden="true">
+            <div className="events-home-rail-poster-fallback" aria-hidden="true">
               <span>श्रमदान</span>
             </div>
           )}
 
-          {showPreview ? (
-            <div className="live-events-rail-preview" aria-hidden="true">
-              <iframe
-                src={previewUrl}
-                title={`${event.title} live preview`}
-                allow="autoplay; encrypted-media"
-                loading="lazy"
-                frameBorder="0"
-              />
+          <div className="events-home-rail-poster-overlay">
+            <div className="events-home-rail-poster-top">
+              <span className="events-home-rail-poster-badge events-home-rail-poster-badge--live">
+                <span className="live-dot" aria-hidden="true" />
+                {copy?.liveBadge || "LIVE"}
+              </span>
+              {Number.isFinite(viewers) ? (
+                <span className="events-home-rail-poster-badge events-home-rail-poster-badge--meta">
+                  <EyeOutlined aria-hidden="true" /> {viewers.toLocaleString()}
+                </span>
+              ) : null}
             </div>
-          ) : null}
-
-          <span className="live-events-rail-badge">
-            <span className="live-dot" aria-hidden="true" />
-            {copy?.liveBadge || "LIVE"}
-          </span>
-          {durationLabel ? (
-            <span className="live-events-rail-duration">{durationLabel}</span>
-          ) : null}
-        </div>
-        <div className="live-events-rail-meta">
-          <h3>{event.title}</h3>
-          {event.addressText ? <p>{event.addressText}</p> : null}
-          {Number.isFinite(viewers) ? (
-            <p className="live-events-rail-viewers">
-              {copy?.viewersPrefix || ""}
-              {viewers.toLocaleString()}
-              {copy?.viewersSuffix || " watching"}
-            </p>
-          ) : null}
+            <div className="events-home-rail-poster-bottom">
+              <h3>{event.title}</h3>
+              {durationLabel ? <p>{durationLabel}</p> : null}
+            </div>
+          </div>
         </div>
       </Link>
     </article>
   );
 }
 
-function UpcomingCard({ event, language }) {
+function UpcomingPosterCard({ event, language, copy, isActive }) {
   const roleCount = Array.isArray(event?.rolesNeeded) ? event.rolesNeeded.length : 0;
+  const dateLabel = formatScheduledPill(event.scheduledAt, language);
+  const rolesLabel =
+    roleCount > 0
+      ? language === "np"
+        ? `${localizeDigits(roleCount, "np")} भूमिका`
+        : `${roleCount} role${roleCount === 1 ? "" : "s"}`
+      : null;
+  // copy intentionally unused for upcoming variant — kept to keep both
+  // card signatures parallel, helps when iterating later.
+  void copy;
+  void isActive;
 
   return (
-    <article className="events-home-rail-card live-events-rail-card">
-      <Link href={`/events/${event.id}`} className="live-events-rail-card-link">
-        <div className="live-events-rail-thumb">
+    <article className="events-home-rail-poster-card events-home-rail-poster-card--upcoming">
+      <Link
+        href={`/events/${event.id}`}
+        className="events-home-rail-poster-link"
+        aria-label={event.title}
+      >
+        <div className="events-home-rail-poster">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={event.thumbnailUrl || "/images/event-types/cleanup.jpg"}
             alt={event.title}
             loading="lazy"
           />
-          <span className="events-home-rail-scheduled-badge">
-            <CalendarOutlined aria-hidden="true" />{" "}
-            {formatScheduledPill(event.scheduledAt, language)}
-          </span>
-        </div>
-        <div className="live-events-rail-meta">
-          <h3>{event.title}</h3>
-          {event.addressText ? (
-            <p>
-              <EnvironmentOutlined aria-hidden="true" /> {event.addressText}
-            </p>
-          ) : null}
-          {event.leaderName ? (
-            <p className="events-home-rail-leader">
-              <TeamOutlined aria-hidden="true" /> {event.leaderName}
-            </p>
-          ) : null}
-          {roleCount > 0 ? (
-            <p className="events-home-rail-roles">
-              {language === "np"
-                ? `${localizeDigits(roleCount, "np")} भूमिका खुला`
-                : `${roleCount} role${roleCount === 1 ? "" : "s"} open`}
-            </p>
-          ) : null}
+
+          <div className="events-home-rail-poster-overlay">
+            <div className="events-home-rail-poster-top">
+              {dateLabel ? (
+                <span className="events-home-rail-poster-badge events-home-rail-poster-badge--date">
+                  <CalendarOutlined aria-hidden="true" /> {dateLabel}
+                </span>
+              ) : null}
+              {rolesLabel ? (
+                <span className="events-home-rail-poster-badge events-home-rail-poster-badge--meta">
+                  <TeamOutlined aria-hidden="true" /> {rolesLabel}
+                </span>
+              ) : null}
+            </div>
+            <div className="events-home-rail-poster-bottom">
+              <h3>{event.title}</h3>
+              {event.addressText ? <p>{event.addressText}</p> : null}
+            </div>
+          </div>
         </div>
       </Link>
     </article>
