@@ -18,7 +18,7 @@ import {
 } from "@ant-design/icons";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const COPY = {
   np: {
@@ -41,6 +41,7 @@ export function QuickActionFab({ language = "np" }) {
   const t = COPY[language] || COPY.np;
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const containerRef = useRef(null);
 
   // Close menu on route change.
   useEffect(() => {
@@ -57,6 +58,18 @@ export function QuickActionFab({ language = "np" }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
+  // Close on click outside the fab.
+  useEffect(() => {
+    if (!open) return undefined;
+    const onPointerDown = (e) => {
+      if (containerRef.current && !containerRef.current.contains(e.target)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => document.removeEventListener("pointerdown", onPointerDown);
+  }, [open]);
+
   if (pathname && HIDDEN_PREFIXES.some((p) => pathname.startsWith(p))) {
     return null;
   }
@@ -68,7 +81,7 @@ export function QuickActionFab({ language = "np" }) {
   ];
 
   return (
-    <div className={`quick-fab${open ? " is-open" : ""}`}>
+    <div ref={containerRef} className={`quick-fab${open ? " is-open" : ""}`}>
       {open ? (
         <div className="quick-fab-menu" role="menu">
           {actions.map(({ href, label, Icon, accent }) => (
