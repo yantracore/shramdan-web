@@ -91,6 +91,10 @@ When you (the coding agent) are working in this repo:
 
 - [x] P2 [from 2.1] Phone + OTP membership UI flow — effort:S ← done: 2026-06-02 *(new `/signup` page: 3-state machine (phone → otp → done), Nepali mobile validation, 6-digit OTP input, dev-dummy success path with ~500ms simulated delay; explicit "Dev mode" hint. Backend endpoints `/auth/otp/send` + `/auth/otp/verify` not wired yet — swap-ready. `/login` page links to it via a dashed accent-tinted CTA.)*
 
+## Phase 8 — Notifications (UI-only, pre-backend)
+
+- [x] P2 [from 8] Topbar notifications bell + dev-dummy inbox — effort:S ← done: 2026-06-02 *(new `NotificationsBell` + 5 sample notifications in `devMockData` covering vote / schedule / result / live / welcome kinds, each kind-tinted circular icon. Badge count localizes to Devanagari digits when language=np; "Mark all read" + per-item read-toggle in local state; backend swap-ready via getJson("/notifications").)*
+
 ## Phase 11 — Cross-cutting
 
 - [ ] P2 [from 11.1] `AdminResponsiveList`: column-visibility toggle — effort:S
