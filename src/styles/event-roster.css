@@ -45,7 +45,21 @@
 .event-roster-row-meta {
   display: flex;
   flex-direction: column;
+  gap: 6px;
+}
+
+.event-roster-row-title {
+  display: flex;
+  flex-direction: column;
   gap: 4px;
+}
+
+.event-roster-role-description {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--muted);
+  max-width: 32ch;
 }
 
 .event-roster-role {
@@ -347,6 +361,77 @@
   color: var(--muted);
   max-width: 64ch;
   line-height: 1.55;
+}
+
+.events-filter-pills {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: 22px 0 4px;
+  padding: 6px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  width: max-content;
+  max-width: 100%;
+  box-shadow: var(--shadow-1);
+}
+
+.events-filter-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+  font-size: 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.events-filter-pill:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.events-filter-pill:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.events-filter-pill.is-active {
+  background: var(--primary);
+  color: #fff;
+}
+
+.events-filter-pill-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.08);
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.events-filter-pill.is-active .events-filter-pill-count {
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+}
+
+:root[data-theme="dark"] .events-filter-pill:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+:root[data-theme="dark"] .events-filter-pill-count {
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .events-section {

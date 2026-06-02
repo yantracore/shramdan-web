@@ -41,6 +41,15 @@ const COPY = {
       SAFETY_LEAD: "सुरक्षा प्रमुख",
       COORDINATOR: "संयोजक",
       LOGISTICS: "लजिस्टिक्स"
+    },
+    roleDescriptions: {
+      WORKER: "फोहोर सङ्कलन, छँटाइ र भौतिक मेहनतको काम।",
+      PHOTOGRAPHER: "अघि–पछिको तस्बिर र सहभागिताको क्षण कैद।",
+      LIVESTREAMER: "युट्युब लाइभ सञ्चालन, क्यामेरा र audio सेटअप।",
+      MEDIC: "साना चोटपटक, पानी–छाया र प्राथमिक उपचार।",
+      SAFETY_LEAD: "सडक–ट्राफिक सुरक्षा र खतरनाक स्थल पहिचान।",
+      COORDINATOR: "टोली सञ्चालन, समय व्यवस्था र स्थानीय समन्वय।",
+      LOGISTICS: "औजार, पानी, झोला र खाजा व्यवस्था।"
     }
   },
   en: {
@@ -57,6 +66,15 @@ const COPY = {
       SAFETY_LEAD: "Safety Lead",
       COORDINATOR: "Coordinator",
       LOGISTICS: "Logistics"
+    },
+    roleDescriptions: {
+      WORKER: "Trash collection, sorting, and physical labour.",
+      PHOTOGRAPHER: "Before/after photos, capturing participation moments.",
+      LIVESTREAMER: "Run YouTube Live, camera and audio setup.",
+      MEDIC: "Minor injuries, hydration, basic first aid.",
+      SAFETY_LEAD: "Traffic safety and hazard scouting.",
+      COORDINATOR: "Team flow, timing, and local coordination.",
+      LOGISTICS: "Tools, water, bags, and refreshments."
     }
   }
 };
@@ -76,15 +94,22 @@ export function EventRosterPanel({ rolesNeeded, language = "np", eventId }) {
         {rolesNeeded.map((row) => (
           <li key={row.role} className="event-roster-row">
             <div className="event-roster-row-meta">
-              <span
-                className="event-roster-role"
-                style={{ "--role-color": ROLE_COLORS[row.role] || "#176b5c" }}
-              >
-                {t.roles[row.role] || row.role}
-              </span>
-              <span className="event-roster-count">
-                {t.filledOf.replace("{filled}", row.filled).replace("{count}", row.count)}
-              </span>
+              <div className="event-roster-row-title">
+                <span
+                  className="event-roster-role"
+                  style={{ "--role-color": ROLE_COLORS[row.role] || "#176b5c" }}
+                >
+                  {t.roles[row.role] || row.role}
+                </span>
+                <span className="event-roster-count">
+                  {t.filledOf.replace("{filled}", row.filled).replace("{count}", row.count)}
+                </span>
+              </div>
+              {t.roleDescriptions[row.role] ? (
+                <p className="event-roster-role-description">
+                  {t.roleDescriptions[row.role]}
+                </p>
+              ) : null}
             </div>
             <div className="event-roster-chips">
               {row.filledNames?.map((name, i) => (

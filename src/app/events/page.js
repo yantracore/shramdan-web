@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { CalendarOutlined, ClockCircleOutlined, EnvironmentOutlined, TeamOutlined } from "@ant-design/icons";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
@@ -48,6 +48,13 @@ const PAGE_COPY = {
       participants: "सहभागी",
       durationMin: "{n} मिनेट",
       view: "विवरण हेर्नुहोस्"
+    },
+    filters: {
+      ariaLabel: "अभियान फिल्टर",
+      all: "सबै",
+      live: "लाइभ",
+      upcoming: "आउँदै",
+      past: "सम्पन्न"
     }
   },
   en: {
@@ -80,6 +87,13 @@ const PAGE_COPY = {
       participants: "participants",
       durationMin: "{n} min",
       view: "View detail"
+    },
+    filters: {
+      ariaLabel: "Filter campaigns",
+      all: "All",
+      live: "Live",
+      upcoming: "Upcoming",
+      past: "Past"
     }
   }
 };
@@ -238,10 +252,22 @@ function Section({ section, children, isEmpty, emptyText }) {
 export default function EventsListPage() {
   const { language } = usePreferences();
   const t = PAGE_COPY[language] || PAGE_COPY.np;
+  const [filter, setFilter] = useState("all");
 
   const live = useMemo(() => getDemoLiveEvents(), []);
   const upcoming = useMemo(() => getDemoUpcomingEvents(), []);
   const past = useMemo(() => getDemoPastEvents(), []);
+
+  const filterOptions = [
+    { key: "all", label: t.filters.all, count: live.length + upcoming.length + past.length },
+    { key: "live", label: t.filters.live, count: live.length },
+    { key: "upcoming", label: t.filters.upcoming, count: upcoming.length },
+    { key: "past", label: t.filters.past, count: past.length }
+  ];
+
+  const showLive = filter === "all" || filter === "live";
+  const showUpcoming = filter === "all" || filter === "upcoming";
+  const showPast = filter === "all" || filter === "past";
 
   return (
     <SiteShell pageTitle={t.pageTitle}>
@@ -252,23 +278,54 @@ export default function EventsListPage() {
           <p>{t.intro}</p>
         </header>
 
-        <Section section={t.sections.live} isEmpty={live.length === 0} emptyText={t.sections.live.empty}>
-          {live.map((event) => (
-            <LiveCard key={event.id} event={event} t={t} language={language} />
-          ))}
-        </Section>
+        <div
+          className="events-filter-pills"
+          role="tablist"
+          aria-label={t.filters.ariaLabel}
+        >
+          {filterOptions.map((option) => {
+            const isActive = filter === option.key;
+            return (
+              <button
+                key={option.key}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                className={`events-filter-pill${isActive ? " is-active" : ""}`}
+                onClick={() => setFilter(option.key)}
+              >
+                <span className="events-filter-pill-label">{option.label}</span>
+                <span className="events-filter-pill-count">
+                  {localizeDigits(option.count, language)}
+                </span>
+              </button>
+            );
+          })}
+        </div>
 
-        <Section section={t.sections.upcoming} isEmpty={upcoming.length === 0} emptyText={t.sections.upcoming.empty}>
-          {upcoming.map((event) => (
-            <UpcomingCard key={event.id} event={event} t={t} language={language} />
-          ))}
-        </Section>
+        {showLive ? (
+          <Section section={t.sections.live} isEmpty={live.length === 0} emptyText={t.sections.live.empty}>
+            {live.map((event) => (
+              <LiveCard key={event.id} event={event} t={t} language={language} />
+            ))}
+          </Section>
+        ) : null}
 
-        <Section section={t.sections.past} isEmpty={past.length === 0} emptyText={t.sections.past.empty}>
-          {past.map((event) => (
-            <PastCard key={event.id} event={event} t={t} language={language} />
-          ))}
-        </Section>
+        {showUpcoming ? (
+          <Section section={t.sections.upcoming} isEmpty={upcoming.length === 0} emptyText={t.sections.upcoming.empty}>
+            {upcoming.map((event) => (
+              <UpcomingCard key={event.id} event={event} t={t} language={language} />
+            ))}
+          </Section>
+        ) : null}
+
+        {showPast ? (
+          <Section section={t.sections.past} isEmpty={past.length === 0} emptyText={t.sections.past.empty}>
+            {past.map((event) => (
+              <PastCard key={event.id} event={event} t={t} language={language} />
+            ))}
+          </Section>
+        ) : null}
       </article>
     </SiteShell>
   );
