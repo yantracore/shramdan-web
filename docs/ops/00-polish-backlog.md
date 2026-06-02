@@ -122,6 +122,13 @@ When you (the coding agent) are working in this repo:
 - [x] P2 [from 11] First-visit onboarding spotlight modal — effort:S ← done: 2026-06-02 *(localStorage-gated; 3 step rows; primary + secondary CTA + skip)*
 - [x] P2 [from 1.2] Emoji reactions row on /issues/[id] — effort:S ← done: 2026-06-02 *(5 reactions with seeded counts + per-issue localStorage picks)*
 - [x] P2 [from 12] `/resources` directory page — effort:M ← done: 2026-06-02 *(4 sections × 3 tiles, kind-tinted icons, bilingual; placeholder hrefs swap-ready)*
+- [x] P2 [from 1.1] Demo public issues registry + `getDemoIssueById` — effort:S ← done: 2026-06-02 *(/me/saved now resolves saved ids to titles + addresses; sparkline + future surfaces lean on it)*
+- [x] P3 [from 1.2] Vote-history sparkline on /issues/[id] — effort:S ← done: 2026-06-02 *(SVG path + area gradient + accent endpoint dot + "+N supports" delta)*
+- [x] P3 [from 11] EmptyState component with 3 inline SVGs — effort:S ← done: 2026-06-02 *(no-results / no-saved / no-events kinds; currentColor flexes to primary/accent)*
+- [x] P2 [from 13] City filter on /events list — effort:S ← done: 2026-06-02 *(Select next to the status filter, URL-synced as `?city=`)*
+- [x] P2 [from 7] `/stories` long-form narrative cards — effort:M ← done: 2026-06-02 *(alternating cover/body layout; counter prefix; testimonial blockquotes pulled from past-event mock data)*
+- [x] P3 [from 0.7] Accent color picker — effort:S ← done: 2026-06-02 *(5 presets in providers.js; round swatch row in Settings; live-tinted via --accent on documentElement)*
+- [x] P2 [from 12] PDF / print export of event detail — effort:S ← done: 2026-06-02 *(window.print() + @media print rule that hides all chrome; PrintButton paired with the back link)*
 
 ## Phase 11 — Cross-cutting
 
