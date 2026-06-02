@@ -1823,7 +1823,7 @@
 /* --- Home pulse row (activity ticker + live online) ------------------ */
 .home-pulse-row {
   width: min(1180px, calc(100% - 32px));
-  margin: 0 auto 12px;
+  margin: 12px auto;
   display: flex;
   align-items: center;
   gap: 12px;
