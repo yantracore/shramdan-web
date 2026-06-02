@@ -1,8 +1,8 @@
 # Shramdan Image Handoff
 
-Copy-pasteable spec for generating the placeholder-replacement images. Three tiers — start with Tier 1, work down if time permits.
+> ⚠️ **2026-06-02 reset.** The Tier 1 sections of this doc were written on a faulty assumption that `event-types/`, `homepage/cleanup-areas/`, and `homepage/core-idea/` were placeholder-only. They were not — all three folders had real, intentionally-shipped images already (May 14 / May 27 / May 29 commits by the project owner). A regeneration round was started and reverted; **do not regenerate Tier 1**. Only Tier 2 and Tier 3 are genuinely needed.
 
-Save every output as the exact file path listed (overwrite the current placeholder). Next.js picks them up automatically — no code change required.
+Copy-pasteable spec for image-generation work. Save every output at the exact file path listed. Next.js picks them up automatically — no code change required.
 
 ---
 
@@ -17,13 +17,17 @@ Save every output as the exact file path listed (overwrite the current placehold
 
 ---
 
-## Tier 1 — Replace existing placeholders (19 images)
+## Tier 1 — ❌ DO NOT RUN
 
-These ship paths are already wired into the live UI. Replacing them upgrades the site instantly.
+The Tier 1 sections (1A event types, 1B cleanup areas, 1C core-idea) were authored on the false premise that those paths held placeholders. They hold real, shipped images already. Regeneration is a net loss (larger file sizes, marginal-at-best visual change).
 
-### 1A. Event types (8 photos) — ✅ DONE 2026-06-02
+- **1A** — `public/images/event-types/*.jpg` (8 files) — real images committed in `61b29e1` on 2026-05-29. Regenerated in `1b06d71` and reverted in the next commit.
+- **1B** — `public/images/homepage/cleanup-areas/*.jpg` (6 files) — real images committed by 2026-05-27 (refresh `cf3b59d`). Do not regenerate.
+- **1C** — `public/images/homepage/core-idea/*.png` (5 files) — real images committed by 2026-05-14. Do not regenerate.
 
-Shipped in commit `1b06d71`. All 8 files render correctly on `/event-types` and `/event-types/[id]`. Skip this section.
+The original prompts and specs are preserved below for reference only — they describe the existing images, not work to do.
+
+### 1A. Event types (8 photos) — ✅ already shipped, do not touch
 
 **Spec:** 3:2 landscape, 1200×800 px, JPG, ~150–250 KB target. Photographic. Save under `public/images/event-types/`.
 
@@ -38,7 +42,7 @@ Shipped in commit `1b06d71`. All 8 files render correctly on `/event-types` and 
 | `public/images/event-types/seasonal.jpg` | Nepali volunteers distributing blankets, warm clothes, or cool drinking water to community members during seasonal extreme weather in Nepal — winter Terai cold-wave with blankets and a small fire, or summer heat-wave with water distribution, compassionate scene. |
 | `public/images/event-types/disaster.jpg` | Nepali community emergency response volunteers in high-visibility vests coordinating after an earthquake, flood, or landslide in Nepal — distributing relief supplies, search and rescue activity with ropes and stretchers, damaged buildings or muddy terrain in background, serious yet hopeful tone. |
 
-### 1B. Homepage cleanup-areas grid (6 photos)
+### 1B. Homepage cleanup-areas grid (6 photos) — ✅ already shipped, do not touch
 
 **Spec:** 3:2 landscape, 1200×800 px, JPG, ~150–250 KB. Photographic. Save under `public/images/homepage/cleanup-areas/`.
 
@@ -51,7 +55,7 @@ Shipped in commit `1b06d71`. All 8 files render correctly on `/event-types` and 
 | `public/images/homepage/cleanup-areas/parks.jpg` | Nepali volunteers tidying a small neighbourhood park or public square in Nepal — picking up litter, sweeping, a couple of children helping nearby, benches and trees visible, a calm warm morning. |
 | `public/images/homepage/cleanup-areas/nature-trails.jpg` | Nepali hikers turned volunteers cleaning a forested nature trail in the Kathmandu Valley foothills (e.g. Shivapuri or Chandragiri), collecting plastic and snack wrappers into sacks, narrow stone trail and rhododendron forest around, dappled morning light. |
 
-### 1C. Homepage core-idea workflow (5 illustrations)
+### 1C. Homepage core-idea workflow (5 illustrations) — ✅ already shipped, do not touch
 
 These are **diagrammatic illustrations, not photos.** They live in the "5-step how it works" panel. Style should match each other as a set — same colour palette, same line weight, same character/iconography.
 
