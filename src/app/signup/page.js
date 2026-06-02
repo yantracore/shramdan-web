@@ -18,6 +18,7 @@ import { Button, Input } from "antd";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { usePreferences } from "@/app/providers";
+import { ConfettiBurst } from "@/components/ConfettiBurst";
 import { SiteShell } from "@/components/SiteShell";
 
 const COPY = {
@@ -222,6 +223,7 @@ export default function SignupPage() {
 
         {step === "done" ? (
           <article className="content-card signup-card signup-card-done" role="status">
+            <ConfettiBurst />
             <span className="signup-seal" aria-hidden="true">
               <CheckCircleFilled />
             </span>

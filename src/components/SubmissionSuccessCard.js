@@ -13,6 +13,7 @@
 import { CheckCircleFilled, CopyOutlined } from "@ant-design/icons";
 import { useState } from "react";
 import { FaFacebookF, FaTelegram, FaWhatsapp, FaXTwitter } from "react-icons/fa6";
+import { ConfettiBurst } from "@/components/ConfettiBurst";
 
 const COPY = {
   np: {
@@ -69,6 +70,7 @@ export function SubmissionSuccessCard({
 
   return (
     <article className="submission-success-card" role="status">
+      <ConfettiBurst />
       <div className="submission-success-seal" aria-hidden="true">
         <CheckCircleFilled />
       </div>
