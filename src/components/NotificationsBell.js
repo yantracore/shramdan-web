@@ -45,6 +45,7 @@ const COPY = {
     heading: "सूचनाहरू",
     empty: "कुनै नयाँ सूचना छैन।",
     markAll: "सबै पढिएको",
+    viewAll: "सबै हेर्नुहोस्",
     minutesAgo: "{n} मि. अघि",
     hoursAgo: "{n} घण्टा अघि",
     daysAgo: "{n} दिन अघि",
@@ -55,6 +56,7 @@ const COPY = {
     heading: "Notifications",
     empty: "No new notifications.",
     markAll: "Mark all read",
+    viewAll: "View all",
     minutesAgo: "{n} min ago",
     hoursAgo: "{n} h ago",
     daysAgo: "{n} d ago",
@@ -142,6 +144,15 @@ export function NotificationsBell({ language = "np" }) {
           );
         })}
       </ul>
+      <footer className="notifications-panel-footer">
+        <Link
+          href="/me/notifications"
+          className="notifications-panel-view-all"
+          onClick={() => setOpen(false)}
+        >
+          {t.viewAll} →
+        </Link>
+      </footer>
     </div>
   );
 
