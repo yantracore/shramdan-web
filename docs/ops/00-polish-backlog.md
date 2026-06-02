@@ -129,6 +129,11 @@ When you (the coding agent) are working in this repo:
 - [x] P2 [from 7] `/stories` long-form narrative cards — effort:M ← done: 2026-06-02 *(alternating cover/body layout; counter prefix; testimonial blockquotes pulled from past-event mock data)*
 - [x] P3 [from 0.7] Accent color picker — effort:S ← done: 2026-06-02 *(5 presets in providers.js; round swatch row in Settings; live-tinted via --accent on documentElement)*
 - [x] P2 [from 12] PDF / print export of event detail — effort:S ← done: 2026-06-02 *(window.print() + @media print rule that hides all chrome; PrintButton paired with the back link)*
+- [x] P2 [from 10] Mobile bottom tab bar at ≤720px — effort:S ← done: 2026-06-02 *(5 slots: Home/Issues/Events/Me/More; the More tab opens the existing hamburger menu via ref)*
+- [x] P2 [from 2] `/me/applications` dummy contribution applications list — effort:S ← done: 2026-06-02 *(3 demo apps with mixed statuses + decision notes)*
+- [x] P2 [from 14] `/changelog` vertical release-notes timeline — effort:S ← done: 2026-06-02 *(5 hand-curated entries, added/improved/fixed groups, NP + EN)*
+- [x] P3 [from 11] Recently viewed strip on homepage + useTrackVisit on detail pages — effort:S ← done: 2026-06-02 *(localStorage stack, up to 6 entries, useSyncExternalStore for cross-component sync)*
+- [x] P3 [from 1.1] NearMeFilter — geolocation proximity sort on /issues — effort:S ← done: 2026-06-02 *(haversine sort over current page; opt-in browser geolocation prompt)*
 
 ## Phase 11 — Cross-cutting
 
