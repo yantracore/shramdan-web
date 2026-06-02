@@ -16,6 +16,7 @@ import { IssueShareRow } from "@/components/IssueShareRow";
 import { IssueStatusTimeline } from "@/components/IssueStatusTimeline";
 import { IssueVoteButton } from "@/components/IssueVoteButton";
 import { IssueComments } from "@/components/IssueComments";
+import { IssueReactions } from "@/components/IssueReactions";
 import { PublicIssueCard, formatSupporters } from "@/components/PublicIssueCard";
 import { ScrollProgressBar } from "@/components/ScrollProgressBar";
 import { SiteShell } from "@/components/SiteShell";
@@ -312,6 +313,12 @@ export default function IssueDetailPage() {
                 issue={issue}
                 content={content}
                 language={language}
+              />
+
+              <IssueReactions
+                issueId={issue.id}
+                language={language}
+                heading={language === "np" ? "तपाईंको प्रतिक्रिया" : "Your reaction"}
               />
 
               <IssueComments issueId={issue.id} language={language} />
