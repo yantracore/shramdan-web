@@ -97,8 +97,13 @@
   --swiper-pagination-bullet-horizontal-gap: 6px;
 }
 
+/* The rail (and ONLY the rail — header still respects the page's
+ * 1180px container) expands to the viewport edges, capped at 1920px
+ * on ultra-wide displays. With slidesPerView=3 this gives the center
+ * card a comfortable size on standard desktop screens (≈480px at
+ * 1440 viewport, ≈610px at 1920 viewport). */
 .events-home-rail-swiper {
-  width: min(1180px, calc(100% - 32px));
+  width: min(1920px, calc(100% - 32px));
   margin: 0 auto;
   padding-block: 56px 24px; /* room for tilted side slides + pagination */
   /* Clip to the rail width — only the active slide + the two adjacent
@@ -112,9 +117,10 @@
  * NOT set here — Swiper controls it via the `slidesPerView` breakpoints
  * declared in EventsHomeRail.js, so exactly 3 cards fit on desktop,
  * 2 on tablet, 1.2 on mobile (the .2 peek hints at swipeability).
- * See DESIGN CONTRACT in EventsHomeRail.js. */
+ * Height ceiling scales to 560px so wide-viewport cards don't end up
+ * abnormally landscape. See DESIGN CONTRACT in EventsHomeRail.js. */
 .events-home-rail-swiper .events-home-rail-slide.swiper-slide {
-  height: clamp(280px, 32vw, 460px) !important;
+  height: clamp(280px, 30vw, 560px) !important;
 }
 
 /* --- Netflix-poster card -------------------------------------------- */
