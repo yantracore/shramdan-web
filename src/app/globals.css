@@ -6,6 +6,7 @@
 @import "../styles/live-events-rail.css";
 @import "../styles/intro.css";
 @import "../styles/event-roster.css";
+@import "../styles/events-split-view.css";
 
 :root {
   color-scheme: light;
