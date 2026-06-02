@@ -6,10 +6,16 @@
 // since we have no per-id mock, we render simple link rows with the
 // issue id and a "remove" affordance.
 
-import { ArrowRightOutlined, HeartFilled, HeartOutlined } from "@ant-design/icons";
+import {
+  ArrowRightOutlined,
+  EnvironmentOutlined,
+  HeartFilled
+} from "@ant-design/icons";
 import Link from "next/link";
+import { EmptyState } from "@/components/EmptyState";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
+import { getDemoIssueById } from "@/lib/devMockData";
 import { useSavedIssues } from "@/lib/useSavedIssues";
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
@@ -71,39 +77,45 @@ export default function MeSavedPage() {
         </header>
 
         {ids.length === 0 ? (
-          <article className="saved-empty content-card">
-            <span aria-hidden="true" className="saved-empty-heart">
-              <HeartOutlined />
-            </span>
-            <p>{t.empty}</p>
-            <Link href="/issues" className="saved-empty-cta">
-              {t.browseLink} <ArrowRightOutlined />
-            </Link>
-          </article>
+          <EmptyState
+            kind="no-saved"
+            title={t.empty}
+            cta={{ label: t.browseLink, href: "/issues" }}
+          />
         ) : (
           <ul className="saved-list">
-            {ids.map((id) => (
-              <li key={id} className="saved-row">
-                <Link href={`/issues/${id}`} className="saved-row-link">
-                  <span className="saved-row-label">{t.issueLabel}</span>
-                  <strong>{id}</strong>
-                </Link>
-                <div className="saved-row-actions">
-                  <Link href={`/issues/${id}`} className="saved-row-view">
-                    {t.viewLabel} <ArrowRightOutlined />
+            {ids.map((id) => {
+              const meta = getDemoIssueById(id);
+              return (
+                <li key={id} className="saved-row">
+                  <Link href={`/issues/${id}`} className="saved-row-link">
+                    <span className="saved-row-label">{t.issueLabel}</span>
+                    <strong className="saved-row-title">
+                      {meta?.title || id}
+                    </strong>
+                    {meta?.addressText ? (
+                      <span className="saved-row-address">
+                        <EnvironmentOutlined aria-hidden="true" /> {meta.addressText}
+                      </span>
+                    ) : null}
                   </Link>
-                  <button
-                    type="button"
-                    className="saved-row-remove"
-                    onClick={() => toggle(id)}
-                    aria-label={t.removeLabel}
-                    title={t.removeLabel}
-                  >
-                    <HeartFilled />
-                  </button>
-                </div>
-              </li>
-            ))}
+                  <div className="saved-row-actions">
+                    <Link href={`/issues/${id}`} className="saved-row-view">
+                      {t.viewLabel} <ArrowRightOutlined />
+                    </Link>
+                    <button
+                      type="button"
+                      className="saved-row-remove"
+                      onClick={() => toggle(id)}
+                      aria-label={t.removeLabel}
+                      title={t.removeLabel}
+                    >
+                      <HeartFilled />
+                    </button>
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         )}
       </section>

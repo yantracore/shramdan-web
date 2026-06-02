@@ -930,6 +930,81 @@ function minutesAgoIso(min) {
   return new Date(Date.now() - min * 60_000).toISOString();
 }
 
+// --- Public demo issues registry ------------------------------------
+// A tiny set of "real-looking" issues whose IDs can be saved/bookmarked
+// from the homepage cards or referenced in deep links. getDemoIssueById
+// also reaches into the linkedIssue blobs on each demo past/upcoming/live
+// event so /me/saved can resolve any id the user has interacted with.
+const DEMO_PUBLIC_ISSUES = [
+  {
+    id: "demo-issue-bagmati-1",
+    title: "बागमती नदी किनार अव्यवस्थित फोहोर",
+    addressText: "तीनकुने पुल, ललितपुर",
+    category: "cleanup",
+    status: "EVENT_SCHEDULED",
+    voteCount: 73,
+    latitude: 27.6749,
+    longitude: 85.3491
+  },
+  {
+    id: "demo-issue-lakeside-1",
+    title: "लेकसाइड किनारको प्लास्टिक",
+    addressText: "Lakeside, Pokhara",
+    category: "cleanup",
+    status: "OPEN",
+    voteCount: 41,
+    latitude: 28.213,
+    longitude: 83.957
+  },
+  {
+    id: "demo-issue-shivapuri-1",
+    title: "शिवपुरी ट्रेल मर्मत आवश्यक",
+    addressText: "शिवपुरी निकुञ्ज, बुढानीलकण्ठ",
+    category: "trail",
+    status: "OPEN",
+    voteCount: 58,
+    latitude: 27.7717,
+    longitude: 85.3654
+  }
+];
+
+export function getDemoPublicIssues() {
+  if (!isDev()) return [];
+  return DEMO_PUBLIC_ISSUES;
+}
+
+export function getDemoIssueById(id) {
+  if (!isDev() || !id) return null;
+  const direct = DEMO_PUBLIC_ISSUES.find((i) => i.id === id);
+  if (direct) return direct;
+  const pools = [DEMO_LIVE_EVENTS, DEMO_UPCOMING_EVENTS, DEMO_PAST_EVENTS];
+  for (const pool of pools) {
+    for (const event of pool) {
+      if (event.linkedIssue?.id === id) return event.linkedIssue;
+    }
+  }
+  return null;
+}
+
+// Vote-count history mini-trend (8 data points). Used by the sparkline
+// on /issues/[id]. Deterministic from issue id so the curve doesn't
+// twitch between renders.
+export function getDemoVoteHistory(issueId) {
+  if (!isDev()) return [];
+  let h = 0;
+  const s = String(issueId || "");
+  for (let i = 0; i < s.length; i += 1) {
+    h = (h * 31 + s.charCodeAt(i)) | 0;
+  }
+  const abs = Math.abs(h);
+  const points = [];
+  for (let i = 0; i < 8; i += 1) {
+    const base = ((abs >> (i % 16)) & 31) + i * 3;
+    points.push(Math.max(1, base));
+  }
+  return points;
+}
+
 export function getDemoIssueComments(issueId) {
   if (!isDev()) return [];
   const h = hashStringToInt(issueId);
