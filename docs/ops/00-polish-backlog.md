@@ -70,13 +70,14 @@ When you (the coding agent) are working in this repo:
 
 ## Phase 1 — Public Issue Discovery & Voting
 
-- [ ] P1 [from 1.1] Skeleton loader on `/issues` list (currently just `<Spin />`) — effort:S
-- [ ] P1 [from 1.1] Pagination / load-more beyond the initial 50 — effort:M
+- [x] P1 [from 1.1] Skeleton loader on `/issues` list (currently just `<Spin />`) — effort:S ← done: 2026-06-02 *(`PublicIssueCardSkeleton` shimmer cards render inside a `role="status"` container while issues are loading; verified during light-mode a11y sweep)*
+- [x] P1 [from 1.1] Pagination / load-more beyond the initial 50 — effort:M ← done: 2026-06-02 *(`public-issues-pagination` nav with prev/next + numbered page buttons is in `/issues/page.js`; bilingual aria labels)*
 - [ ] P2 [from 1.1.2] Persist filters in URL query params (shareable filtered views) — effort:S
 - [ ] P3 [from 1.1] Map-preview thumbnail on issue cards — effort:M
 - [ ] P2 [from 1.2.1] Lightbox / fullscreen for the evidence gallery — effort:S
 - [ ] P2 [from 1.2.3] Related-issues ranking weighted by geo-distance, not category alone — effort:M
 - [ ] P3 [from 1.2] Scroll-progress indicator on long issue descriptions — effort:S
+- [x] P1 [from 1.1] Public issue card images had no alt fallback when `issue.title` was null — Next.js Image stripped the empty alt and headings rendered empty — effort:S ← done: 2026-06-02 *(`PublicIssueCard` now uses an `accessibleLabel` fallback chain: title → addressText → categoryLabel → statusLabel; applied to both `<Image alt>` and the `<h3>` link)*
 
 ## Phase 9 — Admin Control Center
 
@@ -89,6 +90,21 @@ When you (the coding agent) are working in this repo:
 ## Phase 11 — Cross-cutting
 
 - [ ] P2 [from 11.1] `AdminResponsiveList`: column-visibility toggle — effort:S
+- [x] P1 [from 11] `StickyActionBar` was tab-reachable while visually hidden — effort:S ← done: 2026-06-02 *(added `tabIndex={visible ? 0 : -1}` to the inner Link and `inert={!visible || undefined}` on the wrapper, including the React 19 boolean-attribute correction)*
+- [x] P1 [from 11] Leaflet `Marker` pins had no accessible name (axe `name-role-value`) — effort:S ← done: 2026-06-02 *(`IssueMap.IssueMarker` now passes `title` + `alt` + `keyboard` derived from `issue.title || issue.addressText || statusLabel`)*
+
+## Phase 13 — Live Events Rail
+
+- [ ] P3 [from 13] Persist `/events` filter pill state in URL query (`?show=live|upcoming|past`) for shareable filtered views — effort:S
+
+## Phase 14 — Live Event Detail
+
+- [x] P2 [from 14] Promote viewer counter from muted inline span to prominent breathing counter + Devanagari digit localization on `EventLiveStreamPlayer` — effort:S ← done: 2026-06-02 *(big accent-coloured eye + clamp(22–30px) tabular-num number with 3.2s breathe; digit transform respects `language=np`; duration also localized; reduced-motion fallback)*
+- [ ] P2 [from 14] `/events/[id]` document title flashes "Event not found" during initial load before the event fetch resolves — effort:S *(title is computed from `eventData?.title` while it's still `undefined`; needs an explicit loading-state fallback in `SiteShell` pageTitle prop)*
+
+## Phase 15 — Event Detail Polish
+
+- [x] P2 [from 15] `EventRosterPanel`: each role row now carries a one-line description under the title so volunteers understand what the role entails before clicking — effort:S ← done: 2026-06-02 *(7 NP + 7 EN descriptions for WORKER/PHOTOGRAPHER/LIVESTREAMER/MEDIC/SAFETY_LEAD/COORDINATOR/LOGISTICS)*
 
 ---
 
