@@ -331,6 +331,10 @@ export const DEMO_PAST_EVENTS = [
       "/images/event-types/cleanup.jpg",
       "/images/event-types/cleanup.jpg"
     ],
+    beforeAfter: {
+      before: "/images/event-types/cleanup.jpg",
+      after: "/images/homepage/cleanup-areas/riverbanks.jpg"
+    },
     testimonials: [
       {
         name: "कमला अधिकारी",
@@ -379,6 +383,10 @@ export const DEMO_PAST_EVENTS = [
       status: "COMPLETED"
     },
     photos: ["/images/event-types/afforestation.jpg", "/images/event-types/afforestation.jpg"],
+    beforeAfter: {
+      before: "/images/homepage/cleanup-areas/empty-lands.jpg",
+      after: "/images/event-types/afforestation.jpg"
+    },
     testimonials: [
       {
         name: "हरि श्रेष्ठ",
@@ -422,6 +430,10 @@ export const DEMO_PAST_EVENTS = [
       status: "COMPLETED"
     },
     photos: ["/images/event-types/infrastructure.jpg"],
+    beforeAfter: {
+      before: "/images/homepage/cleanup-areas/roadside.jpg",
+      after: "/images/event-types/infrastructure.jpg"
+    },
     testimonials: [
       {
         name: "रिता पाण्डे",
@@ -470,6 +482,10 @@ export const DEMO_PAST_EVENTS = [
       "/images/event-types/cleanup.jpg",
       "/images/event-types/cleanup.jpg"
     ],
+    beforeAfter: {
+      before: "/images/homepage/cleanup-areas/drains.jpg",
+      after: "/images/homepage/cleanup-areas/riverbanks.jpg"
+    },
     testimonials: [
       {
         name: "प्रदीप तामाङ",
@@ -588,6 +604,7 @@ export function getDemoEventById(id) {
       resultSummary: past.resultSummary,
       participantCount: past.participantCount,
       testimonials: past.testimonials || [],
+      beforeAfter: past.beforeAfter || null,
       rolesNeeded: DEMO_ROSTER
     };
   }

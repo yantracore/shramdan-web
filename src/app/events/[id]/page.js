@@ -13,6 +13,7 @@ import { Button, Empty, Skeleton, Tag } from "antd";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
+import { BeforeAfterSlider } from "@/components/BeforeAfterSlider";
 import { EventLiveStreamPlayer } from "@/components/EventLiveStreamPlayer";
 import { EventRosterPanel } from "@/components/EventRosterPanel";
 import IssueMapBlock from "@/components/IssueMapBlock";
@@ -302,6 +303,32 @@ export default function EventDetailPage() {
                       <p>{eventData.resultSummary}</p>
                     </>
                   ) : null}
+                </section>
+              ) : null}
+
+              {eventData.beforeAfter?.before && eventData.beforeAfter?.after ? (
+                <section className="public-issue-detail-section-block before-after-section">
+                  <h2>
+                    {language === "np" ? "अघि र पछि" : "Before and after"}
+                  </h2>
+                  <p className="public-issue-detail-muted">
+                    {language === "np"
+                      ? "थोप्ने बटन तानेर अघि र पछिको दृश्य तुलना गर्नुहोस्।"
+                      : "Drag the handle to compare before and after."}
+                  </p>
+                  <BeforeAfterSlider
+                    beforeUrl={eventData.beforeAfter.before}
+                    afterUrl={eventData.beforeAfter.after}
+                    beforeAlt={language === "np" ? "अघिको दृश्य" : "Before"}
+                    afterAlt={language === "np" ? "पछिको दृश्य" : "After"}
+                    beforeLabel={language === "np" ? "अघि" : "BEFORE"}
+                    afterLabel={language === "np" ? "पछि" : "AFTER"}
+                    ariaLabel={
+                      language === "np"
+                        ? "अघि र पछिको तुलना"
+                        : "Before/after comparison"
+                    }
+                  />
                 </section>
               ) : null}
 
