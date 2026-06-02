@@ -58,7 +58,7 @@ When you (the coding agent) are working in this repo:
 
 ## Phase 0 — Foundation
 
-- [ ] P2 [from 0.3.3] Playlist autoplay-next when a video ends — effort:S
+- [x] P2 [from 0.3.3] Playlist autoplay-next when a video ends — effort:S ← done: 2026-06-02 *(YouTube `videoseries?list=…` embed already chains the next video natively; added `&rel=0&modestbranding=1` so when one episode ends the next one in the series plays — not a YouTube-recommended unrelated video — and the player chrome stays understated.)*
 - [ ] P3 [from 0.3] Subtle scroll-reveal animation on homepage sections — effort:M
 - [x] P1 [from 0.4.1] Honeypot / spam protection on `/join` and `/feedback` — effort:S ← done: 2026-05-28 *(shared `Honeypot` component renders an off-screen `website` field with `tabIndex={-1}` + `autoComplete="off"`; page-level submit silently returns success without calling the API when the field is filled)*
 - [x] P3 [from 0.4] Success state with shareable confirmation link — effort:S ← done: 2026-06-02 *(new shared `SubmissionSuccessCard` replaces the form on /join and /feedback after submission — check seal, bilingual thank-you copy, Facebook/X/WhatsApp/Telegram + copy-link share row, and a "Submit another" reset. Soft entrance animation; share URL is window.location.origin-based.)*
@@ -92,6 +92,9 @@ When you (the coding agent) are working in this repo:
 - [ ] P2 [from 11.1] `AdminResponsiveList`: column-visibility toggle — effort:S
 - [x] P1 [from 11] `StickyActionBar` was tab-reachable while visually hidden — effort:S ← done: 2026-06-02 *(added `tabIndex={visible ? 0 : -1}` to the inner Link and `inert={!visible || undefined}` on the wrapper, including the React 19 boolean-attribute correction)*
 - [x] P1 [from 11] Leaflet `Marker` pins had no accessible name (axe `name-role-value`) — effort:S ← done: 2026-06-02 *(`IssueMap.IssueMarker` now passes `title` + `alt` + `keyboard` derived from `issue.title || issue.addressText || statusLabel`)*
+- [x] P2 [from 11] Skip-to-main-content link (WCAG 2.1 SC 2.4.1 Bypass Blocks) — effort:S ← done: 2026-06-02 *(SiteShell now renders `<a class="skip-to-main">` as the first focusable element; visually hidden until Tab focus, targets a `tabIndex=-1` wrapper around children; bilingual label.)*
+- [x] P2 [from 11] Devanagari line-height baseline (matras/reph were crowding descenders) — effort:S ← done: 2026-06-02 *(`:root[lang="ne"] body|p|li` now uses 1.7 line-height and 1.35 for h1/h2/h3; Latin pages unchanged.)*
+- [x] P2 [from 11] Custom branded 404 page — effort:S ← done: 2026-06-02 *(`src/app/not-found.js` renders inside SiteShell with a "४०४/404" hero, friendly explanation, and three exit-lane buttons; bilingual via usePreferences.)*
 
 ## Phase 13 — Live Events Rail
 
