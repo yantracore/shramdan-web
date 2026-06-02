@@ -9713,8 +9713,13 @@
 }
 
 .quick-fab.is-open .quick-fab-trigger {
-  background: var(--text);
+  background: #d2360b;
   transform: rotate(45deg);
+  box-shadow: 0 14px 30px rgba(210, 54, 11, 0.35);
+}
+
+.quick-fab.is-open .quick-fab-trigger:hover {
+  transform: rotate(45deg) scale(1.05);
 }
 
 .quick-fab-menu {

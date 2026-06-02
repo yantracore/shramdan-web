@@ -10,7 +10,6 @@
 // chrome).
 
 import {
-  CloseOutlined,
   FlagOutlined,
   MessageOutlined,
   PlusOutlined,
@@ -107,7 +106,7 @@ export function QuickActionFab({ language = "np" }) {
         aria-label={t.open}
         onClick={() => setOpen((o) => !o)}
       >
-        {open ? <CloseOutlined /> : <PlusOutlined />}
+        <PlusOutlined />
       </button>
     </div>
   );
