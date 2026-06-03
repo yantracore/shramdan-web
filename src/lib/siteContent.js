@@ -1225,11 +1225,11 @@ export const copy = {
       }
     },
     liveEventsRail: {
-      eyebrow: "लाइभ र आउँदा",
+      eyebrow: "अहिले भइरहेको",
       liveBadge: "लाइभ",
-      title: "लाइभ र आउँदा अभियानहरू",
+      title: "श्रमदान अभियानहरू",
       subtitle:
-        "अहिले लाइभ हेर्नुहोस् वा आउँदा कुनै भूमिकामा अहिल्यै जोडिनुहोस्।",
+        "अहिले लाइभ हेर्नुहोस्, वा आउँदोमा सामेल भएर आकार दिनुहोस्।",
       viewAll: "सबै अभियान हेर्नुहोस्",
       emptyMessage:
         "अहिले कुनै अभियान छैन। जब कुनै सुरु हुन्छ, श्रमेशले यहीँ देखाउनेछ।",
@@ -2816,11 +2816,11 @@ export const copy = {
       }
     },
     liveEventsRail: {
-      eyebrow: "Live & upcoming",
+      eyebrow: "Happening now",
       liveBadge: "LIVE",
-      title: "Live and upcoming campaigns",
+      title: "Shramdan Events",
       subtitle:
-        "Watch one running now or pick an upcoming role and join.",
+        "Watch one live, or join the next one and help shape it.",
       viewAll: "View All Events",
       emptyMessage:
         "No campaigns right now. श्रमेश will surface them here as they start.",
