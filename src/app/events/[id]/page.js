@@ -366,48 +366,6 @@ export default function EventDetailPage() {
                 </section>
               ) : null}
 
-              {hasCoords ? (
-                <section className="public-issue-location-card" id="event-location">
-                  <div className="public-issue-location-header">
-                    <h2>{content.detail.locationTitle}</h2>
-                    {mapsLink ? (
-                      <a
-                        className="public-issue-location-open-link"
-                        href={mapsLink}
-                        rel="noreferrer"
-                        target="_blank"
-                      >
-                        {content.detail.openInMaps} <ExportOutlined />
-                      </a>
-                    ) : null}
-                  </div>
-                  <div className="public-issue-location-map">
-                    <IssueMapBlock
-                      content={issueContent}
-                      height={360}
-                      interactive
-                      issues={[
-                        {
-                          id: eventData.id,
-                          title: linkedIssue?.title || meetupAddress,
-                          status: linkedIssue?.status || "EVENT_SCHEDULED",
-                          category: linkedIssue?.category,
-                          addressText: meetupAddress,
-                          latitude: meetupLat,
-                          longitude: meetupLng,
-                          voteCount: linkedIssue?.voteCount
-                        }
-                      ]}
-                      language={language}
-                      showPopup={false}
-                      enableFullscreen
-                      fullscreenLabel={issueContent?.detail?.fullscreenOpen || "Open fullscreen map"}
-                      exitFullscreenLabel={issueContent?.detail?.fullscreenClose || "Close fullscreen map"}
-                    />
-                  </div>
-                </section>
-              ) : null}
-
               {Array.isArray(eventData.testimonials) && eventData.testimonials.length > 0 ? (
                 <section className="event-testimonials" aria-labelledby="event-testimonials-title">
                   <header className="event-testimonials-header">
@@ -460,13 +418,59 @@ export default function EventDetailPage() {
               ) : null}
               </div>
 
-              {Array.isArray(eventData.rolesNeeded) && eventData.rolesNeeded.length > 0 ? (
+              {hasCoords || (Array.isArray(eventData.rolesNeeded) && eventData.rolesNeeded.length > 0) ? (
                 <aside className="event-detail-side">
-                  <EventRosterPanel
-                    rolesNeeded={eventData.rolesNeeded}
-                    language={language}
-                    eventId={eventData.id}
-                  />
+                  {hasCoords ? (
+                    <section
+                      className="public-issue-location-card event-detail-side-location"
+                      id="event-location"
+                    >
+                      <div className="public-issue-location-header">
+                        <h2>{content.detail.locationTitle}</h2>
+                        {mapsLink ? (
+                          <a
+                            className="public-issue-location-open-link"
+                            href={mapsLink}
+                            rel="noreferrer"
+                            target="_blank"
+                          >
+                            {content.detail.openInMaps} <ExportOutlined />
+                          </a>
+                        ) : null}
+                      </div>
+                      <div className="public-issue-location-map">
+                        <IssueMapBlock
+                          content={issueContent}
+                          height={160}
+                          interactive
+                          issues={[
+                            {
+                              id: eventData.id,
+                              title: linkedIssue?.title || meetupAddress,
+                              status: linkedIssue?.status || "EVENT_SCHEDULED",
+                              category: linkedIssue?.category,
+                              addressText: meetupAddress,
+                              latitude: meetupLat,
+                              longitude: meetupLng,
+                              voteCount: linkedIssue?.voteCount
+                            }
+                          ]}
+                          language={language}
+                          showPopup={false}
+                          enableFullscreen
+                          fullscreenLabel={issueContent?.detail?.fullscreenOpen || "Open fullscreen map"}
+                          exitFullscreenLabel={issueContent?.detail?.fullscreenClose || "Close fullscreen map"}
+                        />
+                      </div>
+                    </section>
+                  ) : null}
+                  {Array.isArray(eventData.rolesNeeded) && eventData.rolesNeeded.length > 0 ? (
+                    <EventRosterPanel
+                      rolesNeeded={eventData.rolesNeeded}
+                      language={language}
+                      eventId={eventData.id}
+                    />
+                  ) : null}
                 </aside>
               ) : null}
             </div>

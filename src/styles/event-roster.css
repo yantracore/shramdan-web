@@ -928,6 +928,33 @@
   border-top: 0;
 }
 
+.event-detail-side-location {
+  padding: 12px;
+  gap: 8px;
+}
+
+.event-detail-side-location .public-issue-location-header {
+  gap: 8px;
+  align-items: center;
+}
+
+.event-detail-side-location h2 {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.event-detail-side-location .public-issue-location-open-link {
+  font-size: 12px;
+}
+
+.event-detail-side-location .public-issue-location-map,
+.event-detail-side-location .public-issue-location-map .issue-map-wrap {
+  border-radius: 8px;
+}
+
 .event-detail-side .event-roster-header h2 {
   font-size: 18px;
 }
