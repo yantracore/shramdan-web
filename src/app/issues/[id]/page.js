@@ -341,6 +341,11 @@ export default function IssueDetailPage() {
                 targetType="issue"
                 targetId={issue.id}
                 language={language}
+                mentionPool={getDemoSupporters(issue.voteCount).map((name) => ({
+                  id: `supporter:${name}`,
+                  name,
+                  role: language === "np" ? "समर्थक" : "Supporter"
+                }))}
               />
             </div>
           </article>

@@ -192,6 +192,21 @@
   color: var(--muted);
 }
 
+.comment-mention {
+  display: inline;
+  color: var(--primary-dark);
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+  padding: 0 5px;
+  border-radius: 6px;
+  font-weight: 600;
+  /* Prevent the chip from breaking mid-name across lines. */
+  white-space: nowrap;
+}
+
+[data-theme="dark"] .comment-mention {
+  background: color-mix(in srgb, var(--primary) 22%, transparent);
+}
+
 /* --- Reactions row ----------------------------------------------------- */
 
 .comment-reactions {

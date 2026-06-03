@@ -435,6 +435,15 @@ export default function EventDetailPage() {
                 targetType="event"
                 targetId={eventData.id}
                 language={language}
+                mentionPool={(Array.isArray(eventData.rolesNeeded)
+                  ? eventData.rolesNeeded.flatMap((r) =>
+                      (r.filledNames || []).map((name) => ({
+                        id: `roster:${r.role}:${name}`,
+                        name,
+                        role: r.role
+                      }))
+                    )
+                  : [])}
               />
 
               {linkedIssue?.id ? (

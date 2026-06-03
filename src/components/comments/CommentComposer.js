@@ -1,9 +1,9 @@
 "use client";
 
 import { CloseOutlined, SendOutlined } from "@ant-design/icons";
-import { Button, Input } from "antd";
+import { Button, Input, Mentions } from "antd";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { COMMENT_LIMITS } from "@/lib/comments";
 
 const COPY = {
@@ -44,7 +44,8 @@ export function CommentComposer({
   onSubmit,
   onCancel,
   autoFocus = false,
-  submittingState = false
+  submittingState = false,
+  mentionPool = []
 }) {
   const t = COPY[language] || COPY.np;
   // The composer is remounted by its parent whenever its mode changes
@@ -53,15 +54,33 @@ export function CommentComposer({
   // sync required.
   const [text, setText] = useState(initialText);
   const textareaRef = useRef(null);
+  // Mentions component swap-in only when we have a real pool — keeps
+  // edit / no-pool flows on the simpler TextArea, fewer moving parts.
+  const useMentions = mentionPool.length > 0 && mode !== "edit";
+  const mentionOptions = useMemo(
+    () =>
+      mentionPool.map((m) => ({
+        value: m.name,
+        label: m.role ? `${m.name} · ${m.role}` : m.name
+      })),
+    [mentionPool]
+  );
 
   useEffect(() => {
-    if (autoFocus && textareaRef.current) {
-      const el = textareaRef.current.resizableTextArea?.textArea || null;
-      el?.focus();
-      if (el && typeof el.setSelectionRange === "function") {
-        const end = el.value.length;
-        el.setSelectionRange(end, end);
-      }
+    if (!autoFocus) return;
+    const ref = textareaRef.current;
+    // The native textarea node sits at different paths on Input.TextArea
+    // vs Mentions. Probe both.
+    const el =
+      ref?.resizableTextArea?.textArea || // Input.TextArea
+      ref?.nativeElement?.querySelector?.("textarea") || // Mentions
+      ref?.focus
+        ? ref
+        : null;
+    if (el?.focus) el.focus();
+    if (el?.setSelectionRange) {
+      const v = (el.value ?? "").length;
+      el.setSelectionRange(v, v);
     }
   }, [autoFocus]);
 
@@ -104,15 +123,34 @@ export function CommentComposer({
       className={`comment-composer comment-composer-${mode}`}
       onSubmit={handleSubmit}
     >
-      <Input.TextArea
-        ref={textareaRef}
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        placeholder={placeholder}
-        autoSize={{ minRows: mode === "top" ? 2 : 2, maxRows: 6 }}
-        maxLength={COMMENT_LIMITS.MAX_TEXT_LENGTH}
-        showCount={mode !== "top"}
-      />
+      {useMentions ? (
+        <Mentions
+          ref={textareaRef}
+          value={text}
+          onChange={setText}
+          placeholder={placeholder}
+          autoSize={{ minRows: 2, maxRows: 6 }}
+          options={mentionOptions}
+          prefix="@"
+          // Match anywhere inside the name — handles Devanagari mid-word
+          // queries the right way too.
+          filterOption={(input, option) =>
+            String(option?.value ?? "")
+              .toLowerCase()
+              .includes(String(input ?? "").toLowerCase())
+          }
+        />
+      ) : (
+        <Input.TextArea
+          ref={textareaRef}
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          placeholder={placeholder}
+          autoSize={{ minRows: 2, maxRows: 6 }}
+          maxLength={COMMENT_LIMITS.MAX_TEXT_LENGTH}
+          showCount={mode !== "top"}
+        />
+      )}
       <div className="comment-composer-foot">
         {tooLong ? (
           <span className="comment-composer-error">{t.tooLong}</span>

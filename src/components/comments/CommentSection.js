@@ -70,7 +70,15 @@ const COPY = {
   }
 };
 
-export function CommentSection({ targetType, targetId, language = "np" }) {
+export function CommentSection({
+  targetType,
+  targetId,
+  language = "np",
+  // External mention pool from the parent page (event roster on
+  // /events/[id], supporter chips on /issues/[id]). Names from comment
+  // authors are merged in automatically below.
+  mentionPool: externalMentionPool = []
+}) {
   const t = COPY[language] || COPY.np;
   const messageApi = useToast();
   const pathname = usePathname();
@@ -118,6 +126,28 @@ export function CommentSection({ targetType, targetId, language = "np" }) {
     [tree, effectiveSort, currentUser?.id]
   );
   const visibleCount = useMemo(() => countVisible(comments), [comments]);
+
+  // Mention pool = external (roster/supporters) merged with distinct
+  // comment-author names. Dedup by name (case-insensitive). The pool is
+  // sorted longest-name-first so longest-prefix matching in the body
+  // renderer chooses the most specific mention available.
+  const mentionPool = useMemo(() => {
+    const seen = new Set();
+    const out = [];
+    const push = (entry) => {
+      if (!entry?.name) return;
+      const key = entry.name.toLowerCase();
+      if (seen.has(key)) return;
+      seen.add(key);
+      out.push({ id: entry.id || entry.name, name: entry.name, role: entry.role || null });
+    };
+    externalMentionPool.forEach(push);
+    for (const c of comments) {
+      if (c.deleted) continue;
+      push({ id: c.author?.id, name: c.author?.name, role: c.author?.role });
+    }
+    return out.sort((a, b) => b.name.length - a.name.length);
+  }, [externalMentionPool, comments]);
 
   const reload = useCallback(() => {
     setComments(loadComments({ targetType, targetId }));
@@ -279,6 +309,7 @@ export function CommentSection({ targetType, targetId, language = "np" }) {
         isAuthenticated={isAuthenticated}
         loginRedirect={pathname || "/"}
         onSubmit={handleSubmitTop}
+        mentionPool={mentionPool}
       />
 
       {tree.length > 0 ? (
@@ -316,6 +347,7 @@ export function CommentSection({ targetType, targetId, language = "np" }) {
           currentUser={currentUser}
           replyingTo={replyingTo}
           editingId={editingId}
+          mentionPool={mentionPool}
           onStartReply={handleStartReply}
           onCancelReply={handleCancelReply}
           onSubmitReply={handleSubmitReply}

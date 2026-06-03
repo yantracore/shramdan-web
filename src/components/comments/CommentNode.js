@@ -60,6 +60,53 @@ function initialOf(name) {
   return Array.from(name.trim())[0] || "—";
 }
 
+// Render comment text as a mix of plain runs and styled mention chips.
+// Uses longest-prefix matching against the mention pool so multi-word
+// Devanagari names render as a single chip (`@रिता पाण्डे`) rather than
+// truncating at the first space.
+function renderBodyWithMentions(text, pool) {
+  const safeText = String(text ?? "");
+  if (!pool || pool.length === 0) return safeText;
+  const names = pool
+    .map((p) => p?.name)
+    .filter(Boolean)
+    .sort((a, b) => b.length - a.length);
+
+  const out = [];
+  let cursor = 0;
+  let chunk = "";
+  let key = 0;
+  while (cursor < safeText.length) {
+    const ch = safeText[cursor];
+    if (ch === "@") {
+      let matched = null;
+      for (const n of names) {
+        if (safeText.startsWith(n, cursor + 1)) {
+          matched = n;
+          break;
+        }
+      }
+      if (matched) {
+        if (chunk) {
+          out.push(chunk);
+          chunk = "";
+        }
+        out.push(
+          <span key={`m-${key++}`} className="comment-mention">
+            @{matched}
+          </span>
+        );
+        cursor += 1 + matched.length;
+        continue;
+      }
+    }
+    chunk += ch;
+    cursor += 1;
+  }
+  if (chunk) out.push(chunk);
+  return out;
+}
+
 export function CommentNode({
   comment,
   depth,
@@ -67,6 +114,7 @@ export function CommentNode({
   currentUser,
   isReplying,
   isEditing,
+  mentionPool = [],
   onStartReply,
   onCancelReply,
   onSubmitReply,
@@ -118,7 +166,9 @@ export function CommentNode({
             onSubmit={onSubmitEdit}
           />
         ) : (
-          <p className="comment-text">{comment.text}</p>
+          <p className="comment-text">
+            {renderBodyWithMentions(comment.text, mentionPool)}
+          </p>
         )}
 
         {!comment.deleted && !isEditing ? (
@@ -170,6 +220,16 @@ export function CommentNode({
               language={language}
               isAuthenticated
               autoFocus
+              mentionPool={mentionPool}
+              // Auto-mention the parent when the reply would otherwise
+              // collapse to depth-2 (sibling) — preserves the
+              // conversational continuity that visual nesting can't
+              // express at the cap.
+              initialText={
+                depth >= 2 && comment.author?.name
+                  ? `@${comment.author.name} `
+                  : ""
+              }
               onCancel={onCancelReply}
               onSubmit={onSubmitReply}
             />

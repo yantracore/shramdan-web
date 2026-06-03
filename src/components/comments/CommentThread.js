@@ -15,6 +15,7 @@ export function CommentThread({
   currentUser,
   replyingTo,
   editingId,
+  mentionPool = [],
   onStartReply,
   onCancelReply,
   onSubmitReply,
@@ -40,6 +41,7 @@ export function CommentThread({
             currentUser={currentUser}
             isReplying={replyingTo === node.id}
             isEditing={editingId === node.id}
+            mentionPool={mentionPool}
             onStartReply={onStartReply}
             onCancelReply={onCancelReply}
             onSubmitReply={onSubmitReply}
@@ -57,6 +59,7 @@ export function CommentThread({
                 currentUser={currentUser}
                 replyingTo={replyingTo}
                 editingId={editingId}
+                mentionPool={mentionPool}
                 onStartReply={onStartReply}
                 onCancelReply={onCancelReply}
                 onSubmitReply={onSubmitReply}
