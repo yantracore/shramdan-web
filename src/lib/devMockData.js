@@ -49,6 +49,7 @@ export const DEMO_LIVE_EVENTS = [
     title: "बागमती नदी सरसफाइ",
     addressText: "तीनकुने पुल, ललितपुर",
     rolesNeeded: DEMO_ROSTER,
+    participantCount: 26,
     meetupNotes:
       "तीनकुने पुलको दक्षिणी छेउमा भेला हुने। पार्किङ पुल छेउको खाली जग्गामा। पन्जा र मास्क लिएर आउनुहोस् — टीमले अरू सामग्री ल्याउँछ।",
     linkedIssue: {
@@ -78,6 +79,7 @@ export const DEMO_LIVE_EVENTS = [
     title: "स्कुल भित्ता पेन्ट + मर्मत",
     addressText: "श्री जनप्रिय मा.वि., काठमाडौँ",
     rolesNeeded: DEMO_ROSTER,
+    participantCount: 14,
     meetupNotes:
       "स्कुलको मुख्य गेटबाट छिर्ने। प्रिन्सिपलको कार्यालयमा हाजिर। पुराना लुगा लगाएर आउनुहोस् — रङ बिग्रिनसक्छ।",
     linkedIssue: {
@@ -107,6 +109,7 @@ export const DEMO_LIVE_EVENTS = [
     title: "वृक्षारोपण अभियान — सूर्यविनायक",
     addressText: "सूर्यविनायक नगर, भक्तपुर",
     rolesNeeded: DEMO_ROSTER,
+    participantCount: 41,
     meetupNotes:
       "सूर्यविनायक मन्दिर परिसरको पश्चिम गेटमा भेला। बिरुवा, चित्रकोलो, पानी, हलुका खाजा सब टीमले ल्याउँछ। आफ्नो पानीको बोतल लिएर आउनुहोस्।",
     linkedIssue: {
