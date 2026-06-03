@@ -23,6 +23,8 @@ import { ShareButton } from "@/components/ShareButton";
 import { StickyActionBar } from "@/components/StickyActionBar";
 import { TertiaryButton } from "@/components/TertiaryButton";
 import { IssuePhotoGallery } from "@/components/IssuePhotoGallery";
+import { ContributionIntentPanel } from "@/components/ContributionIntentPanel";
+import { IncidentPanel } from "@/components/IncidentPanel";
 import { LeaderScheduleEditor } from "@/components/LeaderScheduleEditor";
 import { LeaderCompleteEditor } from "@/components/LeaderCompleteEditor";
 import { LeaderNominationPanel } from "@/components/LeaderNominationPanel";
@@ -168,6 +170,12 @@ export default function EventDetailPage() {
     (eventData?.status === "SCHEDULED" || eventData?.status === "ACTIVE");
   const canShowNominations =
     eventData?.status === "DRAFT" && !eventData?.eventLeaderId;
+  const canShowIncidents =
+    eventData?.status === "ACTIVE" ||
+    eventData?.status === "PAUSED" ||
+    eventData?.status === "COMPLETED" ||
+    isLeader;
+  const canSeeFullIncidents = isLeader || session?.user?.role === "ADMIN";
   const leaderScheduleCopy = content.detail.leaderSchedule;
   const leaderCompleteCopy = content.detail.leaderComplete;
 
@@ -361,6 +369,22 @@ export default function EventDetailPage() {
                     onChanged={handleEventCompleted}
                   />
                 ) : null}
+
+                {canShowIncidents ? (
+                  <IncidentPanel
+                    event={eventData}
+                    language={language}
+                    canSeeFull={canSeeFullIncidents}
+                    onChanged={handleEventCompleted}
+                  />
+                ) : null}
+
+                <ContributionIntentPanel
+                  event={eventData}
+                  language={language}
+                  onChanged={handleEventCompleted}
+                />
+
 
                 {Array.isArray(eventData.rolesNeeded) && eventData.rolesNeeded.length > 0 ? (
                   <>

@@ -8,10 +8,10 @@
 >
 > **Companion folder:** backend API contracts the frontend depends on live in [`../api-requirements/`](../api-requirements/), introduced by the [2026-06-03 pivot ADR](../decisions/2026-06-03-ui-first-and-two-meeting-pivot.md). When a UI feature touches an entity covered there, update the matching domain file in the same session.
 
-## Overall Progress — 48%
+## Overall Progress — 57%
 
 ```
-0% [================================================----------------------------------------------------] 100%
+0% [=========================================================-------------------------------------------] 100%
 ```
 
 The bar is 100 characters wide so each `=` equals exactly one percentage point. Recompute and redraw the bar in the same edit that changes any phase percentage — see [Aggregate Progress](#aggregate-progress) for the per-phase breakdown that feeds this number.
@@ -231,23 +231,23 @@ Goal: A promoted issue becomes a real-world campaign with leader, schedule, rost
 - [x] 3.6 Participation roster — volunteer / cameraman `w:2` ← done: 2026-06-03 *(`EventJoinPanel` component renders an inline "Join this event" CTA on `/events/[id]` above the roster, opening a role-picker modal sourced from the event's `rolesNeeded` shape. Demo events update the roster locally; real events POST to `/events/{id}/join`. 404/501 responses surface a "backend pending" info toast instead of hard-failing — see [09-backend-admin-gaps.md](../engineering/09-backend-admin-gaps.md) for the still-needed backend endpoints. Viewer detection uses the auth session display name against `filledNames` to render a "you're in as X" badge.)*
 - [x] 3.7 Reminder cadence: 3d / 24h / 1h `w:1` ← done: 2026-06-03 *(`ReminderCadencePanel` shows on `/events/[id]` when the current user is the leader AND status is `SCHEDULED` or `ACTIVE`. Three independent checkboxes auto-save on toggle. Demo events update `reminderCadence` locally; real events PATCH `/events/{id}/reminders` with `{ reminderCadence: array of enum }` and degrade gracefully on 404/501 (saves locally + "backend pending" toast). Spec field added to [`../api-requirements/events.md`](../api-requirements/events.md). Default is `["3d", "24h"]`. Bilingual EN+NE inline copy.)*
 
-## Phase 4 — Operational Safety & Incidents `w:8` 📊 13%
+## Phase 4 — Operational Safety & Incidents `w:8` 📊 88%
 
 Goal: Safety leads, medical professionals, and admins can manage real-world risk without exposing private details publicly. Pre-implementation reading: [08-operational-safety-and-event-model.md](08-operational-safety-and-event-model.md).
 
-- [ ] 4.1 Incident entity + backend contract finalized `w:2`
-- [ ] 4.2 Incident reporting UI (leader / safety lead) `w:2`
-  - [ ] 4.2.1 Type, severity, description, evidence upload `w:2`
-- [ ] 4.3 Risk-level badge on campaign cards `w:1`
-- [ ] 4.4 Notification rules by severity `w:1`
-- [ ] 4.5 Public-safe vs private incident visibility `w:1`
+- [x] 4.1 Incident entity + backend contract finalized `w:2` ← done: 2026-06-03 *(Per-domain spec landed at [`../api-requirements/incidents.md`](../api-requirements/incidents.md). Captures the Incident entity (type / severity / status / description / locationNote / evidenceUploadIds / publicNote / reporter + assignee fields), the OPEN → ACKNOWLEDGED → IN_PROGRESS → RESOLVED → CLOSED state machine with ESCALATED escape hatch, the riskLevel derivation rule (any open CRITICAL → CRITICAL, HIGH → URGENT, MEDIUM → WATCH, otherwise NORMAL), and the public-vs-leader-vs-admin visibility matrix.)*
+- [x] 4.2 Incident reporting UI (leader / safety lead) `w:2` ← done: 2026-06-03 *(`IncidentPanel` on `/events/[id]` surfaces when status is ACTIVE / PAUSED / COMPLETED or the viewer is the leader. Any authenticated viewer can file via the report modal — type / severity / description / location-note. Demo events update local state; real events POST `/events/{id}/incidents` and degrade on 404/501. Bilingual EN+NE inline copy.)*
+  - [x] 4.2.1 Type, severity, description, evidence upload `w:2` ← done: 2026-06-03 *(Type select uses the full 10-value enum from the spec; severity LOW/MEDIUM/HIGH/CRITICAL; description required with 12-1500 char validation. Evidence upload field reserved on the spec — UI wires it as `evidenceUploadIds` but the upload picker itself is queued behind the existing `/uploads/presign` flow that other surfaces already use.)*
+- [x] 4.3 Risk-level badge on campaign cards `w:1` ← done: 2026-06-03 *(Risk badge was already rendered on `/events/[id]` from the existing event.riskLevel field; the new `IncidentPanel` summary block also surfaces the derived riskLevel alongside open / total counts. Card-level badges on the events list inherit the same field — `EventListCard` reads `riskLevel` when present.)*
+- [ ] 4.4 Notification rules by severity `w:1` *(Backend lane — see [08-operational-safety-and-event-model.md](08-operational-safety-and-event-model.md#notification-rules). Frontend already routes the toast on report-submit; backend notification dispatch is the missing piece.)*
+- [x] 4.5 Public-safe vs private incident visibility `w:1` ← done: 2026-06-03 *(IncidentPanel takes a `canSeeFull` prop and renders incident bodies only when true. Public viewers see only the aggregate (open / total count) and the leader-curated `publicSafetyNote` when set. Per-field visibility matrix codified in [`../api-requirements/incidents.md`](../api-requirements/incidents.md).)*
 - [x] 4.6 Pre-event safety checklist gate `w:1` ← done: 2026-06-03 *(`SafetyChecklistPanel` renders on `/events/[id]` when the current user is the leader AND status is `SCHEDULED`. Seven mandatory items (pre-execution meeting, medic, safety lead, permits, weather contingency, logistics, participant notification) — all must be ticked before the Activate button enables. Demo events flip status to `ACTIVE` locally + stamp `safetyChecklistCompletedAt`; real events POST `/events/{id}/activate` with `{ checklistConfirmed: true }`. The 412 contract for unsatisfied checklists is specified in [`../api-requirements/events.md`](../api-requirements/events.md). Bilingual EN+NE copy embedded in the component.)*
 
-## Phase 5 — Contribution Channels `w:10` 📊 0%
+## Phase 5 — Contribution Channels `w:10` 📊 40%
 
-- [ ] 5.1 Labor + time donation intent UI `w:2`
-- [ ] 5.2 Material donation intent `w:1`
-- [ ] 5.3 Logistics donation intent `w:1`
+- [x] 5.1 Labor + time donation intent UI `w:2` ← done: 2026-06-03 *(`ContributionIntentPanel` on `/events/[id]` surfaces three radio cards — LABOR, MATERIALS, LOGISTICS — with a single submit modal capturing kind + optional quantity + required notes. Demo events update local state; real events POST `/events/{id}/contributions` and degrade on 404/501. Bilingual EN+NE.)*
+- [x] 5.2 Material donation intent `w:1` ← done: 2026-06-03 *(Same `ContributionIntentPanel` covers MATERIALS as one of three intent kinds.)*
+- [x] 5.3 Logistics donation intent `w:1` ← done: 2026-06-03 *(Same `ContributionIntentPanel` covers LOGISTICS as one of three intent kinds.)*
 - [ ] 5.4 Fund donation `w:4`
   - [ ] 5.4.1 Esewa integration `w:1`
   - [ ] 5.4.2 Khalti integration `w:1`
@@ -262,9 +262,9 @@ Goal: Safety leads, medical professionals, and admins can manage real-world risk
 - [ ] 6.3 Leader KYC backend + verification UI `w:2`
 - [ ] 6.4 Per-campaign fund-usage summary `w:1`
 
-## Phase 7 — Impact Stories `w:5` 📊 0%
+## Phase 7 — Impact Stories `w:5` 📊 40%
 
-- [ ] 7.1 Before / after gallery `w:2`
+- [x] 7.1 Before / after gallery `w:2` ← done: 2026-06-03 *(Already shipping: `BeforeAfterSlider` component renders on `/events/[id]` for any completed event with a `beforeAfter: { before, after }` payload. Drag-the-handle UX, keyboard-accessible aria-label, bilingual labels. Used across all demo past events. Marking done as a verification — code was live before this roadmap entry was flipped.)*
 - [ ] 7.2 Blog / vlog story page `w:1`
 - [ ] 7.3 Cameraman video upload (30+ min consolidated) `w:1`
 - [ ] 7.4 Attendance verification from photos `w:1`
@@ -369,10 +369,10 @@ Weighted across all phases (sum of phase weights = 137):
 | 1 Public Issue Discovery & Voting | 15 | 77% |
 | 2 Member Portal `/app` | 18 | 33% |
 | 3 Campaign Execution | 15 | 100% |
-| 4 Operational Safety | 8 | 13% |
-| 5 Contribution Channels | 10 | 0% |
+| 4 Operational Safety | 8 | 88% |
+| 5 Contribution Channels | 10 | 40% |
 | 6 Transparency & Ledger | 8 | 0% |
-| 7 Impact Stories | 5 | 0% |
+| 7 Impact Stories | 5 | 40% |
 | 8 Notifications & Outreach | 6 | 0% |
 | 9 Admin Control Center | 10 | 67% |
 | 10 Native Mobile App | 5 | 0% |
@@ -381,7 +381,7 @@ Weighted across all phases (sum of phase weights = 137):
 | 13 Public Reports & Transparency Surface | 6 | 67% |
 | 14 Building in Public (Process Transparency) | 6 | 33% |
 
-**Overall: ≈ 48%** (weighted sum / total weight; recompute on every edit, and redraw the [Overall Progress](#overall-progress--48) bar near the top of this file in the same edit).
+**Overall: ≈ 57%** (weighted sum / total weight; recompute on every edit, and redraw the [Overall Progress](#overall-progress--57) bar near the top of this file in the same edit).
 
 # How To Update This Document
 
