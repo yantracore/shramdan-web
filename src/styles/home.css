@@ -8576,6 +8576,49 @@
   color: var(--muted);
 }
 
+/* ---- Voter role picker modal (roadmap 1.5.3) ---- */
+
+.voter-role-modal-intro {
+  margin: 0 0 14px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.voter-role-modal-option {
+  align-items: flex-start;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  transition: background 160ms ease, border-color 160ms ease;
+  width: 100%;
+}
+
+.voter-role-modal-option:hover {
+  background: color-mix(in srgb, var(--primary) 6%, transparent);
+}
+
+.voter-role-modal-option.ant-radio-wrapper-checked {
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
+  border-color: color-mix(in srgb, var(--primary) 36%, var(--line));
+}
+
+.voter-role-modal-option-label {
+  display: block;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.voter-role-modal-option-hint {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
 /* ---- Safety checklist gate panel (roadmap 4.6) ---- */
 
 .safety-checklist-panel {
