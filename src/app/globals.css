@@ -9,6 +9,7 @@
 @import "../styles/events-split-view.css";
 @import "../styles/comments.css";
 @import "../styles/scrollbars.css";
+@import "../styles/antd-dropdown.css";
 
 :root {
   color-scheme: light;

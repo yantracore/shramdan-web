@@ -92,6 +92,40 @@ const baseTheme = {
     },
     Tag: {
       borderRadiusSM: 999
+    },
+    // Unified dropdown grammar. Trigger height matches Button (40) so
+    // filter rows align; popover radius is a notch larger than trigger
+    // (12 vs 10) — convention that reads as "floating chrome" without
+    // looking like a CSS bug. Colors and shadows ride on top of these
+    // via src/styles/antd-dropdown.css so accent/theme changes carry.
+    Select: {
+      controlHeight: 40,
+      controlHeightSM: 32,
+      borderRadius: 10,
+      borderRadiusLG: 12,
+      borderRadiusSM: 8,
+      optionSelectedFontWeight: 600,
+      controlPaddingHorizontal: 14,
+      paddingSM: 10
+    },
+    DatePicker: {
+      controlHeight: 40,
+      borderRadius: 10,
+      borderRadiusLG: 12
+    },
+    Cascader: {
+      controlHeight: 40
+    },
+    TreeSelect: {
+      controlHeight: 40
+    },
+    AutoComplete: {
+      controlHeight: 40,
+      borderRadius: 10
+    },
+    Dropdown: {
+      borderRadiusLG: 12,
+      paddingBlock: 6
     }
   }
 };
