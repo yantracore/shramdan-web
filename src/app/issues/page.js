@@ -11,7 +11,6 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import IssueMapBlock from "@/components/IssueMapBlock";
-import { NearMeFilter } from "@/components/NearMeFilter";
 import {
   PublicIssueCard,
   PublicIssueCardSkeleton,
@@ -24,11 +23,17 @@ import { copy } from "@/lib/siteContent";
 import { ISSUE_CATEGORIES, getListItems } from "@/lib/adminUtils";
 
 const PUBLIC_ISSUE_STATUSES = ["OPEN", "EVENT_SCHEDULED", "COMPLETED"];
+// Server-supported sorts: voteCount, createdAt (no direction param).
+// "nearest" is client-side over the current page using haversine + geolocation.
 const SORT_OPTIONS = [
-  { value: "voteCount", labelKey: "sortMostVotes" },
-  { value: "createdAt", labelKey: "sortNewest" }
+  { value: "voteCount", labelKey: "sortMostVotes", clientOnly: false },
+  { value: "createdAt", labelKey: "sortNewest", clientOnly: false },
+  { value: "nearest", labelKey: "sortNearest", clientOnly: true }
 ];
 const SORT_VALUES = new Set(SORT_OPTIONS.map((o) => o.value));
+const CLIENT_ONLY_SORTS = new Set(
+  SORT_OPTIONS.filter((o) => o.clientOnly).map((o) => o.value)
+);
 const STATUS_VALUES = new Set(PUBLIC_ISSUE_STATUSES);
 const PAGE_SIZE = 12;
 const MAP_FETCH_LIMIT = 100;
@@ -67,10 +72,12 @@ export default function IssuesListPage() {
   const [filters, setFilters] = useState(() => readFiltersFromUrl());
   const [mapIssues, setMapIssues] = useState([]);
   const [nearMe, setNearMe] = useState(null);
+  const [geoBusy, setGeoBusy] = useState(false);
+  const [geoError, setGeoError] = useState("");
 
   const sortedItems = useMemo(() => {
     const items = pages[currentPage - 1]?.items || [];
-    if (!nearMe) return items;
+    if (filters.sort !== "nearest" || !nearMe) return items;
     const haversine = (lat1, lon1, lat2, lon2) => {
       const toRad = (d) => (d * Math.PI) / 180;
       const R = 6371;
@@ -95,7 +102,7 @@ export default function IssuesListPage() {
       const db = haversine(nearMe.lat, nearMe.lng, bLat, bLng);
       return da - db;
     });
-  }, [pages, currentPage, nearMe]);
+  }, [pages, currentPage, nearMe, filters.sort]);
 
   // Re-sync state from URL on back/forward navigation.
   useEffect(() => {
@@ -118,7 +125,10 @@ export default function IssuesListPage() {
         params: {
           status: filters.status,
           category: filters.category,
-          sort: filters.sort,
+          // Server only knows voteCount and createdAt. For client-only sorts
+          // (e.g. "nearest") we let the server default to voteCount and sort
+          // the page locally afterwards.
+          sort: CLIENT_ONLY_SORTS.has(filters.sort) ? undefined : filters.sort,
           limit: PAGE_SIZE,
           cursor
         }
@@ -182,9 +192,9 @@ export default function IssuesListPage() {
     };
   }, [filters.status, filters.category]);
 
-  const setFilter = (key, value) => {
-    setFilters((current) => {
-      const next = { ...current, [key]: value };
+  const applyFilters = useCallback(
+    (next) => {
+      setFilters(next);
       const params = new URLSearchParams(searchParams?.toString() || "");
       if (next.status) params.set("status", next.status);
       else params.delete("status");
@@ -194,8 +204,54 @@ export default function IssuesListPage() {
       else params.delete("sort");
       const query = params.toString();
       router.replace(query ? `/issues?${query}` : "/issues", { scroll: false });
-      return next;
-    });
+    },
+    [router, searchParams]
+  );
+
+  const requestNearMe = useCallback(
+    (onGranted) => {
+      if (typeof window === "undefined" || !navigator?.geolocation) {
+        setGeoError(content.filters.sortLocationUnsupported);
+        return;
+      }
+      setGeoError("");
+      setGeoBusy(true);
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setGeoBusy(false);
+          const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+          setNearMe(loc);
+          onGranted?.(loc);
+        },
+        () => {
+          setGeoBusy(false);
+          setGeoError(content.filters.sortLocationDenied);
+        },
+        { enableHighAccuracy: false, timeout: 8000, maximumAge: 60_000 }
+      );
+    },
+    [content.filters.sortLocationDenied, content.filters.sortLocationUnsupported]
+  );
+
+  // If the page lands with ?sort=nearest (deep link or refresh) and there's
+  // no location fix yet, fire the prompt once. requestNearMe sets state, so
+  // we suppress the cascading-render lint here on purpose.
+  useEffect(() => {
+    if (filters.sort === "nearest" && !nearMe && !geoBusy && !geoError) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      requestNearMe();
+    }
+  }, [filters.sort, nearMe, geoBusy, geoError, requestNearMe]);
+
+  const setFilter = (key, value) => {
+    if (key === "sort" && value === "nearest") {
+      const next = { ...filters, sort: "nearest" };
+      applyFilters(next);
+      if (!nearMe) requestNearMe();
+      return;
+    }
+    if (key === "sort") setGeoError("");
+    applyFilters({ ...filters, [key]: value });
   };
 
   const statusOptions = PUBLIC_ISSUE_STATUSES.map((value) => ({
@@ -299,11 +355,6 @@ export default function IssuesListPage() {
 
         <div className="public-issues-toolbar">
           <div className="public-issues-filters">
-            <NearMeFilter
-              language={language}
-              location={nearMe}
-              onLocation={setNearMe}
-            />
             <div className="public-issues-filter-field">
               <label
                 className="public-issues-filter-label"
@@ -336,7 +387,9 @@ export default function IssuesListPage() {
                 value={filters.category}
               />
             </div>
-            <div className="public-issues-filter-field">
+          </div>
+          <div className="public-issues-actions">
+            <div className="public-issues-filter-field public-issues-sort-field">
               <label
                 className="public-issues-filter-label"
                 htmlFor="issues-filter-sort"
@@ -348,7 +401,16 @@ export default function IssuesListPage() {
                 onChange={(value) => setFilter("sort", value)}
                 options={sortOptions}
                 value={filters.sort}
+                loading={geoBusy}
               />
+              {filters.sort === "nearest" && (geoBusy || geoError) ? (
+                <span
+                  className={`public-issues-sort-hint${geoError ? " is-error" : ""}`}
+                  role={geoError ? "alert" : "status"}
+                >
+                  {geoBusy ? content.filters.sortLocating : geoError}
+                </span>
+              ) : null}
             </div>
             <Link className="public-issues-filters-cta" href="/issues/new">
               <Button type="primary" icon={<PlusOutlined />} size="large">

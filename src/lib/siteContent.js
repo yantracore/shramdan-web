@@ -1097,7 +1097,6 @@ export const copy = {
         supportersMany: "{n} समर्थक",
         viewDetail: "विस्तृत",
         voteAction: "समर्थन गर्नुहोस्",
-        voteTooltip: "समर्थन गरौँ",
         voteDisabledTooltip: "समर्थन जनाउन साइन इन गर्नुहोस्"
       },
       states: {
@@ -1174,7 +1173,6 @@ export const copy = {
         supportersMany: "{n} समर्थक",
         viewDetail: "विस्तृत",
         voteAction: "समर्थन गर्नुहोस्",
-        voteTooltip: "समर्थन गरौँ",
         voteActionDone: "समर्थन गरियो",
         voteDisabledTooltip: "समर्थन गर्न साइन इन गर्नुहोस्",
         voteSuccess: "तपाईंको समर्थन रेकर्ड भयो।",
@@ -2699,7 +2697,6 @@ export const copy = {
         supportersMany: "{n} supporters",
         viewDetail: "Details",
         voteAction: "Support",
-        voteTooltip: "Let's support",
         voteDisabledTooltip: "Sign in to support"
       },
       states: {
@@ -2776,7 +2773,6 @@ export const copy = {
         supportersMany: "{n} supporters",
         viewDetail: "Details",
         voteAction: "Support",
-        voteTooltip: "Let's support",
         voteActionDone: "Supported",
         voteDisabledTooltip: "Sign in to vote",
         voteSuccess: "Your support has been recorded.",
