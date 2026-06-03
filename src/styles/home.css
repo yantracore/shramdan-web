@@ -5703,6 +5703,22 @@
   gap: 8px;
 }
 
+/* Generic share button used in issue/event detail toplines. */
+.ant-btn.share-button.is-copied {
+  background: color-mix(in srgb, #16a34a 14%, var(--surface));
+  border-color: color-mix(in srgb, #16a34a 45%, transparent);
+  color: #166534;
+}
+
+.ant-btn.share-button.is-copied .anticon {
+  color: #16a34a;
+}
+
+.ant-btn.share-button:not(.is-copied):hover .anticon {
+  transition: transform 160ms ease;
+  transform: rotate(-6deg);
+}
+
 .public-issue-detail-meta-row {
   display: flex;
   flex-wrap: wrap;
@@ -7321,7 +7337,6 @@
 .live-issues-heading {
   display: grid;
   gap: 6px;
-  max-width: 680px;
 }
 
 .live-issues-heading h2 {

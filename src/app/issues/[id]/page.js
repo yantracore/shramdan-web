@@ -15,6 +15,7 @@ import { IssuePhotoGallery } from "@/components/IssuePhotoGallery";
 import { IssueShareRow } from "@/components/IssueShareRow";
 import { IssueStatusTimeline } from "@/components/IssueStatusTimeline";
 import { IssueVoteButton } from "@/components/IssueVoteButton";
+import { ShareButton } from "@/components/ShareButton";
 import { CommentSection } from "@/components/comments";
 import { IssueReactions } from "@/components/IssueReactions";
 import { PublicIssueCard, formatSupporters } from "@/components/PublicIssueCard";
@@ -22,6 +23,7 @@ import { VoteSparkline } from "@/components/VoteSparkline";
 import { ScrollProgressBar } from "@/components/ScrollProgressBar";
 import { SiteShell } from "@/components/SiteShell";
 import { StickyActionBar } from "@/components/StickyActionBar";
+import { TertiaryButton } from "@/components/TertiaryButton";
 import { usePreferences } from "@/app/providers";
 import { getJson } from "@/lib/apiClient";
 import { getDemoSupporters } from "@/lib/devMockData";
@@ -190,9 +192,9 @@ export default function IssueDetailPage() {
     <SiteShell pageTitle={issue?.title || content.detail.notFoundTitle}>
       <ScrollProgressBar />
       <section className="page-section public-issue-detail-section">
-        <Link className="public-issue-back-link" href="/issues">
-          <ArrowLeftOutlined /> {content.detail.backToList}
-        </Link>
+        <TertiaryButton href="/issues" icon={<ArrowLeftOutlined />}>
+          {content.detail.backToList}
+        </TertiaryButton>
 
         {loading ? (
           <article className="content-card public-issue-detail public-issue-detail-skeleton" role="status" aria-live="polite">
@@ -257,6 +259,12 @@ export default function IssueDetailPage() {
                   <span className="public-issue-detail-supporters">
                     {formatSupporters(issue.voteCount, content, language)}
                   </span>
+                  <ShareButton
+                    language={language}
+                    title={issue.title}
+                    text={issue.title}
+                    size="large"
+                  />
                   <IssueVoteButton
                     content={content}
                     initialVoteCount={issue.voteCount}

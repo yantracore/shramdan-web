@@ -18,6 +18,7 @@ import { EventLiveStreamPlayer } from "@/components/EventLiveStreamPlayer";
 import { EventRosterPanel } from "@/components/EventRosterPanel";
 import IssueMapBlock from "@/components/IssueMapBlock";
 import { PrintButton } from "@/components/PrintButton";
+import { ShareButton } from "@/components/ShareButton";
 import { StickyActionBar } from "@/components/StickyActionBar";
 import { TertiaryButton } from "@/components/TertiaryButton";
 import { IssuePhotoGallery } from "@/components/IssuePhotoGallery";
@@ -248,6 +249,10 @@ export default function EventDetailPage() {
                       </Tag>
                     ) : null}
                   </div>
+                  <ShareButton
+                    language={language}
+                    title={linkedIssue?.title || eventData.meetupAddress || content.detail.defaultTitle}
+                  />
                 </div>
 
                 <h1>{linkedIssue?.title || eventData.meetupAddress || content.detail.defaultTitle}</h1>
