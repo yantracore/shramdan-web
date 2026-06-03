@@ -7305,7 +7305,7 @@
 .live-issues-section {
   width: min(1180px, calc(100% - 32px));
   margin: 0 auto;
-  padding: 48px 0;
+  padding: 48px 0 0;
   display: grid;
   gap: 20px;
 }
@@ -7489,7 +7489,7 @@
 
 @media (max-width: 720px) {
   .live-issues-section {
-    padding: 40px 0;
+    padding: 40px 0 0;
   }
 
   .live-issues-header {
