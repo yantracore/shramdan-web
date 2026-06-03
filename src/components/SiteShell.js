@@ -17,7 +17,6 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { FaFacebookF, FaTiktok, FaXTwitter, FaYoutube } from "react-icons/fa6";
 import { BackToTop } from "@/components/BackToTop";
-import { CommandPalette } from "@/components/CommandPalette";
 import { KeyboardShortcutsDialog } from "@/components/KeyboardShortcutsDialog";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { NotificationsBell } from "@/components/NotificationsBell";
@@ -272,8 +271,7 @@ export function SiteShell({ children, pageTitle }) {
               </Button>
             </Tooltip>
             <SettingsPopover />
-            <CommandPalette language={language} />
-            <NotificationsBell language={language} />
+            {isAuthenticated ? <NotificationsBell language={language} /> : null}
           </div>
           {isAuthenticated ? (
             <Dropdown menu={userMenu} placement="bottomRight" trigger={["click"]}>
