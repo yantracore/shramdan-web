@@ -345,6 +345,204 @@ export const DEMO_LIVE_EVENTS = [
     imageSlug: "hetauda-trees",
     imagePrompt:
       "Hetauda Ratna Park eastern open ground mid-planting; rows of small saplings staked into freshly turned soil, blue water cans nearby; community members of mixed ages including a school group helping water the plantings; clear afternoon sky."
+  },
+  {
+    id: "demo-live-10",
+    title: "साँखु मन्दिर परिसर सरसफाइ",
+    addressText: "बज्रयोगिनी मन्दिर, साँखु",
+    rolesNeeded: DEMO_ROSTER,
+    participantCount: 24,
+    meetupNotes:
+      "बज्रयोगिनी मन्दिर मुख्य गेट छेउ भेला। पुजारी समितिले स्वागत; ऐतिहासिक संरचना छेउछाउ अत्यन्तै सावधानी आवश्यक।",
+    linkedIssue: {
+      id: "demo-issue-sankhu-l10",
+      title: "बज्रयोगिनी परिसर र सडक छेउ फोहोर",
+      description:
+        "साँखुको ऐतिहासिक बज्रयोगिनी मन्दिर परिसरमा पूजा सामग्री र पर्यटक प्लास्टिकको दैनिक थुप्रो। मन्दिर समिति र वडाको साझेदारीमा हप्तामा दुई पटक सरसफाइ।",
+      category: "cleanup",
+      addressText: "साँखु, काठमाडौँ",
+      latitude: 27.7444,
+      longitude: 85.4644,
+      voteCount: 64,
+      status: "EVENT_SCHEDULED"
+    },
+    liveStream: {
+      isActive: true,
+      startedAt: new Date(Date.now() - 26 * 60_000).toISOString(),
+      streamUrl: localDemoVideo("sankhu-temple"),
+      previewEmbedUrl: localDemoVideo("sankhu-temple"),
+      thumbnailUrl: localDemoPoster("sankhu-temple"),
+      viewerCount: 71,
+      videoSlug: "sankhu-temple"
+    },
+    imageSlug: "sankhu-temple",
+    imagePrompt:
+      "Sankhu Bajrayogini temple courtyard with worn red-brick walls and intricately carved wooden struts; volunteers in respectful attire sweeping fallen flower offerings and plastic packets into bamboo baskets; the temple bell visible in the background; soft mid-morning light."
+  },
+  {
+    id: "demo-live-11",
+    title: "सौराहा गैँडा सेल्टर वरपर सरसफाइ",
+    addressText: "सौराहा बस्ती, चितवन",
+    rolesNeeded: DEMO_ROSTER,
+    participantCount: 36,
+    meetupNotes:
+      "सौराहा हात्ती सेल्टर प्रवेश छेउ भेला। निकुञ्ज प्रशासन र गाइड समितिले सहयोग। जंगली जनावरको भेटिने सम्भावना — सुरक्षा निर्देशन पालना अनिवार्य।",
+    linkedIssue: {
+      id: "demo-issue-sauraha-l11",
+      title: "सौराहा बफर जोनमा पर्यटक प्लास्टिकले प्रदूषण",
+      description:
+        "चितवन राष्ट्रिय निकुञ्ज सौराहा बफर जोन — पर्यटक संख्या उच्च भएको कारण प्लास्टिक फोहोर। गैँडा र हात्ती बस्ने क्षेत्र भएकोले सरसफाइ अति आवश्यक।",
+      category: "cleanup",
+      addressText: "सौराहा, चितवन",
+      latitude: 27.5806,
+      longitude: 84.4972,
+      voteCount: 184,
+      status: "EVENT_SCHEDULED"
+    },
+    liveStream: {
+      isActive: true,
+      startedAt: new Date(Date.now() - 54 * 60_000).toISOString(),
+      streamUrl: localDemoVideo("sauraha-buffer"),
+      previewEmbedUrl: localDemoVideo("sauraha-buffer"),
+      thumbnailUrl: localDemoPoster("sauraha-buffer"),
+      viewerCount: 213,
+      videoSlug: "sauraha-buffer"
+    },
+    imageSlug: "sauraha-buffer",
+    imagePrompt:
+      "Sauraha buffer zone forest edge near the Chitwan National Park boundary; volunteers and uniformed park guides walking single-file along the trail collecting plastic into clear bags; tall sal trees with golden afternoon light filtering through; the Rapti river visible in the distance."
+  },
+  {
+    id: "demo-live-12",
+    title: "पाँचथर ओमे डाँडा वृक्षारोपण",
+    addressText: "ओमे डाँडा, पाँचथर",
+    rolesNeeded: DEMO_ROSTER,
+    participantCount: 18,
+    meetupNotes:
+      "ओमे डाँडा हेलिप्याडमा भेला। ट्र्याक्टरले बिरुवा र पानी डाँडामा पुर्‍याउने। मौसम बदलिनसक्ने — रेन्कोट ल्याए राम्रो।",
+    linkedIssue: {
+      id: "demo-issue-panchthar-l12",
+      title: "ओमे डाँडा मा वृक्षारोपणको आवश्यकता",
+      description:
+        "पाँचथरको ओमे डाँडा खाली; मनसुनमा माटो खस्किने जोखिम। डिभिजन वन कार्यालयले ३०० बिरुवा (चिलाउने, उत्तिस) उपलब्ध गराएको।",
+      category: "afforestation",
+      addressText: "ओमे डाँडा, पाँचथर",
+      latitude: 27.1383,
+      longitude: 87.8417,
+      voteCount: 52,
+      status: "EVENT_SCHEDULED"
+    },
+    liveStream: {
+      isActive: true,
+      startedAt: new Date(Date.now() - 39 * 60_000).toISOString(),
+      streamUrl: localDemoVideo("panchthar-trees"),
+      previewEmbedUrl: localDemoVideo("panchthar-trees"),
+      thumbnailUrl: localDemoPoster("panchthar-trees"),
+      viewerCount: 48,
+      videoSlug: "panchthar-trees"
+    },
+    imageSlug: "panchthar-trees",
+    imagePrompt:
+      "Ome Danda ridge in Panchthar district, mid-hills landscape with terraced fields below; volunteers in light jackets and woollen caps planting young saplings staked at regular intervals along the slope; mist curling up from the valley behind them; cool morning light."
+  },
+  {
+    id: "demo-live-13",
+    title: "नुवाकोट दरबार परिसर मर्मत",
+    addressText: "नुवाकोट सात तले दरबार, नुवाकोट",
+    rolesNeeded: DEMO_ROSTER,
+    participantCount: 27,
+    meetupNotes:
+      "नुवाकोट दरबार मुख्य गेट छेउ भेला। पुरातत्व विभागको प्रतिनिधि उपस्थित; ऐतिहासिक संरचना छुने अनुमति नभएको खण्डमा छुनेबाट जोगिने।",
+    linkedIssue: {
+      id: "demo-issue-nuwakot-l13",
+      title: "नुवाकोट दरबार परिसर अव्यवस्थित र फोहोर",
+      description:
+        "ऐतिहासिक नुवाकोट सात तले दरबार परिसर वर्षौंदेखि व्यवस्थित सरसफाइ नभएको; पुरातत्व विभागले स्वीकृति दिए। ध्यानपूर्वक छुट्याउने काम।",
+      category: "cleanup",
+      addressText: "नुवाकोट दरबार, नुवाकोट",
+      latitude: 27.9114,
+      longitude: 85.1675,
+      voteCount: 96,
+      status: "EVENT_SCHEDULED"
+    },
+    liveStream: {
+      isActive: true,
+      startedAt: new Date(Date.now() - 71 * 60_000).toISOString(),
+      streamUrl: localDemoVideo("nuwakot-darbar"),
+      previewEmbedUrl: localDemoVideo("nuwakot-darbar"),
+      thumbnailUrl: localDemoPoster("nuwakot-darbar"),
+      viewerCount: 108,
+      videoSlug: "nuwakot-darbar"
+    },
+    imageSlug: "nuwakot-darbar",
+    imagePrompt:
+      "Nuwakot seven-storey palace courtyard with characteristic red-brick and timber Newar architecture rising in the background; volunteers carefully separating modern debris from heritage stone fragments into different baskets; a Department of Archaeology officer in uniform supervising; clear morning sky over the Trishuli valley."
+  },
+  {
+    id: "demo-live-14",
+    title: "मनाङ चेम भिलेज ट्रेल मर्मत",
+    addressText: "चेम गाउँ ट्रेल, मनाङ",
+    rolesNeeded: DEMO_ROSTER,
+    participantCount: 15,
+    meetupNotes:
+      "चेम गाउँ चेकपोस्टमा भेला। ट्रेल भिर भएकोले हाइकिङ बुट र हेल्मेट अनिवार्य; हाइकर ACAP कार्डधारी हुनुपर्ने।",
+    linkedIssue: {
+      id: "demo-issue-manang-l14",
+      title: "चेम-मनाङ ट्रेलमा साइनबोर्ड गायब; पर्यटक हराउने",
+      description:
+        "मनाङको चेम-गाउँ ट्रेलमा १८ ठाउँमा साइन गायब; ACAP को नियमित मर्मत भएन। पर्यटक हराउने जोखिम। ACAP र स्थानीय गाइड संघको साझेदारी।",
+      category: "trail",
+      addressText: "मनाङ चेम, मनाङ",
+      latitude: 28.6633,
+      longitude: 84.0167,
+      voteCount: 73,
+      status: "EVENT_SCHEDULED"
+    },
+    liveStream: {
+      isActive: true,
+      startedAt: new Date(Date.now() - 92 * 60_000).toISOString(),
+      streamUrl: localDemoVideo("manang-trail"),
+      previewEmbedUrl: localDemoVideo("manang-trail"),
+      thumbnailUrl: localDemoPoster("manang-trail"),
+      viewerCount: 134,
+      videoSlug: "manang-trail"
+    },
+    imageSlug: "manang-trail",
+    imagePrompt:
+      "Manang Chame high-mountain trail with prayer flags strung between rough stone walls; volunteers in winter jackets mounting fresh wooden direction signs at a switchback; snow-dusted Annapurna peaks rising in the background; thin high-altitude air, clear cold light."
+  },
+  {
+    id: "demo-live-15",
+    title: "स्याङ्जा पाँडव गुफा वरपर सरसफाइ",
+    addressText: "पाँडव गुफा, स्याङ्जा",
+    rolesNeeded: DEMO_ROSTER,
+    participantCount: 21,
+    meetupNotes:
+      "स्याङ्जा बजार बस पार्कमा भेला; बस ले गुफा सम्म लैजाने। टर्चलाइट र हेल्मेट टीमले उपलब्ध गराउने। गुफा भित्र सावधानी।",
+    linkedIssue: {
+      id: "demo-issue-syangja-l15",
+      title: "पाँडव गुफा परिसर र भित्र फोहोर थुप्रिएको",
+      description:
+        "ऐतिहासिक पाँडव गुफा स्याङ्जाको प्रमुख पर्यटक स्थल; पर्यटकले छोडेर जाने प्लास्टिक र भित्र अन्धकारमा फोहोर थुप्रिने। पर्यटन समितिले सहयोग।",
+      category: "cleanup",
+      addressText: "पाँडव गुफा, स्याङ्जा",
+      latitude: 28.0617,
+      longitude: 83.8489,
+      voteCount: 81,
+      status: "EVENT_SCHEDULED"
+    },
+    liveStream: {
+      isActive: true,
+      startedAt: new Date(Date.now() - 43 * 60_000).toISOString(),
+      streamUrl: localDemoVideo("syangja-cave"),
+      previewEmbedUrl: localDemoVideo("syangja-cave"),
+      thumbnailUrl: localDemoPoster("syangja-cave"),
+      viewerCount: 88,
+      videoSlug: "syangja-cave"
+    },
+    imageSlug: "syangja-cave",
+    imagePrompt:
+      "Pandav cave entrance in Syangja, limestone outcrop with the cave mouth visible behind; volunteers wearing helmets and headlamps coming out with bags of collected litter; the misty Syangja hills rolling in the background; soft overcast light filtering through trees."
   }
 ];
 
@@ -810,6 +1008,378 @@ export const DEMO_UPCOMING_EVENTS = [
     imageSlug: "okhaldhunga-school",
     imagePrompt:
       "Hillside school in Okhaldhunga, freshly painted sky-blue exterior walls with white trim; a row of school children in uniform watching shyly from the courtyard while a handful of adult volunteers finish the last corner; pine-clad hills rolling behind the schoolyard."
+  },
+  {
+    id: "demo-up-16",
+    title: "धादिङ्ग गलछी सडक छेउ वृक्षारोपण",
+    addressText: "गलछी चोक, धादिङ",
+    category: "afforestation",
+    thumbnailUrl: "/images/demo-events/galchhi-roadside.jpg",
+    scheduledAt: inHours(78),
+    durationMinutes: 240,
+    meetupLatitude: 27.8447,
+    meetupLongitude: 84.9886,
+    leaderName: "दिनेश गुरुङ",
+    rolesNeeded: DEMO_ROSTER,
+    riskLevel: "NORMAL",
+    meetupNotes:
+      "गलछी चोक बस स्टपमा भेला। पृथ्वी राजमार्ग छेउ — सडक यातायातसँग सावधानी। डिभिजन वन कार्यालयले बिरुवा र पानी पुर्‍याउने।",
+    linkedIssue: {
+      id: "demo-issue-galchhi-16",
+      title: "पृथ्वी राजमार्ग गलछी खण्ड छेउ रित्तो; धुलो र गर्मीको कष्ट",
+      description:
+        "गलछी देखि मलेखु ४ किमी राजमार्ग छेउ खाली; गर्मीमा बस यात्रु र स्थानीयलाई असजिलो। ३५० बिरुवा रोप्ने योजना।",
+      category: "afforestation",
+      addressText: "गलछी, धादिङ",
+      latitude: 27.8447,
+      longitude: 84.9886,
+      voteCount: 79,
+      status: "EVENT_SCHEDULED"
+    },
+    imageSlug: "galchhi-roadside",
+    imagePrompt:
+      "Prithvi Highway near Galchhi with traffic streaming past; volunteers planting saplings in a long row along the roadside, water cans staged at intervals; the Trishuli river visible below the road; dry afternoon light with hills hazy in the distance."
+  },
+  {
+    id: "demo-up-17",
+    title: "रौतहट गौर बजार सरसफाइ",
+    addressText: "गौर मूल बजार, रौतहट",
+    category: "cleanup",
+    thumbnailUrl: "/images/demo-events/gaur-bazaar.jpg",
+    scheduledAt: inHours(102),
+    durationMinutes: 240,
+    meetupLatitude: 26.7625,
+    meetupLongitude: 85.2811,
+    leaderName: "रामकुमार यादव",
+    rolesNeeded: DEMO_ROSTER,
+    riskLevel: "NORMAL",
+    meetupNotes:
+      "गौर मूल बजार चोकमा भेला। हाटको दिनलाई जोडिने; नगरले ट्रक र अग्रिम छुट्याउने काम सहयोग गर्ने।",
+    linkedIssue: {
+      id: "demo-issue-rautahat-17",
+      title: "गौर बजार हाट दिन फोहोरको चाङ",
+      description:
+        "रौतहटको गौर बजारमा हाट दिन (आइतबार/बुधबार) फोहोर थुप्रिएर बजार सम्बन्धी व्यवसाय असजिलो। नगर र व्यापारी सङ्घको साझेदारी।",
+      category: "cleanup",
+      addressText: "गौर, रौतहट",
+      latitude: 26.7625,
+      longitude: 85.2811,
+      voteCount: 64,
+      status: "EVENT_SCHEDULED"
+    },
+    imageSlug: "gaur-bazaar",
+    imagePrompt:
+      "Gaur market in Rautahat after the haat day; volunteers in everyday Madhesi clothing sweeping stall lanes piled with vegetable scraps and torn polythene; a municipal cart waiting at the edge to receive the gathered waste; warm late-afternoon dust hanging in the air."
+  },
+  {
+    id: "demo-up-18",
+    title: "मकवानपुर बेन्द्राङ्ग ट्रेल सरसफाइ",
+    addressText: "बेन्द्राङ्ग ट्रेल, मकवानपुर",
+    category: "trail",
+    thumbnailUrl: "/images/demo-events/bendrang-trail.jpg",
+    scheduledAt: inHours(186),
+    durationMinutes: 300,
+    meetupLatitude: 27.5333,
+    meetupLongitude: 85.1167,
+    leaderName: "कमला अधिकारी",
+    rolesNeeded: DEMO_ROSTER,
+    riskLevel: "WATCH",
+    meetupNotes:
+      "बेन्द्राङ्ग गाउँ ब्रिज छेउ भेला। ट्रेल भिर भएकोले हाइकिङ बुट र पानी अनिवार्य; मौसम अनुसार रेन्कोट।",
+    linkedIssue: {
+      id: "demo-issue-bendrang-18",
+      title: "बेन्द्राङ्ग हाइकिङ ट्रेलमा साइन गायब र इरोसन",
+      description:
+        "मकवानपुरको बेन्द्राङ्ग ट्रेल पर्यटक र स्थानीय हाइकरको प्रिय; तर साइन गायब र दुई खण्डमा इरोसन। नगरले अनुमति र सामग्री दिए।",
+      category: "trail",
+      addressText: "बेन्द्राङ्ग, मकवानपुर",
+      latitude: 27.5333,
+      longitude: 85.1167,
+      voteCount: 87,
+      status: "EVENT_SCHEDULED"
+    },
+    imageSlug: "bendrang-trail",
+    imagePrompt:
+      "Forested hiking trail in Makwanpur winding through pine and rhododendron; volunteers steadying a fresh wooden direction post into the ground while another lays packed stone over an eroded patch nearby; soft filtered light through the canopy."
+  },
+  {
+    id: "demo-up-19",
+    title: "तापलेजुङ कन्जरभेसन एरिया सरसफाइ",
+    addressText: "घुन्सा बस्ती, तापलेजुङ",
+    category: "cleanup",
+    thumbnailUrl: "/images/demo-events/ghunsa-conservation.jpg",
+    scheduledAt: inHours(312),
+    durationMinutes: 360,
+    meetupLatitude: 27.6500,
+    meetupLongitude: 87.9167,
+    leaderName: "कर्ण शेर्पा",
+    rolesNeeded: DEMO_ROSTER,
+    riskLevel: "URGENT",
+    meetupNotes:
+      "घुन्सा बस्ती मध्य भेला। उच्च हिमाली क्षेत्र — कमसेकम ६,००० मि. सम्म जान सक्ने तयारी। KCAP कार्ड अनिवार्य।",
+    linkedIssue: {
+      id: "demo-issue-taplejung-19",
+      title: "कञ्चनजङ्घा कन्जरभेसन एरिया ट्रेकर प्लास्टिक",
+      description:
+        "KCAP को ट्रेक मार्गमा पर्यटकले छोडेका प्लास्टिक र क्यानमा वन्यजन्तु जोखिम; उच्च उचाइको कारण विघटन ढिलो। KCAP प्रशासन र स्थानीय गाइड संघको साझेदारी।",
+      category: "cleanup",
+      addressText: "घुन्सा, तापलेजुङ",
+      latitude: 27.6500,
+      longitude: 87.9167,
+      voteCount: 128,
+      status: "EVENT_SCHEDULED"
+    },
+    imageSlug: "ghunsa-conservation",
+    imagePrompt:
+      "Ghunsa village in the Kanchenjunga Conservation Area; trekkers and local porters in down jackets gathering bags of plastic and tin debris from the trail edges; stone-built Sherpa houses and prayer flags in the background; thin air and crisp light, mountains hazy in the distance."
+  },
+  {
+    id: "demo-up-20",
+    title: "कैलाली घोडाघोडी सरसफाइ",
+    addressText: "घोडाघोडी ताल, कैलाली",
+    category: "cleanup",
+    thumbnailUrl: "/images/demo-events/ghodaghodi-lake.jpg",
+    scheduledAt: inHours(126),
+    durationMinutes: 240,
+    meetupLatitude: 28.7333,
+    meetupLongitude: 80.9333,
+    leaderName: "बिनिता चौधरी",
+    rolesNeeded: DEMO_ROSTER,
+    riskLevel: "WATCH",
+    meetupNotes:
+      "घोडाघोडी ताल मूल प्रवेश द्वार छेउ भेला। ताल किनार वर्षायाममा हिलाम्मे — चप्पल वा रबर बुट ल्याउनुहोस्।",
+    linkedIssue: {
+      id: "demo-issue-kailali-20",
+      title: "घोडाघोडी ताल किनार पर्यटक प्लास्टिकले प्रदूषित",
+      description:
+        "कैलालीको घोडाघोडी रामसार सूचीकृत ताल; पर्यटक वृद्धि र स्थानीय अव्यवस्थित विसर्जनले किनार प्रदूषित। रामसार समिति र वडाको साझेदारीमा।",
+      category: "cleanup",
+      addressText: "घोडाघोडी ताल, कैलाली",
+      latitude: 28.7333,
+      longitude: 80.9333,
+      voteCount: 102,
+      status: "EVENT_SCHEDULED"
+    },
+    imageSlug: "ghodaghodi-lake",
+    imagePrompt:
+      "Ghodaghodi lake in Kailali at sunset, lotus pads floating on still water; volunteers in rolled-up trousers gathering plastic bottles and packets from the marshy edge into clear bags; reeds and small wading birds along the shoreline."
+  },
+  {
+    id: "demo-up-21",
+    title: "बझाङ खप्तड मन्दिर ट्रेल मर्मत",
+    addressText: "खप्तड डाँडा, बझाङ",
+    category: "trail",
+    thumbnailUrl: "/images/demo-events/khaptad-trail.jpg",
+    scheduledAt: inHours(264),
+    durationMinutes: 360,
+    meetupLatitude: 29.3667,
+    meetupLongitude: 81.1833,
+    leaderName: "देव बहादुर थापा",
+    rolesNeeded: DEMO_ROSTER,
+    riskLevel: "WATCH",
+    meetupNotes:
+      "खप्तड क्याम्प छेउ हाजिर। उच्च उचाइ; तातो लुगा अनिवार्य। निकुञ्ज प्रशासनको गाइड साथमा।",
+    linkedIssue: {
+      id: "demo-issue-bajhang-21",
+      title: "खप्तड मन्दिर ट्रेल साइन र पैदलमार्ग जीर्ण",
+      description:
+        "खप्तड राष्ट्रिय निकुञ्ज भित्र खप्तड मन्दिरसम्मको ट्रेलमा साइन गायब र भिर खण्डमा पैदलमार्ग जीर्ण। निकुञ्ज प्रशासनले अनुमति र सामग्री।",
+      category: "trail",
+      addressText: "खप्तड, बझाङ",
+      latitude: 29.3667,
+      longitude: 81.1833,
+      voteCount: 58,
+      status: "EVENT_SCHEDULED"
+    },
+    imageSlug: "khaptad-trail",
+    imagePrompt:
+      "Khaptad high-altitude grassland trail with the small whitewashed temple visible in the distance; volunteers mounting stone-and-wood directional cairns at a junction; herds of grazing yaks in the meadow nearby; cold thin air and broad blue sky over the Khaptad plateau."
+  },
+  {
+    id: "demo-up-22",
+    title: "रसुवा लाङटाङ बस्ती मर्मत",
+    addressText: "लाङटाङ बस्ती, रसुवा",
+    category: "infrastructure",
+    thumbnailUrl: "/images/demo-events/langtang-village.jpg",
+    scheduledAt: inHours(156),
+    durationMinutes: 360,
+    meetupLatitude: 28.2167,
+    meetupLongitude: 85.5500,
+    leaderName: "तेन्जिङ शेर्पा",
+    rolesNeeded: DEMO_ROSTER,
+    riskLevel: "URGENT",
+    meetupNotes:
+      "नयाँ लाङटाङ बस्ती चियाघरमा भेला। भूकम्प जोखिम क्षेत्र — स्थानीय गाइडको निर्देशन अनिवार्य। उच्च उचाइ।",
+    linkedIssue: {
+      id: "demo-issue-rasuwa-22",
+      title: "लाङटाङ बस्ती समुदाय भवन मर्मत आवश्यक",
+      description:
+        "२०७२ भूकम्प पछि नयाँ लाङटाङ बस्तीको सामुदायिक भवन र खानेपानी प्रणाली अधुरो। ट्रेकिङ सिजन अघि मर्मत आवश्यक।",
+      category: "infrastructure",
+      addressText: "लाङटाङ, रसुवा",
+      latitude: 28.2167,
+      longitude: 85.5500,
+      voteCount: 174,
+      status: "EVENT_SCHEDULED"
+    },
+    imageSlug: "langtang-village",
+    imagePrompt:
+      "Langtang village rebuilt after the earthquake; volunteers and local Tamang villagers fitting timber beams onto the community hall under reconstruction; snow-capped Langtang Lirung visible behind the village; cold blue mid-morning sky."
+  },
+  {
+    id: "demo-up-23",
+    title: "तेह्रथुम विद्यालय पुस्तकालय मर्मत",
+    addressText: "श्री तीनथरे मा.वि., तेह्रथुम",
+    category: "infrastructure",
+    thumbnailUrl: "/images/demo-events/terhathum-library.jpg",
+    scheduledAt: inHours(204),
+    durationMinutes: 300,
+    meetupLatitude: 27.1167,
+    meetupLongitude: 87.5333,
+    leaderName: "लक्ष्मी राई",
+    rolesNeeded: DEMO_ROSTER,
+    riskLevel: "NORMAL",
+    meetupNotes:
+      "स्कुलको खेलमैदान छेउ हाजिर; SMC अध्यक्षको स्वागत। पुरानो लुगा र पुस्तक हेरफेर तालिका टीमसँग।",
+    linkedIssue: {
+      id: "demo-issue-terhathum-23",
+      title: "श्री तीनथरे मा.वि. पुस्तकालय भवन र किताब अव्यवस्थित",
+      description:
+        "तेह्रथुमको श्री तीनथरे मा.वि. को पुस्तकालय भवनको झ्याल टुटेका र किताब क्रमबद्ध नभएको। ३४० विद्यार्थी प्रभावित। SMC ले सामग्री बेहोर्ने।",
+      category: "infrastructure",
+      addressText: "श्री तीनथरे मा.वि., तेह्रथुम",
+      latitude: 27.1167,
+      longitude: 87.5333,
+      voteCount: 71,
+      status: "EVENT_SCHEDULED"
+    },
+    imageSlug: "terhathum-library",
+    imagePrompt:
+      "Terhathum hillside school library with sunlight streaming through freshly repaired wooden windows; volunteers and older students arranging books on newly built bamboo shelves; younger students watching from the doorway; cool afternoon light, the Mechi hills visible outside."
+  },
+  {
+    id: "demo-up-24",
+    title: "हुम्ला सिमिकोट खानेपानी पाइप मर्मत",
+    addressText: "सिमिकोट बस्ती, हुम्ला",
+    category: "infrastructure",
+    thumbnailUrl: "/images/demo-events/simikot-water.jpg",
+    scheduledAt: inHours(348),
+    durationMinutes: 480,
+    meetupLatitude: 29.9667,
+    meetupLongitude: 81.8167,
+    leaderName: "पासाङ लामा",
+    rolesNeeded: DEMO_ROSTER,
+    riskLevel: "URGENT",
+    meetupNotes:
+      "सिमिकोट विमानस्थल छेउ भेला। उच्च हिमाली क्षेत्र — तातो लुगा र हेड्ल्याम्प अनिवार्य। स्थानीय गाइडको निर्देशन।",
+    linkedIssue: {
+      id: "demo-issue-humla-24",
+      title: "सिमिकोट खानेपानी पाइप ३ ठाउँमा फुटेको",
+      description:
+        "हुम्लाको सिमिकोट मूल बस्तीको खानेपानी पाइप ३ ठाउँमा फुटेर पानीको आपूर्ति अनियमित। खानेपानी संस्थानको प्राविधिक र हेलिकप्टरबाट सामग्री।",
+      category: "infrastructure",
+      addressText: "सिमिकोट, हुम्ला",
+      latitude: 29.9667,
+      longitude: 81.8167,
+      voteCount: 146,
+      status: "EVENT_SCHEDULED"
+    },
+    imageSlug: "simikot-water",
+    imagePrompt:
+      "Simikot village high in Humla district with snow on distant peaks; volunteers and water-supply technicians in heavy jackets fitting replacement sections of PVC pipe across a rocky stretch; villagers carrying brass and copper pots watching from a path above; thin cold air and bright high-altitude sun."
+  },
+  {
+    id: "demo-up-25",
+    title: "इलाम सुर्योदय ट्रेल सरसफाइ",
+    addressText: "अन्तु डाँडा, इलाम",
+    category: "trail",
+    thumbnailUrl: "/images/demo-events/antu-trail.jpg",
+    scheduledAt: inHours(174),
+    durationMinutes: 300,
+    meetupLatitude: 26.9214,
+    meetupLongitude: 88.0286,
+    leaderName: "गणेश राई",
+    rolesNeeded: DEMO_ROSTER,
+    riskLevel: "NORMAL",
+    meetupNotes:
+      "अन्तु डाँडा होटेल छेउ भेला। सूर्योदय व्यू पोइन्टसम्म ३ किमी हिँड्ने; तातो लुगा बिहान आवश्यक।",
+    linkedIssue: {
+      id: "demo-issue-antu-25",
+      title: "अन्तु डाँडा सूर्योदय व्यू पोइन्ट प्लास्टिकले फोहोर",
+      description:
+        "इलामको अन्तु डाँडा प्रसिद्ध सूर्योदय व्यू पोइन्ट; पर्यटकले छोडेका प्लास्टिक र चियाको कप थुप्रिएको। पर्यटन समितिले अनुमति र सामग्री।",
+      category: "trail",
+      addressText: "अन्तु डाँडा, इलाम",
+      latitude: 26.9214,
+      longitude: 88.0286,
+      voteCount: 89,
+      status: "EVENT_SCHEDULED"
+    },
+    imageSlug: "antu-trail",
+    imagePrompt:
+      "Antu Danda sunrise viewpoint in Ilam at dawn; volunteers in light jackets collecting plastic cups and food packets along the ridge trail; the Kanchenjunga massif glowing pink-gold above a sea of cloud below; tea bushes terraced across the foreground."
+  },
+  {
+    id: "demo-up-26",
+    title: "सिरहा गाउँले विद्यालय भित्ता पेन्ट",
+    addressText: "श्री जय बजरङबली मा.वि., सिरहा",
+    category: "infrastructure",
+    thumbnailUrl: "/images/demo-events/siraha-school.jpg",
+    scheduledAt: inHours(138),
+    durationMinutes: 360,
+    meetupLatitude: 26.6500,
+    meetupLongitude: 86.2167,
+    leaderName: "सुनिल यादव",
+    rolesNeeded: DEMO_ROSTER,
+    riskLevel: "NORMAL",
+    meetupNotes:
+      "स्कुलको मुख्य गेट छेउ भेला; SMC अध्यक्षको स्वागत। मधेसी सङ्गीतसँग खाजा।",
+    linkedIssue: {
+      id: "demo-issue-siraha-26",
+      title: "श्री जय बजरङबली मा.वि. भित्ता ७ वर्षदेखि पेन्ट नभएको",
+      description:
+        "सिरहाको ग्रामीण विद्यालय; भित्ता र शौचालय वर्षौंदेखि मर्मत नभएको। ५२० विद्यार्थी प्रभावित। SMC र वडाले सामग्री बेहोर्ने।",
+      category: "infrastructure",
+      addressText: "श्री जय बजरङबली मा.वि., सिरहा",
+      latitude: 26.6500,
+      longitude: 86.2167,
+      voteCount: 73,
+      status: "EVENT_SCHEDULED"
+    },
+    imageSlug: "siraha-school",
+    imagePrompt:
+      "Rural Madhesh school courtyard in Siraha district; freshly painted walls in cream and turquoise drying in afternoon sun; younger students in uniform watching from a doorway while volunteers in stained smocks finish the last corner; mango trees casting dappled shade across the yard."
+  },
+  {
+    id: "demo-up-27",
+    title: "सिन्धुपाल्चोक मेलम्ची नदी किनार सरसफाइ",
+    addressText: "मेलम्ची बजार, सिन्धुपाल्चोक",
+    category: "cleanup",
+    thumbnailUrl: "/images/demo-events/melamchi-riverbank.jpg",
+    scheduledAt: inHours(90),
+    durationMinutes: 240,
+    meetupLatitude: 27.8333,
+    meetupLongitude: 85.5167,
+    leaderName: "रोहित कार्की",
+    rolesNeeded: DEMO_ROSTER,
+    riskLevel: "WATCH",
+    meetupNotes:
+      "मेलम्ची बजार मुख्य पुलमा भेला। नदी किनार जोखिमपूर्ण; सुरक्षित दूरी कायम। पन्जा अनिवार्य।",
+    linkedIssue: {
+      id: "demo-issue-melamchi-27",
+      title: "मेलम्ची नदी किनार बाढी पछि फोहोरयुक्त",
+      description:
+        "२०७८ बाढीपछि मेलम्ची नदी किनार पूरा बस्ती फोहोरले प्रदूषित। नगरले अग्रिम र ट्रक उपलब्ध गराउने; बाढी पुनःस्थापना समितिको साझेदारी।",
+      category: "cleanup",
+      addressText: "मेलम्ची, सिन्धुपाल्चोक",
+      latitude: 27.8333,
+      longitude: 85.5167,
+      voteCount: 134,
+      status: "EVENT_SCHEDULED"
+    },
+    imageSlug: "melamchi-riverbank",
+    imagePrompt:
+      "Melamchi river bank in the post-flood landscape; volunteers in everyday clothing with municipal workers shovelling debris and silted plastic into truck beds; flood-damaged village buildings on either side of the river; overcast morning, the broad gravel bed of the river stretching upstream."
   }
 ];
 
@@ -1421,6 +1991,546 @@ export const DEMO_PAST_EVENTS = [
     imageSlug: "lamatar-done",
     imagePrompt:
       "Lamatar community park three months after planting; rows of young saplings staked into mounded earth, just beginning to leaf out; children walking between the rows with hand-painted name tags tied to selected trees; volunteers refilling watering cans from a community tap; soft early morning light."
+  },
+  {
+    id: "demo-past-13",
+    title: "कास्की सरङ्कोट हाइकिङ ट्रेल मर्मत",
+    addressText: "सरङ्कोट ट्रेल, पोखरा",
+    category: "trail",
+    thumbnailUrl: "/images/demo-events/sarangkot-done.jpg",
+    scheduledAt: daysAgo(11),
+    completedAt: daysAgo(11),
+    durationMinutes: 300,
+    meetupLatitude: 28.2435,
+    meetupLongitude: 83.9469,
+    leaderName: "बिनिता थापा",
+    participantCount: 42,
+    resultSummary:
+      "४.५ किमी सरङ्कोट हाइकिङ ट्रेल मर्मत; ४२ सहभागी; ११ नयाँ साइनबोर्ड; इरोसन भएको २ खण्डमा ढुङ्गा फेरि मिलाइयो।",
+    meetupNotes:
+      "सरङ्कोट हाइकिङ प्रवेश छेउ भेला। पर्यटन समितिले औजार र खाजा उपलब्ध गराइदिए।",
+    linkedIssue: {
+      id: "demo-issue-sarangkot-p13",
+      title: "सरङ्कोट सूर्योदय ट्रेल फोहोर र साइन गायब",
+      description:
+        "पोखराको प्रसिद्ध सरङ्कोट सूर्योदय व्यू ट्रेलमा साइन गायब, फोहोर र इरोसन। पर्यटक उच्च तर मर्मत नियमित नभएको।",
+      category: "trail",
+      addressText: "सरङ्कोट, कास्की",
+      latitude: 28.2435,
+      longitude: 83.9469,
+      voteCount: 115,
+      status: "COMPLETED"
+    },
+    photos: ["/images/event-types/trail.jpg"],
+    beforeAfter: {
+      before: "/images/event-types/trail.jpg",
+      after: "/images/event-types/trail.jpg"
+    },
+    testimonials: [
+      {
+        name: "बिनिता थापा",
+        role: "संयोजक",
+        quote: "अब पर्यटक हराउने डर छैन — हाइकिङ अनुभव नै फरक हुनेछ। पोखरा पर्यटनलाई पनि सहयोग।"
+      }
+    ],
+    imageSlug: "sarangkot-done",
+    imagePrompt:
+      "Sarangkot ridge trail in Pokhara at sunrise after restoration; freshly mounted wooden signs and stone steps along the path; trekkers from the morning sunrise tour passing by; the Annapurna range glowing pink-gold above Phewa lake in the distance."
+  },
+  {
+    id: "demo-past-14",
+    title: "मोरङ बेलबारी सडक छेउ रोपण",
+    addressText: "बेलबारी बजार, मोरङ",
+    category: "afforestation",
+    thumbnailUrl: "/images/demo-events/belbari-done.jpg",
+    scheduledAt: daysAgo(33),
+    completedAt: daysAgo(33),
+    durationMinutes: 240,
+    meetupLatitude: 26.5667,
+    meetupLongitude: 87.4667,
+    leaderName: "सुनिल मगर",
+    participantCount: 37,
+    resultSummary:
+      "बेलबारी बजार-पथरी सडक छेउ ३.२ किमीमा २८० बिरुवा रोपिए; ३७ सहभागी; अशोक, बकैनो र असुरो।",
+    meetupNotes:
+      "बेलबारी बस पार्क छेउ भेला। डिभिजन वन कार्यालयले बिरुवा र ट्र्याक्टर पुर्‍याइदिए।",
+    linkedIssue: {
+      id: "demo-issue-belbari-p14",
+      title: "बेलबारी पथरी सडक छेउ छहारीविहीन; गर्मीमा यात्रुको कष्ट",
+      description:
+        "मोरङको बेलबारी-पथरी सडक खण्ड लामो; गर्मीमा छहारीविहीन। वडाले बिरुवा अनुरोध गरेको लामो समयदेखि।",
+      category: "afforestation",
+      addressText: "बेलबारी, मोरङ",
+      latitude: 26.5667,
+      longitude: 87.4667,
+      voteCount: 84,
+      status: "COMPLETED"
+    },
+    photos: ["/images/event-types/afforestation.jpg"],
+    beforeAfter: {
+      before: "/images/homepage/cleanup-areas/roadside.jpg",
+      after: "/images/event-types/afforestation.jpg"
+    },
+    testimonials: [
+      {
+        name: "सुनिल मगर",
+        role: "संयोजक",
+        quote: "३ वर्षमा यो सडक छहारीले भरिने अपेक्षा छ। बेलबारी वडाले पनि नियमित पानी हाल्ने प्रतिबद्धता गऱ्यो।"
+      }
+    ],
+    imageSlug: "belbari-done",
+    imagePrompt:
+      "Belbari roadside in Morang, eastern Terai; long row of young saplings staked along the road shoulder, leaves beginning to spread; a tractor parked at the end with empty sapling trays; pedestrians and bicycles passing by in the dusty afternoon."
+  },
+  {
+    id: "demo-past-15",
+    title: "काभ्रे पनौती पुरातत्व सरसफाइ",
+    addressText: "पनौती पुरानो बस्ती, काभ्रे",
+    category: "cleanup",
+    thumbnailUrl: "/images/demo-events/panauti-done.jpg",
+    scheduledAt: daysAgo(24),
+    completedAt: daysAgo(24),
+    durationMinutes: 240,
+    meetupLatitude: 27.5786,
+    meetupLongitude: 85.5239,
+    leaderName: "रोहित कार्की",
+    participantCount: 31,
+    resultSummary:
+      "पनौती मूल चोक र इन्द्रेश्वर मन्दिर परिसर सरसफाइ; ३१ सहभागी; पुरातत्व विभागको प्रतिनिधि उपस्थित।",
+    meetupNotes:
+      "पनौती मूल बजार चोक भेला; मन्दिर समिति र पुरातत्वले स्वागत।",
+    linkedIssue: {
+      id: "demo-issue-panauti-p15",
+      title: "पनौती ऐतिहासिक बस्ती फोहोर र पुरातात्त्विक संरचना जोखिम",
+      description:
+        "काभ्रेको पनौती युनेस्को सूचीकृत पुरातात्त्विक बस्ती; तर अव्यवस्थित विसर्जनले बिग्रिँदै। पुरातत्व विभाग, मन्दिर समिति र वडाको साझेदारी।",
+      category: "cleanup",
+      addressText: "पनौती, काभ्रे",
+      latitude: 27.5786,
+      longitude: 85.5239,
+      voteCount: 96,
+      status: "COMPLETED"
+    },
+    photos: ["/images/event-types/cleanup.jpg"],
+    beforeAfter: {
+      before: "/images/event-types/cleanup.jpg",
+      after: "/images/event-types/cleanup.jpg"
+    },
+    testimonials: [
+      {
+        name: "रोहित कार्की",
+        role: "संयोजक",
+        quote: "पुरातत्व विभागको कर्मचारी उपस्थितिले हाम्रो काम झन गहन भयो — कुन ढुङ्गा छुने, कुन नछुने प्रत्यक्ष सिकाइ।"
+      }
+    ],
+    imageSlug: "panauti-done",
+    imagePrompt:
+      "Panauti old town courtyard after cleaning, traditional Newar brick-and-timber architecture in the background; volunteers chatting near a freshly cleared corner; the Indreshwar temple peeking above the rooftops; soft late afternoon light catching the carved struts."
+  },
+  {
+    id: "demo-past-16",
+    title: "बारा सिमरा बस पार्क सरसफाइ",
+    addressText: "सिमरा मूल बस पार्क, बारा",
+    category: "cleanup",
+    thumbnailUrl: "/images/demo-events/simara-done.jpg",
+    scheduledAt: daysAgo(17),
+    completedAt: daysAgo(17),
+    durationMinutes: 240,
+    meetupLatitude: 27.1611,
+    meetupLongitude: 84.9844,
+    leaderName: "रामकुमार यादव",
+    participantCount: 29,
+    resultSummary:
+      "सिमरा बस पार्क र वरपर ३०० मि. सडक छेउ सफा; २९ सहभागी; २.४ टन फोहोर हटाइयो।",
+    meetupNotes:
+      "सिमरा बस पार्क मुख्य प्रवेश छेउ भेला; नगरले ट्रक र अग्रिम छुट्याउने सहयोग।",
+    linkedIssue: {
+      id: "demo-issue-simara-p16",
+      title: "सिमरा बस पार्क वर्षौंदेखि फोहोरयुक्त",
+      description:
+        "बाराको सिमरा बस पार्क मुख्य ट्रान्जिट प्वाइन्ट; तर वर्षौंदेखि व्यवस्थित सरसफाइ नभएको। यातायात व्यवसायी सङ्घको साझेदारी।",
+      category: "cleanup",
+      addressText: "सिमरा, बारा",
+      latitude: 27.1611,
+      longitude: 84.9844,
+      voteCount: 67,
+      status: "COMPLETED"
+    },
+    photos: ["/images/event-types/cleanup.jpg"],
+    beforeAfter: {
+      before: "/images/homepage/cleanup-areas/roadside.jpg",
+      after: "/images/event-types/cleanup.jpg"
+    },
+    testimonials: [
+      {
+        name: "रामकुमार यादव",
+        role: "संयोजक",
+        quote: "यातायात व्यवसायीले पनि सहभागी भए — अब साप्ताहिक सरसफाइको योजना बनेको छ।"
+      }
+    ],
+    imageSlug: "simara-done",
+    imagePrompt:
+      "Simara bus park after cleanup; tour buses lined up along the dusty terminal; municipal cart being loaded with the day's collected waste; passengers and drivers chatting near a tea stall in the cleared corner; hot Terai afternoon sun."
+  },
+  {
+    id: "demo-past-17",
+    title: "गोरखा दरबार ट्रेल मर्मत",
+    addressText: "गोरखा दरबार, गोरखा",
+    category: "trail",
+    thumbnailUrl: "/images/demo-events/gorkha-done.jpg",
+    scheduledAt: daysAgo(58),
+    completedAt: daysAgo(58),
+    durationMinutes: 360,
+    meetupLatitude: 28.0000,
+    meetupLongitude: 84.6333,
+    leaderName: "देव बहादुर थापा",
+    participantCount: 49,
+    resultSummary:
+      "गोरखा बजार देखि दरबारसम्म १,६०० सिँढी सरसफाइ र साइन मर्मत; ४९ सहभागी।",
+    meetupNotes:
+      "गोरखा बजार चोक भेला; पुरातत्व विभागको प्रतिनिधिले स्वागत।",
+    linkedIssue: {
+      id: "demo-issue-gorkha-p17",
+      title: "गोरखा दरबार सिँढी जीर्ण र साइन गायब",
+      description:
+        "ऐतिहासिक गोरखा दरबारसम्मको पैदलमार्ग १,६०० सिँढी जीर्ण; पुरातत्व विभाग र नगरको साझेदारीमा मर्मत।",
+      category: "trail",
+      addressText: "गोरखा दरबार, गोरखा",
+      latitude: 28.0000,
+      longitude: 84.6333,
+      voteCount: 138,
+      status: "COMPLETED"
+    },
+    photos: ["/images/event-types/trail.jpg"],
+    beforeAfter: {
+      before: "/images/event-types/trail.jpg",
+      after: "/images/event-types/trail.jpg"
+    },
+    testimonials: [
+      {
+        name: "देव बहादुर थापा",
+        role: "संयोजक",
+        quote: "सिँढी मर्मतले पर्यटक अनुभव सुधार्ने मात्र होइन — ऐतिहासिक धरोहरको सम्मान पनि बढायो।"
+      }
+    ],
+    imageSlug: "gorkha-done",
+    imagePrompt:
+      "Gorkha durbar stairway after restoration; long stone steps climbing the ridge with the historic palace silhouetted at the top; volunteers resting near the midpoint with water bottles; the Manaslu range visible behind the durbar in clear morning air."
+  },
+  {
+    id: "demo-past-18",
+    title: "कान्छनपुर शुक्लाफाँट बफर सरसफाइ",
+    addressText: "शुक्लाफाँट बफर जोन, कान्छनपुर",
+    category: "cleanup",
+    thumbnailUrl: "/images/demo-events/shuklaphanta-done.jpg",
+    scheduledAt: daysAgo(72),
+    completedAt: daysAgo(72),
+    durationMinutes: 360,
+    meetupLatitude: 28.8333,
+    meetupLongitude: 80.1500,
+    leaderName: "बिनिता चौधरी",
+    participantCount: 53,
+    resultSummary:
+      "शुक्लाफाँट बफर जोन ४ खण्डमा सरसफाइ; ५३ सहभागी; ३.६ टन प्लास्टिक र काँचको बोतल सङ्कलन।",
+    meetupNotes:
+      "शुक्लाफाँट प्रवेश पोस्ट छेउ भेला; निकुञ्ज प्रशासन र गाइडको निर्देशन।",
+    linkedIssue: {
+      id: "demo-issue-shuklaphanta-p18",
+      title: "शुक्लाफाँट बफर जोन पर्यटक फोहोर थुप्रिएको",
+      description:
+        "कान्छनपुरको शुक्लाफाँट राष्ट्रिय निकुञ्ज बफर जोनमा पर्यटक र पिकनिक समूहले छोडेको फोहोर। निकुञ्ज प्रशासनको साझेदारी।",
+      category: "cleanup",
+      addressText: "शुक्लाफाँट, कान्छनपुर",
+      latitude: 28.8333,
+      longitude: 80.1500,
+      voteCount: 91,
+      status: "COMPLETED"
+    },
+    photos: ["/images/event-types/cleanup.jpg"],
+    beforeAfter: {
+      before: "/images/event-types/cleanup.jpg",
+      after: "/images/homepage/cleanup-areas/riverbanks.jpg"
+    },
+    testimonials: [
+      {
+        name: "बिनिता चौधरी",
+        role: "संयोजक",
+        quote: "निकुञ्जका पार्क रेन्जरले सहभागिता र निर्देशन दिए — संरक्षणलाई जोडिएको सरसफाइ भन्ने अनुभव।"
+      }
+    ],
+    imageSlug: "shuklaphanta-done",
+    imagePrompt:
+      "Shuklaphanta buffer zone grassland in Kanchanpur after cleanup; volunteers in earth-tone clothing carrying bags of plastic out of the tall grass; park rangers in green uniform supervising; deer visible far off in the meadow; warm late afternoon sun across the savanna."
+  },
+  {
+    id: "demo-past-19",
+    title: "रामेछाप मन्थली ट्रेल मर्मत",
+    addressText: "मन्थली बजार ट्रेल, रामेछाप",
+    category: "trail",
+    thumbnailUrl: "/images/demo-events/manthali-done.jpg",
+    scheduledAt: daysAgo(82),
+    completedAt: daysAgo(82),
+    durationMinutes: 300,
+    meetupLatitude: 27.5089,
+    meetupLongitude: 86.0833,
+    leaderName: "कमला अधिकारी",
+    participantCount: 28,
+    resultSummary:
+      "मन्थली देखि सहरे डाँडा ३.८ किमी ट्रेल मर्मत; २८ सहभागी; ७ साइन र इरोसन मर्मत।",
+    meetupNotes:
+      "मन्थली बजार बस पार्क भेला; नगरले औजार पुर्‍याइदिए।",
+    linkedIssue: {
+      id: "demo-issue-manthali-p19",
+      title: "मन्थली-सहरे ट्रेलमा इरोसन र साइन गायब",
+      description:
+        "रामेछापको मन्थली बस्ती देखि सहरे डाँडा हाइकिङ ट्रेल लामो; नियमित मर्मत नभएकोले इरोसन। नगरले अनुमति र सामग्री।",
+      category: "trail",
+      addressText: "मन्थली, रामेछाप",
+      latitude: 27.5089,
+      longitude: 86.0833,
+      voteCount: 58,
+      status: "COMPLETED"
+    },
+    photos: ["/images/event-types/trail.jpg"],
+    beforeAfter: {
+      before: "/images/event-types/trail.jpg",
+      after: "/images/event-types/trail.jpg"
+    },
+    testimonials: [
+      {
+        name: "कमला अधिकारी",
+        role: "संयोजक",
+        quote: "स्थानीय हाइकर समूहले अब साप्ताहिक चहार-मर्मत प्रतिबद्धता गऱ्यो। टिकाउ हुने सङ्केत।"
+      }
+    ],
+    imageSlug: "manthali-done",
+    imagePrompt:
+      "Manthali to Sahare ridge trail in Ramechhap after restoration; fresh wooden signs along the path and packed stone reinforcing eroded sections; the broad Sun Koshi valley visible far below; cool clear post-monsoon air."
+  },
+  {
+    id: "demo-past-20",
+    title: "ताप्लेजुङ फाक्ताङ्लुङ डाँडा सरसफाइ",
+    addressText: "फाक्ताङ्लुङ डाँडा, ताप्लेजुङ",
+    category: "cleanup",
+    thumbnailUrl: "/images/demo-events/phaktanglung-done.jpg",
+    scheduledAt: daysAgo(105),
+    completedAt: daysAgo(105),
+    durationMinutes: 300,
+    meetupLatitude: 27.5500,
+    meetupLongitude: 87.7333,
+    leaderName: "कर्ण शेर्पा",
+    participantCount: 22,
+    resultSummary:
+      "फाक्ताङ्लुङ डाँडा हाइकिङ ट्रेल सरसफाइ; २२ सहभागी; ऐतिहासिक स्तूप परिसर पनि सम्मिलित।",
+    meetupNotes:
+      "फाक्ताङ्लुङ ट्रेल प्रवेश छेउ भेला। उच्च उचाइ; तातो लुगा अनिवार्य।",
+    linkedIssue: {
+      id: "demo-issue-phaktanglung-p20",
+      title: "फाक्ताङ्लुङ डाँडा पर्यटक प्लास्टिकले प्रदूषित",
+      description:
+        "ताप्लेजुङको फाक्ताङ्लुङ डाँडा बौद्ध तीर्थस्थल; तीर्थयात्री र हाइकरले छोडेको प्लास्टिक। स्थानीय बौद्ध समिति र वडाको साझेदारी।",
+      category: "cleanup",
+      addressText: "फाक्ताङ्लुङ, ताप्लेजुङ",
+      latitude: 27.5500,
+      longitude: 87.7333,
+      voteCount: 47,
+      status: "COMPLETED"
+    },
+    photos: ["/images/event-types/cleanup.jpg"],
+    beforeAfter: {
+      before: "/images/event-types/cleanup.jpg",
+      after: "/images/event-types/cleanup.jpg"
+    },
+    testimonials: [
+      {
+        name: "कर्ण शेर्पा",
+        role: "संयोजक",
+        quote: "बौद्ध स्तूप परिसर सफा देख्दा तीर्थयात्रीले पनि आफै ध्यान दिने भएका छन्। सानो शुरुवात तर महत्वपूर्ण।"
+      }
+    ],
+    imageSlug: "phaktanglung-done",
+    imagePrompt:
+      "Phaktanglung ridge in Taplejung at sunset; small whitewashed Buddhist stupa with prayer flags fluttering; volunteers in winter jackets resting after a day of collection; the eastern Himalayan ridges fading into haze."
+  },
+  {
+    id: "demo-past-21",
+    title: "दाङ देउखुरी सडक छेउ रोपण",
+    addressText: "लम्ही चोक, दाङ",
+    category: "afforestation",
+    thumbnailUrl: "/images/demo-events/lamhi-done.jpg",
+    scheduledAt: daysAgo(120),
+    completedAt: daysAgo(120),
+    durationMinutes: 240,
+    meetupLatitude: 28.0500,
+    meetupLongitude: 82.5000,
+    leaderName: "अमित गुरुङ",
+    participantCount: 35,
+    resultSummary:
+      "लम्ही-देउखुरी ४ किमी सडक छेउ ३०० बिरुवा रोपिए; ३५ सहभागी।",
+    meetupNotes:
+      "लम्ही चोक छेउ भेला; वडा कार्यालय र वन कार्यालयको स्वागत।",
+    linkedIssue: {
+      id: "demo-issue-lamhi-p21",
+      title: "लम्ही-देउखुरी सडक छहारीविहीन",
+      description:
+        "दाङको लम्ही-देउखुरी सडक खण्ड लामो; गर्मीमा यात्रुलाई कष्ट। डिभिजन वन कार्यालयले बिरुवा र अनुमति।",
+      category: "afforestation",
+      addressText: "लम्ही, दाङ",
+      latitude: 28.0500,
+      longitude: 82.5000,
+      voteCount: 76,
+      status: "COMPLETED"
+    },
+    photos: ["/images/event-types/afforestation.jpg"],
+    beforeAfter: {
+      before: "/images/homepage/cleanup-areas/empty-lands.jpg",
+      after: "/images/event-types/afforestation.jpg"
+    },
+    testimonials: [
+      {
+        name: "अमित गुरुङ",
+        role: "संयोजक",
+        quote: "वडा कार्यालयले ३ महिनासम्म नियमित पानी हाल्ने टोली बनाएको — दिगो हुने सम्भावना बढी।"
+      }
+    ],
+    imageSlug: "lamhi-done",
+    imagePrompt:
+      "Lamhi to Deukhuri road in Dang district; young saplings staked along both sides of the gravel road; a tractor moving slowly with water tank in the distance; flat Terai farmland stretching to the horizon."
+  },
+  {
+    id: "demo-past-22",
+    title: "सोलुखुम्बु लुक्ला विमानस्थल सरसफाइ",
+    addressText: "लुक्ला बजार, सोलुखुम्बु",
+    category: "cleanup",
+    thumbnailUrl: "/images/demo-events/lukla-done.jpg",
+    scheduledAt: daysAgo(48),
+    completedAt: daysAgo(48),
+    durationMinutes: 240,
+    meetupLatitude: 27.6869,
+    meetupLongitude: 86.7314,
+    leaderName: "तेन्जिङ शेर्पा",
+    participantCount: 31,
+    resultSummary:
+      "लुक्ला विमानस्थल वरपर र बजार ५०० मि. सफा; ३१ सहभागी; ट्रेकरले लाएको प्लास्टिक र क्यान सङ्कलन।",
+    meetupNotes:
+      "लुक्ला विमानस्थल बाहिर चोक भेला; SPCC र पर्यटन समितिको स्वागत।",
+    linkedIssue: {
+      id: "demo-issue-lukla-p22",
+      title: "लुक्ला वरपर ट्रेकर प्लास्टिक",
+      description:
+        "एभरेस्ट ट्रेक प्रारम्भिक विन्दु लुक्ला; ट्रेकरले फालेका प्लास्टिक र क्यान। SPCC (सगरमाथा प्रदूषण नियन्त्रण समिति) र पर्यटन समितिको साझेदारी।",
+      category: "cleanup",
+      addressText: "लुक्ला, सोलुखुम्बु",
+      latitude: 27.6869,
+      longitude: 86.7314,
+      voteCount: 158,
+      status: "COMPLETED"
+    },
+    photos: ["/images/event-types/cleanup.jpg"],
+    beforeAfter: {
+      before: "/images/event-types/cleanup.jpg",
+      after: "/images/event-types/cleanup.jpg"
+    },
+    testimonials: [
+      {
+        name: "तेन्जिङ शेर्पा",
+        role: "संयोजक",
+        quote: "SPCC सँगै काम गर्दा ट्रेकर समूहलाई पनि स्पष्ट सन्देश गयो — अब लुक्ला सफा राख्ने जिम्मेवारी सबैको।"
+      }
+    ],
+    imageSlug: "lukla-done",
+    imagePrompt:
+      "Lukla airstrip in Solukhumbu after cleanup; the famous sloped runway in the foreground with prayer flags strung along it; volunteers and SPCC staff in red jackets carrying bagged waste toward a transport area; snow-dusted peaks visible in the high distance."
+  },
+  {
+    id: "demo-past-23",
+    title: "मुस्ताङ मार्फा गाउँ सरसफाइ",
+    addressText: "मार्फा बजार, मुस्ताङ",
+    category: "cleanup",
+    thumbnailUrl: "/images/demo-events/marpha-done.jpg",
+    scheduledAt: daysAgo(98),
+    completedAt: daysAgo(98),
+    durationMinutes: 240,
+    meetupLatitude: 28.7500,
+    meetupLongitude: 83.6833,
+    leaderName: "पासाङ लामा",
+    participantCount: 24,
+    resultSummary:
+      "मार्फा गाउँ बस्ती र वरपर पैदलमार्ग सरसफाइ; २४ सहभागी; ऐतिहासिक भवनहरूको परिसर सम्मिलित।",
+    meetupNotes:
+      "मार्फा गाउँ मूल चोक भेला; गाउँ समितिले स्वागत र खाजा।",
+    linkedIssue: {
+      id: "demo-issue-marpha-p23",
+      title: "मार्फा ऐतिहासिक गाउँ बस्ती फोहोर",
+      description:
+        "मुस्ताङको मार्फा ऐतिहासिक बस्ती; पर्यटक र ट्रेकरले छोडेका फोहोर। ACAP र गाउँ समितिको साझेदारी।",
+      category: "cleanup",
+      addressText: "मार्फा, मुस्ताङ",
+      latitude: 28.7500,
+      longitude: 83.6833,
+      voteCount: 89,
+      status: "COMPLETED"
+    },
+    photos: ["/images/event-types/cleanup.jpg"],
+    beforeAfter: {
+      before: "/images/event-types/cleanup.jpg",
+      after: "/images/event-types/cleanup.jpg"
+    },
+    testimonials: [
+      {
+        name: "पासाङ लामा",
+        role: "संयोजक",
+        quote: "मार्फाको पुरानो बजार सडक सफा देख्दा गाउँले र पर्यटक दुवैले फरक अनुभव पाए।"
+      }
+    ],
+    imageSlug: "marpha-done",
+    imagePrompt:
+      "Marpha village in Mustang with whitewashed flat-roofed houses lining the cobbled main street; volunteers sweeping the lane while villagers in traditional dress watch from doorways; apple trees in the side garden; dry high-altitude sun and crisp shadows."
+  },
+  {
+    id: "demo-past-24",
+    title: "धनकुटा हिले बजार सरसफाइ",
+    addressText: "हिले बजार, धनकुटा",
+    category: "cleanup",
+    thumbnailUrl: "/images/demo-events/hile-done.jpg",
+    scheduledAt: daysAgo(63),
+    completedAt: daysAgo(63),
+    durationMinutes: 240,
+    meetupLatitude: 27.0167,
+    meetupLongitude: 87.3500,
+    leaderName: "लक्ष्मी राई",
+    participantCount: 26,
+    resultSummary:
+      "हिले बजार र नाली २०० मि. सफा; २६ सहभागी; १.८ टन फोहोर हटाइयो।",
+    meetupNotes:
+      "हिले बजार मूल चोक भेला; नगरले औजार र ट्रक उपलब्ध।",
+    linkedIssue: {
+      id: "demo-issue-hile-p24",
+      title: "हिले बजार र नाली अव्यवस्थित",
+      description:
+        "धनकुटाको हिले बजार मुख्य ट्रान्जिट प्वाइन्ट; तर वर्षौंदेखि व्यवस्थित सरसफाइ नभएको। नगर र व्यापारी सङ्घको साझेदारी।",
+      category: "cleanup",
+      addressText: "हिले, धनकुटा",
+      latitude: 27.0167,
+      longitude: 87.3500,
+      voteCount: 62,
+      status: "COMPLETED"
+    },
+    photos: ["/images/event-types/cleanup.jpg"],
+    beforeAfter: {
+      before: "/images/homepage/cleanup-areas/drains.jpg",
+      after: "/images/event-types/cleanup.jpg"
+    },
+    testimonials: [
+      {
+        name: "लक्ष्मी राई",
+        role: "संयोजक",
+        quote: "व्यापारीहरूले पनि सहयोग गरे; अब साप्ताहिक सरसफाइको योजना बनेको छ।"
+      }
+    ],
+    imageSlug: "hile-done",
+    imagePrompt:
+      "Hile bazaar in Dhankuta after cleanup; the main bazaar lane lined with painted wooden shopfronts and tea shops; volunteers and shopkeepers chatting near a parked municipal cart loaded with cleared waste; cool eastern hills hazy in the distance."
   }
 ];
 
