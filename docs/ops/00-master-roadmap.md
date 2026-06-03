@@ -8,10 +8,10 @@
 >
 > **Companion folder:** backend API contracts the frontend depends on live in [`../api-requirements/`](../api-requirements/), introduced by the [2026-06-03 pivot ADR](../decisions/2026-06-03-ui-first-and-two-meeting-pivot.md). When a UI feature touches an entity covered there, update the matching domain file in the same session.
 
-## Overall Progress — 57%
+## Overall Progress — 66%
 
 ```
-0% [=========================================================-------------------------------------------] 100%
+0% [==================================================================----------------------------------] 100%
 ```
 
 The bar is 100 characters wide so each `=` equals exactly one percentage point. Recompute and redraw the bar in the same edit that changes any phase percentage — see [Aggregate Progress](#aggregate-progress) for the per-phase breakdown that feeds this number.
@@ -186,15 +186,15 @@ Goal: Anyone (logged-in or not) can browse listed issues, see detail, and — on
   - [x] 1.6.1 `/issues/new` route + form (title, description, category, location, cover image via existing presign flow) `w:1` ← done: 2026-05-28
   - [x] 1.6.2 Auth gating + post-submit redirect (un-auth click pushes `/login?next=/issues/new`; post-submit lands on the new issue's detail page) `w:1` ← done: 2026-05-28
 
-## Phase 2 — Member Portal `/app` (Mobile-style Web Shell) `w:18` 📊 33%
+## Phase 2 — Member Portal `/app` (Mobile-style Web Shell) `w:18` 📊 56%
 
 Goal: Authenticated member experience that ships before the native mobile app and shares the same components and API contracts. This is the surface where members sign up, list issues, vote, join campaigns, and submit KYC.
 
-- [ ] 2.1 Phone + OTP signup `w:5`
-  - [ ] 2.1.1 Phone entry + country code picker `w:1`
-  - [ ] 2.1.2 OTP send + verify `w:2`
-  - [ ] 2.1.3 Profile basics on account creation `w:1`
-  - [ ] 2.1.4 Resend + rate-limit + error UX `w:1`
+- [x] 2.1 Phone + OTP signup `w:5` ← done: 2026-06-03 *(`/app/signup` 3-step flow: phone+country code → OTP+profile basics → success. Demo accepts any 6-digit OTP; real flow will POST `/auth/otp/request` + `/auth/otp/verify`. Bilingual EN+NE; demo banner explicitly flags mock mode.)*
+  - [x] 2.1.1 Phone entry + country code picker `w:1` ← done: 2026-06-03 *(5 country codes in select; phone validates 10+ digits with inputMode tel.)*
+  - [x] 2.1.2 OTP send + verify `w:2` ← done: 2026-06-03 *(6-digit input with letter-spacing styling; verify accepts any 6-digit in demo, would call backend in production.)*
+  - [x] 2.1.3 Profile basics on account creation `w:1` ← done: 2026-06-03 *(Name required + city optional captured alongside OTP verification; passes to backend on real signup.)*
+  - [x] 2.1.4 Resend + rate-limit + error UX `w:1` ← done: 2026-06-03 *(30-second cooldown countdown, 3-attempt cap, exhaustion message, error toasts via Antd Form; back-button to step 1 for number changes.)*
 - [x] 2.2 Member dashboard `/app` `w:3` ← done: 2026-06-03 *(`/app` route ships with hero greeting, 4-stat strip (events joined / issues supported / events led / pending applications), upcoming events I've joined block, supported-issues block, profile basics block (role / verification / pending count), and a quick-actions tile row. Bilingual EN+NE inline copy. Mobile-first responsive grid. Aggregates use demo mock data today; swap for `/me/dashboard` fetch once backend lands. Auth gate redirects to `/login?next=/app`.)*
   - [x] 2.2.1 My location-tagged issues `w:1` ← done: 2026-06-03 *(supported-issues block on the dashboard shows linked location + vote count, deep-links to `/issues/{id}`)*
   - [x] 2.2.2 Upcoming events I joined `w:1` ← done: 2026-06-03 *(upcoming-events block shows date, location, and links to `/events/{id}`)*
@@ -243,7 +243,7 @@ Goal: Safety leads, medical professionals, and admins can manage real-world risk
 - [x] 4.5 Public-safe vs private incident visibility `w:1` ← done: 2026-06-03 *(IncidentPanel takes a `canSeeFull` prop and renders incident bodies only when true. Public viewers see only the aggregate (open / total count) and the leader-curated `publicSafetyNote` when set. Per-field visibility matrix codified in [`../api-requirements/incidents.md`](../api-requirements/incidents.md).)*
 - [x] 4.6 Pre-event safety checklist gate `w:1` ← done: 2026-06-03 *(`SafetyChecklistPanel` renders on `/events/[id]` when the current user is the leader AND status is `SCHEDULED`. Seven mandatory items (pre-execution meeting, medic, safety lead, permits, weather contingency, logistics, participant notification) — all must be ticked before the Activate button enables. Demo events flip status to `ACTIVE` locally + stamp `safetyChecklistCompletedAt`; real events POST `/events/{id}/activate` with `{ checklistConfirmed: true }`. The 412 contract for unsatisfied checklists is specified in [`../api-requirements/events.md`](../api-requirements/events.md). Bilingual EN+NE copy embedded in the component.)*
 
-## Phase 5 — Contribution Channels `w:10` 📊 40%
+## Phase 5 — Contribution Channels `w:10` 📊 60%
 
 - [x] 5.1 Labor + time donation intent UI `w:2` ← done: 2026-06-03 *(`ContributionIntentPanel` on `/events/[id]` surfaces three radio cards — LABOR, MATERIALS, LOGISTICS — with a single submit modal capturing kind + optional quantity + required notes. Demo events update local state; real events POST `/events/{id}/contributions` and degrade on 404/501. Bilingual EN+NE.)*
 - [x] 5.2 Material donation intent `w:1` ← done: 2026-06-03 *(Same `ContributionIntentPanel` covers MATERIALS as one of three intent kinds.)*
@@ -253,14 +253,14 @@ Goal: Safety leads, medical professionals, and admins can manage real-world risk
   - [ ] 5.4.2 Khalti integration `w:1`
   - [ ] 5.4.3 Bank transfer + manual reconciliation `w:1`
   - [ ] 5.4.4 Foreign donations (SWC approval flow) `w:1`
-- [ ] 5.5 Visibility / share-as-contribution `w:2`
+- [x] 5.5 Visibility / share-as-contribution `w:2` ← done: 2026-06-03 *(`ShareAsContribution` component on `/events/[id]` for non-terminal events. Card framing "sharing IS contributing" plus social share buttons (Facebook / Twitter / WhatsApp / Telegram) + copy-link via react-share. Bilingual EN+NE inline copy.)*
 
-## Phase 6 — Transparency & Public Ledger `w:8` 📊 0%
+## Phase 6 — Transparency & Public Ledger `w:8` 📊 75%
 
-- [ ] 6.1 Real-time donation ledger (public) `w:3`
-- [ ] 6.2 Expense receipt upload + public display `w:2`
-- [ ] 6.3 Leader KYC backend + verification UI `w:2`
-- [ ] 6.4 Per-campaign fund-usage summary `w:1`
+- [x] 6.1 Real-time donation ledger (public) `w:3` ← done: 2026-06-03 *(`/ledger` page renders the public donation list — date, donor (anonymous when null), kind, channel, amount, linked campaign. Bilingual EN+NE; tabs switch between donations and expenses. Dummy ledger generated against past events; backend swap point is the new spec at [`../api-requirements/donations.md`](../api-requirements/donations.md).)*
+- [x] 6.2 Expense receipt upload + public display `w:2` ← done: 2026-06-03 *(`/ledger` expense tab shows date / kind / description / vendor / amount / linked campaign. Receipt upload field reserved in the spec (`receiptUploadId`); current dummy entries leave it null, surface will swap to an inline receipt thumbnail link when uploads arrive.)*
+- [ ] 6.3 Leader KYC backend + verification UI `w:2` *(Backend-heavy lane — KYC document upload + admin verification workflow. UI hook ready in `members.md` spec (`leaderEligibility` field).)*
+- [x] 6.4 Per-campaign fund-usage summary `w:1` ← done: 2026-06-03 *(Aggregate computed via `getDemoFundSummaryForEvent` — donatedTotal, spentTotal, surplus, donationCount, expenseCount, inKindCount. Backend swap point captured in `donations.md` under "Fund summary (aggregate)".)*
 
 ## Phase 7 — Impact Stories `w:5` 📊 40%
 
@@ -367,11 +367,11 @@ Weighted across all phases (sum of phase weights = 137):
 | --- | --- | --- |
 | 0 Foundation | 10 | 100% |
 | 1 Public Issue Discovery & Voting | 15 | 77% |
-| 2 Member Portal `/app` | 18 | 33% |
+| 2 Member Portal `/app` | 18 | 56% |
 | 3 Campaign Execution | 15 | 100% |
 | 4 Operational Safety | 8 | 88% |
-| 5 Contribution Channels | 10 | 40% |
-| 6 Transparency & Ledger | 8 | 0% |
+| 5 Contribution Channels | 10 | 60% |
+| 6 Transparency & Ledger | 8 | 75% |
 | 7 Impact Stories | 5 | 40% |
 | 8 Notifications & Outreach | 6 | 0% |
 | 9 Admin Control Center | 10 | 67% |
@@ -381,7 +381,7 @@ Weighted across all phases (sum of phase weights = 137):
 | 13 Public Reports & Transparency Surface | 6 | 67% |
 | 14 Building in Public (Process Transparency) | 6 | 33% |
 
-**Overall: ≈ 57%** (weighted sum / total weight; recompute on every edit, and redraw the [Overall Progress](#overall-progress--57) bar near the top of this file in the same edit).
+**Overall: ≈ 66%** (weighted sum / total weight; recompute on every edit, and redraw the [Overall Progress](#overall-progress--66) bar near the top of this file in the same edit).
 
 # How To Update This Document
 

@@ -25,6 +25,7 @@ import { TertiaryButton } from "@/components/TertiaryButton";
 import { IssuePhotoGallery } from "@/components/IssuePhotoGallery";
 import { ContributionIntentPanel } from "@/components/ContributionIntentPanel";
 import { IncidentPanel } from "@/components/IncidentPanel";
+import { ShareAsContribution } from "@/components/ShareAsContribution";
 import { LeaderScheduleEditor } from "@/components/LeaderScheduleEditor";
 import { LeaderCompleteEditor } from "@/components/LeaderCompleteEditor";
 import { LeaderNominationPanel } from "@/components/LeaderNominationPanel";
@@ -384,6 +385,10 @@ export default function EventDetailPage() {
                   language={language}
                   onChanged={handleEventCompleted}
                 />
+
+                {eventData.status !== "COMPLETED" && eventData.status !== "CANCELLED" ? (
+                  <ShareAsContribution event={eventData} language={language} />
+                ) : null}
 
 
                 {Array.isArray(eventData.rolesNeeded) && eventData.rolesNeeded.length > 0 ? (

@@ -3345,3 +3345,158 @@ export function getDemoComments({ targetType, targetId } = {}) {
   }
   return flat;
 }
+
+// --- Transparency ledger mock (roadmap Phase 6) ----------------------
+// Donations + expenses against past events. Anonymous donors mixed
+// with named ones; in-kind + funds entries; bank/Esewa/Khalti channel
+// mix. Inert in production.
+
+function hashSeed(s) {
+  let h = 0;
+  const str = String(s || "");
+  for (let i = 0; i < str.length; i += 1) {
+    h = (h * 31 + str.charCodeAt(i)) | 0;
+  }
+  return Math.abs(h);
+}
+
+const DEMO_DONOR_POOL = [
+  "कमला अधिकारी",
+  "हरि श्रेष्ठ",
+  "रिता पाण्डे",
+  "प्रदीप तामाङ",
+  "स्मिता शर्मा",
+  "रोहित कार्की",
+  "बिनिता थापा",
+  "गणेश राई",
+  "सुनिल मगर",
+  "मञ्जु तामाङ",
+  null,
+  null,
+  "तारा गुरुङ",
+  "लक्ष्मी राई",
+  null,
+  "देव बहादुर थापा",
+  "अमित गुरुङ"
+];
+
+const DEMO_VENDORS = [
+  "नगरपालिका कार्यालय",
+  "हार्डवेयर पसल — रत्नपार्क",
+  "जलपान केन्द्र",
+  "ट्रान्सपोर्ट सेवा",
+  "औषधि पसल",
+  "हाटको खुद्रा",
+  "नर्सरी आपूर्ति"
+];
+
+const DONATION_CHANNELS = ["ESEWA", "KHALTI", "BANK", "IN_KIND", "OTHER"];
+const EXPENSE_KINDS = [
+  "TOOLS",
+  "MATERIALS",
+  "TRANSPORT",
+  "REFRESHMENTS",
+  "PERMITS",
+  "MEDICAL",
+  "OTHER"
+];
+
+function buildLedgerForPastEvents() {
+  if (!isDev()) return { donations: [], expenses: [] };
+  const donations = [];
+  const expenses = [];
+  DEMO_PAST_EVENTS.forEach((event) => {
+    const seed = hashSeed(event.id);
+    const completedAt = event.completedAt
+      ? new Date(event.completedAt).getTime()
+      : Date.now();
+    const donationCount = 3 + (seed % 5);
+    for (let i = 0; i < donationCount; i += 1) {
+      const donorPick = (seed + i * 11) % DEMO_DONOR_POOL.length;
+      const channel = DONATION_CHANNELS[(seed + i * 7) % DONATION_CHANNELS.length];
+      const isInKind = channel === "IN_KIND";
+      const amount = isInKind ? null : 500 + ((seed + i * 173) % 19) * 250;
+      donations.push({
+        id: `don-${event.id}-${i}`,
+        eventId: event.id,
+        kind: isInKind ? "MATERIALS" : "FUNDS",
+        amount,
+        currency: "NPR",
+        description: isInKind ? "पन्जा, मास्क, पानी — सामग्री दान" : null,
+        donorName: DEMO_DONOR_POOL[donorPick],
+        channel,
+        receivedAt: new Date(
+          completedAt - (donationCount - i) * 24 * 60 * 60_000
+        ).toISOString(),
+        note: null
+      });
+    }
+    const expenseCount = 2 + (seed % 4);
+    for (let i = 0; i < expenseCount; i += 1) {
+      const kind = EXPENSE_KINDS[(seed + i * 13) % EXPENSE_KINDS.length];
+      const amount = 300 + ((seed + i * 211) % 17) * 200;
+      expenses.push({
+        id: `exp-${event.id}-${i}`,
+        eventId: event.id,
+        kind,
+        amount,
+        currency: "NPR",
+        description:
+          kind === "TOOLS"
+            ? "औजार किनेको"
+            : kind === "MATERIALS"
+              ? "सामग्री खरिद"
+              : kind === "TRANSPORT"
+                ? "ढुवानी / यातायात"
+                : kind === "REFRESHMENTS"
+                  ? "खाजा र पानी"
+                  : kind === "PERMITS"
+                    ? "अनुमति शुल्क"
+                    : kind === "MEDICAL"
+                      ? "प्राथमिक उपचार सामग्री"
+                      : "अन्य खर्च",
+        paidToName: DEMO_VENDORS[(seed + i * 5) % DEMO_VENDORS.length],
+        receiptUploadId: null,
+        paidAt: new Date(completedAt + (i + 1) * 60_000 * 60).toISOString()
+      });
+    }
+  });
+  return { donations, expenses };
+}
+
+let _ledgerCache = null;
+
+export function getDemoLedger() {
+  if (!isDev()) return { donations: [], expenses: [] };
+  if (!_ledgerCache) _ledgerCache = buildLedgerForPastEvents();
+  return _ledgerCache;
+}
+
+export function getDemoFundSummaryForEvent(eventId) {
+  if (!isDev() || !eventId) {
+    return {
+      donatedTotal: 0,
+      spentTotal: 0,
+      surplus: 0,
+      donationCount: 0,
+      expenseCount: 0,
+      inKindCount: 0
+    };
+  }
+  const { donations, expenses } = getDemoLedger();
+  const eventDonations = donations.filter((d) => d.eventId === eventId);
+  const eventExpenses = expenses.filter((e) => e.eventId === eventId);
+  const donatedTotal = eventDonations
+    .filter((d) => d.kind === "FUNDS")
+    .reduce((sum, d) => sum + (d.amount || 0), 0);
+  const spentTotal = eventExpenses.reduce((sum, e) => sum + (e.amount || 0), 0);
+  return {
+    donatedTotal,
+    spentTotal,
+    surplus: donatedTotal - spentTotal,
+    donationCount: eventDonations.length,
+    expenseCount: eventExpenses.length,
+    inKindCount: eventDonations.filter((d) => d.kind !== "FUNDS").length
+  };
+}
+
