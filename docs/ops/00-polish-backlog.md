@@ -151,6 +151,12 @@ When you (the coding agent) are working in this repo:
 - [ ] P2 [from 11.2] Run Playwright + axe-core scan against all public routes; integrate into CI when CI exists. — effort:M *(logged by the 2026-06-03 a11y baseline audit)*
 - [ ] P3 [from 11.2] Verify WCAG AA contrast across the full palette in both themes with a real contrast tool; tweak `--muted` and primary fills if any fail. — effort:S *(logged by the 2026-06-03 a11y baseline audit)*
 - [ ] P3 [from 11.2] Bump focus ring weight on primary action buttons from Antd's default (2 px) to 3 px for clearer keyboard focus. — effort:S *(logged by the 2026-06-03 a11y baseline audit)*
+- [ ] P2 [from 11.6] Run real Lighthouse CI against staging + capture before/after numbers in `/development` once a CI environment is set up. — effort:M *(logged by the 2026-06-03 perf baseline)*
+- [ ] P3 [from 11.6] Audit Antd imports — verify modular imports / babel-plugin-import shakes unused components. — effort:S
+- [ ] P3 [from 11.6] Code-split `/events/[id]` leader-only panel bundles so unauthenticated viewers don't load them. — effort:M
+- [ ] P3 [from 11.6] Local `/_dev/perf` route printing per-page client-component count to flag regressions. — effort:S
+- [ ] P2 [from 11.5] Wire `registerAnalyticsSink` to a real platform (Plausible recommended for the launch phase). — effort:S *(logged by the 2026-06-03 analytics scaffold)*
+- [ ] P2 [from 11.5] Instrument the 19 canonical events across call sites; today the scaffold exists but no surface dispatches yet. — effort:M
 
 ## Phase 13 — Live Events Rail
 

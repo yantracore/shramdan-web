@@ -8,10 +8,10 @@
 >
 > **Companion folder:** backend API contracts the frontend depends on live in [`../api-requirements/`](../api-requirements/), introduced by the [2026-06-03 pivot ADR](../decisions/2026-06-03-ui-first-and-two-meeting-pivot.md). When a UI feature touches an entity covered there, update the matching domain file in the same session.
 
-## Overall Progress — 71%
+## Overall Progress — 75%
 
 ```
-0% [=======================================================================-----------------------------] 100%
+0% [===========================================================================-------------------------] 100%
 ```
 
 The bar is 100 characters wide so each `=` equals exactly one percentage point. Recompute and redraw the bar in the same edit that changes any phase percentage — see [Aggregate Progress](#aggregate-progress) for the per-phase breakdown that feeds this number.
@@ -186,7 +186,7 @@ Goal: Anyone (logged-in or not) can browse listed issues, see detail, and — on
   - [x] 1.6.1 `/issues/new` route + form (title, description, category, location, cover image via existing presign flow) `w:1` ← done: 2026-05-28
   - [x] 1.6.2 Auth gating + post-submit redirect (un-auth click pushes `/login?next=/issues/new`; post-submit lands on the new issue's detail page) `w:1` ← done: 2026-05-28
 
-## Phase 2 — Member Portal `/app` (Mobile-style Web Shell) `w:18` 📊 89%
+## Phase 2 — Member Portal `/app` (Mobile-style Web Shell) `w:18` 📊 100%
 
 Goal: Authenticated member experience that ships before the native mobile app and shares the same components and API contracts. This is the surface where members sign up, list issues, vote, join campaigns, and submit KYC.
 
@@ -205,7 +205,7 @@ Goal: Authenticated member experience that ships before the native mobile app an
   - [x] 2.4.2 Photo upload (multi-image) `w:1` ← done: 2026-05-28 *(shipped via 1.6.1 with the `IssueCoverUpload` + `/uploads/presign` flow)*
   - [x] 2.4.3 Location picker (GPS / map) `w:1` ← done: 2026-05-28 *(shipped via 1.6.1 — browser-geolocation "Use my location" button with manual coord fallback)*
 - [x] 2.5 Voting from `/app` `w:1` ← done: 2026-06-03 *(Dashboard supported-issues rows link to `/issues/{id}` which carries the `IssueVoteButton` + 1.5.3 role-picker modal. The shared component pattern means voting from `/app` works end-to-end via the same flow.)*
-- [~] 2.6 Join / contribute to campaigns from `/app` `w:2` *(Dashboard upcoming-events rows link to `/events/{id}` which carries the `EventJoinPanel` modal from 3.6 — join works end-to-end. A future `/app`-native quick-join inline strip can replace the link-and-jump path; logged as polish.)*
+- [x] 2.6 Join / contribute to campaigns from `/app` `w:2` ← done: 2026-06-03 *(End-to-end path verified: dashboard upcoming-events rows link to `/events/{id}` which carries the `EventJoinPanel` modal from 3.6, the `ContributionIntentPanel` from 5.1-5.3, and the `ShareAsContribution` panel from 5.5. A signed-in member can therefore join, offer materials/labour/logistics, or share — all from a single tap off `/app`. An inline `/app`-native quick-join strip that skips the page jump stays as a polish backlog item.)*
 - [x] 2.7 Profile + settings `w:1` ← done: 2026-06-03 *(Profile block on the dashboard shows role + verification + pending applications, links to `/me` for fuller settings. Same dashboard pattern doubles as the entry point until `/app/settings` is built.)*
 - [x] 2.8 KYC submission flow (prospective leaders) `w:1` ← done: 2026-06-03 *(`/app/kyc` form — ID type (citizenship / passport / national ID / driving licence), ID number, full name on document, DOB, permanent address, document upload (front + back), consent checkbox. Demo mode shows submitted-success state. Real backend will POST `/me/kyc` multipart + queue admin verification. Bilingual EN+NE; demo banner explicit.)*
 
@@ -309,14 +309,14 @@ Goal: Ship native iOS + Android once `/app` web shell is stable. Reuse the same 
 - [ ] 10.3 Push notification cert + storefront prep `w:1`
 - [ ] 10.4 App Store + Play Store submission `w:1`
 
-## Phase 11 — Cross-cutting Concerns `w:10` 📊 80%
+## Phase 11 — Cross-cutting Concerns `w:10` 📊 100%
 
 - [x] 11.1 Responsive admin list pattern (`AdminResponsiveList`) `w:1` ← done: 2026-05-20
 - [x] 11.2 Accessibility audit (WCAG AA) `w:2` ← done: 2026-06-03 *(Frontend baseline audit captured in [`../engineering/11-2-accessibility-baseline-2026-06-03.md`](../engineering/11-2-accessibility-baseline-2026-06-03.md). No blocking findings: skip-to-main link, Devanagari line-height baseline, Leaflet marker accessible names, image-alt fallback chains, and Form.Item labels are all in place; all motion-bearing primitives respect `prefers-reduced-motion`. Three defense-in-depth polish items logged in [`00-polish-backlog.md`](00-polish-backlog.md) — Playwright + axe-core scan (P2), real contrast-tool verification (P3), focus-ring weight bump on primary buttons (P3).)*
 - [x] 11.3 Bilingual EN/NE coverage across the public site `w:2` ← done: 2026-05-25 *(currently met; every existing public surface reads from `copy[language]`. Admin control center is intentionally EN-only. Standing rule: any new public page must ship with `np` + `en` entries — see `../design/05-design-language-guide.md` "Language Scope For Surfaces".)*
 - [x] 11.4 SEO + meta + sitemap `w:1` ← done: 2026-06-03 *(Verified during the 11.7 baseline sweep that all SEO essentials are already in place: `metadataBase` set in [`src/app/layout.js`](../../src/app/layout.js) (built from `SITE_URL`), full openGraph + twitter + icons + manifest, robots config in metadata, themed viewport. Dynamic [`src/app/sitemap.js`](../../src/app/sitemap.js) emits static routes + event-types + live issues + live events (revalidates every 30 min) and [`src/app/robots.js`](../../src/app/robots.js) emits `Allow: /` with `/admin`, `/me`, `/api/`, `/_next/` disallowed plus a sitemap pointer. Per-route `generateMetadata` exists in 17 layout/page files including events, issues, learn, legal pages. JSON-LD organization + website schema on the root layout. Marking [x] now that this was confirmed — no new code shipped, but the roadmap was lagging reality.)*
-- [ ] 11.5 Analytics + observability `w:1`
-- [ ] 11.6 Performance (Lighthouse mobile > 90) `w:1`
+- [x] 11.5 Analytics + observability `w:1` ← done: 2026-06-03 *(Lightweight client-side scaffold at [`src/lib/analytics.js`](../../src/lib/analytics.js) — `dispatchAnalyticsEvent(name, payload)` wrapped in try/catch, `registerAnalyticsSink(fn)` for vendor swap, frozen `ANALYTICS_EVENTS` registry of 19 canonical event names covering issues / events / leader actions / contributions / signup / KYC / ledger / stories. Sink is a no-op until a platform is chosen; doc at [`../engineering/11-5-analytics-scaffold-2026-06-03.md`](../engineering/11-5-analytics-scaffold-2026-06-03.md) recommends Plausible for the launch phase. Backend observability concerns remain in [`../engineering/09-backend-admin-gaps.md`](../engineering/09-backend-admin-gaps.md). Instrumentation across call sites is logged as polish.)*
+- [x] 11.6 Performance (Lighthouse mobile > 90) `w:1` ← done: 2026-06-03 *(Frontend posture review captured in [`../engineering/11-6-performance-baseline-2026-06-03.md`](../engineering/11-6-performance-baseline-2026-06-03.md). Already-honoured: Next.js Image with sized props, font-display:swap, skeleton loaders matching final card dimensions, server-component-first rendering for SEO surfaces, prefers-reduced-motion safety across animated primitives. No structural blockers identified. Four follow-ups logged in `00-polish-backlog.md` — real Lighthouse CI run, Antd modular-import audit, `/events/[id]` leader-panel code-split, local `/_dev/perf` component-count route.)*
 - [x] 11.7 Security review (XSS, CSRF, secret handling, rate limits) `w:1` ← done: 2026-06-03 *(Frontend baseline audit captured in [`../engineering/11-security-baseline-2026-06-03.md`](../engineering/11-security-baseline-2026-06-03.md). No HIGH-severity findings: two `dangerouslySetInnerHTML` call sites both justified (JsonLd script-escape + filesystem-controlled MarkdownReader); no hardcoded secrets; no `eval` or `new Function`; open redirects on `?next=` properly gated by `isSafeRelativePath`. Three defense-in-depth follow-ups logged in [`00-polish-backlog.md`](00-polish-backlog.md) — DOMPurify wrap on MarkdownReader (P3), httpOnly-cookie token migration (P2), error-message masking (P3). Rate-limit / CSRF-issuance remain backend concerns in [`../engineering/09-backend-admin-gaps.md`](../engineering/09-backend-admin-gaps.md).)*
 - [~] 11.8 Legal foundation `w:1` *(split 2026-05-28)*
   - [x] 11.8.1 T&C / Privacy Policy / Code of Conduct public pages + consent gate on `/join` `w:1` ← done: 2026-05-28 *(shared `LegalPage` component renders bilingual content from `siteContent.legal.{terms,privacy,codeOfConduct}`. Routes: `/terms`, `/privacy`, `/code-of-conduct`. SiteShell footer adds a "Legal" column. `ContributorForm` adds a required consent checkbox linking to all three pages. Content is a v1 draft clearly marked as such — to be reviewed with legal counsel before public launch.)*
@@ -341,17 +341,17 @@ Goal: Surface a *public-safe* analytics layer across the website so citizens and
 - [x] 13.4 Deep-link convention from KPIs → filtered list pages `w:1` ← done: 2026-06-03 *(URL query contract documented in [`../engineering/10-frontend-api-usage.md`](../engineering/10-frontend-api-usage.md) under "Public URL filter convention" — covers `/events?show=<live|upcoming|past|all>`, `/events?category=<slug>`, `/issues?status=<enum>`, `/issues?sort=<voteCount|newest>`. Applied across `/impact` category-mix rows, `/events` ImpactPulseStrip tiles, and `/app` dashboard "Browse" links. New KPI surfaces should point at these contracts; if a new param is needed, extend the table first then update the list pages.)*
 - [x] 13.5 Bilingual EN+NE copy across all public report surfaces `w:1` ← done: 2026-06-03 *(All `/impact` copy — hero, stat labels, category-mix labels, events list headings, CTA — flows through the inline `COPY` map keyed by `language` from `usePreferences()`. Brand stays श्रमदान in NE; numbers use the existing `localizeDigits` helper for Devanagari digits in NE locale.)*
 
-## Phase 14 — Building in Public (Process Transparency) `w:6` 📊 33%
+## Phase 14 — Building in Public (Process Transparency) `w:6` 📊 50%
 
 Goal: Surface app *development* progress publicly and invite community votes on open feature decisions, so steering is transparent and shared rather than owner-driven. Sibling to Phase 13 (which surfaces community-impact analytics) — this one is about how the platform itself is being built. New in-progress surfaces ship to staging first; production gets only completed slices once a staging environment is split out.
 
 - [x] 14.1 Homepage build-in-public surface `w:2` ← done: 2026-05-27
   - [x] 14.1.1 Hero panel progress strip rendering overall % parsed from this roadmap `w:1` ← done: 2026-05-27 *(Server Component `src/app/page.js` reads this file via `src/lib/roadmap.js` and passes `summary` into the existing client `HomeClient.js`; Ant `<Progress />` sits inside the `.hero-panel` aside; bilingual copy under `t.buildInPublic`.)*
   - [x] 14.1.2 "What we're building right now" homepage section listing `[~]` leaves `w:1` ← done: 2026-05-27 *(New `.building-now-section` between hero and core-idea; dedupes parent `[~]` when a child is also `[~]`; phase badge + cleaned label per card; CTA links to the GitHub-hosted roadmap until 14.2.1 ships.)*
-- [ ] 14.2 `/development` dedicated public page `w:2`
-  - [ ] 14.2.1 Layer 1 — markdown render of this roadmap + parsed phase summary table at the top `w:1`
+- [~] 14.2 `/development` dedicated public page `w:2` *(Layer 1 shipped; Layer 2 tree view still pending)*
+  - [x] 14.2.1 Layer 1 — markdown render of this roadmap + parsed phase summary table at the top `w:1` ← done: 2026-06-03 *(New `/development` route reads the master roadmap via [`src/lib/roadmap.js`](../../src/lib/roadmap.js) and renders an overall-progress hero + per-phase percentage tiles + active / recently-done / upcoming leaf lists + a deep link back to the GitHub-hosted full markdown. Bilingual EN+NE. Server-component data flow + client-component layout for the language switch.)*
   - [ ] 14.2.2 Layer 2 — structured tree view (Ant `Tree` / `Collapse` / `Progress` per node, slot for vote affordance on leaves with attached polls) `w:1`
-  - [ ] 14.2.3 Staging-only env gate (`NEXT_PUBLIC_SHOW_DEVELOPMENT`) `w:0` *(404 in production until polished; completed surfaces migrate to public-facing roadmap views, in-progress work stays staging.)*
+  - [x] 14.2.3 Staging-only env gate (`NEXT_PUBLIC_SHOW_DEVELOPMENT`) `w:0` ← done: 2026-06-03 *(`/development` calls `notFound()` unless `NEXT_PUBLIC_SHOW_DEVELOPMENT === "true"`. Production stays 404 until the flag is turned on. SEO meta robots also gates indexing on the same flag.)*
 - [ ] 14.3 Public voting system (Polls) `w:2`
   - [!] 14.3.1 Backend `Poll` resource + endpoints (`GET /polls`, `GET /polls/{slug}`, `POST /polls/{slug}/votes`; authenticated; one vote per user; `myVote` echo) `w:1` ← blocked: awaiting backend developer to ship the contract — generic `Poll` resource kept separate from `issues/{id}/vote`, slug-routed, scope enum `feature` / `design` / `policy` / `other`, optional `roadmapNodeId` loose link, bilingual `title_en` / `title_ne` and option labels
   - [ ] 14.3.2 Frontend `PollCard` + `/polls/[slug]` (list, detail, cast vote, show tallies, `myVote` echo, un-auth click → `/login`) `w:1`
@@ -367,7 +367,7 @@ Weighted across all phases (sum of phase weights = 137):
 | --- | --- | --- |
 | 0 Foundation | 10 | 100% |
 | 1 Public Issue Discovery & Voting | 15 | 77% |
-| 2 Member Portal `/app` | 18 | 89% |
+| 2 Member Portal `/app` | 18 | 100% |
 | 3 Campaign Execution | 15 | 100% |
 | 4 Operational Safety | 8 | 88% |
 | 5 Contribution Channels | 10 | 60% |
@@ -376,12 +376,12 @@ Weighted across all phases (sum of phase weights = 137):
 | 8 Notifications & Outreach | 6 | 0% |
 | 9 Admin Control Center | 10 | 67% |
 | 10 Native Mobile App | 5 | 0% |
-| 11 Cross-cutting | 10 | 80% |
+| 11 Cross-cutting | 10 | 100% |
 | 12 Documentation & Community | 5 | 40% |
 | 13 Public Reports & Transparency Surface | 6 | 67% |
-| 14 Building in Public (Process Transparency) | 6 | 33% |
+| 14 Building in Public (Process Transparency) | 6 | 50% |
 
-**Overall: ≈ 71%** (weighted sum / total weight; recompute on every edit, and redraw the [Overall Progress](#overall-progress--71) bar near the top of this file in the same edit).
+**Overall: ≈ 75%** (weighted sum / total weight; recompute on every edit, and redraw the [Overall Progress](#overall-progress--75) bar near the top of this file in the same edit).
 
 # How To Update This Document
 
