@@ -49,6 +49,7 @@ import { ActivityTicker } from "@/components/ActivityTicker";
 import { EventsHomeRail } from "@/components/EventsHomeRail";
 import { LiveOnlineWidget } from "@/components/LiveOnlineWidget";
 import { MotionSection } from "@/components/MotionSection";
+import { TertiaryButton } from "@/components/TertiaryButton";
 import { TimeOfDayGreeting } from "@/components/TimeOfDayGreeting";
 import { SiteShell } from "@/components/SiteShell";
 import { getDemoLiveEvents, getDemoUpcomingEvents } from "@/lib/devMockData";
@@ -417,6 +418,116 @@ export default function HomeClient({ summary }) {
         />
       </MotionSection>
 
+      {showActiveIssuesSection ? (
+        <MotionSection
+          as="section"
+          className="live-issues-section"
+          aria-labelledby="live-issues-title"
+        >
+          <div className="live-issues-header">
+            <div className="live-issues-heading">
+              <span className="eyebrow">
+                {liveIssuesCopy.eyebrow || "Active Issues"}
+              </span>
+              <h2 id="live-issues-title">
+                {liveIssuesCopy.title || "What the community is flagging"}
+              </h2>
+              <p>{liveIssuesCopy.intro}</p>
+            </div>
+            <TertiaryButton
+              href="/issues"
+              icon={<ArrowRightOutlined />}
+              iconPosition="trailing"
+              className="live-issues-cta"
+            >
+              {liveIssuesCopy.viewAll || "View All Issues"}
+            </TertiaryButton>
+          </div>
+
+          <dl className="live-issues-stats" aria-label={liveIssuesCopy.statsAria}>
+            <div className="live-issues-stat">
+              <dt>{liveIssuesCopy.statIssues || "Active issues"}</dt>
+              <dd>{localizeDigits(activeIssuesStats.total, language)}</dd>
+            </div>
+            <div className="live-issues-stat">
+              <dt>{liveIssuesCopy.statLocations || "Locations"}</dt>
+              <dd>{localizeDigits(activeIssuesStats.locations, language)}</dd>
+            </div>
+            <div className="live-issues-stat">
+              <dt>{liveIssuesCopy.statVotes || "Total support"}</dt>
+              <dd>{localizeDigits(activeIssuesStats.votes, language)}</dd>
+            </div>
+          </dl>
+
+          <div className="live-issues-map-frame">
+            <IssueMapBlock
+              issues={activeIssues}
+              content={issueCopy}
+              language={language}
+              height={360}
+              interactive
+              enableFullscreen
+              fullscreenLabel={liveIssuesCopy.fullscreenOpen || "Open fullscreen map"}
+              exitFullscreenLabel={liveIssuesCopy.fullscreenClose || "Close fullscreen map"}
+            />
+          </div>
+
+          {topIssues.length > 0 ? (
+            <div className="live-issues-top">
+              <h3 className="live-issues-top-title">
+                {liveIssuesCopy.topTitle || "Most-supported right now"}
+              </h3>
+              <ul className="live-issues-top-list">
+                {topIssues.map((issue) => {
+                  const statusLabel =
+                    issueCopy.statusLabels?.[issue.status] || issue.status;
+                  const categoryLabel =
+                    issueCopy.categoryLabels?.[issue.category] || issue.category;
+                  const votes = Number(issue.voteCount) || 0;
+                  const voteText =
+                    votes === 1
+                      ? issueCopy.card?.supportersOne || "1 supporter"
+                      : (
+                          issueCopy.card?.supportersMany || "{n} supporters"
+                        ).replace("{n}", localizeDigits(votes, language));
+                  return (
+                    <li key={issue.id}>
+                      <Link
+                        className="live-issues-top-card"
+                        href={`/issues/${issue.id}`}
+                      >
+                        <div className="live-issues-top-meta">
+                          <span
+                            className={`live-issues-top-status live-issues-top-status--${issue.status}`}
+                            data-tone={ISSUE_STATUS_COLORS[issue.status]}
+                          >
+                            {statusLabel}
+                          </span>
+                          <span className="live-issues-top-category">
+                            {categoryLabel}
+                          </span>
+                        </div>
+                        <h4>{issue.title}</h4>
+                        {issue.addressText ? (
+                          <p className="live-issues-top-address">
+                            <EnvironmentOutlined aria-hidden="true" />
+                            {issue.addressText}
+                          </p>
+                        ) : null}
+                        <span className="live-issues-top-votes">
+                          <LikeOutlined aria-hidden="true" />
+                          {voteText}
+                        </span>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ) : null}
+        </MotionSection>
+      ) : null}
+
       <MotionSection as="div" className="home-pulse-row">
         <ActivityTicker language={language} />
         <LiveOnlineWidget language={language} />
@@ -640,112 +751,6 @@ export default function HomeClient({ summary }) {
         </div>
 
       </MotionSection>
-
-      {showActiveIssuesSection ? (
-        <MotionSection
-          as="section"
-          className="live-issues-section"
-          aria-labelledby="live-issues-title"
-        >
-          <div className="live-issues-header">
-            <div className="live-issues-heading">
-              <span className="eyebrow">
-                {liveIssuesCopy.eyebrow || "Active Issues"}
-              </span>
-              <h2 id="live-issues-title">
-                {liveIssuesCopy.title || "What the community is flagging"}
-              </h2>
-              <p>{liveIssuesCopy.intro}</p>
-            </div>
-            <Link className="live-issues-cta" href="/issues">
-              {liveIssuesCopy.viewAll || "View All Issues"}
-              <ArrowRightOutlined aria-hidden="true" />
-            </Link>
-          </div>
-
-          <dl className="live-issues-stats" aria-label={liveIssuesCopy.statsAria}>
-            <div className="live-issues-stat">
-              <dt>{liveIssuesCopy.statIssues || "Active issues"}</dt>
-              <dd>{localizeDigits(activeIssuesStats.total, language)}</dd>
-            </div>
-            <div className="live-issues-stat">
-              <dt>{liveIssuesCopy.statLocations || "Locations"}</dt>
-              <dd>{localizeDigits(activeIssuesStats.locations, language)}</dd>
-            </div>
-            <div className="live-issues-stat">
-              <dt>{liveIssuesCopy.statVotes || "Total support"}</dt>
-              <dd>{localizeDigits(activeIssuesStats.votes, language)}</dd>
-            </div>
-          </dl>
-
-          <div className="live-issues-map-frame">
-            <IssueMapBlock
-              issues={activeIssues}
-              content={issueCopy}
-              language={language}
-              height={360}
-              interactive
-              enableFullscreen
-              fullscreenLabel={liveIssuesCopy.fullscreenOpen || "Open fullscreen map"}
-              exitFullscreenLabel={liveIssuesCopy.fullscreenClose || "Close fullscreen map"}
-            />
-          </div>
-
-          {topIssues.length > 0 ? (
-            <div className="live-issues-top">
-              <h3 className="live-issues-top-title">
-                {liveIssuesCopy.topTitle || "Most-supported right now"}
-              </h3>
-              <ul className="live-issues-top-list">
-                {topIssues.map((issue) => {
-                  const statusLabel =
-                    issueCopy.statusLabels?.[issue.status] || issue.status;
-                  const categoryLabel =
-                    issueCopy.categoryLabels?.[issue.category] || issue.category;
-                  const votes = Number(issue.voteCount) || 0;
-                  const voteText =
-                    votes === 1
-                      ? issueCopy.card?.supportersOne || "1 supporter"
-                      : (
-                          issueCopy.card?.supportersMany || "{n} supporters"
-                        ).replace("{n}", localizeDigits(votes, language));
-                  return (
-                    <li key={issue.id}>
-                      <Link
-                        className="live-issues-top-card"
-                        href={`/issues/${issue.id}`}
-                      >
-                        <div className="live-issues-top-meta">
-                          <span
-                            className={`live-issues-top-status live-issues-top-status--${issue.status}`}
-                            data-tone={ISSUE_STATUS_COLORS[issue.status]}
-                          >
-                            {statusLabel}
-                          </span>
-                          <span className="live-issues-top-category">
-                            {categoryLabel}
-                          </span>
-                        </div>
-                        <h4>{issue.title}</h4>
-                        {issue.addressText ? (
-                          <p className="live-issues-top-address">
-                            <EnvironmentOutlined aria-hidden="true" />
-                            {issue.addressText}
-                          </p>
-                        ) : null}
-                        <span className="live-issues-top-votes">
-                          <LikeOutlined aria-hidden="true" />
-                          {voteText}
-                        </span>
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          ) : null}
-        </MotionSection>
-      ) : null}
 
       {buildingNowCards.length > 0 ? (
         <MotionSection as="section" className="building-now-section" aria-labelledby="building-now-title">

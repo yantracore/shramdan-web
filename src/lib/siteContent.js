@@ -1230,7 +1230,7 @@ export const copy = {
       title: "लाइभ र आउँदा अभियानहरू",
       subtitle:
         "अहिले लाइभ हेर्नुहोस् वा आउँदा कुनै भूमिकामा अहिल्यै जोडिनुहोस्।",
-      viewAll: "सबै अभियान हेर्नुहोस् →",
+      viewAll: "सबै अभियान हेर्नुहोस्",
       emptyMessage:
         "अहिले कुनै अभियान छैन। जब कुनै सुरु हुन्छ, श्रमेशले यहीँ देखाउनेछ।",
       viewersPrefix: "",
@@ -2821,7 +2821,7 @@ export const copy = {
       title: "Live and upcoming campaigns",
       subtitle:
         "Watch one running now or pick an upcoming role and join.",
-      viewAll: "View All Events →",
+      viewAll: "View All Events",
       emptyMessage:
         "No campaigns right now. श्रमेश will surface them here as they start.",
       viewersPrefix: "",

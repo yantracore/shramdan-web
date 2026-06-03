@@ -7336,19 +7336,9 @@
   line-height: 1.55;
 }
 
-.live-issues-cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--accent);
-  font-weight: 600;
-  text-decoration: none;
-  white-space: nowrap;
-}
-
-.live-issues-cta:hover {
-  text-decoration: underline;
-}
+/* .live-issues-cta — visual chassis is now .tertiary-button (see
+ * <TertiaryButton>). This class survives only as a layout hook in
+ * case we need to nudge the CTA's positioning within the header. */
 
 .live-issues-stats {
   display: grid;

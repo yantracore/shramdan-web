@@ -59,20 +59,15 @@
   max-width: 56ch;
 }
 
+/* Position-only override — the visual chassis is .tertiary-button.
+ * We pin to the right edge of the centered header at the text block's
+ * vertical middle. (See <TertiaryButton> in EventsHomeRail.js.) */
 .events-home-rail-view-all {
   position: absolute;
   right: 0;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--primary);
-  font-size: 14px;
-  font-weight: 600;
-  text-decoration: none;
   white-space: nowrap;
-}
-
-.events-home-rail-view-all:hover {
-  text-decoration: underline;
 }
 
 /* On narrow viewports drop the link below the centered text block

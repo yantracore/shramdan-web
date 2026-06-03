@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useReducedMotion } from "framer-motion";
-import { CalendarOutlined, TeamOutlined } from "@ant-design/icons";
+import { ArrowRightOutlined, CalendarOutlined, TeamOutlined } from "@ant-design/icons";
+import { TertiaryButton } from "@/components/TertiaryButton";
 import { Swiper, SwiperSlide } from "swiper/react";
 import {
   A11y,
@@ -171,9 +172,14 @@ export function EventsHomeRail({
             <h2 id="events-home-rail-title">{copy?.title}</h2>
             {copy?.subtitle ? <p>{copy.subtitle}</p> : null}
           </div>
-          <Link href="/events" className="events-home-rail-view-all">
+          <TertiaryButton
+            href="/events"
+            icon={<ArrowRightOutlined />}
+            iconPosition="trailing"
+            className="events-home-rail-view-all"
+          >
             {copy?.viewAll}
-          </Link>
+          </TertiaryButton>
         </header>
       </div>
 
