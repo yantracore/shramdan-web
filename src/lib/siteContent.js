@@ -1326,6 +1326,29 @@ export const copy = {
           errorToast: "अभियान तय गर्न सकिएन। फेरि प्रयास गर्नुहोस्।",
           forbiddenToast: "तपाईं यस अभियानको संयोजक होइन।",
           conflictToast: "यो अभियान पहिले नै तय भइसकेको छ।"
+        },
+        leaderComplete: {
+          openCta: "अभियान सम्पन्न गर्नुहोस्",
+          eyebrow: "अभियान संयोजक मात्र",
+          intro: "अभियान सम्पन्न हुनासाथ छोटो परिणाम विवरण लेखेर सम्पन्नता दर्ता गर्नुहोस्। सहभागीहरूले यो विवरण अभियान पृष्ठमा देख्नेछन्।",
+          modalTitle: "अभियान सम्पन्न दर्ता",
+          completedAtLabel: "सम्पन्न मिति र समय",
+          completedAtPlaceholder: "मिति र समय छान्नुहोस्",
+          completedAtHelp: "वास्तविक सम्पन्न समय छान्नुहोस्। पूर्व-निर्धारित अहिले हो।",
+          completedAtRequired: "सम्पन्न मिति र समय आवश्यक छ।",
+          completedAtPast: "सम्पन्न मिति भविष्यमा हुन सक्दैन।",
+          resultSummaryLabel: "परिणाम विवरण",
+          resultSummaryPlaceholder: "उदाहरण: २.८ टन फोहोर हटाइयो; ४७ जना सहभागी; नदी किनारको ३०० मिटर सफा। नगरपालिकाले अनुगमन गर्न प्रतिबद्धता जनायो।",
+          resultSummaryHelp: "के सम्पन्न भयो, कतिजना सहभागी, र मापन योग्य परिणाम भए के — संक्षेपमा।",
+          resultSummaryRequired: "परिणाम विवरण आवश्यक छ।",
+          resultSummaryTooShort: "कम्तीमा १२ अक्षर लेख्नुहोस्।",
+          submit: "सम्पन्न दर्ता गर्नुहोस्",
+          cancel: "रद्द गर्नुहोस्",
+          successToast: "अभियान सम्पन्न दर्ता भयो।",
+          demoSuccessToast: "डेमो अभियान सम्पन्न दर्ता भयो (स्थानीय)।",
+          errorToast: "सम्पन्न दर्ता गर्न सकिएन। फेरि प्रयास गर्नुहोस्।",
+          forbiddenToast: "तपाईं यस अभियानको संयोजक होइन।",
+          conflictToast: "यो अभियान पहिले नै सम्पन्न भइसकेको छ।"
         }
       },
       statusLabels: {
@@ -2926,6 +2949,29 @@ export const copy = {
           errorToast: "Could not schedule the campaign. Please try again.",
           forbiddenToast: "You are not the lead for this campaign.",
           conflictToast: "This campaign has already been scheduled."
+        },
+        leaderComplete: {
+          openCta: "Mark Campaign Complete",
+          eyebrow: "Campaign lead only",
+          intro: "Wrap up this campaign by recording a short result summary. Participants will see this on the campaign page.",
+          modalTitle: "Mark this campaign complete",
+          completedAtLabel: "Completion date and time",
+          completedAtPlaceholder: "Pick a date and time",
+          completedAtHelp: "When the campaign actually wound down. Defaults to now.",
+          completedAtRequired: "Completion date and time are required.",
+          completedAtPast: "Completion date cannot be in the future.",
+          resultSummaryLabel: "Result summary",
+          resultSummaryPlaceholder: "e.g. 2.8 tonnes of waste removed; 47 participants; 300 metres of riverbank cleared. Municipality committed to follow-up monitoring.",
+          resultSummaryHelp: "What got done, how many showed up, and any measurable outcomes — kept short.",
+          resultSummaryRequired: "Result summary is required.",
+          resultSummaryTooShort: "Please write at least 12 characters.",
+          submit: "Mark Complete",
+          cancel: "Cancel",
+          successToast: "Campaign marked complete.",
+          demoSuccessToast: "Demo campaign marked complete (local only).",
+          errorToast: "Could not mark the campaign complete. Please try again.",
+          forbiddenToast: "You are not the lead for this campaign.",
+          conflictToast: "This campaign has already been completed."
         }
       },
       statusLabels: {

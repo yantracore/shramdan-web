@@ -123,4 +123,5 @@ A leader may not skip states. The system may auto-transition `SCHEDULED → ACTI
 
 ## Recent changes
 
+- `2026-06-03` — UI now exercises the `Mark event complete` operation through a leader-only modal on `/events/[id]`. Frontend sends `resultSummary` (required, ≥12 chars) and `completedAt` (defaults to now, must not be future) in the POST body. Demo events with `demo-` id prefix simulate the action locally without round-tripping.
 - `2026-06-03` — initial spec draft. Captures the shape the UI consumes today against mock data, including the linkedIssue association, role-fill aggregation, and lifecycle states observed in `/events/[id]` and the home page live rail.

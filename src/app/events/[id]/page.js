@@ -14,6 +14,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import { BeforeAfterSlider } from "@/components/BeforeAfterSlider";
+import { EventJoinPanel } from "@/components/EventJoinPanel";
 import { EventLiveStreamPlayer } from "@/components/EventLiveStreamPlayer";
 import { EventRosterPanel } from "@/components/EventRosterPanel";
 import IssueMapBlock from "@/components/IssueMapBlock";
@@ -23,6 +24,7 @@ import { StickyActionBar } from "@/components/StickyActionBar";
 import { TertiaryButton } from "@/components/TertiaryButton";
 import { IssuePhotoGallery } from "@/components/IssuePhotoGallery";
 import { LeaderScheduleEditor } from "@/components/LeaderScheduleEditor";
+import { LeaderCompleteEditor } from "@/components/LeaderCompleteEditor";
 import { CommentSection } from "@/components/comments";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
@@ -144,11 +146,34 @@ export default function EventDetailPage() {
   const session = useSyncExternalStore(subscribeAuthSession, getAuthSession, () => null);
   const linkedIssue = eventData?.issue ?? null;
   const leader = eventData?.eventLeader ?? null;
+  const isDemoEvent = typeof eventId === "string" && eventId.startsWith("demo-");
+  // Demo events have no real eventLeaderId in the mock payload; we surface
+  // leader controls to any authenticated viewer so the leader UX can be
+  // demoed end-to-end without backend signup.
   const isLeader = Boolean(
-    session?.user?.id && eventData?.eventLeaderId && session.user.id === eventData.eventLeaderId
+    session?.user?.id &&
+      (isDemoEvent ||
+        (eventData?.eventLeaderId && session.user.id === eventData.eventLeaderId))
   );
   const canScheduleEvent = isLeader && eventData?.status === "DRAFT";
+  const canCompleteEvent =
+    isLeader &&
+    (eventData?.status === "ACTIVE" || eventData?.status === "SCHEDULED");
   const leaderScheduleCopy = content.detail.leaderSchedule;
+  const leaderCompleteCopy = content.detail.leaderComplete;
+
+  const handleEventCompleted = useCallback(
+    (updatedEvent) => {
+      if (updatedEvent && typeof updatedEvent === "object") {
+        // Demo events: the editor passes the locally-mutated payload so we
+        // can flip UI state without round-tripping the backend.
+        setEventData((prev) => ({ ...(prev || {}), ...updatedEvent }));
+        return;
+      }
+      fetchEvent();
+    },
+    [fetchEvent]
+  );
   const uploads = Array.isArray(eventData?.uploads) ? eventData.uploads : [];
   const imageUploads = uploads.filter(isImageUpload);
 
@@ -290,12 +315,33 @@ export default function EventDetailPage() {
                   </div>
                 ) : null}
 
+                {canCompleteEvent ? (
+                  <div className="leader-schedule-banner leader-complete-banner">
+                    <div className="leader-schedule-banner-copy">
+                      <span className="eyebrow">{leaderCompleteCopy.eyebrow}</span>
+                      <p>{leaderCompleteCopy.intro}</p>
+                    </div>
+                    <LeaderCompleteEditor
+                      event={eventData}
+                      content={leaderCompleteCopy}
+                      onSaved={handleEventCompleted}
+                    />
+                  </div>
+                ) : null}
+
                 {Array.isArray(eventData.rolesNeeded) && eventData.rolesNeeded.length > 0 ? (
-                  <EventRosterPanel
-                    rolesNeeded={eventData.rolesNeeded}
-                    language={language}
-                    eventId={eventData.id}
-                  />
+                  <>
+                    <EventJoinPanel
+                      event={eventData}
+                      language={language}
+                      onJoined={handleEventCompleted}
+                    />
+                    <EventRosterPanel
+                      rolesNeeded={eventData.rolesNeeded}
+                      language={language}
+                      eventId={eventData.id}
+                    />
+                  </>
                 ) : null}
 
                 {linkedIssue?.description ? (

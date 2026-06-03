@@ -128,4 +128,5 @@ The event's `rolesNeeded` aggregation (described in `events.md`) is conceptually
 
 ## Recent changes
 
+- `2026-06-03` — UI now exercises the `Join event` operation through an in-page modal on `/events/[id]` (`EventJoinPanel`). The modal lists open roles from the event's role plan, filters out fully-staffed roles, and submits `{ role }` to POST `/events/{id}/join`. Demo events with `demo-` id prefix simulate the join locally; real events that 404 / 501 surface a "backend pending" toast rather than a hard error. Viewer detection uses the auth session display name against `filledNames` to render an "already joined as X" state.
 - `2026-06-03` — initial spec draft. Captures the role enum surfaced in the UI roster, the join/leave operations needed by the campaign detail page, and the role-plan aggregation that drives the "help-needed" breakdown.

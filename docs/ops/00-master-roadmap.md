@@ -8,10 +8,10 @@
 >
 > **Companion folder:** backend API contracts the frontend depends on live in [`../api-requirements/`](../api-requirements/), introduced by the [2026-06-03 pivot ADR](../decisions/2026-06-03-ui-first-and-two-meeting-pivot.md). When a UI feature touches an entity covered there, update the matching domain file in the same session.
 
-## Overall Progress — 29%
+## Overall Progress — 34%
 
 ```
-0% [=============================-----------------------------------------------------------------------] 100%
+0% [==================================------------------------------------------------------------------] 100%
 ```
 
 The bar is 100 characters wide so each `=` equals exactly one percentage point. Recompute and redraw the bar in the same edit that changes any phase percentage — see [Aggregate Progress](#aggregate-progress) for the per-phase breakdown that feeds this number.
@@ -96,11 +96,11 @@ If the user gives a high-level instruction like "let's continue", read this file
    - 11.7 Security review baseline — XSS, CSRF, secret handling, rate-limit sweep on existing surfaces
 2. ~~**1.6 Citizen public issue submission**~~ ✅ *(shipped 2026-05-28 — `/issues/new`)*
 3. ~~**3.3 Issue → Campaign promotion**~~ ✅ *(shipped 2026-05-26 — admin force-convert button on `/admin/issues/[id]/view`)*
-4. **3.2 Public campaign detail page** — `/events/[id]` against existing `GET /events/{id}`. *(3.2.1 shipped 2026-05-29; 3.2.2 + 3.2.3 deferred until backend `rolesNeeded` shape and roster endpoint exist.)*
-5. **3.6 Volunteer join + roster** — "I'm joining" button + roster list on the campaign page. **← blocked on backend (see [09-backend-admin-gaps.md](../engineering/09-backend-admin-gaps.md)); 3.5.1 is the next implementable Tier 0 step in the meantime**
-6. **3.5.1 Leader schedule UI** — leader can `PATCH /events/{id}/schedule`.
-7. **4.6 Pre-event safety checklist gate** — simplest form, leader ticks N boxes before the event publishes.
-8. **3.5.2 Leader mark complete** — leader can `POST /events/{id}/complete`.
+4. ~~**3.2 Public campaign detail page**~~ ✅ *(3.2.1 shipped 2026-05-29; 3.2.2 shipped 2026-06-03 after `rolesNeeded` shape was spec'd in [`../api-requirements/events.md`](../api-requirements/events.md); 3.2.3 partial — volunteer count via roster, funds/materials gated on Phase 5)*
+5. ~~**3.6 Volunteer join + roster**~~ ✅ *(shipped 2026-06-03 — `EventJoinPanel` inline modal with role picker; demo events update locally, real events POST to `/events/{id}/join` with graceful 404/501 → "backend pending" toast. Backend endpoints still needed; see [09-backend-admin-gaps.md](../engineering/09-backend-admin-gaps.md))*
+6. ~~**3.5.1 Leader schedule UI**~~ ✅ *(shipped 2026-05-29)*
+7. **4.6 Pre-event safety checklist gate** — simplest form, leader ticks N boxes before the event publishes. **← Tier 0 head**
+8. ~~**3.5.2 Leader mark complete**~~ ✅ *(shipped 2026-06-03 — `LeaderCompleteEditor` modal; demo + real paths)*
 
 **Tier 1 — ship soon after first event** *(intentionally deferred from Tier 0)*
 
@@ -129,12 +129,12 @@ If the user gives a high-level instruction like "let's continue", read this file
 
 This is the active end of the [Launch Critical Path](#launch-critical-path--tier-0). Items collapse forward as Tier 0 sequence steps complete — agents may rewrite this list freely but must keep it consistent with the Tier 0 ladder above. When proposing "what's next", agents must also consult open `P1` items in [00-polish-backlog.md](00-polish-backlog.md) and prefer Tier-0-tagged polish over fresh feature leaves.
 
-1. **3.6 Volunteer join + roster** — **`[!]` BLOCKED on backend**. No participation endpoints exist (`POST/DELETE /events/{id}/join`, `GET /events/{id}/participants`). Backend gap logged in [09-backend-admin-gaps.md](../engineering/09-backend-admin-gaps.md). When unblocked, this is the next Tier 0 piece.
-2. **3.5.2 Leader completion UI** — `POST /events/{id}/complete` already exposed. Now that 3.5.1 has shipped a leader-only modal pattern on `/events/[id]`, the same shell can carry a "Mark complete" affordance for `SCHEDULED/ACTIVE` events with `resultSummary` + attendee count.
-3. **3.2.2 / 3.2.3 progress indicators** — blocked alongside 3.6 (need `rolesNeeded` shape + participants endpoint).
-4. **11.7 Security baseline audit** — non-blocking but should land before first real event.
+1. **4.6 Pre-event safety checklist gate** — Tier 0 next step. Simplest form: leader ticks N boxes (medic confirmed for high-risk categories, weather check, permissions confirmed, logistics readiness) before the event can transition from `SCHEDULED` to `ACTIVE`. Builds on the leader modal pattern from 3.5.1 / 3.5.2.
+2. **3.2.3 progress indicators (volunteers summary)** — small aggregate "X of Y spots filled" strip above the existing `EventRosterPanel`. Funds + materials still gated on Phase 5.
+3. **11.7 Security baseline audit** — non-blocking but should land before first real event. XSS / CSRF / secret handling / rate-limit sweep across existing surfaces.
+4. **Backend follow-up: ship the join endpoints** so `EventJoinPanel` stops swallowing 404/501 into a "backend pending" toast. Logged in [09-backend-admin-gaps.md](../engineering/09-backend-admin-gaps.md).
 
-*Earlier suggestions (9.11.1, Phase 2 stack decision, 3.2 deferral, 3.3 promotion, 3.2.1, 3.5.1) superseded as work ships. Phase 2 stack decision moves to Tier 1; 9.11.1 cancelled.*
+*Earlier suggestions (9.11.1, Phase 2 stack decision, 3.2 deferral, 3.3 promotion, 3.2.1, 3.5.1, 3.5.2, 3.6, 3.2.2) superseded as work ships. Phase 2 stack decision moves to Tier 1; 9.11.1 cancelled.*
 
 ---
 
@@ -207,15 +207,15 @@ Goal: Authenticated member experience that ships before the native mobile app an
 - [ ] 2.7 Profile + settings `w:1`
 - [ ] 2.8 KYC submission flow (prospective leaders) `w:1`
 
-## Phase 3 — Campaign / Event Execution `w:15` 📊 27%
+## Phase 3 — Campaign / Event Execution `w:15` 📊 67%
 
 Goal: A promoted issue becomes a real-world campaign with leader, schedule, roster, and completion. Each event runs through two planning meetings on the canonical happy path — a kickoff meeting (role counts, logistics, date) and a pre-execution review meeting (final roster, last-minute changes) separated by a one-to-two-week public signup window. See [08-operational-safety-and-event-model.md](08-operational-safety-and-event-model.md#event-lifecycle-meetings) for the full meeting flow and the [2026-06-03 pivot ADR](../decisions/2026-06-03-ui-first-and-two-meeting-pivot.md) for the decision that introduced it.
 
 - [x] 3.1 Admin events list (read) `w:1` ← done: 2026-05-19
 - [~] 3.2 Public campaign detail page `w:3`
   - [x] 3.2.1 Date, time, meeting point, goal `w:1` ← done: 2026-05-29 *(`/events/[id]` ships scheduled time, duration, meetup point + map, linked-issue goal/description, leader, risk badge, photo gallery, completion summary; bilingual EN+NE)*
-  - [ ] 3.2.2 Help-needed breakdown `w:1` *(blocked on backend: event resource needs a `rolesNeeded` shape — count by skill/role — before frontend can render it)*
-  - [ ] 3.2.3 Progress indicators (volunteers, funds, materials) `w:1` *(waits on 3.6 roster endpoint for volunteer count; funds/materials need Phase 5 contribution channels)*
+  - [x] 3.2.2 Help-needed breakdown `w:1` ← done: 2026-06-03 *(`EventRosterPanel` renders the `rolesNeeded` shape per the 2026-06-03 pivot — role label, filled-of-count, named chips, open-slots pill. Shape is now spec'd in [`../api-requirements/events.md`](../api-requirements/events.md) and [`../api-requirements/event-participants.md`](../api-requirements/event-participants.md); backend populates the same shape when ready.)*
+  - [~] 3.2.3 Progress indicators (volunteers, funds, materials) `w:1` *(volunteer count is surfaced per role via `EventRosterPanel`; aggregate "X of Y spots filled" summary still pending. Funds + materials gated on Phase 5 contribution channels.)*
 - [x] 3.3 Issue → campaign promotion `w:2` ← done: 2026-05-26
   - [x] 3.3.1 Vote-threshold rule + admin trigger `w:1` ← done: 2026-05-26 *(admin force-convert button on `/admin/issues/[id]/view` calls `POST /issues/{id}/convert-to-event`; backend owns the vote-threshold auto-promote rule)*
   - [x] 3.3.2 Auto-create campaign record on promote `w:1` ← done: 2026-05-26 *(backend `convert-to-event` endpoint creates the event record server-side; frontend trigger shipped in e776f29)*
@@ -223,10 +223,10 @@ Goal: A promoted issue becomes a real-world campaign with leader, schedule, rost
   - [x] 3.4.1 Admin leader assignment (exists in `/admin/events`) ← done: 2026-05-19
   - [ ] 3.4.2 Member nomination flow on `/app` `w:1`
   - [ ] 3.4.3 Member-side tie-break + settle surface `w:1`
-- [~] 3.5 Scheduling + completion (leader-only) `w:3`
+- [x] 3.5 Scheduling + completion (leader-only) `w:3` ← done: 2026-06-03
   - [x] 3.5.1 Leader UI for `PATCH /events/{id}/schedule` `w:2` ← done: 2026-05-29 *(`LeaderScheduleEditor` component renders a leader-only banner + Ant Design Modal on `/events/[id]` when the current user matches `eventLeaderId` AND status is `DRAFT`. Form covers `scheduledAt` (DatePicker showTime, future-only), `durationMinutes` (15-min steps), `meetupAddress`, `meetupNotes`, `meetupLatitude/Longitude` (with "Use issue location" shortcut prefilled from linked issue), and `planningNotes`. Submits via `patchJson('/events/${id}/schedule', payload, { requireAuth: true })`; surfaces 403 / 409 / generic toasts. Verified end-to-end with Playwright as admin-leader: DRAFT → SCHEDULED transition, banner auto-hides afterward.)*
-  - [ ] 3.5.2 Leader UI for `POST /events/{id}/complete` `w:1`
-- [!] 3.6 Participation roster — volunteer / cameraman `w:2` ← blocked: needs `POST/DELETE /events/{id}/join`, `GET /events/{id}/participants`, and ideally `myParticipation` echo on `GET /events/{id}` (see [09-backend-admin-gaps.md](../engineering/09-backend-admin-gaps.md))
+  - [x] 3.5.2 Leader UI for `POST /events/{id}/complete` `w:1` ← done: 2026-06-03 *(`LeaderCompleteEditor` component renders a leader-only success-accented banner + modal on `/events/[id]` when the current user is the leader AND status is `ACTIVE` or `SCHEDULED`. Form captures `completedAt` (DatePicker, past-or-now only, defaults to now) and `resultSummary` (required, ≥12 chars, max 2000). Submits via `postJson('/events/${id}/complete', payload, { requireAuth: true })`; 403/409/generic toasts. Demo events (`demo-*` ids) simulate completion via local state instead of round-tripping the backend; the parent page accepts a partial-event payload from `onSaved` and merges it in.)*
+- [x] 3.6 Participation roster — volunteer / cameraman `w:2` ← done: 2026-06-03 *(`EventJoinPanel` component renders an inline "Join this event" CTA on `/events/[id]` above the roster, opening a role-picker modal sourced from the event's `rolesNeeded` shape. Demo events update the roster locally; real events POST to `/events/{id}/join`. 404/501 responses surface a "backend pending" info toast instead of hard-failing — see [09-backend-admin-gaps.md](../engineering/09-backend-admin-gaps.md) for the still-needed backend endpoints. Viewer detection uses the auth session display name against `filledNames` to render a "you're in as X" badge.)*
 - [ ] 3.7 Reminder cadence: 3d / 24h / 1h `w:1`
 
 ## Phase 4 — Operational Safety & Incidents `w:8` 📊 0%
@@ -366,7 +366,7 @@ Weighted across all phases (sum of phase weights = 137):
 | 0 Foundation | 10 | 100% |
 | 1 Public Issue Discovery & Voting | 15 | 77% |
 | 2 Member Portal `/app` | 18 | 0% |
-| 3 Campaign Execution | 15 | 27% |
+| 3 Campaign Execution | 15 | 67% |
 | 4 Operational Safety | 8 | 0% |
 | 5 Contribution Channels | 10 | 0% |
 | 6 Transparency & Ledger | 8 | 0% |
@@ -379,7 +379,7 @@ Weighted across all phases (sum of phase weights = 137):
 | 13 Public Reports & Transparency Surface | 6 | 0% |
 | 14 Building in Public (Process Transparency) | 6 | 33% |
 
-**Overall: ≈ 29%** (weighted sum / total weight; recompute on every edit, and redraw the [Overall Progress](#overall-progress--29) bar near the top of this file in the same edit).
+**Overall: ≈ 34%** (weighted sum / total weight; recompute on every edit, and redraw the [Overall Progress](#overall-progress--34) bar near the top of this file in the same edit).
 
 # How To Update This Document
 

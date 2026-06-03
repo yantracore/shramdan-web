@@ -8483,6 +8483,99 @@
   }
 }
 
+/* ---- Leader complete banner (mirror of leader-schedule, success accent) ---- */
+
+.leader-complete-banner {
+  border-color: color-mix(in srgb, #2e7d32 42%, var(--line));
+  background: color-mix(in srgb, #2e7d32 6%, var(--surface));
+}
+
+.leader-complete-banner .eyebrow {
+  color: #2e7d32;
+}
+
+[data-theme="dark"] .leader-complete-banner {
+  border-color: color-mix(in srgb, #4ade80 46%, var(--line));
+  background: color-mix(in srgb, #2e7d32 14%, var(--surface));
+}
+
+[data-theme="dark"] .leader-complete-banner .eyebrow {
+  color: #4ade80;
+}
+
+.leader-complete-cta {
+  flex-shrink: 0;
+}
+
+.leader-complete-intro {
+  margin: 0 0 16px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+/* ---- In-page join panel on event detail ---- */
+
+.event-join-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 12px 0 8px;
+  padding: 12px 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+}
+
+.event-join-panel-joined {
+  border-color: color-mix(in srgb, #2e7d32 36%, var(--line));
+  background: color-mix(in srgb, #2e7d32 6%, var(--surface));
+  color: var(--text);
+  font-weight: 500;
+}
+
+.event-join-panel-joined .anticon {
+  color: #2e7d32;
+  font-size: 18px;
+}
+
+[data-theme="dark"] .event-join-panel-joined {
+  background: color-mix(in srgb, #2e7d32 14%, var(--surface));
+  border-color: color-mix(in srgb, #4ade80 44%, var(--line));
+}
+
+[data-theme="dark"] .event-join-panel-joined .anticon {
+  color: #4ade80;
+}
+
+.event-join-panel-closed {
+  color: var(--muted);
+  font-style: italic;
+  justify-content: center;
+}
+
+.event-join-panel-anon {
+  flex-wrap: wrap;
+}
+
+.event-join-panel-anon span {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.event-join-cta {
+  flex-shrink: 0;
+}
+
+.event-join-intro {
+  margin: 0 0 16px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
 /* Edge-to-edge homepage section dividers — the sections themselves are
    constrained to ~1180px, so we draw the divider via a ::before that
    extends to the viewport edges. */
