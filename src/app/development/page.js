@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { DevelopmentClient } from "./DevelopmentClient";
-import { getRoadmapSummary } from "@/lib/roadmap";
+import { getRoadmapSummary, getRoadmapFullTree } from "@/lib/roadmap";
 import { SiteShell } from "@/components/SiteShell";
 
 // /development — public build-in-public page (roadmap 14.2).
@@ -19,10 +19,11 @@ export default async function DevelopmentPage() {
   }
 
   const summary = getRoadmapSummary();
+  const tree = getRoadmapFullTree();
 
   return (
     <SiteShell pageTitle="विकास प्रगति · Build in public">
-      <DevelopmentClient summary={summary} />
+      <DevelopmentClient summary={summary} tree={tree} />
     </SiteShell>
   );
 }

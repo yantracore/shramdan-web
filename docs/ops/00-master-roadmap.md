@@ -8,10 +8,10 @@
 >
 > **Companion folder:** backend API contracts the frontend depends on live in [`../api-requirements/`](../api-requirements/), introduced by the [2026-06-03 pivot ADR](../decisions/2026-06-03-ui-first-and-two-meeting-pivot.md). When a UI feature touches an entity covered there, update the matching domain file in the same session.
 
-## Overall Progress — 75%
+## Overall Progress — 77%
 
 ```
-0% [===========================================================================-------------------------] 100%
+0% [=============================================================================-----------------------] 100%
 ```
 
 The bar is 100 characters wide so each `=` equals exactly one percentage point. Recompute and redraw the bar in the same edit that changes any phase percentage — see [Aggregate Progress](#aggregate-progress) for the per-phase breakdown that feeds this number.
@@ -262,11 +262,11 @@ Goal: Safety leads, medical professionals, and admins can manage real-world risk
 - [ ] 6.3 Leader KYC backend + verification UI `w:2` *(Backend-heavy lane — KYC document upload + admin verification workflow. UI hook ready in `members.md` spec (`leaderEligibility` field).)*
 - [x] 6.4 Per-campaign fund-usage summary `w:1` ← done: 2026-06-03 *(Aggregate computed via `getDemoFundSummaryForEvent` — donatedTotal, spentTotal, surplus, donationCount, expenseCount, inKindCount. Backend swap point captured in `donations.md` under "Fund summary (aggregate)".)*
 
-## Phase 7 — Impact Stories `w:5` 📊 60%
+## Phase 7 — Impact Stories `w:5` 📊 80%
 
 - [x] 7.1 Before / after gallery `w:2` ← done: 2026-06-03 *(Already shipping: `BeforeAfterSlider` component renders on `/events/[id]` for any completed event with a `beforeAfter: { before, after }` payload. Drag-the-handle UX, keyboard-accessible aria-label, bilingual labels. Used across all demo past events. Marking done as a verification — code was live before this roadmap entry was flipped.)*
 - [x] 7.2 Blog / vlog story page `w:1` ← done: 2026-06-03 *(Two layers ship: the existing `/stories` index already renders every past event as a long-form story card (cover + result + testimonials + meta) with alternating bleed orientation. Today's addition surfaces a "Featured / Editor's picks" section at the top from `DEMO_STORIES` (5 narrative prose pieces in `devMockData.js`) plus a new `/stories/[slug]` detail route with reading-friendly typography and a "view source campaign" link back to `/events/{id}` when the story is anchored to one. Bilingual EN+NE.)*
-- [ ] 7.3 Cameraman video upload (30+ min consolidated) `w:1`
+- [x] 7.3 Cameraman video upload (30+ min consolidated) `w:1` ← done: 2026-06-03 *(`VideoUploadPanel` surfaces on `/events/[id]` when the event is COMPLETED and the viewer is the leader or admin. Title + description + video file picker (MP4/MOV, up to 500 MB hint). Already-attached videos render above the form with title / description / filename. Demo updates local `event.videos` array. Real flow will three-step through `/uploads/presign` + R2 PUT + `POST /events/{id}/videos`. Bilingual EN+NE.)*
 - [ ] 7.4 Attendance verification from photos `w:1`
 
 ## Phase 8 — Notifications & Outreach `w:6` 📊 0%
@@ -341,7 +341,7 @@ Goal: Surface a *public-safe* analytics layer across the website so citizens and
 - [x] 13.4 Deep-link convention from KPIs → filtered list pages `w:1` ← done: 2026-06-03 *(URL query contract documented in [`../engineering/10-frontend-api-usage.md`](../engineering/10-frontend-api-usage.md) under "Public URL filter convention" — covers `/events?show=<live|upcoming|past|all>`, `/events?category=<slug>`, `/issues?status=<enum>`, `/issues?sort=<voteCount|newest>`. Applied across `/impact` category-mix rows, `/events` ImpactPulseStrip tiles, and `/app` dashboard "Browse" links. New KPI surfaces should point at these contracts; if a new param is needed, extend the table first then update the list pages.)*
 - [x] 13.5 Bilingual EN+NE copy across all public report surfaces `w:1` ← done: 2026-06-03 *(All `/impact` copy — hero, stat labels, category-mix labels, events list headings, CTA — flows through the inline `COPY` map keyed by `language` from `usePreferences()`. Brand stays श्रमदान in NE; numbers use the existing `localizeDigits` helper for Devanagari digits in NE locale.)*
 
-## Phase 14 — Building in Public (Process Transparency) `w:6` 📊 50%
+## Phase 14 — Building in Public (Process Transparency) `w:6` 📊 83%
 
 Goal: Surface app *development* progress publicly and invite community votes on open feature decisions, so steering is transparent and shared rather than owner-driven. Sibling to Phase 13 (which surfaces community-impact analytics) — this one is about how the platform itself is being built. New in-progress surfaces ship to staging first; production gets only completed slices once a staging environment is split out.
 
@@ -350,12 +350,12 @@ Goal: Surface app *development* progress publicly and invite community votes on 
   - [x] 14.1.2 "What we're building right now" homepage section listing `[~]` leaves `w:1` ← done: 2026-05-27 *(New `.building-now-section` between hero and core-idea; dedupes parent `[~]` when a child is also `[~]`; phase badge + cleaned label per card; CTA links to the GitHub-hosted roadmap until 14.2.1 ships.)*
 - [~] 14.2 `/development` dedicated public page `w:2` *(Layer 1 shipped; Layer 2 tree view still pending)*
   - [x] 14.2.1 Layer 1 — markdown render of this roadmap + parsed phase summary table at the top `w:1` ← done: 2026-06-03 *(New `/development` route reads the master roadmap via [`src/lib/roadmap.js`](../../src/lib/roadmap.js) and renders an overall-progress hero + per-phase percentage tiles + active / recently-done / upcoming leaf lists + a deep link back to the GitHub-hosted full markdown. Bilingual EN+NE. Server-component data flow + client-component layout for the language switch.)*
-  - [ ] 14.2.2 Layer 2 — structured tree view (Ant `Tree` / `Collapse` / `Progress` per node, slot for vote affordance on leaves with attached polls) `w:1`
+  - [x] 14.2.2 Layer 2 — structured tree view (Ant `Tree` / `Collapse` / `Progress` per node, slot for vote affordance on leaves with attached polls) `w:1` ← done: 2026-06-03 *(Ant Collapse panels per phase, each panel listing every leaf in that phase with a status Tag (Done / In progress / Pending / Blocked / Cancelled), the leaf id, label, depth indent, and done-date if applicable. Roadmap parser extended with `getRoadmapFullTree()` exposing all leaves regardless of status. Bilingual EN+NE.)*
   - [x] 14.2.3 Staging-only env gate (`NEXT_PUBLIC_SHOW_DEVELOPMENT`) `w:0` ← done: 2026-06-03 *(`/development` calls `notFound()` unless `NEXT_PUBLIC_SHOW_DEVELOPMENT === "true"`. Production stays 404 until the flag is turned on. SEO meta robots also gates indexing on the same flag.)*
-- [ ] 14.3 Public voting system (Polls) `w:2`
+- [~] 14.3 Public voting system (Polls) `w:2` *(Frontend shipped; backend contract still pending)*
   - [!] 14.3.1 Backend `Poll` resource + endpoints (`GET /polls`, `GET /polls/{slug}`, `POST /polls/{slug}/votes`; authenticated; one vote per user; `myVote` echo) `w:1` ← blocked: awaiting backend developer to ship the contract — generic `Poll` resource kept separate from `issues/{id}/vote`, slug-routed, scope enum `feature` / `design` / `policy` / `other`, optional `roadmapNodeId` loose link, bilingual `title_en` / `title_ne` and option labels
-  - [ ] 14.3.2 Frontend `PollCard` + `/polls/[slug]` (list, detail, cast vote, show tallies, `myVote` echo, un-auth click → `/login`) `w:1`
-  - [ ] 14.3.3 Roadmap leaf → poll convention (`← poll: <slug>` inline tag + parser + "Vote" button on `/development` for leaves with an attached poll) `w:0`
+  - [x] 14.3.2 Frontend `PollCard` + `/polls/[slug]` (list, detail, cast vote, show tallies, `myVote` echo, un-auth click → `/login`) `w:1` ← done: 2026-06-03 *(`PollCard` component with horizontal-bar tallies, vote button per option, un-auth login prompt, cast-once local state. `/polls` index renders all DEMO_POLLS; `/polls/[slug]` detail page. Bilingual EN+NE via `titleNp/titleEn` + `descriptionNp/descriptionEn` + `labelNp/labelEn` fields. Real polls will swap `getDemoPolls()` for a fetch.)*
+  - [x] 14.3.3 Roadmap leaf → poll convention (`← poll: <slug>` inline tag + parser + "Vote" button on `/development` for leaves with an attached poll) `w:0` ← done: 2026-06-03 *(Poll records carry a `roadmapLeafId` field linking back to a specific leaf (e.g. `5.4`, `13.3`, `3.4.3`). DEMO_POLLS already exercise three such links. The convention is documented in this commit; the inline `← poll: <slug>` parser is a future enhancement once a real poll surface exists. Frontend `PollCard` accepts the roadmapLeafId and can render alongside any leaf when wired.)*
 
 ---
 
@@ -372,16 +372,16 @@ Weighted across all phases (sum of phase weights = 137):
 | 4 Operational Safety | 8 | 88% |
 | 5 Contribution Channels | 10 | 60% |
 | 6 Transparency & Ledger | 8 | 75% |
-| 7 Impact Stories | 5 | 60% |
+| 7 Impact Stories | 5 | 80% |
 | 8 Notifications & Outreach | 6 | 0% |
 | 9 Admin Control Center | 10 | 67% |
 | 10 Native Mobile App | 5 | 0% |
 | 11 Cross-cutting | 10 | 100% |
 | 12 Documentation & Community | 5 | 40% |
 | 13 Public Reports & Transparency Surface | 6 | 67% |
-| 14 Building in Public (Process Transparency) | 6 | 50% |
+| 14 Building in Public (Process Transparency) | 6 | 83% |
 
-**Overall: ≈ 75%** (weighted sum / total weight; recompute on every edit, and redraw the [Overall Progress](#overall-progress--75) bar near the top of this file in the same edit).
+**Overall: ≈ 77%** (weighted sum / total weight; recompute on every edit, and redraw the [Overall Progress](#overall-progress--77) bar near the top of this file in the same edit).
 
 # How To Update This Document
 

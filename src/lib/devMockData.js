@@ -3558,6 +3558,159 @@ export function getDemoStories() {
   return DEMO_STORIES;
 }
 
+// --- Community polls (roadmap 14.3) ----------------------------------
+// Public-facing votes on open product decisions. Each poll links
+// (optionally) back to a roadmap leaf via `roadmapLeafId`.
+
+const DEMO_POLLS = [
+  {
+    slug: "next-event-category-priority",
+    titleNp: "अर्को अभियानको प्रकार के होस्?",
+    titleEn: "What should the next campaign type prioritize?",
+    descriptionNp:
+      "श्रमदान अभियानको अर्को लहर कुन प्रकारमा बढी लगानी गर्ने भन्नेमा समुदायको आवाज।",
+    descriptionEn:
+      "Which campaign category should the next wave of शृमदान invest in?",
+    scope: "feature",
+    options: [
+      {
+        id: "afforestation",
+        labelNp: "वृक्षारोपण",
+        labelEn: "Afforestation",
+        voteCount: 134
+      },
+      {
+        id: "infrastructure",
+        labelNp: "विद्यालय / पूर्वाधार मर्मत",
+        labelEn: "School / infrastructure repair",
+        voteCount: 142
+      },
+      {
+        id: "cleanup",
+        labelNp: "नदी सरसफाइ",
+        labelEn: "Riverbank cleanup",
+        voteCount: 98
+      },
+      {
+        id: "trail",
+        labelNp: "ट्रेल मर्मत",
+        labelEn: "Hiking trail repair",
+        voteCount: 64
+      }
+    ],
+    roadmapLeafId: null,
+    closesAt: "2026-08-31T18:00:00.000Z"
+  },
+  {
+    slug: "first-payment-rail",
+    titleNp: "Phase 5 मा कुन भुक्तानी मार्ग पहिले?",
+    titleEn: "Which payment rail should Phase 5 ship first?",
+    descriptionNp:
+      "Phase 5 अन्तर्गत Esewa, Khalti, बैंक ट्रान्सफर, वा विदेशी दान — कुन एकीकरण पहिले बनाउने भन्नेमा तपाईंको मत।",
+    descriptionEn:
+      "Within Phase 5, which payment rail should we wire up first — eSewa, Khalti, bank transfer, or foreign donations?",
+    scope: "feature",
+    options: [
+      { id: "esewa", labelNp: "eSewa", labelEn: "eSewa", voteCount: 87 },
+      { id: "khalti", labelNp: "Khalti", labelEn: "Khalti", voteCount: 79 },
+      {
+        id: "bank",
+        labelNp: "बैंक ट्रान्सफर",
+        labelEn: "Bank transfer",
+        voteCount: 41
+      },
+      {
+        id: "foreign",
+        labelNp: "विदेशी दान (SWC)",
+        labelEn: "Foreign donations (SWC)",
+        voteCount: 28
+      }
+    ],
+    roadmapLeafId: "5.4",
+    closesAt: "2026-07-15T18:00:00.000Z"
+  },
+  {
+    slug: "homepage-pulse-style",
+    titleNp: "गृहपृष्ठमा सामुदायिक नब्ज कस्तो देखियोस्?",
+    titleEn: "How should the homepage community pulse look?",
+    descriptionNp:
+      "ImpactPulseStrip लाई गृहपृष्ठमा कुन शैलीमा embed गर्ने — सानो stat strip, ठूलो hero panel, वा छुट्टै section?",
+    descriptionEn:
+      "How should ImpactPulseStrip embed on the home page — small stat strip, large hero panel, or its own section?",
+    scope: "design",
+    options: [
+      {
+        id: "strip",
+        labelNp: "Hero मुनी सानो stat strip",
+        labelEn: "Small stat strip under the hero",
+        voteCount: 56
+      },
+      {
+        id: "hero",
+        labelNp: "Hero panel मै ठूलो KPI",
+        labelEn: "Large KPI inside the hero panel",
+        voteCount: 34
+      },
+      {
+        id: "section",
+        labelNp: "छुट्टै section तल",
+        labelEn: "Separate section further down",
+        voteCount: 22
+      }
+    ],
+    roadmapLeafId: "13.3",
+    closesAt: "2026-07-01T18:00:00.000Z"
+  },
+  {
+    slug: "leader-tie-break-policy",
+    titleNp: "नेतृत्व मनोनयन बराबर समर्थन भए कसले निर्णय गरोस्?",
+    titleEn: "Who breaks a tie in leader nomination?",
+    descriptionNp:
+      "दुई वा बढी मनोनयन बराबर समर्थन पाएमा अन्तिम निर्णय कसले गरोस्?",
+    descriptionEn:
+      "When two or more nominations tie on supports, who should break the tie?",
+    scope: "policy",
+    options: [
+      {
+        id: "admin",
+        labelNp: "प्रशासन",
+        labelEn: "Admin team",
+        voteCount: 31
+      },
+      {
+        id: "runoff",
+        labelNp: "रन-अफ मतदान",
+        labelEn: "Run-off vote",
+        voteCount: 78
+      },
+      {
+        id: "lottery",
+        labelNp: "लाटरी",
+        labelEn: "Lottery",
+        voteCount: 12
+      },
+      {
+        id: "first-nominated",
+        labelNp: "पहिलो मनोनयन भएको",
+        labelEn: "First nominee wins",
+        voteCount: 19
+      }
+    ],
+    roadmapLeafId: "3.4.3",
+    closesAt: "2026-07-20T18:00:00.000Z"
+  }
+];
+
+export function getDemoPolls() {
+  if (!isDev()) return [];
+  return DEMO_POLLS;
+}
+
+export function getDemoPollBySlug(slug) {
+  if (!isDev() || !slug) return null;
+  return DEMO_POLLS.find((p) => p.slug === slug) || null;
+}
+
 export function getDemoStoryBySlug(slug) {
   if (!isDev() || !slug) return null;
   return DEMO_STORIES.find((s) => s.slug === slug) || null;

@@ -26,6 +26,7 @@ import { IssuePhotoGallery } from "@/components/IssuePhotoGallery";
 import { ContributionIntentPanel } from "@/components/ContributionIntentPanel";
 import { IncidentPanel } from "@/components/IncidentPanel";
 import { ShareAsContribution } from "@/components/ShareAsContribution";
+import { VideoUploadPanel } from "@/components/VideoUploadPanel";
 import { LeaderScheduleEditor } from "@/components/LeaderScheduleEditor";
 import { LeaderCompleteEditor } from "@/components/LeaderCompleteEditor";
 import { LeaderNominationPanel } from "@/components/LeaderNominationPanel";
@@ -177,6 +178,9 @@ export default function EventDetailPage() {
     eventData?.status === "COMPLETED" ||
     isLeader;
   const canSeeFullIncidents = isLeader || session?.user?.role === "ADMIN";
+  const canUploadVideo =
+    eventData?.status === "COMPLETED" &&
+    (isLeader || session?.user?.role === "ADMIN");
   const leaderScheduleCopy = content.detail.leaderSchedule;
   const leaderCompleteCopy = content.detail.leaderComplete;
 
@@ -388,6 +392,15 @@ export default function EventDetailPage() {
 
                 {eventData.status !== "COMPLETED" && eventData.status !== "CANCELLED" ? (
                   <ShareAsContribution event={eventData} language={language} />
+                ) : null}
+
+                {eventData.status === "COMPLETED" ? (
+                  <VideoUploadPanel
+                    event={eventData}
+                    language={language}
+                    canUpload={canUploadVideo}
+                    onChanged={handleEventCompleted}
+                  />
                 ) : null}
 
 

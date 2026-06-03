@@ -110,4 +110,53 @@ export function getRoadmapSummary() {
   return cached;
 }
 
+// Full phase-by-phase leaf tree (roadmap 14.2.2). Returns a map of
+// phase number -> { phase, leaves: [{id, label, status, depth, doneAt?}] }
+// covering ALL leaves regardless of status. Used by the /development
+// Layer 2 tree view; the summary export above stays unchanged.
+let cachedTree = null;
+
+export function getRoadmapFullTree() {
+  if (cachedTree && process.env.NODE_ENV === "production") return cachedTree;
+
+  const text = fs.readFileSync(ROADMAP_PATH, "utf8");
+  const lines = text.split(/\r?\n/);
+  const map = new Map();
+  let currentPhase = null;
+
+  for (const line of lines) {
+    const phase = line.match(PHASE_RE);
+    if (phase) {
+      currentPhase = {
+        number: Number(phase[1]),
+        title: phase[2].trim(),
+        weight: Number(phase[3]),
+        percent: Number(phase[4])
+      };
+      map.set(currentPhase.number, { phase: currentPhase, leaves: [] });
+      continue;
+    }
+
+    const leaf = line.match(LEAF_RE);
+    if (!leaf || !currentPhase) continue;
+
+    const status = leaf[2];
+    const id = leaf[3];
+    const rest = leaf[4];
+    const dateMatch = rest.match(DONE_DATE_RE);
+    map.get(currentPhase.number).leaves.push({
+      id,
+      label: cleanLabel(rest),
+      status,
+      depth: leaf[1].length,
+      doneAt: dateMatch ? dateMatch[1] : null
+    });
+  }
+
+  cachedTree = Array.from(map.values()).sort(
+    (a, b) => a.phase.number - b.phase.number
+  );
+  return cachedTree;
+}
+
 export { topId };

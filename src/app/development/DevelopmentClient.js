@@ -2,7 +2,7 @@
 
 import { CheckCircleFilled, ClockCircleOutlined, RiseOutlined } from "@ant-design/icons";
 import Link from "next/link";
-import { Progress } from "antd";
+import { Collapse, Progress, Tag } from "antd";
 import { usePreferences } from "@/app/providers";
 
 const COPY = {
@@ -20,7 +20,17 @@ const COPY = {
     recentlyDoneEmpty: "विगत १४ दिनमा कुनै फेज सम्पन्न भएन।",
     upcomingEmpty: "सबै लीफ सकिएको छ।",
     githubLink: "GitHub मा पूर्ण रोडम्याप हेर्नुहोस्",
-    phaseLabel: "फेज {n}"
+    phaseLabel: "फेज {n}",
+    treeHeading: "पूर्ण रोडम्याप वृक्ष",
+    treeIntro:
+      "हरेक फेजका सबै लिफ — सम्पन्न, चलिरहेका, र पर्खिँदै। फेज खोल्न क्लिक गर्नुहोस्।",
+    statusLabel: {
+      x: "सम्पन्न",
+      "~": "चलिरहेको",
+      " ": "पर्खिँदै",
+      "!": "ब्लक",
+      "-": "हटाइएको"
+    }
   },
   en: {
     eyebrow: "Built in public",
@@ -36,8 +46,26 @@ const COPY = {
     recentlyDoneEmpty: "Nothing shipped in the last 14 days.",
     upcomingEmpty: "Everything's done.",
     githubLink: "View the full roadmap on GitHub",
-    phaseLabel: "Phase {n}"
+    phaseLabel: "Phase {n}",
+    treeHeading: "Full roadmap tree",
+    treeIntro:
+      "Every leaf in every phase — done, in progress, pending. Expand a phase to drill in.",
+    statusLabel: {
+      x: "Done",
+      "~": "In progress",
+      " ": "Pending",
+      "!": "Blocked",
+      "-": "Cancelled"
+    }
   }
+};
+
+const STATUS_COLOR = {
+  x: "green",
+  "~": "gold",
+  " ": "default",
+  "!": "red",
+  "-": "default"
 };
 
 const GITHUB_ROADMAP_URL =
@@ -58,10 +86,42 @@ function formatDate(iso, language) {
   }
 }
 
-export function DevelopmentClient({ summary }) {
+export function DevelopmentClient({ summary, tree }) {
   const { language } = usePreferences();
   const t = COPY[language] || COPY.np;
   const { overallPercent, phases, inProgress, upcoming, recentlyDone } = summary || {};
+
+  const treePanels = (tree || []).map((entry) => ({
+    key: String(entry.phase.number),
+    label: (
+      <span className="development-tree-panel-head">
+        <strong>
+          {t.phaseLabel.replace("{n}", entry.phase.number)} — {entry.phase.title}
+        </strong>
+        <span className="development-tree-panel-percent">{entry.phase.percent}%</span>
+      </span>
+    ),
+    children: (
+      <ul className="development-tree-leaves">
+        {entry.leaves.map((leaf) => (
+          <li
+            key={leaf.id}
+            className="development-tree-leaf"
+            style={{ paddingLeft: `${Math.min(leaf.depth, 8) * 6}px` }}
+          >
+            <Tag color={STATUS_COLOR[leaf.status] || "default"}>
+              {t.statusLabel[leaf.status] || leaf.status}
+            </Tag>
+            <span className="development-tree-leaf-id">{leaf.id}</span>
+            <span className="development-tree-leaf-label">{leaf.label}</span>
+            {leaf.doneAt ? (
+              <span className="development-tree-leaf-date">{leaf.doneAt}</span>
+            ) : null}
+          </li>
+        ))}
+      </ul>
+    )
+  }));
 
   return (
     <section className="development-page page-section">
@@ -180,6 +240,19 @@ export function DevelopmentClient({ summary }) {
           </ul>
         )}
       </section>
+
+      {treePanels.length > 0 ? (
+        <section
+          className="development-tree"
+          aria-labelledby="development-tree-title"
+        >
+          <header className="development-tree-header">
+            <h2 id="development-tree-title">{t.treeHeading}</h2>
+            <p>{t.treeIntro}</p>
+          </header>
+          <Collapse items={treePanels} bordered={false} ghost />
+        </section>
+      ) : null}
 
       <aside className="development-github">
         <a href={GITHUB_ROADMAP_URL} target="_blank" rel="noreferrer">
