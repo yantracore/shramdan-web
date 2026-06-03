@@ -38,7 +38,7 @@ export function PublicIssueCard({ issue, content, language }) {
   const { isSaved, toggle } = useSavedIssues();
   const saved = isSaved(issue.id);
   const saveLabel = language === "np"
-    ? saved ? "बुकमार्क हटाऔँ" : "बुकमार्क गरौँ"
+    ? saved ? "बुकमार्क हटाउनुहोस्" : "बुकमार्क गर्नुहोस्"
     : saved ? "Remove bookmark" : "Bookmark";
   const descriptionPeek = issue.description
     ? issue.description.length > 110

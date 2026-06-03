@@ -49,7 +49,7 @@ export function IssueVoteButton({
     ? content.card.voteDisabledTooltip
     : voted
       ? ""
-      : content.card.voteAction;
+      : content.card.voteTooltip || content.card.voteAction;
 
   return (
     <Tooltip title={tooltipTitle}>
