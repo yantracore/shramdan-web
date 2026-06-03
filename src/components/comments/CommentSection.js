@@ -12,7 +12,8 @@ import {
   editComment,
   loadComments,
   saveComment,
-  softDeleteComment
+  softDeleteComment,
+  toggleReaction
 } from "@/lib/comments";
 import { getAuthSession, subscribeAuthSession } from "@/lib/authSession";
 import { useToast } from "@/lib/toast";
@@ -207,6 +208,28 @@ export function CommentSection({ targetType, targetId, language = "np" }) {
     [currentUser, targetType, targetId, reload, messageApi, t]
   );
 
+  // Reactions intentionally skip optimistic UI: the localStorage write
+  // is synchronous, so reload() is effectively instant. Saves a state
+  // hop and keeps the count-source-of-truth in one place.
+  const handleToggleReaction = useCallback(
+    (comment, emoji) => {
+      if (!currentUser || !comment?.id || !emoji) return;
+      const result = toggleReaction({
+        targetType,
+        targetId,
+        commentId: comment.id,
+        emoji,
+        userId: currentUser.id
+      });
+      if (result === null) {
+        messageApi.error(t.errorGeneric);
+        return;
+      }
+      reload();
+    },
+    [currentUser, targetType, targetId, reload, messageApi, t]
+  );
+
   if (!targetType || !targetId) return null;
 
   const heading = targetType === "event" ? t.headingEvent : t.headingIssue;
@@ -253,6 +276,7 @@ export function CommentSection({ targetType, targetId, language = "np" }) {
           onCancelEdit={handleCancelEdit}
           onSubmitEdit={handleSubmitEdit}
           onDelete={handleDelete}
+          onToggleReaction={handleToggleReaction}
         />
       )}
     </section>

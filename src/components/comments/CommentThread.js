@@ -21,7 +21,8 @@ export function CommentThread({
   onStartEdit,
   onCancelEdit,
   onSubmitEdit,
-  onDelete
+  onDelete,
+  onToggleReaction
 }) {
   if (!Array.isArray(nodes) || nodes.length === 0) return null;
 
@@ -46,6 +47,7 @@ export function CommentThread({
             onCancelEdit={onCancelEdit}
             onSubmitEdit={onSubmitEdit}
             onDelete={onDelete}
+            onToggleReaction={onToggleReaction}
           >
             {childNodes.length > 0 && canNestVisually ? (
               <CommentThread
@@ -62,6 +64,7 @@ export function CommentThread({
                 onCancelEdit={onCancelEdit}
                 onSubmitEdit={onSubmitEdit}
                 onDelete={onDelete}
+                onToggleReaction={onToggleReaction}
               />
             ) : null}
           </CommentNode>

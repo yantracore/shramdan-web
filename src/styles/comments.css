@@ -186,6 +186,187 @@
   color: var(--muted);
 }
 
+/* --- Reactions row ----------------------------------------------------- */
+
+.comment-reactions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.comment-reaction-tile {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease, border-color 120ms ease, transform 120ms ease;
+}
+
+.comment-reaction-tile:hover:not(:disabled) {
+  color: var(--text);
+  border-color: color-mix(in srgb, var(--primary) 35%, transparent);
+  background: color-mix(in srgb, var(--primary) 6%, var(--surface));
+}
+
+.comment-reaction-tile:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.comment-reaction-tile:disabled {
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
+.comment-reaction-tile.is-picked {
+  background: color-mix(in srgb, var(--primary) 14%, var(--surface));
+  border-color: color-mix(in srgb, var(--primary) 50%, transparent);
+  color: var(--primary-dark);
+}
+
+.comment-reaction-emoji {
+  font-size: 14px;
+  line-height: 1;
+  /* Emoji renders via system font — `apple color emoji` etc. give the
+   * right look on every OS without shipping bytes. */
+  font-family:
+    "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji",
+    "Twemoji Mozilla", "EmojiOne Color", "Android Emoji", sans-serif;
+}
+
+.comment-reaction-count {
+  font-variant-numeric: tabular-nums;
+  /* Tiny gap fix so digits sit on the same visual baseline as emoji. */
+  padding-top: 1px;
+}
+
+.comment-reaction-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  background: transparent;
+  border: 1px dashed var(--line);
+  color: var(--muted);
+  padding: 3px 9px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: color 120ms ease, border-color 120ms ease, background 120ms ease;
+}
+
+.comment-reaction-add:hover:not(:disabled) {
+  color: var(--primary-dark);
+  border-color: color-mix(in srgb, var(--primary) 50%, transparent);
+  background: color-mix(in srgb, var(--primary) 6%, var(--surface));
+}
+
+.comment-reaction-add:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.comment-reaction-add .anticon {
+  font-size: 13px;
+}
+
+.comment-reaction-add-plus {
+  font-size: 11px;
+  font-weight: 800;
+  margin-left: 1px;
+  margin-top: -1px;
+}
+
+/* --- Emoji picker popover ---------------------------------------------- */
+
+.comment-emoji-popover .ant-popover-inner {
+  padding: 10px;
+  border-radius: var(--radius-md);
+}
+
+.comment-emoji-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 248px;
+}
+
+.comment-emoji-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.comment-emoji-section-label {
+  margin: 0;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.comment-emoji-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.comment-emoji-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 4px;
+}
+
+.comment-emoji-tile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 18px;
+  transition: background 120ms ease, border-color 120ms ease, transform 120ms ease;
+  font-family:
+    "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji",
+    "Twemoji Mozilla", "EmojiOne Color", "Android Emoji", sans-serif;
+}
+
+.comment-emoji-tile:hover {
+  background: color-mix(in srgb, var(--primary) 8%, var(--surface));
+  border-color: color-mix(in srgb, var(--primary) 35%, transparent);
+}
+
+.comment-emoji-tile:active {
+  transform: scale(0.92);
+}
+
+.comment-emoji-tile.is-picked {
+  background: color-mix(in srgb, var(--primary) 16%, var(--surface));
+  border-color: color-mix(in srgb, var(--primary) 50%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .comment-reaction-tile,
+  .comment-reaction-add,
+  .comment-emoji-tile {
+    transition: none;
+  }
+  .comment-reaction-tile:active:not(:disabled),
+  .comment-emoji-tile:active {
+    transform: none;
+  }
+}
+
 /* --- Action row -------------------------------------------------------- */
 
 .comment-actions {

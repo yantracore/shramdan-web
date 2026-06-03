@@ -26,18 +26,23 @@ function storageKey(targetType, targetId) {
 }
 
 function readOverlay(targetType, targetId) {
-  if (!canUseStorage()) return { added: [], edits: {}, deletes: [] };
+  const empty = { added: [], edits: {}, deletes: [], picks: {} };
+  if (!canUseStorage()) return empty;
   try {
     const raw = window.localStorage.getItem(storageKey(targetType, targetId));
-    if (!raw) return { added: [], edits: {}, deletes: [] };
+    if (!raw) return empty;
     const parsed = JSON.parse(raw);
     return {
       added: Array.isArray(parsed?.added) ? parsed.added : [],
       edits: parsed?.edits && typeof parsed.edits === "object" ? parsed.edits : {},
-      deletes: Array.isArray(parsed?.deletes) ? parsed.deletes : []
+      deletes: Array.isArray(parsed?.deletes) ? parsed.deletes : [],
+      // picks: { [commentId]: ["👏", "🌱", ...] } — emojis this viewer has
+      // toggled on. Seed reactions live on the comment itself; picks add
+      // +1 each on top (or surface a new emoji at count 1 if not seeded).
+      picks: parsed?.picks && typeof parsed.picks === "object" ? parsed.picks : {}
     };
   } catch {
-    return { added: [], edits: {}, deletes: [] };
+    return empty;
   }
 }
 
@@ -75,8 +80,11 @@ function normalizeComment(raw) {
   };
 }
 
-// Apply the overlay (added/edits/deletes) on top of the seed list.
-// Returns a flat array of normalized comments.
+// Apply the overlay (added/edits/deletes/picks) on top of the seed list.
+// Returns a flat array of normalized comments. Reactions are folded so
+// that the viewer's picks add +1 to seeded counts (or surface unseeded
+// emojis at count 1) and `myReactions` exposes which emojis the viewer
+// currently picked — that's what the UI uses for `is-picked` state.
 function applyOverlay(seed, overlay) {
   const seedNormalized = seed.map(normalizeComment);
   const addedNormalized = overlay.added.map(normalizeComment);
@@ -93,6 +101,18 @@ function applyOverlay(seed, overlay) {
     if (deletesSet.has(c.id)) {
       next.deleted = true;
     }
+
+    const viewerPicks = Array.isArray(overlay.picks?.[c.id])
+      ? overlay.picks[c.id]
+      : [];
+    if (viewerPicks.length > 0) {
+      const folded = { ...c.reactions };
+      for (const emoji of viewerPicks) {
+        folded[emoji] = (folded[emoji] || 0) + 1;
+      }
+      next.reactions = folded;
+    }
+    next.myReactions = viewerPicks;
     return next;
   });
 }
@@ -216,6 +236,44 @@ export function softDeleteComment({ targetType, targetId, commentId, userId }) {
 // Convenience for the section count: total non-deleted comments.
 export function countVisible(flatList) {
   return flatList.filter((c) => !c.deleted).length;
+}
+
+// Toggle one emoji reaction on a comment, on behalf of the viewer. The
+// caller is expected to have already checked `userId` (login wall) —
+// this layer doesn't gate, it just persists. Returns the new pick
+// state (true = now picked, false = now unpicked). Soft-deleted
+// comments cannot be reacted to.
+export function toggleReaction({ targetType, targetId, commentId, emoji, userId }) {
+  if (!targetType || !targetId || !commentId || !emoji || !userId) return null;
+  const all = loadComments({ targetType, targetId });
+  const target = all.find((c) => c.id === commentId);
+  if (!target || target.deleted) return null;
+
+  const overlay = readOverlay(targetType, targetId);
+  const current = Array.isArray(overlay.picks[commentId])
+    ? overlay.picks[commentId]
+    : [];
+  const idx = current.indexOf(emoji);
+  let next;
+  let nowPicked;
+  if (idx >= 0) {
+    next = current.filter((_, i) => i !== idx);
+    nowPicked = false;
+  } else {
+    next = [...current, emoji];
+    nowPicked = true;
+  }
+  overlay.picks = {
+    ...overlay.picks,
+    [commentId]: next
+  };
+  // Drop the key entirely if empty — keeps the localStorage payload lean.
+  if (next.length === 0) {
+    const { [commentId]: _omit, ...rest } = overlay.picks;
+    overlay.picks = rest;
+  }
+  writeOverlay(targetType, targetId, overlay);
+  return nowPicked;
 }
 
 export const COMMENT_LIMITS = {

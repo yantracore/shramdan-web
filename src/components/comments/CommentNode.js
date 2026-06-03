@@ -7,6 +7,7 @@ import {
 } from "@ant-design/icons";
 import { Button } from "antd";
 import { CommentComposer } from "@/components/comments/CommentComposer";
+import { CommentReactions } from "@/components/comments/CommentReactions";
 import { canDeleteComment, canEditComment } from "@/lib/comments";
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
@@ -73,6 +74,7 @@ export function CommentNode({
   onCancelEdit,
   onSubmitEdit,
   onDelete,
+  onToggleReaction,
   children
 }) {
   const t = COPY[language] || COPY.np;
@@ -120,36 +122,45 @@ export function CommentNode({
         )}
 
         {!comment.deleted && !isEditing ? (
-          <div className="comment-actions" role="group">
-            <Button
-              type="text"
-              size="small"
-              icon={<MessageOutlined />}
-              onClick={() => onStartReply?.(comment)}
-            >
-              {t.reply}
-            </Button>
-            {canEdit ? (
+          <>
+            <CommentReactions
+              reactions={comment.reactions}
+              myReactions={comment.myReactions}
+              language={language}
+              isAuthenticated={Boolean(currentUser?.id)}
+              onToggle={(emoji) => onToggleReaction?.(comment, emoji)}
+            />
+            <div className="comment-actions" role="group">
               <Button
                 type="text"
                 size="small"
-                icon={<EditOutlined />}
-                onClick={() => onStartEdit?.(comment)}
+                icon={<MessageOutlined />}
+                onClick={() => onStartReply?.(comment)}
               >
-                {t.edit}
+                {t.reply}
               </Button>
-            ) : null}
-            {canDelete ? (
-              <Button
-                type="text"
-                size="small"
-                icon={<DeleteOutlined />}
-                onClick={() => onDelete?.(comment)}
-              >
-                {t.delete}
-              </Button>
-            ) : null}
-          </div>
+              {canEdit ? (
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<EditOutlined />}
+                  onClick={() => onStartEdit?.(comment)}
+                >
+                  {t.edit}
+                </Button>
+              ) : null}
+              {canDelete ? (
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<DeleteOutlined />}
+                  onClick={() => onDelete?.(comment)}
+                >
+                  {t.delete}
+                </Button>
+              ) : null}
+            </div>
+          </>
         ) : null}
 
         {isReplying ? (

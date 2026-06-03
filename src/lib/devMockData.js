@@ -1144,6 +1144,27 @@ export function getDemoVoteHistory(issueId) {
   return points;
 }
 
+// Curated emoji set used to seed reactions on demo comments. Subset of
+// the picker palette — these are the ones that feel natural on
+// volunteer-coordination chatter. Phase 2 of the comment system.
+const SEED_REACTION_EMOJIS = ["👏", "🌱", "❤️", "🙏", "💪", "🎉", "🌟", "🔥"];
+
+// Hash-deterministic seed reactions for a single comment. We want the
+// same comment to always have the same reaction set + counts across
+// reloads, so we derive both from the comment id.
+function seedReactionsForId(id) {
+  const h = hashStringToInt(id);
+  const emojiCount = 1 + (h % 3); // 1-3 distinct emojis per seeded comment
+  const out = {};
+  for (let i = 0; i < emojiCount; i += 1) {
+    const emoji = SEED_REACTION_EMOJIS[(h + i * 31) % SEED_REACTION_EMOJIS.length];
+    // 2-15 count per emoji — feels populated without looking botted.
+    const count = 2 + ((h >> (i + 1)) % 14);
+    out[emoji] = (out[emoji] || 0) + count;
+  }
+  return out;
+}
+
 // Walk a seed thread node into the flat canonical comment shape.
 // `idPath` segments are joined with "-" → comment ids are stable per
 // (targetType, targetId, threadIdx, nesting path), so the same target
@@ -1168,7 +1189,7 @@ function flattenSeedThread({ node, parentId, depth, targetType, targetId, idPath
       },
       text: node.text || "",
       mentions: [],
-      reactions: {},
+      reactions: seedReactionsForId(id),
       createdAt: minutesAgoIso(Math.max(1, headMinAgo))
     }
   ];
