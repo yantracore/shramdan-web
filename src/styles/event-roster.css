@@ -922,15 +922,9 @@
   font-size: 13.5px;
 }
 
-.event-detail-side .event-roster-panel {
-  margin-top: 0;
-  padding-top: 0;
-  border-top: 0;
-}
-
 .event-detail-side-location {
-  padding: 12px;
-  gap: 8px;
+  padding: 14px;
+  gap: 10px;
 }
 
 .event-detail-side-location .public-issue-location-header {
@@ -952,19 +946,7 @@
 
 .event-detail-side-location .public-issue-location-map,
 .event-detail-side-location .public-issue-location-map .issue-map-wrap {
-  border-radius: 8px;
-}
-
-.event-detail-side .event-roster-header h2 {
-  font-size: 18px;
-}
-
-.event-detail-side .event-roster-header p {
-  font-size: 13px;
-}
-
-.event-detail-side .event-roster-list {
-  grid-template-columns: 1fr;
+  border-radius: 10px;
 }
 
 @media (min-width: 1024px) {
