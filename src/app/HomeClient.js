@@ -49,6 +49,7 @@ import { ActivityTicker } from "@/components/ActivityTicker";
 import { EventsHomeRail } from "@/components/EventsHomeRail";
 import { LiveOnlineWidget } from "@/components/LiveOnlineWidget";
 import { MotionSection } from "@/components/MotionSection";
+import { SectionVideoBackground } from "@/components/SectionVideoBackground";
 import { TertiaryButton } from "@/components/TertiaryButton";
 import { TimeOfDayGreeting } from "@/components/TimeOfDayGreeting";
 import { SiteShell } from "@/components/SiteShell";
@@ -331,6 +332,12 @@ export default function HomeClient({ summary }) {
   return (
     <SiteShell>
       <MotionSection as="section" id="top" className="hero-section">
+        <SectionVideoBackground
+          src="/images/demo-events/bagmati-cleanup.mp4"
+          poster="/images/demo-events/bagmati-cleanup.jpg"
+          overlay="hero"
+          objectPosition="center right"
+        />
         <div className="hero-copy">
           {t.hero.eyebrow ? (
             <span className="eyebrow">
@@ -535,6 +542,11 @@ export default function HomeClient({ summary }) {
 
       <MotionSection as="section" className="event-types-section" aria-labelledby="event-types-title">
         <div className="event-types-heading">
+          <SectionVideoBackground
+            src="/images/demo-events/bagmati-cleanup.mp4"
+            poster="/images/demo-events/bagmati-cleanup.jpg"
+            overlay="soft"
+          />
           <span className="eyebrow">{t.eventTypes.eyebrow}</span>
           <div>
             <h2 id="event-types-title">{t.eventTypes.title}</h2>
@@ -594,6 +606,11 @@ export default function HomeClient({ summary }) {
 
       <MotionSection as="section" className="cleanup-areas-section" aria-labelledby="cleanup-areas-title">
         <div className="cleanup-areas-heading">
+          <SectionVideoBackground
+            src="/images/demo-events/kamalpokhari-beautify.mp4"
+            poster="/images/demo-events/kamalpokhari-beautify.jpg"
+            overlay="soft"
+          />
           <span className="eyebrow">{t.cleanupAreas.eyebrow}</span>
           <div>
             <h2 id="cleanup-areas-title">{t.cleanupAreas.title}</h2>
@@ -621,6 +638,12 @@ export default function HomeClient({ summary }) {
 
       <MotionSection as="section" className="core-idea-section" aria-labelledby="core-idea-title">
         <div className="core-idea-hero">
+          <SectionVideoBackground
+            src="/images/demo-events/suryabinayak-trees.mp4"
+            poster="/images/demo-events/suryabinayak-trees.jpg"
+            overlay="core"
+            objectPosition="right center"
+          />
           <div className="core-idea-copy">
             <span className="core-idea-eyebrow">
               <span aria-hidden="true">
