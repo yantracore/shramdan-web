@@ -309,7 +309,7 @@ Goal: Ship native iOS + Android once `/app` web shell is stable. Reuse the same 
 - [ ] 10.3 Push notification cert + storefront prep `w:1`
 - [ ] 10.4 App Store + Play Store submission `w:1`
 
-## Phase 11 — Cross-cutting Concerns `w:10` 📊 40%
+## Phase 11 — Cross-cutting Concerns `w:10` 📊 50%
 
 - [x] 11.1 Responsive admin list pattern (`AdminResponsiveList`) `w:1` ← done: 2026-05-20
 - [ ] 11.2 Accessibility audit (WCAG AA) `w:2`
@@ -317,7 +317,7 @@ Goal: Ship native iOS + Android once `/app` web shell is stable. Reuse the same 
 - [ ] 11.4 SEO + meta + sitemap `w:1`
 - [ ] 11.5 Analytics + observability `w:1`
 - [ ] 11.6 Performance (Lighthouse mobile > 90) `w:1`
-- [ ] 11.7 Security review (XSS, CSRF, secret handling, rate limits) `w:1`
+- [x] 11.7 Security review (XSS, CSRF, secret handling, rate limits) `w:1` ← done: 2026-06-03 *(Frontend baseline audit captured in [`../engineering/11-security-baseline-2026-06-03.md`](../engineering/11-security-baseline-2026-06-03.md). No HIGH-severity findings: two `dangerouslySetInnerHTML` call sites both justified (JsonLd script-escape + filesystem-controlled MarkdownReader); no hardcoded secrets; no `eval` or `new Function`; open redirects on `?next=` properly gated by `isSafeRelativePath`. Three defense-in-depth follow-ups logged in [`00-polish-backlog.md`](00-polish-backlog.md) — DOMPurify wrap on MarkdownReader (P3), httpOnly-cookie token migration (P2), error-message masking (P3). Rate-limit / CSRF-issuance remain backend concerns in [`../engineering/09-backend-admin-gaps.md`](../engineering/09-backend-admin-gaps.md).)*
 - [~] 11.8 Legal foundation `w:1` *(split 2026-05-28)*
   - [x] 11.8.1 T&C / Privacy Policy / Code of Conduct public pages + consent gate on `/join` `w:1` ← done: 2026-05-28 *(shared `LegalPage` component renders bilingual content from `siteContent.legal.{terms,privacy,codeOfConduct}`. Routes: `/terms`, `/privacy`, `/code-of-conduct`. SiteShell footer adds a "Legal" column. `ContributorForm` adds a required consent checkbox linking to all three pages. Content is a v1 draft clearly marked as such — to be reviewed with legal counsel before public launch.)*
   - [ ] 11.8.2 Org registration (offline / non-code) `w:0` *(tracked here so it isn't lost, but does not block ship work)*
@@ -376,7 +376,7 @@ Weighted across all phases (sum of phase weights = 137):
 | 8 Notifications & Outreach | 6 | 0% |
 | 9 Admin Control Center | 10 | 67% |
 | 10 Native Mobile App | 5 | 0% |
-| 11 Cross-cutting | 10 | 40% |
+| 11 Cross-cutting | 10 | 50% |
 | 12 Documentation & Community | 5 | 40% |
 | 13 Public Reports & Transparency Surface | 6 | 0% |
 | 14 Building in Public (Process Transparency) | 6 | 33% |
