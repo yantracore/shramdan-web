@@ -47,7 +47,6 @@ import { useEffect, useMemo, useState } from "react";
 import IssueMapBlock from "@/components/IssueMapBlock";
 import { ActivityTicker } from "@/components/ActivityTicker";
 import { EventsHomeRail } from "@/components/EventsHomeRail";
-import { FeaturedStoryPanel } from "@/components/FeaturedStoryPanel";
 import { LiveOnlineWidget } from "@/components/LiveOnlineWidget";
 import { MotionSection } from "@/components/MotionSection";
 import { RecentlyViewedStrip } from "@/components/RecentlyViewedStrip";
@@ -417,10 +416,6 @@ export default function HomeClient({ summary }) {
           copy={t.liveEventsRail}
           language={language}
         />
-      </MotionSection>
-
-      <MotionSection as="div">
-        <FeaturedStoryPanel language={language} />
       </MotionSection>
 
       <MotionSection as="div" className="home-pulse-row">
