@@ -8,13 +8,14 @@ Use this document before implementing event/campaign APIs, incident reporting, v
 
 ## Core Recommendation
 
-Keep three separate concepts:
+Keep four separate concepts:
 
 - `Issue`: the community problem and voting lifecycle.
 - `Event` or `Campaign`: the execution plan for solving a promoted issue.
+- `Meeting`: a planning gathering tied to an event. Every event runs through a kickoff meeting and a pre-execution review meeting on the canonical happy path.
 - `Incident` or `EventAlert`: safety, legal, conflict, weather, medical, or urgent operational cases during planning or execution.
 
-Do not put every state into one primary status field. Primary status should describe the normal flow. Risk and incident handling should be a separate operational layer.
+Do not put every state into one primary status field. Primary status should describe the normal flow. Meeting outcomes, risk levels, and incident handling are separate operational layers.
 
 ## Recommended Entity Split
 
@@ -42,6 +43,23 @@ Suggested responsibilities:
 - Summary risk level such as `NORMAL`, `WATCH`, `URGENT`, or `CRITICAL`.
 
 Prefer the term `Campaign` if the product treats cleanup work as a planned community campaign with preparation, participation, documentation, and result publishing. Prefer `Event` only if the backend model is intentionally a single calendar occurrence.
+
+### Meeting
+
+Represents a planning gathering attached to an event. Every event has two meetings on the canonical happy path; additional meetings are allowed but uncommon.
+
+Suggested responsibilities:
+
+- `eventId` reference.
+- Meeting `type` such as `KICKOFF` (first meeting; role counts, logistics, date) or `PRE_EXECUTION` (final review; roster confirmation, last-minute changes).
+- Scheduled time, location or virtual link.
+- Convener and attendee references.
+- Agenda items, decisions recorded, and action items emitted by the meeting.
+- Status such as `SCHEDULED`, `IN_PROGRESS`, `COMPLETED`, or `CANCELLED`.
+
+A meeting is a first-class entity rather than a field on the event so that its attendance, agenda, and outputs can be tracked without bloating the event row and so a third or later meeting can be added if reality demands it.
+
+See the [Event Lifecycle Meetings](#event-lifecycle-meetings) section below for the full flow.
 
 ### Incident Or EventAlert
 
@@ -89,6 +107,7 @@ Recommended rule:
 - `Issue.status` describes the problem lifecycle.
 - `Event.status` describes execution progress.
 - `Event.riskLevel` summarizes current operational risk.
+- `Meeting.status` describes whether a planning meeting is scheduled, in progress, completed, or cancelled.
 - `Incident.status` describes how a specific case is being handled.
 
 Example flow:
@@ -97,8 +116,11 @@ Example flow:
 Issue OPEN
 -> votes reach threshold
 -> server transaction creates Event/Campaign and sets Issue.status = PROMOTED
--> organizer schedules details and sets Event.status = SCHEDULED
+-> leader convenes KICKOFF Meeting, agrees role counts and target date
+-> leader schedules details and sets Event.status = SCHEDULED
 -> Issue.status becomes EVENT_SCHEDULED
+-> public signup window: 1-2 weeks of participants joining
+-> leader convenes PRE_EXECUTION Meeting, confirms final roster
 -> event starts and Event.status = ACTIVE
 -> incident reported, Event.riskLevel becomes URGENT or CRITICAL
 -> incident resolved, Event.riskLevel recalculates
@@ -108,9 +130,68 @@ Issue OPEN
 Status synchronization should happen through backend service functions, not scattered frontend updates. Examples:
 
 - `promoteIssueToCampaign(issueId)`
+- `scheduleKickoffMeeting(eventId, details)`
 - `scheduleCampaign(campaignId, details)`
+- `schedulePreExecutionMeeting(eventId, details)`
 - `pauseCampaignForSafety(campaignId, incidentId)`
 - `completeCampaign(campaignId, result)`
+
+## Event Lifecycle Meetings
+
+Every event runs through two planning meetings on the canonical happy path. A third or later meeting is allowed when reality demands it but is not the norm, and not a failure signal.
+
+### Meeting 1 — Kickoff
+
+Convened by the Leader Shramdan shortly after the event is promoted from an issue.
+
+Purpose:
+
+- Decide maximum participants per role (Worker, Photographer, Livestreamer, Medic, Safety Lead, Coordinator, Logistics — see [`../product/roles.md`](../product/roles.md)).
+- Confirm logistics ownership and the target date and meetup point.
+- Identify pre-event preparation tasks and assign owners.
+
+Output: a confirmed event plan that goes live for public participation signup. `Event.status` advances from `DRAFT` to `SCHEDULED` once the meeting's decisions are recorded.
+
+### Public signup window
+
+Between the two meetings is a public signup window of typically one to two weeks. During this window:
+
+- The event surface is highlighted on the home page and member portals.
+- Members and supporters sign up for available roles.
+- The leader and coordinator monitor role-fill progress and may invite specific people if a role lags.
+- Whether existing supporters of the linked issue auto-populate as candidate participants is an open product question (tracked in the pivot ADR).
+
+### Meeting 2 — Pre-execution review
+
+Convened by the Leader Shramdan shortly before the event execution date — typically 1 to 3 days prior.
+
+Purpose:
+
+- Confirm the final roster against the role counts set at the kickoff meeting.
+- Review logistics readiness (tools, transport, refreshments, permissions).
+- Surface any last-minute changes (weather contingency, role gaps, medic confirmation for high-risk events).
+- Run the pre-event safety checklist (roadmap 4.6).
+
+Output: green light for the event to proceed, or a decision to postpone or cancel. If green-lit, `Event.status` is ready to advance to `ACTIVE` on the day.
+
+### Meeting data model
+
+A meeting carries the references needed to support both flows above:
+
+- Identity (`id`, `eventId`, `type`).
+- Schedule (`scheduledAt`, `location` or `virtualLink`, optional duration).
+- People (`convenerId`, `attendeeIds[]`, attendance status per attendee).
+- Content (`agendaItems[]`, `decisionsRecorded[]`, `actionItems[]` with assignee and due date).
+- Status (`SCHEDULED`, `IN_PROGRESS`, `COMPLETED`, `CANCELLED`).
+- Timestamps (`createdAt`, `completedAt`).
+
+Action items emitted by a meeting may be tracked on the meeting record itself or surfaced into the event's preparation list — the implementation choice is open. The frontend already assumes meetings exist as a separate entity, so backend modeling should not collapse them into event fields.
+
+### Public versus private meeting visibility
+
+- Kickoff meeting existence and scheduled time may be public, to invite the relevant role candidates to attend.
+- Pre-execution review meetings are typically leader-and-coordinator-only; their decisions surface publicly only via the event's "ready" state.
+- Detailed agenda items, decisions, and action items are leader-and-attendee-only by default. The event surface shows the public-safe outcome (role counts, schedule confirmed, etc.), not the meeting minutes.
 
 ## Roles And Assignments
 

@@ -2,7 +2,8 @@
 
 > श्रमदान is not "volunteers doing work." It is a constellation of distinct roles, each contributing labor in its own form. The app itself is built by these same roles.
 >
-> Status: v0 draft (Phase 11). Names and surface mappings will evolve.
+> Status: v0.2 draft. Names and surface mappings will evolve.
+> Restructured 2026-06-03 to use three top-level lanes — see [`../decisions/2026-06-03-ui-first-and-two-meeting-pivot.md`](../decisions/2026-06-03-ui-first-and-two-meeting-pivot.md).
 
 ---
 
@@ -19,7 +20,23 @@ The architectural rule: **every role is श्रमदान**. There is no "co
 
 ---
 
-## Event-day roles
+## Three lanes
+
+Roles group into three top-level lanes, each with its own crowd of people and (in time) its own signup surface:
+
+1. **Event-Participation Shramdan** — people doing labor in service of a specific campaign event.
+2. **Development Shramdan** — people building the platform itself (code, design, copy, community outreach).
+3. **Company-Management Shramdan** — people keeping the operation accountable, legal, and financially sound.
+
+Plus one AI lane that stands apart from the human ones.
+
+People may belong to more than one lane over time — a Developer Shramdan can show up on event day as a Worker Shramdan, and that crossover is part of the design, not an exception.
+
+---
+
+## Event-Participation Shramdan
+
+The lane for roles tied to a specific real-world event. A person signs up for one of these per event; the assignment is confirmed at the pre-execution review meeting (see [`../ops/08-operational-safety-and-event-model.md`](../ops/08-operational-safety-and-event-model.md)).
 
 ### Leader Shramdan
 
@@ -55,9 +72,9 @@ Pre-event procurement and post-event return. Tools, gloves, masks, water, refres
 
 ---
 
-## Platform-side roles *(building the app itself)*
+## Development Shramdan
 
-These exist because श्रमदान is also a software platform. Every role here contributes labor in code, design, or coordination form. Same dignity as the event-day roles.
+The lane for roles building the platform itself — its code, its design, its copy, and the community around it. Same dignity as the event-day roles; the work is just continuous rather than tied to a single event.
 
 ### Developer Shramdan
 
@@ -67,10 +84,6 @@ Writes, reviews, and maintains the code. Frontend, backend, infra, QA, devops �
 
 Visual and interaction design. Iconography, illustration, animation, typography, color systems. Outputs feed both the platform and the event collateral (event posters, share images).
 
-### Financial Advisor Shramdan
-
-Oversees the public ledger. Reviews donation flows, expense receipts, surplus allocation, partnership financial structures. See [`sustenance-strategy.md`](./sustenance-strategy.md). This role is on the operations side — its labor is keeping the money trustworthy.
-
 ### Translator Shramdan
 
 Maintains EN↔NE parity across the platform. New copy lands with both languages; this role keeps that promise. Devanagari rendering, locale-specific phrasing, transliteration of borrowed terms — all here. ([`../engineering/06-implementation-notes.md`](../engineering/06-implementation-notes.md) for the technical layer; this role is the human side.)
@@ -79,17 +92,29 @@ Maintains EN↔NE parity across the platform. New copy lands with both languages
 
 Drafts copy, articles for the dev series, narrative pieces around impact stories. Often handed off to Translator Shramdan for the second-language version. Tone matches [`../ai-agents/01-shramesh.md`](../ai-agents/01-shramesh.md) — humane, never cheesy.
 
-### Legal Shramdan
-
-Pro-bono or volunteer legal counsel for the platform — terms of service review, donation compliance, land permission for events, incident-related questions. Engaged ad-hoc, not always-on.
-
 ### Outreach Shramdan
 
-Talks to communities considering using श्रमदान. Onboards new neighborhoods, fields questions from elder organizers who aren't comfortable with the app, runs the human side of "did you see what they did in Ratnapark?" Counterpart to the Content Writer; one writes, the other talks.
+Talks to communities considering using श्रमदान. Onboards new neighborhoods, fields questions from elder organizers who aren't comfortable with the app, runs the human side of "did you see what they did in Ratnapark?" Counterpart to the Content Writer; one writes, the other talks. Sits in the Development lane because the labor is platform-growth, not event-day execution.
 
 ---
 
-## AI lane
+## Company-Management Shramdan
+
+The lane for roles that keep the operation accountable, legal, and financially sound. Less visible than event-day or platform work, but the platform cannot run without them.
+
+### Financial Advisor Shramdan
+
+Oversees the public ledger. Reviews donation flows, expense receipts, surplus allocation, partnership financial structures. See [`./sustenance-strategy.md`](./sustenance-strategy.md). The labor is keeping the money trustworthy.
+
+### Legal Shramdan
+
+Pro-bono or volunteer legal counsel for the platform — terms of service review, donation compliance, land permission for events, incident-related questions, future organization-partnership contracts. Engaged ad-hoc, not always-on.
+
+Additional management roles — HR, operations admin, partnership lead — will be added here as the platform grows. The lane is kept thin in v0.2 because most management labor today is absorbed by the project lead directly.
+
+---
+
+## AI Lane
 
 ### श्रमेश
 
@@ -101,19 +126,23 @@ The named AI shramdan member. Two modes — developer-facing (current) and user-
 
 ### Selection
 
-- **Self-selection** is the default. People sign up for the role they want on `/join` or via the event's role panel.
-- **Verification** scales by role weight. Anyone can be a Worker Shramdan. Medic Shramdan requires credentials. Leader Shramdan requires community trust (vote or admin nomination).
+- **Self-selection** is the default. People sign up for the role they want via the relevant signup surface (event role panel for Event-Participation, `/join` for Development, direct outreach for Company-Management).
+- **Verification** scales by role weight. Anyone can be a Worker Shramdan. Medic Shramdan requires credentials. Leader Shramdan requires community trust (vote or admin nomination). Financial Advisor and Legal require established credentials and direct vetting.
 - **Skill development** is tracked at the personal level — a Worker Shramdan who has attended five events can step into Coordinator Shramdan for the sixth.
 
 ### Temporary promotion
 
 For a specific event, some roles get **temporary additional rights** without permanent status change. Example: Worker Shramdan promoted to Coordinator Shramdan for one event, gaining the ability to update the participant roster mid-event. Rights revert at event close. This is built into the role-assignment system.
 
-### Workflow: Issue → 1 meeting → fix
+### Workflow: kickoff meeting → signup window → pre-execution review → event
 
-The norm we aim for: any issue that reaches campaign-ready status gets **one planning meeting** (in-person or virtual) where roles are filled, logistics are agreed, and a date is set. The next interaction is the event itself. No protracted committee work.
+Every event runs through two planning meetings on the canonical happy path:
 
-The Leader Shramdan calls the meeting. The meeting may produce a sub-list of pre-event preparation (Logistics Shramdan ordering tools, Outreach Shramdan inviting neighbors, etc.) — but the meeting itself doesn't repeat. If a second meeting becomes necessary, that's a signal something's wrong: the issue is too big, the scope is unclear, or the wrong people are in the room.
+- A **kickoff meeting** convened by the Leader Shramdan shortly after the issue is promoted to an event. It decides how many people are needed in each role, sets logistics ownership, and confirms the target date and meetup point.
+- A **public signup window** of one to two weeks during which the event is highlighted on the home page and member portals, and people sign up for roles.
+- A **pre-execution review meeting** convened shortly before the event date. It confirms the final roster, reviews logistics readiness, and surfaces any last-minute changes.
+
+The full lifecycle and data shape are documented in [`../ops/08-operational-safety-and-event-model.md`](../ops/08-operational-safety-and-event-model.md). The shift from a single-meeting norm to this two-meeting model is recorded in [`../decisions/2026-06-03-ui-first-and-two-meeting-pivot.md`](../decisions/2026-06-03-ui-first-and-two-meeting-pivot.md).
 
 ### Connectivity
 
@@ -125,7 +154,7 @@ Roles work **independently within the group**. A Photographer Shramdan does not 
 
 ## What this doc is NOT
 
-- Not a backend role enum. The API has its own `ApplicationRole` and event-participant role types — see [`../engineering/09-backend-admin-gaps.md`](../engineering/09-backend-admin-gaps.md) for the current contract. This doc is the *narrative*; the schema is the *implementation*.
+- Not a backend role enum. The API has its own `ApplicationRole` and event-participant role types — see [`../engineering/09-backend-admin-gaps.md`](../engineering/09-backend-admin-gaps.md) for the current contract and [`../api-requirements/event-participants.md`](../api-requirements/event-participants.md) (when written) for the forward-looking shape. This doc is the *narrative*; the schema is the *implementation*.
 - Not exhaustive. Roles will emerge as the platform meets real communities. New ones get added here when they earn a stable shape.
 
 ---
@@ -134,5 +163,7 @@ Roles work **independently within the group**. A Photographer Shramdan does not 
 
 - [`../ai-agents/01-shramesh.md`](../ai-agents/01-shramesh.md) — श्रमेश as a role
 - [`./sustenance-strategy.md`](./sustenance-strategy.md) — Financial Advisor Shramdan context
+- [`../ops/08-operational-safety-and-event-model.md`](../ops/08-operational-safety-and-event-model.md) — event lifecycle including meetings, safety, and incidents
 - [`../ops/00-master-roadmap.md`](../ops/00-master-roadmap.md) — Phase 3 (event execution), Phase 4 (safety + roles), Phase 11 (role system expansion)
+- [`../decisions/2026-06-03-ui-first-and-two-meeting-pivot.md`](../decisions/2026-06-03-ui-first-and-two-meeting-pivot.md) — the structural change recorded here
 - `../public/the-people.md` — public-facing summary of who we are

@@ -5,6 +5,8 @@
 > **This file is maintained by coding agents (Codex, Claude, etc.), not by humans.** Agents must update it inline as work progresses — see [Agent Update Protocol](#agent-update-protocol) below.
 >
 > **Companion doc:** improvements to *already-shipped* features live in [00-polish-backlog.md](00-polish-backlog.md), not here. The roadmap is for discrete ship work; polish is continuous and tracked separately so this file stays focused.
+>
+> **Companion folder:** backend API contracts the frontend depends on live in [`../api-requirements/`](../api-requirements/), introduced by the [2026-06-03 pivot ADR](../decisions/2026-06-03-ui-first-and-two-meeting-pivot.md). When a UI feature touches an entity covered there, update the matching domain file in the same session.
 
 ## Overall Progress — 29%
 
@@ -207,7 +209,7 @@ Goal: Authenticated member experience that ships before the native mobile app an
 
 ## Phase 3 — Campaign / Event Execution `w:15` 📊 27%
 
-Goal: A promoted issue becomes a real-world campaign with leader, schedule, roster, and completion.
+Goal: A promoted issue becomes a real-world campaign with leader, schedule, roster, and completion. Each event runs through two planning meetings on the canonical happy path — a kickoff meeting (role counts, logistics, date) and a pre-execution review meeting (final roster, last-minute changes) separated by a one-to-two-week public signup window. See [08-operational-safety-and-event-model.md](08-operational-safety-and-event-model.md#event-lifecycle-meetings) for the full meeting flow and the [2026-06-03 pivot ADR](../decisions/2026-06-03-ui-first-and-two-meeting-pivot.md) for the decision that introduced it.
 
 - [x] 3.1 Admin events list (read) `w:1` ← done: 2026-05-19
 - [~] 3.2 Public campaign detail page `w:3`
