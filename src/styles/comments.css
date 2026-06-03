@@ -126,12 +126,14 @@
   border-top: 1px solid var(--line);
   /* Compact density everywhere — Facebook-style.
    * Pulled into local custom properties so the whole panel scales as a
-   * unit if we ever want a less-tight mode later (e.g. on admin/queue). */
+   * unit if we ever want a less-tight mode later (e.g. on admin/queue).
+   * Body + author bumped +1px after the compaction pass since the
+   * tighter layout left room for slightly larger reading text. */
   --comment-padding-y: 8px;
   --comment-padding-x: 10px;
   --comment-gap: 6px;
   --comment-avatar: 28px;
-  --comment-font: 13px;
+  --comment-font: 14px;
   --comment-meta-font: 11.5px;
   --comment-indent: 22px;
 }
@@ -282,7 +284,7 @@
 
 .comment-author-name {
   font-weight: 700;
-  font-size: 12.5px;
+  font-size: 13.5px;
   color: var(--text);
 }
 
@@ -373,13 +375,14 @@
 .comment-reply-pill {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
   background: transparent;
   border: 1px solid color-mix(in srgb, var(--primary) 30%, var(--line));
   color: var(--primary-dark);
-  font-size: 11.5px;
-  font-weight: 700;
-  padding: 1px 8px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  padding: 1px 7px;
   border-radius: 999px;
   cursor: pointer;
   transition: background 120ms ease, color 120ms ease, border-color 120ms ease, transform 120ms ease;
@@ -742,7 +745,7 @@
     --comment-padding-x: 8px;
     --comment-avatar: 26px;
     --comment-indent: 16px;
-    --comment-font: 12.5px;
+    --comment-font: 13.5px;
   }
 
   .comment-avatar {
