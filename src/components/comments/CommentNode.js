@@ -3,12 +3,19 @@
 import {
   DeleteOutlined,
   EditOutlined,
-  MessageOutlined
+  FlagOutlined,
+  MessageOutlined,
+  PushpinFilled,
+  PushpinOutlined
 } from "@ant-design/icons";
 import { Button } from "antd";
 import { CommentComposer } from "@/components/comments/CommentComposer";
 import { CommentReactions } from "@/components/comments/CommentReactions";
-import { canDeleteComment, canEditComment } from "@/lib/comments";
+import {
+  FLAG_AUTO_HIDE_THRESHOLD,
+  canDeleteComment,
+  canEditComment
+} from "@/lib/comments";
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 
@@ -28,7 +35,13 @@ const COPY = {
     deletedBody: "लेखकले यो टिप्पणी मेटाएका छन्।",
     reply: "जवाफ",
     edit: "सम्पादन",
-    delete: "मेटाउने"
+    delete: "मेटाउने",
+    flag: "रिपोर्ट",
+    flagged: "रिपोर्ट गरियो",
+    pin: "पिन गर्नुहोस्",
+    unpin: "पिन हटाउनुहोस्",
+    pinnedBadge: "📌 पिन गरिएको",
+    underReview: "यो टिप्पणी समीक्षाधीन छ।"
   },
   en: {
     minutesAgo: "{n} min ago",
@@ -39,7 +52,13 @@ const COPY = {
     deletedBody: "The author deleted this comment.",
     reply: "Reply",
     edit: "Edit",
-    delete: "Delete"
+    delete: "Delete",
+    flag: "Report",
+    flagged: "Reported",
+    pin: "Pin",
+    unpin: "Unpin",
+    pinnedBadge: "📌 Pinned",
+    underReview: "This comment is under review."
   }
 };
 
@@ -112,6 +131,8 @@ export function CommentNode({
   depth,
   language = "np",
   currentUser,
+  isAdmin = false,
+  viewerFlagged = false,
   isReplying,
   isEditing,
   mentionPool = [],
@@ -123,16 +144,25 @@ export function CommentNode({
   onSubmitEdit,
   onDelete,
   onToggleReaction,
+  onTogglePin,
+  onStartFlag,
   children
 }) {
   const t = COPY[language] || COPY.np;
   const canEdit = canEditComment(comment, currentUser?.id);
   const canDelete = canDeleteComment(comment, currentUser?.id);
+  // Auto-hide bodies that have accumulated enough flags, but never to
+  // admin viewers — they need to read what was reported when reviewing
+  // in /admin/comments.
+  const hiddenUnderReview =
+    !isAdmin && (Number(comment.flagged) || 0) >= FLAG_AUTO_HIDE_THRESHOLD;
 
   return (
     <li
       className={`comment-node comment-depth-${depth}${
         comment.deleted ? " is-deleted" : ""
+      }${comment.pinned ? " is-pinned" : ""}${
+        hiddenUnderReview ? " is-under-review" : ""
       }`}
       data-comment-id={comment.id}
     >
@@ -151,6 +181,9 @@ export function CommentNode({
           {comment.editedAt && !comment.deleted ? (
             <span className="comment-edited-pill">{t.edited}</span>
           ) : null}
+          {comment.pinned ? (
+            <span className="comment-pinned-pill">{t.pinnedBadge}</span>
+          ) : null}
         </div>
 
         {comment.deleted ? (
@@ -165,13 +198,15 @@ export function CommentNode({
             onCancel={onCancelEdit}
             onSubmit={onSubmitEdit}
           />
+        ) : hiddenUnderReview ? (
+          <p className="comment-text comment-text-review">{t.underReview}</p>
         ) : (
           <p className="comment-text">
             {renderBodyWithMentions(comment.text, mentionPool)}
           </p>
         )}
 
-        {!comment.deleted && !isEditing ? (
+        {!comment.deleted && !isEditing && !hiddenUnderReview ? (
           <>
             <CommentReactions
               reactions={comment.reactions}
@@ -207,6 +242,27 @@ export function CommentNode({
                   onClick={() => onDelete?.(comment)}
                 >
                   {t.delete}
+                </Button>
+              ) : null}
+              {isAdmin ? (
+                <Button
+                  type="text"
+                  size="small"
+                  icon={comment.pinned ? <PushpinFilled /> : <PushpinOutlined />}
+                  onClick={() => onTogglePin?.(comment)}
+                >
+                  {comment.pinned ? t.unpin : t.pin}
+                </Button>
+              ) : null}
+              {currentUser?.id && currentUser.id !== comment.author?.id ? (
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<FlagOutlined />}
+                  onClick={() => onStartFlag?.(comment)}
+                  disabled={viewerFlagged}
+                >
+                  {viewerFlagged ? t.flagged : t.flag}
                 </Button>
               ) : null}
             </div>

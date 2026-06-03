@@ -26,7 +26,14 @@ function storageKey(targetType, targetId) {
 }
 
 function readOverlay(targetType, targetId) {
-  const empty = { added: [], edits: {}, deletes: [], picks: {} };
+  const empty = {
+    added: [],
+    edits: {},
+    deletes: [],
+    picks: {},
+    pinnedId: null,
+    flags: {}
+  };
   if (!canUseStorage()) return empty;
   try {
     const raw = window.localStorage.getItem(storageKey(targetType, targetId));
@@ -39,7 +46,13 @@ function readOverlay(targetType, targetId) {
       // picks: { [commentId]: ["👏", "🌱", ...] } — emojis this viewer has
       // toggled on. Seed reactions live on the comment itself; picks add
       // +1 each on top (or surface a new emoji at count 1 if not seeded).
-      picks: parsed?.picks && typeof parsed.picks === "object" ? parsed.picks : {}
+      picks: parsed?.picks && typeof parsed.picks === "object" ? parsed.picks : {},
+      // pinnedId: at most one pinned comment per target. Admin-only
+      // action; pinning a new comment unpins the previous one.
+      pinnedId: typeof parsed?.pinnedId === "string" ? parsed.pinnedId : null,
+      // flags: { [commentId]: { [reporterUserId]: {reason, note, at} } }
+      // Same user can't double-flag. Visible-flag count = unique keys.
+      flags: parsed?.flags && typeof parsed.flags === "object" ? parsed.flags : {}
     };
   } catch {
     return empty;
@@ -113,6 +126,10 @@ function applyOverlay(seed, overlay) {
       next.reactions = folded;
     }
     next.myReactions = viewerPicks;
+
+    next.pinned = overlay.pinnedId === c.id;
+    const flagRecord = overlay.flags?.[c.id] || {};
+    next.flagged = Object.keys(flagRecord).length;
     return next;
   });
 }
@@ -273,20 +290,29 @@ export function sortTopLevel(tree, mode, currentUserId) {
       ? tree.filter((n) => threadHasAuthor(n, currentUserId))
       : tree;
 
+  let ordered;
   if (mode === "top") {
-    return [...filtered].sort((a, b) => {
+    ordered = [...filtered].sort((a, b) => {
       const diff = sumReactions(b.reactions) - sumReactions(a.reactions);
       if (diff !== 0) return diff;
       return new Date(b.createdAt) - new Date(a.createdAt);
     });
-  }
-  if (mode === "newest") {
-    return [...filtered].sort(
+  } else if (mode === "newest") {
+    ordered = [...filtered].sort(
       (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
     );
+  } else {
+    ordered = filtered;
   }
-  // Default ("mine" or fallback): keep buildTree's chronological order.
-  return filtered;
+
+  // Pinned comments always float to the top regardless of sort mode.
+  // Only one comment can be pinned per target (enforced by togglePin),
+  // but the partition is general so multiple sequential pins (e.g.
+  // from a future enhancement) would still group correctly.
+  const pinned = ordered.filter((n) => n.pinned);
+  if (pinned.length === 0) return ordered;
+  const rest = ordered.filter((n) => !n.pinned);
+  return [...pinned, ...rest];
 }
 
 // Toggle one emoji reaction on a comment, on behalf of the viewer. The
@@ -326,6 +352,69 @@ export function toggleReaction({ targetType, targetId, commentId, emoji, userId 
   writeOverlay(targetType, targetId, overlay);
   return nowPicked;
 }
+
+// Admin-only: pin a single comment on a target. Passing the same id
+// again unpins it. Pinning a different id replaces the previous.
+// Returns true if pinned now, false if unpinned, null on invalid input.
+// The auth/role check is the caller's responsibility (isAdminUser).
+export function togglePin({ targetType, targetId, commentId }) {
+  if (!targetType || !targetId || !commentId) return null;
+  const overlay = readOverlay(targetType, targetId);
+  const nowPinned = overlay.pinnedId !== commentId;
+  overlay.pinnedId = nowPinned ? commentId : null;
+  writeOverlay(targetType, targetId, overlay);
+  return nowPinned;
+}
+
+// One flag per user per comment. Subsequent flags from the same user
+// update the reason/note. Returns the new unique-user flag count, or
+// null on invalid input.
+export function flagComment({
+  targetType,
+  targetId,
+  commentId,
+  reason,
+  note,
+  userId
+}) {
+  if (!targetType || !targetId || !commentId || !userId || !reason) return null;
+  const overlay = readOverlay(targetType, targetId);
+  const existing = overlay.flags?.[commentId] || {};
+  overlay.flags = {
+    ...overlay.flags,
+    [commentId]: {
+      ...existing,
+      [userId]: {
+        reason,
+        note: note || "",
+        at: new Date().toISOString()
+      }
+    }
+  };
+  writeOverlay(targetType, targetId, overlay);
+  return Object.keys(overlay.flags[commentId]).length;
+}
+
+export function hasViewerFlagged(comment, userId) {
+  if (!comment || !userId) return false;
+  // Comment came through applyOverlay, so we can't reach the raw flags
+  // map from here. Caller should peek at the raw overlay for this.
+  // Provided as a stub; CommentSection uses raw overlay access via
+  // readPicksForViewer-style helper below.
+  return false;
+}
+
+// Cheap viewer-flagged lookup so the UI can render the flag button as
+// "Reported" instead of "Report". Reads localStorage directly.
+export function viewerFlagged({ targetType, targetId, commentId, userId }) {
+  if (!targetType || !targetId || !commentId || !userId) return false;
+  const overlay = readOverlay(targetType, targetId);
+  return Boolean(overlay.flags?.[commentId]?.[userId]);
+}
+
+// Threshold above which comment bodies auto-hide for non-admin viewers
+// pending moderation review (Phase 6's queue).
+export const FLAG_AUTO_HIDE_THRESHOLD = 3;
 
 export const COMMENT_LIMITS = {
   MAX_DEPTH,

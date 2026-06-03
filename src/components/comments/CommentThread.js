@@ -13,6 +13,8 @@ export function CommentThread({
   depth = 0,
   language,
   currentUser,
+  isAdmin = false,
+  viewerFlags = new Set(),
   replyingTo,
   editingId,
   mentionPool = [],
@@ -23,7 +25,9 @@ export function CommentThread({
   onCancelEdit,
   onSubmitEdit,
   onDelete,
-  onToggleReaction
+  onToggleReaction,
+  onTogglePin,
+  onStartFlag
 }) {
   if (!Array.isArray(nodes) || nodes.length === 0) return null;
 
@@ -39,6 +43,8 @@ export function CommentThread({
             depth={depth}
             language={language}
             currentUser={currentUser}
+            isAdmin={isAdmin}
+            viewerFlagged={viewerFlags.has(node.id)}
             isReplying={replyingTo === node.id}
             isEditing={editingId === node.id}
             mentionPool={mentionPool}
@@ -50,6 +56,8 @@ export function CommentThread({
             onSubmitEdit={onSubmitEdit}
             onDelete={onDelete}
             onToggleReaction={onToggleReaction}
+            onTogglePin={onTogglePin}
+            onStartFlag={onStartFlag}
           >
             {childNodes.length > 0 && canNestVisually ? (
               <CommentThread
@@ -57,6 +65,8 @@ export function CommentThread({
                 depth={depth + 1}
                 language={language}
                 currentUser={currentUser}
+                isAdmin={isAdmin}
+                viewerFlags={viewerFlags}
                 replyingTo={replyingTo}
                 editingId={editingId}
                 mentionPool={mentionPool}
@@ -68,6 +78,8 @@ export function CommentThread({
                 onSubmitEdit={onSubmitEdit}
                 onDelete={onDelete}
                 onToggleReaction={onToggleReaction}
+                onTogglePin={onTogglePin}
+                onStartFlag={onStartFlag}
               />
             ) : null}
           </CommentNode>

@@ -5,19 +5,23 @@ import { Segmented } from "antd";
 import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { usePathname } from "next/navigation";
 import { CommentComposer } from "@/components/comments/CommentComposer";
+import { CommentFlagModal } from "@/components/comments/CommentFlagModal";
 import { CommentSkeleton } from "@/components/comments/CommentSkeleton";
 import { CommentThread } from "@/components/comments/CommentThread";
 import {
   buildTree,
   countVisible,
   editComment,
+  flagComment,
   loadComments,
   saveComment,
   softDeleteComment,
   sortTopLevel,
-  toggleReaction
+  toggleReaction,
+  togglePin,
+  viewerFlagged
 } from "@/lib/comments";
-import { getAuthSession, subscribeAuthSession } from "@/lib/authSession";
+import { getAuthSession, isAdminUser, subscribeAuthSession } from "@/lib/authSession";
 import { useToast } from "@/lib/toast";
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
@@ -42,6 +46,9 @@ const COPY = {
     successReplied: "जवाफ पठाइयो।",
     successEdited: "टिप्पणी अद्यावधिक भयो।",
     successDeleted: "टिप्पणी मेटाइयो।",
+    successPinned: "टिप्पणी पिन गरियो।",
+    successUnpinned: "पिन हटाइयो।",
+    successFlagged: "रिपोर्ट दर्ता भयो।",
     errorGeneric: "केही गडबड भयो। फेरि कोसिस गर्नुहोस्।",
     sortLabel: "क्रम",
     sortTop: "लोकप्रिय",
@@ -62,6 +69,9 @@ const COPY = {
     successReplied: "Reply posted.",
     successEdited: "Comment updated.",
     successDeleted: "Comment deleted.",
+    successPinned: "Comment pinned.",
+    successUnpinned: "Comment unpinned.",
+    successFlagged: "Report received.",
     errorGeneric: "Something went wrong. Please try again.",
     sortLabel: "Sort",
     sortTop: "Top",
@@ -99,6 +109,8 @@ export function CommentSection({
   // best default for casual readers — it surfaces the conversations
   // already gaining traction.
   const [sortMode, setSortMode] = useState("top");
+  const [flagTarget, setFlagTarget] = useState(null);
+  const isAdmin = isAdminUser(currentUser);
 
   // Hydration — load on mount and on every target change. The
   // `setLoading(true)` on target change is intentional so the skeleton
@@ -265,6 +277,73 @@ export function CommentSection({
     [currentUser, targetType, targetId, reload, messageApi, t]
   );
 
+  const handleTogglePin = useCallback(
+    (comment) => {
+      if (!isAdmin || !comment?.id) return;
+      const result = togglePin({
+        targetType,
+        targetId,
+        commentId: comment.id
+      });
+      if (result === null) {
+        messageApi.error(t.errorGeneric);
+        return;
+      }
+      reload();
+      messageApi.success(result ? t.successPinned : t.successUnpinned);
+    },
+    [isAdmin, targetType, targetId, reload, messageApi, t]
+  );
+
+  const handleStartFlag = useCallback(
+    (comment) => {
+      if (!currentUser?.id || !comment?.id) return;
+      setFlagTarget(comment);
+    },
+    [currentUser]
+  );
+
+  const handleSubmitFlag = useCallback(
+    ({ reason, note }) => {
+      if (!currentUser?.id || !flagTarget?.id) return;
+      const count = flagComment({
+        targetType,
+        targetId,
+        commentId: flagTarget.id,
+        reason,
+        note,
+        userId: currentUser.id
+      });
+      if (count === null) {
+        messageApi.error(t.errorGeneric);
+        return;
+      }
+      setFlagTarget(null);
+      reload();
+      messageApi.success(t.successFlagged);
+    },
+    [currentUser, flagTarget, targetType, targetId, reload, messageApi, t]
+  );
+
+  // viewerFlags: Set of commentIds the current viewer already flagged.
+  // Computed once per (comments, currentUser) so the per-node check is
+  // O(1) at render. Reads the raw overlay via viewerFlagged() helper.
+  const viewerFlags = useMemo(() => {
+    if (!currentUser?.id) return new Set();
+    const out = new Set();
+    for (const c of comments) {
+      if (viewerFlagged({
+        targetType,
+        targetId,
+        commentId: c.id,
+        userId: currentUser.id
+      })) {
+        out.add(c.id);
+      }
+    }
+    return out;
+  }, [comments, currentUser, targetType, targetId]);
+
   // Reactions intentionally skip optimistic UI: the localStorage write
   // is synchronous, so reload() is effectively instant. Saves a state
   // hop and keeps the count-source-of-truth in one place.
@@ -345,6 +424,8 @@ export function CommentSection({
           depth={0}
           language={language}
           currentUser={currentUser}
+          isAdmin={isAdmin}
+          viewerFlags={viewerFlags}
           replyingTo={replyingTo}
           editingId={editingId}
           mentionPool={mentionPool}
@@ -356,8 +437,17 @@ export function CommentSection({
           onSubmitEdit={handleSubmitEdit}
           onDelete={handleDelete}
           onToggleReaction={handleToggleReaction}
+          onTogglePin={handleTogglePin}
+          onStartFlag={handleStartFlag}
         />
       )}
+
+      <CommentFlagModal
+        open={Boolean(flagTarget)}
+        language={language}
+        onCancel={() => setFlagTarget(null)}
+        onSubmit={handleSubmitFlag}
+      />
     </section>
   );
 }
