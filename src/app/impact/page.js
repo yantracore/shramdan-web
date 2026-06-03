@@ -40,6 +40,20 @@ const COPY = {
       locations: "अभियान भएका स्थान",
       minutes: "श्रम मिनेट"
     },
+    categoryMixHeading: "अभियानको प्रकार अनुसार वितरण",
+    categoryMixIntro:
+      "अहिलेसम्म कुन-कुन प्रकारका अभियानमा सबैभन्दा बढी श्रम लागेको — समुदायको चाख कहाँ बढी।",
+    categoryLabels: {
+      cleanup: "सरसफाइ",
+      afforestation: "वृक्षारोपण",
+      beautification: "सौन्दर्यीकरण",
+      trail: "ट्रेल मर्मत",
+      dam: "बाँध / पोखरी",
+      infrastructure: "पूर्वाधार",
+      seasonal: "मौसमी",
+      disaster: "विपद् राहत"
+    },
+    categoryFallback: "अन्य",
     eventsHeading: "सम्पन्न अभियानहरू",
     eventDateLabel: "मिति",
     eventParticipantsLabel: "सहभागी",
@@ -61,6 +75,20 @@ const COPY = {
       locations: "Cities & sites",
       minutes: "Labour-minutes"
     },
+    categoryMixHeading: "Campaigns by category",
+    categoryMixIntro:
+      "Where the labour has been going — community appetite by category.",
+    categoryLabels: {
+      cleanup: "Cleanup",
+      afforestation: "Afforestation",
+      beautification: "Beautification",
+      trail: "Trail repair",
+      dam: "Pond / dam",
+      infrastructure: "Infrastructure",
+      seasonal: "Seasonal",
+      disaster: "Disaster relief"
+    },
+    categoryFallback: "Other",
     eventsHeading: "Completed campaigns",
     eventDateLabel: "Date",
     eventParticipantsLabel: "Participants",
@@ -118,6 +146,22 @@ export default function ImpactPage() {
     { value: totals.minutes, label: t.stats.minutes, icon: ToolOutlined }
   ];
 
+  const categoryMix = useMemo(() => {
+    const counts = new Map();
+    past.forEach((event) => {
+      const key = event.category || "other";
+      counts.set(key, (counts.get(key) || 0) + 1);
+    });
+    const total = past.length || 1;
+    return Array.from(counts.entries())
+      .map(([key, count]) => ({
+        key,
+        count,
+        percent: Math.round((count / total) * 100)
+      }))
+      .sort((a, b) => b.count - a.count);
+  }, [past]);
+
   return (
     <SiteShell pageTitle={t.pageTitle}>
       <section className="impact-section page-section">
@@ -140,6 +184,45 @@ export default function ImpactPage() {
             </article>
           ))}
         </div>
+
+        {categoryMix.length > 0 ? (
+          <section
+            className="impact-category-mix"
+            aria-labelledby="impact-category-mix-title"
+          >
+            <header className="impact-category-mix-header">
+              <h2 id="impact-category-mix-title">{t.categoryMixHeading}</h2>
+              <p>{t.categoryMixIntro}</p>
+            </header>
+            <ul className="impact-category-mix-list">
+              {categoryMix.map((row) => {
+                const label = t.categoryLabels[row.key] || t.categoryFallback;
+                return (
+                  <li key={row.key} className="impact-category-mix-row">
+                    <Link
+                      href={`/events?show=past&category=${encodeURIComponent(row.key)}`}
+                      className="impact-category-mix-link"
+                    >
+                      <span className="impact-category-mix-label">{label}</span>
+                      <span className="impact-category-mix-bar" aria-hidden="true">
+                        <span
+                          className={`impact-category-mix-fill cat-${row.key}`}
+                          style={{ width: `${Math.max(4, row.percent)}%` }}
+                        />
+                      </span>
+                      <span className="impact-category-mix-count">
+                        {localizeDigits(row.count, language)}
+                      </span>
+                      <span className="impact-category-mix-percent">
+                        {localizeDigits(row.percent, language)}%
+                      </span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        ) : null}
 
         <section
           className="impact-events"

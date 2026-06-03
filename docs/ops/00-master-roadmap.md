@@ -8,10 +8,10 @@
 >
 > **Companion folder:** backend API contracts the frontend depends on live in [`../api-requirements/`](../api-requirements/), introduced by the [2026-06-03 pivot ADR](../decisions/2026-06-03-ui-first-and-two-meeting-pivot.md). When a UI feature touches an entity covered there, update the matching domain file in the same session.
 
-## Overall Progress — 37%
+## Overall Progress — 39%
 
 ```
-0% [=====================================---------------------------------------------------------------] 100%
+0% [=======================================-------------------------------------------------------------] 100%
 ```
 
 The bar is 100 characters wide so each `=` equals exactly one percentage point. Recompute and redraw the bar in the same edit that changes any phase percentage — see [Aggregate Progress](#aggregate-progress) for the per-phase breakdown that feeds this number.
@@ -309,12 +309,12 @@ Goal: Ship native iOS + Android once `/app` web shell is stable. Reuse the same 
 - [ ] 10.3 Push notification cert + storefront prep `w:1`
 - [ ] 10.4 App Store + Play Store submission `w:1`
 
-## Phase 11 — Cross-cutting Concerns `w:10` 📊 50%
+## Phase 11 — Cross-cutting Concerns `w:10` 📊 60%
 
 - [x] 11.1 Responsive admin list pattern (`AdminResponsiveList`) `w:1` ← done: 2026-05-20
 - [ ] 11.2 Accessibility audit (WCAG AA) `w:2`
 - [x] 11.3 Bilingual EN/NE coverage across the public site `w:2` ← done: 2026-05-25 *(currently met; every existing public surface reads from `copy[language]`. Admin control center is intentionally EN-only. Standing rule: any new public page must ship with `np` + `en` entries — see `../design/05-design-language-guide.md` "Language Scope For Surfaces".)*
-- [ ] 11.4 SEO + meta + sitemap `w:1`
+- [x] 11.4 SEO + meta + sitemap `w:1` ← done: 2026-06-03 *(Verified during the 11.7 baseline sweep that all SEO essentials are already in place: `metadataBase` set in [`src/app/layout.js`](../../src/app/layout.js) (built from `SITE_URL`), full openGraph + twitter + icons + manifest, robots config in metadata, themed viewport. Dynamic [`src/app/sitemap.js`](../../src/app/sitemap.js) emits static routes + event-types + live issues + live events (revalidates every 30 min) and [`src/app/robots.js`](../../src/app/robots.js) emits `Allow: /` with `/admin`, `/me`, `/api/`, `/_next/` disallowed plus a sitemap pointer. Per-route `generateMetadata` exists in 17 layout/page files including events, issues, learn, legal pages. JSON-LD organization + website schema on the root layout. Marking [x] now that this was confirmed — no new code shipped, but the roadmap was lagging reality.)*
 - [ ] 11.5 Analytics + observability `w:1`
 - [ ] 11.6 Performance (Lighthouse mobile > 90) `w:1`
 - [x] 11.7 Security review (XSS, CSRF, secret handling, rate limits) `w:1` ← done: 2026-06-03 *(Frontend baseline audit captured in [`../engineering/11-security-baseline-2026-06-03.md`](../engineering/11-security-baseline-2026-06-03.md). No HIGH-severity findings: two `dangerouslySetInnerHTML` call sites both justified (JsonLd script-escape + filesystem-controlled MarkdownReader); no hardcoded secrets; no `eval` or `new Function`; open redirects on `?next=` properly gated by `isSafeRelativePath`. Three defense-in-depth follow-ups logged in [`00-polish-backlog.md`](00-polish-backlog.md) — DOMPurify wrap on MarkdownReader (P3), httpOnly-cookie token migration (P2), error-message masking (P3). Rate-limit / CSRF-issuance remain backend concerns in [`../engineering/09-backend-admin-gaps.md`](../engineering/09-backend-admin-gaps.md).)*
@@ -329,17 +329,17 @@ Goal: Ship native iOS + Android once `/app` web shell is stable. Reuse the same 
 - [ ] 12.3 Public FAQ on website `w:1`
 - [ ] 12.4 Decision log / ADRs `w:1`
 
-## Phase 13 — Public Reports & Transparency Surface `w:6` 📊 0%
+## Phase 13 — Public Reports & Transparency Surface `w:6` 📊 33%
 
 Goal: Surface a *public-safe* analytics layer across the website so citizens and members can see the community's footprint at a glance — how many issues, where they are, what's pending. Most numbers double as deep-links into filtered list pages, so a reader can click "Pending issues: 86" and land on `/issues?status=OPEN` ready to act. Distinct from Phase 9.12 (admin-only `/admin/reports`), which is operational and reveals admin-sensitive data. Pre-implementation: confirm the backend public-reports endpoint name and exactly which fields are public-safe (no PII, no admin-only counts) before wiring any UI.
 
 - [!] 13.1 Public reports API client + bilingual labels `w:1` ← blocked: awaiting backend `GET /api/v1/public-reports` (name TBD) — confirm shape and the public-safe field allowlist before building the client
-- [ ] 13.2 Dedicated public reports page (`/reports` or `/impact`, route TBD) `w:2`
-  - [ ] 13.2.1 Page route + bilingual EN+NE shell + SEO meta `w:1` *(must ship with `np` + `en` copy per the standing rule in 11.3)*
-  - [ ] 13.2.2 Headline KPIs + geographic distribution + issue/event mix + simple time-series (read-only; no admin filters, no PII) `w:1`
+- [~] 13.2 Dedicated public reports page (`/impact`, route resolved) `w:2`
+  - [x] 13.2.1 Page route + bilingual EN+NE shell + SEO meta `w:1` ← done: 2026-06-03 *(`/impact` route exists with hero + KPI grid + completed-events list + CTA, all bilingual EN+NE via inline COPY map. Added [`src/app/impact/layout.js`](../../src/app/impact/layout.js) with `metadataBase`-relative canonical, openGraph + twitter cards, alternate locales — appears in sitemap.xml.)*
+  - [~] 13.2.2 Headline KPIs + geographic distribution + issue/event mix + simple time-series `w:1` *(Headline KPIs done — events / participants / locations / labour-minutes. Issue/event mix done — new category-mix horizontal bar primitive sorts categories by completed count and links each row to `/events?show=past&category=<key>`. Geographic distribution + simple time-series still pending; these are the two remaining halves of this leaf.)*
 - [ ] 13.3 Homepage embed — community pulse strip `w:1` *(2–4 hero KPIs near the existing hero — e.g. issues reported, events held, volunteers active — each linking to its filtered list page; reuses chart-light primitives so it stays lightweight)*
-- [ ] 13.4 Deep-link convention from KPIs → filtered list pages `w:1` *("Pending issues: N" → `/issues?status=OPEN`, "This week's events" → `/events?range=week`, etc. Spec the URL query contract once in [10-frontend-api-usage.md](../engineering/10-frontend-api-usage.md) and reuse for every KPI link. Needs `/issues` (and eventually `/events`) to honor the listed query params.)*
-- [ ] 13.5 Bilingual EN+NE copy across all public report surfaces `w:1` *(Brand stays श्रमदान in NE; numbers stay Latin digits unless we make a deliberate choice otherwise — open question.)*
+- [~] 13.4 Deep-link convention from KPIs → filtered list pages `w:1` *(Category-mix rows on `/impact` now deep-link to `/events?show=past&category=<key>` — first instance of the convention. URL query contract still needs spec'ing in [10-frontend-api-usage.md](../engineering/10-frontend-api-usage.md) and applying across the remaining KPI tiles.)*
+- [x] 13.5 Bilingual EN+NE copy across all public report surfaces `w:1` ← done: 2026-06-03 *(All `/impact` copy — hero, stat labels, category-mix labels, events list headings, CTA — flows through the inline `COPY` map keyed by `language` from `usePreferences()`. Brand stays श्रमदान in NE; numbers use the existing `localizeDigits` helper for Devanagari digits in NE locale.)*
 
 ## Phase 14 — Building in Public (Process Transparency) `w:6` 📊 33%
 
@@ -376,12 +376,12 @@ Weighted across all phases (sum of phase weights = 137):
 | 8 Notifications & Outreach | 6 | 0% |
 | 9 Admin Control Center | 10 | 67% |
 | 10 Native Mobile App | 5 | 0% |
-| 11 Cross-cutting | 10 | 50% |
+| 11 Cross-cutting | 10 | 60% |
 | 12 Documentation & Community | 5 | 40% |
-| 13 Public Reports & Transparency Surface | 6 | 0% |
+| 13 Public Reports & Transparency Surface | 6 | 33% |
 | 14 Building in Public (Process Transparency) | 6 | 33% |
 
-**Overall: ≈ 37%** (weighted sum / total weight; recompute on every edit, and redraw the [Overall Progress](#overall-progress--37) bar near the top of this file in the same edit).
+**Overall: ≈ 39%** (weighted sum / total weight; recompute on every edit, and redraw the [Overall Progress](#overall-progress--39) bar near the top of this file in the same edit).
 
 # How To Update This Document
 
