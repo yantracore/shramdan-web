@@ -8619,6 +8619,65 @@
   line-height: 1.5;
 }
 
+/* ---- Reminder cadence panel (roadmap 3.7) ---- */
+
+.reminder-cadence-panel {
+  margin: 16px 0;
+  padding: 16px 18px;
+  border: 1px solid color-mix(in srgb, var(--primary) 26%, var(--line));
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--primary) 4%, var(--surface));
+}
+
+.reminder-cadence-header .eyebrow {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--primary);
+  margin-bottom: 4px;
+}
+
+.reminder-cadence-header h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 6px;
+  font-size: 16px;
+  color: var(--text);
+}
+
+.reminder-cadence-header h2 .anticon {
+  color: var(--primary);
+}
+
+.reminder-cadence-header p {
+  margin: 0 0 10px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.reminder-cadence-options {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.reminder-cadence-option .ant-checkbox-wrapper {
+  font-size: 14px;
+  color: var(--text);
+}
+
+[data-theme="dark"] .reminder-cadence-panel {
+  background: color-mix(in srgb, var(--primary) 10%, var(--surface));
+  border-color: color-mix(in srgb, var(--primary) 40%, var(--line));
+}
+
 /* ---- Safety checklist gate panel (roadmap 4.6) ---- */
 
 .safety-checklist-panel {

@@ -8,10 +8,10 @@
 >
 > **Companion folder:** backend API contracts the frontend depends on live in [`../api-requirements/`](../api-requirements/), introduced by the [2026-06-03 pivot ADR](../decisions/2026-06-03-ui-first-and-two-meeting-pivot.md). When a UI feature touches an entity covered there, update the matching domain file in the same session.
 
-## Overall Progress — 36%
+## Overall Progress — 37%
 
 ```
-0% [====================================----------------------------------------------------------------] 100%
+0% [=====================================---------------------------------------------------------------] 100%
 ```
 
 The bar is 100 characters wide so each `=` equals exactly one percentage point. Recompute and redraw the bar in the same edit that changes any phase percentage — see [Aggregate Progress](#aggregate-progress) for the per-phase breakdown that feeds this number.
@@ -209,7 +209,7 @@ Goal: Authenticated member experience that ships before the native mobile app an
 - [ ] 2.7 Profile + settings `w:1`
 - [ ] 2.8 KYC submission flow (prospective leaders) `w:1`
 
-## Phase 3 — Campaign / Event Execution `w:15` 📊 80%
+## Phase 3 — Campaign / Event Execution `w:15` 📊 87%
 
 Goal: A promoted issue becomes a real-world campaign with leader, schedule, roster, and completion. Each event runs through two planning meetings on the canonical happy path — a kickoff meeting (role counts, logistics, date) and a pre-execution review meeting (final roster, last-minute changes) separated by a one-to-two-week public signup window. See [08-operational-safety-and-event-model.md](08-operational-safety-and-event-model.md#event-lifecycle-meetings) for the full meeting flow and the [2026-06-03 pivot ADR](../decisions/2026-06-03-ui-first-and-two-meeting-pivot.md) for the decision that introduced it.
 
@@ -229,7 +229,7 @@ Goal: A promoted issue becomes a real-world campaign with leader, schedule, rost
   - [x] 3.5.1 Leader UI for `PATCH /events/{id}/schedule` `w:2` ← done: 2026-05-29 *(`LeaderScheduleEditor` component renders a leader-only banner + Ant Design Modal on `/events/[id]` when the current user matches `eventLeaderId` AND status is `DRAFT`. Form covers `scheduledAt` (DatePicker showTime, future-only), `durationMinutes` (15-min steps), `meetupAddress`, `meetupNotes`, `meetupLatitude/Longitude` (with "Use issue location" shortcut prefilled from linked issue), and `planningNotes`. Submits via `patchJson('/events/${id}/schedule', payload, { requireAuth: true })`; surfaces 403 / 409 / generic toasts. Verified end-to-end with Playwright as admin-leader: DRAFT → SCHEDULED transition, banner auto-hides afterward.)*
   - [x] 3.5.2 Leader UI for `POST /events/{id}/complete` `w:1` ← done: 2026-06-03 *(`LeaderCompleteEditor` component renders a leader-only success-accented banner + modal on `/events/[id]` when the current user is the leader AND status is `ACTIVE` or `SCHEDULED`. Form captures `completedAt` (DatePicker, past-or-now only, defaults to now) and `resultSummary` (required, ≥12 chars, max 2000). Submits via `postJson('/events/${id}/complete', payload, { requireAuth: true })`; 403/409/generic toasts. Demo events (`demo-*` ids) simulate completion via local state instead of round-tripping the backend; the parent page accepts a partial-event payload from `onSaved` and merges it in.)*
 - [x] 3.6 Participation roster — volunteer / cameraman `w:2` ← done: 2026-06-03 *(`EventJoinPanel` component renders an inline "Join this event" CTA on `/events/[id]` above the roster, opening a role-picker modal sourced from the event's `rolesNeeded` shape. Demo events update the roster locally; real events POST to `/events/{id}/join`. 404/501 responses surface a "backend pending" info toast instead of hard-failing — see [09-backend-admin-gaps.md](../engineering/09-backend-admin-gaps.md) for the still-needed backend endpoints. Viewer detection uses the auth session display name against `filledNames` to render a "you're in as X" badge.)*
-- [ ] 3.7 Reminder cadence: 3d / 24h / 1h `w:1`
+- [x] 3.7 Reminder cadence: 3d / 24h / 1h `w:1` ← done: 2026-06-03 *(`ReminderCadencePanel` shows on `/events/[id]` when the current user is the leader AND status is `SCHEDULED` or `ACTIVE`. Three independent checkboxes auto-save on toggle. Demo events update `reminderCadence` locally; real events PATCH `/events/{id}/reminders` with `{ reminderCadence: array of enum }` and degrade gracefully on 404/501 (saves locally + "backend pending" toast). Spec field added to [`../api-requirements/events.md`](../api-requirements/events.md). Default is `["3d", "24h"]`. Bilingual EN+NE inline copy.)*
 
 ## Phase 4 — Operational Safety & Incidents `w:8` 📊 13%
 
@@ -368,7 +368,7 @@ Weighted across all phases (sum of phase weights = 137):
 | 0 Foundation | 10 | 100% |
 | 1 Public Issue Discovery & Voting | 15 | 77% |
 | 2 Member Portal `/app` | 18 | 0% |
-| 3 Campaign Execution | 15 | 80% |
+| 3 Campaign Execution | 15 | 87% |
 | 4 Operational Safety | 8 | 13% |
 | 5 Contribution Channels | 10 | 0% |
 | 6 Transparency & Ledger | 8 | 0% |
@@ -381,7 +381,7 @@ Weighted across all phases (sum of phase weights = 137):
 | 13 Public Reports & Transparency Surface | 6 | 0% |
 | 14 Building in Public (Process Transparency) | 6 | 33% |
 
-**Overall: ≈ 36%** (weighted sum / total weight; recompute on every edit, and redraw the [Overall Progress](#overall-progress--36) bar near the top of this file in the same edit).
+**Overall: ≈ 37%** (weighted sum / total weight; recompute on every edit, and redraw the [Overall Progress](#overall-progress--37) bar near the top of this file in the same edit).
 
 # How To Update This Document
 
