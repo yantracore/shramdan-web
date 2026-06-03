@@ -3017,6 +3017,132 @@
   }
 }
 
+/* --- Impact geography distribution + time-series --------------------- */
+
+.impact-geography,
+.impact-time-series {
+  margin: 24px 0;
+  padding: 24px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+
+.impact-section-header h2 {
+  font-size: clamp(18px, 1.8vw, 22px);
+  margin: 0 0 4px;
+  color: var(--text);
+}
+
+.impact-section-header p {
+  margin: 0 0 16px;
+  font-size: 13.5px;
+  color: var(--muted);
+  max-width: 64ch;
+}
+
+.impact-geography-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 8px;
+}
+
+.impact-geography-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--primary) 4%, transparent);
+  border: 1px solid color-mix(in srgb, var(--primary) 16%, var(--line));
+}
+
+.impact-geography-city {
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.impact-geography-count {
+  font-size: 12.5px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.impact-time-series-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  align-items: end;
+  gap: 12px;
+  height: 180px;
+}
+
+.impact-time-series-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+  position: relative;
+}
+
+.impact-time-series-fill {
+  display: block;
+  width: 80%;
+  max-width: 56px;
+  min-height: 4px;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--primary) 90%, transparent) 0%,
+    var(--primary) 100%
+  );
+  border-radius: 6px 6px 2px 2px;
+  transition: height 360ms ease;
+}
+
+.impact-time-series-count {
+  position: absolute;
+  top: -22px;
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+
+.impact-time-series-label {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+@media (max-width: 540px) {
+  .impact-time-series-list {
+    height: 140px;
+    gap: 6px;
+  }
+  .impact-time-series-count {
+    font-size: 11px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .impact-time-series-fill {
+    transition: none;
+  }
+}
+
+[data-theme="dark"] .impact-geography-row {
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+}
+
 /* --- Notifications bell + dropdown panel ----------------------------- */
 .notifications-trigger {
   display: inline-flex;

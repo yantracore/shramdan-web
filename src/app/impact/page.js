@@ -43,6 +43,17 @@ const COPY = {
     categoryMixHeading: "अभियानको प्रकार अनुसार वितरण",
     categoryMixIntro:
       "अहिलेसम्म कुन-कुन प्रकारका अभियानमा सबैभन्दा बढी श्रम लागेको — समुदायको चाख कहाँ बढी।",
+    geographyHeading: "स्थान अनुसार",
+    geographyIntro:
+      "अहिलेसम्म कुन-कुन शहर / गाउँमा श्रमदान भएको — कुल अभियान संख्या अनुसार।",
+    geographyCount: "{n} अभियान",
+    timeSeriesHeading: "मासिक रूपमा सम्पन्न",
+    timeSeriesIntro:
+      "विगत ६ महिनामा कुन-कुन महिनामा कति अभियान सम्पन्न भयो।",
+    monthNames: [
+      "जन", "फेब", "मार्च", "अप्रिल", "मे", "जुन",
+      "जुलाई", "अग", "सेप्ट", "अक्ट", "नोभ", "डिस"
+    ],
     categoryLabels: {
       cleanup: "सरसफाइ",
       afforestation: "वृक्षारोपण",
@@ -78,6 +89,17 @@ const COPY = {
     categoryMixHeading: "Campaigns by category",
     categoryMixIntro:
       "Where the labour has been going — community appetite by category.",
+    geographyHeading: "Where it happened",
+    geographyIntro:
+      "Towns and cities by total campaigns completed so far.",
+    geographyCount: "{n} campaigns",
+    timeSeriesHeading: "Completed by month",
+    timeSeriesIntro:
+      "Campaigns completed across the last six months.",
+    monthNames: [
+      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    ],
     categoryLabels: {
       cleanup: "Cleanup",
       afforestation: "Afforestation",
@@ -162,6 +184,58 @@ export default function ImpactPage() {
       .sort((a, b) => b.count - a.count);
   }, [past]);
 
+  const geographyMix = useMemo(() => {
+    const counts = new Map();
+    past.forEach((event) => {
+      // Extract the trailing geographic segment from addressText, e.g.
+      // "तीनकुने पुल, ललितपुर" → "ललितपुर". Fall back to the whole
+      // address when no comma is present.
+      const raw = (event.addressText || "").trim();
+      if (!raw) return;
+      const city = raw.split(",").pop().trim();
+      if (!city) return;
+      counts.set(city, (counts.get(city) || 0) + 1);
+    });
+    return Array.from(counts.entries())
+      .map(([city, count]) => ({ city, count }))
+      .sort((a, b) => b.count - a.count || a.city.localeCompare(b.city))
+      .slice(0, 8);
+  }, [past]);
+
+  const timeSeries = useMemo(() => {
+    // Six-bucket monthly series of completed events. Builds the bucket
+    // labels from the most recent six calendar months ending with the
+    // newest completedAt seen on a past event (or today if none).
+    const ref = past.reduce((latest, event) => {
+      const ts = event.completedAt ? new Date(event.completedAt).getTime() : 0;
+      return ts > latest ? ts : latest;
+    }, 0);
+    const refDate = ref ? new Date(ref) : new Date(0);
+    if (!ref) return [];
+    const buckets = [];
+    for (let i = 5; i >= 0; i -= 1) {
+      const d = new Date(refDate.getFullYear(), refDate.getMonth() - i, 1);
+      buckets.push({
+        key: `${d.getFullYear()}-${d.getMonth()}`,
+        monthIndex: d.getMonth(),
+        year: d.getFullYear(),
+        count: 0
+      });
+    }
+    past.forEach((event) => {
+      if (!event.completedAt) return;
+      const d = new Date(event.completedAt);
+      const key = `${d.getFullYear()}-${d.getMonth()}`;
+      const bucket = buckets.find((b) => b.key === key);
+      if (bucket) bucket.count += 1;
+    });
+    const max = buckets.reduce((m, b) => Math.max(m, b.count), 0) || 1;
+    return buckets.map((b) => ({
+      ...b,
+      percent: Math.round((b.count / max) * 100)
+    }));
+  }, [past]);
+
   return (
     <SiteShell pageTitle={t.pageTitle}>
       <section className="impact-section page-section">
@@ -221,6 +295,60 @@ export default function ImpactPage() {
                 );
               })}
             </ul>
+          </section>
+        ) : null}
+
+        {geographyMix.length > 0 ? (
+          <section
+            className="impact-geography"
+            aria-labelledby="impact-geography-title"
+          >
+            <header className="impact-section-header">
+              <h2 id="impact-geography-title">{t.geographyHeading}</h2>
+              <p>{t.geographyIntro}</p>
+            </header>
+            <ul className="impact-geography-list">
+              {geographyMix.map((row) => (
+                <li key={row.city} className="impact-geography-row">
+                  <span className="impact-geography-city">{row.city}</span>
+                  <span className="impact-geography-count">
+                    {t.geographyCount.replace(
+                      "{n}",
+                      localizeDigits(row.count, language)
+                    )}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+
+        {timeSeries.length > 0 ? (
+          <section
+            className="impact-time-series"
+            aria-labelledby="impact-time-series-title"
+          >
+            <header className="impact-section-header">
+              <h2 id="impact-time-series-title">{t.timeSeriesHeading}</h2>
+              <p>{t.timeSeriesIntro}</p>
+            </header>
+            <ol className="impact-time-series-list">
+              {timeSeries.map((bucket) => (
+                <li key={bucket.key} className="impact-time-series-bar">
+                  <span
+                    className="impact-time-series-fill"
+                    style={{ height: `${Math.max(4, bucket.percent)}%` }}
+                    aria-hidden="true"
+                  />
+                  <span className="impact-time-series-count">
+                    {localizeDigits(bucket.count, language)}
+                  </span>
+                  <span className="impact-time-series-label">
+                    {t.monthNames[bucket.monthIndex]}
+                  </span>
+                </li>
+              ))}
+            </ol>
           </section>
         ) : null}
 

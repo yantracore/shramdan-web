@@ -8,10 +8,10 @@
 >
 > **Companion folder:** backend API contracts the frontend depends on live in [`../api-requirements/`](../api-requirements/), introduced by the [2026-06-03 pivot ADR](../decisions/2026-06-03-ui-first-and-two-meeting-pivot.md). When a UI feature touches an entity covered there, update the matching domain file in the same session.
 
-## Overall Progress — 39%
+## Overall Progress — 40%
 
 ```
-0% [=======================================-------------------------------------------------------------] 100%
+0% [========================================------------------------------------------------------------] 100%
 ```
 
 The bar is 100 characters wide so each `=` equals exactly one percentage point. Recompute and redraw the bar in the same edit that changes any phase percentage — see [Aggregate Progress](#aggregate-progress) for the per-phase breakdown that feeds this number.
@@ -329,14 +329,14 @@ Goal: Ship native iOS + Android once `/app` web shell is stable. Reuse the same 
 - [ ] 12.3 Public FAQ on website `w:1`
 - [ ] 12.4 Decision log / ADRs `w:1`
 
-## Phase 13 — Public Reports & Transparency Surface `w:6` 📊 33%
+## Phase 13 — Public Reports & Transparency Surface `w:6` 📊 50%
 
 Goal: Surface a *public-safe* analytics layer across the website so citizens and members can see the community's footprint at a glance — how many issues, where they are, what's pending. Most numbers double as deep-links into filtered list pages, so a reader can click "Pending issues: 86" and land on `/issues?status=OPEN` ready to act. Distinct from Phase 9.12 (admin-only `/admin/reports`), which is operational and reveals admin-sensitive data. Pre-implementation: confirm the backend public-reports endpoint name and exactly which fields are public-safe (no PII, no admin-only counts) before wiring any UI.
 
 - [!] 13.1 Public reports API client + bilingual labels `w:1` ← blocked: awaiting backend `GET /api/v1/public-reports` (name TBD) — confirm shape and the public-safe field allowlist before building the client
-- [~] 13.2 Dedicated public reports page (`/impact`, route resolved) `w:2`
+- [x] 13.2 Dedicated public reports page (`/impact`, route resolved) `w:2` ← done: 2026-06-03
   - [x] 13.2.1 Page route + bilingual EN+NE shell + SEO meta `w:1` ← done: 2026-06-03 *(`/impact` route exists with hero + KPI grid + completed-events list + CTA, all bilingual EN+NE via inline COPY map. Added [`src/app/impact/layout.js`](../../src/app/impact/layout.js) with `metadataBase`-relative canonical, openGraph + twitter cards, alternate locales — appears in sitemap.xml.)*
-  - [~] 13.2.2 Headline KPIs + geographic distribution + issue/event mix + simple time-series `w:1` *(Headline KPIs done — events / participants / locations / labour-minutes. Issue/event mix done — new category-mix horizontal bar primitive sorts categories by completed count and links each row to `/events?show=past&category=<key>`. Geographic distribution + simple time-series still pending; these are the two remaining halves of this leaf.)*
+  - [x] 13.2.2 Headline KPIs + geographic distribution + issue/event mix + simple time-series `w:1` ← done: 2026-06-03 *(All four pieces now ship on `/impact`: KPI tiles (events / participants / locations / labour-minutes); category-mix horizontal bars with deep-link to `/events?show=past&category=<key>`; geography list grouping past events by trailing city in `addressText` showing top 8 by completed count; six-month time-series bar chart of completions per month, normalized to the busiest bucket. All read-only, no PII, no admin filters. Pure-CSS primitives — no chart library.)*
 - [ ] 13.3 Homepage embed — community pulse strip `w:1` *(2–4 hero KPIs near the existing hero — e.g. issues reported, events held, volunteers active — each linking to its filtered list page; reuses chart-light primitives so it stays lightweight)*
 - [~] 13.4 Deep-link convention from KPIs → filtered list pages `w:1` *(Category-mix rows on `/impact` now deep-link to `/events?show=past&category=<key>` — first instance of the convention. URL query contract still needs spec'ing in [10-frontend-api-usage.md](../engineering/10-frontend-api-usage.md) and applying across the remaining KPI tiles.)*
 - [x] 13.5 Bilingual EN+NE copy across all public report surfaces `w:1` ← done: 2026-06-03 *(All `/impact` copy — hero, stat labels, category-mix labels, events list headings, CTA — flows through the inline `COPY` map keyed by `language` from `usePreferences()`. Brand stays श्रमदान in NE; numbers use the existing `localizeDigits` helper for Devanagari digits in NE locale.)*
@@ -378,10 +378,10 @@ Weighted across all phases (sum of phase weights = 137):
 | 10 Native Mobile App | 5 | 0% |
 | 11 Cross-cutting | 10 | 60% |
 | 12 Documentation & Community | 5 | 40% |
-| 13 Public Reports & Transparency Surface | 6 | 33% |
+| 13 Public Reports & Transparency Surface | 6 | 50% |
 | 14 Building in Public (Process Transparency) | 6 | 33% |
 
-**Overall: ≈ 39%** (weighted sum / total weight; recompute on every edit, and redraw the [Overall Progress](#overall-progress--39) bar near the top of this file in the same edit).
+**Overall: ≈ 40%** (weighted sum / total weight; recompute on every edit, and redraw the [Overall Progress](#overall-progress--40) bar near the top of this file in the same edit).
 
 # How To Update This Document
 
