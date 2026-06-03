@@ -53,17 +53,15 @@ If a new entity emerges (a genuinely new noun in the product, not just a new fie
 - `partial` — some endpoints are live; gaps documented inline in the domain file.
 - `complete` — all operations in the file are live in production.
 
-| Domain               | Spec        | Backend impl  | Notes |
-|----------------------|-------------|---------------|-------|
-| events               | _pending_   | partial       | First Phase C deliverable. Existing endpoints live; gaps tracked in [`../engineering/09-backend-admin-gaps.md`](../engineering/09-backend-admin-gaps.md). |
-| event-participants   | _pending_   | not-started   | Includes role assignment per event, signup, and roster reads. |
-| meetings             | _pending_   | not-started   | New entity introduced by the two-meeting flow pivot. |
-| members              | _pending_   | partial       | Existing `/users` endpoints are the rough equivalent; spec will name the product-side noun explicitly. |
-| comments             | _pending_   | not-started   | Includes live-event comment streams; transport considerations (SSE or WebSocket) captured in-file. |
-| live-streams         | _pending_   | not-started   | YouTube wrapper plus viewer-count and reaction streams. |
-| notifications        | _pending_   | not-started   | Reminder cadence (kickoff → signup → pre-execution → event day) and incident alerts. |
-
-Spec files will populate during Phase C of the rollout described in the ADR.
+| Domain | Spec | Backend impl | Notes |
+| --- | --- | --- | --- |
+| [events](events.md) | draft | partial | Existing endpoints live; gaps tracked in [`../engineering/09-backend-admin-gaps.md`](../engineering/09-backend-admin-gaps.md). |
+| [event-participants](event-participants.md) | draft | not-started | Role assignment per event, signup, roster reads, and the role-plan aggregation. |
+| [meetings](meetings.md) | draft | not-started | New entity introduced by the two-meeting flow pivot. No UI surface yet; spec leads. |
+| [members](members.md) | draft | partial | Includes the Applications sub-entity. Maps roughly to the existing `/users` endpoints. |
+| [comments](comments.md) | draft | not-started | Shared shape for issue and event comments; SSE for live-event chat. |
+| [live-streams](live-streams.md) | draft | not-started | Event broadcast metadata plus viewer-count SSE; player URL is multi-format. |
+| notifications | _pending_ | not-started | Reminder cadence (kickoff → signup → pre-execution → event day) and incident alerts. Deferred from Phase C. |
 
 ---
 
