@@ -379,10 +379,11 @@
   background: transparent;
   border: 1px solid color-mix(in srgb, var(--primary) 30%, var(--line));
   color: var(--primary-dark);
-  font-size: 10.5px;
+  font-size: 9px;
   font-weight: 600;
-  letter-spacing: 0.01em;
-  padding: 1px 7px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  padding: 1px 6px;
   border-radius: 999px;
   cursor: pointer;
   transition: background 120ms ease, color 120ms ease, border-color 120ms ease, transform 120ms ease;
@@ -398,7 +399,7 @@
 }
 
 .comment-reply-pill .anticon {
-  font-size: 11px;
+  font-size: 9.5px;
 }
 
 @media (prefers-reduced-motion: reduce) {
