@@ -56,6 +56,12 @@
   font-size: 13.5px;
 }
 
+.comment-section-sort {
+  display: flex;
+  justify-content: flex-end;
+  margin: 14px 0 6px;
+}
+
 /* --- Lists / nesting --------------------------------------------------- */
 
 .comment-list {

@@ -1,6 +1,7 @@
 "use client";
 
 import { MessageOutlined } from "@ant-design/icons";
+import { Segmented } from "antd";
 import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { usePathname } from "next/navigation";
 import { CommentComposer } from "@/components/comments/CommentComposer";
@@ -13,6 +14,7 @@ import {
   loadComments,
   saveComment,
   softDeleteComment,
+  sortTopLevel,
   toggleReaction
 } from "@/lib/comments";
 import { getAuthSession, subscribeAuthSession } from "@/lib/authSession";
@@ -34,11 +36,17 @@ const COPY = {
     countLabel: "टिप्पणी",
     emptyTitle: "पहिलो टिप्पणी तपाईंको होस्",
     emptyBody: "तपाईंको विचारले छलफल सुरु गर्न मद्दत गर्छ।",
+    emptyMineTitle: "तपाईंको कुनै टिप्पणी छैन",
+    emptyMineBody: "जब तपाईं टिप्पणी वा जवाफ राख्नुहुन्छ, यहाँ देखिने छन्।",
     successPosted: "टिप्पणी पठाइयो।",
     successReplied: "जवाफ पठाइयो।",
     successEdited: "टिप्पणी अद्यावधिक भयो।",
     successDeleted: "टिप्पणी मेटाइयो।",
-    errorGeneric: "केही गडबड भयो। फेरि कोसिस गर्नुहोस्।"
+    errorGeneric: "केही गडबड भयो। फेरि कोसिस गर्नुहोस्।",
+    sortLabel: "क्रम",
+    sortTop: "लोकप्रिय",
+    sortNewest: "नयाँ",
+    sortMine: "मेरा"
   },
   en: {
     headingIssue: "Discussion",
@@ -48,11 +56,17 @@ const COPY = {
     countLabel: "comments",
     emptyTitle: "Be the first to comment",
     emptyBody: "Your thought helps start the conversation.",
+    emptyMineTitle: "You haven't commented yet",
+    emptyMineBody: "Comments and replies you post will show up here.",
     successPosted: "Comment posted.",
     successReplied: "Reply posted.",
     successEdited: "Comment updated.",
     successDeleted: "Comment deleted.",
-    errorGeneric: "Something went wrong. Please try again."
+    errorGeneric: "Something went wrong. Please try again.",
+    sortLabel: "Sort",
+    sortTop: "Top",
+    sortNewest: "Newest",
+    sortMine: "Mine"
   }
 };
 
@@ -72,6 +86,11 @@ export function CommentSection({ targetType, targetId, language = "np" }) {
   const [loading, setLoading] = useState(true);
   const [replyingTo, setReplyingTo] = useState(null);
   const [editingId, setEditingId] = useState(null);
+  // Sort modes: "top" (reactions desc), "newest" (createdAt desc), "mine"
+  // (filter to threads viewer participates in). "top" feels like the
+  // best default for casual readers — it surfaces the conversations
+  // already gaining traction.
+  const [sortMode, setSortMode] = useState("top");
 
   // Hydration — load on mount and on every target change. The
   // `setLoading(true)` on target change is intentional so the skeleton
@@ -90,6 +109,14 @@ export function CommentSection({ targetType, targetId, language = "np" }) {
 
   // Memoized tree of top-level → children based on the flat list.
   const tree = useMemo(() => buildTree(comments), [comments]);
+  // The "Mine" filter requires a logged-in viewer. If logged out while
+  // "mine" is selected, fall back to "top" silently — surfacing an
+  // empty thread list with a "log in" prompt would be confusing.
+  const effectiveSort = !isAuthenticated && sortMode === "mine" ? "top" : sortMode;
+  const sortedTopLevel = useMemo(
+    () => sortTopLevel(tree, effectiveSort, currentUser?.id),
+    [tree, effectiveSort, currentUser?.id]
+  );
   const visibleCount = useMemo(() => countVisible(comments), [comments]);
 
   const reload = useCallback(() => {
@@ -254,6 +281,21 @@ export function CommentSection({ targetType, targetId, language = "np" }) {
         onSubmit={handleSubmitTop}
       />
 
+      {tree.length > 0 ? (
+        <div className="comment-section-sort" role="group" aria-label={t.sortLabel}>
+          <Segmented
+            value={effectiveSort}
+            onChange={setSortMode}
+            options={[
+              { label: t.sortTop, value: "top" },
+              { label: t.sortNewest, value: "newest" },
+              ...(isAuthenticated ? [{ label: t.sortMine, value: "mine" }] : [])
+            ]}
+            size="small"
+          />
+        </div>
+      ) : null}
+
       {loading ? (
         <CommentSkeleton rows={3} />
       ) : tree.length === 0 ? (
@@ -261,9 +303,14 @@ export function CommentSection({ targetType, targetId, language = "np" }) {
           <strong>{t.emptyTitle}</strong>
           <p>{t.emptyBody}</p>
         </div>
+      ) : sortedTopLevel.length === 0 ? (
+        <div className="comment-empty">
+          <strong>{t.emptyMineTitle}</strong>
+          <p>{t.emptyMineBody}</p>
+        </div>
       ) : (
         <CommentThread
-          nodes={tree}
+          nodes={sortedTopLevel}
           depth={0}
           language={language}
           currentUser={currentUser}

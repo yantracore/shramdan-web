@@ -238,6 +238,57 @@ export function countVisible(flatList) {
   return flatList.filter((c) => !c.deleted).length;
 }
 
+function sumReactions(reactions) {
+  if (!reactions || typeof reactions !== "object") return 0;
+  let total = 0;
+  for (const v of Object.values(reactions)) total += Number(v) || 0;
+  return total;
+}
+
+// True if any comment in this subtree (root or descendant) was written
+// by `userId`. Used by the "Mine" filter so a user's own reply on
+// someone else's top-level keeps the whole thread visible.
+function threadHasAuthor(node, userId) {
+  if (!node || !userId) return false;
+  if (node.author?.id === userId) return true;
+  const kids = Array.isArray(node.children) ? node.children : [];
+  for (const kid of kids) {
+    if (threadHasAuthor(kid, userId)) return true;
+  }
+  return false;
+}
+
+// Top-level sort modes. Children are always chronological (set by
+// buildTree) — sorting deeper would break conversational flow.
+//
+//   "top"    — descending by total reactions on the depth-0 node, ties
+//              broken by newer-first
+//   "newest" — descending by createdAt on the depth-0 node
+//   "mine"   — filters to threads that contain `currentUserId` anywhere
+//              (preserves natural chronological order)
+export function sortTopLevel(tree, mode, currentUserId) {
+  if (!Array.isArray(tree)) return [];
+  const filtered =
+    mode === "mine" && currentUserId
+      ? tree.filter((n) => threadHasAuthor(n, currentUserId))
+      : tree;
+
+  if (mode === "top") {
+    return [...filtered].sort((a, b) => {
+      const diff = sumReactions(b.reactions) - sumReactions(a.reactions);
+      if (diff !== 0) return diff;
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    });
+  }
+  if (mode === "newest") {
+    return [...filtered].sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
+  }
+  // Default ("mine" or fallback): keep buildTree's chronological order.
+  return filtered;
+}
+
 // Toggle one emoji reaction on a comment, on behalf of the viewer. The
 // caller is expected to have already checked `userId` (login wall) —
 // this layer doesn't gate, it just persists. Returns the new pick
