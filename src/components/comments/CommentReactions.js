@@ -26,7 +26,11 @@ export function CommentReactions({
   myReactions = [],
   language = "np",
   isAuthenticated = false,
-  onToggle
+  onToggle,
+  // Optional leading slot — used by CommentNode to inline the Reply
+  // chip at the start of the row so we save a whole second action row
+  // beneath. Passed in as a ReactNode (e.g., a <button>).
+  leading = null
 }) {
   const t = COPY[language] || COPY.np;
 
@@ -35,7 +39,10 @@ export function CommentReactions({
   // don't need to render empty-state tiles.
   const entries = Object.entries(reactions).filter(([, count]) => Number(count) > 0);
 
-  if (entries.length === 0 && !isAuthenticated) return null;
+  // Keep rendering when there's a leading slot or the viewer is authed
+  // (so the picker is reachable). Only collapse the row entirely when
+  // there's truly nothing to show.
+  if (entries.length === 0 && !isAuthenticated && !leading) return null;
 
   const handleToggle = (emoji) => {
     if (!isAuthenticated) return;
@@ -44,6 +51,7 @@ export function CommentReactions({
 
   return (
     <div className="comment-reactions" role="group" aria-label={t.reactionTip}>
+      {leading}
       {entries.map(([emoji, count]) => {
         const picked = myReactions.includes(emoji);
         const tile = (

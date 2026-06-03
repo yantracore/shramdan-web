@@ -214,58 +214,64 @@ export function CommentNode({
               language={language}
               isAuthenticated={Boolean(currentUser?.id)}
               onToggle={(emoji) => onToggleReaction?.(comment, emoji)}
+              leading={
+                <button
+                  type="button"
+                  className="comment-reply-pill"
+                  onClick={() => onStartReply?.(comment)}
+                  aria-label={t.reply}
+                >
+                  <MessageOutlined aria-hidden="true" />
+                  <span>{t.reply}</span>
+                </button>
+              }
             />
-            <div className="comment-actions" role="group">
-              <Button
-                type="text"
-                size="small"
-                icon={<MessageOutlined />}
-                onClick={() => onStartReply?.(comment)}
-              >
-                {t.reply}
-              </Button>
-              {canEdit ? (
-                <Button
-                  type="text"
-                  size="small"
-                  icon={<EditOutlined />}
-                  onClick={() => onStartEdit?.(comment)}
-                >
-                  {t.edit}
-                </Button>
-              ) : null}
-              {canDelete ? (
-                <Button
-                  type="text"
-                  size="small"
-                  icon={<DeleteOutlined />}
-                  onClick={() => onDelete?.(comment)}
-                >
-                  {t.delete}
-                </Button>
-              ) : null}
-              {isAdmin ? (
-                <Button
-                  type="text"
-                  size="small"
-                  icon={comment.pinned ? <PushpinFilled /> : <PushpinOutlined />}
-                  onClick={() => onTogglePin?.(comment)}
-                >
-                  {comment.pinned ? t.unpin : t.pin}
-                </Button>
-              ) : null}
-              {currentUser?.id && currentUser.id !== comment.author?.id ? (
-                <Button
-                  type="text"
-                  size="small"
-                  icon={<FlagOutlined />}
-                  onClick={() => onStartFlag?.(comment)}
-                  disabled={viewerFlagged}
-                >
-                  {viewerFlagged ? t.flagged : t.flag}
-                </Button>
-              ) : null}
-            </div>
+            {canEdit || canDelete || isAdmin ||
+            (currentUser?.id && currentUser.id !== comment.author?.id) ? (
+              <div className="comment-actions" role="group">
+                {canEdit ? (
+                  <Button
+                    type="text"
+                    size="small"
+                    icon={<EditOutlined />}
+                    onClick={() => onStartEdit?.(comment)}
+                  >
+                    {t.edit}
+                  </Button>
+                ) : null}
+                {canDelete ? (
+                  <Button
+                    type="text"
+                    size="small"
+                    icon={<DeleteOutlined />}
+                    onClick={() => onDelete?.(comment)}
+                  >
+                    {t.delete}
+                  </Button>
+                ) : null}
+                {isAdmin ? (
+                  <Button
+                    type="text"
+                    size="small"
+                    icon={comment.pinned ? <PushpinFilled /> : <PushpinOutlined />}
+                    onClick={() => onTogglePin?.(comment)}
+                  >
+                    {comment.pinned ? t.unpin : t.pin}
+                  </Button>
+                ) : null}
+                {currentUser?.id && currentUser.id !== comment.author?.id ? (
+                  <Button
+                    type="text"
+                    size="small"
+                    icon={<FlagOutlined />}
+                    onClick={() => onStartFlag?.(comment)}
+                    disabled={viewerFlagged}
+                  >
+                    {viewerFlagged ? t.flagged : t.flag}
+                  </Button>
+                ) : null}
+              </div>
+            ) : null}
           </>
         ) : null}
 
