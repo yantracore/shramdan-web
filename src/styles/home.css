@@ -9398,6 +9398,249 @@
   text-align: center;
 }
 
+/* ---- Push opt-in panel (roadmap 8.3) -------------------------------- */
+
+.push-optin-panel {
+  margin: 16px 0;
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.push-optin-header .eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--primary);
+  margin-bottom: 4px;
+}
+
+.push-optin-header h2 {
+  margin: 0 0 6px;
+  font-size: 17px;
+  color: var(--text);
+}
+
+.push-optin-header p {
+  margin: 0 0 14px;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.push-optin-status {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  margin: 0 0 14px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  border: 1px solid var(--line);
+}
+
+.push-optin-status-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.push-optin-status.is-granted {
+  background: color-mix(in srgb, #2e7d32 6%, var(--surface));
+  border-color: color-mix(in srgb, #2e7d32 28%, var(--line));
+}
+
+.push-optin-status.is-granted .push-optin-status-icon {
+  color: #2e7d32;
+}
+
+.push-optin-status.is-denied,
+.push-optin-status.is-unsupported {
+  background: color-mix(in srgb, #b42318 5%, var(--surface));
+  border-color: color-mix(in srgb, #b42318 24%, var(--line));
+}
+
+.push-optin-status.is-denied .push-optin-status-icon,
+.push-optin-status.is-unsupported .push-optin-status-icon {
+  color: #b42318;
+}
+
+.push-optin-status.is-default .push-optin-status-icon {
+  color: var(--muted);
+}
+
+.push-optin-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* ---- Attendance verify panel (roadmap 7.4) -------------------------- */
+
+.attendance-verify-panel {
+  margin: 16px 0;
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.attendance-verify-header .eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--primary);
+  margin-bottom: 4px;
+}
+
+.attendance-verify-header h2 {
+  margin: 0 0 6px;
+  font-size: 18px;
+}
+
+.attendance-verify-header p {
+  margin: 0 0 14px;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.attendance-verify-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.attendance-verify-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: var(--bg);
+  border: 1px solid color-mix(in srgb, var(--line) 80%, transparent);
+  flex-wrap: wrap;
+}
+
+.attendance-verify-row.state-saw {
+  border-color: color-mix(in srgb, #2e7d32 28%, var(--line));
+  background: color-mix(in srgb, #2e7d32 4%, var(--surface));
+}
+
+.attendance-verify-row.state-missed {
+  border-color: color-mix(in srgb, #b42318 28%, var(--line));
+  background: color-mix(in srgb, #b42318 4%, var(--surface));
+}
+
+.attendance-verify-row-meta strong {
+  display: block;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.attendance-verify-row-meta span {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.attendance-verify-row-actions {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.attendance-verify-pill {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--muted);
+  padding: 4px 10px;
+  font-size: 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: background 160ms ease, color 160ms ease, border-color 160ms ease;
+}
+
+.attendance-verify-pill.is-selected.is-saw {
+  background: #2e7d32;
+  color: var(--surface);
+  border-color: #2e7d32;
+}
+
+.attendance-verify-pill.is-selected.is-missed {
+  background: #b42318;
+  color: var(--surface);
+  border-color: #b42318;
+}
+
+.attendance-verify-pill.is-selected.is-unsure {
+  background: var(--muted);
+  color: var(--surface);
+  border-color: var(--muted);
+}
+
+.attendance-verify-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.attendance-verify-summary {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.attendance-verify-empty {
+  margin: 16px 0;
+  text-align: center;
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* ---- Poll-attached leaf link on /development tree -------------------- */
+
+.development-tree-leaf-poll {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11.5px;
+  color: var(--primary);
+  text-decoration: none;
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-weight: 500;
+}
+
+.development-tree-leaf-poll:hover {
+  background: color-mix(in srgb, var(--primary) 18%, transparent);
+  text-decoration: underline;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .attendance-verify-pill {
+    transition: none;
+  }
+}
+
 /* ---- Polls index + card (roadmap 14.3) ------------------------------ */
 
 .polls-page {

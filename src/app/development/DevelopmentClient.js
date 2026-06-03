@@ -24,6 +24,7 @@ const COPY = {
     treeHeading: "पूर्ण रोडम्याप वृक्ष",
     treeIntro:
       "हरेक फेजका सबै लिफ — सम्पन्न, चलिरहेका, र पर्खिँदै। फेज खोल्न क्लिक गर्नुहोस्।",
+    voteCta: "मतदान",
     statusLabel: {
       x: "सम्पन्न",
       "~": "चलिरहेको",
@@ -50,6 +51,7 @@ const COPY = {
     treeHeading: "Full roadmap tree",
     treeIntro:
       "Every leaf in every phase — done, in progress, pending. Expand a phase to drill in.",
+    voteCta: "Vote",
     statusLabel: {
       x: "Done",
       "~": "In progress",
@@ -114,6 +116,14 @@ export function DevelopmentClient({ summary, tree }) {
             </Tag>
             <span className="development-tree-leaf-id">{leaf.id}</span>
             <span className="development-tree-leaf-label">{leaf.label}</span>
+            {leaf.pollSlug ? (
+              <Link
+                href={`/polls/${leaf.pollSlug}`}
+                className="development-tree-leaf-poll"
+              >
+                {t.voteCta || "Vote"} ↗
+              </Link>
+            ) : null}
             {leaf.doneAt ? (
               <span className="development-tree-leaf-date">{leaf.doneAt}</span>
             ) : null}

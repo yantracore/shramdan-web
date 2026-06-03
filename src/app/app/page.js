@@ -20,6 +20,7 @@ import { Button, Empty } from "antd";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useSyncExternalStore } from "react";
+import { PushOptInPanel } from "@/components/PushOptInPanel";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
 import {
@@ -286,6 +287,8 @@ export default function AppDashboardPage() {
             <Button icon={<UserOutlined />}>{t.profileEdit}</Button>
           </Link>
         </section>
+
+        <PushOptInPanel language={language} />
 
         <section
           className="app-dashboard-block app-dashboard-quick"

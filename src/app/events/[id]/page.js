@@ -23,6 +23,7 @@ import { ShareButton } from "@/components/ShareButton";
 import { StickyActionBar } from "@/components/StickyActionBar";
 import { TertiaryButton } from "@/components/TertiaryButton";
 import { IssuePhotoGallery } from "@/components/IssuePhotoGallery";
+import { AttendanceVerifyPanel } from "@/components/AttendanceVerifyPanel";
 import { ContributionIntentPanel } from "@/components/ContributionIntentPanel";
 import { IncidentPanel } from "@/components/IncidentPanel";
 import { ShareAsContribution } from "@/components/ShareAsContribution";
@@ -399,6 +400,14 @@ export default function EventDetailPage() {
                     event={eventData}
                     language={language}
                     canUpload={canUploadVideo}
+                    onChanged={handleEventCompleted}
+                  />
+                ) : null}
+
+                {eventData.status === "COMPLETED" && canUploadVideo ? (
+                  <AttendanceVerifyPanel
+                    event={eventData}
+                    language={language}
                     onChanged={handleEventCompleted}
                   />
                 ) : null}

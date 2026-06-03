@@ -6,6 +6,7 @@ const OVERALL_RE = /^## Overall Progress\s*—\s*(\d+)%/;
 const PHASE_RE = /^## Phase\s+(\d+)\s*—\s*(.+?)\s*`w:(\d+)`\s*📊\s*(\d+)%\s*$/;
 const LEAF_RE = /^(\s*)-\s*\[([ x~!\-])\]\s*([\d.]+[a-z]?)\s+(.+?)\s*$/;
 const DONE_DATE_RE = /←\s*done:\s*(\d{4}-\d{2}-\d{2})/;
+const POLL_TAG_RE = /←\s*poll:\s*([a-z0-9-]+)/i;
 
 const HIDDEN_PHASES = new Set([9, 11, 12]);
 const RECENT_WINDOW_DAYS = 14;
@@ -144,12 +145,14 @@ export function getRoadmapFullTree() {
     const id = leaf[3];
     const rest = leaf[4];
     const dateMatch = rest.match(DONE_DATE_RE);
+    const pollMatch = rest.match(POLL_TAG_RE);
     map.get(currentPhase.number).leaves.push({
       id,
       label: cleanLabel(rest),
       status,
       depth: leaf[1].length,
-      doneAt: dateMatch ? dateMatch[1] : null
+      doneAt: dateMatch ? dateMatch[1] : null,
+      pollSlug: pollMatch ? pollMatch[1] : null
     });
   }
 

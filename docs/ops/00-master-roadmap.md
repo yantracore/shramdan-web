@@ -8,10 +8,10 @@
 >
 > **Companion folder:** backend API contracts the frontend depends on live in [`../api-requirements/`](../api-requirements/), introduced by the [2026-06-03 pivot ADR](../decisions/2026-06-03-ui-first-and-two-meeting-pivot.md). When a UI feature touches an entity covered there, update the matching domain file in the same session.
 
-## Overall Progress — 77%
+## Overall Progress — 79%
 
 ```
-0% [=============================================================================-----------------------] 100%
+0% [===============================================================================---------------------] 100%
 ```
 
 The bar is 100 characters wide so each `=` equals exactly one percentage point. Recompute and redraw the bar in the same edit that changes any phase percentage — see [Aggregate Progress](#aggregate-progress) for the per-phase breakdown that feeds this number.
@@ -248,7 +248,7 @@ Goal: Safety leads, medical professionals, and admins can manage real-world risk
 - [x] 5.1 Labor + time donation intent UI `w:2` ← done: 2026-06-03 *(`ContributionIntentPanel` on `/events/[id]` surfaces three radio cards — LABOR, MATERIALS, LOGISTICS — with a single submit modal capturing kind + optional quantity + required notes. Demo events update local state; real events POST `/events/{id}/contributions` and degrade on 404/501. Bilingual EN+NE.)*
 - [x] 5.2 Material donation intent `w:1` ← done: 2026-06-03 *(Same `ContributionIntentPanel` covers MATERIALS as one of three intent kinds.)*
 - [x] 5.3 Logistics donation intent `w:1` ← done: 2026-06-03 *(Same `ContributionIntentPanel` covers LOGISTICS as one of three intent kinds.)*
-- [ ] 5.4 Fund donation `w:4`
+- [ ] 5.4 Fund donation `w:4` ← poll: first-payment-rail
   - [ ] 5.4.1 Esewa integration `w:1`
   - [ ] 5.4.2 Khalti integration `w:1`
   - [ ] 5.4.3 Bank transfer + manual reconciliation `w:1`
@@ -262,18 +262,18 @@ Goal: Safety leads, medical professionals, and admins can manage real-world risk
 - [ ] 6.3 Leader KYC backend + verification UI `w:2` *(Backend-heavy lane — KYC document upload + admin verification workflow. UI hook ready in `members.md` spec (`leaderEligibility` field).)*
 - [x] 6.4 Per-campaign fund-usage summary `w:1` ← done: 2026-06-03 *(Aggregate computed via `getDemoFundSummaryForEvent` — donatedTotal, spentTotal, surplus, donationCount, expenseCount, inKindCount. Backend swap point captured in `donations.md` under "Fund summary (aggregate)".)*
 
-## Phase 7 — Impact Stories `w:5` 📊 80%
+## Phase 7 — Impact Stories `w:5` 📊 100%
 
 - [x] 7.1 Before / after gallery `w:2` ← done: 2026-06-03 *(Already shipping: `BeforeAfterSlider` component renders on `/events/[id]` for any completed event with a `beforeAfter: { before, after }` payload. Drag-the-handle UX, keyboard-accessible aria-label, bilingual labels. Used across all demo past events. Marking done as a verification — code was live before this roadmap entry was flipped.)*
 - [x] 7.2 Blog / vlog story page `w:1` ← done: 2026-06-03 *(Two layers ship: the existing `/stories` index already renders every past event as a long-form story card (cover + result + testimonials + meta) with alternating bleed orientation. Today's addition surfaces a "Featured / Editor's picks" section at the top from `DEMO_STORIES` (5 narrative prose pieces in `devMockData.js`) plus a new `/stories/[slug]` detail route with reading-friendly typography and a "view source campaign" link back to `/events/{id}` when the story is anchored to one. Bilingual EN+NE.)*
 - [x] 7.3 Cameraman video upload (30+ min consolidated) `w:1` ← done: 2026-06-03 *(`VideoUploadPanel` surfaces on `/events/[id]` when the event is COMPLETED and the viewer is the leader or admin. Title + description + video file picker (MP4/MOV, up to 500 MB hint). Already-attached videos render above the form with title / description / filename. Demo updates local `event.videos` array. Real flow will three-step through `/uploads/presign` + R2 PUT + `POST /events/{id}/videos`. Bilingual EN+NE.)*
-- [ ] 7.4 Attendance verification from photos `w:1`
+- [x] 7.4 Attendance verification from photos `w:1` ← done: 2026-06-03 *(`AttendanceVerifyPanel` on COMPLETED `/events/[id]` for leader / admin. Tri-state pill per roster member (Saw / Missed / Unsure); summary line shows confirmed / missed / unsure counts; save action persists verifications to `event.attendanceVerifications` locally for demo. Future photo-AI cross-check is reserved as the next iteration; the manual surface is the v1.)*
 
-## Phase 8 — Notifications & Outreach `w:6` 📊 0%
+## Phase 8 — Notifications & Outreach `w:6` 📊 17%
 
 - [ ] 8.1 Email notifications `w:2`
 - [ ] 8.2 SMS for OTP + urgent alerts `w:1`
-- [ ] 8.3 PWA push notifications `w:1`
+- [x] 8.3 PWA push notifications `w:1` ← done: 2026-06-03 *(`/public/sw.js` minimal service worker handles push + notificationclick → focus or open URL. `src/lib/pwa.js` wraps registration + permission + subscribe + unsubscribe + local-test helpers. `PushOptInPanel` on `/app` dashboard surfaces a tri-state (default / granted / denied / unsupported), an enable / disable button, and a local-test notification button. Bilingual EN+NE. VAPID public key not wired yet — production swap point documented inline; demo mode treats permission grant as the success surface and exercises notifications via the local-test path.)*
 - [ ] 8.4 AI assistant on WhatsApp / Messenger / IG `w:2` *(future / Meta API)*
 
 ## Phase 9 — Admin Control Center Expansion `w:10` 📊 67%
@@ -337,7 +337,7 @@ Goal: Surface a *public-safe* analytics layer across the website so citizens and
 - [x] 13.2 Dedicated public reports page (`/impact`, route resolved) `w:2` ← done: 2026-06-03
   - [x] 13.2.1 Page route + bilingual EN+NE shell + SEO meta `w:1` ← done: 2026-06-03 *(`/impact` route exists with hero + KPI grid + completed-events list + CTA, all bilingual EN+NE via inline COPY map. Added [`src/app/impact/layout.js`](../../src/app/impact/layout.js) with `metadataBase`-relative canonical, openGraph + twitter cards, alternate locales — appears in sitemap.xml.)*
   - [x] 13.2.2 Headline KPIs + geographic distribution + issue/event mix + simple time-series `w:1` ← done: 2026-06-03 *(All four pieces now ship on `/impact`: KPI tiles (events / participants / locations / labour-minutes); category-mix horizontal bars with deep-link to `/events?show=past&category=<key>`; geography list grouping past events by trailing city in `addressText` showing top 8 by completed count; six-month time-series bar chart of completions per month, normalized to the busiest bucket. All read-only, no PII, no admin filters. Pure-CSS primitives — no chart library.)*
-- [~] 13.3 Homepage embed — community pulse strip `w:1` *(Component shipped: [`src/components/ImpactPulseStrip.js`](../../src/components/ImpactPulseStrip.js) — 4 KPI tiles (live / upcoming / completed / open issues) each deep-linking to its filtered list page. Already mounted on `/events` between the header and the toolbar. Homepage integration is pending — `src/app/HomeClient.js` has uncommitted session-start changes I should not stomp on; once that file is in a clean state, drop `<ImpactPulseStrip language={language} />` near the hero panel. Chart-light, no chart library.)*
+- [~] 13.3 Homepage embed — community pulse strip `w:1` ← poll: homepage-pulse-style *(Component shipped: [`src/components/ImpactPulseStrip.js`](../../src/components/ImpactPulseStrip.js) — 4 KPI tiles (live / upcoming / completed / open issues) each deep-linking to its filtered list page. Already mounted on `/events` between the header and the toolbar. Homepage integration is pending — `src/app/HomeClient.js` has uncommitted session-start changes I should not stomp on; once that file is in a clean state, drop `<ImpactPulseStrip language={language} />` near the hero panel. Chart-light, no chart library.)*
 - [x] 13.4 Deep-link convention from KPIs → filtered list pages `w:1` ← done: 2026-06-03 *(URL query contract documented in [`../engineering/10-frontend-api-usage.md`](../engineering/10-frontend-api-usage.md) under "Public URL filter convention" — covers `/events?show=<live|upcoming|past|all>`, `/events?category=<slug>`, `/issues?status=<enum>`, `/issues?sort=<voteCount|newest>`. Applied across `/impact` category-mix rows, `/events` ImpactPulseStrip tiles, and `/app` dashboard "Browse" links. New KPI surfaces should point at these contracts; if a new param is needed, extend the table first then update the list pages.)*
 - [x] 13.5 Bilingual EN+NE copy across all public report surfaces `w:1` ← done: 2026-06-03 *(All `/impact` copy — hero, stat labels, category-mix labels, events list headings, CTA — flows through the inline `COPY` map keyed by `language` from `usePreferences()`. Brand stays श्रमदान in NE; numbers use the existing `localizeDigits` helper for Devanagari digits in NE locale.)*
 
@@ -372,8 +372,8 @@ Weighted across all phases (sum of phase weights = 137):
 | 4 Operational Safety | 8 | 88% |
 | 5 Contribution Channels | 10 | 60% |
 | 6 Transparency & Ledger | 8 | 75% |
-| 7 Impact Stories | 5 | 80% |
-| 8 Notifications & Outreach | 6 | 0% |
+| 7 Impact Stories | 5 | 100% |
+| 8 Notifications & Outreach | 6 | 17% |
 | 9 Admin Control Center | 10 | 67% |
 | 10 Native Mobile App | 5 | 0% |
 | 11 Cross-cutting | 10 | 100% |
@@ -381,7 +381,7 @@ Weighted across all phases (sum of phase weights = 137):
 | 13 Public Reports & Transparency Surface | 6 | 67% |
 | 14 Building in Public (Process Transparency) | 6 | 83% |
 
-**Overall: ≈ 77%** (weighted sum / total weight; recompute on every edit, and redraw the [Overall Progress](#overall-progress--77) bar near the top of this file in the same edit).
+**Overall: ≈ 79%** (weighted sum / total weight; recompute on every edit, and redraw the [Overall Progress](#overall-progress--79) bar near the top of this file in the same edit).
 
 # How To Update This Document
 
