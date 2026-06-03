@@ -84,7 +84,7 @@ When you (the coding agent) are working in this repo:
 - [ ] P2 [from 9.1] Bulk actions on applications (approve / reject multiple at once) — effort:M
 - [ ] P3 [from 9.1] Export applications to CSV — effort:S
 - [ ] P2 [from 9.4] Calendar view for events (currently list-only) — effort:M
-- [ ] P2 [from 9.5a] Auto-save draft on issue create / edit (avoid lost work on reload) — effort:M
+- [x] P2 [from 9.5a] Auto-save draft on issue create / edit (avoid lost work on reload) — effort:M ← done: 2026-06-02 *(localStorage-backed draft on `/issues/new`: debounced (800ms) write on every form change saves title/description/category/addressText/location to key `shramdan:issue-draft:v1` with 14d TTL. On mount a dashed banner surfaces if a non-empty draft is found, with "Restore" / "Discard" actions and a "X min ago" age hint; a live "Draft saved · X min ago" status pill below the submit button refreshes every 30s. Successful POST clears the draft. Cover/uploads are excluded — they reference server upload IDs and can't be safely restored. Bilingual NE+EN.)*
 - [ ] P2 [from 9.10] Search + filter users by role / name — effort:S
 
 ## Phase 2 — Member Portal (UI-only, pre-backend)
