@@ -5,13 +5,10 @@ import {
   AppstoreOutlined,
   LogoutOutlined,
   MenuOutlined,
-  MoonOutlined,
-  SunOutlined,
-  TranslationOutlined,
   UserAddOutlined,
   UserOutlined
 } from "@ant-design/icons";
-import { Avatar, Button, Dropdown, Tag, Tooltip } from "antd";
+import { Avatar, Button, Dropdown, Tag } from "antd";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -254,22 +251,6 @@ export function SiteShell({ children, pageTitle }) {
 
         <div className="toolbar" aria-label={t.ariaLabels.preferences}>
           <div className="preference-controls">
-            <Tooltip title={t.controls.themeTooltip}>
-              <Button
-                aria-label={t.controls.themeTooltip}
-                icon={mode === "light" ? <SunOutlined /> : <MoonOutlined />}
-                onClick={toggleMode}
-              />
-            </Tooltip>
-            <Tooltip title={t.controls.languageTooltip}>
-              <Button
-                aria-label={t.controls.languageTooltip}
-                icon={<TranslationOutlined />}
-                onClick={toggleLanguage}
-              >
-                {t.controls.language}
-              </Button>
-            </Tooltip>
             <SettingsPopover />
             {isAuthenticated ? <NotificationsBell language={language} /> : null}
           </div>
