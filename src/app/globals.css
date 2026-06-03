@@ -8,6 +8,7 @@
 @import "../styles/event-roster.css";
 @import "../styles/events-split-view.css";
 @import "../styles/comments.css";
+@import "../styles/scrollbars.css";
 
 :root {
   color-scheme: light;

@@ -1,0 +1,240 @@
+/* scrollbars.css — state-of-the-art custom scrollbar grammar.
+ *
+ * One scrollbar voice across the whole app: minimal in idle, brand-tinted
+ * on engage, and quietly removed on touch devices where the OS already
+ * draws a beautiful overlay bar.
+ *
+ * Design intent
+ * - "Pleasing, not loud." Stable 10px box. Idle thumb is a translucent
+ *   pill, low-contrast, sits over a near-invisible track. The transparent
+ *   3px inset border makes the visible pill feel taut without making the
+ *   drag target hostile.
+ * - On hover OR while the user is interacting (parent :hover or :focus-
+ *   within), the thumb fills with a brand gradient and gains a subtle
+ *   glow — so it feels like the UI noticed. (Width is NOT animated:
+ *   Chromium does not re-size the ::-webkit-scrollbar box after first
+ *   paint. Tone-and-glow swap is the pattern Linear, Stripe, Vercel use.)
+ * - Track is transparent by default. A whisper of --line appears only
+ *   on parent hover so the user senses the runway.
+ * - Dark theme: denser thumb so it reads against deep surface.
+ * - Touch / coarse pointer: opt out — the platform's native overlay bar
+ *   is better than anything custom for fat fingers.
+ *
+ * Where it applies
+ * - Global: <html> (page-level scroll).
+ * - Any element. Tokens drive ::-webkit-scrollbar AND Firefox's
+ *   scrollbar-color / scrollbar-width on *. Authors don't need to opt in.
+ * - Internal scroll containers (.event-preview-photos, event-roster
+ *   max-height column, comments list, settings dropdowns, etc.) inherit
+ *   the same look for free.
+ *
+ * Knobs (set on :root, override per-container if ever needed)
+ * - --scrollbar-size              : 10px (one width, stable across states)
+ * - --scrollbar-thumb-radius      : 999px
+ * - --scrollbar-thumb-gradient-*  : linear-gradient(...) for idle vs active thumb
+ * - --scrollbar-thumb-shadow      : box-shadow for the active glow
+ * - --scrollbar-track-color       : near-invisible rail
+ * - --scrollbar-thumb-inset       : transparent border inside the thumb box
+ *
+ * Firefox supports scrollbar-color (two-color pair: thumb, track) and
+ * scrollbar-width: thin | auto | none. It cannot do gradients or hover
+ * states on the bar itself. We pick the gradient's mid-stop as the
+ * single Firefox thumb color so it still feels on-brand.
+ */
+
+:root {
+  /* One width across idle + active. Chromium does not animate
+     ::-webkit-scrollbar width dynamically — the box is sized at first
+     paint and rules updated later silently no-op. Industry pattern
+     (Linear, Stripe, Vercel) is to keep size stable and animate only
+     color / opacity / glow. Track here is just wide enough (10px) to
+     read as a designed element without feeling intrusive. */
+  --scrollbar-size: 10px;
+  --scrollbar-thumb-radius: 999px;
+
+  /* Idle thumb whispers — translucent brand-primary with a soft inner
+     gradient. Active state lights up into a solid brand gradient with
+     a subtle glow that says "I'm engaged." */
+  --scrollbar-thumb-color-idle: color-mix(in srgb, var(--primary) 40%, transparent);
+  --scrollbar-thumb-color-active: var(--primary);
+  --scrollbar-thumb-gradient-idle: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--primary) 55%, transparent) 0%,
+    color-mix(in srgb, var(--primary-dark) 40%, transparent) 100%
+  );
+  --scrollbar-thumb-gradient-active: linear-gradient(
+    180deg,
+    var(--primary) 0%,
+    var(--primary-dark) 100%
+  );
+  --scrollbar-thumb-shadow: 0 0 0 0.5px color-mix(in srgb, var(--primary-dark) 35%, transparent),
+                            0 4px 10px color-mix(in srgb, var(--primary) 22%, transparent);
+
+  --scrollbar-track-color: transparent;
+  --scrollbar-track-color-hover: color-mix(in srgb, var(--line) 45%, transparent);
+
+  /* The transparent border that pads the thumb inward, making the
+     "designed" thumb feel slimmer than its hit-target. 3px on a 10px
+     box leaves a 4px visible pill — taut but not anaemic. */
+  --scrollbar-thumb-inset: 3px;
+}
+
+:root[data-theme="dark"] {
+  /* In dark mode the primary green-light reads pale against deep
+     surface, so the thumb gets a touch more density. */
+  --scrollbar-thumb-color-idle: color-mix(in srgb, var(--primary) 55%, transparent);
+  --scrollbar-thumb-color-active: color-mix(in srgb, var(--primary) 92%, white 8%);
+  --scrollbar-thumb-gradient-idle: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--primary) 65%, transparent) 0%,
+    color-mix(in srgb, var(--primary) 40%, transparent) 100%
+  );
+  --scrollbar-thumb-gradient-active: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--primary) 95%, white 5%) 0%,
+    var(--primary) 100%
+  );
+  --scrollbar-thumb-shadow: 0 0 0 0.5px color-mix(in srgb, var(--primary) 45%, transparent),
+                            0 4px 12px color-mix(in srgb, var(--primary) 30%, transparent);
+  --scrollbar-track-color-hover: color-mix(in srgb, var(--line) 70%, transparent);
+}
+
+/* ---------------------------------------------------------------------- */
+/* Firefox — single color pair. No gradient, no per-element hover.        */
+/* ---------------------------------------------------------------------- */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb-color-idle) var(--scrollbar-track-color);
+}
+
+/* When the parent is hovered / focused, brighten the FF thumb too. */
+*:hover,
+*:focus-within {
+  scrollbar-color: var(--scrollbar-thumb-color-active) var(--scrollbar-track-color-hover);
+}
+
+/* ---------------------------------------------------------------------- */
+/* WebKit / Blink — the full design.                                      */
+/* ---------------------------------------------------------------------- */
+::-webkit-scrollbar {
+  width: var(--scrollbar-size);
+  height: var(--scrollbar-size);
+  background: transparent;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track-color);
+  border-radius: var(--scrollbar-thumb-radius);
+  margin: 4px;
+  transition: background var(--duration-base, 250ms) var(--ease-out-soft, ease-out);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb-gradient-idle);
+  border-radius: var(--scrollbar-thumb-radius);
+  /* Transparent inset border keeps the thumb visually slimmer than its
+     hit-target so the bar feels precise without being hostile to drag. */
+  border: var(--scrollbar-thumb-inset) solid transparent;
+  background-clip: padding-box;
+  transition: background var(--duration-base, 250ms) var(--ease-out-soft, ease-out),
+              box-shadow var(--duration-base, 250ms) var(--ease-out-soft, ease-out);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Brighten when the surrounding element is engaged. We use parent
+   :hover / :focus-within rather than ::-webkit-scrollbar:hover so the
+   bar lights up even while the cursor is over content. */
+*:hover::-webkit-scrollbar-track,
+*:focus-within::-webkit-scrollbar-track {
+  background: var(--scrollbar-track-color-hover);
+}
+
+*:hover::-webkit-scrollbar-thumb,
+*:focus-within::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb-gradient-active);
+  background-clip: padding-box;
+  box-shadow: var(--scrollbar-thumb-shadow);
+}
+
+/* Direct interaction on the bar itself — strongest state. */
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-gradient-active);
+  background-clip: padding-box;
+  box-shadow: var(--scrollbar-thumb-shadow);
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(
+    180deg,
+    var(--primary-dark) 0%,
+    var(--primary) 100%
+  );
+  background-clip: padding-box;
+}
+
+/* No spinner buttons. */
+::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Touch / coarse-pointer devices — defer to the native overlay bar.      */
+/* The OS one is already perfect at thumb-size, and our custom width      */
+/* steals screen real estate from already-narrow phone viewports.         */
+/* ---------------------------------------------------------------------- */
+@media (pointer: coarse) {
+  * {
+    scrollbar-width: auto;
+    scrollbar-color: auto;
+  }
+  ::-webkit-scrollbar {
+    width: initial;
+    height: initial;
+  }
+  ::-webkit-scrollbar-thumb,
+  ::-webkit-scrollbar-track {
+    background: initial;
+    border: initial;
+    box-shadow: none;
+  }
+}
+
+/* ---------------------------------------------------------------------- */
+/* Reduced motion — no background transitions on the bar.                 */
+/* ---------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  ::-webkit-scrollbar-track,
+  ::-webkit-scrollbar-thumb {
+    transition: none;
+  }
+}
+
+/* ---------------------------------------------------------------------- */
+/* Opt-out utility — for places where a scrollbar must not show at all    */
+/* (e.g., horizontal card rails that use their own swipe affordance).     */
+/* Usage: <div class="scrollbar-none">                                    */
+/* ---------------------------------------------------------------------- */
+.scrollbar-none {
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Opt-in utility — slightly more prominent bar inside data-dense panels  */
+/* like long modal bodies or admin tables. Adds a touch more contrast     */
+/* without breaking the design language.                                  */
+/* Usage: <div class="scrollbar-strong">                                  */
+/* ---------------------------------------------------------------------- */
+.scrollbar-strong {
+  --scrollbar-size: 14px;
+  --scrollbar-thumb-color-idle: color-mix(in srgb, var(--primary) 70%, transparent);
+}
