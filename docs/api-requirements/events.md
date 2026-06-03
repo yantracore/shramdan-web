@@ -34,6 +34,7 @@
 - **safetyChecklist** (`array of object`, optional, internal) — pre-event safety checklist for the SCHEDULED → ACTIVE gate. Each entry `{ id, label, required, checkedBy, checkedAt }`. Leader-and-admin-only by default; not returned in public reads. MVP shape may store only the boolean confirmation rather than per-item history if simpler — see the Operations section.
 - **safetyChecklistCompletedAt** (`datetime`, optional, public) — timestamp captured when the leader satisfied the safety checklist and the event transitioned to ACTIVE. Public so the audit trail is visible.
 - **reminderCadence** (`array of enum`, optional, public) — which reminder pulses the leader wants sent to confirmed participants. Each entry one of `3d`, `24h`, `1h`. Default is `["3d", "24h"]` when unset. Reminders are sent only to participants whose status is `CONFIRMED` or higher. Public-readable so participants can see what reminders to expect, but only the leader can edit.
+- **nominations** (`array of object`, optional, public) — leader-nomination records for `DRAFT` events that have no assigned `leaderId`. Each entry `{ id, memberId, memberName, voteCount, votedByMe, createdAt }`. `votedByMe` is per-viewer and only present in authenticated reads. Empty / absent on non-DRAFT events or once a leader is selected.
 
 ---
 
@@ -58,6 +59,9 @@
 | Update event schedule | REST PATCH | EventLeader or Admin | Updates schedule, meetup, and planning fields. Used by the leader scheduling UI. |
 | Activate event (safety-gated) | REST POST | EventLeader or Admin | Transitions the event from `SCHEDULED` to `ACTIVE` after the leader has satisfied the pre-event safety checklist. Accepts `{ checklistConfirmed: true }` in MVP; richer per-item confirmation may follow. Returns 412 if the checklist gate is not satisfied. |
 | Update reminder cadence | REST PATCH | EventLeader or Admin | Updates which reminder pulses (`3d`, `24h`, `1h`) the leader wants sent. Body: `{ reminderCadence: array of enum }`. Idempotent. |
+| Nominate self as leader | REST POST | Authenticated | Creates a nomination on a `DRAFT` event with no assigned leader. Body may be empty (server uses the auth context). Returns the nomination record. Idempotent — re-nominating returns the existing record. |
+| Vote for a nomination | REST POST | Authenticated | Adds a support vote on a nomination. Idempotent — voting twice returns 200 with no count change. |
+| Withdraw vote for a nomination | REST DELETE | Authenticated | Removes a previously-cast support vote. |
 | Mark event complete | REST POST | EventLeader or Admin | Transitions the event to `COMPLETED` and accepts `resultSummary`, photo uploads, and `completedAt`. |
 | Pause for safety | REST POST | EventLeader, SafetyLead, or Admin | Transitions the event to `PAUSED` with a reference to the triggering incident. |
 | Resume event | REST POST | EventLeader or Admin | Transitions a `PAUSED` event back to `ACTIVE` when the incident is resolved. |
@@ -128,6 +132,7 @@ A leader may not skip states. The system may auto-transition `SCHEDULED → ACTI
 
 ## Recent changes
 
+- `2026-06-03` — UI now exercises three new leader-nomination operations through the `LeaderNominationPanel` (roadmap 3.4.2 + 3.4.3): `Nominate self as leader`, `Vote for a nomination`, `Withdraw vote`. Field `nominations` added to the Event entity (array of `{ id, memberId, memberName, voteCount, votedByMe, createdAt }`). The panel surfaces on `DRAFT` events with no assigned leader; tie detection between top candidates renders a "community decide" banner. Demo events update local state; real events POST / DELETE to `/events/{id}/nominations[/{id}/vote]` and degrade gracefully on 404/501.
 - `2026-06-03` — UI now exercises the `Update reminder cadence` operation through the new `ReminderCadencePanel` (roadmap 3.7). Three independent checkboxes (`3d`, `24h`, `1h`) auto-save on toggle; demo events update local state, real events PATCH `/events/{id}/reminders` with `{ reminderCadence: array of enum }`. Field `reminderCadence` added to the Event entity. Default when unset is `["3d", "24h"]`.
 - `2026-06-03` — UI now exercises the `Activate event (safety-gated)` operation via the new `SafetyChecklistPanel` (roadmap 4.6). The leader must tick seven safety items (pre-execution meeting completed, medic on site, safety lead identified, permits confirmed, weather contingency, logistics ready, participants re-notified) before the activate button enables. Frontend POSTs `{ checklistConfirmed: true }`; demo events flip status to ACTIVE locally and stamp `safetyChecklistCompletedAt`. Backend should return 412 if the checklist is not satisfied. Field `safetyChecklist` (array of items) and `safetyChecklistCompletedAt` (timestamp) added.
 - `2026-06-03` — UI now exercises the `Mark event complete` operation through a leader-only modal on `/events/[id]`. Frontend sends `resultSummary` (required, ≥12 chars) and `completedAt` (defaults to now, must not be future) in the POST body. Demo events with `demo-` id prefix simulate the action locally without round-tripping.

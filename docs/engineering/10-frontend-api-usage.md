@@ -129,6 +129,34 @@ Uses the same `IssueForm` component as the create page (see "One shared form com
 
 Scheduling (`PATCH /events/{id}/schedule`) and completion (`POST /events/{id}/complete`) are restricted to the assigned event leader by the API, so they are not exposed in the admin UI.
 
+## Public URL filter convention (roadmap 13.4)
+
+KPI tiles, activity strips, and impact summaries deep-link into the public list pages with a shared query-param contract. The contract is intentionally short — only what the frontend list pages already honor.
+
+### `/events`
+
+| Param | Values | Meaning |
+| --- | --- | --- |
+| `show` | `live`, `upcoming`, `past`, `all` (default) | Filter pill on the events list |
+| `category` | one of the event-type slugs (`cleanup`, `afforestation`, `beautification`, `trail`, `dam`, `infrastructure`, `seasonal`, `disaster`) | Restrict to a single category |
+| `range` | `today`, `week`, `month` | Reserved — not yet honored on `/events`. Logged as a follow-up. |
+
+### `/issues`
+
+| Param | Values | Meaning |
+| --- | --- | --- |
+| `status` | one of the status enums (`OPEN`, `PROMOTED`, `EVENT_SCHEDULED`, `COMPLETED`, `REJECTED`, `DUPLICATE`) | Filter pill on the issues list |
+| `category` | string | Category filter |
+| `sort` | `voteCount` (default), `newest` | Sort order |
+
+### Where the convention is applied today
+
+- `/impact` category-mix rows link to `/events?show=past&category=<key>` (shipped 2026-06-03 with 13.2.2).
+- `/events` ImpactPulseStrip tiles link to `/events?show=<live|upcoming>`, `/issues?status=OPEN`, `/impact` (shipped 2026-06-03 with 13.3).
+- `/app` member dashboard "Browse" links use the same conventions.
+
+When you ship a new KPI tile or summary link, point it at one of these contracts; if you need a new query param, extend the table above first and then update the list pages to honor it.
+
 ## Keeping this updated
 
 When you add a page or component that calls a backend endpoint:

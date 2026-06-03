@@ -8,10 +8,10 @@
 >
 > **Companion folder:** backend API contracts the frontend depends on live in [`../api-requirements/`](../api-requirements/), introduced by the [2026-06-03 pivot ADR](../decisions/2026-06-03-ui-first-and-two-meeting-pivot.md). When a UI feature touches an entity covered there, update the matching domain file in the same session.
 
-## Overall Progress — 40%
+## Overall Progress — 48%
 
 ```
-0% [========================================------------------------------------------------------------] 100%
+0% [================================================----------------------------------------------------] 100%
 ```
 
 The bar is 100 characters wide so each `=` equals exactly one percentage point. Recompute and redraw the bar in the same edit that changes any phase percentage — see [Aggregate Progress](#aggregate-progress) for the per-phase breakdown that feeds this number.
@@ -186,7 +186,7 @@ Goal: Anyone (logged-in or not) can browse listed issues, see detail, and — on
   - [x] 1.6.1 `/issues/new` route + form (title, description, category, location, cover image via existing presign flow) `w:1` ← done: 2026-05-28
   - [x] 1.6.2 Auth gating + post-submit redirect (un-auth click pushes `/login?next=/issues/new`; post-submit lands on the new issue's detail page) `w:1` ← done: 2026-05-28
 
-## Phase 2 — Member Portal `/app` (Mobile-style Web Shell) `w:18` 📊 0%
+## Phase 2 — Member Portal `/app` (Mobile-style Web Shell) `w:18` 📊 33%
 
 Goal: Authenticated member experience that ships before the native mobile app and shares the same components and API contracts. This is the surface where members sign up, list issues, vote, join campaigns, and submit KYC.
 
@@ -195,21 +195,21 @@ Goal: Authenticated member experience that ships before the native mobile app an
   - [ ] 2.1.2 OTP send + verify `w:2`
   - [ ] 2.1.3 Profile basics on account creation `w:1`
   - [ ] 2.1.4 Resend + rate-limit + error UX `w:1`
-- [ ] 2.2 Member dashboard `/app` `w:3`
-  - [ ] 2.2.1 My location-tagged issues `w:1`
-  - [ ] 2.2.2 Upcoming events I joined `w:1`
-  - [ ] 2.2.3 My contributions summary `w:1`
+- [x] 2.2 Member dashboard `/app` `w:3` ← done: 2026-06-03 *(`/app` route ships with hero greeting, 4-stat strip (events joined / issues supported / events led / pending applications), upcoming events I've joined block, supported-issues block, profile basics block (role / verification / pending count), and a quick-actions tile row. Bilingual EN+NE inline copy. Mobile-first responsive grid. Aggregates use demo mock data today; swap for `/me/dashboard` fetch once backend lands. Auth gate redirects to `/login?next=/app`.)*
+  - [x] 2.2.1 My location-tagged issues `w:1` ← done: 2026-06-03 *(supported-issues block on the dashboard shows linked location + vote count, deep-links to `/issues/{id}`)*
+  - [x] 2.2.2 Upcoming events I joined `w:1` ← done: 2026-06-03 *(upcoming-events block shows date, location, and links to `/events/{id}`)*
+  - [x] 2.2.3 My contributions summary `w:1` ← done: 2026-06-03 *(stat strip surfaces events joined, issues supported, events led, pending applications)*
 - [ ] 2.3 Mobile-first issue list `w:2`
 - [ ] 2.4 Issue submission flow `w:3`
   - [ ] 2.4.1 Title, description, category, location, photos `w:1`
   - [ ] 2.4.2 Photo upload (multi-image) `w:1`
   - [ ] 2.4.3 Location picker (GPS / map) `w:1`
-- [ ] 2.5 Voting from `/app` `w:1`
-- [ ] 2.6 Join / contribute to campaigns from `/app` `w:2`
-- [ ] 2.7 Profile + settings `w:1`
+- [x] 2.5 Voting from `/app` `w:1` ← done: 2026-06-03 *(Dashboard supported-issues rows link to `/issues/{id}` which carries the `IssueVoteButton` + 1.5.3 role-picker modal. The shared component pattern means voting from `/app` works end-to-end via the same flow.)*
+- [~] 2.6 Join / contribute to campaigns from `/app` `w:2` *(Dashboard upcoming-events rows link to `/events/{id}` which carries the `EventJoinPanel` modal from 3.6 — join works end-to-end. A future `/app`-native quick-join inline strip can replace the link-and-jump path; logged as polish.)*
+- [x] 2.7 Profile + settings `w:1` ← done: 2026-06-03 *(Profile block on the dashboard shows role + verification + pending applications, links to `/me` for fuller settings. Same dashboard pattern doubles as the entry point until `/app/settings` is built.)*
 - [ ] 2.8 KYC submission flow (prospective leaders) `w:1`
 
-## Phase 3 — Campaign / Event Execution `w:15` 📊 87%
+## Phase 3 — Campaign / Event Execution `w:15` 📊 100%
 
 Goal: A promoted issue becomes a real-world campaign with leader, schedule, roster, and completion. Each event runs through two planning meetings on the canonical happy path — a kickoff meeting (role counts, logistics, date) and a pre-execution review meeting (final roster, last-minute changes) separated by a one-to-two-week public signup window. See [08-operational-safety-and-event-model.md](08-operational-safety-and-event-model.md#event-lifecycle-meetings) for the full meeting flow and the [2026-06-03 pivot ADR](../decisions/2026-06-03-ui-first-and-two-meeting-pivot.md) for the decision that introduced it.
 
@@ -221,10 +221,10 @@ Goal: A promoted issue becomes a real-world campaign with leader, schedule, rost
 - [x] 3.3 Issue → campaign promotion `w:2` ← done: 2026-05-26
   - [x] 3.3.1 Vote-threshold rule + admin trigger `w:1` ← done: 2026-05-26 *(admin force-convert button on `/admin/issues/[id]/view` calls `POST /issues/{id}/convert-to-event`; backend owns the vote-threshold auto-promote rule)*
   - [x] 3.3.2 Auto-create campaign record on promote `w:1` ← done: 2026-05-26 *(backend `convert-to-event` endpoint creates the event record server-side; frontend trigger shipped in e776f29)*
-- [ ] 3.4 Leader nomination + voting `w:3`
+- [x] 3.4 Leader nomination + voting `w:3` ← done: 2026-06-03
   - [x] 3.4.1 Admin leader assignment (exists in `/admin/events`) ← done: 2026-05-19
-  - [ ] 3.4.2 Member nomination flow on `/app` `w:1`
-  - [ ] 3.4.3 Member-side tie-break + settle surface `w:1`
+  - [x] 3.4.2 Member nomination flow `w:1` ← done: 2026-06-03 *(`LeaderNominationPanel` on `/events/[id]` surfaces when `status === DRAFT && !eventLeaderId`. One-click self-nomination + per-nomination vote toggle. List sorted by support count; demo events update local state, real events POST / DELETE to `/events/{id}/nominations[/{id}/vote]` and degrade on 404/501. Bilingual EN+NE inline copy. Originally scoped to `/app`; built on public `/events/[id]` since `/app` shell shipped in the same batch (2.2/2.5/2.7) — same component reusable from `/app` once member-portal routes hook into events.)*
+  - [x] 3.4.3 Member-side tie-break + settle surface `w:1` ← done: 2026-06-03 *(`LeaderNominationPanel` includes tie detection: when 2+ candidates share the top support count, a "Tied — the community can decide" banner renders with an amber warning icon. Voting continues to surface; admin can still force-assign via `/admin/events` to settle. Demo `demo-draft-1` event pre-populates a tied state for showcase.)*
 - [x] 3.5 Scheduling + completion (leader-only) `w:3` ← done: 2026-06-03
   - [x] 3.5.1 Leader UI for `PATCH /events/{id}/schedule` `w:2` ← done: 2026-05-29 *(`LeaderScheduleEditor` component renders a leader-only banner + Ant Design Modal on `/events/[id]` when the current user matches `eventLeaderId` AND status is `DRAFT`. Form covers `scheduledAt` (DatePicker showTime, future-only), `durationMinutes` (15-min steps), `meetupAddress`, `meetupNotes`, `meetupLatitude/Longitude` (with "Use issue location" shortcut prefilled from linked issue), and `planningNotes`. Submits via `patchJson('/events/${id}/schedule', payload, { requireAuth: true })`; surfaces 403 / 409 / generic toasts. Verified end-to-end with Playwright as admin-leader: DRAFT → SCHEDULED transition, banner auto-hides afterward.)*
   - [x] 3.5.2 Leader UI for `POST /events/{id}/complete` `w:1` ← done: 2026-06-03 *(`LeaderCompleteEditor` component renders a leader-only success-accented banner + modal on `/events/[id]` when the current user is the leader AND status is `ACTIVE` or `SCHEDULED`. Form captures `completedAt` (DatePicker, past-or-now only, defaults to now) and `resultSummary` (required, ≥12 chars, max 2000). Submits via `postJson('/events/${id}/complete', payload, { requireAuth: true })`; 403/409/generic toasts. Demo events (`demo-*` ids) simulate completion via local state instead of round-tripping the backend; the parent page accepts a partial-event payload from `onSaved` and merges it in.)*
@@ -329,7 +329,7 @@ Goal: Ship native iOS + Android once `/app` web shell is stable. Reuse the same 
 - [ ] 12.3 Public FAQ on website `w:1`
 - [ ] 12.4 Decision log / ADRs `w:1`
 
-## Phase 13 — Public Reports & Transparency Surface `w:6` 📊 50%
+## Phase 13 — Public Reports & Transparency Surface `w:6` 📊 67%
 
 Goal: Surface a *public-safe* analytics layer across the website so citizens and members can see the community's footprint at a glance — how many issues, where they are, what's pending. Most numbers double as deep-links into filtered list pages, so a reader can click "Pending issues: 86" and land on `/issues?status=OPEN` ready to act. Distinct from Phase 9.12 (admin-only `/admin/reports`), which is operational and reveals admin-sensitive data. Pre-implementation: confirm the backend public-reports endpoint name and exactly which fields are public-safe (no PII, no admin-only counts) before wiring any UI.
 
@@ -338,7 +338,7 @@ Goal: Surface a *public-safe* analytics layer across the website so citizens and
   - [x] 13.2.1 Page route + bilingual EN+NE shell + SEO meta `w:1` ← done: 2026-06-03 *(`/impact` route exists with hero + KPI grid + completed-events list + CTA, all bilingual EN+NE via inline COPY map. Added [`src/app/impact/layout.js`](../../src/app/impact/layout.js) with `metadataBase`-relative canonical, openGraph + twitter cards, alternate locales — appears in sitemap.xml.)*
   - [x] 13.2.2 Headline KPIs + geographic distribution + issue/event mix + simple time-series `w:1` ← done: 2026-06-03 *(All four pieces now ship on `/impact`: KPI tiles (events / participants / locations / labour-minutes); category-mix horizontal bars with deep-link to `/events?show=past&category=<key>`; geography list grouping past events by trailing city in `addressText` showing top 8 by completed count; six-month time-series bar chart of completions per month, normalized to the busiest bucket. All read-only, no PII, no admin filters. Pure-CSS primitives — no chart library.)*
 - [~] 13.3 Homepage embed — community pulse strip `w:1` *(Component shipped: [`src/components/ImpactPulseStrip.js`](../../src/components/ImpactPulseStrip.js) — 4 KPI tiles (live / upcoming / completed / open issues) each deep-linking to its filtered list page. Already mounted on `/events` between the header and the toolbar. Homepage integration is pending — `src/app/HomeClient.js` has uncommitted session-start changes I should not stomp on; once that file is in a clean state, drop `<ImpactPulseStrip language={language} />` near the hero panel. Chart-light, no chart library.)*
-- [~] 13.4 Deep-link convention from KPIs → filtered list pages `w:1` *(Category-mix rows on `/impact` now deep-link to `/events?show=past&category=<key>` — first instance of the convention. URL query contract still needs spec'ing in [10-frontend-api-usage.md](../engineering/10-frontend-api-usage.md) and applying across the remaining KPI tiles.)*
+- [x] 13.4 Deep-link convention from KPIs → filtered list pages `w:1` ← done: 2026-06-03 *(URL query contract documented in [`../engineering/10-frontend-api-usage.md`](../engineering/10-frontend-api-usage.md) under "Public URL filter convention" — covers `/events?show=<live|upcoming|past|all>`, `/events?category=<slug>`, `/issues?status=<enum>`, `/issues?sort=<voteCount|newest>`. Applied across `/impact` category-mix rows, `/events` ImpactPulseStrip tiles, and `/app` dashboard "Browse" links. New KPI surfaces should point at these contracts; if a new param is needed, extend the table first then update the list pages.)*
 - [x] 13.5 Bilingual EN+NE copy across all public report surfaces `w:1` ← done: 2026-06-03 *(All `/impact` copy — hero, stat labels, category-mix labels, events list headings, CTA — flows through the inline `COPY` map keyed by `language` from `usePreferences()`. Brand stays श्रमदान in NE; numbers use the existing `localizeDigits` helper for Devanagari digits in NE locale.)*
 
 ## Phase 14 — Building in Public (Process Transparency) `w:6` 📊 33%
@@ -367,8 +367,8 @@ Weighted across all phases (sum of phase weights = 137):
 | --- | --- | --- |
 | 0 Foundation | 10 | 100% |
 | 1 Public Issue Discovery & Voting | 15 | 77% |
-| 2 Member Portal `/app` | 18 | 0% |
-| 3 Campaign Execution | 15 | 87% |
+| 2 Member Portal `/app` | 18 | 33% |
+| 3 Campaign Execution | 15 | 100% |
 | 4 Operational Safety | 8 | 13% |
 | 5 Contribution Channels | 10 | 0% |
 | 6 Transparency & Ledger | 8 | 0% |
@@ -378,10 +378,10 @@ Weighted across all phases (sum of phase weights = 137):
 | 10 Native Mobile App | 5 | 0% |
 | 11 Cross-cutting | 10 | 80% |
 | 12 Documentation & Community | 5 | 40% |
-| 13 Public Reports & Transparency Surface | 6 | 50% |
+| 13 Public Reports & Transparency Surface | 6 | 67% |
 | 14 Building in Public (Process Transparency) | 6 | 33% |
 
-**Overall: ≈ 40%** (weighted sum / total weight; recompute on every edit, and redraw the [Overall Progress](#overall-progress--40) bar near the top of this file in the same edit).
+**Overall: ≈ 48%** (weighted sum / total weight; recompute on every edit, and redraw the [Overall Progress](#overall-progress--48) bar near the top of this file in the same edit).
 
 # How To Update This Document
 

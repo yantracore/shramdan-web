@@ -2548,11 +2548,87 @@ export function getDemoAllEvents() {
   };
 }
 
+// --- Demo DRAFT events (no leader yet, nomination phase) -------------
+// A small set of campaigns waiting on a community-elected leader.
+// Surfaces the LeaderNominationPanel (roadmap 3.4.2 + 3.4.3) without
+// needing a real backend.
+const DEMO_DRAFT_EVENTS = [
+  {
+    id: "demo-draft-1",
+    title: "बल्खु बजार सरसफाइ",
+    addressText: "बल्खु चोक, काठमाडौँ",
+    category: "cleanup",
+    status: "DRAFT",
+    meetupAddress: "बल्खु चोक, काठमाडौँ",
+    meetupLatitude: 27.6841,
+    meetupLongitude: 85.2861,
+    meetupNotes:
+      "मस्यौदा अभियान — संयोजक तय हुनेबित्तिकै मिति र विवरण तय गरिनेछ।",
+    eventLeader: { name: null },
+    eventLeaderId: null,
+    rolesNeeded: DEMO_ROSTER,
+    linkedIssue: {
+      id: "demo-issue-balkhu-1",
+      title: "बल्खु बजार छेउ फोहोरको चाङ; मनसुनमा नाली पुरिने",
+      description:
+        "बल्खु बजार र वरपरको खण्ड वर्षौंदेखि नियमित सरसफाइ नभएको। हाटको दिनहरूमा फोहोर थुप्रिएर वर्षायाममा नालीहरू पुरिने। नगर र व्यापार समितिले सामग्री र अग्रिमको प्रतिबद्धता।",
+      category: "cleanup",
+      addressText: "बल्खु, काठमाडौँ",
+      latitude: 27.6841,
+      longitude: 85.2861,
+      voteCount: 54,
+      status: "PROMOTED"
+    },
+    nominations: [
+      {
+        id: "nom-balkhu-rohit",
+        memberId: "demo-member-rohit",
+        memberName: "रोहित कार्की",
+        voteCount: 7,
+        votedByMe: false,
+        createdAt: daysAgo(4)
+      },
+      {
+        id: "nom-balkhu-stmita",
+        memberId: "demo-member-smita",
+        memberName: "स्मिता शर्मा",
+        voteCount: 7,
+        votedByMe: false,
+        createdAt: daysAgo(3)
+      },
+      {
+        id: "nom-balkhu-binita",
+        memberId: "demo-member-binita",
+        memberName: "बिनिता थापा",
+        voteCount: 3,
+        votedByMe: false,
+        createdAt: daysAgo(2)
+      }
+    ]
+  }
+];
+
+export function getDemoDraftEvents() {
+  if (!isDev()) return [];
+  return DEMO_DRAFT_EVENTS;
+}
+
 // Lookup for the event-detail page so demo-* IDs can resolve to a
-// payload without hitting the backend. Handles live, upcoming, and
-// past demo events.
+// payload without hitting the backend. Handles live, upcoming, past,
+// and draft demo events.
 export function getDemoEventById(id) {
   if (!isDev()) return null;
+
+  const draft = DEMO_DRAFT_EVENTS.find((event) => event.id === id);
+  if (draft) {
+    return {
+      ...draft,
+      issue: draft.linkedIssue || null,
+      uploads: [],
+      photos: [],
+      resultSummary: null
+    };
+  }
 
   const live = DEMO_LIVE_EVENTS.find((event) => event.id === id);
   if (live) {

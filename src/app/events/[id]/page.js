@@ -25,6 +25,7 @@ import { TertiaryButton } from "@/components/TertiaryButton";
 import { IssuePhotoGallery } from "@/components/IssuePhotoGallery";
 import { LeaderScheduleEditor } from "@/components/LeaderScheduleEditor";
 import { LeaderCompleteEditor } from "@/components/LeaderCompleteEditor";
+import { LeaderNominationPanel } from "@/components/LeaderNominationPanel";
 import { ReminderCadencePanel } from "@/components/ReminderCadencePanel";
 import { SafetyChecklistPanel } from "@/components/SafetyChecklistPanel";
 import { CommentSection } from "@/components/comments";
@@ -165,6 +166,8 @@ export default function EventDetailPage() {
   const canManageReminders =
     isLeader &&
     (eventData?.status === "SCHEDULED" || eventData?.status === "ACTIVE");
+  const canShowNominations =
+    eventData?.status === "DRAFT" && !eventData?.eventLeaderId;
   const leaderScheduleCopy = content.detail.leaderSchedule;
   const leaderCompleteCopy = content.detail.leaderComplete;
 
@@ -348,6 +351,14 @@ export default function EventDetailPage() {
                     event={eventData}
                     language={language}
                     onSaved={handleEventCompleted}
+                  />
+                ) : null}
+
+                {canShowNominations ? (
+                  <LeaderNominationPanel
+                    event={eventData}
+                    language={language}
+                    onChanged={handleEventCompleted}
                   />
                 ) : null}
 

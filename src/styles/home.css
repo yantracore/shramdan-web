@@ -9028,6 +9028,394 @@
   line-height: 1.5;
 }
 
+/* ---- /app member dashboard (roadmap 2.2 + 2.5 + 2.7) ---- */
+
+.app-dashboard {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.app-dashboard-hero h1 {
+  font-size: clamp(24px, 3vw, 32px);
+  margin: 0 0 6px;
+  color: var(--text);
+}
+
+.app-dashboard-hero p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.app-dashboard-anon {
+  max-width: 480px;
+  margin: 48px auto;
+  padding: 32px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+}
+
+.app-dashboard-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.app-dashboard-stat {
+  display: grid;
+  grid-template-areas:
+    "icon ."
+    "value value"
+    "label label";
+  grid-template-columns: auto 1fr;
+  gap: 4px 8px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.app-dashboard-stat-icon {
+  grid-area: icon;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font-size: 16px;
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  color: var(--primary);
+}
+
+.app-dashboard-stat-value {
+  grid-area: value;
+  font-size: clamp(22px, 2.4vw, 28px);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+  line-height: 1;
+}
+
+.app-dashboard-stat-label {
+  grid-area: label;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.app-dashboard-block {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 20px;
+}
+
+.app-dashboard-block-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 14px;
+  flex-wrap: wrap;
+}
+
+.app-dashboard-block-header h2 {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 17px;
+  color: var(--text);
+}
+
+.app-dashboard-block-header h2 .anticon {
+  color: var(--primary);
+}
+
+.app-dashboard-block-more {
+  font-size: 13px;
+  color: var(--primary);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.app-dashboard-block-more:hover {
+  text-decoration: underline;
+}
+
+.app-dashboard-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.app-dashboard-row-link {
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--bg);
+  border: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+  text-decoration: none;
+  color: var(--text);
+  transition: background 160ms ease, border-color 160ms ease;
+}
+
+.app-dashboard-row-link:hover {
+  background: color-mix(in srgb, var(--primary) 5%, var(--surface));
+  border-color: color-mix(in srgb, var(--primary) 28%, var(--line));
+}
+
+.app-dashboard-row-title {
+  font-weight: 500;
+  font-size: 14.5px;
+  color: var(--text);
+}
+
+.app-dashboard-row-meta {
+  font-size: 12.5px;
+  color: var(--muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.app-dashboard-profile-list {
+  margin: 0 0 14px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.app-dashboard-profile-list div {
+  padding: 10px 12px;
+  background: var(--bg);
+  border: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+  border-radius: 8px;
+}
+
+.app-dashboard-profile-list dt {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 2px;
+}
+
+.app-dashboard-profile-list dd {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  margin: 0;
+}
+
+.app-dashboard-profile-edit {
+  display: inline-block;
+}
+
+.app-dashboard-quick-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.app-dashboard-quick-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 18px 12px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--primary) 5%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--primary) 22%, var(--line));
+  color: var(--text);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: center;
+  transition: transform 160ms ease, background 160ms ease;
+}
+
+.app-dashboard-quick-tile:hover {
+  transform: translateY(-2px);
+  background: color-mix(in srgb, var(--primary) 10%, var(--surface));
+}
+
+.app-dashboard-quick-tile .anticon {
+  font-size: 22px;
+  color: var(--primary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-dashboard-row-link,
+  .app-dashboard-quick-tile {
+    transition: none;
+  }
+  .app-dashboard-quick-tile:hover {
+    transform: none;
+  }
+}
+
+/* ---- Leader nomination panel (roadmap 3.4.2 + 3.4.3) ---- */
+
+.leader-nomination-panel {
+  margin: 16px 0;
+  padding: 20px;
+  border: 1px solid color-mix(in srgb, #7b3fa0 32%, var(--line));
+  border-radius: 12px;
+  background: color-mix(in srgb, #7b3fa0 5%, var(--surface));
+}
+
+.leader-nomination-header .eyebrow {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #7b3fa0;
+  margin-bottom: 4px;
+}
+
+.leader-nomination-header h2 {
+  margin: 0 0 6px;
+  font-size: 18px;
+  color: var(--text);
+}
+
+.leader-nomination-header p {
+  margin: 0 0 12px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.leader-nomination-tie {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  margin: 0 0 12px;
+  border-radius: 8px;
+  background: color-mix(in srgb, #b7791f 12%, transparent);
+  color: #b7791f;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.leader-nomination-self {
+  margin: 0 0 14px;
+}
+
+.leader-nomination-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.leader-nomination-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+
+.leader-nomination-row.is-elect {
+  border-color: color-mix(in srgb, #2e7d32 36%, var(--line));
+  background: color-mix(in srgb, #2e7d32 5%, var(--surface));
+}
+
+.leader-nomination-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.leader-nomination-elect-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #2e7d32;
+}
+
+.leader-nomination-votes {
+  font-size: 13px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.leader-nomination-empty {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.leader-nomination-panel-anon .leader-nomination-anon-cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.leader-nomination-panel-anon .leader-nomination-anon-cta span {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+[data-theme="dark"] .leader-nomination-panel {
+  background: color-mix(in srgb, #7b3fa0 14%, var(--surface));
+  border-color: color-mix(in srgb, #c084fc 44%, var(--line));
+}
+
+[data-theme="dark"] .leader-nomination-header .eyebrow {
+  color: #c084fc;
+}
+
+[data-theme="dark"] .leader-nomination-row.is-elect {
+  background: color-mix(in srgb, #2e7d32 12%, var(--surface));
+  border-color: color-mix(in srgb, #4ade80 44%, var(--line));
+}
+
+[data-theme="dark"] .leader-nomination-elect-badge {
+  color: #4ade80;
+}
+
+@media (max-width: 540px) {
+  .leader-nomination-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+}
+
 /* ---- Reminder cadence panel (roadmap 3.7) ---- */
 
 .reminder-cadence-panel {
