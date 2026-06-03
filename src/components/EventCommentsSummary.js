@@ -1,0 +1,133 @@
+"use client";
+
+// Compact discussion teaser shown inside EventPreviewPane (events split
+// view). Pulls the same data layer the full /events/[id] comment
+// section uses, but renders only the headline figure (count) + the
+// single most recent non-deleted comment as a quote-snippet. Acts as a
+// hook into the conversation without taking the user off the list.
+
+import { ArrowRightOutlined, MessageOutlined } from "@ant-design/icons";
+import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
+import { countVisible, loadComments } from "@/lib/comments";
+
+const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
+function localizeDigits(value, language) {
+  const str = String(value ?? "");
+  if (language !== "np") return str;
+  return str.replace(/\d/g, (d) => NP_DIGITS[Number(d)]);
+}
+
+const COPY = {
+  np: {
+    eyebrow: "छलफल",
+    countOne: "टिप्पणी",
+    countMany: "टिप्पणी",
+    empty: "अहिलेसम्म कुनै टिप्पणी छैन — पहिलो तपाईं हुनुहोस्।",
+    latestBy: "ताजा",
+    openAll: "सबै हेर्नुहोस्",
+    minutesAgo: "{n} मि. अघि",
+    hoursAgo: "{n} घण्टा अघि",
+    daysAgo: "{n} दिन अघि",
+    justNow: "भर्खर"
+  },
+  en: {
+    eyebrow: "Discussion",
+    countOne: "comment",
+    countMany: "comments",
+    empty: "No comments yet — be the first.",
+    latestBy: "Latest",
+    openAll: "Open all",
+    minutesAgo: "{n} min ago",
+    hoursAgo: "{n} h ago",
+    daysAgo: "{n} d ago",
+    justNow: "just now"
+  }
+};
+
+function relativeTime(iso, t, language) {
+  if (!iso) return "";
+  const ms = Date.now() - Date.parse(iso);
+  if (!Number.isFinite(ms) || ms < 60_000) return t.justNow;
+  const min = Math.floor(ms / 60_000);
+  if (min < 60) return t.minutesAgo.replace("{n}", localizeDigits(min, language));
+  const hr = Math.floor(min / 60);
+  if (hr < 24) return t.hoursAgo.replace("{n}", localizeDigits(hr, language));
+  const days = Math.floor(hr / 24);
+  return t.daysAgo.replace("{n}", localizeDigits(days, language));
+}
+
+function truncate(text, max) {
+  const safe = String(text || "").replace(/\s+/g, " ").trim();
+  if (safe.length <= max) return safe;
+  return `${safe.slice(0, max - 1).trimEnd()}…`;
+}
+
+export function EventCommentsSummary({ eventId, language = "np" }) {
+  const t = COPY[language] || COPY.np;
+  // Defer the load until after mount — keeps SSR HTML stable and
+  // sidesteps any hydration mismatch from window-only `Date.now()` use
+  // inside the relative-time helper.
+  const [hydrated, setHydrated] = useState(false);
+  const [comments, setComments] = useState([]);
+
+  useEffect(() => {
+    if (!eventId) return;
+    // Sync external store (localStorage) into component state on mount /
+    // event change. The lint rule discourages this in general, but here
+    // localStorage is exactly the "external system" the docs reference.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setComments(loadComments({ targetType: "event", targetId: eventId }));
+    setHydrated(true);
+  }, [eventId]);
+
+  const { count, latest } = useMemo(() => {
+    if (!comments.length) return { count: 0, latest: null };
+    const visible = comments.filter((c) => !c.deleted);
+    const recent = [...visible].sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    )[0];
+    return { count: countVisible(comments), latest: recent || null };
+  }, [comments]);
+
+  if (!eventId) return null;
+  // Render nothing pre-hydration so the SSR HTML doesn't bake in a
+  // "0 comments" state that flips to a populated one after JS boots.
+  if (!hydrated) return null;
+
+  const noun = count === 1 ? t.countOne : t.countMany;
+  const href = `/events/${eventId}#comment-section-title`;
+
+  return (
+    <section className="event-preview-comments" aria-label={t.eyebrow}>
+      <Link href={href} className="event-preview-comments-link">
+        <header className="event-preview-comments-header">
+          <span className="event-preview-comments-icon" aria-hidden="true">
+            <MessageOutlined />
+          </span>
+          <strong className="event-preview-comments-count">
+            {localizeDigits(count, language)} {noun}
+          </strong>
+          <span className="event-preview-comments-open">
+            {t.openAll} <ArrowRightOutlined aria-hidden="true" />
+          </span>
+        </header>
+
+        {count === 0 ? (
+          <p className="event-preview-comments-empty">{t.empty}</p>
+        ) : latest ? (
+          <p className="event-preview-comments-latest">
+            <span className="event-preview-comments-latest-meta">
+              {t.latestBy} · <strong>{latest.author?.name || "—"}</strong>
+              {" · "}
+              {relativeTime(latest.createdAt, t, language)}
+            </span>
+            <span className="event-preview-comments-latest-text">
+              “{truncate(latest.text, 140)}”
+            </span>
+          </p>
+        ) : null}
+      </Link>
+    </section>
+  );
+}

@@ -11,6 +11,7 @@ import {
   TeamOutlined,
   WarningOutlined
 } from "@ant-design/icons";
+import { EventCommentsSummary } from "@/components/EventCommentsSummary";
 import { EventLiveStreamPlayer } from "@/components/EventLiveStreamPlayer";
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
@@ -92,6 +93,7 @@ export function EventPreviewPane({
   // selection from far down, we scroll it back into the sticky zone
   // (scroll-margin-top on the aside handles the header offset).
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setDescExpanded(false);
     if (!event?.id) return undefined;
 
@@ -400,6 +402,8 @@ export function EventPreviewPane({
             </div>
           </section>
         ) : null}
+
+        <EventCommentsSummary eventId={event.id} language={language} />
 
         <div className="event-preview-actions">
           <Link
