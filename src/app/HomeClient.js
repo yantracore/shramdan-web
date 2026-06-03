@@ -410,21 +410,27 @@ export default function HomeClient({ summary }) {
         </aside>
       </MotionSection>
 
-      <div className="home-pulse-row">
+      <MotionSection as="div">
+        <EventsHomeRail
+          liveEvents={getDemoLiveEvents()}
+          upcomingEvents={getDemoUpcomingEvents()}
+          copy={t.liveEventsRail}
+          language={language}
+        />
+      </MotionSection>
+
+      <MotionSection as="div">
+        <FeaturedStoryPanel language={language} />
+      </MotionSection>
+
+      <MotionSection as="div" className="home-pulse-row">
         <ActivityTicker language={language} />
         <LiveOnlineWidget language={language} />
-      </div>
+      </MotionSection>
 
-      <EventsHomeRail
-        liveEvents={getDemoLiveEvents()}
-        upcomingEvents={getDemoUpcomingEvents()}
-        copy={t.liveEventsRail}
-        language={language}
-      />
-
-      <FeaturedStoryPanel language={language} />
-
-      <RecentlyViewedStrip language={language} />
+      <MotionSection as="div">
+        <RecentlyViewedStrip language={language} />
+      </MotionSection>
 
       <MotionSection as="section" className="event-types-section" aria-labelledby="event-types-title">
         <div className="event-types-heading">
