@@ -32,6 +32,9 @@ const COPY = {
   np: {
     heading: "सहभागीहरू",
     intro: "हरेक श्रमदानमा विभिन्न तरिकाले साथीहरू सहभागी हुन्छन्। तपाईं पनि आफ्नो रुचि अनुसार जोडिनुहोस्।",
+    progressLabel: "{filled} / {total} स्थान पूरा",
+    progressFullLabel: "सबै {total} स्थान पूरा",
+    openSummary: "{n} खाली",
     filledOf: "{filled} / {count}",
     moreFilled: "+{n}",
     openPill: "+{n} खाली",
@@ -60,6 +63,9 @@ const COPY = {
   en: {
     heading: "Participants",
     intro: "Every shramdan welcomes participants in different ways. Pick one that fits you and join.",
+    progressLabel: "{filled} of {total} spots filled",
+    progressFullLabel: "All {total} spots filled",
+    openSummary: "{n} open",
     filledOf: "{filled} / {count}",
     moreFilled: "+{n}",
     openPill: "+{n} open",
@@ -91,12 +97,48 @@ export function EventRosterPanel({ rolesNeeded, language = "np", eventId }) {
   if (!Array.isArray(rolesNeeded) || rolesNeeded.length === 0) return null;
   const t = COPY[language] || COPY.np;
 
+  const totalSlots = rolesNeeded.reduce((sum, row) => sum + (row.count || 0), 0);
+  const filledSlots = rolesNeeded.reduce(
+    (sum, row) => sum + Math.min(row.filled || 0, row.count || 0),
+    0
+  );
+  const openSlots = Math.max(0, totalSlots - filledSlots);
+  const fillPercent = totalSlots > 0 ? Math.round((filledSlots / totalSlots) * 100) : 0;
+  const isFull = openSlots === 0 && totalSlots > 0;
+
+  const progressLabel = isFull
+    ? t.progressFullLabel.replace("{total}", totalSlots)
+    : t.progressLabel.replace("{filled}", filledSlots).replace("{total}", totalSlots);
+
   return (
     <section className="event-roster-panel" aria-labelledby="event-roster-title">
       <header className="event-roster-header">
         <h2 id="event-roster-title">{t.heading}</h2>
         <p>{t.intro}</p>
       </header>
+
+      {totalSlots > 0 ? (
+        <div
+          className={`event-roster-progress ${isFull ? "is-full" : ""}`}
+          role="group"
+          aria-label={progressLabel}
+        >
+          <div className="event-roster-progress-bar" aria-hidden="true">
+            <span
+              className="event-roster-progress-fill"
+              style={{ width: `${fillPercent}%` }}
+            />
+          </div>
+          <div className="event-roster-progress-meta">
+            <span className="event-roster-progress-count">{progressLabel}</span>
+            {openSlots > 0 ? (
+              <span className="event-roster-progress-open">
+                {t.openSummary.replace("{n}", openSlots)}
+              </span>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
 
       <ul className="event-roster-list">
         {rolesNeeded.map((row) => {

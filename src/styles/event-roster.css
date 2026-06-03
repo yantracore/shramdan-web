@@ -214,6 +214,70 @@
   max-width: 64ch;
 }
 
+.event-roster-progress {
+  margin: 6px 0 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.event-roster-progress-bar {
+  position: relative;
+  height: 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--line) 70%, transparent);
+  overflow: hidden;
+}
+
+.event-roster-progress-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, #176b5c 90%, var(--primary)) 0%,
+    var(--primary) 100%
+  );
+  border-radius: inherit;
+  transition: width 320ms ease;
+}
+
+.event-roster-progress.is-full .event-roster-progress-fill {
+  background: linear-gradient(90deg, #2e7d32, #4ade80);
+}
+
+.event-roster-progress-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.event-roster-progress-count {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.event-roster-progress-open {
+  color: var(--primary);
+  font-weight: 500;
+}
+
+.event-roster-progress.is-full .event-roster-progress-count {
+  color: #2e7d32;
+}
+
+[data-theme="dark"] .event-roster-progress.is-full .event-roster-progress-count {
+  color: #4ade80;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .event-roster-progress-fill {
+    transition: none;
+  }
+}
+
 .event-roster-list {
   list-style: none;
   margin: 0;

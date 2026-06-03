@@ -8,10 +8,10 @@
 >
 > **Companion folder:** backend API contracts the frontend depends on live in [`../api-requirements/`](../api-requirements/), introduced by the [2026-06-03 pivot ADR](../decisions/2026-06-03-ui-first-and-two-meeting-pivot.md). When a UI feature touches an entity covered there, update the matching domain file in the same session.
 
-## Overall Progress — 35%
+## Overall Progress — 36%
 
 ```
-0% [===================================-----------------------------------------------------------------] 100%
+0% [====================================----------------------------------------------------------------] 100%
 ```
 
 The bar is 100 characters wide so each `=` equals exactly one percentage point. Recompute and redraw the bar in the same edit that changes any phase percentage — see [Aggregate Progress](#aggregate-progress) for the per-phase breakdown that feeds this number.
@@ -209,15 +209,15 @@ Goal: Authenticated member experience that ships before the native mobile app an
 - [ ] 2.7 Profile + settings `w:1`
 - [ ] 2.8 KYC submission flow (prospective leaders) `w:1`
 
-## Phase 3 — Campaign / Event Execution `w:15` 📊 67%
+## Phase 3 — Campaign / Event Execution `w:15` 📊 80%
 
 Goal: A promoted issue becomes a real-world campaign with leader, schedule, roster, and completion. Each event runs through two planning meetings on the canonical happy path — a kickoff meeting (role counts, logistics, date) and a pre-execution review meeting (final roster, last-minute changes) separated by a one-to-two-week public signup window. See [08-operational-safety-and-event-model.md](08-operational-safety-and-event-model.md#event-lifecycle-meetings) for the full meeting flow and the [2026-06-03 pivot ADR](../decisions/2026-06-03-ui-first-and-two-meeting-pivot.md) for the decision that introduced it.
 
 - [x] 3.1 Admin events list (read) `w:1` ← done: 2026-05-19
-- [~] 3.2 Public campaign detail page `w:3`
+- [x] 3.2 Public campaign detail page `w:3` ← done: 2026-06-03
   - [x] 3.2.1 Date, time, meeting point, goal `w:1` ← done: 2026-05-29 *(`/events/[id]` ships scheduled time, duration, meetup point + map, linked-issue goal/description, leader, risk badge, photo gallery, completion summary; bilingual EN+NE)*
   - [x] 3.2.2 Help-needed breakdown `w:1` ← done: 2026-06-03 *(`EventRosterPanel` renders the `rolesNeeded` shape per the 2026-06-03 pivot — role label, filled-of-count, named chips, open-slots pill. Shape is now spec'd in [`../api-requirements/events.md`](../api-requirements/events.md) and [`../api-requirements/event-participants.md`](../api-requirements/event-participants.md); backend populates the same shape when ready.)*
-  - [~] 3.2.3 Progress indicators (volunteers, funds, materials) `w:1` *(volunteer count is surfaced per role via `EventRosterPanel`; aggregate "X of Y spots filled" summary still pending. Funds + materials gated on Phase 5 contribution channels.)*
+  - [x] 3.2.3 Progress indicators (volunteers; funds + materials deferred to Phase 5) `w:1` ← done: 2026-06-03 *(Aggregate `EventRosterPanel` progress strip — gradient bar with "{filled} of {total} spots filled" and "{n} open" badge. Switches to green and reads "All {n} spots filled" once the event is fully staffed. Reduced-motion safe. Bilingual EN+NE inline copy. Funds + materials progress will plug in here when Phase 5 donations ships; the strip is structured to accept additional bars.)*
 - [x] 3.3 Issue → campaign promotion `w:2` ← done: 2026-05-26
   - [x] 3.3.1 Vote-threshold rule + admin trigger `w:1` ← done: 2026-05-26 *(admin force-convert button on `/admin/issues/[id]/view` calls `POST /issues/{id}/convert-to-event`; backend owns the vote-threshold auto-promote rule)*
   - [x] 3.3.2 Auto-create campaign record on promote `w:1` ← done: 2026-05-26 *(backend `convert-to-event` endpoint creates the event record server-side; frontend trigger shipped in e776f29)*
@@ -368,7 +368,7 @@ Weighted across all phases (sum of phase weights = 137):
 | 0 Foundation | 10 | 100% |
 | 1 Public Issue Discovery & Voting | 15 | 77% |
 | 2 Member Portal `/app` | 18 | 0% |
-| 3 Campaign Execution | 15 | 67% |
+| 3 Campaign Execution | 15 | 80% |
 | 4 Operational Safety | 8 | 13% |
 | 5 Contribution Channels | 10 | 0% |
 | 6 Transparency & Ledger | 8 | 0% |
@@ -381,7 +381,7 @@ Weighted across all phases (sum of phase weights = 137):
 | 13 Public Reports & Transparency Surface | 6 | 0% |
 | 14 Building in Public (Process Transparency) | 6 | 33% |
 
-**Overall: ≈ 35%** (weighted sum / total weight; recompute on every edit, and redraw the [Overall Progress](#overall-progress--35) bar near the top of this file in the same edit).
+**Overall: ≈ 36%** (weighted sum / total weight; recompute on every edit, and redraw the [Overall Progress](#overall-progress--36) bar near the top of this file in the same edit).
 
 # How To Update This Document
 
