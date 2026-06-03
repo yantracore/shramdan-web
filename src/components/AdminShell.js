@@ -4,6 +4,7 @@ import {
   AppstoreOutlined,
   BarChartOutlined,
   CalendarOutlined,
+  CommentOutlined,
   EnvironmentOutlined,
   FormOutlined,
   GlobalOutlined,
@@ -44,7 +45,8 @@ const adminNavGroups = [
   ],
   [
     { href: "/admin/applications", icon: <FormOutlined />, label: "Applications" },
-    { href: "/admin/feedback", icon: <MessageOutlined />, label: "Feedback" }
+    { href: "/admin/feedback", icon: <MessageOutlined />, label: "Feedback" },
+    { href: "/admin/comments", icon: <CommentOutlined />, label: "Comments" }
   ],
   [
     { href: "/admin/issues", icon: <EnvironmentOutlined />, label: "Issues" },

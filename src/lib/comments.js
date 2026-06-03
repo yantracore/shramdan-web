@@ -416,6 +416,72 @@ export function viewerFlagged({ targetType, targetId, commentId, userId }) {
 // pending moderation review (Phase 6's queue).
 export const FLAG_AUTO_HIDE_THRESHOLD = 3;
 
+// Walk every comment-overlay key in localStorage and return one entry
+// per flagged comment, sorted by flag count desc. Used by the admin
+// moderation queue at /admin/comments. In production this becomes a
+// single API call (GET /admin/comments/flags) — shape is identical.
+export function listAllFlaggedComments() {
+  if (!canUseStorage()) return [];
+  const out = [];
+  for (let i = 0; i < window.localStorage.length; i += 1) {
+    const key = window.localStorage.key(i);
+    if (!key || !key.startsWith(`${STORAGE_PREFIX}:`)) continue;
+    const parts = key.split(":");
+    // shramdan-comments:<targetType>:<targetId>
+    if (parts.length < 3) continue;
+    const targetType = parts[1];
+    const targetId = parts.slice(2).join(":");
+    const overlay = readOverlay(targetType, targetId);
+    if (!overlay.flags || Object.keys(overlay.flags).length === 0) continue;
+    const all = loadComments({ targetType, targetId });
+    for (const [commentId, reports] of Object.entries(overlay.flags)) {
+      const comment = all.find((c) => c.id === commentId);
+      if (!comment) continue;
+      const reportEntries = Object.entries(reports);
+      out.push({
+        targetType,
+        targetId,
+        commentId,
+        comment,
+        flagCount: reportEntries.length,
+        reports: reportEntries.map(([userId, info]) => ({
+          userId,
+          reason: info?.reason || "",
+          note: info?.note || "",
+          at: info?.at || null
+        }))
+      });
+    }
+  }
+  return out.sort((a, b) => b.flagCount - a.flagCount);
+}
+
+// Admin: clear all flags on a single comment (Approve action). Returns
+// true if anything was cleared, false otherwise.
+export function approveFlaggedComment({ targetType, targetId, commentId }) {
+  if (!targetType || !targetId || !commentId) return false;
+  const overlay = readOverlay(targetType, targetId);
+  if (!overlay.flags?.[commentId]) return false;
+  const { [commentId]: _omit, ...rest } = overlay.flags;
+  overlay.flags = rest;
+  writeOverlay(targetType, targetId, overlay);
+  return true;
+}
+
+// Admin: remove a flagged comment (Remove action). Soft-deletes + clears
+// the flag record so the queue empties for this id.
+export function adminRemoveComment({ targetType, targetId, commentId }) {
+  if (!targetType || !targetId || !commentId) return false;
+  const overlay = readOverlay(targetType, targetId);
+  if (!overlay.deletes.includes(commentId)) overlay.deletes.push(commentId);
+  if (overlay.flags?.[commentId]) {
+    const { [commentId]: _omit, ...rest } = overlay.flags;
+    overlay.flags = rest;
+  }
+  writeOverlay(targetType, targetId, overlay);
+  return true;
+}
+
 export const COMMENT_LIMITS = {
   MAX_DEPTH,
   EDIT_WINDOW_MS,
