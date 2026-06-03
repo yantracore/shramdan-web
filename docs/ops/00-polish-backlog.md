@@ -144,6 +144,7 @@ When you (the coding agent) are working in this repo:
 - [x] P2 [from 11] Skip-to-main-content link (WCAG 2.1 SC 2.4.1 Bypass Blocks) — effort:S ← done: 2026-06-02 *(SiteShell now renders `<a class="skip-to-main">` as the first focusable element; visually hidden until Tab focus, targets a `tabIndex=-1` wrapper around children; bilingual label.)*
 - [x] P2 [from 11] Devanagari line-height baseline (matras/reph were crowding descenders) — effort:S ← done: 2026-06-02 *(`:root[lang="ne"] body|p|li` now uses 1.7 line-height and 1.35 for h1/h2/h3; Latin pages unchanged.)*
 - [x] P2 [from 11] Custom branded 404 page — effort:S ← done: 2026-06-02 *(`src/app/not-found.js` renders inside SiteShell with a "४०४/404" hero, friendly explanation, and three exit-lane buttons; bilingual via usePreferences.)*
+- [ ] P3 [from 11] `docs/api-requirements/` drift-check script — scan `src/lib/devMockData.js` and consuming UI components against each domain spec, list mismatched fields / missing operations / new shapes. Run as a session routine step once a working cadence is established. — effort:M *(follow-up from the 2026-06-03 pivot ADR open questions)*
 
 ## Phase 13 — Live Events Rail
 
