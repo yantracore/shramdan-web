@@ -6,7 +6,6 @@ import {
   LogoutOutlined,
   MenuOutlined,
   MoonOutlined,
-  SettingOutlined,
   SunOutlined,
   TranslationOutlined,
   UserAddOutlined,
@@ -24,6 +23,7 @@ import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { NotificationsBell } from "@/components/NotificationsBell";
 import { OnboardingSpotlight } from "@/components/OnboardingSpotlight";
 import { QuickActionFab } from "@/components/QuickActionFab";
+import { SettingsPopover } from "@/components/SettingsPopover";
 import { usePreferences } from "@/app/providers";
 import { copy } from "@/lib/siteContent";
 import { getAuthSession, isAdminUser, subscribeAuthSession } from "@/lib/authSession";
@@ -271,13 +271,7 @@ export function SiteShell({ children, pageTitle }) {
                 {t.controls.language}
               </Button>
             </Tooltip>
-            <Tooltip title={t.nav.settings}>
-              <Button
-                aria-label={t.nav.settings}
-                icon={<SettingOutlined />}
-                href="/settings"
-              />
-            </Tooltip>
+            <SettingsPopover />
             <CommandPalette language={language} />
             <NotificationsBell language={language} />
           </div>
