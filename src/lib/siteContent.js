@@ -3102,7 +3102,7 @@ export const copy = {
       successMessage: "Your report was submitted successfully.",
       authRequiredMessage: "Please log in to report an issue.",
       cta: {
-        list: "Report a New Issue"
+        list: "Report New Issue"
       },
       fields: {
         cover: "Cover photo",

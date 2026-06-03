@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined, CheckCircleFilled } from "@ant-design/icons";
 import { Button, Select } from "antd";
 import { SiteShell } from "@/components/SiteShell";
 import { EventListCard } from "@/components/EventListCard";
@@ -39,13 +39,18 @@ const PAGE_COPY = {
     filters: {
       ariaLabel: "अभियान फिल्टर",
       all: "सबै",
+      allStatuses: "सबै स्थिति",
       live: "लाइभ",
       upcoming: "आउँदै",
       past: "सम्पन्न",
       statusLabel: "स्थिति",
       statusPlaceholder: "सबै स्थिति",
+      districtLabel: "जिल्ला",
+      districtPlaceholder: "सबै जिल्ला",
+      allDistricts: "सबै जिल्ला",
       eventTypeLabel: "अभियानको प्रकार",
-      eventTypeCleanup: "सरसफाइ"
+      eventTypeCleanup: "सरसफाइ",
+      eventTypeChipSuffix: "अहिले सक्रिय"
     },
     preview: {
       empty: "बायाँबाट कुनै अभियान छान्नुहोस्।",
@@ -91,13 +96,18 @@ const PAGE_COPY = {
     filters: {
       ariaLabel: "Filter campaigns",
       all: "All",
+      allStatuses: "All Statuses",
       live: "Live",
       upcoming: "Upcoming",
       past: "Past",
       statusLabel: "Status",
       statusPlaceholder: "All Statuses",
+      districtLabel: "District",
+      districtPlaceholder: "All Districts",
+      allDistricts: "All Districts",
       eventTypeLabel: "Event Type",
-      eventTypeCleanup: "Cleanup"
+      eventTypeCleanup: "Cleanup",
+      eventTypeChipSuffix: "currently active"
     },
     preview: {
       empty: "Pick a campaign from the list to see details here.",
@@ -359,15 +369,19 @@ export default function EventsListPage() {
   );
 
   const statusOptions = [
+    { value: "all", label: t.filters.allStatuses },
     { value: "live", label: t.filters.live },
     { value: "upcoming", label: t.filters.upcoming },
     { value: "past", label: t.filters.past }
   ];
-  const eventTypeOptions = [{ value: "cleanup", label: t.filters.eventTypeCleanup }];
+  const districtOptions = [
+    { value: "all", label: t.filters.allDistricts },
+    ...cityOptions.map((c) => ({ value: c, label: c }))
+  ];
 
   const localizedCopy = copy[language] || copy.np;
   const reportIssueCtaLabel =
-    localizedCopy?.issueNew?.cta?.list ?? "Report a New Issue";
+    localizedCopy?.issueNew?.cta?.list ?? "Report New Issue";
 
   // ----- keyboard nav on the listbox -------------------------------------
   const listRef = useRef(null);
@@ -465,18 +479,25 @@ export default function EventsListPage() {
         <div className="public-issues-toolbar">
           <div className="public-issues-filters">
             <div className="public-issues-filter-field">
-              <label
-                className="public-issues-filter-label"
-                htmlFor="events-filter-type"
-              >
+              <span className="public-issues-filter-label">
                 {t.filters.eventTypeLabel}
-              </label>
-              <Select
-                id="events-filter-type"
-                disabled
-                options={eventTypeOptions}
-                value="cleanup"
-              />
+              </span>
+              <div
+                className="events-eventtype-chip"
+                role="status"
+                aria-label={`${t.filters.eventTypeCleanup} — ${t.filters.eventTypeChipSuffix}`}
+              >
+                <CheckCircleFilled
+                  aria-hidden="true"
+                  className="events-eventtype-chip-icon"
+                />
+                <span className="events-eventtype-chip-label">
+                  {t.filters.eventTypeCleanup}
+                </span>
+                <span className="events-eventtype-chip-suffix">
+                  {t.filters.eventTypeChipSuffix}
+                </span>
+              </div>
             </div>
             <div className="public-issues-filter-field">
               <label
@@ -487,27 +508,23 @@ export default function EventsListPage() {
               </label>
               <Select
                 id="events-filter-status"
-                allowClear
                 onChange={(value) => updateFilter(value || "all")}
                 options={statusOptions}
-                placeholder={t.filters.statusPlaceholder}
-                value={filter === "all" ? undefined : filter}
+                value={filter}
               />
             </div>
             <div className="public-issues-filter-field">
               <label
                 className="public-issues-filter-label"
-                htmlFor="events-filter-city"
+                htmlFor="events-filter-district"
               >
-                {language === "np" ? "स्थान" : "City"}
+                {t.filters.districtLabel}
               </label>
               <Select
-                id="events-filter-city"
-                allowClear
+                id="events-filter-district"
                 onChange={(value) => updateCity(value || "all")}
-                options={cityOptions.map((c) => ({ value: c, label: c }))}
-                placeholder={language === "np" ? "सबै स्थान" : "All cities"}
-                value={city === "all" ? undefined : city}
+                options={districtOptions}
+                value={city}
               />
             </div>
             <Link className="public-issues-filters-cta" href="/issues/new">

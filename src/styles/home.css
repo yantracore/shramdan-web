@@ -5094,6 +5094,62 @@
   color: rgba(255, 255, 255, 0.85) !important;
 }
 
+/* Event Type — non-interactive "currently active" indicator chip.
+   Looks confident and highlighted, not disabled. The locked state is
+   conveyed by absence of a chevron/affordance, not by faded styling. */
+.events-eventtype-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+  color: var(--accent-dark, var(--accent));
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: default;
+  user-select: none;
+}
+
+.events-eventtype-chip-icon {
+  font-size: 14px;
+  color: var(--accent);
+}
+
+.events-eventtype-chip-label {
+  font-size: 14px;
+}
+
+.events-eventtype-chip-suffix {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--accent-dark, var(--accent)) 70%, var(--muted));
+  padding-left: 8px;
+  margin-left: 2px;
+  border-left: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
+}
+
+:root[data-theme="dark"] .events-eventtype-chip {
+  background: color-mix(in srgb, var(--accent) 18%, var(--surface));
+  color: color-mix(in srgb, var(--accent) 70%, #fff);
+  border-color: color-mix(in srgb, var(--accent) 50%, transparent);
+}
+
+:root[data-theme="dark"] .events-eventtype-chip-suffix {
+  color: color-mix(in srgb, var(--accent) 55%, rgba(255, 255, 255, 0.8));
+}
+
+@media (max-width: 620px) {
+  .events-eventtype-chip {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
 .public-issues-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
