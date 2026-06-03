@@ -9398,6 +9398,352 @@
   text-align: center;
 }
 
+/* ---- /app issues mobile list (roadmap 2.3) -------------------------- */
+
+.app-issues {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+}
+
+.app-issues-hero h1 {
+  font-size: clamp(22px, 2.4vw, 28px);
+  margin: 0 0 6px;
+}
+
+.app-issues-hero p {
+  margin: 0 0 16px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.app-issues-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 16px;
+}
+
+.app-issues-filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.app-issues-filter label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.app-issues-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.app-issues-card-link {
+  display: block;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  text-decoration: none;
+  color: var(--text);
+  transition: background 160ms ease, border-color 160ms ease;
+}
+
+.app-issues-card-link:hover {
+  background: color-mix(in srgb, var(--primary) 4%, var(--surface));
+  border-color: color-mix(in srgb, var(--primary) 28%, var(--line));
+}
+
+.app-issues-card-status {
+  display: inline-block;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--primary);
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  margin-bottom: 6px;
+}
+
+.app-issues-card-title {
+  margin: 0 0 4px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.app-issues-card-meta {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.app-issues-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+  font-size: 13px;
+}
+
+.app-issues-card-votes {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--muted);
+}
+
+.app-issues-card-arrow {
+  color: var(--primary);
+  font-weight: 500;
+}
+
+/* ---- /app KYC submission (roadmap 2.8) ------------------------------- */
+
+.app-kyc {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 32px 16px 56px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.app-kyc-hero {
+  text-align: center;
+}
+
+.app-kyc-hero .eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--primary);
+  margin-bottom: 4px;
+}
+
+.app-kyc-hero h1 {
+  font-size: clamp(22px, 2.4vw, 28px);
+  margin: 0 0 6px;
+}
+
+.app-kyc-hero p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.app-kyc-demo-banner {
+  margin: 0;
+}
+
+.app-kyc-form {
+  padding: 24px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+
+.app-kyc-consent {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.app-kyc-consent input[type="checkbox"] {
+  margin-top: 4px;
+}
+
+.app-kyc-success {
+  text-align: center;
+  padding: 32px 24px;
+  background: var(--surface);
+  border: 1px solid color-mix(in srgb, #2e7d32 26%, var(--line));
+  border-radius: 14px;
+}
+
+.app-kyc-success .anticon {
+  font-size: 56px;
+  color: #2e7d32;
+  margin-bottom: 12px;
+}
+
+.app-kyc-success h1 {
+  margin: 0 0 8px;
+  font-size: 22px;
+  color: var(--text);
+}
+
+.app-kyc-success p {
+  margin: 0 0 18px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* ---- Story detail (roadmap 7.2) -------------------------------------- */
+
+.story-detail {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px 16px 64px;
+}
+
+.story-detail-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.story-detail-back:hover {
+  color: var(--primary);
+}
+
+.story-detail-header h1 {
+  font-size: clamp(26px, 3vw, 34px);
+  margin: 0 0 10px;
+  line-height: 1.2;
+  color: var(--text);
+}
+
+.story-detail-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 24px;
+}
+
+.story-detail-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.story-detail-body {
+  font-size: 16px;
+  line-height: 1.75;
+  color: var(--text);
+}
+
+.story-detail-body p {
+  margin: 0 0 18px;
+}
+
+.story-detail-source {
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+/* ---- Featured stories on /stories index ----------------------------- */
+
+.stories-featured {
+  margin: 0 0 32px;
+  padding: 20px;
+  background: color-mix(in srgb, var(--primary) 4%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--primary) 22%, var(--line));
+  border-radius: 14px;
+}
+
+.stories-featured-header .eyebrow {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--primary);
+  margin-bottom: 4px;
+}
+
+.stories-featured-header h2 {
+  margin: 0 0 14px;
+  font-size: 20px;
+  color: var(--text);
+}
+
+.stories-featured-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.stories-featured-card a {
+  display: block;
+  padding: 16px;
+  border-radius: 10px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  text-decoration: none;
+  color: var(--text);
+  height: 100%;
+  transition: transform 160ms ease, border-color 160ms ease;
+}
+
+.stories-featured-card a:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--primary) 36%, var(--line));
+}
+
+.stories-featured-card h3 {
+  font-size: 16px;
+  margin: 0 0 6px;
+  color: var(--text);
+}
+
+.stories-featured-card p {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--muted);
+  margin: 0 0 8px;
+}
+
+.stories-featured-cta {
+  font-size: 12.5px;
+  color: var(--primary);
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-issues-card-link,
+  .stories-featured-card a {
+    transition: none;
+  }
+}
+
 /* ---- Transparency ledger (roadmap Phase 6) ---- */
 
 .ledger-page {

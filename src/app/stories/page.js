@@ -16,7 +16,7 @@ import Link from "next/link";
 import { useMemo } from "react";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
-import { getDemoPastEvents } from "@/lib/devMockData";
+import { getDemoPastEvents, getDemoStories } from "@/lib/devMockData";
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 function localizeDigits(v, lang) {
@@ -33,7 +33,10 @@ const COPY = {
       "हरेक श्रमदान अभियानको एउटा-एउटा कथा — स्थान, सहभागी, र समुदायको आवाजमार्फत।",
     participants: "सहभागी",
     readMore: "पूरा कथा हेर्नुहोस्",
-    empty: "अहिले कुनै कथा प्रकाशित भएको छैन।"
+    empty: "अहिले कुनै कथा प्रकाशित भएको छैन।",
+    featuredEyebrow: "फिचर्ड कथा",
+    featuredHeading: "सम्पादकको छनोट",
+    featuredCta: "पढ्नुहोस्"
   },
   en: {
     pageTitle: "Shramdan stories",
@@ -43,7 +46,10 @@ const COPY = {
       "A story for every Shramdan campaign — told through place, people, and the community's voice.",
     participants: "participants",
     readMore: "Read the full story",
-    empty: "No stories published yet."
+    empty: "No stories published yet.",
+    featuredEyebrow: "Featured",
+    featuredHeading: "Editor's picks",
+    featuredCta: "Read"
   }
 };
 
@@ -67,6 +73,7 @@ export default function StoriesPage() {
   const { language } = usePreferences();
   const t = COPY[language] || COPY.np;
   const past = useMemo(() => getDemoPastEvents(), []);
+  const featuredStories = useMemo(() => getDemoStories().slice(0, 3), []);
 
   return (
     <SiteShell pageTitle={t.pageTitle}>
@@ -76,6 +83,28 @@ export default function StoriesPage() {
           <h1>{t.title}</h1>
           <p>{t.intro}</p>
         </header>
+
+        {featuredStories.length > 0 ? (
+          <section className="stories-featured" aria-labelledby="stories-featured-title">
+            <header className="stories-featured-header">
+              <span className="eyebrow">{t.featuredEyebrow}</span>
+              <h2 id="stories-featured-title">{t.featuredHeading}</h2>
+            </header>
+            <ul className="stories-featured-list">
+              {featuredStories.map((story) => (
+                <li key={story.slug} className="stories-featured-card">
+                  <Link href={`/stories/${story.slug}`}>
+                    <h3>{story.title}</h3>
+                    <p>{story.excerpt}</p>
+                    <span className="stories-featured-cta">
+                      {t.featuredCta} <ArrowRightOutlined aria-hidden="true" />
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
 
         {past.length === 0 ? (
           <p className="stories-empty">{t.empty}</p>

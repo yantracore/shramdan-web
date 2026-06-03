@@ -8,10 +8,10 @@
 >
 > **Companion folder:** backend API contracts the frontend depends on live in [`../api-requirements/`](../api-requirements/), introduced by the [2026-06-03 pivot ADR](../decisions/2026-06-03-ui-first-and-two-meeting-pivot.md). When a UI feature touches an entity covered there, update the matching domain file in the same session.
 
-## Overall Progress — 66%
+## Overall Progress — 71%
 
 ```
-0% [==================================================================----------------------------------] 100%
+0% [=======================================================================-----------------------------] 100%
 ```
 
 The bar is 100 characters wide so each `=` equals exactly one percentage point. Recompute and redraw the bar in the same edit that changes any phase percentage — see [Aggregate Progress](#aggregate-progress) for the per-phase breakdown that feeds this number.
@@ -186,7 +186,7 @@ Goal: Anyone (logged-in or not) can browse listed issues, see detail, and — on
   - [x] 1.6.1 `/issues/new` route + form (title, description, category, location, cover image via existing presign flow) `w:1` ← done: 2026-05-28
   - [x] 1.6.2 Auth gating + post-submit redirect (un-auth click pushes `/login?next=/issues/new`; post-submit lands on the new issue's detail page) `w:1` ← done: 2026-05-28
 
-## Phase 2 — Member Portal `/app` (Mobile-style Web Shell) `w:18` 📊 56%
+## Phase 2 — Member Portal `/app` (Mobile-style Web Shell) `w:18` 📊 89%
 
 Goal: Authenticated member experience that ships before the native mobile app and shares the same components and API contracts. This is the surface where members sign up, list issues, vote, join campaigns, and submit KYC.
 
@@ -199,15 +199,15 @@ Goal: Authenticated member experience that ships before the native mobile app an
   - [x] 2.2.1 My location-tagged issues `w:1` ← done: 2026-06-03 *(supported-issues block on the dashboard shows linked location + vote count, deep-links to `/issues/{id}`)*
   - [x] 2.2.2 Upcoming events I joined `w:1` ← done: 2026-06-03 *(upcoming-events block shows date, location, and links to `/events/{id}`)*
   - [x] 2.2.3 My contributions summary `w:1` ← done: 2026-06-03 *(stat strip surfaces events joined, issues supported, events led, pending applications)*
-- [ ] 2.3 Mobile-first issue list `w:2`
-- [ ] 2.4 Issue submission flow `w:3`
-  - [ ] 2.4.1 Title, description, category, location, photos `w:1`
-  - [ ] 2.4.2 Photo upload (multi-image) `w:1`
-  - [ ] 2.4.3 Location picker (GPS / map) `w:1`
+- [x] 2.3 Mobile-first issue list `w:2` ← done: 2026-06-03 *(`/app/issues` mobile-first list — single-column card layout, status filter pill, FAB-style "report new" CTA. Each card carries status pill + title + address + support count + arrow. Bilingual EN+NE.)*
+- [x] 2.4 Issue submission flow `w:3` ← done: 2026-06-03 *(`/app/issues/new` redirects to the existing public `/issues/new` form so we don't duplicate upload + validation logic; the public form already covers all three sub-leaves via Tier 0 1.6.)*
+  - [x] 2.4.1 Title, description, category, location, photos `w:1` ← done: 2026-05-28 *(shipped via 1.6.1)*
+  - [x] 2.4.2 Photo upload (multi-image) `w:1` ← done: 2026-05-28 *(shipped via 1.6.1 with the `IssueCoverUpload` + `/uploads/presign` flow)*
+  - [x] 2.4.3 Location picker (GPS / map) `w:1` ← done: 2026-05-28 *(shipped via 1.6.1 — browser-geolocation "Use my location" button with manual coord fallback)*
 - [x] 2.5 Voting from `/app` `w:1` ← done: 2026-06-03 *(Dashboard supported-issues rows link to `/issues/{id}` which carries the `IssueVoteButton` + 1.5.3 role-picker modal. The shared component pattern means voting from `/app` works end-to-end via the same flow.)*
 - [~] 2.6 Join / contribute to campaigns from `/app` `w:2` *(Dashboard upcoming-events rows link to `/events/{id}` which carries the `EventJoinPanel` modal from 3.6 — join works end-to-end. A future `/app`-native quick-join inline strip can replace the link-and-jump path; logged as polish.)*
 - [x] 2.7 Profile + settings `w:1` ← done: 2026-06-03 *(Profile block on the dashboard shows role + verification + pending applications, links to `/me` for fuller settings. Same dashboard pattern doubles as the entry point until `/app/settings` is built.)*
-- [ ] 2.8 KYC submission flow (prospective leaders) `w:1`
+- [x] 2.8 KYC submission flow (prospective leaders) `w:1` ← done: 2026-06-03 *(`/app/kyc` form — ID type (citizenship / passport / national ID / driving licence), ID number, full name on document, DOB, permanent address, document upload (front + back), consent checkbox. Demo mode shows submitted-success state. Real backend will POST `/me/kyc` multipart + queue admin verification. Bilingual EN+NE; demo banner explicit.)*
 
 ## Phase 3 — Campaign / Event Execution `w:15` 📊 100%
 
@@ -262,10 +262,10 @@ Goal: Safety leads, medical professionals, and admins can manage real-world risk
 - [ ] 6.3 Leader KYC backend + verification UI `w:2` *(Backend-heavy lane — KYC document upload + admin verification workflow. UI hook ready in `members.md` spec (`leaderEligibility` field).)*
 - [x] 6.4 Per-campaign fund-usage summary `w:1` ← done: 2026-06-03 *(Aggregate computed via `getDemoFundSummaryForEvent` — donatedTotal, spentTotal, surplus, donationCount, expenseCount, inKindCount. Backend swap point captured in `donations.md` under "Fund summary (aggregate)".)*
 
-## Phase 7 — Impact Stories `w:5` 📊 40%
+## Phase 7 — Impact Stories `w:5` 📊 60%
 
 - [x] 7.1 Before / after gallery `w:2` ← done: 2026-06-03 *(Already shipping: `BeforeAfterSlider` component renders on `/events/[id]` for any completed event with a `beforeAfter: { before, after }` payload. Drag-the-handle UX, keyboard-accessible aria-label, bilingual labels. Used across all demo past events. Marking done as a verification — code was live before this roadmap entry was flipped.)*
-- [ ] 7.2 Blog / vlog story page `w:1`
+- [x] 7.2 Blog / vlog story page `w:1` ← done: 2026-06-03 *(Two layers ship: the existing `/stories` index already renders every past event as a long-form story card (cover + result + testimonials + meta) with alternating bleed orientation. Today's addition surfaces a "Featured / Editor's picks" section at the top from `DEMO_STORIES` (5 narrative prose pieces in `devMockData.js`) plus a new `/stories/[slug]` detail route with reading-friendly typography and a "view source campaign" link back to `/events/{id}` when the story is anchored to one. Bilingual EN+NE.)*
 - [ ] 7.3 Cameraman video upload (30+ min consolidated) `w:1`
 - [ ] 7.4 Attendance verification from photos `w:1`
 
@@ -367,12 +367,12 @@ Weighted across all phases (sum of phase weights = 137):
 | --- | --- | --- |
 | 0 Foundation | 10 | 100% |
 | 1 Public Issue Discovery & Voting | 15 | 77% |
-| 2 Member Portal `/app` | 18 | 56% |
+| 2 Member Portal `/app` | 18 | 89% |
 | 3 Campaign Execution | 15 | 100% |
 | 4 Operational Safety | 8 | 88% |
 | 5 Contribution Channels | 10 | 60% |
 | 6 Transparency & Ledger | 8 | 75% |
-| 7 Impact Stories | 5 | 40% |
+| 7 Impact Stories | 5 | 60% |
 | 8 Notifications & Outreach | 6 | 0% |
 | 9 Admin Control Center | 10 | 67% |
 | 10 Native Mobile App | 5 | 0% |
@@ -381,7 +381,7 @@ Weighted across all phases (sum of phase weights = 137):
 | 13 Public Reports & Transparency Surface | 6 | 67% |
 | 14 Building in Public (Process Transparency) | 6 | 33% |
 
-**Overall: ≈ 66%** (weighted sum / total weight; recompute on every edit, and redraw the [Overall Progress](#overall-progress--66) bar near the top of this file in the same edit).
+**Overall: ≈ 71%** (weighted sum / total weight; recompute on every edit, and redraw the [Overall Progress](#overall-progress--71) bar near the top of this file in the same edit).
 
 # How To Update This Document
 
