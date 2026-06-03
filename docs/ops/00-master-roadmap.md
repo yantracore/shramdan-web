@@ -8,10 +8,10 @@
 >
 > **Companion folder:** backend API contracts the frontend depends on live in [`../api-requirements/`](../api-requirements/), introduced by the [2026-06-03 pivot ADR](../decisions/2026-06-03-ui-first-and-two-meeting-pivot.md). When a UI feature touches an entity covered there, update the matching domain file in the same session.
 
-## Overall Progress — 34%
+## Overall Progress — 35%
 
 ```
-0% [==================================------------------------------------------------------------------] 100%
+0% [===================================-----------------------------------------------------------------] 100%
 ```
 
 The bar is 100 characters wide so each `=` equals exactly one percentage point. Recompute and redraw the bar in the same edit that changes any phase percentage — see [Aggregate Progress](#aggregate-progress) for the per-phase breakdown that feeds this number.
@@ -99,8 +99,10 @@ If the user gives a high-level instruction like "let's continue", read this file
 4. ~~**3.2 Public campaign detail page**~~ ✅ *(3.2.1 shipped 2026-05-29; 3.2.2 shipped 2026-06-03 after `rolesNeeded` shape was spec'd in [`../api-requirements/events.md`](../api-requirements/events.md); 3.2.3 partial — volunteer count via roster, funds/materials gated on Phase 5)*
 5. ~~**3.6 Volunteer join + roster**~~ ✅ *(shipped 2026-06-03 — `EventJoinPanel` inline modal with role picker; demo events update locally, real events POST to `/events/{id}/join` with graceful 404/501 → "backend pending" toast. Backend endpoints still needed; see [09-backend-admin-gaps.md](../engineering/09-backend-admin-gaps.md))*
 6. ~~**3.5.1 Leader schedule UI**~~ ✅ *(shipped 2026-05-29)*
-7. **4.6 Pre-event safety checklist gate** — simplest form, leader ticks N boxes before the event publishes. **← Tier 0 head**
+7. ~~**4.6 Pre-event safety checklist gate**~~ ✅ *(shipped 2026-06-03 — `SafetyChecklistPanel` seven-item gate; demo flips local status to ACTIVE, real posts to `/events/{id}/activate`)*
 8. ~~**3.5.2 Leader mark complete**~~ ✅ *(shipped 2026-06-03 — `LeaderCompleteEditor` modal; demo + real paths)*
+
+**🎉 Tier 0 ladder exhausted as of 2026-06-03.** The platform can now host the first real-world श्रमदान event end-to-end: a citizen reports an issue → community votes → admin promotes to a campaign → leader schedules → safety checklist gates activation → leader marks complete. Backend join endpoints remain pending (see [`../engineering/09-backend-admin-gaps.md`](../engineering/09-backend-admin-gaps.md)) and `3.7` reminder cadence is still open, but neither blocks running the first event manually.
 
 **Tier 1 — ship soon after first event** *(intentionally deferred from Tier 0)*
 
@@ -129,10 +131,10 @@ If the user gives a high-level instruction like "let's continue", read this file
 
 This is the active end of the [Launch Critical Path](#launch-critical-path--tier-0). Items collapse forward as Tier 0 sequence steps complete — agents may rewrite this list freely but must keep it consistent with the Tier 0 ladder above. When proposing "what's next", agents must also consult open `P1` items in [00-polish-backlog.md](00-polish-backlog.md) and prefer Tier-0-tagged polish over fresh feature leaves.
 
-1. **4.6 Pre-event safety checklist gate** — Tier 0 next step. Simplest form: leader ticks N boxes (medic confirmed for high-risk categories, weather check, permissions confirmed, logistics readiness) before the event can transition from `SCHEDULED` to `ACTIVE`. Builds on the leader modal pattern from 3.5.1 / 3.5.2.
-2. **3.2.3 progress indicators (volunteers summary)** — small aggregate "X of Y spots filled" strip above the existing `EventRosterPanel`. Funds + materials still gated on Phase 5.
-3. **11.7 Security baseline audit** — non-blocking but should land before first real event. XSS / CSRF / secret handling / rate-limit sweep across existing surfaces.
-4. **Backend follow-up: ship the join endpoints** so `EventJoinPanel` stops swallowing 404/501 into a "backend pending" toast. Logged in [09-backend-admin-gaps.md](../engineering/09-backend-admin-gaps.md).
+1. **11.7 Security baseline audit** — should land before first real event. XSS / CSRF / secret handling / rate-limit sweep across existing surfaces.
+2. **Backend follow-up: ship the join + activate + complete endpoints** with the contracts now spec'd in [`../api-requirements/events.md`](../api-requirements/events.md) and [`../api-requirements/event-participants.md`](../api-requirements/event-participants.md). The frontend already degrades gracefully when these 404 / 501.
+3. **3.2.3 volunteers progress strip** — small aggregate "X of Y spots filled" above the existing `EventRosterPanel`. Funds + materials still gated on Phase 5.
+4. **Tier 1 begins** — phone+OTP signup (2.1), member portal `/app` (2.2–2.7), reminder cadence (3.7), member-side leader nomination (3.4.2 / 3.4.3).
 
 *Earlier suggestions (9.11.1, Phase 2 stack decision, 3.2 deferral, 3.3 promotion, 3.2.1, 3.5.1, 3.5.2, 3.6, 3.2.2) superseded as work ships. Phase 2 stack decision moves to Tier 1; 9.11.1 cancelled.*
 
@@ -229,7 +231,7 @@ Goal: A promoted issue becomes a real-world campaign with leader, schedule, rost
 - [x] 3.6 Participation roster — volunteer / cameraman `w:2` ← done: 2026-06-03 *(`EventJoinPanel` component renders an inline "Join this event" CTA on `/events/[id]` above the roster, opening a role-picker modal sourced from the event's `rolesNeeded` shape. Demo events update the roster locally; real events POST to `/events/{id}/join`. 404/501 responses surface a "backend pending" info toast instead of hard-failing — see [09-backend-admin-gaps.md](../engineering/09-backend-admin-gaps.md) for the still-needed backend endpoints. Viewer detection uses the auth session display name against `filledNames` to render a "you're in as X" badge.)*
 - [ ] 3.7 Reminder cadence: 3d / 24h / 1h `w:1`
 
-## Phase 4 — Operational Safety & Incidents `w:8` 📊 0%
+## Phase 4 — Operational Safety & Incidents `w:8` 📊 13%
 
 Goal: Safety leads, medical professionals, and admins can manage real-world risk without exposing private details publicly. Pre-implementation reading: [08-operational-safety-and-event-model.md](08-operational-safety-and-event-model.md).
 
@@ -239,7 +241,7 @@ Goal: Safety leads, medical professionals, and admins can manage real-world risk
 - [ ] 4.3 Risk-level badge on campaign cards `w:1`
 - [ ] 4.4 Notification rules by severity `w:1`
 - [ ] 4.5 Public-safe vs private incident visibility `w:1`
-- [ ] 4.6 Pre-event safety checklist gate `w:1`
+- [x] 4.6 Pre-event safety checklist gate `w:1` ← done: 2026-06-03 *(`SafetyChecklistPanel` renders on `/events/[id]` when the current user is the leader AND status is `SCHEDULED`. Seven mandatory items (pre-execution meeting, medic, safety lead, permits, weather contingency, logistics, participant notification) — all must be ticked before the Activate button enables. Demo events flip status to `ACTIVE` locally + stamp `safetyChecklistCompletedAt`; real events POST `/events/{id}/activate` with `{ checklistConfirmed: true }`. The 412 contract for unsatisfied checklists is specified in [`../api-requirements/events.md`](../api-requirements/events.md). Bilingual EN+NE copy embedded in the component.)*
 
 ## Phase 5 — Contribution Channels `w:10` 📊 0%
 
@@ -367,7 +369,7 @@ Weighted across all phases (sum of phase weights = 137):
 | 1 Public Issue Discovery & Voting | 15 | 77% |
 | 2 Member Portal `/app` | 18 | 0% |
 | 3 Campaign Execution | 15 | 67% |
-| 4 Operational Safety | 8 | 0% |
+| 4 Operational Safety | 8 | 13% |
 | 5 Contribution Channels | 10 | 0% |
 | 6 Transparency & Ledger | 8 | 0% |
 | 7 Impact Stories | 5 | 0% |
@@ -379,7 +381,7 @@ Weighted across all phases (sum of phase weights = 137):
 | 13 Public Reports & Transparency Surface | 6 | 0% |
 | 14 Building in Public (Process Transparency) | 6 | 33% |
 
-**Overall: ≈ 34%** (weighted sum / total weight; recompute on every edit, and redraw the [Overall Progress](#overall-progress--34) bar near the top of this file in the same edit).
+**Overall: ≈ 35%** (weighted sum / total weight; recompute on every edit, and redraw the [Overall Progress](#overall-progress--35) bar near the top of this file in the same edit).
 
 # How To Update This Document
 

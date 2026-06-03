@@ -25,6 +25,7 @@ import { TertiaryButton } from "@/components/TertiaryButton";
 import { IssuePhotoGallery } from "@/components/IssuePhotoGallery";
 import { LeaderScheduleEditor } from "@/components/LeaderScheduleEditor";
 import { LeaderCompleteEditor } from "@/components/LeaderCompleteEditor";
+import { SafetyChecklistPanel } from "@/components/SafetyChecklistPanel";
 import { CommentSection } from "@/components/comments";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
@@ -156,6 +157,7 @@ export default function EventDetailPage() {
         (eventData?.eventLeaderId && session.user.id === eventData.eventLeaderId))
   );
   const canScheduleEvent = isLeader && eventData?.status === "DRAFT";
+  const canActivateEvent = isLeader && eventData?.status === "SCHEDULED";
   const canCompleteEvent =
     isLeader &&
     (eventData?.status === "ACTIVE" || eventData?.status === "SCHEDULED");
@@ -327,6 +329,14 @@ export default function EventDetailPage() {
                       onSaved={handleEventCompleted}
                     />
                   </div>
+                ) : null}
+
+                {canActivateEvent ? (
+                  <SafetyChecklistPanel
+                    event={eventData}
+                    language={language}
+                    onActivated={handleEventCompleted}
+                  />
                 ) : null}
 
                 {Array.isArray(eventData.rolesNeeded) && eventData.rolesNeeded.length > 0 ? (

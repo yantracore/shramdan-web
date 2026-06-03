@@ -4,6 +4,15 @@ This document tracks backend endpoints that the admin UI needs but that are not 
 
 Gaps tracked here typically appear as `[!]` blocked leaves in [00-master-roadmap.md](../ops/00-master-roadmap.md). When a gap is closed, both files should be updated in the same change.
 
+> **2026-06-03 migration note.** Per the [UI-first pivot ADR](../decisions/2026-06-03-ui-first-and-two-meeting-pivot.md), per-domain API contracts now live in [`../api-requirements/`](../api-requirements/). That folder is the **canonical** spec the backend should implement against. This file remains useful as a quick "what's still missing" scratchpad — the two are not contradictory. When this file says a gap exists, the corresponding domain file in `api-requirements/` carries the full prose spec.
+>
+> **Recent gaps surfaced by UI ships (2026-06-03):**
+>
+> - `POST /events/{id}/complete` payload: confirm backend accepts `{ resultSummary: string, completedAt: ISO datetime }`. Frontend now sends this shape; the operation is consumed by [`LeaderCompleteEditor`](../../src/components/LeaderCompleteEditor.js). Spec: [`../api-requirements/events.md`](../api-requirements/events.md).
+> - `POST /events/{id}/join` accepting `{ role: ParticipantRole }` — UI surface [`EventJoinPanel`](../../src/components/EventJoinPanel.js) currently degrades 404/501 to an info toast. Spec: [`../api-requirements/event-participants.md`](../api-requirements/event-participants.md).
+> - `GET /events/{id}/participants` (or roster echo on `GET /events/{id}`) — UI renders the roster from `rolesNeeded` + `filledNames` aggregates; backend must populate the same shape. Spec: [`../api-requirements/event-participants.md`](../api-requirements/event-participants.md).
+> - `POST /events/{id}/activate` to transition `SCHEDULED → ACTIVE` once the pre-event safety checklist is satisfied (roadmap 4.6, shipping after this entry). Spec landing in [`../api-requirements/events.md`](../api-requirements/events.md).
+
 ## Issues
 
 Current API only exposes:

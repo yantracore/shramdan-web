@@ -31,6 +31,8 @@
 - **photoUploadIds** (`array of string`, optional, public) — references to upload records associated with the event (cover, gallery, before/after pairs).
 - **beforeAfter** (`object`, optional, public) — convenience pair with `{ before: uploadId, after: uploadId }` for the before/after impact display. Both ids must point to records inside `photoUploadIds`.
 - **testimonialIds** (`array of string`, optional, public) — references to testimonial records (see relationships).
+- **safetyChecklist** (`array of object`, optional, internal) — pre-event safety checklist for the SCHEDULED → ACTIVE gate. Each entry `{ id, label, required, checkedBy, checkedAt }`. Leader-and-admin-only by default; not returned in public reads. MVP shape may store only the boolean confirmation rather than per-item history if simpler — see the Operations section.
+- **safetyChecklistCompletedAt** (`datetime`, optional, public) — timestamp captured when the leader satisfied the safety checklist and the event transitioned to ACTIVE. Public so the audit trail is visible.
 
 ---
 
@@ -53,6 +55,7 @@
 | Get event by id or slug | REST GET | Public | Returns a single event with computed fields populated. |
 | Promote issue to event | REST POST | Admin | Creates the event server-side from a promotion request on the issue. The event starts in `DRAFT`. |
 | Update event schedule | REST PATCH | EventLeader or Admin | Updates schedule, meetup, and planning fields. Used by the leader scheduling UI. |
+| Activate event (safety-gated) | REST POST | EventLeader or Admin | Transitions the event from `SCHEDULED` to `ACTIVE` after the leader has satisfied the pre-event safety checklist. Accepts `{ checklistConfirmed: true }` in MVP; richer per-item confirmation may follow. Returns 412 if the checklist gate is not satisfied. |
 | Mark event complete | REST POST | EventLeader or Admin | Transitions the event to `COMPLETED` and accepts `resultSummary`, photo uploads, and `completedAt`. |
 | Pause for safety | REST POST | EventLeader, SafetyLead, or Admin | Transitions the event to `PAUSED` with a reference to the triggering incident. |
 | Resume event | REST POST | EventLeader or Admin | Transitions a `PAUSED` event back to `ACTIVE` when the incident is resolved. |
@@ -98,7 +101,7 @@
 
 ```
 DRAFT      → SCHEDULED   (requires: scheduledAt, meetupAddress, leaderId; trigger: EventLeader)
-SCHEDULED  → ACTIVE      (trigger: EventLeader, or system at scheduledAt)
+SCHEDULED  → ACTIVE      (requires: safety checklist confirmed; trigger: EventLeader via the Activate operation)
 SCHEDULED  → CANCELLED   (trigger: EventLeader or Admin)
 ACTIVE     → PAUSED      (trigger: EventLeader, SafetyLead, or Admin; on incident escalation)
 ACTIVE     → COMPLETED   (trigger: EventLeader; requires: resultSummary)
@@ -123,5 +126,6 @@ A leader may not skip states. The system may auto-transition `SCHEDULED → ACTI
 
 ## Recent changes
 
+- `2026-06-03` — UI now exercises the `Activate event (safety-gated)` operation via the new `SafetyChecklistPanel` (roadmap 4.6). The leader must tick seven safety items (pre-execution meeting completed, medic on site, safety lead identified, permits confirmed, weather contingency, logistics ready, participants re-notified) before the activate button enables. Frontend POSTs `{ checklistConfirmed: true }`; demo events flip status to ACTIVE locally and stamp `safetyChecklistCompletedAt`. Backend should return 412 if the checklist is not satisfied. Field `safetyChecklist` (array of items) and `safetyChecklistCompletedAt` (timestamp) added.
 - `2026-06-03` — UI now exercises the `Mark event complete` operation through a leader-only modal on `/events/[id]`. Frontend sends `resultSummary` (required, ≥12 chars) and `completedAt` (defaults to now, must not be future) in the POST body. Demo events with `demo-` id prefix simulate the action locally without round-tripping.
 - `2026-06-03` — initial spec draft. Captures the shape the UI consumes today against mock data, including the linkedIssue association, role-fill aggregation, and lifecycle states observed in `/events/[id]` and the home page live rail.
