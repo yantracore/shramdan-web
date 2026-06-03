@@ -1072,7 +1072,11 @@ export const copy = {
         categoryPlaceholder: "सबै क्षेत्र",
         sortLabel: "क्रमबद्ध",
         sortMostVotes: "सबैभन्दा बढी समर्थन",
-        sortNewest: "नयाँ पहिले"
+        sortNewest: "नयाँ पहिले",
+        sortNearest: "नजिकैका पहिले",
+        sortLocating: "स्थान खोज्दै…",
+        sortLocationDenied: "स्थान अनुमति अस्वीकृत भयो",
+        sortLocationUnsupported: "ब्राउजरले स्थान समर्थन गर्दैन"
       },
       statusLabels: {
         OPEN: "खुला",
@@ -1092,7 +1096,7 @@ export const copy = {
         supportersOne: "१ समर्थक",
         supportersMany: "{n} समर्थक",
         viewDetail: "विस्तृत",
-        voteAction: "समर्थन गर्नुहोस्",
+        voteAction: "समर्थन गरौँ",
         voteDisabledTooltip: "समर्थन जनाउन साइन इन गर्नुहोस्"
       },
       states: {
@@ -1144,7 +1148,11 @@ export const copy = {
         categoryPlaceholder: "सबै क्षेत्र",
         sortLabel: "क्रमबद्ध",
         sortMostVotes: "सबैभन्दा बढी समर्थन",
-        sortNewest: "नयाँ पहिले"
+        sortNewest: "नयाँ पहिले",
+        sortNearest: "नजिकैका पहिले",
+        sortLocating: "स्थान खोज्दै…",
+        sortLocationDenied: "स्थान अनुमति अस्वीकृत भयो",
+        sortLocationUnsupported: "ब्राउजरले स्थान समर्थन गर्दैन"
       },
       statusLabels: {
         OPEN: "खुला",
@@ -1164,7 +1172,7 @@ export const copy = {
         supportersOne: "१ समर्थक",
         supportersMany: "{n} समर्थक",
         viewDetail: "विस्तृत",
-        voteAction: "समर्थन गर्नुहोस्",
+        voteAction: "समर्थन गरौँ",
         voteActionDone: "समर्थन गरियो",
         voteDisabledTooltip: "समर्थन गर्न साइन इन गर्नुहोस्",
         voteSuccess: "तपाईंको समर्थन रेकर्ड भयो।",
@@ -1238,13 +1246,14 @@ export const copy = {
       participantsLabel: "सहभागी",
       justStarted: "भर्खर सुरु",
       durationLive: "देखि लाइभ",
+      viewDetails: "विवरण",
       ariaCarousel: "लाइभ र आउँदा अभियानहरूको स्लाइडर",
       prevAria: "अघिल्ला अभियानहरू देखाउनुहोस्",
       nextAria: "अरू अभियानहरू देखाउनुहोस्"
     },
     liveIssues: {
       eyebrow: "सक्रिय समस्याहरू",
-      title: "अहिले समुदायले उठाएका समस्याहरू",
+      title: "देशभरबाट उठेका समस्याहरू",
       intro:
         "सदस्यहरूले हालै रिपोर्ट गरेका, समर्थन बटुलिरहेका र अभियानको तयारीमा रहेका समस्याहरू। नक्सामा क्लिक गरेर वा सूचीमा गएर पूर्ण विवरण हेर्नुहोस्।",
       viewAll: "सबै समस्या हेर्नुहोस्",
@@ -2663,7 +2672,11 @@ export const copy = {
         categoryPlaceholder: "All Categories",
         sortLabel: "Sort By",
         sortMostVotes: "Most Supported",
-        sortNewest: "Newest First"
+        sortNewest: "Newest First",
+        sortNearest: "Nearest to Me",
+        sortLocating: "Locating…",
+        sortLocationDenied: "Location permission denied",
+        sortLocationUnsupported: "Browser does not support location"
       },
       statusLabels: {
         OPEN: "Open",
@@ -2735,7 +2748,11 @@ export const copy = {
         categoryPlaceholder: "All Categories",
         sortLabel: "Sort By",
         sortMostVotes: "Most Supported",
-        sortNewest: "Newest First"
+        sortNewest: "Newest First",
+        sortNearest: "Nearest to Me",
+        sortLocating: "Locating…",
+        sortLocationDenied: "Location permission denied",
+        sortLocationUnsupported: "Browser does not support location"
       },
       statusLabels: {
         OPEN: "Open",
@@ -2829,13 +2846,14 @@ export const copy = {
       participantsLabel: "Participants",
       justStarted: "Just started",
       durationLive: "live",
+      viewDetails: "View Details",
       ariaCarousel: "Live and upcoming campaigns carousel",
       prevAria: "Show previous campaigns",
       nextAria: "Show next campaigns"
     },
     liveIssues: {
       eyebrow: "Active Issues",
-      title: "What the community is flagging right now",
+      title: "Issues from across the country",
       intro:
         "Recently reported problems gathering support and getting ready for cleanup campaigns. Click a pin on the map or open the list for full details.",
       viewAll: "View All Issues",

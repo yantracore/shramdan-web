@@ -45,7 +45,11 @@ export function IssueVoteButton({
   }, [voteCount]);
 
   const label = voted ? content.card.voteActionDone : content.card.voteAction;
-  const tooltipTitle = !isAuthenticated ? content.card.voteDisabledTooltip : "";
+  const tooltipTitle = !isAuthenticated
+    ? content.card.voteDisabledTooltip
+    : voted
+      ? ""
+      : content.card.voteAction;
 
   return (
     <Tooltip title={tooltipTitle}>
