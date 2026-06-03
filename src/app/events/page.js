@@ -72,7 +72,7 @@ const PAGE_COPY = {
   en: {
     pageTitle: "Events",
     eyebrow: "Events",
-    title: "Shramdan Campaigns",
+    title: "Shramdan Events",
     intro:
       "All campaigns — live, upcoming, and recently completed. Pick any event from the left; the live stream and details show on the right.",
     sections: {
