@@ -8,6 +8,7 @@ import { Button, Select } from "antd";
 import { SiteShell } from "@/components/SiteShell";
 import { EventListCard } from "@/components/EventListCard";
 import { EventPreviewPane } from "@/components/EventPreviewPane";
+import { ImpactPulseStrip } from "@/components/ImpactPulseStrip";
 import { usePreferences } from "@/app/providers";
 import { copy } from "@/lib/siteContent";
 import {
@@ -475,6 +476,8 @@ export default function EventsListPage() {
           <h1>{t.title}</h1>
           <p>{t.intro}</p>
         </header>
+
+        <ImpactPulseStrip language={language} />
 
         <div className="public-issues-toolbar">
           <div className="public-issues-filters">

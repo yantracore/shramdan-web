@@ -148,6 +148,9 @@ When you (the coding agent) are working in this repo:
 - [ ] P3 [from 11.7] Wrap `MarkdownReader` output with DOMPurify or switch to `react-markdown` — defense-in-depth in case user-generated Markdown ever flows to the surface. — effort:S *(logged by the 2026-06-03 security baseline audit)*
 - [ ] P2 [from 11.7] Migrate auth token storage from `localStorage` to httpOnly cookies — requires backend cooperation; XSS would no longer leak tokens. — effort:M *(logged by the 2026-06-03 security baseline audit)*
 - [ ] P3 [from 11.7] Mask raw backend error `message` in `apiClient.js` if/when backend starts returning verbose stack traces — currently no leak observed but a curated localized fallback would prevent regressions. — effort:S *(logged by the 2026-06-03 security baseline audit)*
+- [ ] P2 [from 11.2] Run Playwright + axe-core scan against all public routes; integrate into CI when CI exists. — effort:M *(logged by the 2026-06-03 a11y baseline audit)*
+- [ ] P3 [from 11.2] Verify WCAG AA contrast across the full palette in both themes with a real contrast tool; tweak `--muted` and primary fills if any fail. — effort:S *(logged by the 2026-06-03 a11y baseline audit)*
+- [ ] P3 [from 11.2] Bump focus ring weight on primary action buttons from Antd's default (2 px) to 3 px for clearer keyboard focus. — effort:S *(logged by the 2026-06-03 a11y baseline audit)*
 
 ## Phase 13 — Live Events Rail
 

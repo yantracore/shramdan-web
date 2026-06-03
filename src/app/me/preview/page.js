@@ -144,7 +144,7 @@ const COPY = {
     stat1Label: "Events joined",
     stat2Label: "Issues supported",
     stat3Label: "Events coordinated",
-    stat4Label: "Volunteer hours",
+    stat4Label: "Shramdan hours",
     stat4Delta: "+{n} this month",
     badgesTitle: "Achievements",
     badgesLockedHint: "Coming up",

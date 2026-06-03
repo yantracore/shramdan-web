@@ -3143,6 +3143,143 @@
   background: color-mix(in srgb, var(--primary) 12%, transparent);
 }
 
+/* --- Impact pulse strip (roadmap 13.3) -------------------------------- */
+
+.impact-pulse-strip {
+  margin: 16px 0 24px;
+}
+
+.impact-pulse-strip-header .eyebrow {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--primary);
+  margin-bottom: 4px;
+}
+
+.impact-pulse-strip-header h2 {
+  font-size: clamp(16px, 1.6vw, 19px);
+  margin: 0 0 14px;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.impact-pulse-strip-tiles {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.impact-pulse-strip-tile-link {
+  display: grid;
+  grid-template-areas:
+    "icon hint"
+    "value value"
+    "label label";
+  grid-template-columns: auto 1fr;
+  gap: 4px 8px;
+  padding: 16px 18px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  text-decoration: none;
+  color: var(--text);
+  transition: transform 200ms ease, border-color 200ms ease, background 200ms ease;
+}
+
+.impact-pulse-strip-tile-link:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--primary) 38%, var(--line));
+  background: color-mix(in srgb, var(--primary) 4%, var(--surface));
+}
+
+.impact-pulse-strip-tile-icon {
+  grid-area: icon;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font-size: 18px;
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  color: var(--primary);
+}
+
+.impact-pulse-strip-tile-value {
+  grid-area: value;
+  font-size: clamp(28px, 3vw, 36px);
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+
+.impact-pulse-strip-tile-label {
+  grid-area: label;
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.impact-pulse-strip-tile-hint {
+  grid-area: hint;
+  align-self: center;
+  justify-self: end;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--primary);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.impact-pulse-strip-tile-link:hover .impact-pulse-strip-tile-hint,
+.impact-pulse-strip-tile-link:focus-visible .impact-pulse-strip-tile-hint {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.impact-pulse-strip-tile.pulse-live .impact-pulse-strip-tile-icon {
+  background: color-mix(in srgb, #d2360b 12%, transparent);
+  color: #d2360b;
+}
+
+.impact-pulse-strip-tile.pulse-upcoming .impact-pulse-strip-tile-icon {
+  background: color-mix(in srgb, #176b5c 12%, transparent);
+  color: #176b5c;
+}
+
+.impact-pulse-strip-tile.pulse-completed .impact-pulse-strip-tile-icon {
+  background: color-mix(in srgb, #2e7d32 14%, transparent);
+  color: #2e7d32;
+}
+
+.impact-pulse-strip-tile.pulse-issues .impact-pulse-strip-tile-icon {
+  background: color-mix(in srgb, #1d4ed8 12%, transparent);
+  color: #1d4ed8;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .impact-pulse-strip-tile-link {
+    transition: none;
+  }
+  .impact-pulse-strip-tile-link:hover {
+    transform: none;
+  }
+  .impact-pulse-strip-tile-hint {
+    transition: none;
+  }
+}
+
 /* --- Notifications bell + dropdown panel ----------------------------- */
 .notifications-trigger {
   display: inline-flex;

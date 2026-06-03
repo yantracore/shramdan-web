@@ -742,13 +742,13 @@ export const copy = {
     },
     volunteerInvite: {
       brandLine: "आफ्नो श्रम दिनुहोस्। आफ्नो समुदाय बनाउनुहोस्।",
-      eyebrow: "स्वयंसेवक निम्तो",
+      eyebrow: "श्रमदान सदस्यको निम्तो",
       titleLead: "हामी सबै मिली",
       titleStrong: "श्रमदान गरौँ",
       titleTrail: "आफ्नो देशका लागि",
       intro:
         "यो समुदायबाट चल्ने मञ्च सबैका लागि खुला छ। आफ्नो सीप, समय वा सम्पर्क लिएर आफ्नो टोलीमा जोडिनुहोस्, सिक्दै सिकाउँदै भूमिका लिनुहोस्, र स्थानीय परिवर्तन सुरु गर्नुहोस्।",
-      primaryCta: "स्वयंसेवक बन्नुहोस्",
+      primaryCta: "श्रमदान सदस्य बन्नुहोस्",
       secondaryCta: "सुझाव दिनुहोस्",
       panelEyebrow: "तपाईंको आवश्यकता छ",
       panelTitle: "आफ्नो भूमिका छान्नुहोस् र एप बनाउन श्रमदान गर्नुहोस्।",
@@ -765,63 +765,63 @@ export const copy = {
           id: "frontend",
           value: "FRONTEND_DEVELOPER",
           title: "फ्रन्टएन्ड डेभलपर",
-          badge: "१ स्वयंसेवक",
+          badge: "१ सदस्य चाहिन्छ",
           description: "वेब पृष्ठ, अन्तरक्रिया र प्रयोगकर्ता अनुभव बनाउन साथ दिनुहोस्।"
         },
         {
           id: "backend",
           value: "BACKEND_DEVELOPER",
           title: "ब्याकएन्ड डेभलपर",
-          badge: "१ स्वयंसेवक",
+          badge: "१ सदस्य चाहिन्छ",
           description: "सुरक्षित सेवा, तथ्याङ्क भण्डारण र प्रणाली संरचनामा योगदान गर्नुहोस्।"
         },
         {
           id: "qa",
           value: "QA_ENGINEER",
           title: "गुणस्तर परीक्षक (QA)",
-          badge: "१ स्वयंसेवक",
+          badge: "१ सदस्य चाहिन्छ",
           description: "एप परीक्षण, बग पहिचान र रिलिजअघि गुणस्तर सुनिश्चित गर्नुहोस्।"
         },
         {
           id: "devops",
           value: "DEVOPS_ENGINEER",
           title: "डेभअप्स इन्जिनियर",
-          badge: "१ स्वयंसेवक",
+          badge: "१ सदस्य चाहिन्छ",
           description: "सर्भर, सीआई/सीडी, डिप्लोयमेन्ट र निगरानी प्रणाली सञ्चालन गर्नुहोस्।"
         },
         {
           id: "uiux",
           value: "UI_UX_DESIGNER",
           title: "यूआई/यूएक्स डिजाइनर",
-          badge: "१ स्वयंसेवक",
+          badge: "१ सदस्य चाहिन्छ",
           description: "प्रयोगकर्ता अनुभव, रूपरेखा र डिजाइन प्रणाली सुधार्नुहोस्।"
         },
         {
           id: "graphics",
           value: "GRAPHICS_DESIGNER",
           title: "ग्राफिक्स डिजाइनर",
-          badge: "१ स्वयंसेवक",
+          badge: "१ सदस्य चाहिन्छ",
           description: "पहिचान, दृश्य सामग्री, चित्रण र अभियान सामग्री बनाउनुहोस्।"
         },
         {
           id: "content",
           value: "CONTENT_WRITER",
           title: "कन्टेन्ट लेखक",
-          badge: "१ स्वयंसेवक",
+          badge: "१ सदस्य चाहिन्छ",
           description: "लेख, कथा र समुदायिक सामग्री दुवै भाषामा तयार गर्नुहोस्।"
         },
         {
           id: "legal",
           value: "LEGAL",
           title: "कानुनी सल्लाहकार",
-          badge: "१ स्वयंसेवक",
+          badge: "१ सदस्य चाहिन्छ",
           description: "कानुनी मार्गदर्शन, संस्था निर्माण र नियमपालनमा बाटो देखाउनुहोस्।"
         },
         {
           id: "finance",
           value: "FINANCE",
           title: "वित्तीय सल्लाहकार",
-          badge: "१ स्वयंसेवक",
+          badge: "१ सदस्य चाहिन्छ",
           description: "वित्तीय योजना, पारदर्शिता र रणनीतिमा सहयोग गर्नुहोस्।"
         },
         {
@@ -975,7 +975,7 @@ export const copy = {
         { label: "वित्तीय सल्लाहकार", value: "FINANCE" },
         { label: "आर्थिक सहयोगदाता", value: "DONOR" },
         { label: "सामुदायिक नेतृत्वकर्ता", value: "COMMUNITY_MANAGER" },
-        { label: "भोलन्टियर", value: "VOLUNTEER" },
+        { label: "श्रमदान सदस्य", value: "VOLUNTEER" },
         { label: "अदर", value: "OTHER" }
       ],
       feedbackTypes: [
@@ -1831,7 +1831,7 @@ export const copy = {
           id: "cleanup",
           status: "current",
           image: "/images/event-types/cleanup.jpg",
-          imageAlt: "Volunteers participating in a community cleanup drive",
+          imageAlt: "Shramdan members participating in a community cleanup drive",
           imagePrompt:
             "A group of Nepali community volunteers in safety vests cleaning a public street or riverbank in Nepal, holding brooms, gloves and trash bags, visible piles of collected waste, daylight, active and hopeful mood, Kathmandu Valley urban setting with familiar Nepali street elements.",
           title: "Cleanup",
@@ -1892,7 +1892,7 @@ export const copy = {
             "Long-term care and monitoring of planted saplings"
           ],
           whoCanHelp: [
-            "Volunteers and students",
+            "Shramdan members and students",
             "Nursery operators and agriculture experts",
             "Community Forest User Groups",
             "Donors of saplings, digging tools, and water",
@@ -1963,7 +1963,7 @@ export const copy = {
           id: "trail",
           status: "future",
           image: "/images/event-types/trail.jpg",
-          imageAlt: "Volunteers maintaining a hiking trail and placing markers",
+          imageAlt: "Shramdan members maintaining a hiking trail and placing markers",
           imagePrompt:
             "Nepali volunteers maintaining a mountain hiking trail in Nepal — clearing fallen rocks, repairing erosion damage with stone work, placing wooden trail markers and signage, surrounded by forested or terraced mountain landscape, daylight, practical working scene.",
           title: "Trail Maintenance",
@@ -2025,7 +2025,7 @@ export const copy = {
           whoCanHelp: [
             "Civil engineers and technical supervisors",
             "Trained masons and stoneworkers",
-            "Volunteers contributing labor",
+            "Shramdan members contributing labor",
             "Donors of stones, wire mesh, cement",
             "Local authority and road division (coordination)"
           ],
@@ -2051,7 +2051,7 @@ export const copy = {
           id: "infrastructure",
           status: "future",
           image: "/images/event-types/infrastructure.jpg",
-          imageAlt: "Volunteers painting and repairing a community school",
+          imageAlt: "Shramdan members painting and repairing a community school",
           imagePrompt:
             "Nepali community volunteers helping at a rural school or hospital in Nepal — painting classroom walls, installing library shelves, fixing school furniture, with children or staff visible in background, bright cheerful colors, sense of community support.",
           title: "Institution Support",
@@ -2095,7 +2095,7 @@ export const copy = {
           id: "seasonal",
           status: "future",
           image: "/images/event-types/seasonal.jpg",
-          imageAlt: "Volunteers distributing warm clothes to families during a Terai cold-wave",
+          imageAlt: "Shramdan members distributing warm clothes to families during a Terai cold-wave",
           imagePrompt:
             "Nepali volunteers distributing blankets, warm clothes, or cool drinking water to community members during seasonal extreme weather in Nepal — winter Terai cold-wave with blankets and a small fire, or summer heat-wave with water distribution, compassionate scene.",
           title: "Seasonal Relief",
@@ -2280,14 +2280,14 @@ export const copy = {
         {
           id: "roadside",
           image: "/images/homepage/cleanup-areas/roadside.jpg",
-          imageAlt: "Volunteers cleaning a roadside area",
+          imageAlt: "Shramdan members cleaning a roadside area",
           title: "Street & Roadside",
           body: "Clean visible litter along roads, alleys, footpaths, and street edges."
         },
         {
           id: "lands",
           image: "/images/homepage/cleanup-areas/empty-lands.jpg",
-          imageAlt: "Volunteers collecting waste from vacant land",
+          imageAlt: "Shramdan members collecting waste from vacant land",
           title: "Vacant Lands",
           body: "Turn neglected plots and open grounds into cleaner, safer local spaces."
         },
@@ -2308,7 +2308,7 @@ export const copy = {
         {
           id: "parks",
           image: "/images/homepage/cleanup-areas/parks.jpg",
-          imageAlt: "Volunteers cleaning a park and public space",
+          imageAlt: "Shramdan members cleaning a park and public space",
           title: "Parks & Public Spaces",
           body: "Clean parks, squares, bus stops, community zones, and gathering spaces."
         },
@@ -2365,13 +2365,13 @@ export const copy = {
     },
     volunteerInvite: {
       brandLine: "Donate Your Labour. Build Your Community.",
-      eyebrow: "Volunteer invitation",
+      eyebrow: "Shramdan invitation",
       titleLead: "Build",
       titleStrong: "Shramdan with us",
       titleTrail: "for Nepal",
       intro:
         "Shramdan is a community-driven platform open to everyone. Bring your skill, time, or network, join your team to learn while you teach, and start local impact.",
-      primaryCta: "Become a Volunteer",
+      primaryCta: "Become a Shramdan Member",
       secondaryCta: "Share Feedback",
       panelEyebrow: "We need you",
       panelTitle: "Take any role and contribute to App Development.",
@@ -2388,63 +2388,63 @@ export const copy = {
           id: "frontend",
           value: "FRONTEND_DEVELOPER",
           title: "Frontend Developer",
-          badge: "1 Volunteer",
+          badge: "1 needed",
           description: "React, Next.js, UI implementation."
         },
         {
           id: "backend",
           value: "BACKEND_DEVELOPER",
           title: "Backend Developer",
-          badge: "1 Volunteer",
+          badge: "1 needed",
           description: "Node.js, APIs, database design."
         },
         {
           id: "qa",
           value: "QA_ENGINEER",
           title: "QA / Quality Analyst",
-          badge: "1 Volunteer",
+          badge: "1 needed",
           description: "Test the app, file bugs, sign off on quality before release."
         },
         {
           id: "devops",
           value: "DEVOPS_ENGINEER",
           title: "DevOps Engineer",
-          badge: "1 Volunteer",
+          badge: "1 needed",
           description: "Server setup, CI/CD, deployments, monitoring."
         },
         {
           id: "uiux",
           value: "UI_UX_DESIGNER",
           title: "UI/UX Designer",
-          badge: "1 Volunteer",
+          badge: "1 needed",
           description: "User experience, wireframes, design systems."
         },
         {
           id: "graphics",
           value: "GRAPHICS_DESIGNER",
           title: "Graphics Designer",
-          badge: "1 Volunteer",
+          badge: "1 needed",
           description: "Branding, visuals, illustrations, motion."
         },
         {
           id: "content",
           value: "CONTENT_WRITER",
           title: "Content Writer",
-          badge: "1 Volunteer",
+          badge: "1 needed",
           description: "Articles, case studies, community stories — bilingual."
         },
         {
           id: "legal",
           value: "LEGAL",
           title: "Lawyer / Legal",
-          badge: "1 Volunteer",
+          badge: "1 needed",
           description: "Legal guidance, organization, compliance."
         },
         {
           id: "finance",
           value: "FINANCE",
           title: "Financial Advisor",
-          badge: "1 Volunteer",
+          badge: "1 needed",
           description: "Financial planning, transparency, strategy."
         },
         {
@@ -2598,7 +2598,7 @@ export const copy = {
         { label: "Finance", value: "FINANCE" },
         { label: "Donor", value: "DONOR" },
         { label: "Community Manager", value: "COMMUNITY_MANAGER" },
-        { label: "Volunteer", value: "VOLUNTEER" },
+        { label: "Shramdan Member", value: "VOLUNTEER" },
         { label: "Other", value: "OTHER" }
       ],
       feedbackTypes: [

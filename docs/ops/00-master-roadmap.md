@@ -108,7 +108,7 @@ If the user gives a high-level instruction like "let's continue", read this file
 
 - 2.1 Phone+OTP signup (replaces email+password as Shramdan Member auth)
 - 2.2–2.7 Full member portal `/app` (mobile-style web shell)
-- "Volunteer → Shramdan Member" rename across `/join` + admin
+- ~~"Volunteer → Shramdan Member" rename across `/join` + admin~~ ✅ *(shipped 2026-06-03 — top-level role enum labels in both NP+EN, homepage `volunteerInvite` eyebrow/CTA/9 role badges, image alt text, `/me/preview` stat label. Backend `VOLUNTEER` enum value stays — only user-facing strings changed. Descriptive prose still mentions "स्वयंसेवक" / "Volunteer" in a few flowing sentences and the `WOULD_VOLUNTEER` voter intent label; left intact intentionally — those are functional descriptors of an act, not the platform role label.)*
 - 8.1 / 8.2 Email + SMS reminders
 - 3.4.2 Member-side leader nomination + 3.4.3 tie-break
 - 1.5.3 Voter role tagging
@@ -309,10 +309,10 @@ Goal: Ship native iOS + Android once `/app` web shell is stable. Reuse the same 
 - [ ] 10.3 Push notification cert + storefront prep `w:1`
 - [ ] 10.4 App Store + Play Store submission `w:1`
 
-## Phase 11 — Cross-cutting Concerns `w:10` 📊 60%
+## Phase 11 — Cross-cutting Concerns `w:10` 📊 80%
 
 - [x] 11.1 Responsive admin list pattern (`AdminResponsiveList`) `w:1` ← done: 2026-05-20
-- [ ] 11.2 Accessibility audit (WCAG AA) `w:2`
+- [x] 11.2 Accessibility audit (WCAG AA) `w:2` ← done: 2026-06-03 *(Frontend baseline audit captured in [`../engineering/11-2-accessibility-baseline-2026-06-03.md`](../engineering/11-2-accessibility-baseline-2026-06-03.md). No blocking findings: skip-to-main link, Devanagari line-height baseline, Leaflet marker accessible names, image-alt fallback chains, and Form.Item labels are all in place; all motion-bearing primitives respect `prefers-reduced-motion`. Three defense-in-depth polish items logged in [`00-polish-backlog.md`](00-polish-backlog.md) — Playwright + axe-core scan (P2), real contrast-tool verification (P3), focus-ring weight bump on primary buttons (P3).)*
 - [x] 11.3 Bilingual EN/NE coverage across the public site `w:2` ← done: 2026-05-25 *(currently met; every existing public surface reads from `copy[language]`. Admin control center is intentionally EN-only. Standing rule: any new public page must ship with `np` + `en` entries — see `../design/05-design-language-guide.md` "Language Scope For Surfaces".)*
 - [x] 11.4 SEO + meta + sitemap `w:1` ← done: 2026-06-03 *(Verified during the 11.7 baseline sweep that all SEO essentials are already in place: `metadataBase` set in [`src/app/layout.js`](../../src/app/layout.js) (built from `SITE_URL`), full openGraph + twitter + icons + manifest, robots config in metadata, themed viewport. Dynamic [`src/app/sitemap.js`](../../src/app/sitemap.js) emits static routes + event-types + live issues + live events (revalidates every 30 min) and [`src/app/robots.js`](../../src/app/robots.js) emits `Allow: /` with `/admin`, `/me`, `/api/`, `/_next/` disallowed plus a sitemap pointer. Per-route `generateMetadata` exists in 17 layout/page files including events, issues, learn, legal pages. JSON-LD organization + website schema on the root layout. Marking [x] now that this was confirmed — no new code shipped, but the roadmap was lagging reality.)*
 - [ ] 11.5 Analytics + observability `w:1`
@@ -337,7 +337,7 @@ Goal: Surface a *public-safe* analytics layer across the website so citizens and
 - [x] 13.2 Dedicated public reports page (`/impact`, route resolved) `w:2` ← done: 2026-06-03
   - [x] 13.2.1 Page route + bilingual EN+NE shell + SEO meta `w:1` ← done: 2026-06-03 *(`/impact` route exists with hero + KPI grid + completed-events list + CTA, all bilingual EN+NE via inline COPY map. Added [`src/app/impact/layout.js`](../../src/app/impact/layout.js) with `metadataBase`-relative canonical, openGraph + twitter cards, alternate locales — appears in sitemap.xml.)*
   - [x] 13.2.2 Headline KPIs + geographic distribution + issue/event mix + simple time-series `w:1` ← done: 2026-06-03 *(All four pieces now ship on `/impact`: KPI tiles (events / participants / locations / labour-minutes); category-mix horizontal bars with deep-link to `/events?show=past&category=<key>`; geography list grouping past events by trailing city in `addressText` showing top 8 by completed count; six-month time-series bar chart of completions per month, normalized to the busiest bucket. All read-only, no PII, no admin filters. Pure-CSS primitives — no chart library.)*
-- [ ] 13.3 Homepage embed — community pulse strip `w:1` *(2–4 hero KPIs near the existing hero — e.g. issues reported, events held, volunteers active — each linking to its filtered list page; reuses chart-light primitives so it stays lightweight)*
+- [~] 13.3 Homepage embed — community pulse strip `w:1` *(Component shipped: [`src/components/ImpactPulseStrip.js`](../../src/components/ImpactPulseStrip.js) — 4 KPI tiles (live / upcoming / completed / open issues) each deep-linking to its filtered list page. Already mounted on `/events` between the header and the toolbar. Homepage integration is pending — `src/app/HomeClient.js` has uncommitted session-start changes I should not stomp on; once that file is in a clean state, drop `<ImpactPulseStrip language={language} />` near the hero panel. Chart-light, no chart library.)*
 - [~] 13.4 Deep-link convention from KPIs → filtered list pages `w:1` *(Category-mix rows on `/impact` now deep-link to `/events?show=past&category=<key>` — first instance of the convention. URL query contract still needs spec'ing in [10-frontend-api-usage.md](../engineering/10-frontend-api-usage.md) and applying across the remaining KPI tiles.)*
 - [x] 13.5 Bilingual EN+NE copy across all public report surfaces `w:1` ← done: 2026-06-03 *(All `/impact` copy — hero, stat labels, category-mix labels, events list headings, CTA — flows through the inline `COPY` map keyed by `language` from `usePreferences()`. Brand stays श्रमदान in NE; numbers use the existing `localizeDigits` helper for Devanagari digits in NE locale.)*
 
@@ -376,7 +376,7 @@ Weighted across all phases (sum of phase weights = 137):
 | 8 Notifications & Outreach | 6 | 0% |
 | 9 Admin Control Center | 10 | 67% |
 | 10 Native Mobile App | 5 | 0% |
-| 11 Cross-cutting | 10 | 60% |
+| 11 Cross-cutting | 10 | 80% |
 | 12 Documentation & Community | 5 | 40% |
 | 13 Public Reports & Transparency Surface | 6 | 50% |
 | 14 Building in Public (Process Transparency) | 6 | 33% |
