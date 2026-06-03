@@ -6,7 +6,7 @@
 // real (eventually-populated) backend data takes over without code
 // changes at the call site.
 
-const YT_DEMO_ID = "qviiNFXX_WQ"; // existing dev-series episode
+const YT_DEMO_ID = "qviiNFXX_WQ"; // fallback for injectMockLiveStream() on arbitrary backend events
 
 function buildPreviewEmbed(videoId) {
   return `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${videoId}&modestbranding=1&rel=0`;
@@ -18,6 +18,18 @@ function buildLivePlayerEmbed(videoId) {
 
 function ytThumb(videoId) {
   return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+}
+
+// Local MP4 footage paired with each live demo event. The
+// EventLiveStreamPlayer auto-switches to a native <video> when the URL
+// ends in .mp4, so these slugs control what plays on the event detail
+// page and in the events-page split-view preview.
+function localDemoVideo(slug) {
+  return `/images/demo-events/${slug}.mp4`;
+}
+
+function localDemoPoster(slug) {
+  return `/images/demo-events/${slug}.jpg`;
 }
 
 const isDev = () => process.env.NODE_ENV !== "production";
@@ -43,6 +55,8 @@ const DEMO_ROSTER = [
 
 // Demo live events for the homepage live-events rail.
 // IDs prefixed "demo-live-" so the event detail page can recognize them.
+// Each entry is paired with a real MP4 in /public/images/demo-events/
+// so EventLiveStreamPlayer can autoplay native footage on the page.
 export const DEMO_LIVE_EVENTS = [
   {
     id: "demo-live-1",
@@ -67,41 +81,41 @@ export const DEMO_LIVE_EVENTS = [
     liveStream: {
       isActive: true,
       startedAt: new Date(Date.now() - 37 * 60_000).toISOString(),
-      streamUrl: buildLivePlayerEmbed(YT_DEMO_ID),
-      previewEmbedUrl: buildPreviewEmbed(YT_DEMO_ID),
-      thumbnailUrl: "/images/demo-events/bagmati-cleanup.jpg",
+      streamUrl: localDemoVideo("bagmati-cleanup"),
+      previewEmbedUrl: localDemoVideo("bagmati-cleanup"),
+      thumbnailUrl: localDemoPoster("bagmati-cleanup"),
       viewerCount: 124,
-      videoId: YT_DEMO_ID
+      videoSlug: "bagmati-cleanup"
     }
   },
   {
     id: "demo-live-2",
-    title: "स्कुल भित्ता पेन्ट + मर्मत",
-    addressText: "श्री जनप्रिय मा.वि., काठमाडौँ",
+    title: "कमलपोखरी सौन्दर्यीकरण",
+    addressText: "कमलपोखरी पैदलमार्ग, काठमाडौँ",
     rolesNeeded: DEMO_ROSTER,
-    participantCount: 14,
+    participantCount: 18,
     meetupNotes:
-      "स्कुलको मुख्य गेटबाट छिर्ने। प्रिन्सिपलको कार्यालयमा हाजिर। पुराना लुगा लगाएर आउनुहोस् — रङ बिग्रिनसक्छ।",
+      "कमलपोखरी मन्दिर छेउ भेला। पैदलमार्गको दुई किनारका ८ ठाउँमा भित्ता चित्र। रङ टीमको, ब्रश आफ्नो लगे राम्रो।",
     linkedIssue: {
-      id: "demo-issue-school-2",
-      title: "श्री जनप्रिय मा.वि. भित्ता पेन्ट र पुस्तकालय मर्मत",
+      id: "demo-issue-kamal-5",
+      title: "कमलपोखरी पैदलमार्ग भित्ता र साइनबोर्ड पुराना",
       description:
-        "विद्यालयको मुख्य भवनको भित्ता ८ वर्षदेखि पेन्ट नभएको। पुस्तकालयका ३ ओटा झ्याल टुटेका। ४८० विद्यार्थी प्रभावित। SMC ले सामग्री खर्च बेहोर्ने प्रतिबद्धता गरेको — हामी श्रम र समय जुटाउँछौं।",
-      category: "infrastructure",
-      addressText: "श्री जनप्रिय मा.वि., काठमाडौँ",
-      latitude: 27.7037,
-      longitude: 85.3346,
-      voteCount: 56,
+        "कमलपोखरी ५०० मि. पैदलमार्ग पुरानो र अदृश्य। नगरपालिकाले अनुमति दिएको; ८ भित्ता चित्र र ४ साइनबोर्ड नयाँ बनाउने। स्थानीय कलाकारहरूले डिजाइन तयार पारेका — सहभागीहरूले पेन्ट र चित्रकोलोले रङ हाल्ने।",
+      category: "beautification",
+      addressText: "कमलपोखरी पैदलमार्ग, काठमाडौँ",
+      latitude: 27.7155,
+      longitude: 85.3260,
+      voteCount: 38,
       status: "EVENT_SCHEDULED"
     },
     liveStream: {
       isActive: true,
-      startedAt: new Date(Date.now() - 8 * 60_000).toISOString(),
-      streamUrl: buildLivePlayerEmbed(YT_DEMO_ID),
-      previewEmbedUrl: buildPreviewEmbed(YT_DEMO_ID),
-      thumbnailUrl: "/images/demo-events/school-paint.jpg",
-      viewerCount: 38,
-      videoId: YT_DEMO_ID
+      startedAt: new Date(Date.now() - 22 * 60_000).toISOString(),
+      streamUrl: localDemoVideo("kamalpokhari-beautify"),
+      previewEmbedUrl: localDemoVideo("kamalpokhari-beautify"),
+      thumbnailUrl: localDemoPoster("kamalpokhari-beautify"),
+      viewerCount: 84,
+      videoSlug: "kamalpokhari-beautify"
     }
   },
   {
@@ -127,12 +141,210 @@ export const DEMO_LIVE_EVENTS = [
     liveStream: {
       isActive: true,
       startedAt: new Date(Date.now() - 102 * 60_000).toISOString(),
-      streamUrl: buildLivePlayerEmbed(YT_DEMO_ID),
-      previewEmbedUrl: buildPreviewEmbed(YT_DEMO_ID),
-      thumbnailUrl: "/images/demo-events/suryabinayak-trees.jpg",
+      streamUrl: localDemoVideo("suryabinayak-trees"),
+      previewEmbedUrl: localDemoVideo("suryabinayak-trees"),
+      thumbnailUrl: localDemoPoster("suryabinayak-trees"),
       viewerCount: 261,
-      videoId: YT_DEMO_ID
+      videoSlug: "suryabinayak-trees"
     }
+  },
+  {
+    id: "demo-live-4",
+    title: "हनुमन्ते खोला किनार सरसफाइ",
+    addressText: "लोकन्थली पुल, ललितपुर",
+    rolesNeeded: DEMO_ROSTER,
+    participantCount: 32,
+    meetupNotes:
+      "लोकन्थली पुलको पूर्वी किनारमा भेला हुने। तीन टोलीमा बाँडिने; प्रत्येकले ४०० मि. लम्बाइ कभर गर्ने। नगरको ट्रक १० बजेमा आइपुग्छ।",
+    linkedIssue: {
+      id: "demo-issue-hanumante-l4",
+      title: "हनुमन्ते खोला लोकन्थली खण्डमा फोहोर पुनः थुप्रिएको",
+      description:
+        "अघिल्लो अभियानको ६० दिनमा पुनः फोहोर थुप्रिने क्रम जारी छ — माथिल्लो किनारबाट बगेर आउने प्लास्टिक मुख्य कारण। यो पटक सङ्कलनसँगै किनार किनारका साइनबोर्ड पनि लगाउने।",
+      category: "cleanup",
+      addressText: "लोकन्थली पुल, ललितपुर",
+      latitude: 27.6766,
+      longitude: 85.3804,
+      voteCount: 78,
+      status: "EVENT_SCHEDULED"
+    },
+    liveStream: {
+      isActive: true,
+      startedAt: new Date(Date.now() - 18 * 60_000).toISOString(),
+      streamUrl: localDemoVideo("hanumante-live"),
+      previewEmbedUrl: localDemoVideo("hanumante-live"),
+      thumbnailUrl: localDemoPoster("hanumante-live"),
+      viewerCount: 96,
+      videoSlug: "hanumante-live"
+    },
+    imageSlug: "hanumante-live",
+    imagePrompt:
+      "Hanumante riverbank near Lokanthali bridge with cleanup in progress; consolidated plastic bags lined along the embankment; community members in everyday clothing bending over the bank with brooms and gloves; overcast monsoon sky; the bridge piers visible in the background."
+  },
+  {
+    id: "demo-live-5",
+    title: "फेवाताल किनार प्लास्टिक सङ्कलन",
+    addressText: "बारही टोल, पोखरा",
+    rolesNeeded: DEMO_ROSTER,
+    participantCount: 47,
+    meetupNotes:
+      "बारही टोलको ताल किनार पैदलमार्गमा भेला हुने। डुङ्गा प्रयोग गरेर पानीमा तैरिने प्लास्टिक पनि सङ्कलन; डुङ्गा चालक स्थानीय समितिले उपलब्ध गराउँदै छन्।",
+    linkedIssue: {
+      id: "demo-issue-fewa-l5",
+      title: "फेवातालको दक्षिणी किनार प्लास्टिकले प्रदूषित",
+      description:
+        "बर्षायाममा माथिल्लो खण्डबाट बगेर आउने प्लास्टिक तालको दक्षिणी छेउमा थुप्रिने। पर्यटन व्यवसायी समिति र वडाको साझेदारी; डुङ्गा र अग्रिम छुट्याउने काम स्थानीयले।",
+      category: "cleanup",
+      addressText: "फेवाताल, पोखरा",
+      latitude: 28.2096,
+      longitude: 83.9586,
+      voteCount: 156,
+      status: "EVENT_SCHEDULED"
+    },
+    liveStream: {
+      isActive: true,
+      startedAt: new Date(Date.now() - 64 * 60_000).toISOString(),
+      streamUrl: localDemoVideo("fewa-cleanup"),
+      previewEmbedUrl: localDemoVideo("fewa-cleanup"),
+      thumbnailUrl: localDemoPoster("fewa-cleanup"),
+      viewerCount: 187,
+      videoSlug: "fewa-cleanup"
+    },
+    imageSlug: "fewa-cleanup",
+    imagePrompt:
+      "Fewa lake southern shore in Pokhara at midday; two wooden boats pulled close to shore with bagged plastic loaded inside; community members along the pebbled bank with collection bags; the Annapurna range hazy in the distance behind the lake."
+  },
+  {
+    id: "demo-live-6",
+    title: "तौमढी स्क्वायर मर्मत सहयोग",
+    addressText: "तौमढी स्क्वायर, भक्तपुर",
+    rolesNeeded: DEMO_ROSTER,
+    participantCount: 22,
+    meetupNotes:
+      "न्यातपोल मन्दिर सिँढीको दक्षिणी छेउमा भेला। मन्दिर परिसर सरसफाइ + सिँढीमा भएको चुनढुङ्गा छुट्याइ। पुरातत्व विभागको प्रतिनिधि उपस्थित हुने।",
+    linkedIssue: {
+      id: "demo-issue-taumadhi-l6",
+      title: "तौमढी स्क्वायर पुरातात्त्विक परिसर अव्यवस्थित",
+      description:
+        "तौमढी स्क्वायरमा पर्यटक र स्थानीय दुवै फोहोर छोडेर जाने — सिँढी छेउ पुरातात्त्विक ढुङ्गा र आधुनिक प्लास्टिक मिसिएको। पुरातत्व विभागको स्वीकृति प्राप्त; ध्यानपूर्वक छुट्याउन हाम्रो काम।",
+      category: "beautification",
+      addressText: "तौमढी स्क्वायर, भक्तपुर",
+      latitude: 27.6722,
+      longitude: 85.4297,
+      voteCount: 104,
+      status: "EVENT_SCHEDULED"
+    },
+    liveStream: {
+      isActive: true,
+      startedAt: new Date(Date.now() - 29 * 60_000).toISOString(),
+      streamUrl: localDemoVideo("taumadhi-heritage"),
+      previewEmbedUrl: localDemoVideo("taumadhi-heritage"),
+      thumbnailUrl: localDemoPoster("taumadhi-heritage"),
+      viewerCount: 142,
+      videoSlug: "taumadhi-heritage"
+    },
+    imageSlug: "taumadhi-heritage",
+    imagePrompt:
+      "Taumadhi Square in Bhaktapur at the foot of Nyatapola Temple; community members in everyday dress kneeling along the stone steps separating fragments of carved heritage stone from modern litter into different baskets; brick-paved square stretching out behind them; soft morning light."
+  },
+  {
+    id: "demo-live-7",
+    title: "नगरकोट ट्रेल मर्मत",
+    addressText: "नगरकोट सूर्योदय व्यू पोइन्ट, भक्तपुर",
+    rolesNeeded: DEMO_ROSTER,
+    participantCount: 19,
+    meetupNotes:
+      "नगरकोट बस पार्क छेउ भेला; त्यहाँबाट ट्रेलमा पैदल। हाइकिङ बुट र पानी आफ्नै ल्याउनुहोस्। नगरपालिकाले औजार र दिउँसो खाजा उपलब्ध गराउँछन्।",
+    linkedIssue: {
+      id: "demo-issue-nagarkot-l7",
+      title: "नगरकोट सूर्योदय ट्रेलमा साइनबोर्ड गायब र इरोसन",
+      description:
+        "नगरकोट देखि सूर्योदय व्यू पोइन्टसम्मको २.८ किमी ट्रेलमा पाँच ठाउँमा साइनबोर्ड हराएको; तीन ठाउँमा डाँडामा इरोसन। पर्यटन समितिले सामग्री र अनुमति दिए।",
+      category: "trail",
+      addressText: "नगरकोट, भक्तपुर",
+      latitude: 27.7167,
+      longitude: 85.5167,
+      voteCount: 67,
+      status: "EVENT_SCHEDULED"
+    },
+    liveStream: {
+      isActive: true,
+      startedAt: new Date(Date.now() - 81 * 60_000).toISOString(),
+      streamUrl: localDemoVideo("nagarkot-trail"),
+      previewEmbedUrl: localDemoVideo("nagarkot-trail"),
+      thumbnailUrl: localDemoPoster("nagarkot-trail"),
+      viewerCount: 65,
+      videoSlug: "nagarkot-trail"
+    },
+    imageSlug: "nagarkot-trail",
+    imagePrompt:
+      "Nagarkot hiking trail in pine forest, mid-morning light filtering through trees; one new wooden trail sign being mounted onto a sturdy post by two community members in jeans and t-shirts; tools resting against a stack of stones nearby; mist over the valley visible through a gap in the trees."
+  },
+  {
+    id: "demo-live-8",
+    title: "धरान हाटबजार सरसफाइ",
+    addressText: "धरान भन्ज्याङ चोक, सुनसरी",
+    rolesNeeded: DEMO_ROSTER,
+    participantCount: 38,
+    meetupNotes:
+      "भन्ज्याङ चोक स्ट्यान्डमा भेला। हाटबजार समितिले हाटको दिन छुट्याएर सहयोग गरेको; ट्रक र अग्रिम छुट्याउने उपलब्ध।",
+    linkedIssue: {
+      id: "demo-issue-dharan-l8",
+      title: "धरान हाटबजारमा हाटको दिन फोहोरको चाङ",
+      description:
+        "धरान हाटबजारमा प्रत्येक हाटको दिन (मंगलबार/शुक्रबार) चियाजति फोहोर थुप्रिने; पाँच वर्षदेखि स्थायी समाधान खोजिएको। यो पटक हाट सकिएपछि साँझ ४ बजेबाट सरसफाइ; अर्को हाट अघि सकाउने लक्ष्य।",
+      category: "cleanup",
+      addressText: "धरान, सुनसरी",
+      latitude: 26.8147,
+      longitude: 87.2769,
+      voteCount: 92,
+      status: "EVENT_SCHEDULED"
+    },
+    liveStream: {
+      isActive: true,
+      startedAt: new Date(Date.now() - 53 * 60_000).toISOString(),
+      streamUrl: localDemoVideo("dharan-bazaar"),
+      previewEmbedUrl: localDemoVideo("dharan-bazaar"),
+      thumbnailUrl: localDemoPoster("dharan-bazaar"),
+      viewerCount: 78,
+      videoSlug: "dharan-bazaar"
+    },
+    imageSlug: "dharan-bazaar",
+    imagePrompt:
+      "Dharan market square in the early evening after the haat day has wound down; volunteers with brooms sweeping the empty stall lanes; piled vegetable peelings and torn plastic bags being shovelled into a municipal truck parked at the edge; the eastern hills warm in the setting sun."
+  },
+  {
+    id: "demo-live-9",
+    title: "हेटौँडा रत्न पार्क वृक्षारोपण",
+    addressText: "रत्न पार्क, हेटौँडा",
+    rolesNeeded: DEMO_ROSTER,
+    participantCount: 29,
+    meetupNotes:
+      "रत्न पार्क मुख्य गेटमा भेला। २२० बिरुवा रोप्ने लक्ष्य; डिभिजन वन कार्यालयले बिरुवा र पानीको ट्याङ्की उपलब्ध गराएको।",
+    linkedIssue: {
+      id: "demo-issue-hetauda-l9",
+      title: "रत्न पार्कको पूर्व खण्ड खाली; गर्मीमा छहारी अभाव",
+      description:
+        "हेटौँडा रत्न पार्कको पूर्व खण्ड ०.४ हेक्टर खाली; गर्मीमा पार्क प्रयोगकर्ताले छहारी पाउँदैनन्। वन कार्यालय र नगरपालिकाको साझेदारीमा बकैनो र असुरो बिरुवा रोप्ने योजना।",
+      category: "afforestation",
+      addressText: "हेटौँडा, मकवानपुर",
+      latitude: 27.4286,
+      longitude: 85.0322,
+      voteCount: 73,
+      status: "EVENT_SCHEDULED"
+    },
+    liveStream: {
+      isActive: true,
+      startedAt: new Date(Date.now() - 47 * 60_000).toISOString(),
+      streamUrl: localDemoVideo("hetauda-trees"),
+      previewEmbedUrl: localDemoVideo("hetauda-trees"),
+      thumbnailUrl: localDemoPoster("hetauda-trees"),
+      viewerCount: 91,
+      videoSlug: "hetauda-trees"
+    },
+    imageSlug: "hetauda-trees",
+    imagePrompt:
+      "Hetauda Ratna Park eastern open ground mid-planting; rows of small saplings staked into freshly turned soil, blue water cans nearby; community members of mixed ages including a school group helping water the plantings; clear afternoon sky."
   }
 ];
 
@@ -263,31 +475,341 @@ export const DEMO_UPCOMING_EVENTS = [
   },
   {
     id: "demo-up-5",
-    title: "कमलपोखरी सौन्दर्यीकरण",
-    addressText: "कमलपोखरी पैदलमार्ग, काठमाडौँ",
-    category: "beautification",
-    thumbnailUrl: "/images/demo-events/kamalpokhari-beautify.jpg",
-    scheduledAt: inHours(264),
-    durationMinutes: 240,
-    meetupLatitude: 27.7155,
-    meetupLongitude: 85.3260,
+    title: "श्री जनप्रिय मा.वि. भित्ता पेन्ट र पुस्तकालय मर्मत",
+    addressText: "श्री जनप्रिय मा.वि., काठमाडौँ",
+    category: "infrastructure",
+    thumbnailUrl: "/images/demo-events/school-paint.jpg",
+    scheduledAt: inHours(96),
+    durationMinutes: 300,
+    meetupLatitude: 27.7037,
+    meetupLongitude: 85.3346,
     leaderName: "सुनिल मगर",
     rolesNeeded: DEMO_ROSTER,
     riskLevel: "NORMAL",
     meetupNotes:
-      "कमलपोखरी मन्दिर छेउ भेला। पैदलमार्गको दुई किनारका ८ ठाउँमा भित्ता चित्र। रङ टीमको, ब्रश आफ्नो लगे राम्रो।",
+      "स्कुलको मुख्य गेटबाट छिर्ने। प्रिन्सिपलको कार्यालयमा हाजिर। पुराना लुगा लगाएर आउनुहोस् — रङ बिग्रिनसक्छ।",
     linkedIssue: {
-      id: "demo-issue-kamal-5",
-      title: "कमलपोखरी पैदलमार्ग भित्ता र साइनबोर्ड पुराना",
+      id: "demo-issue-school-2",
+      title: "श्री जनप्रिय मा.वि. भित्ता पेन्ट र पुस्तकालय मर्मत",
       description:
-        "कमलपोखरी ५०० मि. पैदलमार्ग पुरानो र अदृश्य। नगरपालिकाले अनुमति दिएको; ८ भित्ता चित्र र ४ साइनबोर्ड नयाँ बनाउने। स्थानीय कलाकारहरूले डिजाइन तयार पारेका — सहभागीहरूले पेन्ट र चित्रकोलोले रङ हाल्ने।",
-      category: "beautification",
-      addressText: "कमलपोखरी पैदलमार्ग, काठमाडौँ",
-      latitude: 27.7155,
-      longitude: 85.3260,
-      voteCount: 38,
+        "विद्यालयको मुख्य भवनको भित्ता ८ वर्षदेखि पेन्ट नभएको। पुस्तकालयका ३ ओटा झ्याल टुटेका। ४८० विद्यार्थी प्रभावित। SMC ले सामग्री खर्च बेहोर्ने प्रतिबद्धता गरेको — हामी श्रम र समय जुटाउँछौं।",
+      category: "infrastructure",
+      addressText: "श्री जनप्रिय मा.वि., काठमाडौँ",
+      latitude: 27.7037,
+      longitude: 85.3346,
+      voteCount: 56,
       status: "EVENT_SCHEDULED"
     }
+  },
+  {
+    id: "demo-up-6",
+    title: "स्वयम्भू सिँढी सरसफाइ र मर्मत",
+    addressText: "स्वयम्भू महाचैत्य, काठमाडौँ",
+    category: "trail",
+    thumbnailUrl: "/images/demo-events/swayambhu-steps.jpg",
+    scheduledAt: inHours(42),
+    durationMinutes: 240,
+    meetupLatitude: 27.7146,
+    meetupLongitude: 85.2906,
+    leaderName: "मञ्जु तामाङ",
+    rolesNeeded: DEMO_ROSTER,
+    riskLevel: "NORMAL",
+    meetupNotes:
+      "स्वयम्भू पूर्वी सिँढी मुनी (नागपोखरी छेउ) भेला। ३६५ सिँढी टोलीमा बाँडिने; तल्लो खण्डबाट सुरु। कलश समितिले हलुका खाजा र खानेपानी उपलब्ध गराउने।",
+    linkedIssue: {
+      id: "demo-issue-swayambhu-6",
+      title: "स्वयम्भू पूर्वी सिँढी पुरानो र फोहोरयुक्त",
+      description:
+        "स्वयम्भू महाचैत्यको पूर्वी ३६५ सिँढी पुराना भएर माथिल्लो खण्डमा भत्किएका; पर्यटक र तीर्थयात्रीले फालेको प्लास्टिक थुप्रिएको। कलश समिति र पुरातत्व विभागको स्वीकृतिमा।",
+      category: "trail",
+      addressText: "स्वयम्भू महाचैत्य, काठमाडौँ",
+      latitude: 27.7146,
+      longitude: 85.2906,
+      voteCount: 134,
+      status: "EVENT_SCHEDULED"
+    },
+    imageSlug: "swayambhu-steps",
+    imagePrompt:
+      "Swayambhu eastern stairway from below, looking up the long stone ascent; community members sweeping individual steps and gathering debris into bags; monkeys watching from the stupa wall in the distance; prayer flags flickering in the morning breeze."
+  },
+  {
+    id: "demo-up-7",
+    title: "पाशुपति आर्यघाट परिसर सरसफाइ",
+    addressText: "आर्यघाट, पाशुपतिनाथ, काठमाडौँ",
+    category: "cleanup",
+    thumbnailUrl: "/images/demo-events/pashupati-aryaghat.jpg",
+    scheduledAt: inHours(66),
+    durationMinutes: 180,
+    meetupLatitude: 27.7106,
+    meetupLongitude: 85.3489,
+    leaderName: "हरि श्रेष्ठ",
+    rolesNeeded: DEMO_ROSTER,
+    riskLevel: "WATCH",
+    meetupNotes:
+      "पाशुपति पूर्वी गेट (कैलाशनाथ छेउ) भेला। आर्यघाट खण्ड संवेदनशील — कोषाध्यक्ष समितिले निर्देशन दिने। कुनै फोटो वा भिडियो अनुमति बिना नगर्नुहोला।",
+    linkedIssue: {
+      id: "demo-issue-pashupati-7",
+      title: "आर्यघाट परिसर वरपर फोहोर र पूजा सामग्रीको ढुङ्ग्रो",
+      description:
+        "पाशुपति परिसरको आर्यघाट छेउ पूजा सामग्री र अरू अव्यवस्थित विसर्जन साप्ताहिक थुप्रिने। पाशुपति क्षेत्र विकास कोषको स्वीकृतिमा समय-समय मा सहयोग।",
+      category: "cleanup",
+      addressText: "आर्यघाट, पाशुपतिनाथ",
+      latitude: 27.7106,
+      longitude: 85.3489,
+      voteCount: 87,
+      status: "EVENT_SCHEDULED"
+    },
+    imageSlug: "pashupati-aryaghat",
+    imagePrompt:
+      "Pashupatinath Aryaghat area at dawn; small group of volunteers in respectful attire collecting offerings and debris into baskets along the stone river ghats; smoke from a distant cremation drifting; the temple gold roofs glowing in the first light. Treat the scene reverently."
+  },
+  {
+    id: "demo-up-8",
+    title: "लुम्बिनी सडक छेउ वृक्षारोपण",
+    addressText: "लुम्बिनी सांस्कृतिक नगरपालिका, रुपन्देही",
+    category: "afforestation",
+    thumbnailUrl: "/images/demo-events/lumbini-roadside.jpg",
+    scheduledAt: inHours(96),
+    durationMinutes: 300,
+    meetupLatitude: 27.4844,
+    meetupLongitude: 83.2762,
+    leaderName: "रोशन के.सी.",
+    rolesNeeded: DEMO_ROSTER,
+    riskLevel: "NORMAL",
+    meetupNotes:
+      "लुम्बिनी पवित्र क्षेत्र पूर्वी द्वार छेउ भेला। ३ किमी सडक छेउमा ४५० बिरुवा रोप्ने लक्ष्य; पानी छर्ने व्यवस्था कोषले गर्ने।",
+    linkedIssue: {
+      id: "demo-issue-lumbini-8",
+      title: "लुम्बिनी प्रवेश सडक छेउ रित्तो; गर्मीमा यात्रुको असजिलो",
+      description:
+        "लुम्बिनी पवित्र क्षेत्रको पूर्वी प्रवेश ३ किमी सडक छेउ खाली — गर्मीमा बौद्ध यात्रु र स्थानीयलाई कष्ट। लुम्बिनी विकास कोषले बिरुवा र अनुमति दुवै उपलब्ध गराएको।",
+      category: "afforestation",
+      addressText: "लुम्बिनी, रुपन्देही",
+      latitude: 27.4844,
+      longitude: 83.2762,
+      voteCount: 124,
+      status: "EVENT_SCHEDULED"
+    },
+    imageSlug: "lumbini-roadside",
+    imagePrompt:
+      "Long straight road approaching Lumbini sacred area, flanked by recently planted saplings staked at regular intervals; volunteers walking the line watering each sapling from blue cans; the white peace pagoda visible distantly through clear winter haze."
+  },
+  {
+    id: "demo-up-9",
+    title: "जनकपुर रामजानकी परिसर सरसफाइ",
+    addressText: "रामजानकी मन्दिर, जनकपुर",
+    category: "cleanup",
+    thumbnailUrl: "/images/demo-events/janakpur-temple.jpg",
+    scheduledAt: inHours(132),
+    durationMinutes: 240,
+    meetupLatitude: 26.7286,
+    meetupLongitude: 85.9251,
+    leaderName: "बिनिता थापा",
+    rolesNeeded: DEMO_ROSTER,
+    riskLevel: "NORMAL",
+    meetupNotes:
+      "रामजानकी मन्दिर पश्चिमी गेटमा भेला। मन्दिर समितिले स्वागत; जलपान उपलब्ध। तौलिया र साबुन आफ्नै ल्याउनुहोस्।",
+    linkedIssue: {
+      id: "demo-issue-janakpur-9",
+      title: "जनकपुर रामजानकी मन्दिर परिसर र पोखरी फोहोरयुक्त",
+      description:
+        "जनकपुर रामजानकी मन्दिर परिसर र अग्निशाला पोखरीमा दैनिक श्रद्धालुले छोडेर जाने फोहोर। मन्दिर समिति र नगरपालिकाको साझेदारीमा यो सरसफाइ।",
+      category: "cleanup",
+      addressText: "रामजानकी मन्दिर, जनकपुर",
+      latitude: 26.7286,
+      longitude: 85.9251,
+      voteCount: 98,
+      status: "EVENT_SCHEDULED"
+    },
+    imageSlug: "janakpur-temple",
+    imagePrompt:
+      "Janakpur Ram Janaki temple courtyard at mid-morning; the distinctive white-and-pink Mithila architecture in the background; volunteers in saris and kurtas raking offerings and dried leaves into bamboo baskets; a small group cleaning the steps of the Agnishala pond off to one side."
+  },
+  {
+    id: "demo-up-10",
+    title: "इलाम चिया बारी पैदलमार्ग मर्मत",
+    addressText: "कन्याम चिया बगान, इलाम",
+    category: "trail",
+    thumbnailUrl: "/images/demo-events/ilam-tea-trail.jpg",
+    scheduledAt: inHours(168),
+    durationMinutes: 300,
+    meetupLatitude: 26.9018,
+    meetupLongitude: 87.9347,
+    leaderName: "गणेश राई",
+    rolesNeeded: DEMO_ROSTER,
+    riskLevel: "WATCH",
+    meetupNotes:
+      "कन्याम चिया बगान प्रवेश ढोकामा भेला। ५ किमी पैदलमार्ग टोलीमा बाँडिने; हाइकिङ बुट र पानी अनिवार्य। चिया बगानले दिउँसो खाजा उपलब्ध गराउने।",
+    linkedIssue: {
+      id: "demo-issue-ilam-10",
+      title: "कन्याम चिया बगान वरपरको पैदलमार्ग पर्यटक अनुकूल नभएको",
+      description:
+        "कन्याम चिया बगान प्रसिद्ध पर्यटक स्थल — तर वरपरको ५ किमी पैदलमार्गमा साइनबोर्ड गायब, इरोसन र फोहोर। चिया उत्पादक संघ र पर्यटन समितिको साझेदारीमा यो अभियान।",
+      category: "trail",
+      addressText: "कन्याम, इलाम",
+      latitude: 26.9018,
+      longitude: 87.9347,
+      voteCount: 81,
+      status: "EVENT_SCHEDULED"
+    },
+    imageSlug: "ilam-tea-trail",
+    imagePrompt:
+      "Rolling tea garden hills of Kanyam in Ilam; a narrow trail winding through the manicured tea bushes; volunteers in light jackets mounting wooden directional signs at a junction; misty morning, the silver of dew still on the tea leaves."
+  },
+  {
+    id: "demo-up-11",
+    title: "मुग्लिङ बजार जल निकास सरसफाइ",
+    addressText: "मुग्लिङ बस पार्क, चितवन",
+    category: "infrastructure",
+    thumbnailUrl: "/images/demo-events/muglin-drains.jpg",
+    scheduledAt: inHours(54),
+    durationMinutes: 240,
+    meetupLatitude: 27.8856,
+    meetupLongitude: 84.5436,
+    leaderName: "प्रदीप तामाङ",
+    rolesNeeded: DEMO_ROSTER,
+    riskLevel: "WATCH",
+    meetupNotes:
+      "मुग्लिङ बस पार्क मूल चोकमा भेला। नालीहरू टोलीमा बाँडिने; गहिरो नालीमा सुरक्षा बेल्ट प्रयोग गर्ने। पन्जा र मास्क अनिवार्य।",
+    linkedIssue: {
+      id: "demo-issue-muglin-11",
+      title: "मुग्लिङ बजार नालीहरू बन्द; मनसुनमा जलमग्न",
+      description:
+        "मुग्लिङ बजार राजमार्ग जोडिने प्रमुख चोक — तर मुख्य नालीहरू वर्षौंदेखि सफा नभएको। प्रत्येक मनसुनमा बस पार्क र वरपरका पसल जलमग्न। नगरले अग्रिम र ट्रक उपलब्ध गराउने प्रतिबद्धता।",
+      category: "infrastructure",
+      addressText: "मुग्लिङ, चितवन",
+      latitude: 27.8856,
+      longitude: 84.5436,
+      voteCount: 145,
+      status: "EVENT_SCHEDULED"
+    },
+    imageSlug: "muglin-drains",
+    imagePrompt:
+      "Muglin bus park area with the main highway visible behind; volunteers crouched over open street drains pulling out packed dirt and plastic with long-handled rakes; municipal truck idling at the curb; commercial signs in Nepali Devanagari along the storefronts."
+  },
+  {
+    id: "demo-up-12",
+    title: "पाल्पा तानसेन दरबार परिसर सजावट",
+    addressText: "श्रीनगर पार्क छेउ, तानसेन, पाल्पा",
+    category: "beautification",
+    thumbnailUrl: "/images/demo-events/tansen-darbar.jpg",
+    scheduledAt: inHours(216),
+    durationMinutes: 360,
+    meetupLatitude: 27.8682,
+    meetupLongitude: 83.5499,
+    leaderName: "स्मिता शर्मा",
+    rolesNeeded: DEMO_ROSTER,
+    riskLevel: "NORMAL",
+    meetupNotes:
+      "तानसेन दरबार मुख्य गेटमा हाजिर। नगरपालिकाले रङ र ब्रश ल्याइदिने; पुरानो लुगा लगाएर आउनुहोस्। प्रतिनिधि सदस्यबाट छोटो ऐतिहासिक परिचय हुने।",
+    linkedIssue: {
+      id: "demo-issue-tansen-12",
+      title: "तानसेन ऐतिहासिक दरबार परिसर भित्ता रित्तो र पुरानो",
+      description:
+        "तानसेन दरबार पाल्पाको प्रमुख ऐतिहासिक स्थल — परिसरका भित्ता वर्षौंदेखि पेन्ट नभएको र केही ठाउँमा अव्यवस्थित भित्ते लेखन। पुरातत्व विभागले अनुमति दिए; स्थानीय कलाकारले मिथिला र नेवारी प्रेरित डिजाइन तयार पारेका।",
+      category: "beautification",
+      addressText: "तानसेन दरबार, पाल्पा",
+      latitude: 27.8682,
+      longitude: 83.5499,
+      voteCount: 89,
+      status: "EVENT_SCHEDULED"
+    },
+    imageSlug: "tansen-darbar",
+    imagePrompt:
+      "Tansen Darbar courtyard wall in the late afternoon; one half of a long wall freshly painted in muted ochre and cream, the other half still bare brick; two artists in stained smocks finishing a stylized lotus pattern in the corner; the hills of Palpa visible above the wall."
+  },
+  {
+    id: "demo-up-13",
+    title: "बर्दिया जंगल किनार सरसफाइ",
+    addressText: "ठाकुरद्वारा बफर जोन, बर्दिया",
+    category: "cleanup",
+    thumbnailUrl: "/images/demo-events/bardia-buffer.jpg",
+    scheduledAt: inHours(144),
+    durationMinutes: 300,
+    meetupLatitude: 28.3935,
+    meetupLongitude: 81.4317,
+    leaderName: "अमित गुरुङ",
+    rolesNeeded: DEMO_ROSTER,
+    riskLevel: "URGENT",
+    meetupNotes:
+      "ठाकुरद्वारा बफर जोन प्रवेश पोस्टमा भेला। निकुञ्ज प्रशासनको प्रतिनिधि र स्थानीय गाइड साथमा अनिवार्य; एक्लै जंगल छेउ नजानुहोला। हाइकिङ बुट र पानी ल्याउनुहोस्।",
+    linkedIssue: {
+      id: "demo-issue-bardia-13",
+      title: "बर्दिया निकुञ्ज बफर जोन पर्यटक प्लास्टिकले प्रदूषित",
+      description:
+        "बर्दिया राष्ट्रिय निकुञ्जको बफर जोन — पर्यटक र पिकनिक समूहले छोडेर जाने प्लास्टिक जंगली जीवको लागि जोखिम। निकुञ्ज प्रशासन र बफर जोन उपभोक्ता समितिको साझेदारीमा।",
+      category: "cleanup",
+      addressText: "बर्दिया राष्ट्रिय निकुञ्ज, बर्दिया",
+      latitude: 28.3935,
+      longitude: 81.4317,
+      voteCount: 167,
+      status: "EVENT_SCHEDULED"
+    },
+    imageSlug: "bardia-buffer",
+    imagePrompt:
+      "Bardia National Park buffer zone trail; community members and a uniformed park guide walking single file along the forest edge, collecting plastic into clear bags; tall sal trees overhead, undergrowth in dry-season ochre; a sign warning of wildlife visible at the bend."
+  },
+  {
+    id: "demo-up-14",
+    title: "सुर्खेत बुलबुले हाइकिङ ट्रेल मर्मत",
+    addressText: "बुलबुले झरना ट्रेल, सुर्खेत",
+    category: "trail",
+    thumbnailUrl: "/images/demo-events/surkhet-bulbule.jpg",
+    scheduledAt: inHours(252),
+    durationMinutes: 360,
+    meetupLatitude: 28.6086,
+    meetupLongitude: 81.6175,
+    leaderName: "रोहित कार्की",
+    rolesNeeded: DEMO_ROSTER,
+    riskLevel: "WATCH",
+    meetupNotes:
+      "बुलबुले झरना मूल प्रवेश गेटमा भेला। ट्रेल भिर-भिरालो छ; हाइकिङ बुट र हेल्मेट सहित। नगरपालिकाले औजार र खाजा उपलब्ध गराउने।",
+    linkedIssue: {
+      id: "demo-issue-surkhet-14",
+      title: "बुलबुले झरना ट्रेल खस्किएको र साइन गायब",
+      description:
+        "सुर्खेतको बुलबुले झरना स्थानीय पर्यटन स्थल — तर पुग्ने ट्रेलको दुई खण्ड पहिरोले खस्किएको र साइनबोर्ड गायब। नगरले औजार र अनुमति दिए; ट्रेलमा थप ल्याम्पपोस्ट पनि लगाउने।",
+      category: "trail",
+      addressText: "बुलबुले झरना, सुर्खेत",
+      latitude: 28.6086,
+      longitude: 81.6175,
+      voteCount: 76,
+      status: "EVENT_SCHEDULED"
+    },
+    imageSlug: "surkhet-bulbule",
+    imagePrompt:
+      "Bulbule waterfall trail in Surkhet, mid-morning; volunteers shoring up a landslide section with timber pickets and packed earth; the falls visible through trees in the background, fine spray catching the light; a freshly painted directional sign leaning against a rock waiting to be mounted."
+  },
+  {
+    id: "demo-up-15",
+    title: "ओखलढुंगा माविमा भित्ता पेन्ट",
+    addressText: "श्री जलजला मा.वि., ओखलढुंगा",
+    category: "infrastructure",
+    thumbnailUrl: "/images/demo-events/okhaldhunga-school.jpg",
+    scheduledAt: inHours(108),
+    durationMinutes: 360,
+    meetupLatitude: 27.3158,
+    meetupLongitude: 86.4992,
+    leaderName: "मञ्जु तामाङ",
+    rolesNeeded: DEMO_ROSTER,
+    riskLevel: "NORMAL",
+    meetupNotes:
+      "स्कुलको मुख्य गेटमा हाजिर। SMC अध्यक्षले स्वागत। २४० विद्यार्थी पनि सहभागी हुने — सहभागीहरूले उनीहरूलाई हलुका काम लगाउने (कुची धुने, ब्रश सुकाउने)।",
+    linkedIssue: {
+      id: "demo-issue-okhal-15",
+      title: "श्री जलजला मा.वि. ७ वर्षदेखि पेन्ट नभएको",
+      description:
+        "ओखलढुंगाको श्री जलजला मा.वि. भवनको भित्ता ७ वर्षदेखि पेन्ट नभएको; २४० विद्यार्थी प्रभावित। SMC ले रङ र सामग्री खर्च बेहोर्ने; हामी श्रम र समय जुटाउँछौँ।",
+      category: "infrastructure",
+      addressText: "श्री जलजला मा.वि., ओखलढुंगा",
+      latitude: 27.3158,
+      longitude: 86.4992,
+      voteCount: 102,
+      status: "EVENT_SCHEDULED"
+    },
+    imageSlug: "okhaldhunga-school",
+    imagePrompt:
+      "Hillside school in Okhaldhunga, freshly painted sky-blue exterior walls with white trim; a row of school children in uniform watching shyly from the courtyard while a handful of adult volunteers finish the last corner; pine-clad hills rolling behind the schoolyard."
   }
 ];
 
@@ -506,6 +1028,399 @@ export const DEMO_PAST_EVENTS = [
         quote: "स्थानीय निकायलाई पनि नमुना दियो — नगरले अब हरेक तीन महिनामा संयुक्त सरसफाइ राख्न मानेको छ।"
       }
     ]
+  },
+  {
+    id: "demo-past-5",
+    title: "बौद्ध परिसर साप्ताहिक सरसफाइ",
+    addressText: "बौद्धनाथ स्तूप, काठमाडौँ",
+    category: "cleanup",
+    thumbnailUrl: "/images/demo-events/boudha-done.jpg",
+    scheduledAt: daysAgo(7),
+    completedAt: daysAgo(7),
+    durationMinutes: 180,
+    meetupLatitude: 27.7215,
+    meetupLongitude: 85.3620,
+    leaderName: "गणेश राई",
+    participantCount: 33,
+    resultSummary:
+      "स्तूप परिसर र छेउछाउका १२ पसल अघिल्तिर सफा; ३३ सहभागी; १.६ टन फोहोर हटाइयो। मठाधीशले अनुमोदन।",
+    meetupNotes:
+      "बौद्ध स्तूप पूर्वी प्रवेश छेउ भेला। मठ समितिले स्वागत र जलपान।",
+    linkedIssue: {
+      id: "demo-issue-boudha-p5",
+      title: "बौद्ध परिसर वरपर फोहोर र पसल अघिल्तिर अव्यवस्थित",
+      description:
+        "बौद्ध स्तूप परिसर वरपर साप्ताहिक रूपमा फोहोर थुप्रिने; पसलेहरूको सहभागिताबाट दिगो सरसफाइ।",
+      category: "cleanup",
+      addressText: "बौद्ध, काठमाडौँ",
+      latitude: 27.7215,
+      longitude: 85.3620,
+      voteCount: 87,
+      status: "COMPLETED"
+    },
+    photos: ["/images/event-types/cleanup.jpg", "/images/event-types/cleanup.jpg"],
+    beforeAfter: {
+      before: "/images/event-types/cleanup.jpg",
+      after: "/images/homepage/cleanup-areas/roadside.jpg"
+    },
+    testimonials: [
+      {
+        name: "गणेश राई",
+        role: "संयोजक",
+        quote: "स्थानीय पसलेहरू पनि सहभागी भए — अब साप्ताहिक भनेर बैठक तय गरेका छौँ।"
+      },
+      {
+        name: "तेन्जिङ शेर्पा",
+        role: "स्थानीय व्यवसायी",
+        quote: "स्तूप परिसर सफा देख्दा तीर्थयात्रीले आफै फोहोर फाल्न डराउने भएका छन्।"
+      }
+    ],
+    imageSlug: "boudha-done",
+    imagePrompt:
+      "Boudhanath stupa courtyard at end of day, recently cleared; shopkeepers and volunteers chatting in small groups near the eastern entrance; the great white dome glowing pink in sunset, prayer flags strung overhead; clean stone-paved circuit around the stupa."
+  },
+  {
+    id: "demo-past-6",
+    title: "नागदह पोखरी सरसफाइ र मर्मत",
+    addressText: "नागदह, ललितपुर",
+    category: "dam",
+    thumbnailUrl: "/images/demo-events/nagdah-done.jpg",
+    scheduledAt: daysAgo(35),
+    completedAt: daysAgo(35),
+    durationMinutes: 420,
+    meetupLatitude: 27.6017,
+    meetupLongitude: 85.3258,
+    leaderName: "बिनिता थापा",
+    participantCount: 51,
+    resultSummary:
+      "नागदह पोखरीको दक्षिणी पाल मर्मत; ५१ सहभागी; ८ क्युबिक मिटर माटो खस्किएको हटाइयो। पोखरी संरक्षण समितिले पुनःस्थापना अनुगमन।",
+    meetupNotes:
+      "नागदह पोखरी पूर्वी छेउ भेला। डिभिजन वन कार्यालयले अग्रिम र पाल मर्मत सामग्री ल्याइदिए।",
+    linkedIssue: {
+      id: "demo-issue-nagdah-p6",
+      title: "नागदह पोखरीको पाल खस्किएर पानी कम भएको",
+      description:
+        "ऐतिहासिक नागदह पोखरीको दक्षिणी पाल बर्षायाममा खस्किएर पोखरीको पानी सतह घटेको; स्थानीय खेती र वातावरण दुवै प्रभावित।",
+      category: "dam",
+      addressText: "नागदह, ललितपुर",
+      latitude: 27.6017,
+      longitude: 85.3258,
+      voteCount: 119,
+      status: "COMPLETED"
+    },
+    photos: ["/images/event-types/dam.jpg"],
+    beforeAfter: {
+      before: "/images/homepage/cleanup-areas/empty-lands.jpg",
+      after: "/images/event-types/dam.jpg"
+    },
+    testimonials: [
+      {
+        name: "बिनिता थापा",
+        role: "संयोजक",
+        quote: "ऐतिहासिक पोखरी पुनःस्थापना हुँदै — स्थानीय खेतीलाई पनि सकारात्मक असर पर्ने अपेक्षा।"
+      },
+      {
+        name: "केशव श्रेष्ठ",
+        role: "पोखरी संरक्षण समिति",
+        quote: "१७ वर्षदेखि गुनासो दिँदै थियौँ; एकै दिनमा यति परिवर्तन — आगामी मनसुनमा पनि टिक्ने आशा छ।"
+      }
+    ],
+    imageSlug: "nagdah-done",
+    imagePrompt:
+      "Nagdah pond in Lalitpur after restoration, southern earthen embankment freshly repaired with packed soil and stone facing; villagers walking the perimeter inspecting the work; pond water calm with reflections of surrounding trees; community committee members in conversation by a small notice board."
+  },
+  {
+    id: "demo-past-7",
+    title: "चन्द्रागिरी हाइकिङ ट्रेल मर्मत",
+    addressText: "चन्द्रागिरी डाँडा, काठमाडौँ",
+    category: "trail",
+    thumbnailUrl: "/images/demo-events/chandragiri-done.jpg",
+    scheduledAt: daysAgo(21),
+    completedAt: daysAgo(21),
+    durationMinutes: 360,
+    meetupLatitude: 27.6586,
+    meetupLongitude: 85.2247,
+    leaderName: "स्मिता शर्मा",
+    participantCount: 38,
+    resultSummary:
+      "७ किमी ट्रेल मर्मत; ३८ सहभागी; ९ नयाँ साइनबोर्ड; इरोसन भएको ३ खण्डमा ढुङ्गा फेरि मिलाइयो।",
+    meetupNotes:
+      "थानकोट देखि केबल कार स्टेसन छेउ भेला। ३ टोलीमा बाँडिने।",
+    linkedIssue: {
+      id: "demo-issue-chandra-p7",
+      title: "चन्द्रागिरी ट्रेल फोहोर र साइन गायब",
+      description:
+        "चन्द्रागिरी डाँडासम्मको हाइकिङ ट्रेलमा साइन गायब र इरोसन; पर्यटनलाई असर। नगर र पर्यटन समितिको सहयोगमा।",
+      category: "trail",
+      addressText: "चन्द्रागिरी, काठमाडौँ",
+      latitude: 27.6586,
+      longitude: 85.2247,
+      voteCount: 92,
+      status: "COMPLETED"
+    },
+    photos: ["/images/event-types/trail.jpg", "/images/event-types/trail.jpg"],
+    beforeAfter: {
+      before: "/images/event-types/trail.jpg",
+      after: "/images/event-types/trail.jpg"
+    },
+    testimonials: [
+      {
+        name: "स्मिता शर्मा",
+        role: "संयोजक",
+        quote: "अब ट्रेलमा हराउने डर छैन। केबल कारका यात्रुहरूले पनि पैदल फर्किने विकल्प पाए।"
+      }
+    ],
+    imageSlug: "chandragiri-done",
+    imagePrompt:
+      "Chandragiri ridge trail in winter clarity; freshly mounted wooden directional signs at a Y-junction; volunteers in fleeces resting near the markers with thermoses; the Kathmandu valley spread out below the ridge, Annapurna visible to the north."
+  },
+  {
+    id: "demo-past-8",
+    title: "बागलुङ हाइस्कुल मर्मत",
+    addressText: "श्री गल्कोट मा.वि., बागलुङ",
+    category: "infrastructure",
+    thumbnailUrl: "/images/demo-events/baglung-school-done.jpg",
+    scheduledAt: daysAgo(50),
+    completedAt: daysAgo(50),
+    durationMinutes: 420,
+    meetupLatitude: 28.2167,
+    meetupLongitude: 83.6000,
+    leaderName: "रोहित कार्की",
+    participantCount: 44,
+    resultSummary:
+      "विद्यालयको ३ कक्षा कोठा पेन्ट; २ शौचालय ढोका पुनःस्थापना; पुस्तकालय कक्षको सिलिङ मर्मत। ४४ सहभागी।",
+    meetupNotes:
+      "स्कुलको खेलमैदान छेउ भेला; SMC अध्यक्षको स्वागत।",
+    linkedIssue: {
+      id: "demo-issue-baglung-p8",
+      title: "श्री गल्कोट मा.वि. भौतिक संरचना मर्मतयोग्य",
+      description:
+        "बागलुङको श्री गल्कोट मा.वि.का कक्षाकोठा र शौचालय वर्षौंदेखि मर्मत नभएको। SMC ले सामग्री बेहोर्ने; हामी श्रम।",
+      category: "infrastructure",
+      addressText: "श्री गल्कोट मा.वि., बागलुङ",
+      latitude: 28.2167,
+      longitude: 83.6000,
+      voteCount: 104,
+      status: "COMPLETED"
+    },
+    photos: ["/images/event-types/infrastructure.jpg"],
+    beforeAfter: {
+      before: "/images/event-types/infrastructure.jpg",
+      after: "/images/event-types/infrastructure.jpg"
+    },
+    testimonials: [
+      {
+        name: "रोहित कार्की",
+        role: "संयोजक",
+        quote: "विद्यार्थीहरूले पनि सहयोग गरे; अब उनीहरूको स्कुलप्रति अपनत्व भाव बढ्यो।"
+      },
+      {
+        name: "लक्ष्मी शर्मा",
+        role: "SMC अध्यक्ष",
+        quote: "सामग्री किन्न साढे २ लाख खर्च गऱ्यौँ; श्रम जुटेन भने यो काम ३ महिनासम्म जान सक्थ्यो — एकै दिनमा सकियो।"
+      }
+    ],
+    imageSlug: "baglung-school-done",
+    imagePrompt:
+      "Baglung hillside secondary school after restoration; freshly painted classroom block in pale yellow, repaired toilet doors visible at the far end; students in uniform crossing the courtyard at recess; pine and oak forested hills behind the school."
+  },
+  {
+    id: "demo-past-9",
+    title: "कीर्तिपुर खानेपानी मर्मत",
+    addressText: "कीर्तिपुर मूल बस्ती, काठमाडौँ",
+    category: "infrastructure",
+    thumbnailUrl: "/images/demo-events/kirtipur-water.jpg",
+    scheduledAt: daysAgo(40),
+    completedAt: daysAgo(40),
+    durationMinutes: 300,
+    meetupLatitude: 27.6781,
+    meetupLongitude: 85.2767,
+    leaderName: "हरि श्रेष्ठ",
+    participantCount: 36,
+    resultSummary:
+      "मूल बस्तीका ४ ओटा सार्वजनिक धारा मर्मत; ३६ सहभागी; खानेपानी संस्थानको प्राविधिक सहयोग।",
+    meetupNotes:
+      "कीर्तिपुर मूल चोकमा भेला। खानेपानी संस्थानको प्राविधिकले प्रत्येक धारामा निर्देशन दिने।",
+    linkedIssue: {
+      id: "demo-issue-kirtipur-p9",
+      title: "कीर्तिपुर सार्वजनिक धारा सुख्खा वा फुटेका",
+      description:
+        "कीर्तिपुरका ४ सार्वजनिक धारा महिनौंदेखि सुख्खा वा फुटेका; स्थानीय आमासमूहले खानेपानी ल्याउन धेरै टाढा जानुपर्ने।",
+      category: "infrastructure",
+      addressText: "कीर्तिपुर, काठमाडौँ",
+      latitude: 27.6781,
+      longitude: 85.2767,
+      voteCount: 142,
+      status: "COMPLETED"
+    },
+    photos: ["/images/event-types/infrastructure.jpg"],
+    beforeAfter: {
+      before: "/images/homepage/cleanup-areas/drains.jpg",
+      after: "/images/event-types/infrastructure.jpg"
+    },
+    testimonials: [
+      {
+        name: "हरि श्रेष्ठ",
+        role: "संयोजक",
+        quote: "खानेपानी संस्थानको प्राविधिकले सिकाएको — अब स्थानीयले आफै सानो मर्मत गर्न सक्ने भए।"
+      },
+      {
+        name: "गीता तामाङ",
+        role: "स्थानीय आमासमूह",
+        quote: "धारा फेरि चल्न थाल्यो। पानी ल्याउन बिहान-बेलुका हिँड्नुपर्ने अब हटेको।"
+      }
+    ],
+    imageSlug: "kirtipur-water",
+    imagePrompt:
+      "Kirtipur old town public water tap restored; women filling brass and steel water pots at the spout; a community volunteer in jeans showing a teenager how to fit a replacement washer; old brick walls and carved wooden windows framing the scene."
+  },
+  {
+    id: "demo-past-10",
+    title: "ठिमी पार्क सजावट र मूर्ति मर्मत",
+    addressText: "ठिमी पार्क, मध्यपुर ठिमी",
+    category: "beautification",
+    thumbnailUrl: "/images/demo-events/thimi-park-done.jpg",
+    scheduledAt: daysAgo(70),
+    completedAt: daysAgo(70),
+    durationMinutes: 300,
+    meetupLatitude: 27.6822,
+    meetupLongitude: 85.3858,
+    leaderName: "मञ्जु तामाङ",
+    participantCount: 26,
+    resultSummary:
+      "पार्कका ६ बेन्च मर्मत; ३ मूर्ति पेन्ट; प्रवेश गेटको साइन नवीकरण। २६ सहभागी।",
+    meetupNotes:
+      "ठिमी पार्क मुख्य गेटमा भेला। मूर्ति समिति र नगरपालिकाको साझेदारी।",
+    linkedIssue: {
+      id: "demo-issue-thimi-p10",
+      title: "ठिमी पार्क पुरानो; बेन्च टुटेका, साइन फिक्का",
+      description:
+        "ठिमी पार्क स्थानीय बच्चा र वृद्धहरूको प्रिय ठाउँ; तर बेन्च र साइनबोर्ड वर्षौंदेखि मर्मत नभएको।",
+      category: "beautification",
+      addressText: "ठिमी पार्क, मध्यपुर",
+      latitude: 27.6822,
+      longitude: 85.3858,
+      voteCount: 71,
+      status: "COMPLETED"
+    },
+    photos: ["/images/event-types/beautification.jpg"],
+    beforeAfter: {
+      before: "/images/event-types/beautification.jpg",
+      after: "/images/event-types/beautification.jpg"
+    },
+    testimonials: [
+      {
+        name: "मञ्जु तामाङ",
+        role: "संयोजक",
+        quote: "वडाध्यक्षले औपचारिक उद्घाटन गरे; अब पार्कको दैनिक हेरचाह स्थानीयले आफै गर्ने भए।"
+      }
+    ],
+    imageSlug: "thimi-park-done",
+    imagePrompt:
+      "Thimi Park in late afternoon, restored; freshly painted benches under flowering trees; children sketching the repainted statues at the centre; an elderly couple resting on a corner bench watching; old Newar brick gateway visible at the entrance."
+  },
+  {
+    id: "demo-past-11",
+    title: "नौबिसे राजमार्ग छेउ नाली सरसफाइ",
+    addressText: "नौबिसे चोक, धादिङ",
+    category: "infrastructure",
+    thumbnailUrl: "/images/demo-events/naubise-drains.jpg",
+    scheduledAt: daysAgo(18),
+    completedAt: daysAgo(18),
+    durationMinutes: 240,
+    meetupLatitude: 27.7878,
+    meetupLongitude: 85.1747,
+    leaderName: "प्रदीप तामाङ",
+    participantCount: 41,
+    resultSummary:
+      "राजमार्ग छेउको १.२ किमी नाली खुलाइयो; ४१ सहभागी; ३.८ टन माटो र फोहोर हटाइयो। यातायात व्यवस्था र नगरपालिकाको साझेदारी।",
+    meetupNotes:
+      "नौबिसे मूल चोक छेउ भेला। यातायातका साथीहरूले अग्रिम र ट्रक उपलब्ध गराइदिए।",
+    linkedIssue: {
+      id: "demo-issue-naubise-p11",
+      title: "नौबिसे राजमार्ग छेउ नाली पुरिएको; यातायातमा बाधा",
+      description:
+        "नौबिसे चोक वरपरको राजमार्ग नाली बर्षौंदेखि सफा नभएको; वर्षायाममा सडक जलमग्न र पुरिने। यातायात अवरुद्ध हुने।",
+      category: "infrastructure",
+      addressText: "नौबिसे, धादिङ",
+      latitude: 27.7878,
+      longitude: 85.1747,
+      voteCount: 88,
+      status: "COMPLETED"
+    },
+    photos: ["/images/event-types/infrastructure.jpg"],
+    beforeAfter: {
+      before: "/images/homepage/cleanup-areas/drains.jpg",
+      after: "/images/event-types/infrastructure.jpg"
+    },
+    testimonials: [
+      {
+        name: "प्रदीप तामाङ",
+        role: "संयोजक",
+        quote: "१.२ किमी नालीमा ३.८ टन फोहोर थियो — सोचेभन्दा बढी। अब अर्को मनसुनमा सडक जलमग्न नहुने अपेक्षा।"
+      },
+      {
+        name: "रामकुमार थापा",
+        role: "यातायात व्यवसायी",
+        quote: "गाडी हिलोले पुग्न नसक्ने अवस्था अब हट्यो। हाम्रो व्यवसायलाई पनि सकारात्मक।"
+      }
+    ],
+    imageSlug: "naubise-drains",
+    imagePrompt:
+      "Naubise highway junction after roadside drains have been cleared; volunteers piling shovel loads of excavated dirt into a municipal tipper; long-haul trucks rolling through in the background; the western hills hazy under afternoon sun; clean concrete drain channels visible alongside the highway."
+  },
+  {
+    id: "demo-past-12",
+    title: "लामाटार सामुदायिक पार्क रोपण",
+    addressText: "लामाटार, ललितपुर",
+    category: "afforestation",
+    thumbnailUrl: "/images/demo-events/lamatar-done.jpg",
+    scheduledAt: daysAgo(90),
+    completedAt: daysAgo(90),
+    durationMinutes: 360,
+    meetupLatitude: 27.5947,
+    meetupLongitude: 85.4022,
+    leaderName: "अमित गुरुङ",
+    participantCount: 58,
+    resultSummary:
+      "सामुदायिक पार्कमा ३७० बिरुवा रोपिए — बकैनो, अप्रिकोट, सिमल। ५८ सहभागी; वडा कार्यालय र वन कार्यालयको साझेदारी।",
+    meetupNotes:
+      "लामाटार सामुदायिक पार्क प्रवेश गेटमा भेला। बिरुवा र पानी टीमले उपलब्ध गराएको।",
+    linkedIssue: {
+      id: "demo-issue-lamatar-p12",
+      title: "लामाटार सामुदायिक पार्क खाली; छहारी अभाव",
+      description:
+        "लामाटारको नयाँ सामुदायिक पार्क १.६ हेक्टर खाली; ३ वर्षदेखि बिरुवा रोप्न नसकिएको। वडा कार्यालय र वन कार्यालयले बिरुवा र पानी उपलब्ध गराउने प्रतिबद्धता।",
+      category: "afforestation",
+      addressText: "लामाटार, ललितपुर",
+      latitude: 27.5947,
+      longitude: 85.4022,
+      voteCount: 137,
+      status: "COMPLETED"
+    },
+    photos: [
+      "/images/event-types/afforestation.jpg",
+      "/images/event-types/afforestation.jpg"
+    ],
+    beforeAfter: {
+      before: "/images/homepage/cleanup-areas/empty-lands.jpg",
+      after: "/images/event-types/afforestation.jpg"
+    },
+    testimonials: [
+      {
+        name: "अमित गुरुङ",
+        role: "संयोजक",
+        quote: "३७० बिरुवा एकै दिनमा। अब ३ महिनासम्म नियमित पानी हाल्ने टोली बनाएका छौँ।"
+      },
+      {
+        name: "रश्मि श्रेष्ठ",
+        role: "स्थानीय शिक्षक",
+        quote: "विद्यार्थीहरूले पनि रोपे — अब प्रत्येक बिरुवालाई आफ्नो नाम दिए। बच्चाहरूको पार्कप्रति ओत्ती बस्यो।"
+      }
+    ],
+    imageSlug: "lamatar-done",
+    imagePrompt:
+      "Lamatar community park three months after planting; rows of young saplings staked into mounded earth, just beginning to leaf out; children walking between the rows with hand-painted name tags tied to selected trees; volunteers refilling watering cans from a community tap; soft early morning light."
   }
 ];
 
@@ -769,8 +1684,8 @@ const DEMO_NOTIFICATIONS = [
     kind: "live",
     title: { np: "अहिले लाइभ", en: "Live now" },
     body: {
-      np: "बागमती नदी सरसफाइ युट्युब लाइभमा प्रसारण भइरहेको छ।",
-      en: "Bagmati cleanup is streaming on YouTube Live."
+      np: "बागमती नदी सरसफाइ अहिले लाइभ प्रसारण भइरहेको छ।",
+      en: "Bagmati cleanup is streaming live right now."
     },
     href: "/events/demo-live-1",
     isRead: true,
