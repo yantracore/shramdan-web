@@ -9,18 +9,23 @@ import { CommentFlagModal } from "@/components/comments/CommentFlagModal";
 import { CommentSkeleton } from "@/components/comments/CommentSkeleton";
 import { CommentThread } from "@/components/comments/CommentThread";
 import {
+  applyLocalOverlay,
   buildTree,
   countVisible,
-  editComment,
   flagComment,
-  loadComments,
-  saveComment,
-  softDeleteComment,
   sortTopLevel,
-  toggleReaction,
+  toggleReactionOverlay,
   togglePin,
   viewerFlagged
 } from "@/lib/comments";
+import {
+  addReactionRemote,
+  createComment,
+  deleteCommentRemote,
+  fetchComments,
+  removeReactionRemote,
+  updateComment
+} from "@/lib/commentsApi";
 import { getAuthSession, isAdminUser, subscribeAuthSession } from "@/lib/authSession";
 import { useToast } from "@/lib/toast";
 
@@ -104,34 +109,55 @@ export function CommentSection({
   const [loading, setLoading] = useState(true);
   const [replyingTo, setReplyingTo] = useState(null);
   const [editingId, setEditingId] = useState(null);
-  // Sort modes: "top" (reactions desc), "newest" (createdAt desc), "mine"
-  // (filter to threads viewer participates in). "top" feels like the
-  // best default for casual readers — it surfaces the conversations
-  // already gaining traction.
   const [sortMode, setSortMode] = useState("top");
   const [flagTarget, setFlagTarget] = useState(null);
   const isAdmin = isAdminUser(currentUser);
 
-  // Hydration — load on mount and on every target change. The
-  // `setLoading(true)` on target change is intentional so the skeleton
-  // re-shows during a target swap; same pattern as
-  // [src/app/issues/[id]/page.js:151-154](src/app/issues/[id]/page.js#L151-L154).
+  const reload = useCallback(async () => {
+    if (!targetType || !targetId) return;
+    try {
+      const list = await fetchComments({
+        targetType,
+        targetId,
+        limit: 200,
+        requireAuth: isAuthenticated
+      });
+      setComments(applyLocalOverlay({ targetType, targetId, list }));
+    } catch (error) {
+      // Leave previous state in place so a transient error doesn't blank
+      // out the conversation. The toast only fires on user-initiated
+      // actions below; silent refresh failures are noise.
+      console.warn("Comment fetch failed", error);
+    }
+  }, [targetType, targetId, isAuthenticated]);
+
   useEffect(() => {
     if (!targetType || !targetId) return;
+    let cancelled = false;
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
-    const handle = window.setTimeout(() => {
-      setComments(loadComments({ targetType, targetId }));
-      setLoading(false);
-    }, 80);
-    return () => window.clearTimeout(handle);
-  }, [targetType, targetId]);
+    (async () => {
+      try {
+        const list = await fetchComments({
+          targetType,
+          targetId,
+          limit: 200,
+          requireAuth: isAuthenticated
+        });
+        if (cancelled) return;
+        setComments(applyLocalOverlay({ targetType, targetId, list }));
+      } catch {
+        if (!cancelled) setComments([]);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [targetType, targetId, isAuthenticated]);
 
-  // Memoized tree of top-level → children based on the flat list.
   const tree = useMemo(() => buildTree(comments), [comments]);
-  // The "Mine" filter requires a logged-in viewer. If logged out while
-  // "mine" is selected, fall back to "top" silently — surfacing an
-  // empty thread list with a "log in" prompt would be confusing.
   const effectiveSort = !isAuthenticated && sortMode === "mine" ? "top" : sortMode;
   const sortedTopLevel = useMemo(
     () => sortTopLevel(tree, effectiveSort, currentUser?.id),
@@ -139,10 +165,6 @@ export function CommentSection({
   );
   const visibleCount = useMemo(() => countVisible(comments), [comments]);
 
-  // Mention pool = external (roster/supporters) merged with distinct
-  // comment-author names. Dedup by name (case-insensitive). The pool is
-  // sorted longest-name-first so longest-prefix matching in the body
-  // renderer chooses the most specific mention available.
   const mentionPool = useMemo(() => {
     const seen = new Set();
     const out = [];
@@ -161,26 +183,20 @@ export function CommentSection({
     return out.sort((a, b) => b.name.length - a.name.length);
   }, [externalMentionPool, comments]);
 
-  const reload = useCallback(() => {
-    setComments(loadComments({ targetType, targetId }));
-  }, [targetType, targetId]);
-
   const handleSubmitTop = useCallback(
-    (text) => {
+    async (text) => {
       if (!currentUser) return;
-      const created = saveComment({
-        targetType,
-        targetId,
-        parentId: null,
-        parentDepth: -1,
-        text,
-        author: currentUser
-      });
-      if (created) {
-        reload();
+      try {
+        await createComment({
+          targetType,
+          targetId,
+          parentId: null,
+          text
+        });
+        await reload();
         messageApi.success(t.successPosted);
-      } else {
-        messageApi.error(t.errorGeneric);
+      } catch (error) {
+        messageApi.error(error?.message || t.errorGeneric);
       }
     },
     [currentUser, targetType, targetId, reload, messageApi, t]
@@ -198,36 +214,23 @@ export function CommentSection({
   const handleCancelReply = useCallback(() => setReplyingTo(null), []);
 
   const handleSubmitReply = useCallback(
-    (text) => {
+    async (text) => {
       if (!currentUser || !replyingTo) return;
-      const parent = comments.find((c) => c.id === replyingTo);
-      if (!parent) return;
-      const created = saveComment({
-        targetType,
-        targetId,
-        parentId: parent.id,
-        parentDepth: parent.depth,
-        text,
-        author: currentUser
-      });
-      if (created) {
+      try {
+        await createComment({
+          targetType,
+          targetId,
+          parentId: replyingTo,
+          text
+        });
         setReplyingTo(null);
-        reload();
+        await reload();
         messageApi.success(t.successReplied);
-      } else {
-        messageApi.error(t.errorGeneric);
+      } catch (error) {
+        messageApi.error(error?.message || t.errorGeneric);
       }
     },
-    [
-      currentUser,
-      replyingTo,
-      comments,
-      targetType,
-      targetId,
-      reload,
-      messageApi,
-      t
-    ]
+    [currentUser, replyingTo, targetType, targetId, reload, messageApi, t]
   );
 
   const handleStartEdit = useCallback((comment) => {
@@ -238,43 +241,32 @@ export function CommentSection({
   const handleCancelEdit = useCallback(() => setEditingId(null), []);
 
   const handleSubmitEdit = useCallback(
-    (text) => {
+    async (text) => {
       if (!currentUser || !editingId) return;
-      const ok = editComment({
-        targetType,
-        targetId,
-        commentId: editingId,
-        text,
-        userId: currentUser.id
-      });
-      if (ok) {
+      try {
+        await updateComment({ id: editingId, text });
         setEditingId(null);
-        reload();
+        await reload();
         messageApi.success(t.successEdited);
-      } else {
-        messageApi.error(t.errorGeneric);
+      } catch (error) {
+        messageApi.error(error?.message || t.errorGeneric);
       }
     },
-    [currentUser, editingId, targetType, targetId, reload, messageApi, t]
+    [currentUser, editingId, reload, messageApi, t]
   );
 
   const handleDelete = useCallback(
-    (comment) => {
+    async (comment) => {
       if (!currentUser) return;
-      const ok = softDeleteComment({
-        targetType,
-        targetId,
-        commentId: comment.id,
-        userId: currentUser.id
-      });
-      if (ok) {
-        reload();
+      try {
+        await deleteCommentRemote({ id: comment.id });
+        await reload();
         messageApi.success(t.successDeleted);
-      } else {
-        messageApi.error(t.errorGeneric);
+      } catch (error) {
+        messageApi.error(error?.message || t.errorGeneric);
       }
     },
-    [currentUser, targetType, targetId, reload, messageApi, t]
+    [currentUser, reload, messageApi, t]
   );
 
   const handleTogglePin = useCallback(
@@ -289,10 +281,12 @@ export function CommentSection({
         messageApi.error(t.errorGeneric);
         return;
       }
-      reload();
+      // togglePin only touches localStorage — re-apply the overlay so
+      // the pinned chip flips without re-fetching from the backend.
+      setComments((prev) => applyLocalOverlay({ targetType, targetId, list: prev }));
       messageApi.success(result ? t.successPinned : t.successUnpinned);
     },
-    [isAdmin, targetType, targetId, reload, messageApi, t]
+    [isAdmin, targetType, targetId, messageApi, t]
   );
 
   const handleStartFlag = useCallback(
@@ -319,15 +313,12 @@ export function CommentSection({
         return;
       }
       setFlagTarget(null);
-      reload();
+      setComments((prev) => applyLocalOverlay({ targetType, targetId, list: prev }));
       messageApi.success(t.successFlagged);
     },
-    [currentUser, flagTarget, targetType, targetId, reload, messageApi, t]
+    [currentUser, flagTarget, targetType, targetId, messageApi, t]
   );
 
-  // viewerFlags: Set of commentIds the current viewer already flagged.
-  // Computed once per (comments, currentUser) so the per-node check is
-  // O(1) at render. Reads the raw overlay via viewerFlagged() helper.
   const viewerFlags = useMemo(() => {
     if (!currentUser?.id) return new Set();
     const out = new Set();
@@ -344,24 +335,43 @@ export function CommentSection({
     return out;
   }, [comments, currentUser, targetType, targetId]);
 
-  // Reactions intentionally skip optimistic UI: the localStorage write
-  // is synchronous, so reload() is effectively instant. Saves a state
-  // hop and keeps the count-source-of-truth in one place.
   const handleToggleReaction = useCallback(
-    (comment, emoji) => {
+    async (comment, emoji) => {
       if (!currentUser || !comment?.id || !emoji) return;
-      const result = toggleReaction({
+      // Flip the local overlay immediately so the chip's pressed
+      // state updates without waiting for the network round-trip.
+      // applyLocalOverlay re-runs against the existing list so the
+      // aggregate count reflects the optimistic toggle too.
+      const nowPicked = toggleReactionOverlay({
         targetType,
         targetId,
         commentId: comment.id,
-        emoji,
-        userId: currentUser.id
+        emoji
       });
-      if (result === null) {
-        messageApi.error(t.errorGeneric);
-        return;
+      if (nowPicked === null) return;
+      setComments((prev) => applyLocalOverlay({ targetType, targetId, list: prev }));
+
+      try {
+        if (nowPicked) {
+          await addReactionRemote({ id: comment.id, emoji });
+        } else {
+          await removeReactionRemote({ id: comment.id, emoji });
+        }
+        // Refresh from backend so the aggregate count converges with
+        // truth (other users' reactions, server-side rate-limiting,
+        // etc.). The local overlay is reapplied inside reload().
+        await reload();
+      } catch (error) {
+        // Revert the optimistic overlay flip on failure.
+        toggleReactionOverlay({
+          targetType,
+          targetId,
+          commentId: comment.id,
+          emoji
+        });
+        setComments((prev) => applyLocalOverlay({ targetType, targetId, list: prev }));
+        messageApi.error(error?.message || t.errorGeneric);
       }
-      reload();
     },
     [currentUser, targetType, targetId, reload, messageApi, t]
   );

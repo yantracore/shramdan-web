@@ -59,7 +59,7 @@ If a new entity emerges (a genuinely new noun in the product, not just a new fie
 | [event-participants](event-participants.md) | draft | partial | Self-join, my-participation, and roster reads are wired (2026-06-04). Invite / role-change / check-in / role-plan PUT and SSE remain not-yet-wired. |
 | [meetings](meetings.md) | draft | not-started | New entity introduced by the two-meeting flow pivot. No UI surface yet; spec leads. |
 | [members](members.md) | draft | partial | Includes the Applications sub-entity. Maps roughly to the existing `/users` endpoints. |
-| [comments](comments.md) | draft | not-started | Shared shape for issue and event comments; SSE for live-event chat. |
+| [comments](comments.md) | draft | partial | CRUD + reactions wired through `CommentSection` (2026-06-04). SSE stream + admin-side flag/pin endpoints remain not-yet-wired. |
 | [live-streams](live-streams.md) | draft | not-started | Event broadcast metadata plus viewer-count SSE; player URL is multi-format. |
 | notifications | _pending_ | not-started | Reminder cadence (kickoff → signup → pre-execution → event day) and incident alerts. Deferred from Phase C. |
 

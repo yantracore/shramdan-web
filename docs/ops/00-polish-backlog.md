@@ -157,6 +157,7 @@ When you (the coding agent) are working in this repo:
 - [ ] P3 [from 11.6] Local `/_dev/perf` route printing per-page client-component count to flag regressions. — effort:S
 - [ ] P2 [from 11.5] Wire `registerAnalyticsSink` to a real platform (Plausible recommended for the launch phase). — effort:S *(logged by the 2026-06-03 analytics scaffold)*
 - [ ] P2 [from 11.5] Instrument the 19 canonical events across call sites; today the scaffold exists but no surface dispatches yet. — effort:M
+- [ ] P2 [from 11] Comment count badges on `IssueListCard` + `EventListCard` + `CommentsSummary` (preview pane) — currently show 0 because the data layer migrated to async backend fetch but the cards still call the deprecated sync `loadComments()` stub. Cheapest fix is a `commentCount` field on the issue/event resource (backend ask); fallback is async-fetch on card mount (N+1, acceptable for low-traffic list views). — effort:S *(regression introduced by Phase B comment wiring 2026-06-04)*
 
 ## Phase 13 — Live Events Rail
 

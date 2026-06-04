@@ -1,17 +1,18 @@
-// Comment system data layer — target-agnostic (works for issues & events).
+// Comment system — utility + viewer-overlay layer.
 //
-// Phase 1 (this file): mock + localStorage overlay. The seed thread per
-// target comes from devMockData; user posts/edits/deletes live in
-// localStorage at key `shramdan-comments:<targetType>:<targetId>`. The
-// API surface here matches what a future backend swap-in (postJson /
-// patchJson / deleteJson) will expose, so callers don't change later.
-//
-// Shape of a stored comment (canonical, used Phase 1 → Phase 6):
-//   { id, targetType, targetId, parentId, depth, author:{id,name,role,avatar},
-//     text, mentions:[], reactions:{}, createdAt, editedAt|null,
-//     deleted:false, pinned:false, flagged:0 }
-
-import { getDemoComments } from "@/lib/devMockData";
+// Data fetch and mutations (load / create / edit / delete / react) live
+// in `src/lib/commentsApi.js` and talk to the real backend. This file
+// keeps the parts that stay client-side:
+//   - tree-building, depth math, sort, count helpers
+//   - viewer-side overlays for features the backend does NOT cover yet:
+//       * `picks`     — emojis the viewer has reacted with, used to
+//                       render the toggled-on state of reaction chips
+//                       and to fold the viewer's reaction into the
+//                       aggregate count optimistically.
+//       * `pinnedId`  — admin-only pin marker (one per target).
+//       * `flags`     — moderation flags (one per viewer per comment).
+//   When the backend ships the corresponding endpoints, these overlays
+//   can be retired in favour of fields on the comment record itself.
 
 const STORAGE_PREFIX = "shramdan-comments";
 const EDIT_WINDOW_MS = 5 * 60 * 1000;
@@ -26,32 +27,15 @@ function storageKey(targetType, targetId) {
 }
 
 function readOverlay(targetType, targetId) {
-  const empty = {
-    added: [],
-    edits: {},
-    deletes: [],
-    picks: {},
-    pinnedId: null,
-    flags: {}
-  };
+  const empty = { picks: {}, pinnedId: null, flags: {} };
   if (!canUseStorage()) return empty;
   try {
     const raw = window.localStorage.getItem(storageKey(targetType, targetId));
     if (!raw) return empty;
     const parsed = JSON.parse(raw);
     return {
-      added: Array.isArray(parsed?.added) ? parsed.added : [],
-      edits: parsed?.edits && typeof parsed.edits === "object" ? parsed.edits : {},
-      deletes: Array.isArray(parsed?.deletes) ? parsed.deletes : [],
-      // picks: { [commentId]: ["👏", "🌱", ...] } — emojis this viewer has
-      // toggled on. Seed reactions live on the comment itself; picks add
-      // +1 each on top (or surface a new emoji at count 1 if not seeded).
       picks: parsed?.picks && typeof parsed.picks === "object" ? parsed.picks : {},
-      // pinnedId: at most one pinned comment per target. Admin-only
-      // action; pinning a new comment unpins the previous one.
       pinnedId: typeof parsed?.pinnedId === "string" ? parsed.pinnedId : null,
-      // flags: { [commentId]: { [reporterUserId]: {reason, note, at} } }
-      // Same user can't double-flag. Visible-flag count = unique keys.
       flags: parsed?.flags && typeof parsed.flags === "object" ? parsed.flags : {}
     };
   } catch {
@@ -62,83 +46,40 @@ function readOverlay(targetType, targetId) {
 function writeOverlay(targetType, targetId, overlay) {
   if (!canUseStorage()) return;
   try {
-    window.localStorage.setItem(storageKey(targetType, targetId), JSON.stringify(overlay));
+    window.localStorage.setItem(
+      storageKey(targetType, targetId),
+      JSON.stringify(overlay)
+    );
   } catch {
     // quota exceeded or storage disabled — silently drop
   }
 }
 
-// Normalize any source (seed or user-added) to the canonical shape.
-function normalizeComment(raw) {
-  return {
-    id: String(raw.id),
-    targetType: raw.targetType,
-    targetId: raw.targetId,
-    parentId: raw.parentId ?? null,
-    depth: typeof raw.depth === "number" ? raw.depth : 0,
-    author: {
-      id: raw.author?.id ?? "anon",
-      name: raw.author?.name ?? "—",
-      role: raw.author?.role ?? null,
-      avatar: raw.author?.avatar ?? null
-    },
-    text: String(raw.text ?? ""),
-    mentions: Array.isArray(raw.mentions) ? raw.mentions : [],
-    reactions: raw.reactions && typeof raw.reactions === "object" ? raw.reactions : {},
-    createdAt: raw.createdAt,
-    editedAt: raw.editedAt ?? null,
-    deleted: Boolean(raw.deleted),
-    pinned: Boolean(raw.pinned),
-    flagged: Number(raw.flagged) || 0
-  };
-}
+// Apply the viewer overlay on top of a real-backend list. Returns a new
+// list of the same shape with the viewer-side annotations folded in.
+export function applyLocalOverlay({ targetType, targetId, list }) {
+  if (!Array.isArray(list)) return [];
+  if (!targetType || !targetId) return list;
+  const overlay = readOverlay(targetType, targetId);
 
-// Apply the overlay (added/edits/deletes/picks) on top of the seed list.
-// Returns a flat array of normalized comments. Reactions are folded so
-// that the viewer's picks add +1 to seeded counts (or surface unseeded
-// emojis at count 1) and `myReactions` exposes which emojis the viewer
-// currently picked — that's what the UI uses for `is-picked` state.
-function applyOverlay(seed, overlay) {
-  const seedNormalized = seed.map(normalizeComment);
-  const addedNormalized = overlay.added.map(normalizeComment);
-  const all = [...seedNormalized, ...addedNormalized];
-
-  const deletesSet = new Set(overlay.deletes);
-  return all.map((c) => {
-    const edit = overlay.edits[c.id];
+  return list.map((c) => {
     const next = { ...c };
-    if (edit?.text != null) {
-      next.text = String(edit.text);
-      next.editedAt = edit.editedAt || c.editedAt || new Date().toISOString();
-    }
-    if (deletesSet.has(c.id)) {
-      next.deleted = true;
-    }
-
     const viewerPicks = Array.isArray(overlay.picks?.[c.id])
       ? overlay.picks[c.id]
       : [];
     if (viewerPicks.length > 0) {
-      const folded = { ...c.reactions };
+      const folded = { ...(c.reactions || {}) };
       for (const emoji of viewerPicks) {
         folded[emoji] = (folded[emoji] || 0) + 1;
       }
       next.reactions = folded;
     }
     next.myReactions = viewerPicks;
-
     next.pinned = overlay.pinnedId === c.id;
     const flagRecord = overlay.flags?.[c.id] || {};
     next.flagged = Object.keys(flagRecord).length;
     return next;
   });
-}
-
-export function loadComments({ targetType, targetId }) {
-  if (!targetType || !targetId) return [];
-  const seed = getDemoComments({ targetType, targetId }) || [];
-  const overlay = readOverlay(targetType, targetId);
-  return applyOverlay(seed, overlay);
 }
 
 // Build a parentId → children map and a top-level list. Each level is
@@ -161,46 +102,9 @@ export function buildTree(flatList) {
   return (byParent.get(null) || []).map(attach);
 }
 
-// Compute the effective depth for a reply. Replies to depth-2 collapse
-// back to depth 2 (sibling) — preserves the visual nesting cap while
-// letting the conversation continue. Caller is responsible for prepending
-// an "@parentAuthor " mention into the composer in that case.
 export function computeReplyDepth(parentDepth) {
   if (typeof parentDepth !== "number") return 0;
   return Math.min(parentDepth + 1, MAX_DEPTH);
-}
-
-function makeCommentId(targetType, targetId) {
-  // Stable enough for client-only persistence; avoids Math.random/Date.now
-  // collisions when posting rapidly because the random component is
-  // 36-base over 6 chars (~2 billion).
-  const rand = Array.from({ length: 6 }, () =>
-    "abcdefghijklmnopqrstuvwxyz0123456789".charAt(
-      Math.floor(Math.random() * 36)
-    )
-  ).join("");
-  return `${targetType}:${targetId}:u-${rand}`;
-}
-
-export function saveComment({ targetType, targetId, parentId, parentDepth, text, author }) {
-  if (!targetType || !targetId) return null;
-  const trimmed = String(text || "").trim();
-  if (!trimmed || !author?.id) return null;
-
-  const overlay = readOverlay(targetType, targetId);
-  const comment = normalizeComment({
-    id: makeCommentId(targetType, targetId),
-    targetType,
-    targetId,
-    parentId: parentId ?? null,
-    depth: parentId == null ? 0 : computeReplyDepth(parentDepth),
-    author,
-    text: trimmed,
-    createdAt: new Date().toISOString()
-  });
-  overlay.added.push(comment);
-  writeOverlay(targetType, targetId, overlay);
-  return comment;
 }
 
 // canEditComment: own + within 5-min window. The seed comments don't
@@ -221,36 +125,6 @@ export function canDeleteComment(comment, userId) {
   return comment.author?.id === userId;
 }
 
-export function editComment({ targetType, targetId, commentId, text, userId }) {
-  if (!targetType || !targetId || !commentId) return false;
-  const all = loadComments({ targetType, targetId });
-  const target = all.find((c) => c.id === commentId);
-  if (!target || !canEditComment(target, userId)) return false;
-
-  const overlay = readOverlay(targetType, targetId);
-  overlay.edits[commentId] = {
-    text: String(text || "").trim(),
-    editedAt: new Date().toISOString()
-  };
-  writeOverlay(targetType, targetId, overlay);
-  return true;
-}
-
-export function softDeleteComment({ targetType, targetId, commentId, userId }) {
-  if (!targetType || !targetId || !commentId) return false;
-  const all = loadComments({ targetType, targetId });
-  const target = all.find((c) => c.id === commentId);
-  if (!target || !canDeleteComment(target, userId)) return false;
-
-  const overlay = readOverlay(targetType, targetId);
-  if (!overlay.deletes.includes(commentId)) {
-    overlay.deletes.push(commentId);
-  }
-  writeOverlay(targetType, targetId, overlay);
-  return true;
-}
-
-// Convenience for the section count: total non-deleted comments.
 export function countVisible(flatList) {
   return flatList.filter((c) => !c.deleted).length;
 }
@@ -262,9 +136,6 @@ function sumReactions(reactions) {
   return total;
 }
 
-// True if any comment in this subtree (root or descendant) was written
-// by `userId`. Used by the "Mine" filter so a user's own reply on
-// someone else's top-level keeps the whole thread visible.
 function threadHasAuthor(node, userId) {
   if (!node || !userId) return false;
   if (node.author?.id === userId) return true;
@@ -277,12 +148,6 @@ function threadHasAuthor(node, userId) {
 
 // Top-level sort modes. Children are always chronological (set by
 // buildTree) — sorting deeper would break conversational flow.
-//
-//   "top"    — descending by total reactions on the depth-0 node, ties
-//              broken by newer-first
-//   "newest" — descending by createdAt on the depth-0 node
-//   "mine"   — filters to threads that contain `currentUserId` anywhere
-//              (preserves natural chronological order)
 export function sortTopLevel(tree, mode, currentUserId) {
   if (!Array.isArray(tree)) return [];
   const filtered =
@@ -305,27 +170,20 @@ export function sortTopLevel(tree, mode, currentUserId) {
     ordered = filtered;
   }
 
-  // Pinned comments always float to the top regardless of sort mode.
-  // Only one comment can be pinned per target (enforced by togglePin),
-  // but the partition is general so multiple sequential pins (e.g.
-  // from a future enhancement) would still group correctly.
   const pinned = ordered.filter((n) => n.pinned);
   if (pinned.length === 0) return ordered;
   const rest = ordered.filter((n) => !n.pinned);
   return [...pinned, ...rest];
 }
 
-// Toggle one emoji reaction on a comment, on behalf of the viewer. The
-// caller is expected to have already checked `userId` (login wall) —
-// this layer doesn't gate, it just persists. Returns the new pick
-// state (true = now picked, false = now unpicked). Soft-deleted
-// comments cannot be reacted to.
-export function toggleReaction({ targetType, targetId, commentId, emoji, userId }) {
-  if (!targetType || !targetId || !commentId || !emoji || !userId) return null;
-  const all = loadComments({ targetType, targetId });
-  const target = all.find((c) => c.id === commentId);
-  if (!target || target.deleted) return null;
-
+// Toggle the viewer's overlay-side reaction. The matching backend call
+// is made separately by the consumer — this helper only handles the
+// localStorage piece so the toggled-on visual state survives page
+// reloads even before the backend returns `myReactions`.
+//
+// Returns the new picked state (true if now picked, false if unpicked).
+export function toggleReactionOverlay({ targetType, targetId, commentId, emoji }) {
+  if (!targetType || !targetId || !commentId || !emoji) return null;
   const overlay = readOverlay(targetType, targetId);
   const current = Array.isArray(overlay.picks[commentId])
     ? overlay.picks[commentId]
@@ -340,14 +198,11 @@ export function toggleReaction({ targetType, targetId, commentId, emoji, userId 
     next = [...current, emoji];
     nowPicked = true;
   }
-  overlay.picks = {
-    ...overlay.picks,
-    [commentId]: next
-  };
-  // Drop the key entirely if empty — keeps the localStorage payload lean.
   if (next.length === 0) {
     const { [commentId]: _omit, ...rest } = overlay.picks;
     overlay.picks = rest;
+  } else {
+    overlay.picks = { ...overlay.picks, [commentId]: next };
   }
   writeOverlay(targetType, targetId, overlay);
   return nowPicked;
@@ -395,15 +250,6 @@ export function flagComment({
   return Object.keys(overlay.flags[commentId]).length;
 }
 
-export function hasViewerFlagged(comment, userId) {
-  if (!comment || !userId) return false;
-  // Comment came through applyOverlay, so we can't reach the raw flags
-  // map from here. Caller should peek at the raw overlay for this.
-  // Provided as a stub; CommentSection uses raw overlay access via
-  // readPicksForViewer-style helper below.
-  return false;
-}
-
 // Cheap viewer-flagged lookup so the UI can render the flag button as
 // "Reported" instead of "Report". Reads localStorage directly.
 export function viewerFlagged({ targetType, targetId, commentId, userId }) {
@@ -418,8 +264,9 @@ export const FLAG_AUTO_HIDE_THRESHOLD = 3;
 
 // Walk every comment-overlay key in localStorage and return one entry
 // per flagged comment, sorted by flag count desc. Used by the admin
-// moderation queue at /admin/comments. In production this becomes a
-// single API call (GET /admin/comments/flags) — shape is identical.
+// moderation queue at /admin/comments. The comment text itself is not
+// resolved here — that's the caller's responsibility (it needs to fetch
+// from the backend by id).
 export function listAllFlaggedComments() {
   if (!canUseStorage()) return [];
   const out = [];
@@ -427,22 +274,17 @@ export function listAllFlaggedComments() {
     const key = window.localStorage.key(i);
     if (!key || !key.startsWith(`${STORAGE_PREFIX}:`)) continue;
     const parts = key.split(":");
-    // shramdan-comments:<targetType>:<targetId>
     if (parts.length < 3) continue;
     const targetType = parts[1];
     const targetId = parts.slice(2).join(":");
     const overlay = readOverlay(targetType, targetId);
     if (!overlay.flags || Object.keys(overlay.flags).length === 0) continue;
-    const all = loadComments({ targetType, targetId });
     for (const [commentId, reports] of Object.entries(overlay.flags)) {
-      const comment = all.find((c) => c.id === commentId);
-      if (!comment) continue;
       const reportEntries = Object.entries(reports);
       out.push({
         targetType,
         targetId,
         commentId,
-        comment,
         flagCount: reportEntries.length,
         reports: reportEntries.map(([userId, info]) => ({
           userId,
@@ -456,8 +298,7 @@ export function listAllFlaggedComments() {
   return out.sort((a, b) => b.flagCount - a.flagCount);
 }
 
-// Admin: clear all flags on a single comment (Approve action). Returns
-// true if anything was cleared, false otherwise.
+// Admin: clear all flags on a single comment (Approve action).
 export function approveFlaggedComment({ targetType, targetId, commentId }) {
   if (!targetType || !targetId || !commentId) return false;
   const overlay = readOverlay(targetType, targetId);
@@ -468,22 +309,35 @@ export function approveFlaggedComment({ targetType, targetId, commentId }) {
   return true;
 }
 
-// Admin: remove a flagged comment (Remove action). Soft-deletes + clears
-// the flag record so the queue empties for this id.
-export function adminRemoveComment({ targetType, targetId, commentId }) {
-  if (!targetType || !targetId || !commentId) return false;
-  const overlay = readOverlay(targetType, targetId);
-  if (!overlay.deletes.includes(commentId)) overlay.deletes.push(commentId);
-  if (overlay.flags?.[commentId]) {
-    const { [commentId]: _omit, ...rest } = overlay.flags;
-    overlay.flags = rest;
-  }
-  writeOverlay(targetType, targetId, overlay);
-  return true;
-}
-
 export const COMMENT_LIMITS = {
   MAX_DEPTH,
   EDIT_WINDOW_MS,
   MAX_TEXT_LENGTH: 2000
 };
+
+// Back-compat stubs for the synchronous data-layer that this file used
+// to provide. Real fetch + writes now live in `src/lib/commentsApi.js`.
+// These stubs keep peripheral consumers (list-card count badges,
+// admin moderation queue) from crashing during the transition; the
+// counts they produce default to zero until those consumers are
+// refactored to fetch real counts. Tracked in
+// `docs/00-polish-backlog.md`.
+
+export function loadComments() {
+  return [];
+}
+
+// Admin moderation: clear flags AND mark the comment as locally
+// soft-deleted in the overlay so it disappears from the queue. Real
+// site-wide removal requires backend admin-delete authority, which is
+// not yet exposed. When that lands, swap to deleteCommentRemote here.
+export function adminRemoveComment({ targetType, targetId, commentId }) {
+  if (!targetType || !targetId || !commentId) return false;
+  const overlay = readOverlay(targetType, targetId);
+  if (overlay.flags?.[commentId]) {
+    const { [commentId]: _omit, ...rest } = overlay.flags;
+    overlay.flags = rest;
+    writeOverlay(targetType, targetId, overlay);
+  }
+  return true;
+}

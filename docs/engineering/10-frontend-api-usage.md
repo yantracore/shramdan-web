@@ -116,6 +116,21 @@ Uses the same `IssueForm` component as the create page (see "One shared form com
 | `src/components/EventJoinPanel.js` | `GET /events/{id}/participants/me` | `getJson` | Authenticated; called on mount to detect whether the viewer is already a participant. 404 means "not joined yet" — handled silently. Drives the `joined / waitlisted / checked-in` label states. |
 | `src/components/EventJoinPanel.js` | `POST /events/{id}/participants` | `postJson` | Authenticated; body `{ role }`. 201 = joined (CONFIRMED) or waitlisted (INVITED). 403 surfaces a medic-credential error toast; 409 re-pulls the participation record so the UI flips to "joined" state. |
 
+### Comments (issue + event detail pages)
+
+All comment requests funnel through `src/lib/commentsApi.js` (`fetchComments` / `createComment` / `updateComment` / `deleteCommentRemote` / `addReactionRemote` / `removeReactionRemote`). The consumer is `src/components/comments/CommentSection.js`, mounted from both `src/app/issues/[id]/page.js` and `src/app/events/[id]/page.js`.
+
+| Method + path | apiClient fn | Trigger |
+| --- | --- | --- |
+| `GET /comments?targetType&targetId&limit=200` | `getJson` | Mount and after every successful mutation. Bearer token attached when the viewer is authenticated so the response includes any per-viewer fields. |
+| `POST /comments` | `postJson` | Composer submit (top-level or reply); body `{ targetType, targetId, parentId?, text, mentions? }`. |
+| `PATCH /comments/{id}` | `patchJson` | Edit composer submit within the five-minute window; body `{ text, mentions? }`. |
+| `DELETE /comments/{id}` | `deleteJson` | "Delete" action on own comment (soft delete by default). |
+| `POST /comments/{id}/reactions` | `postJson` | Emoji picker selection — fires when the local overlay flip records a new pick; body `{ emoji }`. |
+| `DELETE /comments/{id}/reactions?emoji=…` | `deleteJson` | Same handler reverses the toggle when the viewer's pick flips off. |
+
+Pin and flag remain a localStorage overlay (`src/lib/comments.js`) — admin-only features the backend does not yet expose. The `myReactions` field is also not returned by staging, so the local overlay also keeps a per-viewer `picks` list so reaction chips can render their toggled-on state across reloads.
+
 ### Public issue pages
 
 | Page | Method + path | apiClient fn | Notes |
