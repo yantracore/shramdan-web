@@ -63,23 +63,25 @@ function truncate(text, max) {
   return `${safe.slice(0, max - 1).trimEnd()}…`;
 }
 
-export function EventCommentsSummary({ eventId, language = "np" }) {
+// Shared comments-summary used by both event and issue preview panes.
+// `targetType` discriminates the localStorage bucket and the detail-page
+// anchor; everything else is language-driven copy.
+export function CommentsSummary({
+  targetType,
+  targetId,
+  language = "np",
+  detailHref
+}) {
   const t = COPY[language] || COPY.np;
-  // Defer the load until after mount — keeps SSR HTML stable and
-  // sidesteps any hydration mismatch from window-only `Date.now()` use
-  // inside the relative-time helper.
   const [hydrated, setHydrated] = useState(false);
   const [comments, setComments] = useState([]);
 
   useEffect(() => {
-    if (!eventId) return;
-    // Sync external store (localStorage) into component state on mount /
-    // event change. The lint rule discourages this in general, but here
-    // localStorage is exactly the "external system" the docs reference.
+    if (!targetId || !targetType) return;
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setComments(loadComments({ targetType: "event", targetId: eventId }));
+    setComments(loadComments({ targetType, targetId }));
     setHydrated(true);
-  }, [eventId]);
+  }, [targetType, targetId]);
 
   const { count, latest } = useMemo(() => {
     if (!comments.length) return { count: 0, latest: null };
@@ -90,13 +92,13 @@ export function EventCommentsSummary({ eventId, language = "np" }) {
     return { count: countVisible(comments), latest: recent || null };
   }, [comments]);
 
-  if (!eventId) return null;
-  // Render nothing pre-hydration so the SSR HTML doesn't bake in a
-  // "0 comments" state that flips to a populated one after JS boots.
+  if (!targetId || !targetType) return null;
   if (!hydrated) return null;
 
   const noun = count === 1 ? t.countOne : t.countMany;
-  const href = `/events/${eventId}#comment-section-title`;
+  const href =
+    detailHref ||
+    `/${targetType === "issue" ? "issues" : "events"}/${targetId}#comment-section-title`;
 
   return (
     <section className="event-preview-comments" aria-label={t.eyebrow}>
@@ -129,5 +131,15 @@ export function EventCommentsSummary({ eventId, language = "np" }) {
         ) : null}
       </Link>
     </section>
+  );
+}
+
+export function EventCommentsSummary({ eventId, language = "np" }) {
+  return (
+    <CommentsSummary
+      targetType="event"
+      targetId={eventId}
+      language={language}
+    />
   );
 }

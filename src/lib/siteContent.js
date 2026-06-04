@@ -1230,6 +1230,24 @@ export const copy = {
         viewMap: "नक्सा",
         toggleLabel: "सूची वा नक्सा छनोट गर्नुहोस्",
         markerCount: "नक्सामा {n} समस्या"
+      },
+      split: {
+        listAriaLabel: "समस्याहरूको सूची",
+        loadingMore: "थप समस्या ल्याउँदै…",
+        noMore: "सबै समस्या देखाइए।",
+        sectionScheduled: "अभियान तय भएका",
+        sectionOpen: "खुला समस्याहरू",
+        sectionCompleted: "सम्पन्न"
+      },
+      preview: {
+        empty: "बायाँबाट कुनै समस्या छान्नुहोस् — विवरण यहाँ देखिनेछ।",
+        back: "सूचीमा फर्कनुहोस्",
+        openFull: "पूर्ण विवरण पृष्ठ खोल्नुहोस्",
+        reportedOn: "रिपोर्ट मिति",
+        showMore: "थप पढ्नुहोस्",
+        showLess: "छोटो बनाउनुहोस्",
+        supporters: "समर्थनकर्ता",
+        supportersMore: "थप {n}"
       }
     },
     liveEventsRail: {
@@ -2853,6 +2871,24 @@ export const copy = {
         viewMap: "Map",
         toggleLabel: "Switch between list and map",
         markerCount: "{n} on map"
+      },
+      split: {
+        listAriaLabel: "List of issues",
+        loadingMore: "Loading more issues…",
+        noMore: "All issues shown.",
+        sectionScheduled: "Campaign scheduled",
+        sectionOpen: "Open issues",
+        sectionCompleted: "Completed"
+      },
+      preview: {
+        empty: "Pick an issue from the list to see details here.",
+        back: "Back to list",
+        openFull: "Open Full Issue Page",
+        reportedOn: "Reported on",
+        showMore: "Show more",
+        showLess: "Show less",
+        supporters: "Supporters",
+        supportersMore: "+{n} more"
       }
     },
     liveEventsRail: {
