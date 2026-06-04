@@ -3,8 +3,11 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import {
   AppstoreOutlined,
+  BellOutlined,
+  HeartOutlined,
   LogoutOutlined,
   MenuOutlined,
+  SolutionOutlined,
   UserAddOutlined,
   UserOutlined
 } from "@ant-design/icons";
@@ -133,7 +136,8 @@ export function SiteShell({ children, pageTitle }) {
                   icon: <AppstoreOutlined />,
                   label: t.me.menu.adminCenter,
                   onClick: () => router.push("/admin")
-                }
+                },
+                { type: "divider" }
               ]
             : []),
           {
@@ -141,6 +145,24 @@ export function SiteShell({ children, pageTitle }) {
             icon: <UserOutlined />,
             label: t.me.menu.myProfile,
             onClick: () => router.push("/me")
+          },
+          {
+            key: "applications",
+            icon: <SolutionOutlined />,
+            label: t.me.menu.applications,
+            onClick: () => router.push("/me/applications")
+          },
+          {
+            key: "saved",
+            icon: <HeartOutlined />,
+            label: t.me.menu.saved,
+            onClick: () => router.push("/me/saved")
+          },
+          {
+            key: "notifications",
+            icon: <BellOutlined />,
+            label: t.me.menu.notifications,
+            onClick: () => router.push("/me/notifications")
           },
           { type: "divider" },
           {

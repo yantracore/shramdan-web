@@ -1001,6 +1001,9 @@ export const copy = {
       menu: {
         adminCenter: "एड्मिन कन्ट्रोल सेन्टर",
         myProfile: "मेरो प्रोफाइल",
+        applications: "मेरा अनुरोधहरू",
+        saved: "सेभ गरिएका",
+        notifications: "सूचनाहरू",
         logout: "लग आउट"
       },
       identity: {
@@ -2648,8 +2651,11 @@ export const copy = {
       navLabel: "My profile",
       menu: {
         adminCenter: "Admin Control Center",
-        myProfile: "My profile",
-        logout: "Logout"
+        myProfile: "My Profile",
+        applications: "My Applications",
+        saved: "Saved",
+        notifications: "Notifications",
+        logout: "Log Out"
       },
       identity: {
         heading: "Account details",
