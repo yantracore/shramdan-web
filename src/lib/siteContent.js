@@ -1264,8 +1264,7 @@ export const copy = {
       eyebrow: "अहिले भइरहेको",
       liveBadge: "लाइभ",
       title: "श्रमदान अभियानहरू",
-      subtitle:
-        "अहिले लाइभ हेर्नुहोस्, वा आउँदोमा सामेल भएर आकार दिनुहोस्।",
+      subtitle: "अहिले लाइभ भइरहेका अभियानहरू हेर्नुहोस्।",
       viewAll: "सबै अभियान हेर्नुहोस्",
       emptyMessage:
         "अहिले कुनै अभियान छैन। जब कुनै सुरु हुन्छ, श्रमेशले यहीँ देखाउनेछ।",
@@ -1275,7 +1274,7 @@ export const copy = {
       justStarted: "भर्खर सुरु",
       durationLive: "देखि लाइभ",
       viewDetails: "विवरण",
-      ariaCarousel: "लाइभ र आउँदा अभियानहरूको स्लाइडर",
+      ariaCarousel: "लाइभ अभियानहरूको स्लाइडर",
       prevAria: "अघिल्ला अभियानहरू देखाउनुहोस्",
       nextAria: "अरू अभियानहरू देखाउनुहोस्"
     },
@@ -2915,8 +2914,7 @@ export const copy = {
       eyebrow: "Happening now",
       liveBadge: "LIVE",
       title: "Shramdan Events",
-      subtitle:
-        "Watch one live, or join the next one and help shape it.",
+      subtitle: "Watch what's live right now.",
       viewAll: "View All Events",
       emptyMessage:
         "No campaigns right now. श्रमेश will surface them here as they start.",
@@ -2926,7 +2924,7 @@ export const copy = {
       justStarted: "Just started",
       durationLive: "live",
       viewDetails: "View Details",
-      ariaCarousel: "Live and upcoming campaigns carousel",
+      ariaCarousel: "Live campaigns carousel",
       prevAria: "Show previous campaigns",
       nextAria: "Show next campaigns"
     },

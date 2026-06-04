@@ -53,10 +53,14 @@ import { SectionVideoBackground } from "@/components/SectionVideoBackground";
 import { TertiaryButton } from "@/components/TertiaryButton";
 import { TimeOfDayGreeting } from "@/components/TimeOfDayGreeting";
 import { SiteShell } from "@/components/SiteShell";
-import { getDemoLiveEvents, getDemoUpcomingEvents } from "@/lib/devMockData";
+import { getDemoLiveEvents } from "@/lib/devMockData";
 import { usePreferences } from "@/app/providers";
 import { getJson } from "@/lib/apiClient";
-import { ISSUE_STATUS_COLORS, getListItems } from "@/lib/adminUtils";
+import {
+  ISSUE_STATUS_COLORS,
+  getIssueCoverImageUrl,
+  getListItems
+} from "@/lib/adminUtils";
 import { copy } from "@/lib/siteContent";
 
 const LIVE_RESOURCE_IDS = new Set(["participate", "watchLive"]);
@@ -419,7 +423,6 @@ export default function HomeClient({ summary }) {
       <MotionSection as="div">
         <EventsHomeRail
           liveEvents={getDemoLiveEvents()}
-          upcomingEvents={getDemoUpcomingEvents()}
           copy={t.liveEventsRail}
           language={language}
         />
@@ -497,34 +500,56 @@ export default function HomeClient({ summary }) {
                       : (
                           issueCopy.card?.supportersMany || "{n} supporters"
                         ).replace("{n}", localizeDigits(votes, language));
+                  const coverUrl = getIssueCoverImageUrl(issue);
+                  const cardLabel =
+                    issue.title || issue.addressText || categoryLabel;
                   return (
                     <li key={issue.id}>
                       <Link
                         className="live-issues-top-card"
                         href={`/issues/${issue.id}`}
                       >
-                        <div className="live-issues-top-meta">
-                          <span
-                            className={`live-issues-top-status live-issues-top-status--${issue.status}`}
-                            data-tone={ISSUE_STATUS_COLORS[issue.status]}
-                          >
-                            {statusLabel}
-                          </span>
-                          <span className="live-issues-top-category">
-                            {categoryLabel}
+                        <div
+                          className={`live-issues-top-thumb${coverUrl ? "" : " is-placeholder"}`}
+                          aria-hidden="true"
+                        >
+                          {coverUrl ? (
+                            <Image
+                              alt=""
+                              src={coverUrl}
+                              width={88}
+                              height={88}
+                              sizes="88px"
+                              unoptimized
+                            />
+                          ) : (
+                            <EnvironmentOutlined />
+                          )}
+                        </div>
+                        <div className="live-issues-top-body">
+                          <div className="live-issues-top-meta">
+                            <span
+                              className={`live-issues-top-status live-issues-top-status--${issue.status}`}
+                              data-tone={ISSUE_STATUS_COLORS[issue.status]}
+                            >
+                              {statusLabel}
+                            </span>
+                            <span className="live-issues-top-category">
+                              {categoryLabel}
+                            </span>
+                          </div>
+                          <h4>{cardLabel}</h4>
+                          {issue.addressText ? (
+                            <p className="live-issues-top-address">
+                              <EnvironmentOutlined aria-hidden="true" />
+                              <span>{issue.addressText}</span>
+                            </p>
+                          ) : null}
+                          <span className="live-issues-top-votes">
+                            <LikeOutlined aria-hidden="true" />
+                            {voteText}
                           </span>
                         </div>
-                        <h4>{issue.title}</h4>
-                        {issue.addressText ? (
-                          <p className="live-issues-top-address">
-                            <EnvironmentOutlined aria-hidden="true" />
-                            {issue.addressText}
-                          </p>
-                        ) : null}
-                        <span className="live-issues-top-votes">
-                          <LikeOutlined aria-hidden="true" />
-                          {voteText}
-                        </span>
                       </Link>
                     </li>
                   );
