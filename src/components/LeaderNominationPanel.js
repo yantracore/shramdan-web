@@ -1,16 +1,27 @@
 "use client";
 
 // LeaderNominationPanel — roadmap 3.4.2 + 3.4.3.
-// Surfaces nomination + community vote on a DRAFT event that does
-// not yet have a leader assigned. Authenticated members can:
-//  - Self-nominate (cheapest path; one-click)
-//  - Cast / withdraw a support vote on existing nominations
+// Surfaces the leader-voting state on a DRAFT event that does not yet
+// have a leader assigned. Authenticated members can:
+//  - Cast or withdraw their support for one of the existing candidates
 //  - See the current leader-elect (highest support count) and any
 //    active tie between top candidates
 //
-// Demo events update local state through onChanged. Real events
-// would POST /events/{id}/nominations + /events/{id}/nominations/{id}/vote.
-// Backend endpoints pending; the UI degrades gracefully on 404/501.
+// Backend data model (per `events.md` + the leader-voting OpenAPI):
+//   GET    /events/{id}/leader-voting          → { status, candidates: [{ id, name, voteCount }], closesAt, ... }
+//   POST   /events/{id}/leader-vote { candidateId } — cast / change my vote
+//   DELETE /events/{id}/leader-vote            — retract my vote
+//
+// Candidates are seeded earlier — at the issue-voting stage — when
+// members express a "WANT_TO_LEAD" interest. There is no public
+// self-nominate endpoint at this stage; the self-nominate CTA on
+// the panel is therefore an inert hint linking back to the originating
+// issue. When the backend ships post-promotion self-nomination, the
+// hint can be promoted back to an active button.
+//
+// Demo events (`demo-` id prefix) stay on the local-state mock path
+// so the leader-nomination UX can still be exercised end-to-end
+// without round-tripping the backend.
 
 import {
   CheckCircleFilled,
@@ -18,10 +29,10 @@ import {
   UserAddOutlined,
   WarningOutlined
 } from "@ant-design/icons";
-import { Button } from "antd";
-import { useMemo, useState, useSyncExternalStore } from "react";
+import { Button, Tooltip } from "antd";
+import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
-import { postJson, deleteJson } from "@/lib/apiClient";
+import { deleteJson, getJson, postJson } from "@/lib/apiClient";
 import { getAuthSession, subscribeAuthSession } from "@/lib/authSession";
 import { useToast } from "@/lib/toast";
 
@@ -32,47 +43,43 @@ const COPY = {
     eyebrow: "नेतृत्व मनोनयन",
     title: "अभियानको संयोजक छनोट",
     intro:
-      "यो अभियानमा अहिलेसम्म कुनै संयोजक तय भएको छैन। आफै मनोनयन भर्नुहोस् अथवा अरूले मनोनयन भरेका सदस्यलाई समर्थन गर्नुहोस्।",
+      "यो अभियानमा अहिलेसम्म कुनै संयोजक तय भएको छैन। उम्मेदवारहरूमध्ये एक जनालाई समर्थन गर्नुहोस्।",
     selfNominateCta: "म आफै संयोजक बन्न तयार छु",
-    alreadyNominated: "तपाईं पहिल्यै मनोनयन भर्नुभएको छ",
+    selfNominateDisabledTooltip:
+      "मनोनयन समस्या भोटिङका बेला 'नेतृत्व चाहन्छु' छानेर मात्र मिल्छ।",
     voteCta: "समर्थन",
     voteDoneCta: "समर्थन गरियो",
     leaderElectLabel: "अग्रस्थानमा",
     tieLabel: "बराबर समर्थन — समुदायले निर्णय गर्न सक्छ",
-    emptyState:
-      "अहिले कुनै मनोनयन छैन। पहिले मनोनयन भर्ने व्यक्ति बन्नुहोस्।",
-    loginPrompt: "मनोनयन / समर्थनका लागि पहिले लग-इन गर्नुहोस्",
+    emptyState: "अहिले कुनै उम्मेदवार छैन।",
+    loginPrompt: "समर्थनका लागि पहिले लग-इन गर्नुहोस्",
     loginCta: "लग-इन गर्नुहोस्",
-    successNominate: "तपाईंको मनोनयन दर्ता भयो।",
     successVote: "समर्थन दर्ता भयो।",
     successWithdraw: "समर्थन फिर्ता भयो।",
-    backendPendingToast:
-      "ब्याकएन्ड समर्थन अझै तयार छैन — डेमो मा स्थानीय रूपमा सुरक्षित।",
     errorToast: "केही गडबड भयो। फेरि प्रयास गर्नुहोस्।",
-    votesCount: "{n} समर्थन"
+    votesCount: "{n} समर्थन",
+    backToIssueLabel: "मूल समस्या हेर्नुहोस्"
   },
   en: {
     eyebrow: "Leader nomination",
     title: "Pick a campaign leader",
     intro:
-      "No leader has been chosen for this campaign yet. Nominate yourself or back another member who has nominated.",
+      "No leader has been chosen for this campaign yet. Back one of the candidates below.",
     selfNominateCta: "I'd like to lead this",
-    alreadyNominated: "You've already nominated",
+    selfNominateDisabledTooltip:
+      "Self-nomination happens during issue voting — pick 'Want to lead' there.",
     voteCta: "Support",
     voteDoneCta: "Supported",
     leaderElectLabel: "Leading",
     tieLabel: "Tied — the community can decide",
-    emptyState:
-      "No nominations yet. Be the first to nominate.",
-    loginPrompt: "Sign in to nominate or support",
+    emptyState: "No candidates yet.",
+    loginPrompt: "Sign in to support a candidate",
     loginCta: "Sign In",
-    successNominate: "Your nomination is in.",
     successVote: "Support recorded.",
     successWithdraw: "Support withdrawn.",
-    backendPendingToast:
-      "Backend endpoint is pending — saved locally for the demo.",
     errorToast: "Something went wrong. Try again.",
-    votesCount: "{n} supporting"
+    votesCount: "{n} supporting",
+    backToIssueLabel: "Open original issue"
   }
 };
 
@@ -91,28 +98,73 @@ function detectTie(nominations) {
   return nominations.filter((n) => (n.voteCount || 0) === top.voteCount).length > 1;
 }
 
+function unwrap(response) {
+  if (!response || typeof response !== "object") return response ?? null;
+  return response.data ?? response;
+}
+
+function candidatesToNominations(candidates, viewerVotedCandidateId) {
+  if (!Array.isArray(candidates)) return [];
+  return candidates.map((c) => ({
+    id: c.id,
+    memberId: c.id,
+    memberName: c.name || "—",
+    voteCount: Number.isFinite(c.voteCount) ? c.voteCount : 0,
+    votedByMe:
+      typeof c.votedByMe === "boolean"
+        ? c.votedByMe
+        : viewerVotedCandidateId === c.id
+  }));
+}
+
 export function LeaderNominationPanel({ event, language = "np", onChanged }) {
   const t = COPY[language] || COPY.np;
   const session = useSyncExternalStore(subscribeAuthSession, getAuthSession, () => null);
   const messageApi = useToast();
   const [saving, setSaving] = useState(false);
+  const [votingState, setVotingState] = useState(null);
+  // Tracks which candidate the current viewer last voted for in this
+  // session. The backend's /leader-voting response does not include a
+  // per-viewer flag today (gap noted in api-requirements/events.md), so
+  // this is our best handle on the toggle-state until the field lands.
+  // Cleared on withdraw, replaced on a fresh vote.
+  const [viewerVotedCandidateId, setViewerVotedCandidateId] = useState(null);
 
-  const nominations = useMemo(
-    () => (Array.isArray(event?.nominations) ? event.nominations : []),
-    [event?.nominations]
-  );
-
+  const eventId = event?.id;
+  const isDemo = isDemoId(eventId);
   const viewerId = session?.user?.id || null;
-  const viewerName = session?.user?.name || null;
-  const myNomination = useMemo(
-    () => nominations.find((n) => n.memberId === viewerId),
-    [nominations, viewerId]
-  );
+
+  const refreshVoting = useCallback(async () => {
+    if (!eventId || isDemo) return;
+    try {
+      const response = await getJson(`/events/${eventId}/leader-voting`);
+      setVotingState(unwrap(response));
+    } catch {
+      setVotingState(null);
+    }
+  }, [eventId, isDemo]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    refreshVoting();
+  }, [refreshVoting]);
+
+  // Demo events keep using the in-memory mock nominations supplied by
+  // the parent; real events use the live leader-voting state mapped
+  // into a nomination-shaped row so the existing list rendering keeps
+  // working untouched.
+  const nominations = isDemo
+    ? Array.isArray(event?.nominations)
+      ? event.nominations
+      : []
+    : candidatesToNominations(votingState?.candidates, viewerVotedCandidateId);
+
+  const myNomination = nominations.find((n) => n.memberId === viewerId);
   const leaderElect = findLeaderElect(nominations);
   const isTie = detectTie(nominations);
 
-  if (!session?.user?.id) {
-    const next = encodeURIComponent(`/events/${event?.id || ""}`);
+  if (!viewerId) {
+    const next = encodeURIComponent(`/events/${eventId || ""}`);
     return (
       <section className="leader-nomination-panel leader-nomination-panel-anon">
         <header className="leader-nomination-header">
@@ -130,83 +182,49 @@ export function LeaderNominationPanel({ event, language = "np", onChanged }) {
     );
   }
 
-  const persist = async (action, payload, optimisticUpdate) => {
+  const handleToggleVote = async (nomination) => {
+    if (saving) return;
     setSaving(true);
+    const wasVoted = nomination.votedByMe;
     try {
-      const next = optimisticUpdate(nominations);
-      if (isDemoId(event?.id)) {
-        await new Promise((resolve) => setTimeout(resolve, 250));
+      if (isDemo) {
+        await new Promise((resolve) => setTimeout(resolve, 200));
+        const next = nominations.map((n) => {
+          if (n.id !== nomination.id) return n;
+          return {
+            ...n,
+            votedByMe: !wasVoted,
+            voteCount: Math.max(0, (n.voteCount || 0) + (wasVoted ? -1 : 1))
+          };
+        });
         onChanged?.({ ...event, nominations: next });
-        return { ok: true };
+        messageApi.success(wasVoted ? t.successWithdraw : t.successVote);
+        return;
       }
-      try {
-        if (action === "nominate") {
-          await postJson(`/events/${event.id}/nominations`, payload || {}, {
-            requireAuth: true
-          });
-        } else if (action === "vote") {
-          await postJson(
-            `/events/${event.id}/nominations/${payload.nominationId}/vote`,
-            {},
-            { requireAuth: true }
-          );
-        } else if (action === "withdraw") {
-          await deleteJson(
-            `/events/${event.id}/nominations/${payload.nominationId}/vote`,
-            { requireAuth: true }
-          );
-        }
-        onChanged?.();
-        return { ok: true };
-      } catch (apiError) {
-        if (apiError?.status === 404 || apiError?.status === 501) {
-          messageApi.info(t.backendPendingToast);
-          onChanged?.({ ...event, nominations: next });
-          return { ok: true, fallback: true };
-        }
-        throw apiError;
+
+      if (wasVoted) {
+        await deleteJson(`/events/${eventId}/leader-vote`, { requireAuth: true });
+        setViewerVotedCandidateId(null);
+        messageApi.success(t.successWithdraw);
+      } else {
+        await postJson(
+          `/events/${eventId}/leader-vote`,
+          { candidateId: nomination.id },
+          { requireAuth: true }
+        );
+        setViewerVotedCandidateId(nomination.id);
+        messageApi.success(t.successVote);
       }
+      await refreshVoting();
+      onChanged?.();
     } catch (error) {
       messageApi.error(error?.message || t.errorToast);
-      return { ok: false };
     } finally {
       setSaving(false);
     }
   };
 
-  const handleSelfNominate = async () => {
-    if (myNomination || saving) return;
-    const result = await persist("nominate", null, (current) => [
-      ...current,
-      {
-        id: `nom-${viewerId}-${Date.now()}`,
-        memberId: viewerId,
-        memberName: viewerName || "तपाईं",
-        voteCount: 1,
-        votedByMe: true,
-        createdAt: new Date().toISOString()
-      }
-    ]);
-    if (result.ok) messageApi.success(t.successNominate);
-  };
-
-  const handleToggleVote = async (nomination) => {
-    if (saving) return;
-    const next = nominations.map((n) => {
-      if (n.id !== nomination.id) return n;
-      const wasVoted = n.votedByMe;
-      return {
-        ...n,
-        votedByMe: !wasVoted,
-        voteCount: Math.max(0, (n.voteCount || 0) + (wasVoted ? -1 : 1))
-      };
-    });
-    const action = nomination.votedByMe ? "withdraw" : "vote";
-    const result = await persist(action, { nominationId: nomination.id }, () => next);
-    if (result.ok) {
-      messageApi.success(nomination.votedByMe ? t.successWithdraw : t.successVote);
-    }
-  };
+  const issueHref = event?.issueId ? `/issues/${event.issueId}` : null;
 
   return (
     <section className="leader-nomination-panel" aria-labelledby="leader-nomination-title">
@@ -224,15 +242,21 @@ export function LeaderNominationPanel({ event, language = "np", onChanged }) {
       ) : null}
 
       <div className="leader-nomination-self">
-        <Button
-          type="primary"
-          icon={<UserAddOutlined />}
-          onClick={handleSelfNominate}
-          disabled={!!myNomination || saving}
-          loading={saving && !myNomination}
-        >
-          {myNomination ? t.alreadyNominated : t.selfNominateCta}
-        </Button>
+        <Tooltip title={t.selfNominateDisabledTooltip}>
+          <Button
+            type="default"
+            icon={<UserAddOutlined />}
+            disabled
+            aria-disabled="true"
+          >
+            {t.selfNominateCta}
+          </Button>
+        </Tooltip>
+        {issueHref ? (
+          <Link className="leader-nomination-issue-link" href={issueHref}>
+            {t.backToIssueLabel}
+          </Link>
+        ) : null}
       </div>
 
       {nominations.length === 0 ? (
@@ -275,6 +299,10 @@ export function LeaderNominationPanel({ event, language = "np", onChanged }) {
             })}
         </ul>
       )}
+      {/* myNomination intentionally unused after the self-nominate
+          flow was disabled — kept in the memo above so the
+          eligibility check is ready when backend ships the endpoint. */}
+      {myNomination ? null : null}
     </section>
   );
 }
