@@ -6,7 +6,8 @@ import {
   setAuthSession
 } from "@/lib/authSession";
 
-const FALLBACK_API_BASE_URL = "https://backend.shramdan.org/api/v1";
+// Staging tunnel (active). Production URL: https://backend.shramdan.org/api/v1
+const FALLBACK_API_BASE_URL = "https://z0n76c1j-3000.usw3.devtunnels.ms/api/v1";
 
 function normalizeApiBaseUrl(baseUrl) {
   const normalizedBaseUrl = baseUrl.replace(/\/+$/, "");

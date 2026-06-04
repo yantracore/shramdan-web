@@ -107,6 +107,15 @@ Uses the same `IssueForm` component as the create page (see "One shared form com
 | `GET /issues/{id}` | `getJson` | Initial load to populate `initialValues` |
 | `PATCH /issues/{id}` | `patchJson` | Submit of the shared `IssueForm` — currently blocked by missing backend endpoint, see `09-backend-admin-gaps.md` |
 
+### Public event pages
+
+| Page / component | Method + path | apiClient fn | Notes |
+| --- | --- | --- | --- |
+| `src/app/events/[id]/page.js` | `GET /events/{id}` | `getJson` | Anonymous; primary event payload. Returns the raw `rolePlan`, not the derived `rolesNeeded` aggregation. |
+| `src/app/events/[id]/page.js` | `GET /events/{id}/participants?limit=200` | `getJson` | Anonymous; loaded once per visit when the event payload carries a `rolePlan`. The page composes `rolesNeeded` (with `filled` / `filledNames`) and `participantCount` client-side via `src/lib/eventParticipants.js`. Soft-fails to zero-fill if the request errors. Skipped for demo events. |
+| `src/components/EventJoinPanel.js` | `GET /events/{id}/participants/me` | `getJson` | Authenticated; called on mount to detect whether the viewer is already a participant. 404 means "not joined yet" — handled silently. Drives the `joined / waitlisted / checked-in` label states. |
+| `src/components/EventJoinPanel.js` | `POST /events/{id}/participants` | `postJson` | Authenticated; body `{ role }`. 201 = joined (CONFIRMED) or waitlisted (INVITED). 403 surfaces a medic-credential error toast; 409 re-pulls the participation record so the UI flips to "joined" state. |
+
 ### Public issue pages
 
 | Page | Method + path | apiClient fn | Notes |

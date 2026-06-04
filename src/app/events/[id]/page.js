@@ -40,6 +40,7 @@ import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
 import { getJson } from "@/lib/apiClient";
 import { getDemoEventById, injectMockLiveStream } from "@/lib/devMockData";
+import { buildRolesNeeded, countActiveParticipants } from "@/lib/eventParticipants";
 import { getAuthSession, subscribeAuthSession } from "@/lib/authSession";
 import { copy } from "@/lib/siteContent";
 import { useTrackVisit } from "@/lib/useRecentlyViewed";
@@ -133,9 +134,46 @@ export default function EventDetailPage() {
         setEventData(null);
         return;
       }
+
+      // Real-backend events: GET /events/{id} returns `rolePlan` (raw
+      // targets only). The roster of joined members lives on the
+      // separate /participants resource. We fetch it and compose the
+      // `rolesNeeded` aggregation client-side so existing UI
+      // (EventJoinPanel, EventRosterPanel, participant chip row)
+      // keeps consuming the same shape. Demo events ship rolesNeeded
+      // baked-in so they skip this branch.
+      let merged = data;
+      if (Array.isArray(data?.rolePlan) && !Array.isArray(data?.rolesNeeded)) {
+        try {
+          const rosterResponse = await getJson(
+            `/events/${eventId}/participants?limit=200`
+          );
+          const rosterData = getResponseData(rosterResponse, null);
+          const participants = Array.isArray(rosterData?.items)
+            ? rosterData.items
+            : Array.isArray(rosterData)
+              ? rosterData
+              : [];
+          merged = {
+            ...data,
+            rolesNeeded: buildRolesNeeded(data.rolePlan, participants),
+            participantCount: countActiveParticipants(participants)
+          };
+        } catch {
+          // Soft-fail: surface rolePlan with zero fill so the panel
+          // still renders, even if the participants endpoint is
+          // momentarily unreachable.
+          merged = {
+            ...data,
+            rolesNeeded: buildRolesNeeded(data.rolePlan, []),
+            participantCount: 0
+          };
+        }
+      }
+
       // Dev mock: pin a liveStream onto fetched real events so the
       // player block visually appears. No-op in production builds.
-      setEventData(injectMockLiveStream(eventId, data));
+      setEventData(injectMockLiveStream(eventId, merged));
     } catch (fetchError) {
       if (fetchError?.status === 404) {
         setNotFound(true);

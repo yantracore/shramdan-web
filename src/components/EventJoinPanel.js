@@ -3,8 +3,8 @@
 import { CheckCircleFilled, UserAddOutlined } from "@ant-design/icons";
 import { Button, Modal, Radio, Space } from "antd";
 import Link from "next/link";
-import { useMemo, useState, useSyncExternalStore } from "react";
-import { postJson } from "@/lib/apiClient";
+import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
+import { getJson, postJson } from "@/lib/apiClient";
 import { getAuthSession, subscribeAuthSession } from "@/lib/authSession";
 import { useToast } from "@/lib/toast";
 
@@ -14,6 +14,8 @@ const COPY = {
   np: {
     cta: "यो अभियानमा जोडिनुहोस्",
     alreadyJoined: "तपाईं {role} भूमिकामा जोडिनुभएको छ",
+    waitlistedAs: "{role} भूमिकाको प्रतीक्षा सूचीमा हुनुहुन्छ",
+    checkedIn: "तपाईं {role} भूमिकामा साइटमा चेक-इन हुनुभयो",
     closedStatus: "अभियान अब जोडिन खुल्ला छैन",
     modalTitle: "कुन भूमिकामा जोडिने?",
     modalIntro: "तपाईंलाई मन पर्ने / आफूलाई मिल्ने भूमिका छान्नुहोस्। पछि परिवर्तन गर्न सकिन्छ।",
@@ -23,10 +25,11 @@ const COPY = {
     cancel: "रद्द गर्नुहोस्",
     selectRequired: "एक भूमिका छान्नुहोस्।",
     successToast: "तपाईं अभियानमा जोडिनुभयो।",
+    waitlistToast: "भूमिका भरिएको छ — तपाईं प्रतीक्षा सूचीमा हुनुहुन्छ।",
     demoSuccessToast: "तपाईं डेमो अभियानमा जोडिनुभयो (स्थानीय)।",
     errorToast: "जोडिन सकिएन। फेरि प्रयास गर्नुहोस्।",
-    backendPendingToast:
-      "ब्याकएन्ड समर्थन अझै तयार छैन — तर तपाईंको रुचि नोट गरियो।",
+    medicCredentialError: "स्वास्थ्यकर्मी भूमिकाको लागि प्रमाणित मेडिकल क्रेडेन्सियल चाहिन्छ।",
+    alreadyJoinedDifferentRole: "तपाईं पहिले अर्को भूमिकामा जोडिनुभएको छ।",
     loginPrompt: "जोडिन पहिले लग-इन गर्नुहोस्",
     loginCta: "लग-इन गर्नुहोस्",
     roles: {
@@ -42,6 +45,8 @@ const COPY = {
   en: {
     cta: "Join This Event",
     alreadyJoined: "You're in as {role}",
+    waitlistedAs: "You're on the {role} waitlist",
+    checkedIn: "You're checked in as {role}",
     closedStatus: "This event is no longer open to join",
     modalTitle: "Which role would you take?",
     modalIntro: "Pick the role that fits you. You can change it later.",
@@ -51,10 +56,11 @@ const COPY = {
     cancel: "Cancel",
     selectRequired: "Pick a role to continue.",
     successToast: "You're in.",
+    waitlistToast: "That role is full — you're on the waitlist.",
     demoSuccessToast: "You're in this demo event (local only).",
     errorToast: "Could not join. Please try again.",
-    backendPendingToast:
-      "Backend join endpoint is pending — your interest has been noted.",
+    medicCredentialError: "The Medic role requires verified medical credentials.",
+    alreadyJoinedDifferentRole: "You've already joined this event in a different role.",
     loginPrompt: "Sign in to join",
     loginCta: "Sign In",
     roles: {
@@ -71,7 +77,7 @@ const COPY = {
 
 const JOINABLE_STATUSES = new Set(["SCHEDULED", "ACTIVE", "DRAFT"]);
 
-function findViewerRole(rolesNeeded, viewerName) {
+function findViewerRoleByName(rolesNeeded, viewerName) {
   if (!viewerName || !Array.isArray(rolesNeeded)) return null;
   for (const row of rolesNeeded) {
     if (Array.isArray(row.filledNames) && row.filledNames.includes(viewerName)) {
@@ -79,6 +85,11 @@ function findViewerRole(rolesNeeded, viewerName) {
     }
   }
   return null;
+}
+
+function unwrap(response) {
+  if (!response || typeof response !== "object") return response ?? null;
+  return response.data ?? response;
 }
 
 export function EventJoinPanel({ event, language = "np", onJoined }) {
@@ -90,13 +101,53 @@ export function EventJoinPanel({ event, language = "np", onJoined }) {
   const [selectedRole, setSelectedRole] = useState(null);
   const [saving, setSaving] = useState(false);
 
-  const rolesNeeded = useMemo(
-    () => (Array.isArray(event?.rolesNeeded) ? event.rolesNeeded : []),
-    [event?.rolesNeeded]
-  );
-
+  const eventId = event?.id;
+  const isDemo = isDemoId(eventId);
+  const viewerId = session?.user?.id || null;
   const viewerName = session?.user?.name || null;
-  const viewerRole = findViewerRole(rolesNeeded, viewerName);
+
+  const rolesNeeded = Array.isArray(event?.rolesNeeded) ? event.rolesNeeded : [];
+
+  // myParticipation: the real-backend record for the current viewer on this
+  // event. Null until fetched; { role, status } once known. Demo events skip
+  // the network call and fall back to filledNames-name matching.
+  const [myParticipation, setMyParticipation] = useState(null);
+
+  const fetchMyParticipation = useCallback(async () => {
+    if (!eventId || isDemo || !viewerId) {
+      setMyParticipation(null);
+      return;
+    }
+    try {
+      const response = await getJson(`/events/${eventId}/participants/me`, {
+        requireAuth: true
+      });
+      const data = unwrap(response);
+      if (data && data.role) {
+        setMyParticipation({ id: data.id, role: data.role, status: data.status });
+      } else {
+        setMyParticipation(null);
+      }
+    } catch (error) {
+      if (error?.status === 404) {
+        setMyParticipation(null);
+        return;
+      }
+      // Soft-fail: a transient error shouldn't break the join button.
+      // We fall back to the name-match heuristic below.
+      setMyParticipation(null);
+    }
+  }, [eventId, isDemo, viewerId]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchMyParticipation();
+  }, [fetchMyParticipation]);
+
+  const viewerRoleFromBackend = myParticipation?.role || null;
+  const viewerRoleFromNames = findViewerRoleByName(rolesNeeded, viewerName);
+  const viewerRole = viewerRoleFromBackend || viewerRoleFromNames;
+  const viewerStatus = myParticipation?.status || null;
 
   if (rolesNeeded.length === 0) return null;
 
@@ -111,17 +162,22 @@ export function EventJoinPanel({ event, language = "np", onJoined }) {
   }
 
   if (viewerRole) {
+    const roleLabel = t.roles[viewerRole] || viewerRole;
+    let label = t.alreadyJoined.replace("{role}", roleLabel);
+    if (viewerStatus === "INVITED") {
+      label = t.waitlistedAs.replace("{role}", roleLabel);
+    } else if (viewerStatus === "CHECKED_IN") {
+      label = t.checkedIn.replace("{role}", roleLabel);
+    }
     return (
       <div className="event-join-panel event-join-panel-joined">
         <CheckCircleFilled aria-hidden="true" />
-        <span>
-          {t.alreadyJoined.replace("{role}", t.roles[viewerRole] || viewerRole)}
-        </span>
+        <span>{label}</span>
       </div>
     );
   }
 
-  if (!session?.user?.id) {
+  if (!viewerId) {
     const next = encodeURIComponent(`/events/${event?.id || ""}`);
     return (
       <div className="event-join-panel event-join-panel-anon">
@@ -147,7 +203,7 @@ export function EventJoinPanel({ event, language = "np", onJoined }) {
     }
     setSaving(true);
     try {
-      if (isDemoId(event?.id)) {
+      if (isDemo) {
         await new Promise((resolve) => setTimeout(resolve, 350));
         const nextRoles = rolesNeeded.map((row) => {
           if (row.role !== selectedRole) return row;
@@ -169,25 +225,38 @@ export function EventJoinPanel({ event, language = "np", onJoined }) {
         return;
       }
 
-      try {
-        await postJson(
-          `/events/${event.id}/join`,
-          { role: selectedRole },
-          { requireAuth: true }
-        );
-        messageApi.success(t.successToast);
-        setOpen(false);
-        onJoined?.();
-      } catch (apiError) {
-        if (apiError?.status === 404 || apiError?.status === 501) {
-          messageApi.info(t.backendPendingToast);
-          setOpen(false);
-          return;
+      const response = await postJson(
+        `/events/${eventId}/participants`,
+        { role: selectedRole },
+        { requireAuth: true }
+      );
+      const created = unwrap(response);
+      if (created && created.role) {
+        setMyParticipation({
+          id: created.id,
+          role: created.role,
+          status: created.status
+        });
+        if (created.status === "INVITED") {
+          messageApi.info(t.waitlistToast);
+        } else {
+          messageApi.success(t.successToast);
         }
-        throw apiError;
+      } else {
+        messageApi.success(t.successToast);
       }
-    } catch (error) {
-      messageApi.error(error?.message || t.errorToast);
+      setOpen(false);
+      onJoined?.();
+    } catch (apiError) {
+      if (apiError?.status === 403) {
+        messageApi.error(t.medicCredentialError);
+      } else if (apiError?.status === 409) {
+        messageApi.warning(t.alreadyJoinedDifferentRole);
+        // Re-pull the participation so the UI flips to "joined" state.
+        fetchMyParticipation();
+      } else {
+        messageApi.error(apiError?.message || t.errorToast);
+      }
     } finally {
       setSaving(false);
     }
