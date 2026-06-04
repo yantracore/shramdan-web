@@ -10,6 +10,7 @@ import {
   WarningOutlined
 } from "@ant-design/icons";
 import { Button, Empty, Skeleton, Tag } from "antd";
+import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
@@ -18,6 +19,7 @@ import { EventJoinPanel } from "@/components/EventJoinPanel";
 import { EventLiveStreamPlayer } from "@/components/EventLiveStreamPlayer";
 import { EventRosterPanel } from "@/components/EventRosterPanel";
 import IssueMapBlock from "@/components/IssueMapBlock";
+import { PeopleChipRow } from "@/components/PeopleChipRow";
 import { PrintButton } from "@/components/PrintButton";
 import { ShareButton } from "@/components/ShareButton";
 import { StickyActionBar } from "@/components/StickyActionBar";
@@ -200,6 +202,43 @@ export default function EventDetailPage() {
   const uploads = Array.isArray(eventData?.uploads) ? eventData.uploads : [];
   const imageUploads = uploads.filter(isImageUpload);
 
+  const coverImageUrl =
+    eventData?.thumbnailUrl ||
+    imageUploads[0]?.url ||
+    eventData?.liveStream?.thumbnailUrl ||
+    null;
+
+  // Build a flat participant list from rolesNeeded.filledNames, prepended
+  // by the event leader if present. This mirrors what /issues/[id] shows
+  // for supporters — a single chip row that gives a face to the count.
+  const participants = (() => {
+    const list = [];
+    if (leader?.name) list.push({ id: `leader:${leader.id || leader.name}`, name: leader.name, role: "LEADER" });
+    if (Array.isArray(eventData?.rolesNeeded)) {
+      eventData.rolesNeeded.forEach((entry) => {
+        const filled = Array.isArray(entry?.filledNames) ? entry.filledNames : [];
+        filled.forEach((name, i) => {
+          list.push({ id: `${entry.role}:${name}:${i}`, name, role: entry.role });
+        });
+      });
+    }
+    return list;
+  })();
+  const totalParticipantCount = (() => {
+    if (Number.isFinite(Number(eventData?.participantCount))) {
+      return Number(eventData.participantCount);
+    }
+    if (Array.isArray(eventData?.rolesNeeded)) {
+      const sum = eventData.rolesNeeded.reduce(
+        (acc, r) => acc + (Number.isFinite(r?.filled) ? r.filled : 0),
+        0
+      );
+      return sum + (leader?.name ? 1 : 0);
+    }
+    return participants.length;
+  })();
+  const participantsExtra = Math.max(0, totalParticipantCount - participants.length);
+
   const meetupLat = Number(eventData?.meetupLatitude ?? linkedIssue?.latitude);
   const meetupLng = Number(eventData?.meetupLongitude ?? linkedIssue?.longitude);
   const hasCoords = Number.isFinite(meetupLat) && Number.isFinite(meetupLng);
@@ -281,6 +320,18 @@ export default function EventDetailPage() {
                   viewersSuffix: language === "np" ? "जना हेर्दैछन्" : "watching"
                 }}
               />
+            ) : coverImageUrl ? (
+              <div className="public-issue-detail-cover">
+                <Image
+                  alt={pageTitle || content.detail.defaultTitle}
+                  height={720}
+                  src={coverImageUrl}
+                  unoptimized
+                  width={1920}
+                  sizes="(max-width: 768px) 100vw, 1180px"
+                  priority
+                />
+              </div>
             ) : null}
 
             <div className="public-issue-detail-body event-detail-body">
@@ -323,6 +374,21 @@ export default function EventDetailPage() {
                     {leader?.name || content.detail.leaderUnassigned}
                   </span>
                 </div>
+
+                {totalParticipantCount > 0 ? (
+                  <PeopleChipRow
+                    title={language === "np" ? "सहभागीहरू" : "Participants"}
+                    intro={
+                      language === "np"
+                        ? "जसले यो अभियानमा सहभागी हुने प्रतिबद्धता जनाएका छन्।"
+                        : "Who has signed up to take part in this campaign."
+                    }
+                    people={participants}
+                    extraCount={participantsExtra}
+                    moreLabel={language === "np" ? "थप {n}" : "+{n} more"}
+                    language={language}
+                  />
+                ) : null}
 
                 {canScheduleEvent ? (
                   <div className="leader-schedule-banner">

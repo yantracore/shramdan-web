@@ -15,6 +15,7 @@ import { IssuePhotoGallery } from "@/components/IssuePhotoGallery";
 import { IssueShareRow } from "@/components/IssueShareRow";
 import { IssueStatusTimeline } from "@/components/IssueStatusTimeline";
 import { IssueVoteButton } from "@/components/IssueVoteButton";
+import { PeopleChipRow } from "@/components/PeopleChipRow";
 import { ShareButton } from "@/components/ShareButton";
 import { CommentSection } from "@/components/comments";
 import { IssueReactions } from "@/components/IssueReactions";
@@ -53,31 +54,6 @@ const SUPPORTERS_COPY = {
     more: "+{n} more"
   }
 };
-
-function IssueSupportersChipRow({ voteCount, language }) {
-  const supporters = getDemoSupporters(voteCount);
-  if (!supporters.length) return null;
-  const t = SUPPORTERS_COPY[language] || SUPPORTERS_COPY.np;
-  const remaining = Math.max(0, (Number(voteCount) || 0) - supporters.length);
-  return (
-    <section className="public-issue-detail-section-block issue-supporters">
-      <h2>{t.title}</h2>
-      <p className="public-issue-detail-muted">{t.intro}</p>
-      <div className="issue-supporters-chips">
-        {supporters.map((name, i) => (
-          <span key={i} className="issue-supporters-chip" title={name}>
-            {Array.from(name.trim())[0] || "?"}
-          </span>
-        ))}
-        {remaining > 0 ? (
-          <span className="issue-supporters-chip issue-supporters-chip-more">
-            {t.more.replace("{n}", remaining)}
-          </span>
-        ) : null}
-      </div>
-    </section>
-  );
-}
 
 function formatIssueDate(value, language) {
   if (!value) return "";
@@ -317,8 +293,16 @@ export default function IssueDetailPage() {
                 <VoteSparkline issueId={issue.id} language={language} />
               </div>
 
-              <IssueSupportersChipRow
-                voteCount={issue.voteCount}
+              <PeopleChipRow
+                title={(SUPPORTERS_COPY[language] || SUPPORTERS_COPY.np).title}
+                intro={(SUPPORTERS_COPY[language] || SUPPORTERS_COPY.np).intro}
+                people={getDemoSupporters(issue.voteCount)}
+                extraCount={Math.max(
+                  0,
+                  (Number(issue.voteCount) || 0) -
+                    getDemoSupporters(issue.voteCount).length
+                )}
+                moreLabel={(SUPPORTERS_COPY[language] || SUPPORTERS_COPY.np).more}
                 language={language}
               />
 
