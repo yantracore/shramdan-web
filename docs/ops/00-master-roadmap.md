@@ -8,10 +8,10 @@
 >
 > **Companion folder:** backend API contracts the frontend depends on live in [`../api-requirements/`](../api-requirements/), introduced by the [2026-06-03 pivot ADR](../decisions/2026-06-03-ui-first-and-two-meeting-pivot.md). When a UI feature touches an entity covered there, update the matching domain file in the same session.
 
-## Overall Progress — 79%
+## Overall Progress — 68%
 
 ```
-0% [===============================================================================---------------------] 100%
+0% [====================================================================--------------------------------] 100%
 ```
 
 The bar is 100 characters wide so each `=` equals exactly one percentage point. Recompute and redraw the bar in the same edit that changes any phase percentage — see [Aggregate Progress](#aggregate-progress) for the per-phase breakdown that feeds this number.
@@ -186,19 +186,21 @@ Goal: Anyone (logged-in or not) can browse listed issues, see detail, and — on
   - [x] 1.6.1 `/issues/new` route + form (title, description, category, location, cover image via existing presign flow) `w:1` ← done: 2026-05-28
   - [x] 1.6.2 Auth gating + post-submit redirect (un-auth click pushes `/login?next=/issues/new`; post-submit lands on the new issue's detail page) `w:1` ← done: 2026-05-28
 
-## Phase 2 — Member Portal `/app` (Mobile-style Web Shell) `w:18` 📊 100%
+## Phase 2 — Member Portal `/app` (Mobile-style Web Shell) `w:24` 📊 75%
 
 Goal: Authenticated member experience that ships before the native mobile app and shares the same components and API contracts. This is the surface where members sign up, list issues, vote, join campaigns, and submit KYC.
 
-- [x] 2.1 Phone + OTP signup `w:5` ← done: 2026-06-03 *(`/app/signup` 3-step flow: phone+country code → OTP+profile basics → success. Demo accepts any 6-digit OTP; real flow will POST `/auth/otp/request` + `/auth/otp/verify`. Bilingual EN+NE; demo banner explicitly flags mock mode.)*
+- [~] 2.1 Phone + OTP signup `w:8` *(UI shipped 2026-06-03; backend OTP endpoints pending — `POST /auth/otp/request` + `POST /auth/otp/verify`.)*
   - [x] 2.1.1 Phone entry + country code picker `w:1` ← done: 2026-06-03 *(5 country codes in select; phone validates 10+ digits with inputMode tel.)*
   - [x] 2.1.2 OTP send + verify `w:2` ← done: 2026-06-03 *(6-digit input with letter-spacing styling; verify accepts any 6-digit in demo, would call backend in production.)*
   - [x] 2.1.3 Profile basics on account creation `w:1` ← done: 2026-06-03 *(Name required + city optional captured alongside OTP verification; passes to backend on real signup.)*
   - [x] 2.1.4 Resend + rate-limit + error UX `w:1` ← done: 2026-06-03 *(30-second cooldown countdown, 3-attempt cap, exhaustion message, error toasts via Antd Form; back-button to step 1 for number changes.)*
-- [x] 2.2 Member dashboard `/app` `w:3` ← done: 2026-06-03 *(`/app` route ships with hero greeting, 4-stat strip (events joined / issues supported / events led / pending applications), upcoming events I've joined block, supported-issues block, profile basics block (role / verification / pending count), and a quick-actions tile row. Bilingual EN+NE inline copy. Mobile-first responsive grid. Aggregates use demo mock data today; swap for `/me/dashboard` fetch once backend lands. Auth gate redirects to `/login?next=/app`.)*
+  - [!] 2.1.5 Backend OTP endpoints (`POST /auth/otp/request` + `POST /auth/otp/verify`) `w:3` ← blocked: backend pending
+- [~] 2.2 Member dashboard `/app` `w:5` *(UI shipped 2026-06-03; backend `GET /me/dashboard` aggregate endpoint pending — surface currently rendering from demo mock data.)*
   - [x] 2.2.1 My location-tagged issues `w:1` ← done: 2026-06-03 *(supported-issues block on the dashboard shows linked location + vote count, deep-links to `/issues/{id}`)*
   - [x] 2.2.2 Upcoming events I joined `w:1` ← done: 2026-06-03 *(upcoming-events block shows date, location, and links to `/events/{id}`)*
   - [x] 2.2.3 My contributions summary `w:1` ← done: 2026-06-03 *(stat strip surfaces events joined, issues supported, events led, pending applications)*
+  - [!] 2.2.4 Backend `GET /me/dashboard` aggregate endpoint `w:2` ← blocked: backend pending
 - [x] 2.3 Mobile-first issue list `w:2` ← done: 2026-06-03 *(`/app/issues` mobile-first list — single-column card layout, status filter pill, FAB-style "report new" CTA. Each card carries status pill + title + address + support count + arrow. Bilingual EN+NE.)*
 - [x] 2.4 Issue submission flow `w:3` ← done: 2026-06-03 *(`/app/issues/new` redirects to the existing public `/issues/new` form so we don't duplicate upload + validation logic; the public form already covers all three sub-leaves via Tier 0 1.6.)*
   - [x] 2.4.1 Title, description, category, location, photos `w:1` ← done: 2026-05-28 *(shipped via 1.6.1)*
@@ -207,9 +209,11 @@ Goal: Authenticated member experience that ships before the native mobile app an
 - [x] 2.5 Voting from `/app` `w:1` ← done: 2026-06-03 *(Dashboard supported-issues rows link to `/issues/{id}` which carries the `IssueVoteButton` + 1.5.3 role-picker modal. The shared component pattern means voting from `/app` works end-to-end via the same flow.)*
 - [x] 2.6 Join / contribute to campaigns from `/app` `w:2` ← done: 2026-06-03 *(End-to-end path verified: dashboard upcoming-events rows link to `/events/{id}` which carries the `EventJoinPanel` modal from 3.6, the `ContributionIntentPanel` from 5.1-5.3, and the `ShareAsContribution` panel from 5.5. A signed-in member can therefore join, offer materials/labour/logistics, or share — all from a single tap off `/app`. An inline `/app`-native quick-join strip that skips the page jump stays as a polish backlog item.)*
 - [x] 2.7 Profile + settings `w:1` ← done: 2026-06-03 *(Profile block on the dashboard shows role + verification + pending applications, links to `/me` for fuller settings. Same dashboard pattern doubles as the entry point until `/app/settings` is built.)*
-- [x] 2.8 KYC submission flow (prospective leaders) `w:1` ← done: 2026-06-03 *(`/app/kyc` form — ID type (citizenship / passport / national ID / driving licence), ID number, full name on document, DOB, permanent address, document upload (front + back), consent checkbox. Demo mode shows submitted-success state. Real backend will POST `/me/kyc` multipart + queue admin verification. Bilingual EN+NE; demo banner explicit.)*
+- [~] 2.8 KYC submission flow (prospective leaders) `w:2` *(UI shipped 2026-06-03; backend submission + verification queue pending.)*
+  - [x] 2.8.1 UI form + demo submit `w:1` ← done: 2026-06-03 *(`/app/kyc` form — ID type (citizenship / passport / national ID / driving licence), ID number, full name on document, DOB, permanent address, document upload (front + back), consent checkbox. Demo mode shows submitted-success state. Bilingual EN+NE; demo banner explicit.)*
+  - [!] 2.8.2 Backend `POST /me/kyc` multipart + admin verification queue `w:1` ← blocked: backend pending
 
-## Phase 3 — Campaign / Event Execution `w:15` 📊 100%
+## Phase 3 — Campaign / Event Execution `w:18` 📊 83%
 
 Goal: A promoted issue becomes a real-world campaign with leader, schedule, roster, and completion. Each event runs through two planning meetings on the canonical happy path — a kickoff meeting (role counts, logistics, date) and a pre-execution review meeting (final roster, last-minute changes) separated by a one-to-two-week public signup window. See [08-operational-safety-and-event-model.md](08-operational-safety-and-event-model.md#event-lifecycle-meetings) for the full meeting flow and the [2026-06-03 pivot ADR](../decisions/2026-06-03-ui-first-and-two-meeting-pivot.md) for the decision that introduced it.
 
@@ -221,29 +225,37 @@ Goal: A promoted issue becomes a real-world campaign with leader, schedule, rost
 - [x] 3.3 Issue → campaign promotion `w:2` ← done: 2026-05-26
   - [x] 3.3.1 Vote-threshold rule + admin trigger `w:1` ← done: 2026-05-26 *(admin force-convert button on `/admin/issues/[id]/view` calls `POST /issues/{id}/convert-to-event`; backend owns the vote-threshold auto-promote rule)*
   - [x] 3.3.2 Auto-create campaign record on promote `w:1` ← done: 2026-05-26 *(backend `convert-to-event` endpoint creates the event record server-side; frontend trigger shipped in e776f29)*
-- [x] 3.4 Leader nomination + voting `w:3` ← done: 2026-06-03
+- [~] 3.4 Leader nomination + voting `w:4` *(UI shipped 2026-06-03; backend nomination + tie-break endpoints pending.)*
   - [x] 3.4.1 Admin leader assignment (exists in `/admin/events`) ← done: 2026-05-19
   - [x] 3.4.2 Member nomination flow `w:1` ← done: 2026-06-03 *(`LeaderNominationPanel` on `/events/[id]` surfaces when `status === DRAFT && !eventLeaderId`. One-click self-nomination + per-nomination vote toggle. List sorted by support count; demo events update local state, real events POST / DELETE to `/events/{id}/nominations[/{id}/vote]` and degrade on 404/501. Bilingual EN+NE inline copy. Originally scoped to `/app`; built on public `/events/[id]` since `/app` shell shipped in the same batch (2.2/2.5/2.7) — same component reusable from `/app` once member-portal routes hook into events.)*
   - [x] 3.4.3 Member-side tie-break + settle surface `w:1` ← done: 2026-06-03 *(`LeaderNominationPanel` includes tie detection: when 2+ candidates share the top support count, a "Tied — the community can decide" banner renders with an amber warning icon. Voting continues to surface; admin can still force-assign via `/admin/events` to settle. Demo `demo-draft-1` event pre-populates a tied state for showcase.)*
+  - [!] 3.4.4 Backend nomination + tie-break endpoints (`POST` / `DELETE /events/{id}/nominations`) `w:1` ← blocked: backend pending
 - [x] 3.5 Scheduling + completion (leader-only) `w:3` ← done: 2026-06-03
   - [x] 3.5.1 Leader UI for `PATCH /events/{id}/schedule` `w:2` ← done: 2026-05-29 *(`LeaderScheduleEditor` component renders a leader-only banner + Ant Design Modal on `/events/[id]` when the current user matches `eventLeaderId` AND status is `DRAFT`. Form covers `scheduledAt` (DatePicker showTime, future-only), `durationMinutes` (15-min steps), `meetupAddress`, `meetupNotes`, `meetupLatitude/Longitude` (with "Use issue location" shortcut prefilled from linked issue), and `planningNotes`. Submits via `patchJson('/events/${id}/schedule', payload, { requireAuth: true })`; surfaces 403 / 409 / generic toasts. Verified end-to-end with Playwright as admin-leader: DRAFT → SCHEDULED transition, banner auto-hides afterward.)*
   - [x] 3.5.2 Leader UI for `POST /events/{id}/complete` `w:1` ← done: 2026-06-03 *(`LeaderCompleteEditor` component renders a leader-only success-accented banner + modal on `/events/[id]` when the current user is the leader AND status is `ACTIVE` or `SCHEDULED`. Form captures `completedAt` (DatePicker, past-or-now only, defaults to now) and `resultSummary` (required, ≥12 chars, max 2000). Submits via `postJson('/events/${id}/complete', payload, { requireAuth: true })`; 403/409/generic toasts. Demo events (`demo-*` ids) simulate completion via local state instead of round-tripping the backend; the parent page accepts a partial-event payload from `onSaved` and merges it in.)*
-- [x] 3.6 Participation roster — volunteer / cameraman `w:2` ← done: 2026-06-03 *(`EventJoinPanel` component renders an inline "Join this event" CTA on `/events/[id]` above the roster, opening a role-picker modal sourced from the event's `rolesNeeded` shape. Demo events update the roster locally; real events POST to `/events/{id}/join`. 404/501 responses surface a "backend pending" info toast instead of hard-failing — see [09-backend-admin-gaps.md](../engineering/09-backend-admin-gaps.md) for the still-needed backend endpoints. Viewer detection uses the auth session display name against `filledNames` to render a "you're in as X" badge.)*
-- [x] 3.7 Reminder cadence: 3d / 24h / 1h `w:1` ← done: 2026-06-03 *(`ReminderCadencePanel` shows on `/events/[id]` when the current user is the leader AND status is `SCHEDULED` or `ACTIVE`. Three independent checkboxes auto-save on toggle. Demo events update `reminderCadence` locally; real events PATCH `/events/{id}/reminders` with `{ reminderCadence: array of enum }` and degrade gracefully on 404/501 (saves locally + "backend pending" toast). Spec field added to [`../api-requirements/events.md`](../api-requirements/events.md). Default is `["3d", "24h"]`. Bilingual EN+NE inline copy.)*
+- [~] 3.6 Participation roster — volunteer / cameraman `w:3` *(UI shipped 2026-06-03; backend join endpoint pending.)*
+  - [x] 3.6.1 UI roster + join panel `w:2` ← done: 2026-06-03 *(`EventJoinPanel` component renders an inline "Join this event" CTA on `/events/[id]` above the roster, opening a role-picker modal sourced from the event's `rolesNeeded` shape. Demo events update the roster locally; real events POST to `/events/{id}/join`. 404/501 responses surface a "backend pending" info toast instead of hard-failing. Viewer detection uses the auth session display name against `filledNames` to render a "you're in as X" badge.)*
+  - [!] 3.6.2 Backend `POST /events/{id}/join` + roster fetch `w:1` ← blocked: backend pending — see [`../engineering/09-backend-admin-gaps.md`](../engineering/09-backend-admin-gaps.md)
+- [~] 3.7 Reminder cadence: 3d / 24h / 1h `w:2` *(UI shipped 2026-06-03; backend reminders endpoint + scheduler dispatch pending.)*
+  - [x] 3.7.1 UI cadence panel `w:1` ← done: 2026-06-03 *(`ReminderCadencePanel` shows on `/events/[id]` when the current user is the leader AND status is `SCHEDULED` or `ACTIVE`. Three independent checkboxes auto-save on toggle. Demo events update `reminderCadence` locally; real events PATCH `/events/{id}/reminders` with `{ reminderCadence: array of enum }` and degrade gracefully on 404/501 (saves locally + "backend pending" toast). Spec field added to [`../api-requirements/events.md`](../api-requirements/events.md). Default is `["3d", "24h"]`. Bilingual EN+NE inline copy.)*
+  - [!] 3.7.2 Backend `PATCH /events/{id}/reminders` + scheduler dispatch `w:1` ← blocked: backend pending
 
-## Phase 4 — Operational Safety & Incidents `w:8` 📊 88%
+## Phase 4 — Operational Safety & Incidents `w:10` 📊 70%
 
 Goal: Safety leads, medical professionals, and admins can manage real-world risk without exposing private details publicly. Pre-implementation reading: [08-operational-safety-and-event-model.md](08-operational-safety-and-event-model.md).
 
 - [x] 4.1 Incident entity + backend contract finalized `w:2` ← done: 2026-06-03 *(Per-domain spec landed at [`../api-requirements/incidents.md`](../api-requirements/incidents.md). Captures the Incident entity (type / severity / status / description / locationNote / evidenceUploadIds / publicNote / reporter + assignee fields), the OPEN → ACKNOWLEDGED → IN_PROGRESS → RESOLVED → CLOSED state machine with ESCALATED escape hatch, the riskLevel derivation rule (any open CRITICAL → CRITICAL, HIGH → URGENT, MEDIUM → WATCH, otherwise NORMAL), and the public-vs-leader-vs-admin visibility matrix.)*
-- [x] 4.2 Incident reporting UI (leader / safety lead) `w:2` ← done: 2026-06-03 *(`IncidentPanel` on `/events/[id]` surfaces when status is ACTIVE / PAUSED / COMPLETED or the viewer is the leader. Any authenticated viewer can file via the report modal — type / severity / description / location-note. Demo events update local state; real events POST `/events/{id}/incidents` and degrade on 404/501. Bilingual EN+NE inline copy.)*
+- [~] 4.2 Incident reporting UI (leader / safety lead) `w:3` *(UI shipped 2026-06-03; backend incidents endpoint pending.)*
   - [x] 4.2.1 Type, severity, description, evidence upload `w:2` ← done: 2026-06-03 *(Type select uses the full 10-value enum from the spec; severity LOW/MEDIUM/HIGH/CRITICAL; description required with 12-1500 char validation. Evidence upload field reserved on the spec — UI wires it as `evidenceUploadIds` but the upload picker itself is queued behind the existing `/uploads/presign` flow that other surfaces already use.)*
+  - [!] 4.2.2 Backend `POST /events/{id}/incidents` + state machine wiring `w:1` ← blocked: backend pending
 - [x] 4.3 Risk-level badge on campaign cards `w:1` ← done: 2026-06-03 *(Risk badge was already rendered on `/events/[id]` from the existing event.riskLevel field; the new `IncidentPanel` summary block also surfaces the derived riskLevel alongside open / total counts. Card-level badges on the events list inherit the same field — `EventListCard` reads `riskLevel` when present.)*
 - [ ] 4.4 Notification rules by severity `w:1` *(Backend lane — see [08-operational-safety-and-event-model.md](08-operational-safety-and-event-model.md#notification-rules). Frontend already routes the toast on report-submit; backend notification dispatch is the missing piece.)*
 - [x] 4.5 Public-safe vs private incident visibility `w:1` ← done: 2026-06-03 *(IncidentPanel takes a `canSeeFull` prop and renders incident bodies only when true. Public viewers see only the aggregate (open / total count) and the leader-curated `publicSafetyNote` when set. Per-field visibility matrix codified in [`../api-requirements/incidents.md`](../api-requirements/incidents.md).)*
-- [x] 4.6 Pre-event safety checklist gate `w:1` ← done: 2026-06-03 *(`SafetyChecklistPanel` renders on `/events/[id]` when the current user is the leader AND status is `SCHEDULED`. Seven mandatory items (pre-execution meeting, medic, safety lead, permits, weather contingency, logistics, participant notification) — all must be ticked before the Activate button enables. Demo events flip status to `ACTIVE` locally + stamp `safetyChecklistCompletedAt`; real events POST `/events/{id}/activate` with `{ checklistConfirmed: true }`. The 412 contract for unsatisfied checklists is specified in [`../api-requirements/events.md`](../api-requirements/events.md). Bilingual EN+NE copy embedded in the component.)*
+- [~] 4.6 Pre-event safety checklist gate `w:2` *(UI shipped 2026-06-03; backend activate endpoint pending.)*
+  - [x] 4.6.1 UI checklist + activate gate `w:1` ← done: 2026-06-03 *(`SafetyChecklistPanel` renders on `/events/[id]` when the current user is the leader AND status is `SCHEDULED`. Seven mandatory items (pre-execution meeting, medic, safety lead, permits, weather contingency, logistics, participant notification) — all must be ticked before the Activate button enables. Demo events flip status to `ACTIVE` locally + stamp `safetyChecklistCompletedAt`; real events POST `/events/{id}/activate` with `{ checklistConfirmed: true }`. The 412 contract for unsatisfied checklists is specified in [`../api-requirements/events.md`](../api-requirements/events.md). Bilingual EN+NE copy embedded in the component.)*
+  - [!] 4.6.2 Backend `POST /events/{id}/activate` + 412 checklist contract `w:1` ← blocked: backend pending
 
-## Phase 5 — Contribution Channels `w:10` 📊 60%
+## Phase 5 — Contribution Channels `w:12` 📊 50%
 
 - [x] 5.1 Labor + time donation intent UI `w:2` ← done: 2026-06-03 *(`ContributionIntentPanel` on `/events/[id]` surfaces three radio cards — LABOR, MATERIALS, LOGISTICS — with a single submit modal capturing kind + optional quantity + required notes. Demo events update local state; real events POST `/events/{id}/contributions` and degrade on 404/501. Bilingual EN+NE.)*
 - [x] 5.2 Material donation intent `w:1` ← done: 2026-06-03 *(Same `ContributionIntentPanel` covers MATERIALS as one of three intent kinds.)*
@@ -254,26 +266,39 @@ Goal: Safety leads, medical professionals, and admins can manage real-world risk
   - [ ] 5.4.3 Bank transfer + manual reconciliation `w:1`
   - [ ] 5.4.4 Foreign donations (SWC approval flow) `w:1`
 - [x] 5.5 Visibility / share-as-contribution `w:2` ← done: 2026-06-03 *(`ShareAsContribution` component on `/events/[id]` for non-terminal events. Card framing "sharing IS contributing" plus social share buttons (Facebook / Twitter / WhatsApp / Telegram) + copy-link via react-share. Bilingual EN+NE inline copy.)*
+- [!] 5.6 Backend contribution intent endpoint (`POST /events/{id}/contributions`) `w:2` ← blocked: backend pending — shared dependency for 5.1, 5.2, 5.3
 
-## Phase 6 — Transparency & Public Ledger `w:8` 📊 75%
+## Phase 6 — Transparency & Public Ledger `w:12` 📊 50%
 
-- [x] 6.1 Real-time donation ledger (public) `w:3` ← done: 2026-06-03 *(`/ledger` page renders the public donation list — date, donor (anonymous when null), kind, channel, amount, linked campaign. Bilingual EN+NE; tabs switch between donations and expenses. Dummy ledger generated against past events; backend swap point is the new spec at [`../api-requirements/donations.md`](../api-requirements/donations.md).)*
-- [x] 6.2 Expense receipt upload + public display `w:2` ← done: 2026-06-03 *(`/ledger` expense tab shows date / kind / description / vendor / amount / linked campaign. Receipt upload field reserved in the spec (`receiptUploadId`); current dummy entries leave it null, surface will swap to an inline receipt thumbnail link when uploads arrive.)*
+- [~] 6.1 Real-time donation ledger (public) `w:5` *(UI shipped 2026-06-03; backend ledger endpoints pending.)*
+  - [x] 6.1.1 UI ledger page `w:3` ← done: 2026-06-03 *(`/ledger` page renders the public donation list — date, donor (anonymous when null), kind, channel, amount, linked campaign. Bilingual EN+NE; tabs switch between donations and expenses. Dummy ledger generated against past events; backend swap point is the new spec at [`../api-requirements/donations.md`](../api-requirements/donations.md).)*
+  - [!] 6.1.2 Backend `GET /donations` + `GET /expenses` list endpoints `w:2` ← blocked: backend pending
+- [~] 6.2 Expense receipt upload + public display `w:3` *(UI shipped 2026-06-03; backend expense create + receipt resolution pending.)*
+  - [x] 6.2.1 UI expense tab + receipt placeholder `w:2` ← done: 2026-06-03 *(`/ledger` expense tab shows date / kind / description / vendor / amount / linked campaign. Receipt upload field reserved in the spec (`receiptUploadId`); current dummy entries leave it null, surface will swap to an inline receipt thumbnail link when uploads arrive.)*
+  - [!] 6.2.2 Backend expense create + `receiptUploadId` resolution `w:1` ← blocked: backend pending
 - [ ] 6.3 Leader KYC backend + verification UI `w:2` *(Backend-heavy lane — KYC document upload + admin verification workflow. UI hook ready in `members.md` spec (`leaderEligibility` field).)*
-- [x] 6.4 Per-campaign fund-usage summary `w:1` ← done: 2026-06-03 *(Aggregate computed via `getDemoFundSummaryForEvent` — donatedTotal, spentTotal, surplus, donationCount, expenseCount, inKindCount. Backend swap point captured in `donations.md` under "Fund summary (aggregate)".)*
+- [~] 6.4 Per-campaign fund-usage summary `w:2` *(UI shipped 2026-06-03; backend aggregate endpoint pending.)*
+  - [x] 6.4.1 UI aggregate summary `w:1` ← done: 2026-06-03 *(Aggregate computed via `getDemoFundSummaryForEvent` — donatedTotal, spentTotal, surplus, donationCount, expenseCount, inKindCount. Backend swap point captured in `donations.md` under "Fund summary (aggregate)".)*
+  - [!] 6.4.2 Backend `GET /events/{id}/fund-summary` aggregate `w:1` ← blocked: backend pending
 
-## Phase 7 — Impact Stories `w:5` 📊 100%
+## Phase 7 — Impact Stories `w:7` 📊 71%
 
 - [x] 7.1 Before / after gallery `w:2` ← done: 2026-06-03 *(Already shipping: `BeforeAfterSlider` component renders on `/events/[id]` for any completed event with a `beforeAfter: { before, after }` payload. Drag-the-handle UX, keyboard-accessible aria-label, bilingual labels. Used across all demo past events. Marking done as a verification — code was live before this roadmap entry was flipped.)*
 - [x] 7.2 Blog / vlog story page `w:1` ← done: 2026-06-03 *(Two layers ship: the existing `/stories` index already renders every past event as a long-form story card (cover + result + testimonials + meta) with alternating bleed orientation. Today's addition surfaces a "Featured / Editor's picks" section at the top from `DEMO_STORIES` (5 narrative prose pieces in `devMockData.js`) plus a new `/stories/[slug]` detail route with reading-friendly typography and a "view source campaign" link back to `/events/{id}` when the story is anchored to one. Bilingual EN+NE.)*
-- [x] 7.3 Cameraman video upload (30+ min consolidated) `w:1` ← done: 2026-06-03 *(`VideoUploadPanel` surfaces on `/events/[id]` when the event is COMPLETED and the viewer is the leader or admin. Title + description + video file picker (MP4/MOV, up to 500 MB hint). Already-attached videos render above the form with title / description / filename. Demo updates local `event.videos` array. Real flow will three-step through `/uploads/presign` + R2 PUT + `POST /events/{id}/videos`. Bilingual EN+NE.)*
-- [x] 7.4 Attendance verification from photos `w:1` ← done: 2026-06-03 *(`AttendanceVerifyPanel` on COMPLETED `/events/[id]` for leader / admin. Tri-state pill per roster member (Saw / Missed / Unsure); summary line shows confirmed / missed / unsure counts; save action persists verifications to `event.attendanceVerifications` locally for demo. Future photo-AI cross-check is reserved as the next iteration; the manual surface is the v1.)*
+- [~] 7.3 Cameraman video upload (30+ min consolidated) `w:2` *(UI shipped 2026-06-03; backend video upload pipeline pending.)*
+  - [x] 7.3.1 UI upload panel `w:1` ← done: 2026-06-03 *(`VideoUploadPanel` surfaces on `/events/[id]` when the event is COMPLETED and the viewer is the leader or admin. Title + description + video file picker (MP4/MOV, up to 500 MB hint). Already-attached videos render above the form with title / description / filename. Demo updates local `event.videos` array. Real flow will three-step through `/uploads/presign` + R2 PUT + `POST /events/{id}/videos`. Bilingual EN+NE.)*
+  - [!] 7.3.2 Backend `/uploads/presign` (video) + `POST /events/{id}/videos` `w:1` ← blocked: backend pending
+- [~] 7.4 Attendance verification from photos `w:2` *(UI shipped 2026-06-03; backend verification persistence pending.)*
+  - [x] 7.4.1 UI attendance panel `w:1` ← done: 2026-06-03 *(`AttendanceVerifyPanel` on COMPLETED `/events/[id]` for leader / admin. Tri-state pill per roster member (Saw / Missed / Unsure); summary line shows confirmed / missed / unsure counts; save action persists verifications to `event.attendanceVerifications` locally for demo. Future photo-AI cross-check is reserved as the next iteration; the manual surface is the v1.)*
+  - [!] 7.4.2 Backend attendance verification persistence + photo-AI hook `w:1` ← blocked: backend pending
 
-## Phase 8 — Notifications & Outreach `w:6` 📊 17%
+## Phase 8 — Notifications & Outreach `w:7` 📊 14%
 
 - [ ] 8.1 Email notifications `w:2`
 - [ ] 8.2 SMS for OTP + urgent alerts `w:1`
-- [x] 8.3 PWA push notifications `w:1` ← done: 2026-06-03 *(`/public/sw.js` minimal service worker handles push + notificationclick → focus or open URL. `src/lib/pwa.js` wraps registration + permission + subscribe + unsubscribe + local-test helpers. `PushOptInPanel` on `/app` dashboard surfaces a tri-state (default / granted / denied / unsupported), an enable / disable button, and a local-test notification button. Bilingual EN+NE. VAPID public key not wired yet — production swap point documented inline; demo mode treats permission grant as the success surface and exercises notifications via the local-test path.)*
+- [~] 8.3 PWA push notifications `w:2` *(UI shipped 2026-06-03; backend VAPID + push dispatch pending.)*
+  - [x] 8.3.1 UI service worker + opt-in panel `w:1` ← done: 2026-06-03 *(`/public/sw.js` minimal service worker handles push + notificationclick → focus or open URL. `src/lib/pwa.js` wraps registration + permission + subscribe + unsubscribe + local-test helpers. `PushOptInPanel` on `/app` dashboard surfaces a tri-state (default / granted / denied / unsupported), an enable / disable button, and a local-test notification button. Bilingual EN+NE.)*
+  - [!] 8.3.2 Backend VAPID key + push subscription store + dispatch endpoint `w:1` ← blocked: backend pending
 - [ ] 8.4 AI assistant on WhatsApp / Messenger / IG `w:2` *(future / Meta API)*
 
 ## Phase 9 — Admin Control Center Expansion `w:10` 📊 67%
@@ -361,19 +386,19 @@ Goal: Surface app *development* progress publicly and invite community votes on 
 
 # Aggregate Progress
 
-Weighted across all phases (sum of phase weights = 137):
+Weighted across all phases (sum of phase weights = 157):
 
 | Phase | Weight | Progress |
 | --- | --- | --- |
 | 0 Foundation | 10 | 100% |
 | 1 Public Issue Discovery & Voting | 15 | 77% |
-| 2 Member Portal `/app` | 18 | 100% |
-| 3 Campaign Execution | 15 | 100% |
-| 4 Operational Safety | 8 | 88% |
-| 5 Contribution Channels | 10 | 60% |
-| 6 Transparency & Ledger | 8 | 75% |
-| 7 Impact Stories | 5 | 100% |
-| 8 Notifications & Outreach | 6 | 17% |
+| 2 Member Portal `/app` | 24 | 75% |
+| 3 Campaign Execution | 18 | 83% |
+| 4 Operational Safety | 10 | 70% |
+| 5 Contribution Channels | 12 | 50% |
+| 6 Transparency & Ledger | 12 | 50% |
+| 7 Impact Stories | 7 | 71% |
+| 8 Notifications & Outreach | 7 | 14% |
 | 9 Admin Control Center | 10 | 67% |
 | 10 Native Mobile App | 5 | 0% |
 | 11 Cross-cutting | 10 | 100% |
@@ -381,7 +406,7 @@ Weighted across all phases (sum of phase weights = 137):
 | 13 Public Reports & Transparency Surface | 6 | 67% |
 | 14 Building in Public (Process Transparency) | 6 | 83% |
 
-**Overall: ≈ 79%** (weighted sum / total weight; recompute on every edit, and redraw the [Overall Progress](#overall-progress--79) bar near the top of this file in the same edit).
+**Overall: ≈ 68%** (weighted sum / total weight; recompute on every edit, and redraw the [Overall Progress](#overall-progress--68) bar near the top of this file in the same edit).
 
 # How To Update This Document
 
