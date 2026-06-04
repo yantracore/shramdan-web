@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { PlusOutlined, CheckCircleFilled } from "@ant-design/icons";
 import { Button, Select } from "antd";
 import { SiteShell } from "@/components/SiteShell";
+import { ActivityTypeTabs } from "@/components/ActivityTypeTabs";
 import { EventListCard } from "@/components/EventListCard";
 import { EventPreviewPane } from "@/components/EventPreviewPane";
 import { ImpactPulseStrip } from "@/components/ImpactPulseStrip";
@@ -481,6 +482,7 @@ export default function EventsListPage() {
 
         <div className="public-issues-toolbar">
           <div className="public-issues-filters">
+            <ActivityTypeTabs active="event" labels={localizedCopy.activityTabs} />
             <div className="public-issues-filter-field">
               <span className="public-issues-filter-label">
                 {t.filters.eventTypeLabel}

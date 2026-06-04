@@ -1250,6 +1250,13 @@ export const copy = {
         supportersMore: "थप {n}"
       }
     },
+    activityTabs: {
+      ariaLabel: "गतिविधिको प्रकार",
+      issueLabel: "समस्या",
+      issueSub: "सूचीमा",
+      eventLabel: "अभियान",
+      eventSub: "सञ्चालनमा"
+    },
     liveEventsRail: {
       eyebrow: "अहिले भइरहेको",
       liveBadge: "लाइभ",
@@ -2890,6 +2897,13 @@ export const copy = {
         supporters: "Supporters",
         supportersMore: "+{n} more"
       }
+    },
+    activityTabs: {
+      ariaLabel: "Activity type",
+      issueLabel: "Issue",
+      issueSub: "Listed",
+      eventLabel: "Event",
+      eventSub: "In execution"
     },
     liveEventsRail: {
       eyebrow: "Happening now",
