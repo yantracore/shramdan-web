@@ -16,7 +16,8 @@ import { IssueMapThumb } from "@/components/IssueMapThumb";
 import { IssueVoteButton } from "@/components/IssueVoteButton";
 import {
   ISSUE_STATUS_COLORS,
-  getIssueCoverImageUrl
+  getIssueCoverImageUrl,
+  localizeIssue
 } from "@/lib/adminUtils";
 import { getDemoSupporters } from "@/lib/devMockData";
 
@@ -70,13 +71,14 @@ function formatSupportersLabel(count, content, language) {
 }
 
 export function IssuePreviewPane({
-  issue,
+  issue: rawIssue,
   language,
   content,
   preview,
   onBack,
   isMobileDrillActive
 }) {
+  const issue = localizeIssue(rawIssue, language);
   const [descExpanded, setDescExpanded] = useState(false);
   const [isPinned, setIsPinned] = useState(false);
   const [isChanging, setIsChanging] = useState(false);

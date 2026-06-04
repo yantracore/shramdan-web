@@ -10,7 +10,7 @@ import {
 } from "@ant-design/icons";
 import { forwardRef, useEffect, useState } from "react";
 import { countVisible, loadComments } from "@/lib/comments";
-import { getIssueCoverImageUrl } from "@/lib/adminUtils";
+import { getIssueCoverImageUrl, localizeIssue } from "@/lib/adminUtils";
 import { IssueMapThumb } from "@/components/IssueMapThumb";
 
 // Maps the API issue status onto the same data-status hooks the event card
@@ -50,9 +50,10 @@ function timeAgoShort(iso, language) {
 }
 
 export const IssueListCard = forwardRef(function IssueListCard(
-  { issue, selected, language, content, onSelect, optionId },
+  { issue: rawIssue, selected, language, content, onSelect, optionId },
   ref
 ) {
+  const issue = localizeIssue(rawIssue, language);
   const status = visualStatus(issue.status);
   const statusLabel = content.statusLabels?.[issue.status] || issue.status;
   const coverUrl = getIssueCoverImageUrl(issue);

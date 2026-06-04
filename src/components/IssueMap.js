@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
+import { localizeIssue } from "@/lib/adminUtils";
 
 const NEPAL_BOUNDS = [
   [26.3, 80.0],
@@ -86,7 +87,8 @@ function toLocalDigits(value, language) {
   return str.replace(/\d/g, (d) => NP_DIGITS[Number(d)]);
 }
 
-function IssueMarker({ issue, interactive, showPopup, content, language }) {
+function IssueMarker({ issue: rawIssue, interactive, showPopup, content, language }) {
+  const issue = localizeIssue(rawIssue, language);
   const lat = Number(issue.latitude);
   const lng = Number(issue.longitude);
   const statusLabel =

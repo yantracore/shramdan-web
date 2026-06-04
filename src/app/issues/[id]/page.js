@@ -27,7 +27,7 @@ import { StickyActionBar } from "@/components/StickyActionBar";
 import { TertiaryButton } from "@/components/TertiaryButton";
 import { usePreferences } from "@/app/providers";
 import { getJson } from "@/lib/apiClient";
-import { getDemoSupporters } from "@/lib/devMockData";
+import { getDemoIssueById, getDemoSupporters } from "@/lib/devMockData";
 import { copy } from "@/lib/siteContent";
 import { useTrackVisit } from "@/lib/useRecentlyViewed";
 import {
@@ -35,7 +35,8 @@ import {
   getIssueCoverImageUrl,
   getListItems,
   getResponseData,
-  isImageUpload
+  isImageUpload,
+  localizeIssue
 } from "@/lib/adminUtils";
 
 const PUBLIC_ISSUE_STATUSES = ["OPEN", "EVENT_SCHEDULED", "COMPLETED"];
@@ -77,7 +78,8 @@ export default function IssueDetailPage() {
   const t = copy[language];
   const content = t.issues;
 
-  const [issue, setIssue] = useState(null);
+  const [rawIssue, setIssue] = useState(null);
+  const issue = rawIssue ? localizeIssue(rawIssue, language) : null;
   const [related, setRelated] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -88,6 +90,23 @@ export default function IssueDetailPage() {
     setLoading(true);
     setError("");
     setNotFound(false);
+
+    // Demo ids never hit the backend — they live in devMockData and the
+    // /issues list mixes them in alongside real API issues. Resolve them
+    // locally so deep links from the list work.
+    if (typeof issueId === "string" && issueId.startsWith("demo-")) {
+      const demo = getDemoIssueById(issueId);
+      if (demo) {
+        setIssue(demo);
+        setRelated([]);
+        setLoading(false);
+        return;
+      }
+      setNotFound(true);
+      setIssue(null);
+      setLoading(false);
+      return;
+    }
 
     try {
       const response = await getJson(`/issues/${issueId}`);

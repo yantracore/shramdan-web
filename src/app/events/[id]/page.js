@@ -49,7 +49,8 @@ import {
   EVENT_STATUS_COLORS,
   formatEnum,
   getResponseData,
-  isImageUpload
+  isImageUpload,
+  localizeIssue
 } from "@/lib/adminUtils";
 
 function formatScheduledAt(value, language) {
@@ -192,7 +193,7 @@ export default function EventDetailPage() {
   }, [fetchEvent]);
 
   const session = useSyncExternalStore(subscribeAuthSession, getAuthSession, () => null);
-  const linkedIssue = eventData?.issue ?? null;
+  const linkedIssue = eventData?.issue ? localizeIssue(eventData.issue, language) : null;
   const leader = eventData?.eventLeader ?? null;
   const isDemoEvent = typeof eventId === "string" && eventId.startsWith("demo-");
   // Demo events have no real eventLeaderId in the mock payload; we surface

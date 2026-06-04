@@ -130,3 +130,25 @@ export function getIssueCoverImageUrl(issue) {
   if (raw && typeof raw === "object" && typeof raw.url === "string" && raw.url) return raw.url;
   return getFirstIssueImage(issue)?.url || null;
 }
+
+// Backend stores the issue title/description as a translations[] array
+// keyed by locale ("en" / "ne"). The frontend uses "np" as the language
+// code, so we map "np" → "ne" when picking. Fallback chain:
+//   wanted locale → English → Nepali → first available → top-level title.
+// Top-level `title`/`description` are kept as a fallback so dummy data
+// or older API responses without translations still render.
+export function localizeIssue(issue, language) {
+  if (!issue) return issue;
+  const translations = Array.isArray(issue.translations) ? issue.translations : [];
+  if (translations.length === 0) return issue;
+  const wantedLocale = language === "np" ? "ne" : "en";
+  const wanted = translations.find((entry) => entry?.locale === wantedLocale);
+  const enEntry = translations.find((entry) => entry?.locale === "en");
+  const neEntry = translations.find((entry) => entry?.locale === "ne");
+  const picked = wanted || enEntry || neEntry || translations[0];
+  return {
+    ...issue,
+    title: picked?.title || issue.title || "",
+    description: picked?.description || issue.description || ""
+  };
+}

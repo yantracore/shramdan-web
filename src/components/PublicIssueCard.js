@@ -11,7 +11,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { IssueMapThumb } from "@/components/IssueMapThumb";
 import { IssueVoteButton } from "@/components/IssueVoteButton";
-import { ISSUE_STATUS_COLORS, getIssueCoverImageUrl } from "@/lib/adminUtils";
+import {
+  ISSUE_STATUS_COLORS,
+  getIssueCoverImageUrl,
+  localizeIssue
+} from "@/lib/adminUtils";
 import { useSavedIssues } from "@/lib/useSavedIssues";
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
@@ -29,7 +33,8 @@ export function formatSupporters(count, content, language) {
   return content.card.supportersMany.replace("{n}", localized);
 }
 
-export function PublicIssueCard({ issue, content, language }) {
+export function PublicIssueCard({ issue: rawIssue, content, language }) {
+  const issue = localizeIssue(rawIssue, language);
   const statusLabel = content.statusLabels[issue.status] || issue.status;
   const categoryLabel = content.categoryLabels[issue.category] || issue.category;
   const coverImageUrl = getIssueCoverImageUrl(issue);

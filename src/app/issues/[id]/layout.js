@@ -1,5 +1,5 @@
 import { API_BASE_URL } from "@/lib/apiClient";
-import { getIssueCoverImageUrl, getResponseData } from "@/lib/adminUtils";
+import { getIssueCoverImageUrl, getResponseData, localizeIssue } from "@/lib/adminUtils";
 import {
   articleSchema,
   breadcrumbSchema,
@@ -22,9 +22,17 @@ async function fetchIssue(id) {
   }
 }
 
+// Metadata is single-locale per page; SSR can't read the user's
+// language preference (client cookie/localStorage), so we pick Nepali
+// by default — the public site's primary audience. The detail page
+// itself re-renders bilingually based on the in-app language toggle.
+function localizedIssue(issue) {
+  return issue ? localizeIssue(issue, "np") : null;
+}
+
 export async function generateMetadata({ params }) {
   const { id } = await params;
-  const issue = await fetchIssue(id);
+  const issue = localizedIssue(await fetchIssue(id));
   const path = `/issues/${id}`;
 
   if (!issue) {
@@ -48,7 +56,7 @@ export async function generateMetadata({ params }) {
 
 export default async function IssueDetailLayout({ children, params }) {
   const { id } = await params;
-  const issue = await fetchIssue(id);
+  const issue = localizedIssue(await fetchIssue(id));
 
   if (!issue) return children;
 

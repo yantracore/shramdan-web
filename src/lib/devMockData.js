@@ -546,9 +546,14 @@ export const DEMO_LIVE_EVENTS = [
   }
 ];
 
+function hydrateEventLinkedIssue(event) {
+  if (!event?.linkedIssue) return event;
+  return { ...event, linkedIssue: attachIssueTranslations(event.linkedIssue) };
+}
+
 export function getDemoLiveEvents() {
   if (!isDev()) return [];
-  return DEMO_LIVE_EVENTS;
+  return DEMO_LIVE_EVENTS.map(hydrateEventLinkedIssue);
 }
 
 // --- Upcoming demo events (SCHEDULED) -------------------------------
@@ -1385,7 +1390,7 @@ export const DEMO_UPCOMING_EVENTS = [
 
 export function getDemoUpcomingEvents() {
   if (!isDev()) return [];
-  return DEMO_UPCOMING_EVENTS;
+  return DEMO_UPCOMING_EVENTS.map(hydrateEventLinkedIssue);
 }
 
 // --- Past demo events (COMPLETED) -----------------------------------
@@ -2536,15 +2541,15 @@ export const DEMO_PAST_EVENTS = [
 
 export function getDemoPastEvents() {
   if (!isDev()) return [];
-  return DEMO_PAST_EVENTS;
+  return DEMO_PAST_EVENTS.map(hydrateEventLinkedIssue);
 }
 
 export function getDemoAllEvents() {
   if (!isDev()) return { live: [], upcoming: [], past: [] };
   return {
-    live: DEMO_LIVE_EVENTS,
-    upcoming: DEMO_UPCOMING_EVENTS,
-    past: DEMO_PAST_EVENTS
+    live: DEMO_LIVE_EVENTS.map(hydrateEventLinkedIssue),
+    upcoming: DEMO_UPCOMING_EVENTS.map(hydrateEventLinkedIssue),
+    past: DEMO_PAST_EVENTS.map(hydrateEventLinkedIssue)
   };
 }
 
@@ -2623,7 +2628,7 @@ export function getDemoEventById(id) {
   if (draft) {
     return {
       ...draft,
-      issue: draft.linkedIssue || null,
+      issue: attachIssueTranslations(draft.linkedIssue) || null,
       uploads: [],
       photos: [],
       resultSummary: null
@@ -2632,6 +2637,7 @@ export function getDemoEventById(id) {
 
   const live = DEMO_LIVE_EVENTS.find((event) => event.id === id);
   if (live) {
+    const linkedIssue = attachIssueTranslations(live.linkedIssue);
     return {
       id: live.id,
       title: live.title,
@@ -2643,8 +2649,8 @@ export function getDemoEventById(id) {
       scheduledAt: live.liveStream.startedAt,
       durationMinutes: 180,
       planningNotes: null,
-      issue: live.linkedIssue || null,
-      linkedIssue: live.linkedIssue || null,
+      issue: linkedIssue || null,
+      linkedIssue: linkedIssue || null,
       eventLeader: { name: live.linkedIssue ? "टोली नेता" : null },
       eventLeaderId: null,
       uploads: [],
@@ -2657,6 +2663,7 @@ export function getDemoEventById(id) {
 
   const upcoming = DEMO_UPCOMING_EVENTS.find((event) => event.id === id);
   if (upcoming) {
+    const linkedIssue = attachIssueTranslations(upcoming.linkedIssue);
     return {
       id: upcoming.id,
       title: upcoming.title,
@@ -2668,8 +2675,8 @@ export function getDemoEventById(id) {
       scheduledAt: upcoming.scheduledAt,
       durationMinutes: upcoming.durationMinutes,
       planningNotes: null,
-      issue: upcoming.linkedIssue || null,
-      linkedIssue: upcoming.linkedIssue || null,
+      issue: linkedIssue || null,
+      linkedIssue: linkedIssue || null,
       eventLeader: { name: upcoming.leaderName || null },
       eventLeaderId: null,
       uploads: [],
@@ -2682,6 +2689,7 @@ export function getDemoEventById(id) {
 
   const past = DEMO_PAST_EVENTS.find((event) => event.id === id);
   if (past) {
+    const linkedIssue = attachIssueTranslations(past.linkedIssue);
     return {
       id: past.id,
       title: past.title,
@@ -2694,8 +2702,8 @@ export function getDemoEventById(id) {
       completedAt: past.completedAt,
       durationMinutes: past.durationMinutes,
       planningNotes: null,
-      issue: past.linkedIssue || null,
-      linkedIssue: past.linkedIssue || null,
+      issue: linkedIssue || null,
+      linkedIssue: linkedIssue || null,
       eventLeader: { name: past.leaderName || null },
       eventLeaderId: null,
       uploads: (past.photos || []).map((url, i) => ({
@@ -3172,22 +3180,256 @@ const DEMO_PUBLIC_ISSUES = [
   }
 ];
 
+// English translations for demo issues, keyed by issue id. Used by
+// attachIssueTranslations() to build the bilingual translations[] array
+// that mirrors the real API shape. Items absent from this map fall back
+// to re-using the Nepali title/description as the EN entry — a known
+// degraded state that still renders something readable.
+const DEMO_ISSUE_EN_TRANSLATIONS = {
+  // --- DEMO_LIVE_EVENTS linkedIssues -------------------------------
+  "demo-issue-bagmati-1": {
+    title: "Bagmati riverbank choked with litter",
+    description:
+      "The 500-metre stretch upstream of Teenkune Bridge fills with plastic and debris every monsoon. With more than 1,200 daily pedestrians along the bank, local businesses report rising mosquito complaints and stench. Today's drive will separate plastics, collect inorganics, and lay groundwork for ongoing monitoring."
+  },
+  "demo-issue-kamal-5": {
+    title: "Kamal Pokhari walkway murals and signage outdated",
+    description:
+      "A 500-m stretch of the Kamal Pokhari walkway has faded murals and missing wayfinding. The municipality has issued permits for 8 new murals and 4 fresh signboards. Local artists have prepared designs; volunteers will paint and refinish on the day."
+  },
+  "demo-issue-tree-3": {
+    title: "Tree plantation drive at the Surya Binayak slope",
+    description:
+      "A 0.8-hectare bare slope behind Surya Binayak Temple is at landslide risk. The municipality is providing chilaune, uttis and apricot saplings free of charge. We plant, fence the saplings, and commit to a 3-month watering rotation."
+  },
+  "demo-issue-hanumante-l4": {
+    title: "Hanumante river at Lokanthali silting up with waste again",
+    description:
+      "Just 60 days after the last drive, plastic is piling up again — most of it carried downstream from upper reaches. This round pairs collection with riverbank signage to discourage repeat dumping."
+  },
+  "demo-issue-fewa-l5": {
+    title: "South shore of Phewa Lake polluted by drifting plastic",
+    description:
+      "Plastic from upstream washes ashore on the south bank during monsoon. The Pokhara tourism merchants' committee and the ward are partnering with local boatmen to retrieve floating waste alongside the on-shore sweep."
+  },
+  "demo-issue-taumadhi-l6": {
+    title: "Taumadhi Square heritage zone littered and disorganised",
+    description:
+      "Tourists and locals alike leave waste at Taumadhi Square, where modern plastic mixes with the carved stone fragments around the temple steps. The Department of Archaeology has approved a careful sorting and cleanup."
+  },
+  "demo-issue-nagarkot-l7": {
+    title: "Nagarkot sunrise trail missing signs and showing erosion",
+    description:
+      "The 2.8-km trail from Nagarkot to the sunrise viewpoint has lost five signposts and shows erosion at three switchbacks. The tourism committee is providing materials and permits."
+  },
+  "demo-issue-dharan-l8": {
+    title: "Waste piles at Dharan haat-bazaar after every market day",
+    description:
+      "Every Tuesday and Friday haat day, the Dharan bazaar leaves heaps of organic and packaging waste behind. A five-year search for a lasting fix; this round starts the evening of haat day and aims to finish before the next one begins."
+  },
+  "demo-issue-hetauda-l9": {
+    title: "Ratna Park east section bare; no shade in summer heat",
+    description:
+      "The 0.4-hectare eastern section of Hetauda's Ratna Park has no canopy — park-goers struggle in summer. In partnership with the forest office and municipality, we plant bakaino and asuro saplings."
+  },
+  "demo-issue-sankhu-l10": {
+    title: "Bajrayogini temple grounds and street fronts littered",
+    description:
+      "Daily offerings and tourist plastic accumulate around the historic Bajrayogini temple at Sankhu. The temple committee and ward are partnering on a twice-weekly cleanup rotation."
+  },
+  "demo-issue-sauraha-l11": {
+    title: "Sauraha buffer zone polluted by visitor plastic",
+    description:
+      "Chitwan National Park's Sauraha buffer zone — high tourist footfall has produced a plastic-waste problem. Critical habitat for rhinos and elephants, so cleanup is urgent."
+  },
+  "demo-issue-panchthar-l12": {
+    title: "Tree plantation needed at the Ome ridge",
+    description:
+      "The Ome ridge in Panchthar is bare, raising landslide risk during monsoon. The Division Forest Office has supplied 300 saplings — chilaune and uttis."
+  },
+  "demo-issue-nuwakot-l13": {
+    title: "Nuwakot palace grounds disorganised and littered",
+    description:
+      "The historic seven-storey palace at Nuwakot has not seen organised cleanup in years. The Department of Archaeology has authorised a careful sort-and-clear operation."
+  },
+  "demo-issue-manang-l14": {
+    title: "Chame–Manang trail signs missing; trekkers go astray",
+    description:
+      "On the Chame–Manang circuit trail, 18 directional signs have gone missing and ACAP's maintenance has lapsed — trekkers occasionally lose the path. ACAP and the local guide association are partnering on this drive."
+  },
+  "demo-issue-syangja-l15": {
+    title: "Pandav Cave grounds and interior piling up with litter",
+    description:
+      "The historic Pandav Cave is Syangja's main tourist site. Visitors leave plastic outside and, more troubling, inside the cave's dark recesses. The tourism committee is supporting this cleanup."
+  },
+
+  // --- DEMO_UPCOMING_EVENTS linkedIssues ---------------------------
+  "demo-issue-ratna-1": {
+    title: "Ratnapark grounds and roadside trash problem",
+    description:
+      "Ratnapark is the central public space in the city, but fortnight-long litter accumulation has made the grounds and roadside unpleasant for the 10,000+ daily walkers. The municipality is supplying trucks; we sort, bag, and load."
+  },
+  "demo-issue-tripureshwar-2": {
+    title: "Riverbank stabilisation near Tripureshwar Bridge",
+    description:
+      "Both banks near Tripureshwar Bridge have eroded — landslide risk in monsoon. The forest office is providing 300 saplings (bakaino, ritha, apricot) free. We plant, then organise a 3-month watering rotation."
+  },
+  "demo-issue-trail-3": {
+    title: "Gokarneshwar trail: erosion, missing signs, and litter",
+    description:
+      "The 4.2-km hiking trail from Gokarneshwar to Shivapuri has three core problems — four signs missing, erosion at two switchbacks, and tourist plastic strewn along the route. This day covers signage, stonework, and waste collection."
+  },
+  "demo-issue-school-4": {
+    title: "Shree Durga Devi Secondary School: 320 students, building in disrepair",
+    description:
+      "The school walls have not been painted in six years; two toilet doors are broken; the library ceiling leaks. 320 students affected. The School Management Committee will cover paint and materials; we contribute labour and coordination."
+  },
+  "demo-issue-school-2": {
+    title: "Shree Janapriya Secondary: wall painting and library repair",
+    description:
+      "The main building has not been painted in eight years; three library windows are broken. 480 students affected. The SMC is committed to materials; we organise the labour and time."
+  },
+  "demo-issue-swayambhu-6": {
+    title: "Swayambhu eastern stairway worn and littered",
+    description:
+      "Swayambhu's eastern 365-step stairway has cracking upper sections, and tourists and pilgrims leave plastic on the lower steps. The Federation of Buddhist Communities and the Department of Archaeology have authorised the cleanup and repair."
+  },
+  "demo-issue-pashupati-7": {
+    title: "Aryaghat area littered with offerings and packaging",
+    description:
+      "The area around Aryaghat at Pashupatinath accumulates offerings and unsorted disposal weekly. Periodic clearance is approved by the Pashupati Area Development Fund."
+  },
+  "demo-issue-lumbini-8": {
+    title: "Lumbini entrance road bare; summer travel is gruelling",
+    description:
+      "The 3 km eastern approach to the sacred area at Lumbini is treeless, leaving Buddhist pilgrims and locals exposed during summer. The Lumbini Development Trust has provided saplings and approvals."
+  },
+  "demo-issue-janakpur-9": {
+    title: "Janakpur Ram Janaki temple grounds and pond littered",
+    description:
+      "Daily devotees leave waste around the Ram Janaki temple and at the Agnishala pond. This drive is a partnership between the temple committee and the municipality."
+  },
+  "demo-issue-ilam-10": {
+    title: "Trail through Kanyam tea gardens not visitor-ready",
+    description:
+      "The Kanyam tea gardens are a major tourist draw, but the 5 km walking trail has missing signs, erosion patches, and accumulated litter. Run jointly with the tea growers' association and the tourism committee."
+  },
+  "demo-issue-muglin-11": {
+    title: "Muglin bazaar drains blocked; chronic monsoon flooding",
+    description:
+      "Muglin sits at the junction of major highways, but its main drains have not been cleared in years. Every monsoon, the bus park and nearby shops flood. The municipality is supplying loaders and trucks."
+  },
+  "demo-issue-tansen-12": {
+    title: "Tansen Durbar grounds bare-walled and dated",
+    description:
+      "Tansen Durbar is Palpa's flagship heritage site — its compound walls are unpainted and parts have unauthorised graffiti. The Department of Archaeology has approved the work; local artists have prepared Mithila and Newari-inspired designs."
+  },
+  "demo-issue-bardia-13": {
+    title: "Bardia National Park buffer zone polluted by visitor plastic",
+    description:
+      "Visitors and picnic groups leave plastic at the Bardia buffer zone, posing a risk to wildlife. Park administration and the buffer zone users' committee are partnering on this drive."
+  },
+  "demo-issue-surkhet-14": {
+    title: "Bulbule waterfall trail damaged and signage missing",
+    description:
+      "Surkhet's Bulbule waterfall is a regional draw, but two trail sections have collapsed and signboards are missing. The municipality has approved tools and new lampposts along the trail."
+  },
+  "demo-issue-okhal-15": {
+    title: "Shree Jaljala Secondary unpainted for seven years",
+    description:
+      "Shree Jaljala Secondary in Okhaldhunga has not been painted in seven years; 240 students affected. The SMC is covering paint and materials; we contribute labour and time."
+  },
+  "demo-issue-galchhi-16": {
+    title: "Prithvi Highway near Galchhi treeless; dust and summer heat",
+    description:
+      "The 4 km highway stretch from Galchhi toward Malekhu is bare — bus passengers and locals suffer through summer. Plan: plant 350 saplings."
+  },
+
+  // --- DEMO_PUBLIC_ISSUES + draft event ----------------------------
+  "demo-issue-lakeside-1": {
+    title: "Plastic litter along the Lakeside shoreline",
+    description: "Long stretches of the Lakeside walking promenade have collected plastic carried in by the wind off Phewa Lake."
+  },
+  "demo-issue-shivapuri-1": {
+    title: "Shivapuri trail in need of repair",
+    description: "Sections of the popular hiking trail through Shivapuri National Park have eroded and lost wayfinding."
+  },
+  "demo-issue-balkhu-1": {
+    title: "Balkhu bazaar trash piles up; monsoon drains clog",
+    description:
+      "Balkhu and the surrounding stretch have not seen regular cleanup in years. Haat-day rubbish accumulates and the drains clog every monsoon. The municipality and the merchants' association have committed materials and a loader."
+  }
+};
+
+// Attach a translations[] array to a demo issue so the localizeIssue()
+// helper can render it in the requested language. Keeps the top-level
+// title/description in place as a safety net for any caller that hasn't
+// been migrated to the localized helper yet.
+export function attachIssueTranslations(issue) {
+  if (!issue || !issue.id) return issue;
+  if (Array.isArray(issue.translations) && issue.translations.length > 0) {
+    return issue;
+  }
+  const enOverride = DEMO_ISSUE_EN_TRANSLATIONS[issue.id];
+  return {
+    ...issue,
+    translations: [
+      {
+        locale: "en",
+        title: enOverride?.title || issue.title || "",
+        description: enOverride?.description || issue.description || ""
+      },
+      {
+        locale: "ne",
+        title: issue.title || "",
+        description: issue.description || ""
+      }
+    ]
+  };
+}
+
 export function getDemoPublicIssues() {
   if (!isDev()) return [];
-  return DEMO_PUBLIC_ISSUES;
+  return DEMO_PUBLIC_ISSUES.map(attachIssueTranslations);
 }
 
 export function getDemoIssueById(id) {
   if (!isDev() || !id) return null;
   const direct = DEMO_PUBLIC_ISSUES.find((i) => i.id === id);
-  if (direct) return direct;
+  if (direct) return attachIssueTranslations(direct);
   const pools = [DEMO_LIVE_EVENTS, DEMO_UPCOMING_EVENTS, DEMO_PAST_EVENTS];
   for (const pool of pools) {
     for (const event of pool) {
-      if (event.linkedIssue?.id === id) return event.linkedIssue;
+      if (event.linkedIssue?.id === id) {
+        return attachIssueTranslations(event.linkedIssue);
+      }
     }
   }
   return null;
+}
+
+// Flat, deduped list of demo issues used to augment the API issues
+// list. Pulls from every demo event pool plus the standalone public
+// issue registry so the homepage cards, live rail, and /issues list
+// all reference a consistent set of bilingual issues.
+export function getDemoIssues() {
+  if (!isDev()) return [];
+  const seen = new Map();
+  const pools = [DEMO_LIVE_EVENTS, DEMO_UPCOMING_EVENTS, DEMO_PAST_EVENTS];
+  for (const pool of pools) {
+    for (const event of pool) {
+      const linked = event?.linkedIssue;
+      if (linked?.id && !seen.has(linked.id)) {
+        seen.set(linked.id, attachIssueTranslations(linked));
+      }
+    }
+  }
+  for (const issue of DEMO_PUBLIC_ISSUES) {
+    if (issue?.id && !seen.has(issue.id)) {
+      seen.set(issue.id, attachIssueTranslations(issue));
+    }
+  }
+  return Array.from(seen.values());
 }
 
 // Vote-count history mini-trend (8 data points). Used by the sparkline
