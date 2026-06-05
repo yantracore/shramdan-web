@@ -1266,6 +1266,186 @@
   margin-inline: auto;
 }
 
+.form-section-wide {
+  max-width: 1120px;
+}
+
+.form-page-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(360px, 1.1fr);
+  gap: 28px;
+  align-items: stretch;
+}
+
+.form-page-layout > .content-card,
+.form-page-layout > .form-card {
+  min-width: 0;
+  height: 100%;
+}
+
+.form-visual-panel {
+  overflow: hidden;
+  display: grid;
+  align-content: start;
+  gap: 18px;
+  min-width: 0;
+  min-height: 100%;
+  padding: 16px 16px 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background:
+    linear-gradient(150deg, color-mix(in srgb, var(--primary) 12%, transparent), transparent 70%),
+    var(--surface);
+  box-shadow: var(--shadow-1);
+}
+
+.form-visual-media {
+  position: relative;
+  min-height: 300px;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: calc(var(--radius-lg) - 4px);
+  background: var(--surface-soft);
+}
+
+.form-visual-media img {
+  object-fit: cover;
+}
+
+.form-visual-copy {
+  display: grid;
+  gap: 8px;
+  padding: 0 4px;
+}
+
+.form-visual-copy h2 {
+  margin: 0;
+  color: var(--text);
+  font-size: clamp(20px, 2.2vw, 26px);
+  line-height: 1.18;
+}
+
+.form-visual-copy p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.form-visual-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.form-visual-stat {
+  display: grid;
+  gap: 2px;
+  padding: 12px 14px;
+  border: 1px solid color-mix(in srgb, var(--line) 82%, transparent);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+}
+
+.form-visual-stat strong {
+  color: var(--primary);
+  font-size: 22px;
+  line-height: 1;
+}
+
+.form-visual-stat span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.form-visual-list {
+  list-style: none;
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+}
+
+.form-visual-list li {
+  position: relative;
+  padding-left: 24px;
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.form-visual-list li::before {
+  content: "";
+  position: absolute;
+  top: 0.62em;
+  left: 4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--accent);
+}
+
+.join-role-context {
+  display: grid;
+  gap: 6px;
+  padding: 14px;
+  border: 1px solid color-mix(in srgb, var(--primary) 22%, var(--line));
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--primary) 8%, var(--surface));
+}
+
+.join-role-context-eyebrow {
+  color: var(--primary);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.join-role-context h3,
+.join-role-context p {
+  margin: 0;
+}
+
+.join-role-context h3 {
+  color: var(--text);
+  font-size: 16px;
+  line-height: 1.25;
+}
+
+.join-role-context p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.join-role-context-event {
+  color: var(--text) !important;
+  font-weight: 800;
+}
+
+@media (min-width: 901px) {
+  .form-page-layout {
+    min-height: 720px;
+  }
+
+  .form-page-layout > .form-card {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .form-page-layout > .form-card .ant-form-item:last-of-type {
+    margin-bottom: 16px;
+  }
+}
+
+@media (max-width: 900px) {
+  .form-page-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* --- Submission success card (used by /join + /feedback) -------------- */
 .submission-success-card {
   background: var(--surface);
@@ -1716,6 +1896,22 @@
   align-items: stretch;
 }
 
+@media (min-width: 821px) {
+  .login-layout {
+    min-height: 640px;
+  }
+
+  .login-benefits,
+  .login-card {
+    height: 100%;
+    min-height: 640px;
+  }
+
+  .login-card {
+    align-content: center;
+  }
+}
+
 @media (max-width: 820px) {
   .login-layout {
     grid-template-columns: 1fr;
@@ -1848,7 +2044,7 @@
 
 .login-card {
   display: grid;
-  align-self: center;
+  align-self: stretch;
 }
 
 /* --- Home pulse row (activity ticker + live online) ------------------ */
