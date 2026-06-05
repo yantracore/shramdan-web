@@ -12,13 +12,14 @@
 // IntroCinematic at /intro is a separate, already-polished page.
 
 import { FilterOutlined, SearchOutlined } from "@ant-design/icons";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ActivityStatsRow } from "@/components/ActivityStatsRow";
+import EventMapBlock from "@/components/EventMapBlock";
 import { EventsHomeRail } from "@/components/EventsHomeRail";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
-import { listLiveEvents, listUpcomingEvents } from "@/lib/eventsApi";
+import { listAllEvents } from "@/lib/eventsApi";
 import { copy } from "@/lib/siteContent";
 
 export default function HomeSearchView() {
@@ -30,29 +31,44 @@ export default function HomeSearchView() {
 
   const [liveEvents, setLiveEvents] = useState([]);
   const [upcomingEvents, setUpcomingEvents] = useState([]);
+  const [pastEvents, setPastEvents] = useState([]);
   const [query, setQuery] = useState("");
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
-        const [live, upcoming] = await Promise.all([
-          listLiveEvents({ language }),
-          listUpcomingEvents({ language, limit: 12 })
-        ]);
+        // listAllEvents() returns the three buckets in one shot so the
+        // rail and the map stay in sync without firing 3 parallel calls.
+        const buckets = await listAllEvents({ language });
         if (cancelled) return;
-        setLiveEvents(live);
-        setUpcomingEvents(upcoming);
+        setLiveEvents(buckets.live ?? []);
+        setUpcomingEvents(buckets.upcoming ?? []);
+        setPastEvents(buckets.past ?? []);
       } catch {
         if (cancelled) return;
         setLiveEvents([]);
         setUpcomingEvents([]);
+        setPastEvents([]);
       }
     })();
     return () => {
       cancelled = true;
     };
   }, [language]);
+
+  // Build map entries from all three buckets. EventMap filters to entries
+  // with finite lat/lng internally; we just tag each with its status so
+  // the pin colour matches reality.
+  const mapEntries = useMemo(() => {
+    const tag = (events, status) =>
+      (events ?? []).map((event) => ({ event, status }));
+    return [
+      ...tag(liveEvents, "live"),
+      ...tag(upcomingEvents, "upcoming"),
+      ...tag(pastEvents, "past")
+    ];
+  }, [liveEvents, upcomingEvents, pastEvents]);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -105,6 +121,34 @@ export default function HomeSearchView() {
           <div className="home-search-stats">
             <ActivityStatsRow language={language} variant="events" />
           </div>
+
+          {mapEntries.length > 0 ? (
+            <section
+              className="home-search-map"
+              aria-labelledby="home-search-map-title"
+            >
+              <header className="home-search-map-header">
+                <span className="eyebrow home-search-map-eyebrow">
+                  {search.mapEyebrow}
+                </span>
+              </header>
+              <h2 id="home-search-map-title" className="sr-only">
+                {search.mapEyebrow}
+              </h2>
+              <div className="home-search-map-frame">
+                <EventMapBlock
+                  entries={mapEntries}
+                  t={search.map}
+                  language={language}
+                  height={320}
+                  interactive
+                  enableFullscreen
+                  fullscreenLabel={search.map.fullscreenOpen}
+                  exitFullscreenLabel={search.map.fullscreenClose}
+                />
+              </div>
+            </section>
+          ) : null}
         </div>
       </section>
 

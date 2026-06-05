@@ -237,3 +237,71 @@
     backdrop-filter: none;
   }
 }
+
+/* Map sits below the stats pills — decent size, glass-bordered, rounded
+ * so it reads as part of the search band rather than a separate brochure
+ * block. Leaflet container takes the height we pass via the prop. */
+.home-search-map {
+  width: 100%;
+  display: grid;
+  gap: 10px;
+}
+
+.home-search-map-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.home-search-map-eyebrow {
+  /* Reuse the global `.eyebrow` styling but center it under the pills. */
+  text-align: center;
+}
+
+.home-search-map-frame {
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  border: 1px solid color-mix(in srgb, var(--line) 45%, transparent);
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  backdrop-filter: blur(18px) saturate(1.2);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.32) inset,
+    0 18px 48px rgba(23, 33, 28, 0.16);
+}
+
+.home-search-map-frame .issue-map-wrap {
+  /* Strip the inner wrap's own border/radius so the outer glass frame
+   * is the only visible edge — prevents the double-bordered look. */
+  border: 0;
+  border-radius: inherit;
+  overflow: hidden;
+}
+
+@media (max-width: 720px) {
+  .home-search-map-frame {
+    border-radius: 12px;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .home-search-map-frame {
+    background: var(--surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+/* Visually-hidden helper for the map's accessible heading. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

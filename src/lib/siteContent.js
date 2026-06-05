@@ -1392,7 +1392,19 @@ export const copy = {
       searchPlaceholder: "अभियान, समस्या वा ठाउँ खोज्नुहोस्…",
       searchAria: "श्रमदानमा खोज्नुहोस्",
       filtersLabel: "फिल्टर",
-      submitAria: "खोज सुरु गर्नुहोस्"
+      submitAria: "खोज सुरु गर्नुहोस्",
+      mapEyebrow: "नक्सामा",
+      mapEmpty: "अहिले नक्सामा देखाउन कुनै अभियान छैन।",
+      map: {
+        statusLabels: {
+          live: "अहिले लाइभ",
+          upcoming: "आउँदै",
+          past: "सम्पन्न"
+        },
+        viewDetail: "विवरण",
+        fullscreenOpen: "पूर्ण-स्क्रिन नक्सा खोल्नुहोस्",
+        fullscreenClose: "पूर्ण-स्क्रिन नक्सा बन्द गर्नुहोस्"
+      }
     },
     liveEventsRail: {
       eyebrow: "अहिले भइरहेको",
@@ -1781,31 +1793,32 @@ export const copy = {
         steps: {
           intro: {
             title: "स्वागत",
-            heading: "श्रमदानमा जोडिनुहोस्",
+            heading: "तपाईंको सीपले समुदायको काम अघि बढाउँछ",
             intro:
-              "तपाईंको सीप, समय वा उर्जा — जे छ त्यही लिएर समुदायको कामलाई अगाडि बढाउनुहोस्।",
+              "श्रमदानमा विकासकर्ता, डिजाइनर, लेखक, संयोजक वा स्वयंसेवकका रूपमा जोडिँदा तपाईंको योगदान वास्तविक अभियान, रिपोर्ट र सामुदायिक निर्णयमा प्रयोग हुन्छ।",
             cta: "आवेदन सुरु गर्नुहोस्",
+            eyebrow: "किन जोडिने?",
+            imageAlt: "श्रमदानका योगदानकर्ताहरू सामुदायिक कामको योजना बनाउँदै",
+            imageSrc: "/images/forms/join-contributors.webp",
+            stats: [
+              { value: "१२+", label: "योगदान भूमिका" },
+              { value: "१", label: "साझा उद्देश्य" }
+            ],
             bullets: [
-              "केवल ५ छोटा चरण।",
-              "आफ्नो भूमिका आफै छान्नुहोस्।",
-              "हाम्रो टोलीले इमेल वा फोनमा सम्पर्क गर्छ।"
+              "आफ्नो समय र सीप अनुसार जोडिनुहोस्।",
+              "हामीले उपयुक्त काम र अभियानसँग जोड्न सम्पर्क गर्छौँ।",
+              "सानो योगदानले पनि सार्वजनिक समस्या समाधानतिर धकेल्छ।"
             ]
           },
           basics: {
             title: "विवरण",
             heading: "आधारभूत विवरण",
-            intro: "तपाईंलाई सम्पर्क गर्न आवश्यक न्यूनतम जानकारी।"
-          },
-          role: {
-            title: "भूमिका",
-            heading: "तपाईंको योगदान कुन लेनमा?",
-            intro: "तीन लेन — आफ्नो काम र समय अनुसार एउटा छान्नुहोस्।",
-            required: "कृपया एक लेन छान्नुहोस्।"
+            intro: "तपाईंलाई सम्पर्क गर्न आवश्यक जानकारी।"
           },
           work: {
             title: "अनुभव",
             heading: "अनुभव र पोर्टफोलियो",
-            intro: "तपाईंको पृष्ठभूमि बुझ्न मद्दत हुने विवरण।"
+            intro: "तपाईंको पृष्ठभूमि बुझ्न मद्दत हुने विवरण — सबै वैकल्पिक।"
           },
           motivation: {
             title: "प्रेरणा",
@@ -3305,7 +3318,19 @@ export const copy = {
       searchPlaceholder: "Search events, issues, or places…",
       searchAria: "Search Shramdan",
       filtersLabel: "Filters",
-      submitAria: "Submit search"
+      submitAria: "Submit search",
+      mapEyebrow: "On the map",
+      mapEmpty: "No campaigns to map right now.",
+      map: {
+        statusLabels: {
+          live: "LIVE",
+          upcoming: "Upcoming",
+          past: "Completed"
+        },
+        viewDetail: "View detail",
+        fullscreenOpen: "Open fullscreen map",
+        fullscreenClose: "Exit fullscreen map"
+      }
     },
     liveEventsRail: {
       eyebrow: "Happening now",
@@ -3694,31 +3719,32 @@ export const copy = {
         steps: {
           intro: {
             title: "Welcome",
-            heading: "Join Shramdan",
+            heading: "Your skills can move community work forward",
             intro:
-              "Bring your skill, time or energy — whatever you have — to push community work forward.",
+              "Join as a developer, designer, writer, organiser, or volunteer. Your contribution can support real campaigns, reports, and local decisions.",
             cta: "Start Application",
+            eyebrow: "Why join?",
+            imageAlt: "Shramdan contributors planning community work together",
+            imageSrc: "/images/forms/join-contributors.webp",
+            stats: [
+              { value: "12+", label: "Contributor roles" },
+              { value: "1", label: "Shared purpose" }
+            ],
             bullets: [
-              "Only 5 short steps.",
-              "Pick your own contribution lane.",
-              "Our team reaches out by email or phone."
+              "Show up with whatever time and skills you have.",
+              "We connect you with relevant work or campaigns.",
+              "Even a small contribution helps local problems move toward action."
             ]
           },
           basics: {
             title: "Basics",
             heading: "Your basic details",
-            intro: "The minimum we need to reach you."
-          },
-          role: {
-            title: "Role",
-            heading: "Which lane fits your contribution?",
-            intro: "Three lanes — pick the one that fits your work and time.",
-            required: "Please pick a lane."
+            intro: "What we need to reach you."
           },
           work: {
             title: "Experience",
             heading: "Experience & portfolio",
-            intro: "Details that help us understand your background."
+            intro: "Background details that help us understand you — all optional."
           },
           motivation: {
             title: "Motivation",
