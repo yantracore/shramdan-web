@@ -4970,6 +4970,44 @@
   color: var(--text-muted, #6b7280);
 }
 
+/* Page-wide drag hint: when a file is dragged anywhere on the window,
+   every visible drop zone glows accent-orange with a gentle pulse so the
+   user can spot where to release. Driven by GlobalFileDragWatcher. */
+:root[data-file-dragging="true"] .public-attachment-field .ant-upload-drag,
+:root[data-file-dragging="true"] .admin-cover-dragger.ant-upload-wrapper .ant-upload-drag,
+:root[data-file-dragging="true"] .admin-issue-images-add {
+  border-color: var(--accent) !important;
+  background: color-mix(in srgb, var(--accent) 8%, var(--surface, transparent));
+  animation: shramdan-drop-zone-pulse 1.6s ease-in-out infinite;
+}
+
+:root[data-file-dragging="true"] .public-attachment-field .ant-upload-drag .ant-upload-drag-icon,
+:root[data-file-dragging="true"] .admin-cover-dragger .ant-upload-drag-icon,
+:root[data-file-dragging="true"] .admin-issue-images-add {
+  color: var(--accent);
+}
+
+@keyframes shramdan-drop-zone-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 28%, transparent);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--accent) 14%, transparent);
+    transform: scale(1.006);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root[data-file-dragging="true"] .public-attachment-field .ant-upload-drag,
+  :root[data-file-dragging="true"] .admin-cover-dragger.ant-upload-wrapper .ant-upload-drag,
+  :root[data-file-dragging="true"] .admin-issue-images-add {
+    animation: none;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 28%, transparent);
+  }
+}
+
 .footer {
   display: grid;
   grid-template-columns: minmax(280px, 1.4fr) minmax(0, 2fr);
