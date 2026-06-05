@@ -57,6 +57,12 @@ export function MobileBottomNav({ language = "np", onMore }) {
             href={href}
             className={`mobile-bottom-nav-tab${active ? " is-active" : ""}`}
             aria-current={active ? "page" : undefined}
+            onClick={(event) => {
+              if (pathname === href && typeof window !== "undefined" && window.scrollY > 0) {
+                event.preventDefault();
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }
+            }}
           >
             <Icon aria-hidden="true" />
             <span>{t[id]}</span>
