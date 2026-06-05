@@ -18,12 +18,28 @@
 import { getJson } from "@/lib/apiClient";
 import { getListItems, getIssueCoverImageUrl, localizeIssue } from "@/lib/adminUtils";
 
-// Pick a representative title for an event by reading its parent issue's
-// translations. If neither locale matches, falls back to whatever the
-// backend supplied at the top level.
+// Backend gap: GET /events embeds `issue` without its `translations` array,
+// so localizeIssue() returns no title and the card renders blank. Until the
+// backend includes translations (or events expose their own title), fall
+// back to a humanized slug so users see *something* readable.
+function humanizeSlug(slug) {
+  if (!slug || typeof slug !== "string") return "";
+  return slug
+    .replace(/[-_]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 function pickEventTitle(rawEvent, language) {
   const localized = rawEvent?.issue ? localizeIssue(rawEvent.issue, language) : null;
-  return localized?.title || rawEvent?.title || "";
+  return (
+    localized?.title ||
+    rawEvent?.title ||
+    humanizeSlug(rawEvent?.issue?.slug) ||
+    humanizeSlug(rawEvent?.slug) ||
+    ""
+  );
 }
 
 // Normalise a backend event into the shape the home rail / list pages /
