@@ -1,0 +1,995 @@
+{
+  "startedAt": "2026-06-05T07:01:01.559Z",
+  "updatedAt": "2026-06-05T07:08:06.978Z",
+  "members": {
+    "arjun": {
+      "id": "28239366-f7e1-4755-8b97-b9eefe6f6c08",
+      "email": "arjun.seed@shramdan.org",
+      "name": "Arjun Shrestha",
+      "phone": "+9779820100001"
+    },
+    "maya": {
+      "id": "3bb76d7e-1e39-44a0-90e4-a7bfa865f96a",
+      "email": "maya.seed@shramdan.org",
+      "name": "Maya Tamang",
+      "phone": "+9779820100002"
+    },
+    "bishnu": {
+      "id": "6408eb65-48db-4adf-b0a0-2a1c7ec2428d",
+      "email": "bishnu.seed@shramdan.org",
+      "name": "Bishnu Adhikari",
+      "phone": "+9779820100003"
+    },
+    "ramesh": {
+      "id": "50fceb0f-b225-47d3-8fa3-45d4b2426f43",
+      "email": "ramesh.seed@shramdan.org",
+      "name": "Ramesh Karki",
+      "phone": "+9779820100004"
+    },
+    "sita": {
+      "id": "0223c95d-5cf6-4fd3-b4cc-b1a281c22aca",
+      "email": "sita.seed@shramdan.org",
+      "name": "Sita Gurung",
+      "phone": "+9779820100005"
+    },
+    "hari": {
+      "id": "1ec84d86-0c5b-4dba-bfdc-cce056b62cd6",
+      "email": "hari.seed@shramdan.org",
+      "name": "Hari KC",
+      "phone": "+9779820100006"
+    },
+    "priya": {
+      "id": "4c967f2c-6300-4d96-9f77-e02131ca8230",
+      "email": "priya.seed@shramdan.org",
+      "name": "Priya Lama",
+      "phone": "+9779820100007"
+    },
+    "suman": {
+      "id": "8c23b84e-5ae7-4475-af51-cde50febeb38",
+      "email": "suman.seed@shramdan.org",
+      "name": "Suman Rai",
+      "phone": "+9779820100008"
+    },
+    "anjali": {
+      "id": "b4b960fc-fd4e-4d69-80d0-271b68615171",
+      "email": "anjali.seed@shramdan.org",
+      "name": "Anjali Magar",
+      "phone": "+9779820100009"
+    },
+    "bikash": {
+      "id": "0f0c5540-9549-4a8d-a003-af85651722cc",
+      "email": "bikash.seed@shramdan.org",
+      "name": "Bikash Thapa",
+      "phone": "+9779820100010"
+    }
+  },
+  "uploads": {
+    "bagmati-cleanup.jpg": {
+      "id": "6416f24c-55db-40c3-83a5-481515bc4f91",
+      "downloadUrl": "https://pub-d6463995d1cd4467b0498bbfae5de180.r2.dev/uploads/public/0601efaa263407a142c09a105c7886a6.jpg",
+      "mimeType": "image/jpeg"
+    },
+    "bagmati-cleanup.mp4": {
+      "id": "870b6306-28f6-4dc5-996e-e0904abc8b40",
+      "downloadUrl": "https://pub-d6463995d1cd4467b0498bbfae5de180.r2.dev/uploads/public/5914df944f883eb186d3475dbe2354ac.mp4",
+      "mimeType": "video/mp4"
+    },
+    "bagmati-tree-line.jpg": {
+      "id": "b6d34747-0a82-4b28-aa19-175756080d33",
+      "downloadUrl": "https://pub-d6463995d1cd4467b0498bbfae5de180.r2.dev/uploads/public/6856d91ea460cf7d104a58634386b4c1.jpg",
+      "mimeType": "image/jpeg"
+    },
+    "antu-trail.jpg": {
+      "id": "6e14479e-8829-4539-956f-1b08df6fd8c8",
+      "downloadUrl": "https://pub-d6463995d1cd4467b0498bbfae5de180.r2.dev/uploads/public/7fa2f21454630d00485ea4633261acd3.jpg",
+      "mimeType": "image/jpeg"
+    },
+    "bardia-buffer.jpg": {
+      "id": "19e87c0c-416c-44a1-aa74-1a6bc67d3378",
+      "downloadUrl": "https://pub-d6463995d1cd4467b0498bbfae5de180.r2.dev/uploads/public/fd2d740999808fa2bfdac25dc76f1010.jpg",
+      "mimeType": "image/jpeg"
+    },
+    "boudha-done.jpg": {
+      "id": "c999dc2b-c9dd-4ab9-a4f8-23808b2b526b",
+      "downloadUrl": "https://pub-d6463995d1cd4467b0498bbfae5de180.r2.dev/uploads/public/e86d78756781ff42baa3d6a5faf78478.jpg",
+      "mimeType": "image/jpeg"
+    },
+    "dharan-bazaar.jpg": {
+      "id": "99f164b9-9c34-49f5-a201-b937ed0449b8",
+      "downloadUrl": "https://pub-d6463995d1cd4467b0498bbfae5de180.r2.dev/uploads/public/c6e7df837adefb6aed92379926885f6b.jpg",
+      "mimeType": "image/jpeg"
+    },
+    "durga-devi-paint.jpg": {
+      "id": "7bb4ffda-5670-47e3-9803-6d39dc295b12",
+      "downloadUrl": "https://pub-d6463995d1cd4467b0498bbfae5de180.r2.dev/uploads/public/0a8431c48047de22f6f575f087f89948.jpg",
+      "mimeType": "image/jpeg"
+    },
+    "fewa-cleanup-poster.jpg": {
+      "id": "89cf154e-ffa1-4168-a0a0-628ed14c3789",
+      "downloadUrl": "https://pub-d6463995d1cd4467b0498bbfae5de180.r2.dev/uploads/public/ffbc0dec604479f216d32e2db34ee09c.jpg",
+      "mimeType": "image/jpeg"
+    },
+    "fewa-cleanup.jpg": {
+      "id": "df60e8dc-f954-4751-857b-f9bd004bac2b",
+      "downloadUrl": "https://pub-d6463995d1cd4467b0498bbfae5de180.r2.dev/uploads/public/85958b519b6ed69ae13eb3a9a9ad9e18.jpg",
+      "mimeType": "image/jpeg"
+    },
+    "fewa-cleanup.mp4": {
+      "id": "bce437eb-0366-4539-a765-47a6fc3cf7fe",
+      "downloadUrl": "https://pub-d6463995d1cd4467b0498bbfae5de180.r2.dev/uploads/public/fb49092f5be04592a89e782b949e85c1.mp4",
+      "mimeType": "video/mp4"
+    },
+    "gaur-bazaar.jpg": {
+      "id": "a9a44338-5fc2-48e4-9c2f-31f3b8818f31",
+      "downloadUrl": "https://pub-d6463995d1cd4467b0498bbfae5de180.r2.dev/uploads/public/bfc58458fe81fc7b6e9f9d55e262e5f2.jpg",
+      "mimeType": "image/jpeg"
+    },
+    "ghodaghodi-lake.jpg": {
+      "id": "314b7c7d-d81d-4252-98f8-18707963d5e3",
+      "downloadUrl": "https://pub-d6463995d1cd4467b0498bbfae5de180.r2.dev/uploads/public/ec96cbd6216d3e90887b3e52eb81448e.jpg",
+      "mimeType": "image/jpeg"
+    },
+    "gorkha-done.jpg": {
+      "id": "7994c38a-a2a1-4334-be88-65bfa01fa21a",
+      "downloadUrl": "https://pub-d6463995d1cd4467b0498bbfae5de180.r2.dev/uploads/public/c6850e2421ccbb404b14b48da37f0939.jpg",
+      "mimeType": "image/jpeg"
+    },
+    "hanumante-cleanup-done.jpg": {
+      "id": "1f6dfc0d-5bd9-4a3a-a708-d6f80ea49c3d",
+      "downloadUrl": "https://pub-d6463995d1cd4467b0498bbfae5de180.r2.dev/uploads/public/eaad2c5d9bdf74376e7e4aa8df1bba31.jpg",
+      "mimeType": "image/jpeg"
+    },
+    "hanumante-live.jpg": {
+      "id": "b779136a-2b65-4809-a914-43778eca96ec",
+      "downloadUrl": "https://pub-d6463995d1cd4467b0498bbfae5de180.r2.dev/uploads/public/69e81518bae541b83435854c13f4ba50.jpg",
+      "mimeType": "image/jpeg"
+    },
+    "hanumante-live.mp4": {
+      "id": "d9d5abd9-04dc-44cb-83b1-984e46fd06df",
+      "downloadUrl": "https://pub-d6463995d1cd4467b0498bbfae5de180.r2.dev/uploads/public/98c8c98806f770fa1de732bd60efd9d9.mp4",
+      "mimeType": "video/mp4"
+    },
+    "hile-done.jpg": {
+      "id": "b0feae60-62b4-4710-8a11-8c56044c4cbb",
+      "downloadUrl": "https://pub-d6463995d1cd4467b0498bbfae5de180.r2.dev/uploads/public/50fab491cc58ded254316f2578c0fb37.jpg",
+      "mimeType": "image/jpeg"
+    },
+    "kamalpokhari-beautify.jpg": {
+      "id": "42c4adba-878f-4a79-a664-a8110cab3298",
+      "downloadUrl": "https://pub-d6463995d1cd4467b0498bbfae5de180.r2.dev/uploads/public/0318f2afcd2316ad1cf2faf927501a2c.jpg",
+      "mimeType": "image/jpeg"
+    },
+    "kamalpokhari-beautify.mp4": {
+      "id": "edbc22c9-ad37-46dc-8a78-7a5fb24e6f83",
+      "downloadUrl": "https://pub-d6463995d1cd4467b0498bbfae5de180.r2.dev/uploads/public/da744855311b6b9d5da04cfa8225aabd.mp4",
+      "mimeType": "video/mp4"
+    },
+    "khaptad-trail.jpg": {
+      "id": "05b6dc70-e0ae-43cb-8dc8-0fc29bbfaae8",
+      "downloadUrl": "https://pub-d6463995d1cd4467b0498bbfae5de180.r2.dev/uploads/public/67725b0947b73692f011a6874a81513d.jpg",
+      "mimeType": "image/jpeg"
+    },
+    "manang-trail.jpg": {
+      "id": "0f4ee756-c3e6-4b84-88b1-11531b450870",
+      "downloadUrl": "https://pub-d6463995d1cd4467b0498bbfae5de180.r2.dev/uploads/public/06eb39bf73ad5b199c8f979c8b6b9275.jpg",
+      "mimeType": "image/jpeg"
+    },
+    "melamchi-riverbank.jpg": {
+      "id": "82dbd9d5-1d30-4658-aae2-532401176d06",
+      "downloadUrl": "https://pub-d6463995d1cd4467b0498bbfae5de180.r2.dev/uploads/public/d06ce22e4fc3acdf09217eea4a8c3548.jpg",
+      "mimeType": "image/jpeg"
+    },
+    "nagarkot-trail.jpg": {
+      "id": "585df843-c4f7-485a-a4f2-131faa740796",
+      "downloadUrl": "https://pub-d6463995d1cd4467b0498bbfae5de180.r2.dev/uploads/public/2627d877f8a3aca6391241d58128301f.jpg",
+      "mimeType": "image/jpeg"
+    },
+    "naubise-drains.jpg": {
+      "id": "749ebff0-e772-4f6b-b850-2e13347065dd",
+      "downloadUrl": "https://pub-d6463995d1cd4467b0498bbfae5de180.r2.dev/uploads/public/bc13379f2f1812f49c97b251fb85392f.jpg",
+      "mimeType": "image/jpeg"
+    },
+    "panauti-done.jpg": {
+      "id": "569b737f-d7c9-4efc-84ab-44960b3d7a17",
+      "downloadUrl": "https://pub-d6463995d1cd4467b0498bbfae5de180.r2.dev/uploads/public/38a8ccacfaacdf81521a6bd96e465633.jpg",
+      "mimeType": "image/jpeg"
+    },
+    "suryabinayak-trees.jpg": {
+      "id": "14acbe52-17bf-4a0b-9490-68635127ac5f",
+      "downloadUrl": "https://pub-d6463995d1cd4467b0498bbfae5de180.r2.dev/uploads/public/01a15304b3f8abe2e36a123a12ae2cef.jpg",
+      "mimeType": "image/jpeg"
+    },
+    "suryabinayak-trees.mp4": {
+      "id": "4440709b-3c49-447b-a8fe-2809414df0c7",
+      "downloadUrl": "https://pub-d6463995d1cd4467b0498bbfae5de180.r2.dev/uploads/public/f0a260458ee5cf465d502e0d54a0d37c.mp4",
+      "mimeType": "video/mp4"
+    },
+    "taumadhi-heritage.jpg": {
+      "id": "80cf7f0b-44d3-4637-b82d-ff94f75b4d8e",
+      "downloadUrl": "https://pub-d6463995d1cd4467b0498bbfae5de180.r2.dev/uploads/public/f4c86a4b71c03f7ad86074b50ea15ecd.jpg",
+      "mimeType": "image/jpeg"
+    }
+  },
+  "issues": {
+    "shankhamul-bagmati-plastic": {
+      "id": "686bef02-9495-4c52-8a36-06c7f0f63977",
+      "backendSlug": "plastic-and-styrofoam-accumulated-in-bagmati-at-shankhamul-2",
+      "status": "OPEN",
+      "role": "rich-standalone"
+    },
+    "bagmati-tinkune-cleanup": {
+      "id": "ea53cf2c-24f5-45c8-8ddb-b0c2ab48c52f",
+      "backendSlug": "disorganized-waste-along-the-bagmati-river",
+      "status": "OPEN",
+      "role": "rich-event-live"
+    },
+    "boudha-ring-road-trash": {
+      "id": "5826550b-2737-4fbf-a454-dacd4a6669e4",
+      "backendSlug": "bouddha-ring-road-messy-with-garbage",
+      "status": "OPEN",
+      "role": "rich-standalone"
+    },
+    "asan-main-bazaar-blocked": {
+      "id": "e4dc958f-d786-4b78-8d4c-451d8903be5d",
+      "backendSlug": "asan-main-market-crowded-with-pedestrians-garbage-and-disorganized-sales",
+      "status": "OPEN",
+      "role": "rich-standalone"
+    },
+    "traffic-chowk-drain-jam": {
+      "id": "af4d4a0e-fdab-4cf8-8450-2b424509f6cc",
+      "backendSlug": "drain-blockage-near-traffic-junction-a-monsoon-hazard",
+      "status": "OPEN",
+      "role": "rich-standalone"
+    },
+    "sarangkot-sunrise-trail-trash": {
+      "id": "c552b78e-c60c-49fa-8a27-0f788df45b3f",
+      "backendSlug": "trash-left-by-tourists-on-the-sarangkot-sunrise-trail",
+      "status": "OPEN",
+      "role": "rich-standalone"
+    },
+    "kamalpokhari-beautification": {
+      "id": "d9a2078f-5bfd-4ec9-bfbc-cae89fedbd81",
+      "backendSlug": "old-wall-and-signboards-on-kamalpokhari-footpath",
+      "status": "OPEN",
+      "role": "rich-event-live"
+    },
+    "suryabinayak-afforestation": {
+      "id": "50e5ec8c-45d2-4c08-bc8e-5748ebb13d25",
+      "backendSlug": "tree-planting-at-surya-binayak-empty-land",
+      "status": "OPEN",
+      "role": "rich-event-live"
+    },
+    "hanumante-lokanthali-cleanup": {
+      "id": "d54dda8a-19ab-4f0f-9070-bfddcd521598",
+      "backendSlug": "garbage-piling-up-again-in-hanumante-river-lokanthali-section",
+      "status": "OPEN",
+      "role": "rich-event-live"
+    },
+    "fewa-shoreline-cleanup": {
+      "id": "398813ec-427d-4f25-8414-d2b3596f0a12",
+      "backendSlug": "southern-shore-of-fewa-lake-polluted-by-plastic",
+      "status": "OPEN",
+      "role": "rich-event-live"
+    },
+    "nagarkot-trail-upcoming": {
+      "id": "15afe240-e57a-4c12-957c-ca7318795ae8",
+      "backendSlug": "nagarkot-trekking-route-cleanup",
+      "status": "OPEN",
+      "role": "upcoming-event"
+    },
+    "taumadhi-heritage-cleanup": {
+      "id": "d24f39df-1cff-47ba-9814-d2df5e5dfe9d",
+      "backendSlug": "taumadhi-square-heritage-restoration",
+      "status": "OPEN",
+      "role": "upcoming-event"
+    },
+    "dharan-bazaar-cleanup": {
+      "id": "ba4b5bc4-8f6d-4f3b-8a78-a1fd74e4158e",
+      "backendSlug": "cleaning-around-dharan-market",
+      "status": "OPEN",
+      "role": "upcoming-event"
+    },
+    "hile-village-cleanup-past": {
+      "id": "d1089bc2-6268-4f4f-90ef-c41e173ddbc7",
+      "backendSlug": "hile-village-cleanup-campaign",
+      "status": "OPEN",
+      "role": "past-event"
+    },
+    "panauti-temple-cleanup-past": {
+      "id": "615964dc-a038-40ba-8778-2f7906ce0782",
+      "backendSlug": "cleaning-of-panauti-temple-complex",
+      "status": "OPEN",
+      "role": "past-event"
+    },
+    "gorkha-darbar-cleanup-past": {
+      "id": "c5523f25-0b65-4bcc-913a-cf8201002b09",
+      "backendSlug": "gorkha-old-palace-complex-cleanup",
+      "status": "OPEN",
+      "role": "past-event"
+    },
+    "bardia-buffer-zone-trash": {
+      "id": "494fd090-c6f0-4524-923e-72a8bab7c2b7",
+      "backendSlug": "garbage-in-bardiya-buffer-zone",
+      "status": "OPEN",
+      "role": "light-standalone"
+    },
+    "ghodaghodi-lake-shore": {
+      "id": "f787c41b-1ec3-474f-bce1-bf58266d610d",
+      "backendSlug": "cleanup-needed-at-ghoda-ghodi-lake-shore",
+      "status": "OPEN",
+      "role": "light-standalone"
+    },
+    "khaptad-trail-trash": {
+      "id": "7d7ee7ca-101a-47a3-b8fb-53bd9cd8f133",
+      "backendSlug": "trash-on-khaptad-trekking-route",
+      "status": "OPEN",
+      "role": "light-standalone"
+    },
+    "melamchi-riverbank-trash": {
+      "id": "ba401519-b38d-4f3a-b1f9-64b51cb74dd7",
+      "backendSlug": "garbage-along-the-melamchi-riverbank",
+      "status": "OPEN",
+      "role": "light-standalone"
+    },
+    "manang-trail-cleanup-needed": {
+      "id": "dadeb353-a798-43b7-9b8f-bfa6e0b35317",
+      "backendSlug": "increasing-garbage-on-the-manang-trekking-route",
+      "status": "OPEN",
+      "role": "light-standalone"
+    }
+  },
+  "events": {
+    "bagmati-tinkune-cleanup": {
+      "id": "54137cfb-2e64-480a-9ee8-3176146ca9fd",
+      "state": "live",
+      "scheduledAt": "2026-06-05T06:24:10.030Z"
+    },
+    "kamalpokhari-beautification": {
+      "id": "d237a7a7-de37-49cd-9107-cb4f79ae4c18",
+      "state": "live",
+      "scheduledAt": "2026-06-05T06:40:45.223Z"
+    },
+    "suryabinayak-afforestation": {
+      "id": "9755cbac-aab4-43f7-b67d-ebaa168cb57d",
+      "state": "live",
+      "scheduledAt": "2026-06-05T05:20:45.875Z"
+    },
+    "hanumante-lokanthali-cleanup": {
+      "id": "ab77d274-86e9-49ba-9c52-dab688f66c0b",
+      "state": "live",
+      "scheduledAt": "2026-06-05T06:44:46.403Z"
+    },
+    "fewa-shoreline-cleanup": {
+      "id": "0bfac747-1317-4869-952c-744f82a6b21e",
+      "state": "live",
+      "scheduledAt": "2026-06-05T05:58:46.927Z"
+    },
+    "nagarkot-trail-upcoming": {
+      "id": "28d12671-79e7-4e56-bfd6-7ad72dc928dd",
+      "state": "upcoming",
+      "scheduledAt": "2026-06-08T07:02:47.451Z"
+    },
+    "taumadhi-heritage-cleanup": {
+      "id": "9003bd51-4d0b-46f2-b2ce-367677112d94",
+      "state": "upcoming",
+      "scheduledAt": "2026-06-12T07:02:47.871Z"
+    },
+    "dharan-bazaar-cleanup": {
+      "id": "efaf83d0-5662-4a42-8cc1-fc948248be68",
+      "state": "upcoming",
+      "scheduledAt": "2026-06-15T07:02:48.281Z"
+    },
+    "hile-village-cleanup-past": {
+      "id": "071071fd-2861-4a7a-9826-469a2f979cc5",
+      "state": "past",
+      "scheduledAt": "2026-05-22T07:02:48.696Z"
+    },
+    "panauti-temple-cleanup-past": {
+      "id": "f76ae5bc-9993-46b1-b252-ae28bc8b6393",
+      "state": "past",
+      "scheduledAt": "2026-05-08T07:02:49.325Z"
+    },
+    "gorkha-darbar-cleanup-past": {
+      "id": "c0bcc4ca-d547-4750-b8fa-8be2f23d955e",
+      "state": "past",
+      "scheduledAt": "2026-04-21T07:02:49.940Z"
+    }
+  },
+  "participants": {
+    "bagmati-tinkune-cleanup": [
+      {
+        "memberSlug": "arjun",
+        "role": "COORDINATOR"
+      },
+      {
+        "memberSlug": "maya",
+        "role": "PHOTOGRAPHER"
+      },
+      {
+        "memberSlug": "ramesh",
+        "role": "LIVESTREAMER"
+      },
+      {
+        "memberSlug": "priya",
+        "role": "SAFETY_LEAD"
+      },
+      {
+        "memberSlug": "sita",
+        "role": "WORKER"
+      },
+      {
+        "memberSlug": "hari",
+        "role": "WORKER"
+      },
+      {
+        "memberSlug": "bishnu",
+        "role": "MEDIC"
+      }
+    ],
+    "kamalpokhari-beautification": [
+      {
+        "memberSlug": "bishnu",
+        "role": "COORDINATOR"
+      },
+      {
+        "memberSlug": "maya",
+        "role": "PHOTOGRAPHER"
+      },
+      {
+        "memberSlug": "ramesh",
+        "role": "LIVESTREAMER"
+      },
+      {
+        "memberSlug": "priya",
+        "role": "SAFETY_LEAD"
+      },
+      {
+        "memberSlug": "sita",
+        "role": "WORKER"
+      }
+    ],
+    "suryabinayak-afforestation": [
+      {
+        "memberSlug": "arjun",
+        "role": "COORDINATOR"
+      },
+      {
+        "memberSlug": "maya",
+        "role": "PHOTOGRAPHER"
+      },
+      {
+        "memberSlug": "hari",
+        "role": "WORKER"
+      },
+      {
+        "memberSlug": "sita",
+        "role": "WORKER"
+      },
+      {
+        "memberSlug": "bikash",
+        "role": "WORKER"
+      },
+      {
+        "memberSlug": "bishnu",
+        "role": "MEDIC"
+      }
+    ],
+    "hanumante-lokanthali-cleanup": [
+      {
+        "memberSlug": "suman",
+        "role": "COORDINATOR"
+      },
+      {
+        "memberSlug": "ramesh",
+        "role": "LIVESTREAMER"
+      },
+      {
+        "memberSlug": "priya",
+        "role": "SAFETY_LEAD"
+      },
+      {
+        "memberSlug": "hari",
+        "role": "WORKER"
+      },
+      {
+        "memberSlug": "bishnu",
+        "role": "MEDIC"
+      }
+    ],
+    "fewa-shoreline-cleanup": [
+      {
+        "memberSlug": "arjun",
+        "role": "COORDINATOR"
+      },
+      {
+        "memberSlug": "maya",
+        "role": "PHOTOGRAPHER"
+      },
+      {
+        "memberSlug": "ramesh",
+        "role": "LIVESTREAMER"
+      },
+      {
+        "memberSlug": "priya",
+        "role": "SAFETY_LEAD"
+      },
+      {
+        "memberSlug": "sita",
+        "role": "WORKER"
+      },
+      {
+        "memberSlug": "bikash",
+        "role": "WORKER"
+      },
+      {
+        "memberSlug": "bishnu",
+        "role": "MEDIC"
+      }
+    ]
+  },
+  "votes": [
+    {
+      "memberSlug": "arjun",
+      "issueSlug": "shankhamul-bagmati-plastic"
+    },
+    {
+      "memberSlug": "maya",
+      "issueSlug": "shankhamul-bagmati-plastic"
+    },
+    {
+      "memberSlug": "bishnu",
+      "issueSlug": "shankhamul-bagmati-plastic"
+    },
+    {
+      "memberSlug": "ramesh",
+      "issueSlug": "shankhamul-bagmati-plastic"
+    },
+    {
+      "memberSlug": "sita",
+      "issueSlug": "shankhamul-bagmati-plastic"
+    },
+    {
+      "memberSlug": "hari",
+      "issueSlug": "shankhamul-bagmati-plastic"
+    },
+    {
+      "memberSlug": "priya",
+      "issueSlug": "shankhamul-bagmati-plastic"
+    },
+    {
+      "memberSlug": "suman",
+      "issueSlug": "shankhamul-bagmati-plastic"
+    },
+    {
+      "memberSlug": "bikash",
+      "issueSlug": "shankhamul-bagmati-plastic"
+    },
+    {
+      "memberSlug": "arjun",
+      "issueSlug": "boudha-ring-road-trash"
+    },
+    {
+      "memberSlug": "maya",
+      "issueSlug": "boudha-ring-road-trash"
+    },
+    {
+      "memberSlug": "bishnu",
+      "issueSlug": "boudha-ring-road-trash"
+    },
+    {
+      "memberSlug": "ramesh",
+      "issueSlug": "boudha-ring-road-trash"
+    },
+    {
+      "memberSlug": "sita",
+      "issueSlug": "boudha-ring-road-trash"
+    },
+    {
+      "memberSlug": "hari",
+      "issueSlug": "boudha-ring-road-trash"
+    },
+    {
+      "memberSlug": "priya",
+      "issueSlug": "boudha-ring-road-trash"
+    },
+    {
+      "memberSlug": "suman",
+      "issueSlug": "boudha-ring-road-trash"
+    },
+    {
+      "memberSlug": "bikash",
+      "issueSlug": "boudha-ring-road-trash"
+    },
+    {
+      "memberSlug": "arjun",
+      "issueSlug": "asan-main-bazaar-blocked"
+    },
+    {
+      "memberSlug": "maya",
+      "issueSlug": "asan-main-bazaar-blocked"
+    },
+    {
+      "memberSlug": "bishnu",
+      "issueSlug": "asan-main-bazaar-blocked"
+    },
+    {
+      "memberSlug": "ramesh",
+      "issueSlug": "asan-main-bazaar-blocked"
+    },
+    {
+      "memberSlug": "sita",
+      "issueSlug": "asan-main-bazaar-blocked"
+    },
+    {
+      "memberSlug": "hari",
+      "issueSlug": "asan-main-bazaar-blocked"
+    },
+    {
+      "memberSlug": "priya",
+      "issueSlug": "asan-main-bazaar-blocked"
+    },
+    {
+      "memberSlug": "suman",
+      "issueSlug": "asan-main-bazaar-blocked"
+    },
+    {
+      "memberSlug": "bikash",
+      "issueSlug": "asan-main-bazaar-blocked"
+    },
+    {
+      "memberSlug": "arjun",
+      "issueSlug": "traffic-chowk-drain-jam"
+    },
+    {
+      "memberSlug": "maya",
+      "issueSlug": "traffic-chowk-drain-jam"
+    },
+    {
+      "memberSlug": "bishnu",
+      "issueSlug": "traffic-chowk-drain-jam"
+    },
+    {
+      "memberSlug": "ramesh",
+      "issueSlug": "traffic-chowk-drain-jam"
+    },
+    {
+      "memberSlug": "sita",
+      "issueSlug": "traffic-chowk-drain-jam"
+    },
+    {
+      "memberSlug": "hari",
+      "issueSlug": "traffic-chowk-drain-jam"
+    },
+    {
+      "memberSlug": "priya",
+      "issueSlug": "traffic-chowk-drain-jam"
+    },
+    {
+      "memberSlug": "suman",
+      "issueSlug": "traffic-chowk-drain-jam"
+    },
+    {
+      "memberSlug": "bikash",
+      "issueSlug": "traffic-chowk-drain-jam"
+    },
+    {
+      "memberSlug": "arjun",
+      "issueSlug": "sarangkot-sunrise-trail-trash"
+    },
+    {
+      "memberSlug": "maya",
+      "issueSlug": "sarangkot-sunrise-trail-trash"
+    },
+    {
+      "memberSlug": "bishnu",
+      "issueSlug": "sarangkot-sunrise-trail-trash"
+    },
+    {
+      "memberSlug": "ramesh",
+      "issueSlug": "sarangkot-sunrise-trail-trash"
+    },
+    {
+      "memberSlug": "sita",
+      "issueSlug": "sarangkot-sunrise-trail-trash"
+    },
+    {
+      "memberSlug": "hari",
+      "issueSlug": "sarangkot-sunrise-trail-trash"
+    },
+    {
+      "memberSlug": "priya",
+      "issueSlug": "sarangkot-sunrise-trail-trash"
+    },
+    {
+      "memberSlug": "suman",
+      "issueSlug": "sarangkot-sunrise-trail-trash"
+    },
+    {
+      "memberSlug": "bikash",
+      "issueSlug": "sarangkot-sunrise-trail-trash"
+    },
+    {
+      "memberSlug": "anjali",
+      "issueSlug": "bardia-buffer-zone-trash"
+    },
+    {
+      "memberSlug": "arjun",
+      "issueSlug": "ghodaghodi-lake-shore"
+    },
+    {
+      "memberSlug": "maya",
+      "issueSlug": "khaptad-trail-trash"
+    },
+    {
+      "memberSlug": "hari",
+      "issueSlug": "melamchi-riverbank-trash"
+    },
+    {
+      "memberSlug": "bikash",
+      "issueSlug": "manang-trail-cleanup-needed"
+    }
+  ],
+  "comments": {
+    "issue:shankhamul-bagmati-plastic": [
+      {
+        "id": "7cb2310f-02c1-4ae1-96db-acebf671059d",
+        "memberSlug": "arjun",
+        "text": "यो स्थानमा हामीले पहिले पनि अभियान चलाएका थियौँ — स्थायी समाधान चाहिएको हो। साइनबोर्डले मात्र पुग्दैन।"
+      },
+      {
+        "id": "0685ff80-df01-4def-885b-beb49172a2dc",
+        "memberSlug": "priya",
+        "text": "मनसुनको पानी सँगै आउने प्लास्टिक रोक्न ने माथिल्लो खण्डमा छाननी लगाउनुपर्छ। नगरपालिकालाई सिफारिस गरौँ।"
+      },
+      {
+        "id": "98ad4206-78e3-43da-9d9f-4e16b4a75de5",
+        "memberSlug": "bishnu",
+        "text": "अग्रिम अभियान चलाउनु अघि बासिन्दा बैठक राख्ने सुझाव।"
+      },
+      {
+        "id": "b0def9fc-5533-42b8-b076-ecf2d4b3e193",
+        "memberSlug": "sita",
+        "text": "मेरो परिवारका सबै सहभागी हुन तयार छन्। शनिबार उपयुक्त हुनेछ।"
+      }
+    ],
+    "issue:boudha-ring-road-trash": [
+      {
+        "id": "cb2ec2ba-2218-4fb8-83c6-e2825fc631f0",
+        "memberSlug": "ramesh",
+        "text": "मैले हिजो विडियो गरें — दृश्य साँच्चै खराब छ। टायर र पुराना सिमेन्ट पनि छन्।"
+      },
+      {
+        "id": "5ad62412-d78d-44c8-992e-8fc040433588",
+        "memberSlug": "bishnu",
+        "text": "नगरपालिकाको ट्रक के बेला आउँछ निश्चित गरौँ — नभए सङ्कलित फोहोर त्यहीँ नै बस्छ।"
+      },
+      {
+        "id": "768eeb80-d7ee-4a96-baeb-efec8b1bdf72",
+        "memberSlug": "maya",
+        "text": "व्यापार सङ्घले स्वयंसेवक पनि ल्याउने भनेका छन् भन्ने सुनेँ।"
+      }
+    ],
+    "issue:asan-main-bazaar-blocked": [
+      {
+        "id": "35374805-01d3-46ac-869d-f709fdece1d8",
+        "memberSlug": "hari",
+        "text": "असनमा बजार खण्ड मेरो दैनिक हिँडाइको बाटो — एकदम साँचो प्रश्न उठाइएको।"
+      },
+      {
+        "id": "d78b410e-80a8-4c92-952d-b2824f05dfb6",
+        "memberSlug": "arjun",
+        "text": "व्यापारीहरूसँग पनि कुरा गर्नुपर्ने हुन्छ; जबरजस्ती हटाउँदा उल्टो प्रभाव पर्न सक्छ।"
+      },
+      {
+        "id": "ee7b6400-bcfe-43ef-a355-f03eb71cb049",
+        "memberSlug": "priya",
+        "text": "बजार समितिको सहयोग बिना यो सम्भव छैन। पहिले उहाँहरूसँग भेट तय गरौँ।"
+      }
+    ],
+    "issue:traffic-chowk-drain-jam": [
+      {
+        "id": "9b1bebf7-bbba-4805-bcf5-e3b765c2d533",
+        "memberSlug": "bikash",
+        "text": "मनसुन सुरु हुनुअघि नै काम सकाउनुपर्छ। ढिलाइ गर्न मिल्दैन।"
+      },
+      {
+        "id": "85f3a379-1caa-41a8-aa5d-ec6091d5ba2a",
+        "memberSlug": "ramesh",
+        "text": "नगरपालिकाको इन्जिनियरिङ शाखासँग छलफल भएको छ कि छैन?"
+      },
+      {
+        "id": "f0186965-2e35-40a9-9a6e-f2d8ddfdb537",
+        "memberSlug": "bishnu",
+        "text": "ढल मर्मत स्वयंसेवकको कामभन्दा प्राविधिक टोलीको हो जस्तो लाग्छ।"
+      }
+    ],
+    "issue:sarangkot-sunrise-trail-trash": [
+      {
+        "id": "18c7b95a-fc41-45c8-8f8e-35cf5767d0f7",
+        "memberSlug": "maya",
+        "text": "मैले पनि अघिल्लो साता हेरें — साँच्चै अव्यवस्थित। यात्रीहरूलाई पनि शिक्षा चाहिएको।"
+      },
+      {
+        "id": "74ad7dc8-71cc-4683-bb84-e57e06668449",
+        "memberSlug": "suman",
+        "text": "स्थानीय गाइडसँग समन्वय गरेर हरेक १५ दिनमा छोटो सरसफाइ राख्ने सुझाव दिन्छु।"
+      }
+    ],
+    "event:bagmati-tinkune-cleanup": [
+      {
+        "id": "62a9af2d-dea1-492d-beea-2cbb5b7148a4",
+        "memberSlug": "arjun",
+        "text": "टोली एकदम राम्रो आइरहेको छ। प्लास्टिक सङ्कलन पनि व्यवस्थित।"
+      },
+      {
+        "id": "b4da73ca-676c-4cc1-bd37-d3ad27508f66",
+        "memberSlug": "maya",
+        "text": "तस्बिर खिच्ने ठाउँ राम्रो छ — पुलबाट र दक्षिणी किनारबाट दुवैतर्फ।"
+      },
+      {
+        "id": "63054b19-ac5a-47e8-920c-3444ffbd2e4f",
+        "memberSlug": "ramesh",
+        "text": "लाइभ स्ट्रिम चलिरहेको छ; viewer count राम्रो छ।"
+      },
+      {
+        "id": "34e45d8c-f0e3-4cb1-ac08-50439feb5c89",
+        "memberSlug": "priya",
+        "text": "सुरक्षा जोखिम भएको ठाउँमा साइनबोर्ड लगायौँ। पन्जा र मास्क सबैले लगाएका छन्।"
+      },
+      {
+        "id": "7ba5086d-40f3-42eb-b2f5-f9e92e51174a",
+        "memberSlug": "sita",
+        "text": "पहिलो दिन यतिकै सहभागी आउँदा साँच्चै राम्रो लागिरहेको छ।"
+      }
+    ],
+    "event:kamalpokhari-beautification": [
+      {
+        "id": "e832aea8-07f5-492e-ad80-41cc8c0356b7",
+        "memberSlug": "bishnu",
+        "text": "रङ चयन र डिजाइन एकदम राम्रो। स्थानीय कलाकारलाई धन्यवाद।"
+      },
+      {
+        "id": "8087db99-18b4-481e-b2e6-2361910f02b5",
+        "memberSlug": "maya",
+        "text": "भित्ता चित्र क्षेत्र सकिनै लाग्यो; अगाडिको साइनबोर्ड पनि सुरु गरौँ।"
+      },
+      {
+        "id": "abbe91f4-92e7-415d-95c4-f5ee0467d47e",
+        "memberSlug": "ramesh",
+        "text": "लाइभ चलिरहेको छ — कमेन्ट र likes राम्रो आइरहेका छन्।"
+      }
+    ],
+    "event:suryabinayak-afforestation": [
+      {
+        "id": "22fbfeb0-520d-4054-b9a1-9f1ad53ea230",
+        "memberSlug": "arjun",
+        "text": "१०० बिरुवा सकियो; अब सुरक्षा घेरा हाल्न सुरु गर्दैछौँ।"
+      },
+      {
+        "id": "ac7eeb31-e4d9-4770-939f-e72f57a5f73e",
+        "memberSlug": "bishnu",
+        "text": "मेडिकल टोली तयार छ। अहिलेसम्म कुनै दुर्घटना छैन।"
+      },
+      {
+        "id": "1b5d28ea-4ee4-49fb-8e3b-239a612090c1",
+        "memberSlug": "hari",
+        "text": "साँच्चै थकिएको तर सन्तुष्ट छु। ३ महिनासम्म पानी हाल्ने जिम्मा मेरो।"
+      }
+    ],
+    "event:hanumante-lokanthali-cleanup": [
+      {
+        "id": "13429204-c08d-4e72-8831-03a292b63f94",
+        "memberSlug": "suman",
+        "text": "तीन टोली नै बाँडिएका छन्; प्रगति राम्रो।"
+      },
+      {
+        "id": "5a963aa7-a80f-4063-bab1-58beb0fba1ec",
+        "memberSlug": "bishnu",
+        "text": "साइनबोर्ड लगाउने ठाउँ चयन गरिसकेँ।"
+      }
+    ],
+    "event:fewa-shoreline-cleanup": [
+      {
+        "id": "d3edd3d2-46f3-44ec-aef3-8fa43306b9b9",
+        "memberSlug": "arjun",
+        "text": "डुङ्गा टोली पानीको प्लास्टिक उठाउँदै छन्। राम्रो coordination।"
+      },
+      {
+        "id": "ff7488a7-e58b-4202-b8fd-281a62dff68b",
+        "memberSlug": "maya",
+        "text": "तस्बिर र विडियो राम्रो भइरहेको छ — सूर्यास्त सम्ममा सकिने आशा।"
+      },
+      {
+        "id": "122a940d-d4d5-4c28-9c74-f6b72f5b0c11",
+        "memberSlug": "ramesh",
+        "text": "लाइभ stream पर्यटकहरूको पनि ध्यान आकर्षण गरिरहेको छ।"
+      }
+    ]
+  },
+  "applications": [
+    {
+      "id": "ca3dd1cd-3246-4d2f-b976-6268e4ac824f",
+      "memberSlug": "maya",
+      "role": "GRAPHICS_DESIGNER"
+    },
+    {
+      "id": "98081a59-9cf0-4a46-8a87-629bba2d3e37",
+      "memberSlug": "arjun",
+      "role": "FRONTEND_DEVELOPER"
+    },
+    {
+      "id": "fb02c919-b199-4705-8fff-4c23de1e44d6",
+      "memberSlug": "maya",
+      "role": "OTHER"
+    },
+    {
+      "id": "7c0b3f9c-5a8f-421c-a6b1-a57eb7e0bacc",
+      "memberSlug": "bishnu",
+      "role": "VOLUNTEER"
+    },
+    {
+      "id": "2cbe5d01-dfb5-49e6-bc9b-ce5984630699",
+      "memberSlug": "ramesh",
+      "role": "COMMUNITY_MANAGER"
+    },
+    {
+      "id": "d6c84fef-db0c-4c99-bfba-21f1e2ce7c86",
+      "memberSlug": "suman",
+      "role": "BACKEND_DEVELOPER"
+    },
+    {
+      "id": "d8dee708-bb39-4dda-ab19-8a6152732412",
+      "memberSlug": "priya",
+      "role": "LEGAL"
+    },
+    {
+      "id": "e6ced527-b0fb-4a0c-a85e-fb86603281f2",
+      "memberSlug": "sita",
+      "role": "COMMUNITY_MANAGER"
+    },
+    {
+      "id": "685ac0b4-4f9d-41cc-9306-923fac5828d6",
+      "memberSlug": "hari",
+      "role": "VOLUNTEER"
+    },
+    {
+      "id": "71c0028c-28b8-417c-81bc-c0fb2d24862c",
+      "memberSlug": "bikash",
+      "role": "DONOR"
+    },
+    {
+      "id": "e72fa1ca-da2e-4ba1-9242-0b278a068ec4",
+      "memberSlug": "anjali",
+      "role": "UI_UX_DESIGNER"
+    },
+    {
+      "id": "de745cdd-dabf-4301-9944-19a11a806642",
+      "memberSlug": "bishnu",
+      "role": "FINANCE"
+    }
+  ],
+  "leaderVoting": {
+    "bagmati-tinkune-cleanup": {
+      "state": "NONE",
+      "note": "ordering bug — votes must precede convert"
+    },
+    "kamalpokhari-beautification": {
+      "state": "NONE",
+      "note": "ordering bug — votes must precede convert"
+    }
+  },
+  "feedback": [
+    {
+      "id": "8ecb9e75-9eff-40fb-9da9-668fdc274f4f",
+      "name": "Niraj Pant",
+      "email": "niraj.pant@example.com",
+      "message": "Mobile app कहिले आउने हो? Notification PWA भन्दा native push राम्रो हुने थियो।"
+    },
+    {
+      "id": "828fb9ca-9555-49ab-abea-574b87be768a",
+      "name": "Sangita Karki",
+      "email": "sangita.karki@example.com",
+      "message": "/events page मा कहिले काहीँ live stream player काम गर्दैन — Chrome on Windows बाट हेर्दा।"
+    }
+  ]
+}
