@@ -1407,19 +1407,25 @@ export const copy = {
       },
       forYou: {
         eyebrow: "तपाईंका लागि",
-        title: "नजिकैका अभियानहरू",
-        intro: "तपाईंको ठाउँ नजिकैका लाइभ र आउँदै गरेका श्रमदान अभियानहरू।",
+        title: "नजिकैका अभियान र समस्या",
+        intro: "तपाईंको ठाउँ नजिकैका लाइभ अभियान, आउँदै गरेका योजना र खुला समस्याहरू।",
         viewLink: "विवरण",
-        emptyMessage: "अहिले देखाउन कुनै अभियान छैन।",
+        emptyMessage: "अहिले देखाउन कुनै कुरा छैन।",
         statusLabels: {
           live: "लाइभ",
           upcoming: "आउँदै",
-          past: "सम्पन्न"
+          past: "सम्पन्न",
+          OPEN: "खुला",
+          EVENT_SCHEDULED: "तालिकामा",
+          COMPLETED: "समाधान"
         },
         distanceNearby: "नजिकै",
         distanceSuffix: "किमी दूर",
         locationCta: "नजिकैका देखाउनुहोस्",
-        locationGranted: "तपाईंको ठाउँअनुसार क्रम मिलाइयो"
+        locationGranted: "तपाईंको ठाउँअनुसार क्रम मिलाइयो",
+        modeEventLabel: "अभियानहरू",
+        modeIssueLabel: "समस्याहरू",
+        modeTabsAria: "धारा प्रकार"
       }
     },
     liveEventsRail: {
@@ -3351,19 +3357,25 @@ export const copy = {
       },
       forYou: {
         eyebrow: "For you",
-        title: "Nearby campaigns",
-        intro: "Live and upcoming Shramdan campaigns near you.",
+        title: "Nearby campaigns + issues",
+        intro: "Live campaigns, upcoming events, and open issues near you.",
         viewLink: "View detail",
-        emptyMessage: "No campaigns to show right now.",
+        emptyMessage: "Nothing to show right now.",
         statusLabels: {
           live: "LIVE",
           upcoming: "Upcoming",
-          past: "Completed"
+          past: "Completed",
+          OPEN: "Open",
+          EVENT_SCHEDULED: "Scheduled",
+          COMPLETED: "Resolved"
         },
         distanceNearby: "Nearby",
         distanceSuffix: "km away",
         locationCta: "Show nearby",
-        locationGranted: "Sorted by your location"
+        locationGranted: "Sorted by your location",
+        modeEventLabel: "Events",
+        modeIssueLabel: "Issues",
+        modeTabsAria: "Stream type"
       }
     },
     liveEventsRail: {

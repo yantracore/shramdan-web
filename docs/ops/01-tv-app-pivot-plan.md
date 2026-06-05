@@ -120,10 +120,11 @@ Item count adapts to screen real estate. Use container queries (or width breakpo
 
 The list-renderer used by the homepage scrolled section, `/events`, and `/issues` becomes one component with a tabbed Issue/Event switch.
 
-- [ ] Extract a single `<StreamList>` component that renders both. Inputs: `mode: 'issue' | 'event' | 'all'`, `view: 'list' | 'thumbnails' | 'map'`, `filters`.
-- [ ] Replace the current `/events` split-view body and the `/issues` body with `<StreamList>`. The two pages remain valid deep-link entry points but render the same component.
-- [ ] Persist support actions on issues that have already promoted to events, until the linked event finishes. Surface a small "supported via event" affordance.
-- [ ] Stats pills become tabbed filter chips inside `<StreamList>`. Same component on homepage + dedicated pages.
+- [x] Extract a single `<StreamList>` component that renders both. Inputs: `defaultMode: 'issue' | 'event'`, `maxItems`, `copy`, `language`. Compact grid layout; in-place mode-tab switch. ← done: 2026-06-05 (v0 ships in `src/components/StreamList.js`; replaces `HomeForYouStream` on the homepage)
+- [ ] **Phase 3 v1**: Replace the current `/events` split-view body and the `/issues` body with `<StreamList>`. The two pages remain valid deep-link entry points but render the same component. (Deferred — both pages are ~900 lines with interconnected list/preview/map/filter logic; v1 is its own commit.)
+- [ ] **Phase 3 v1**: Extend `<StreamList>` to accept `view: 'list' | 'thumbnails' | 'map'` and merge with existing EventListCard + IssueListCard + EventMap so the view-switch finally drives layout (currently still a placeholder on /events).
+- [ ] **Phase 3 v1**: Persist support actions on issues that have already promoted to events, until the linked event finishes. Surface a small "supported via event" affordance.
+- [ ] Stats pills become tabbed filter chips inside `<StreamList>`. (v0 keeps ActivityStatsRow as a separate row above the stream; v1 merges them.)
 
 **Backend asks:**
 - `docs/api-requirements/events.md` — confirm "supports continue until event finishes" semantics. Update if needed.

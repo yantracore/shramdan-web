@@ -399,6 +399,71 @@
   font-weight: 600;
 }
 
+/* Mode tabs for the unified Events ↔ Issues stream switch (Phase 3 v0).
+ * Button-based (NOT anchors) so toggling stays in-place; the View-all
+ * link in the header still navigates to the deep route. */
+.stream-list-mode-tabs {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 18px;
+  padding: 4px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  backdrop-filter: blur(18px) saturate(1.2);
+  border: 1px solid color-mix(in srgb, var(--line) 45%, transparent);
+}
+
+.stream-list-mode-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.stream-list-mode-tab:hover {
+  color: var(--primary-dark);
+}
+
+.stream-list-mode-tab.is-active {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(23, 107, 92, 0.22);
+}
+
+.stream-list-mode-tab.is-active:hover {
+  color: #fff;
+}
+
+@media (max-width: 540px) {
+  .stream-list-mode-tab {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+  .stream-list-mode-tab span {
+    /* Keep label visible — the homepage already prioritised the eyebrow,
+     * but at 320-360px we want a compact pair. */
+    white-space: nowrap;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .stream-list-mode-tabs {
+    background: var(--surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
 .home-for-you-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -502,6 +567,26 @@
 }
 
 .home-for-you-card-badge--past {
+  background: color-mix(in srgb, #16a34a 26%, rgba(0, 0, 0, 0.34));
+  border-color: rgba(255, 255, 255, 0.34);
+  color: #fff;
+}
+
+/* Issue status badges (Phase 3 v0) — colour-keyed to /issues page
+ * conventions: open = warm amber, scheduled = blue, completed = green. */
+.home-for-you-card-badge--open {
+  background: color-mix(in srgb, #d97706 28%, rgba(0, 0, 0, 0.34));
+  border-color: rgba(255, 255, 255, 0.34);
+  color: #fff;
+}
+
+.home-for-you-card-badge--event-scheduled {
+  background: color-mix(in srgb, #2563eb 26%, rgba(0, 0, 0, 0.34));
+  border-color: rgba(255, 255, 255, 0.34);
+  color: #fff;
+}
+
+.home-for-you-card-badge--completed {
   background: color-mix(in srgb, #16a34a 26%, rgba(0, 0, 0, 0.34));
   border-color: rgba(255, 255, 255, 0.34);
   color: #fff;
