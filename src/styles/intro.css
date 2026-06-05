@@ -185,6 +185,270 @@
   border: 1px solid var(--line);
 }
 
+/* ─────────────────────────────────────────────────────────────────────
+ * Phase 6 (2026-06-05 pivot) — photo-driven chapters
+ * Two new chapter shapes inside .intro-act:
+ *   - .intro-act-steps with .intro-workflow-grid (5 photo cards)
+ *   - .intro-act-community with .intro-community-grid (3 photo tiles)
+ * Plus a fixed-right jump-nav for desktop and a quiet .intro-close.
+ * Old .intro-cta, .intro-act-list, .intro-act-quote are no longer
+ * rendered; legacy rules kept harmless for any third-party imports.
+ * ───────────────────────────────────────────────────────────────────── */
+
+.intro-act-steps,
+.intro-act-community {
+  /* These chapters carry a photo grid that breathes wider than the
+   * default 820px act width — relax the container so cards can use
+   * actual desktop real-estate. */
+  width: min(1200px, calc(100% - 32px));
+  min-height: auto;
+  padding: 72px 0;
+}
+
+.intro-workflow-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 18px;
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+}
+
+.intro-workflow-card {
+  display: grid;
+  gap: 10px;
+  border-radius: 14px;
+  padding: 14px;
+  background: color-mix(in srgb, var(--surface) 86%, transparent);
+  border: 1px solid color-mix(in srgb, var(--line) 55%, transparent);
+  box-shadow: 0 6px 18px rgba(23, 33, 28, 0.06);
+}
+
+.intro-workflow-card-photo {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--surface-soft);
+}
+
+.intro-workflow-card-photo img {
+  object-fit: cover;
+}
+
+.intro-workflow-card-number {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.46);
+  color: #fff;
+  font-weight: 800;
+  font-size: 13px;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+}
+
+.intro-workflow-card h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--primary-dark);
+}
+
+.intro-workflow-card p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.intro-community-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin: 16px 0 0;
+}
+
+.intro-community-tile {
+  display: grid;
+  gap: 10px;
+  border-radius: 16px;
+  padding: 18px;
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  backdrop-filter: blur(18px) saturate(1.2);
+  border: 1px solid color-mix(in srgb, var(--line) 45%, transparent);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.32) inset,
+    0 12px 32px rgba(23, 33, 28, 0.1);
+  transition: transform 200ms ease, border-color 200ms ease;
+}
+
+.intro-community-tile:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--primary) 28%, var(--line));
+}
+
+.intro-community-tile-photo {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--surface-soft);
+}
+
+.intro-community-tile-photo img {
+  object-fit: cover;
+}
+
+.intro-community-tile h3 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--primary-dark);
+}
+
+.intro-community-tile p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text);
+  opacity: 0.86;
+}
+
+.intro-community-tile-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--primary-dark);
+  font-weight: 700;
+  font-size: 13.5px;
+  margin-top: 2px;
+}
+
+.intro-close {
+  text-align: center;
+  align-items: center;
+  min-height: auto;
+  padding: 48px 0 80px;
+}
+
+.intro-close p {
+  font-size: clamp(18px, 1.8vw, 22px);
+  color: var(--muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.intro-close-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--primary-dark);
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
+.intro-jumpnav {
+  position: fixed;
+  right: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  backdrop-filter: blur(18px) saturate(1.2);
+  border: 1px solid color-mix(in srgb, var(--line) 45%, transparent);
+  box-shadow: 0 8px 24px rgba(23, 33, 28, 0.12);
+  z-index: 40;
+}
+
+@media (min-width: 1180px) {
+  .intro-jumpnav {
+    display: flex;
+  }
+}
+
+.intro-jumpnav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  transition: color 160ms ease;
+}
+
+.intro-jumpnav-link:hover {
+  color: var(--primary-dark);
+}
+
+.intro-jumpnav-link[aria-current="true"] {
+  color: var(--primary-dark);
+}
+
+.intro-jumpnav-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--muted) 50%, transparent);
+  transition: background 160ms ease, transform 160ms ease;
+}
+
+.intro-jumpnav-link[aria-current="true"] .intro-jumpnav-dot {
+  background: var(--primary);
+  transform: scale(1.2);
+}
+
+@media (max-width: 1023px) {
+  .intro-workflow-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .intro-community-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 540px) {
+  .intro-workflow-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro-community-tile {
+    transition: none;
+  }
+  .intro-community-tile:hover {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .intro-community-tile,
+  .intro-jumpnav {
+    background: var(--surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
 /* Compact mobile rhythm — sections shrink but keep cinematic feel. */
 @media (max-width: 720px) {
   .intro-hero,
@@ -195,5 +459,9 @@
   }
   .intro-hero {
     min-height: 70vh;
+  }
+  .intro-act-steps,
+  .intro-act-community {
+    padding: 48px 0;
   }
 }
