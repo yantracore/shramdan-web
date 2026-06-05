@@ -37,15 +37,30 @@ export function MultiStepShell({
 }) {
   const t = COPY[language] || COPY.np;
   const headingRef = useRef(null);
+  const bodyRef = useRef(null);
   const total = steps.length;
   const currentStep = steps[current];
   const isLast = current === total - 1;
 
   useEffect(() => {
-    headingRef.current?.focus?.({ preventScroll: false });
     if (typeof window !== "undefined") {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
+    // After the step renders, pick the first interactive field in the card
+    // body and focus it. If there isn't one (intro / done steps), fall back
+    // to focusing the heading so screen readers still announce the step.
+    const id = window.setTimeout(() => {
+      const card = bodyRef.current;
+      const target = card?.querySelector(
+        'input:not([type="hidden"]):not([disabled]):not([readonly]), textarea:not([disabled]):not([readonly]), [contenteditable="true"]'
+      );
+      if (target && typeof target.focus === "function") {
+        target.focus({ preventScroll: false });
+      } else {
+        headingRef.current?.focus?.({ preventScroll: false });
+      }
+    }, 60);
+    return () => window.clearTimeout(id);
   }, [current]);
 
   const stepLabel = t.stepFmt
@@ -82,7 +97,9 @@ export function MultiStepShell({
           {currentStep?.intro ? <p>{currentStep.intro}</p> : null}
         </header>
 
-        <div className="multi-step-card-body">{children}</div>
+        <div className="multi-step-card-body" ref={bodyRef}>
+          {children}
+        </div>
 
         {(!hideBack || !hideNext) && (
           <footer className="multi-step-footer">

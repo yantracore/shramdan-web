@@ -1,47 +1,97 @@
 "use client";
 
 import { Checkbox, Input } from "antd";
+import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Form } from "@/components/AppForm";
 import { Honeypot } from "@/components/Honeypot";
 import { MultiStepShell } from "@/components/MultiStepShell";
 import { PublicAttachmentField } from "@/components/PublicAttachmentField";
-import {
-  RoleLaneSelector,
-  ROLE_LANE_VALUES,
-  SKIP_PORTFOLIO_LANE
-} from "@/components/RoleLaneSelector";
 
-/* Multi-step contributor application — five steps:
+/* Multi-step contributor application — four steps:
  *
- *   0. intro       (just an "Apply" CTA, no fields)
- *   1. basics      (name, email, phone)
- *   2. role        (3-lane selector)
- *   3. work        (portfolio, resume, experience) — SKIPPED if lane = EVENT_PARTICIPATION
- *   4. motivation  (motivation textarea + consent + submit)
+ *   0. intro       Visual hero card + Apply CTA (no fields)
+ *   1. basics      name, email, phone (all required)
+ *   2. work        portfolio, resume, experience (all optional)
+ *   3. motivation  motivation textarea + consent + submit
  *
- * `additionalInfo` is no longer in the UI; it's sent as "n/a" until the
- * backend marks it optional. `role` on the payload carries the lane enum
- * (EVENT_PARTICIPATION / DEVELOPMENT / COMPANY_MANAGEMENT) — see
- * docs/api-requirements/applications.md for the reconciliation note. */
+ * Role selector was removed 2026-06-05 (later same day) — every applicant
+ * lands as a generic Shramdan member (`role: "VOLUNTEER"` on the API).
+ * Members get promoted to specific lanes automatically as they participate
+ * in events. The `additionalInfo` field is also gone; submissions send
+ * `additionalInfo: "n/a"` until the backend marks it optional.
+ *
+ * Form values persist to localStorage (debounced) so a page refresh
+ * doesn't wipe what the user has typed. The resume upload is intentionally
+ * NOT persisted — it's a confirmed file reference and re-uploading is the
+ * safer recovery path. */
 
-const STEP_KEYS = ["intro", "basics", "role", "work", "motivation"];
+const STEP_KEYS = ["intro", "basics", "work", "motivation"];
 const STEP_FIELDS = {
   intro: [],
   basics: ["name", "email", "phone"],
-  role: ["role"],
-  work: ["portfolio", "resume", "experience"],
+  work: ["portfolio", "experience"],
   motivation: ["motivation", "consent"]
 };
+
+const DRAFT_KEY = "shramdan:join-draft:v1";
+const DRAFT_TTL_MS = 14 * 24 * 60 * 60_000;
+const DRAFT_FIELDS = ["name", "email", "phone", "portfolio", "experience", "motivation"];
+const DRAFT_DEBOUNCE_MS = 600;
+
+function readDraft() {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(DRAFT_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed?.savedAt) return null;
+    if (Date.now() - parsed.savedAt > DRAFT_TTL_MS) {
+      window.localStorage.removeItem(DRAFT_KEY);
+      return null;
+    }
+    return parsed.values || null;
+  } catch {
+    return null;
+  }
+}
+
+function writeDraft(values) {
+  if (typeof window === "undefined") return;
+  const slice = {};
+  let anyFilled = false;
+  for (const k of DRAFT_FIELDS) {
+    const v = values?.[k];
+    if (typeof v === "string" && v.trim()) {
+      slice[k] = v;
+      anyFilled = true;
+    }
+  }
+  if (!anyFilled) {
+    window.localStorage.removeItem(DRAFT_KEY);
+    return;
+  }
+  try {
+    window.localStorage.setItem(
+      DRAFT_KEY,
+      JSON.stringify({ values: slice, savedAt: Date.now() })
+    );
+  } catch {
+    // quota / serialization — best effort, swallow
+  }
+}
+
+function clearDraft() {
+  if (typeof window === "undefined") return;
+  window.localStorage.removeItem(DRAFT_KEY);
+}
 
 export function ContributorForm({
   content,
   language = "np",
   eyebrow,
-  title,
   intro,
-  initialRole,
   onSubmit,
   submitting = false
 }) {
@@ -52,39 +102,43 @@ export function ContributorForm({
   const requiredRule = { required: true, message: content.messages.required };
 
   const [stepIndex, setStepIndex] = useState(0);
-  const [history, setHistory] = useState([0]);
-  const [selectedLane, setSelectedLane] = useState(
-    ROLE_LANE_VALUES.includes(initialRole) ? initialRole : undefined
-  );
+  const draftLoadedRef = useRef(false);
+  const debounceRef = useRef(null);
 
-  const stepDefs = useMemo(
-    () =>
-      STEP_KEYS.map((key) => ({
-        key,
-        title: joinSteps[key].title,
-        heading: joinSteps[key].heading,
-        intro: joinSteps[key].intro
-      })),
-    [joinSteps]
-  );
+  // Restore draft on mount.
+  useEffect(() => {
+    if (draftLoadedRef.current) return;
+    draftLoadedRef.current = true;
+    const draft = readDraft();
+    if (draft) {
+      form.setFieldsValue(draft);
+    }
+  }, [form]);
+
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, []);
+
+  const scheduleDraftSave = useCallback(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      writeDraft(form.getFieldsValue(DRAFT_FIELDS));
+    }, DRAFT_DEBOUNCE_MS);
+  }, [form]);
 
   const currentKey = STEP_KEYS[stepIndex];
-  const skipWork = selectedLane === SKIP_PORTFOLIO_LANE;
+
+  const stepDefs = STEP_KEYS.map((key) => ({
+    key,
+    title: joinSteps[key].title,
+    heading: joinSteps[key].heading,
+    intro: joinSteps[key].intro
+  }));
 
   const goNext = async () => {
     const fields = STEP_FIELDS[currentKey];
-
-    if (currentKey === "role") {
-      if (!selectedLane) {
-        form.setFields([
-          { name: "role", errors: [joinSteps.role.required] }
-        ]);
-        return;
-      }
-      form.setFieldsValue({ role: selectedLane });
-      form.setFields([{ name: "role", errors: [] }]);
-    }
-
     if (fields.length) {
       try {
         await form.validateFields(fields);
@@ -92,22 +146,11 @@ export function ContributorForm({
         return;
       }
     }
-
-    let nextIndex = stepIndex + 1;
-    if (STEP_KEYS[nextIndex] === "work" && skipWork) {
-      nextIndex += 1;
-    }
-    setStepIndex(nextIndex);
-    setHistory((h) => [...h, nextIndex]);
+    setStepIndex((i) => i + 1);
   };
 
   const goBack = () => {
-    setHistory((h) => {
-      if (h.length <= 1) return h;
-      const next = h.slice(0, -1);
-      setStepIndex(next[next.length - 1]);
-      return next;
-    });
+    setStepIndex((i) => Math.max(0, i - 1));
   };
 
   const handleSubmit = async () => {
@@ -122,7 +165,9 @@ export function ContributorForm({
 
     const payload = {
       ...rest,
-      role: selectedLane,
+      // Every applicant lands as a generic Shramdan member. Promotion to
+      // specific lanes happens later through event participation.
+      role: "VOLUNTEER",
       additionalInfo: "n/a",
       ...(resume?.id ? { resumeId: resume.id } : {})
     };
@@ -131,27 +176,22 @@ export function ContributorForm({
 
     if (shouldReset !== false) {
       form.resetFields();
-      setSelectedLane(undefined);
+      clearDraft();
       setStepIndex(0);
-      setHistory([0]);
     }
   };
 
-  const handleLaneChange = (next) => {
-    setSelectedLane(next);
-    form.setFieldsValue({ role: next });
-    form.setFields([{ name: "role", errors: [] }]);
-  };
-
   const isLastStep = currentKey === "motivation";
+  const introCopy = joinSteps.intro;
 
   return (
-    <Form form={form} layout="vertical" component="div" preserve>
-      {/* role registers as a hidden form field so the existing validation
-          plumbing works without exposing the legacy <Select>. */}
-      <Form.Item name="role" hidden>
-        <Input type="hidden" />
-      </Form.Item>
+    <Form
+      form={form}
+      layout="vertical"
+      component="div"
+      preserve
+      onValuesChange={scheduleDraftSave}
+    >
       <Honeypot />
 
       <MultiStepShell
@@ -162,26 +202,52 @@ export function ContributorForm({
         onNext={goNext}
         onSubmit={handleSubmit}
         nextLoading={submitting && isLastStep}
-        nextLabel={currentKey === "intro" ? joinSteps.intro.cta : undefined}
+        nextLabel={currentKey === "intro" ? introCopy.cta : undefined}
         isSubmitStep={isLastStep}
         submitLabel={labels.submit}
+        cardClassName={currentKey === "intro" ? "multi-step-shell-intro" : ""}
       >
         {currentKey === "intro" ? (
           <div className="multi-step-intro-card">
-            {eyebrow ? <span className="eyebrow">{eyebrow}</span> : null}
+            {introCopy.imageSrc ? (
+              <div className="multi-step-intro-hero">
+                <Image
+                  src={introCopy.imageSrc}
+                  alt={introCopy.imageAlt || ""}
+                  fill
+                  sizes="(max-width: 720px) 100vw, 620px"
+                  priority
+                />
+              </div>
+            ) : null}
+            {(introCopy.eyebrow || eyebrow) ? (
+              <span className="eyebrow">{introCopy.eyebrow || eyebrow}</span>
+            ) : null}
             {intro ? <p>{intro}</p> : null}
-            <ul>
-              {joinSteps.intro.bullets.map((b) => (
-                <li key={b}>{b}</li>
-              ))}
-            </ul>
+            {Array.isArray(introCopy.stats) && introCopy.stats.length ? (
+              <div className="multi-step-intro-stats" aria-hidden="true">
+                {introCopy.stats.map((s) => (
+                  <span className="multi-step-intro-stat" key={`${s.value}-${s.label}`}>
+                    <strong>{s.value}</strong>
+                    <span>{s.label}</span>
+                  </span>
+                ))}
+              </div>
+            ) : null}
+            {Array.isArray(introCopy.bullets) && introCopy.bullets.length ? (
+              <ul>
+                {introCopy.bullets.map((b) => (
+                  <li key={b}>{b}</li>
+                ))}
+              </ul>
+            ) : null}
           </div>
         ) : null}
 
         {currentKey === "basics" ? (
           <>
             <Form.Item name="name" label={labels.name} rules={[requiredRule]}>
-              <Input autoFocus placeholder={content.placeholders.joinName} />
+              <Input placeholder={content.placeholders.joinName} />
             </Form.Item>
             <Form.Item
               name="email"
@@ -190,32 +256,12 @@ export function ContributorForm({
             >
               <Input placeholder={content.placeholders.email} />
             </Form.Item>
-            <Form.Item name="phone" label={labels.phone}>
-              <Input placeholder={content.placeholders.phone} />
-            </Form.Item>
-          </>
-        ) : null}
-
-        {currentKey === "role" ? (
-          <>
-            <RoleLaneSelector
-              value={selectedLane}
-              onChange={handleLaneChange}
-              copy={ms.lanes}
-              pickLabel={ms.lanes.pickLabel}
-            />
             <Form.Item
-              shouldUpdate
-              noStyle
+              name="phone"
+              label={labels.phone}
+              rules={[requiredRule]}
             >
-              {() => {
-                const err = form.getFieldError("role");
-                return err && err.length ? (
-                  <p className="role-lane-card-error" role="alert">
-                    {err[0]}
-                  </p>
-                ) : null;
-              }}
+              <Input placeholder={content.placeholders.phone} inputMode="tel" autoComplete="tel" />
             </Form.Item>
           </>
         ) : null}
@@ -254,7 +300,6 @@ export function ContributorForm({
                 rows={5}
                 maxLength={500}
                 showCount
-                autoFocus
                 placeholder={content.placeholders.motivation}
               />
             </Form.Item>
