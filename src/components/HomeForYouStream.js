@@ -210,9 +210,13 @@ export function HomeForYouStream({ language = "np", copy }) {
     return [...live, ...upcoming, ...past].slice(0, 12);
   }, [buckets, position]);
 
-  if (loaded && entries.length === 0) {
-    return null; // empty state handled by the rail's existing empty message
-  }
+  // Empty-state guard: the rail's "अहिले कुनै अभियान छैन…" message used
+  // to be the only empty surface, but on the new homepage the rail
+  // shows just live events while the for-you grid is the place where
+  // upcoming/past also live. Render an explicit empty card so visitors
+  // don't see a dead band when there's genuinely nothing to surface
+  // (e.g. between staging seeds or on a cold backend).
+  const isEmpty = loaded && entries.length === 0;
 
   // "Show nearby" CTA appears when (a) location isn't granted yet and
   // (b) the user has either had a silent attempt complete with no
@@ -255,18 +259,34 @@ export function HomeForYouStream({ language = "np", copy }) {
         </div>
       </header>
 
-      <div className="home-for-you-grid">
-        {entries.map(({ event, status, distanceKm }) => (
-          <ForYouCard
-            key={`${status}-${event.id ?? event.slug}`}
-            event={event}
-            status={status}
-            distanceKm={distanceKm}
-            language={language}
-            copy={t}
-          />
-        ))}
-      </div>
+      {isEmpty ? (
+        <div className="home-for-you-empty" role="status">
+          <EnvironmentOutlined aria-hidden="true" />
+          <p>
+            {t.emptyMessage ||
+              (language === "np"
+                ? "अहिले देखाउन कुनै अभियान छैन।"
+                : "No campaigns to show right now.")}
+          </p>
+          <Link className="home-for-you-empty-cta" href="/events">
+            {language === "np" ? "सबै अभियान हेर्नुहोस्" : "Browse all events"}
+            <ArrowRightOutlined aria-hidden="true" />
+          </Link>
+        </div>
+      ) : (
+        <div className="home-for-you-grid">
+          {entries.map(({ event, status, distanceKm }) => (
+            <ForYouCard
+              key={`${status}-${event.id ?? event.slug}`}
+              event={event}
+              status={status}
+              distanceKm={distanceKm}
+              language={language}
+              copy={t}
+            />
+          ))}
+        </div>
+      )}
     </section>
   );
 }

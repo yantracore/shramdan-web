@@ -48,13 +48,18 @@
   gap: var(--corner-gap);
   min-height: 44px;
   padding: 8px 12px;
-  /* Glass treatment — CC-1 cross-cutting principle. */
-  background: color-mix(in srgb, var(--surface) 94%, transparent);
-  -webkit-backdrop-filter: blur(14px);
-  backdrop-filter: blur(14px);
-  border: 1px solid color-mix(in srgb, var(--line) 60%, transparent);
+  /* Glass treatment — CC-1 cross-cutting principle. Surface alpha pulled
+   * into the 68-72% range so the blur reads as actual glass against
+   * whatever's behind, not opaque. Tune the alpha (not the blur radius)
+   * when you want more/less translucency. */
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  backdrop-filter: blur(18px) saturate(1.2);
+  border: 1px solid color-mix(in srgb, var(--line) 45%, transparent);
   border-radius: 14px;
-  box-shadow: 0 8px 24px rgba(23, 33, 28, 0.08);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.32) inset,
+    0 12px 32px rgba(23, 33, 28, 0.14);
 }
 
 /* Corner outer wrappers are flush to their respective walls — no inset.
@@ -158,12 +163,14 @@
   color: var(--muted);
   font-size: 14px;
   font-weight: 650;
-  background: color-mix(in srgb, var(--surface) 94%, transparent);
-  -webkit-backdrop-filter: blur(14px);
-  backdrop-filter: blur(14px);
-  border: 1px solid color-mix(in srgb, var(--line) 60%, transparent);
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  backdrop-filter: blur(18px) saturate(1.2);
+  border: 1px solid color-mix(in srgb, var(--line) 45%, transparent);
   border-radius: 999px;
-  box-shadow: 0 12px 32px rgba(23, 33, 28, 0.1);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.32) inset,
+    0 14px 36px rgba(23, 33, 28, 0.16);
   transform: translateX(-50%);
   transition:
     opacity 420ms cubic-bezier(0.22, 1, 0.36, 1),

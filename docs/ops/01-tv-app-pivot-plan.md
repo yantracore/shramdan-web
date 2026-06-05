@@ -163,12 +163,16 @@ Pattern for every page: page-name + eyebrow + filters + actions occupy under 96p
 
 ## Phase 6 — New `/intro` page from the old homepage
 
-- [ ] Move current `HomeClient.js` body to `/intro`.
+> **Current state (2026-06-05):** Phase 2 v0 moved the new search-surface homepage to `/`. `HomeClient.js` is no longer rendered anywhere but is intentionally kept in the repo as **the canonical source for the photo-driven steps section** that this phase merges into `/intro`. The existing `/intro` route currently renders `IntroCinematic` (a 5-act narrative) — Phase 6 decides whether `IntroCinematic` stays, gets photo-stripped from `HomeClient`, or is replaced wholesale.
+
+- [ ] Decide intro shape: keep `IntroCinematic` as-is and graft the photo-driven steps section in, OR replace `IntroCinematic` with a stripped-down `HomeClient`.
+- [ ] Move the relevant sections of `HomeClient.js` body into `/intro` (the photo steps + community collaboration section; do NOT bring the brochure cheese).
 - [ ] **Strip** sections: "join us" rally copy, government-partnership claims, "small hands together" duplicate, redundant "five steps one journey" duplicate.
-- [ ] **Keep** the photo-driven steps section (the one with the actual photos of the steps).
+- [ ] **Keep** the photo-driven steps section (the one with the actual photos of the steps) — this is the load-bearing reason `HomeClient.js` is still in the repo.
 - [ ] **Add** a new section: community collaboration — maintenance, funding, non-profit framing, no-one-owns-it, all funds go to the work and the app itself.
 - [ ] Add a fixed right-side jump navigation that lists the section titles and scrolls to each on click; highlight current section using `IntersectionObserver`.
 - [ ] Link to `/intro` from a discreet corner of the new homepage (e.g. the org block in the top-left) so newcomers can still find the philosophy.
+- [ ] **Delete `HomeClient.js`** as the final step of this phase — only after the photo-driven section has been confirmed live on `/intro`. Until then it stays.
 
 ---
 

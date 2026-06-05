@@ -16,6 +16,8 @@ import { usePreferences } from "@/app/providers";
 import { copy } from "@/lib/siteContent";
 import { injectMockLiveStream } from "@/lib/devMockData";
 import { listAllEvents } from "@/lib/eventsApi";
+import { haversineKm } from "@/lib/haversine";
+import { useGeolocation } from "@/lib/useGeolocation";
 import { ISSUE_CATEGORIES } from "@/lib/adminUtils";
 
 const PAGE_COPY = {
@@ -226,16 +228,6 @@ function byCompletedDesc(a, b) {
   return Date.parse(b.completedAt) - Date.parse(a.completedAt);
 }
 
-function haversineKm(lat1, lon1, lat2, lon2) {
-  const toRad = (d) => (d * Math.PI) / 180;
-  const R = 6371;
-  const dLat = toRad(lat2 - lat1);
-  const dLon = toRad(lon2 - lon1);
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
-  return 2 * R * Math.asin(Math.sqrt(a));
-}
 
 function EventsListPageContent() {
   const { language } = usePreferences();
@@ -329,34 +321,23 @@ function EventsListPageContent() {
   );
 
   // ----- geolocation (for sort=nearest) ----------------------------------
-  const [nearMe, setNearMe] = useState(null);
-  const [geoBusy, setGeoBusy] = useState(false);
-  const [geoError, setGeoError] = useState("");
+  // Uses the shared useGeolocation hook + haversineKm helper so this
+  // surface and the homepage for-you grid stay aligned on permission UX.
+  // `nearMe` is just an alias for the hook's position; geoBusy / geoError
+  // remain as local state-derived names so the rest of the file reads
+  // unchanged from its prior shape.
+  const {
+    position: nearMe,
+    busy: geoBusy,
+    error: geoErrorCode,
+    request: requestNearMe
+  } = useGeolocation();
 
-  const requestNearMe = useCallback(
-    (onGranted) => {
-      if (typeof window === "undefined" || !navigator?.geolocation) {
-        setGeoError(t.filters.sortLocationUnsupported);
-        return;
-      }
-      setGeoError("");
-      setGeoBusy(true);
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          setGeoBusy(false);
-          const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-          setNearMe(loc);
-          onGranted?.(loc);
-        },
-        () => {
-          setGeoBusy(false);
-          setGeoError(t.filters.sortLocationDenied);
-        },
-        { enableHighAccuracy: false, timeout: 8000, maximumAge: 60_000 }
-      );
-    },
-    [t.filters.sortLocationDenied, t.filters.sortLocationUnsupported]
-  );
+  const geoError = useMemo(() => {
+    if (!geoErrorCode) return "";
+    if (geoErrorCode === "unsupported") return t.filters.sortLocationUnsupported;
+    return t.filters.sortLocationDenied;
+  }, [geoErrorCode, t.filters.sortLocationDenied, t.filters.sortLocationUnsupported]);
 
   useEffect(() => {
     if (filters.sort === "nearest" && !nearMe && !geoBusy && !geoError) {
@@ -371,7 +352,6 @@ function EventsListPageContent() {
         if (!nearMe) requestNearMe();
         return;
       }
-      if (key === "sort") setGeoError("");
       applyFilters({ ...filters, [key]: value });
     },
     [filters, applyFilters, nearMe, requestNearMe]
