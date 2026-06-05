@@ -1,15 +1,15 @@
 {
-  "previousFetchedAt": "2026-06-04T13:22:25+05:45",
-  "currentFetchedAt": "2026-06-05T12:13:36+05:45",
-  "comparedAt": "2026-06-05T06:28:36.081Z",
+  "previousFetchedAt": "2026-06-05T12:13:36+05:45",
+  "currentFetchedAt": "2026-06-05T13:09:33+05:45",
+  "comparedAt": "2026-06-05T07:24:33.515Z",
   "totals": {
     "added": 2,
     "removed": 0,
     "modified": 0
   },
   "added": [
-    "POST /api/v1/events/bulk",
-    "POST /api/v1/issues/bulk"
+    "POST /api/v1/uploads/public/presign",
+    "POST /api/v1/uploads/public/{id}/confirm"
   ],
   "removed": [],
   "modified": [],
