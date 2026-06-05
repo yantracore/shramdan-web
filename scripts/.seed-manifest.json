@@ -1,6 +1,6 @@
 {
   "startedAt": "2026-06-05T07:01:01.559Z",
-  "updatedAt": "2026-06-05T07:08:06.978Z",
+  "updatedAt": "2026-06-05T07:51:37.627Z",
   "members": {
     "arjun": {
       "id": "28239366-f7e1-4755-8b97-b9eefe6f6c08",
@@ -61,6 +61,156 @@
       "email": "bikash.seed@shramdan.org",
       "name": "Bikash Thapa",
       "phone": "+9779820100010"
+    },
+    "deepika": {
+      "id": "c1ca1c20-a3a6-49ac-a298-84000fde4f44",
+      "email": "deepika.seed@shramdan.org",
+      "name": "Deepika Sharma",
+      "phone": "+9779820100011"
+    },
+    "rajiv": {
+      "id": "6c683ac3-a87d-4daa-9f88-b17ae7e3fe5a",
+      "email": "rajiv.seed@shramdan.org",
+      "name": "Rajiv Khadka",
+      "phone": "+9779820100012"
+    },
+    "nisha": {
+      "id": "e56ff3e5-da34-44a5-abc5-c1d392f7fe0f",
+      "email": "nisha.seed@shramdan.org",
+      "name": "Nisha Pandey",
+      "phone": "+9779820100013"
+    },
+    "kushal": {
+      "id": "e53ea694-f539-4d25-8bbf-0efe1de419ce",
+      "email": "kushal.seed@shramdan.org",
+      "name": "Kushal Bhattarai",
+      "phone": "+9779820100014"
+    },
+    "saraswati": {
+      "id": "701a56cb-4c4e-48e4-af31-fc0ea38e72f9",
+      "email": "saraswati.seed@shramdan.org",
+      "name": "Saraswati Subedi",
+      "phone": "+9779820100015"
+    },
+    "naresh": {
+      "id": "5add21bc-e08f-479e-bf45-59b5d373eb7a",
+      "email": "naresh.seed@shramdan.org",
+      "name": "Naresh Pokharel",
+      "phone": "+9779820100016"
+    },
+    "asmita": {
+      "id": "e164ad6d-c8d1-49e9-89fb-f8be413e819b",
+      "email": "asmita.seed@shramdan.org",
+      "name": "Asmita Joshi",
+      "phone": "+9779820100017"
+    },
+    "milan": {
+      "id": "e9c20247-41b5-4e96-9780-e34732ff09c3",
+      "email": "milan.seed@shramdan.org",
+      "name": "Milan Rana",
+      "phone": "+9779820100018"
+    },
+    "yamuna": {
+      "id": "a6982489-771e-49cb-b075-9fdca7e3b2ca",
+      "email": "yamuna.seed@shramdan.org",
+      "name": "Yamuna Acharya",
+      "phone": "+9779820100019"
+    },
+    "sandip": {
+      "id": "e9d0800c-2559-4594-8a70-efd380e765b2",
+      "email": "sandip.seed@shramdan.org",
+      "name": "Sandip Bhandari",
+      "phone": "+9779820100020"
+    },
+    "kabita": {
+      "id": "46251953-3119-4e63-adce-148ab9250cf1",
+      "email": "kabita.seed@shramdan.org",
+      "name": "Kabita Tharu",
+      "phone": "+9779820100021"
+    },
+    "rabindra": {
+      "id": "1c247faf-1438-4a3b-9516-dfe24869b7ff",
+      "email": "rabindra.seed@shramdan.org",
+      "name": "Rabindra Dahal",
+      "phone": "+9779820100022"
+    },
+    "ishwori": {
+      "id": "2dd312ff-3190-4919-af5f-17d8a306d871",
+      "email": "ishwori.seed@shramdan.org",
+      "name": "Ishwori Chaudhary",
+      "phone": "+9779820100023"
+    },
+    "manish": {
+      "id": "9622ec20-6c21-45f7-b3d9-f6bfe6bd8bfb",
+      "email": "manish.seed@shramdan.org",
+      "name": "Manish Kafle",
+      "phone": "+9779820100024"
+    },
+    "rojina": {
+      "id": "d505894c-9a49-4091-8e45-c2ebc9305e06",
+      "email": "rojina.seed@shramdan.org",
+      "name": "Rojina Bista",
+      "phone": "+9779820100025"
+    },
+    "subash": {
+      "id": "b61b611e-4447-46f9-bb23-3abe1b1ba34a",
+      "email": "subash.seed@shramdan.org",
+      "name": "Subash Neupane",
+      "phone": "+9779820100026"
+    },
+    "anu": {
+      "id": "6f328bb7-d9af-4503-8127-750c5af9939c",
+      "email": "anu.seed@shramdan.org",
+      "name": "Anu Maharjan",
+      "phone": "+9779820100027"
+    },
+    "krishna": {
+      "id": "5f8421fb-322d-49b8-b451-e44c1c9d18ca",
+      "email": "krishna.seed@shramdan.org",
+      "name": "Krishna Limbu",
+      "phone": "+9779820100028"
+    },
+    "muna": {
+      "id": "e4d187b5-d364-4b81-b1f6-0de17a086644",
+      "email": "muna.seed@shramdan.org",
+      "name": "Muna Shrestha",
+      "phone": "+9779820100029"
+    },
+    "binod": {
+      "id": "e0d32f4f-9026-41eb-95e1-2d32f2706455",
+      "email": "binod.seed@shramdan.org",
+      "name": "Binod Aryal",
+      "phone": "+9779820100030"
+    },
+    "sushma": {
+      "id": "fbdf2cb4-30cf-4485-89ee-6036d815fe94",
+      "email": "sushma.seed@shramdan.org",
+      "name": "Sushma Pradhan",
+      "phone": "+9779820100031"
+    },
+    "dilip": {
+      "id": "014f6c75-2dcc-419b-844f-ad86aaecb9b0",
+      "email": "dilip.seed@shramdan.org",
+      "name": "Dilip Khanal",
+      "phone": "+9779820100032"
+    },
+    "bandana": {
+      "id": "42bd5dd5-696e-4dfe-b66b-6e7425cf7527",
+      "email": "bandana.seed@shramdan.org",
+      "name": "Bandana Lamsal",
+      "phone": "+9779820100033"
+    },
+    "umesh": {
+      "id": "954b1a90-8c92-465f-8d7e-331facc880fd",
+      "email": "umesh.seed@shramdan.org",
+      "name": "Umesh Adhikari",
+      "phone": "+9779820100034"
+    },
+    "junu": {
+      "id": "0718529c-2dbd-43cf-8dba-5a23852ef89d",
+      "email": "junu.seed@shramdan.org",
+      "name": "Junu Magar",
+      "phone": "+9779820100035"
     }
   },
   "uploads": {
@@ -472,6 +622,46 @@
       {
         "memberSlug": "bishnu",
         "role": "MEDIC"
+      },
+      {
+        "memberSlug": "priya",
+        "role": "SAFETY_LEAD"
+      },
+      {
+        "memberSlug": "anu",
+        "role": "LOGISTICS"
+      },
+      {
+        "memberSlug": "rajiv",
+        "role": "LOGISTICS"
+      },
+      {
+        "memberSlug": "deepika",
+        "role": "WORKER"
+      },
+      {
+        "memberSlug": "nisha",
+        "role": "WORKER"
+      },
+      {
+        "memberSlug": "kushal",
+        "role": "WORKER"
+      },
+      {
+        "memberSlug": "saraswati",
+        "role": "WORKER"
+      },
+      {
+        "memberSlug": "naresh",
+        "role": "WORKER"
+      },
+      {
+        "memberSlug": "asmita",
+        "role": "WORKER"
+      },
+      {
+        "memberSlug": "milan",
+        "role": "WORKER"
       }
     ],
     "hanumante-lokanthali-cleanup": [
@@ -727,6 +917,10 @@
     {
       "memberSlug": "bikash",
       "issueSlug": "manang-trail-cleanup-needed"
+    },
+    {
+      "memberSlug": "anjali",
+      "issueSlug": "boudha-ring-road-trash"
     }
   ],
   "comments": {
@@ -767,6 +961,162 @@
         "id": "768eeb80-d7ee-4a96-baeb-efec8b1bdf72",
         "memberSlug": "maya",
         "text": "व्यापार सङ्घले स्वयंसेवक पनि ल्याउने भनेका छन् भन्ने सुनेँ।"
+      },
+      {
+        "id": "22e94a91-81fa-472c-b50c-a7e8be376e79",
+        "memberSlug": "deepika",
+        "text": "मैले हिजो साँझ Ring Road मा हिँडेर आउँदा देखेँ — Bouddha तर्फको दक्षिणी छेउ साँच्चै बिग्रिएको रहेछ। पर्यटक ओर्लिने ठाउँमै फोहोर जमेर बसेको छ।",
+        "parentId": null
+      },
+      {
+        "id": "d00b9827-9b2c-4aaf-a78c-0a14141e2a10",
+        "memberSlug": "rajiv",
+        "text": "साँच्चै। मेरो होटेल त्यहीँ छ; अतिथिले पहिलो दिन नै सोध्छन्।",
+        "parentId": "22e94a91-81fa-472c-b50c-a7e8be376e79"
+      },
+      {
+        "id": "773a2b0b-05ec-4e0b-b710-5f829abf17f0",
+        "memberSlug": "nisha",
+        "text": "नगरपालिकाको ट्रक हप्ताको एकपटक मात्र आउँछ कि भन्ने सुनेँ।",
+        "parentId": "22e94a91-81fa-472c-b50c-a7e8be376e79"
+      },
+      {
+        "id": "1f3b7255-700a-4f13-a61e-2eefe79f2314",
+        "memberSlug": "rajiv",
+        "text": "अहो, त्यसैले हो। आर्थिक रूपमा सहयोग गर्न पनि व्यापारीहरू तयार छन्।",
+        "parentId": "773a2b0b-05ec-4e0b-b710-5f829abf17f0"
+      },
+      {
+        "id": "c07b15f0-1d2e-40b2-8dde-f999031a0cc6",
+        "memberSlug": "kushal",
+        "text": "स्थानीय व्यापार सङ्घले पनि सहयोग गर्ने भनेका छन् — तर coordinate गर्ने एउटा point of contact चाहिएको रहेछ। श्रमदान ले त्यो भूमिका लिन सक्छ?",
+        "parentId": null
+      },
+      {
+        "id": "9096d97f-6859-4196-8270-1e669f696b8f",
+        "memberSlug": "arjun",
+        "text": "हुन्छ — coordinator role plan मा छ। तपाईंले अघि बढ्ने भए application पठाउनुहोस्।",
+        "parentId": "c07b15f0-1d2e-40b2-8dde-f999031a0cc6"
+      },
+      {
+        "id": "c8d2cbdc-cdba-420f-865f-d2f0c1702472",
+        "memberSlug": "saraswati",
+        "text": "Boudha Stupa भित्र-बाहिर सबै पर्यटक र भक्तजनको गन्तव्य हो। यो ठाउँको पहिलो प्रभाव खराब हुनु भनेको देशकै प्रतिष्ठाको कुरा हो।",
+        "parentId": null
+      },
+      {
+        "id": "95e463e1-403d-4e86-847c-94c63c08f772",
+        "memberSlug": "naresh",
+        "text": "मेरो परिवारको ४ जना सहभागी हुन तयार छन् — खाली शनिबार वा आइतबार उत्तम।",
+        "parentId": null
+      },
+      {
+        "id": "751c59d9-953c-417e-886b-7eb420ff7f5d",
+        "memberSlug": "asmita",
+        "text": "हाम्रो office team पनि CSR day मा यो अभियानमा जोडिन सक्छ। 20-25 जना अनुमानित।",
+        "parentId": "95e463e1-403d-4e86-847c-94c63c08f772"
+      },
+      {
+        "id": "82048f19-af79-4e35-9d47-9c4c353abbd1",
+        "memberSlug": "milan",
+        "text": "Plastic बिक्री गर्ने scrap dealer सँग पनि कुरा गरौँ — सङ्कलित प्लास्टिक उनीहरूले लग्न तयार छन् भने पुनःप्रयोग पनि हुन्छ।",
+        "parentId": null
+      },
+      {
+        "id": "734e5829-d0a8-45c6-84ec-8842a50d94b4",
+        "memberSlug": "yamuna",
+        "text": "मैले गत हप्ता तस्बिर खिचेर आफ्नो instagram मा पोस्ट गरेकी थिएँ — साथीहरूले reach out गरिरहेका छन् कसरी सहयोग गर्ने भनेर। पर्खाइ-पर्खाइको ठाउँ हो यो।",
+        "parentId": null
+      },
+      {
+        "id": "0f6aa32f-b9ee-434f-a2cb-1d2ab584dfdd",
+        "memberSlug": "ramesh",
+        "text": "तस्बिरको लिंक share गर्न मिल्छ? Live stream को content मा reference राख्न मिल्छ।",
+        "parentId": "734e5829-d0a8-45c6-84ec-8842a50d94b4"
+      },
+      {
+        "id": "b5f3c5c5-cbac-4778-a291-2b2d5082ffa3",
+        "memberSlug": "yamuna",
+        "text": "हुन्छ, DM गरेँ। Visual story powerful छ।",
+        "parentId": "0f6aa32f-b9ee-434f-a2cb-1d2ab584dfdd"
+      },
+      {
+        "id": "539a3185-c262-4b3a-96a4-213f04d378c3",
+        "memberSlug": "sandip",
+        "text": "Ring Road को यो खण्ड मेरो दैनिक commute मा पर्छ। सडक माथिको पुरानो टायर र building debris देख्दा साँच्चै दुख लाग्छ।",
+        "parentId": null
+      },
+      {
+        "id": "1a8570f3-84dd-4e4e-96e6-13630ab48582",
+        "memberSlug": "kabita",
+        "text": "महिला समूहले पनि coordinate गर्न सक्छन् — हाम्रो स्थानीय बैठकमा यो विषय उठाउँछौँ। 10-12 जना confirmed आउँछन्।",
+        "parentId": null
+      },
+      {
+        "id": "7e32f1fe-14db-4b28-9f84-cbd8da9594f1",
+        "memberSlug": "rabindra",
+        "text": "नगरपालिकाको permit लाई कस्तो process छ? मैले अघि incident plan पनि चाहिने भनेर सुनेको थिएँ।",
+        "parentId": null
+      },
+      {
+        "id": "73e41a77-e8b8-4f81-a401-2532e64d493e",
+        "memberSlug": "priya",
+        "text": "Safety lead role को क्षेत्र हो यो — मैले permit + insurance दुवै कुरा गर्दैछु। आउँदो साताभित्र clear हुन्छ।",
+        "parentId": "7e32f1fe-14db-4b28-9f84-cbd8da9594f1"
+      },
+      {
+        "id": "45a08de2-0fe8-4e07-9738-e4531a944c28",
+        "memberSlug": "ishwori",
+        "text": "Tharu Society Bouddha शाखाले पनि सहयोग गर्ने प्रतिज्ञा गरेका छन्। प्रत्येक सदस्यले औंलो छेउ बजाएर मिल्छु भन्ने जवाफ दिए।",
+        "parentId": null
+      },
+      {
+        "id": "efed0a4a-7d70-4fbe-a608-6b16f3b230bc",
+        "memberSlug": "manish",
+        "text": "Photographer/videographer छन् भने मलाई DM गर्नुहोस् — content team को coordination मेरो जिम्मा हो। Post-event recap video बनाउने योजना छ।",
+        "parentId": null
+      },
+      {
+        "id": "84ced838-c9e2-43be-a32b-8dccc350d2c1",
+        "memberSlug": "maya",
+        "text": "म PHOTOGRAPHER role मा apply गर्दैछु। Two cameras लिएर आउँछु।",
+        "parentId": "efed0a4a-7d70-4fbe-a608-6b16f3b230bc"
+      },
+      {
+        "id": "21c4d168-2c54-4022-9ceb-3a633e5e8b59",
+        "memberSlug": "rojina",
+        "text": "नगरपालिकाको bin व्यवस्थापन सुधार नभई दिगो समाधान आउँदैन। यो अभियानले त्यो दिशामा pressure पनि बनाउँछ।",
+        "parentId": null
+      },
+      {
+        "id": "f85c5d80-d316-49c7-ad62-125167ed0f6f",
+        "memberSlug": "subash",
+        "text": "Volunteer हरुलाई कस्तो dress code छ? Branded T-shirt? मैले अघिल्लो अभियानमा देखेँ छुट्टै रङ्गको थियो।",
+        "parentId": null
+      },
+      {
+        "id": "99e533ff-5213-4356-8476-02cf665c46ed",
+        "memberSlug": "arjun",
+        "text": "हो — हरियो polo त्यो दिनमा हामी सबैले लगाउँछौँ। Distribution venue मा हुन्छ।",
+        "parentId": "f85c5d80-d316-49c7-ad62-125167ed0f6f"
+      },
+      {
+        "id": "82ce4e89-bca2-4f03-9d13-48ee6b1b1ae2",
+        "memberSlug": "anu",
+        "text": "Drinking water + light snacks coordination मेरो जिम्मा लिन्छु। LOGISTICS role मा apply गर्दैछु — local supplier सँग tie-up पनि छ।",
+        "parentId": null
+      },
+      {
+        "id": "382305da-4132-4f97-a4cc-44b41099cd6b",
+        "memberSlug": "krishna",
+        "text": "Limbu Cultural Centre बाट volunteer हरु पठाउने tentative commitment छ। Final list यो हप्ताभित्रमा confirm हुन्छ।",
+        "parentId": null
+      },
+      {
+        "id": "d8545c0a-29f4-45e7-9685-9ff3e5f9ad71",
+        "memberSlug": "arjun",
+        "text": "🙏 Cross-community participation साँच्चै beautiful हुन्छ।",
+        "parentId": "382305da-4132-4f97-a4cc-44b41099cd6b"
       }
     ],
     "issue:asan-main-bazaar-blocked": [
@@ -874,6 +1224,162 @@
         "id": "1b5d28ea-4ee4-49fb-8e3b-239a612090c1",
         "memberSlug": "hari",
         "text": "साँच्चै थकिएको तर सन्तुष्ट छु। ३ महिनासम्म पानी हाल्ने जिम्मा मेरो।"
+      },
+      {
+        "id": "248376d9-db73-4fce-874d-793b091ba566",
+        "memberSlug": "deepika",
+        "text": "११० बिरुवा लागेका छन् अहिले — चिलाउनेको line एकदम राम्रो देखिएको। बच्चाहरूले पनि खुसी मानेर रोप्दैछन्।",
+        "parentId": null
+      },
+      {
+        "id": "694e15a7-9e1b-497f-b29b-1d509929aeb6",
+        "memberSlug": "arjun",
+        "text": "बच्चाहरूको photo को permission ल पहिले लिँदा राम्रो। Maya, छ?",
+        "parentId": "248376d9-db73-4fce-874d-793b091ba566"
+      },
+      {
+        "id": "5f4709db-9221-4a88-83f8-eeb235db11d0",
+        "memberSlug": "maya",
+        "text": "लिएँ — सबै अभिभावकले सही दिएको form आज सबेरै हो।",
+        "parentId": "248376d9-db73-4fce-874d-793b091ba566"
+      },
+      {
+        "id": "84dc0a66-28fd-457c-81cd-55bc0ccbe3a9",
+        "memberSlug": "arjun",
+        "text": "Perfect. Continue गर्नुहोस्।",
+        "parentId": "5f4709db-9221-4a88-83f8-eeb235db11d0"
+      },
+      {
+        "id": "668d669b-6a30-47c9-8a83-8e503a612b91",
+        "memberSlug": "rajiv",
+        "text": "नगरपालिकाको technician आइसके — soil quality test को result २ हप्तामा आउँछ। त्यो आधारमा अर्को batch को बिरुवा छनोट हुन्छ।",
+        "parentId": null
+      },
+      {
+        "id": "b6e5d31b-d619-45d9-922f-bbeadcd28ca5",
+        "memberSlug": "nisha",
+        "text": "बच्चाहरूलाई पानी हाल्ने responsibility असाइन गऱ्यौँ — आउँदो ३ महिनासम्म साप्ताहिक schedule तयार छ।",
+        "parentId": null
+      },
+      {
+        "id": "c152fb48-64d2-40c5-b4db-87d69ff0c5fc",
+        "memberSlug": "hari",
+        "text": "मेरो जिम्मा हरेक आइतबार। SMS reminder आउँछ?",
+        "parentId": "b6e5d31b-d619-45d9-922f-bbeadcd28ca5"
+      },
+      {
+        "id": "2e6bd85e-4a8c-49d0-806e-e4ed496c7038",
+        "memberSlug": "arjun",
+        "text": "SMS reminder backend ले अझै handle गरेको छैन — manual whatsapp group ले अहिले replace गरेको छ।",
+        "parentId": "b6e5d31b-d619-45d9-922f-bbeadcd28ca5"
+      },
+      {
+        "id": "4b49ecaf-9880-48cf-94df-4b61a9b55817",
+        "memberSlug": "kushal",
+        "text": "Bhaktapur municipality को heritage committee पनि आज visit गर्न आउने रहेछन्। Coordination ramping up छ।",
+        "parentId": null
+      },
+      {
+        "id": "f55949c5-e9a4-4a77-8219-33b862dd3bc4",
+        "memberSlug": "saraswati",
+        "text": "साइनबोर्ड मा local language र English दुवै राख्ने योजना? तब टुरिस्टले पनि बिरुवाको नाम र महत्व बुझ्न सक्छन्।",
+        "parentId": null
+      },
+      {
+        "id": "b2a06fe1-ff3f-4104-af0c-c93396ee3906",
+        "memberSlug": "bishnu",
+        "text": "हो — bilingual सबै सूचना। मैले अघि draft पठाएको थिएँ।",
+        "parentId": "f55949c5-e9a4-4a77-8219-33b862dd3bc4"
+      },
+      {
+        "id": "b367db00-9a78-414c-b72e-4a67161fae5a",
+        "memberSlug": "asmita",
+        "text": "मेडिकल team मा कुनै emergency आयो भने Bhaktapur Hospital बाट ambulance ५ मिनेटमा pickup हुने commitment मिलेको रहेछ।",
+        "parentId": null
+      },
+      {
+        "id": "1522cf6f-ac9e-42bc-9c1c-3728390c4995",
+        "memberSlug": "milan",
+        "text": "धन्यवाद bishnu doctor — हिजो दिनभर बस्नुभयो, हिजो आजसम्म कुनै दुर्घटना छैन। यो organizing को quality हो।",
+        "parentId": null
+      },
+      {
+        "id": "f88248fe-ca6b-45f0-9407-b062dd876738",
+        "memberSlug": "bishnu",
+        "text": "Team को discipline को कारण हो। Hands-on लीडरशिप ले काम सजिलो बनाइदियो।",
+        "parentId": "1522cf6f-ac9e-42bc-9c1c-3728390c4995"
+      },
+      {
+        "id": "e9a45c94-6d08-40ae-90b8-aa3c10b93c64",
+        "memberSlug": "naresh",
+        "text": "Live stream को viewer count धेरै राम्रो छ — पहिलो दिन मात्र ३५० बढी viewer थिए। Geographical reach Australia, USA, Middle East बाट पनि।",
+        "parentId": null
+      },
+      {
+        "id": "e04072e0-7c8f-4e4c-a8c3-c313fbfe76a4",
+        "memberSlug": "yamuna",
+        "text": "Post-event का लागि photo collection को drive folder प्रत्येक participant ले upload गर्न सक्ने बनाउनुपर्छ। Memory archive long term value।",
+        "parentId": null
+      },
+      {
+        "id": "bb6b19e1-744f-4b6a-b34d-bbfd15e9824a",
+        "memberSlug": "manish",
+        "text": "मैले shared drive open गरें — group मा link पठायौँ।",
+        "parentId": "e04072e0-7c8f-4e4c-a8c3-c313fbfe76a4"
+      },
+      {
+        "id": "e79a8b7d-c90c-4c12-a004-b823e5761d0e",
+        "memberSlug": "sandip",
+        "text": "खाजाको quality र distribution flow पनि सहज छ — पन्जा र मास्क पनि सबैले उपयोग गरिरहेका छन्। Hygiene प्रोटोकल proper।",
+        "parentId": null
+      },
+      {
+        "id": "5ad61e65-0ac9-4b50-867a-a826fb6a09b2",
+        "memberSlug": "kabita",
+        "text": "Day 2 मा कति बिरुवा हुने अनुमान? Soil prep हिजो जति ज्यादा भयो — पानी पनि सजिलै सेच्न मिल्ने।",
+        "parentId": null
+      },
+      {
+        "id": "f797f44e-e7d6-48ed-a23a-fa8a52844e38",
+        "memberSlug": "arjun",
+        "text": "लक्ष्य 200 आज, total 300+ within next 36 hours। Materials supply pipeline ready छ।",
+        "parentId": "5ad61e65-0ac9-4b50-867a-a826fb6a09b2"
+      },
+      {
+        "id": "d9909a38-a047-433a-93c7-a304e070e283",
+        "memberSlug": "rabindra",
+        "text": "मेरो organization ले yearly CSR contribution यो अभियानमा लिने proposal अहिले bordroom मा छ। Update आउने बित्तिकै share गर्छु।",
+        "parentId": null
+      },
+      {
+        "id": "31a9911e-cc16-40e6-b86b-d3b026710d93",
+        "memberSlug": "ishwori",
+        "text": "Limbu, Tharu, Magar — हाम्रो टीम मा अहिले ५ different ethnic background का साथीहरू एकैसाथ काम गर्दैछौँ। यो साँच्चै beautiful मिसन हो।",
+        "parentId": null
+      },
+      {
+        "id": "5fa72d47-32e4-4a98-b856-85ba7d725d5f",
+        "memberSlug": "suman",
+        "text": "🌱 Diversity ले strength बनाउँछ। Photo opportunity पनि powerful छ।",
+        "parentId": "31a9911e-cc16-40e6-b86b-d3b026710d93"
+      },
+      {
+        "id": "393053f9-ab37-46ea-b46c-9c0f2f5822ac",
+        "memberSlug": "subash",
+        "text": "Tree-tagging GPS app proposal आज planning मा थियो — हरेक रोपिएको बिरुवालाई unique ID + lat/long record गर्ने। Maintenance ट्रयाक सजिलो।",
+        "parentId": null
+      },
+      {
+        "id": "77a9d1ce-4bd0-4942-b1c0-72aa71d252c0",
+        "memberSlug": "anu",
+        "text": "Lunch coordination पूर्ण भयो आजको — local catering ले ५ thousand rupee discount दिए। Sustainability + community support दुवै।",
+        "parentId": null
+      },
+      {
+        "id": "307fe1de-a895-4ea5-adeb-b66b2b34505a",
+        "memberSlug": "bikash",
+        "text": "Donor समूहले lunch cost पनि sponsor गर्ने आग्रह आजै आयो।",
+        "parentId": "77a9d1ce-4bd0-4942-b1c0-72aa71d252c0"
       }
     ],
     "event:hanumante-lokanthali-cleanup": [
