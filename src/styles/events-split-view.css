@@ -320,7 +320,13 @@
   max-height: calc(100vh - 16px);
   scroll-margin-top: 8px;
   overflow-y: auto;
-  overscroll-behavior: contain;
+  /* `overscroll-behavior: contain` previously trapped wheel events
+   * inside the sticky pane — when the user scrolled past the bottom
+   * (or top) of the preview, the body refused to scroll. विवेक called
+   * this out as the scroll-pass-through bug. `auto` restores scroll
+   * chaining so once the preview hits its boundary, the body picks
+   * up the wheel naturally. (Phase 4 v0, 2026-06-05) */
+  overscroll-behavior: auto;
   border: 1px solid var(--line);
   border-radius: 18px;
   background: var(--surface);
