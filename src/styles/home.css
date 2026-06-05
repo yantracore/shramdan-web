@@ -6251,13 +6251,54 @@
 .public-issues-section,
 .public-issue-detail-section {
   display: grid;
-  gap: 28px;
+  /* Phase 5 shrink-down — section-heading goes from generous 28px to
+   * a tight 14px so the result list owns the vertical real estate. */
+  gap: 14px;
   padding-bottom: 96px;
 }
 
+/* Phase 5 v0 — slim heading band for /events + /issues. Title drops
+ * from `clamp(28, 3.4vw, 40)` to a flatter `clamp(22, 2.4vw, 30)`;
+ * eyebrow shrinks to 11px; the intro paragraph clamps to a single
+ * line (with ellipsis) on desktop. The list / preview area is where
+ * the user is going — chrome stays out of the way. */
+.public-issues-section .section-heading {
+  display: grid;
+  gap: 4px;
+}
+
+.public-issues-section .section-heading .eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+}
+
 .public-issues-section .section-heading h1 {
-  font-size: clamp(28px, 3.4vw, 40px);
-  line-height: 1.1;
+  margin: 0;
+  font-size: clamp(22px, 2.4vw, 30px);
+  line-height: 1.18;
+}
+
+.public-issues-section .section-heading p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--muted);
+  /* Single-line clamp on desktop — full text still readable on hover
+   * via title attribute / via dedicated page in the future. */
+  max-width: 100%;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  overflow: hidden;
+}
+
+@media (max-width: 720px) {
+  .public-issues-section .section-heading p {
+    /* Allow two lines on phones where headings already wrap. */
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
 }
 
 .public-issues-filters {
