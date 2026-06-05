@@ -106,15 +106,71 @@ Note that the spec exposes this as the `isVerified` boolean plus an implicit del
 
 ---
 
+## Public profile (Phase 7 — new in 2026-06-05 pivot)
+
+The 2026-06-05 TV-app pivot introduces a public member-profile surface at `/members/[idOrSlug]`. This is the click-through target from member avatars rendered in comments, event rosters, discussion threads, and leader-nomination cards. The public profile must work for unauthenticated visitors (SEO + share-link friendly).
+
+### publicProfile — fields
+
+A `publicProfile` is a server-side projection of a `Member` record, restricted to fields the member has opted into making public. It is NOT a separate table; the backend computes this shape from the member row + the member's `publicProfilePreferences` sub-object.
+
+- **id** (`string`, required, public) — member id; doubles as the `/members/[id]` route segment when `slug` is not set.
+- **slug** (`string`, optional, public) — derived from `username` if present, otherwise from a hashed id-suffix. Used as the canonical `/members/[slug]` route. Slugs are immutable once issued so deep-links never break.
+- **displayName** (`string`, required, public) — `name` from the underlying member row. Always shown — anonymous member profiles do not exist; members can EITHER have a public profile OR they cannot have posted under their identity. Anonymous posts route to the anonymous-author placeholder, not to a profile page.
+- **avatarUrl** (`string`, optional, public) — `avatarUrl` from the member row. UI falls back to initials.
+- **bio** (`string`, optional, public) — `bio` from the member row. Surfaced when set.
+- **city** (`string`, optional, public) — surfaced when the member opted in via `publicProfilePreferences.showCity`.
+- **memberSince** (`datetime`, required, public) — `createdAt` from the member row.
+- **publicLanes** (`array of enum`, required, public) — derived from approved applications and active participations; surfaces the lanes (e.g. `EVENT_PARTICIPATION`, `DEVELOPMENT`) the member contributes through. Empty array for members with no active lane.
+- **supportedIssueCount** (`number`, required, public) — count of issues the member has upvoted that are currently `OPEN` or `EVENT_SCHEDULED`. Drives the "X issues backed" badge.
+- **participatedEventCount** (`number`, required, public) — count of past events the member attended.
+- **leaderNominationCount** (`number`, optional, public) — count of nominations the member has received as event leader. Only surfaced when ≥ 1.
+- **discussionsStartedCount** (`number`, required, public) — count of `DiscussionTopic` rows authored by this member where `anonymous === false`. (Anonymous topics are excluded from the member's public profile by design.)
+- **featureProposalsCount** (`number`, required, public) — same as above, filtered to `kind: FEATURE_PROPOSAL`.
+- **recentActivity** (`array of object`, required, public) — chronological feed (newest first, max 10) of public actions: supported issue, joined event, posted comment, opened discussion, etc. Each entry: `{ kind, when, target: { kind, id, slug, title } }`. Anonymous actions are excluded.
+
+### publicProfilePreferences — fields (sub-object on the member row)
+
+- **enabled** (`boolean`, required, internal default `true`) — master switch. When `false`, `/members/[id]` returns 404 for unauthenticated visitors and 403 for authenticated non-self visitors. The member's anonymous activity remains anonymous regardless; this controls the visibility of the profile *surface*, not retroactively the surfaced activity.
+- **showCity** (`boolean`, required, internal default `true`) — gate for `city` projection.
+- **showLanes** (`boolean`, required, internal default `true`) — gate for `publicLanes` + counts.
+- **showRecentActivity** (`boolean`, required, internal default `true`) — gate for the `recentActivity` feed.
+
+Members can edit `publicProfilePreferences` from their own `/me/settings` page. The backend rejects edits from a viewer that is not the owning member.
+
+### Operations on public profile
+
+| Operation          | Transport  | RBAC                 | Description |
+|--------------------|------------|----------------------|-------------|
+| Get public profile | REST GET   | Public               | `/members/{idOrSlug}` returns the publicProfile projection. 404 when `publicProfilePreferences.enabled === false` for visitors who are not the owning member. |
+| Update preferences | REST PATCH | Owning member only   | `/members/me/public-profile-preferences`. |
+
+### Validation rules (public profile)
+
+- An admin cannot override `publicProfilePreferences.enabled` to `true` against the member's wishes. The flag is owner-controlled.
+- If the member account is `SUSPENDED` or `DELETED`, the public profile returns 410 (gone) regardless of preferences.
+- The `recentActivity` feed must be cache-able for at least 60 seconds (server-side); the spec does not require real-time freshness for this view.
+
+### Relationships (public profile)
+
+- A public profile references many `Issue`s through the supportedIssue projection.
+- A public profile references many `Event`s through the participated-event projection.
+- A public profile references many `DiscussionTopic`s — only non-anonymous ones.
+
+---
+
 ## Future-proofing notes
 
 - `organizationId` field — for future support where members belong to a partner organization. Safe to leave null in single-org operation.
 - `kycRecordId` field — references a separate KYC submission record. Out of scope for the current member shape but tracked elsewhere in Phase 6.
 - Multi-lane membership — a future surface may want to display all the lanes (Event-Participation, Development, Company-Management) a member is active in. Derived from applications and participations; no additional schema needed in MVP.
+- `publicProfileBackgroundUrl` — let members upload a banner/cover image for their profile page. Deferred.
+- `pronouns` field — surface in publicProfile when set. Deferred until member feedback asks for it.
 
 ---
 
 ## Recent changes
 
+- `2026-06-05` — Added Public profile section (Phase 7 pivot): `publicProfile` projection + `publicProfilePreferences` sub-object + `/members/[idOrSlug]` route. Linked from comments, rosters, and discussion threads.
 - `2026-06-05` — Applications sub-entity collapsed to a pointer; full spec now lives in [`applications.md`](applications.md).
 - `2026-06-03` — initial spec draft. Captures the member shape currently exercised through `/users`, `/applications`, and the member portal mocks. Includes the Applications sub-entity since it shares lifetime with the member.
