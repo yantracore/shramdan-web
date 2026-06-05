@@ -150,16 +150,19 @@
 }
 
 /* Top-center pill nav — CSS-only visibility at >= 1180px so SSR/hydration
- * stays stable; DOM is always present. */
+ * stays stable; DOM is always present. Flush to the top edge like the
+ * four corner chips: only the two inward-facing (bottom) corners round,
+ * top border drops so it reads as part of the wall. Saves the vertical
+ * inset the floating capsule used to claim. */
 .site-shell-pill {
   display: none;
   position: fixed;
-  top: var(--corner-inset);
+  top: 0;
   left: 50%;
   z-index: var(--pill-z);
   align-items: center;
   gap: 4px;
-  padding: 6px 10px;
+  padding: 6px 12px 8px;
   color: var(--muted);
   font-size: 14px;
   font-weight: 650;
@@ -167,10 +170,11 @@
   -webkit-backdrop-filter: blur(18px) saturate(1.2);
   backdrop-filter: blur(18px) saturate(1.2);
   border: 1px solid color-mix(in srgb, var(--line) 45%, transparent);
-  border-radius: 999px;
+  border-top-width: 0;
+  border-radius: 0 0 14px 14px;
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.32) inset,
-    0 14px 36px rgba(23, 33, 28, 0.16);
+    0 12px 32px rgba(23, 33, 28, 0.14);
   transform: translateX(-50%);
   transition:
     opacity 420ms cubic-bezier(0.22, 1, 0.36, 1),
@@ -284,11 +288,12 @@
   }
 }
 
-/* Pill entrance: starts shifted up + scaled + transparent; resting state
- * is reached when `.is-entering` is removed by the effect on first paint. */
+/* Pill entrance: starts tucked above the top wall, then drops into its
+ * resting top:0 position. Resting state is reached when `.is-entering`
+ * is removed by the effect on first paint. */
 .site-shell-pill.is-entering {
   opacity: 0;
-  transform: translateX(-50%) translateY(-12px) scale(0.96);
+  transform: translateX(-50%) translateY(-100%);
 }
 
 .site-shell-pill.is-entering a {
@@ -318,7 +323,8 @@
 }
 
 .user-icon-trigger,
-.apps-grid-trigger {
+.apps-grid-trigger,
+.quick-settings-button {
   display: grid;
   width: 38px;
   height: 38px;
@@ -333,10 +339,49 @@
 }
 
 .user-icon-trigger:hover,
-.apps-grid-trigger:hover {
+.apps-grid-trigger:hover,
+.quick-settings-button:hover,
+.quick-settings-button:focus-visible {
   background: color-mix(in srgb, var(--primary) 12%, var(--surface));
   color: var(--primary-dark);
   transform: translateY(-1px);
+  outline: none;
+}
+
+/* Quick settings stack — TR corner is the always-visible quick panel
+ * (Language + Theme + User toggles, with a "View all settings" link
+ * footer linking to the full /settings page). The 38px circular chips
+ * share the .user-icon-trigger chassis above, and the corner chip flips
+ * to a column flex so the link sits centred under the buttons. */
+.site-shell-corner--top-right .site-shell-corner__inner {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+}
+
+.quick-settings-row {
+  display: flex;
+  align-items: center;
+  gap: var(--corner-gap);
+}
+
+.quick-settings-link {
+  align-self: center;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: color-mix(in srgb, var(--text) 64%, transparent);
+  text-decoration: none;
+  padding: 2px 10px;
+  border-radius: 999px;
+  transition: color 160ms ease, background 160ms ease;
+}
+
+.quick-settings-link:hover,
+.quick-settings-link:focus-visible {
+  color: var(--primary-dark);
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  outline: none;
 }
 
 /* --- Apps Start Menu (BL corner) -------------------------------------
@@ -5830,9 +5875,11 @@
     flex-shrink: 0;
   }
 
-  /* Narrowest viewports: hide Settings + Bell from corner-tr to keep
-   * the bar fitting at 360px. The mobile drawer surfaces both anyway. */
-  .site-shell-corner--top-right .preference-controls {
+  /* Narrowest viewports: hide quick-settings toggles (Lang + Theme +
+   * Bell) and the "View all settings" link from corner-tr to keep the
+   * bar fitting at 360px. The mobile drawer surfaces all of this. */
+  .site-shell-corner--top-right .preference-controls,
+  .site-shell-corner--top-right .quick-settings-link {
     display: none;
   }
 
@@ -15933,3 +15980,302 @@
   }
 }
 
+/* =====================================================================
+ * Phase 5 v0 batch — page-by-page section-heading shrink
+ * ---------------------------------------------------------------------
+ * Each block below is scoped to a single route's bespoke heading
+ * container (NOT the global .section-heading rule, which stays intact
+ * for any page that still relies on the original large hero ramp).
+ *
+ * Shared targets (mirroring the .public-issues-section pattern that
+ * already shipped on /issues + /events):
+ *   - h1   -> clamp(22px, 2.4vw, 30px), line-height 1.18, margin 0
+ *   - eyebrow -> 11px / 0.12em letter-spacing
+ *   - intro p -> 13.5px muted, single-line ellipsis clamp on desktop,
+ *                two lines under 720px (impact gets one extra line)
+ *   - heading gap -> 4px; section gap -> 14px (impact: 18px)
+ *
+ * Pages skipped (audit returned empty cssBlock):
+ *   - /me/preview  (identity card, not a Phase 5 heading band)
+ * ===================================================================== */
+
+/* ---- /me ---- */
+.me-section .section-heading {
+  position: static;
+  display: grid;
+  gap: 4px;
+}
+
+.me-section .section-heading h1 {
+  margin: 0;
+  font-size: clamp(22px, 2.4vw, 30px);
+  line-height: 1.18;
+  letter-spacing: 0;
+}
+
+.me-section .section-heading p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--muted);
+  max-width: 100%;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  overflow: hidden;
+}
+
+@media (max-width: 720px) {
+  .me-section .section-heading p {
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+}
+
+.me-section {
+  gap: 14px;
+}
+
+/* ---- /calendar ---- */
+.calendar-section {
+  gap: 14px;
+}
+
+.calendar-section .calendar-hero {
+  gap: 4px;
+}
+
+.calendar-section .calendar-hero .eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+}
+
+.calendar-section .calendar-hero h1 {
+  margin: 0;
+  font-size: clamp(22px, 2.4vw, 30px);
+  line-height: 1.18;
+}
+
+.calendar-section .calendar-hero p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--muted);
+  max-width: 100%;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  overflow: hidden;
+}
+
+@media (max-width: 720px) {
+  .calendar-section .calendar-hero p {
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+}
+
+/* ---- /impact ---- */
+.impact-section {
+  gap: 18px;
+}
+
+.impact-section .impact-hero {
+  gap: 4px;
+}
+
+.impact-section .impact-hero .eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+}
+
+.impact-section .impact-hero h1 {
+  margin: 0;
+  font-size: clamp(22px, 2.4vw, 30px);
+  line-height: 1.18;
+  max-width: 28ch;
+}
+
+.impact-section .impact-hero p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--muted);
+  max-width: 64ch;
+  /* Two-line clamp on desktop — impact intro is a full mission
+   * sentence, not a label-style sub-line, so allow it to breathe
+   * one extra line vs /issues. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
+@media (max-width: 720px) {
+  .impact-section .impact-hero p {
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+  }
+}
+
+/* ---- /stories ---- */
+.stories-section {
+  gap: 14px;
+}
+
+.stories-hero {
+  gap: 4px;
+}
+
+.stories-hero .eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+}
+
+.stories-hero h1 {
+  margin: 0;
+  font-size: clamp(22px, 2.4vw, 30px);
+  line-height: 1.18;
+}
+
+.stories-hero p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--muted);
+  max-width: 60ch;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  overflow: hidden;
+}
+
+@media (max-width: 720px) {
+  .stories-hero p {
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+}
+
+/* ---- /ledger ---- */
+.ledger-page .ledger-hero {
+  display: grid;
+  gap: 4px;
+  margin: 0 0 14px;
+}
+
+.ledger-page .ledger-hero .eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  margin-bottom: 0;
+}
+
+.ledger-page .ledger-hero h1 {
+  margin: 0;
+  font-size: clamp(22px, 2.4vw, 30px);
+  line-height: 1.18;
+}
+
+.ledger-page .ledger-hero p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--muted);
+  max-width: 100%;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  overflow: hidden;
+}
+
+@media (max-width: 720px) {
+  .ledger-page .ledger-hero p {
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+}
+
+/* ---- /feedback (+ shared dual-pane forms: /contact, /issues/new) ---- */
+.form-page-layout .form-card-heading {
+  gap: 4px;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+}
+
+.form-page-layout .form-card-heading .eyebrow {
+  margin-bottom: 0;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+}
+
+.form-page-layout .form-card-heading h1 {
+  margin: 0;
+  font-size: clamp(22px, 2.4vw, 30px);
+  line-height: 1.18;
+}
+
+.form-page-layout .form-card-heading p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--muted);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  overflow: hidden;
+}
+
+@media (max-width: 720px) {
+  .form-page-layout .form-card-heading p {
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+}
+
+/* ---- /polls ---- */
+.polls-page {
+  display: grid;
+  gap: 14px;
+}
+
+.polls-page .polls-hero {
+  display: grid;
+  gap: 4px;
+}
+
+.polls-page .polls-hero .eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+}
+
+.polls-page .polls-hero h1 {
+  margin: 0;
+  font-size: clamp(22px, 2.4vw, 30px);
+  line-height: 1.18;
+}
+
+.polls-page .polls-hero p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--muted);
+  max-width: 100%;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  overflow: hidden;
+}
+
+@media (max-width: 720px) {
+  .polls-page .polls-hero p {
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+}
