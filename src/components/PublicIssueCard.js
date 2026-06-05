@@ -72,7 +72,7 @@ export function PublicIssueCard({ issue: rawIssue, content, language }) {
         <Link
           aria-label={accessibleLabel}
           className="public-issue-card-cover"
-          href={`/issues/${issue.id}`}
+          href={`/issues/${issue.slug ?? issue.id}`}
         >
           <Image
             alt={accessibleLabel}
@@ -88,7 +88,7 @@ export function PublicIssueCard({ issue: rawIssue, content, language }) {
         <Link
           aria-label={accessibleLabel}
           className="public-issue-card-cover public-issue-card-cover-map"
-          href={`/issues/${issue.id}`}
+          href={`/issues/${issue.slug ?? issue.id}`}
         >
           <IssueMapThumb
             latitude={issue.latitude}
@@ -100,7 +100,7 @@ export function PublicIssueCard({ issue: rawIssue, content, language }) {
         <Link
           aria-label={accessibleLabel}
           className="public-issue-card-cover public-issue-card-cover-placeholder"
-          href={`/issues/${issue.id}`}
+          href={`/issues/${issue.slug ?? issue.id}`}
         >
           <PictureOutlined aria-hidden="true" />
         </Link>
@@ -115,7 +115,7 @@ export function PublicIssueCard({ issue: rawIssue, content, language }) {
         <Tag className="public-issue-card-category">{categoryLabel}</Tag>
       </div>
       <h3>
-        <Link className="public-issue-card-title" href={`/issues/${issue.id}`}>
+        <Link className="public-issue-card-title" href={`/issues/${issue.slug ?? issue.id}`}>
           {issue.title || accessibleLabel}
         </Link>
       </h3>
@@ -131,7 +131,7 @@ export function PublicIssueCard({ issue: rawIssue, content, language }) {
           issueId={issue.id}
           language={language}
         />
-        <Link className="card-link" href={`/issues/${issue.id}`}>
+        <Link className="card-link" href={`/issues/${issue.slug ?? issue.id}`}>
           {content.card.viewDetail} <ArrowRightOutlined />
         </Link>
       </div>

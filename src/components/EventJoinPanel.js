@@ -178,7 +178,7 @@ export function EventJoinPanel({ event, language = "np", onJoined }) {
   }
 
   if (!viewerId) {
-    const next = encodeURIComponent(`/events/${event?.id || ""}`);
+    const next = encodeURIComponent(`/events/${event?.slug ?? event?.id ?? ""}`);
     return (
       <div className="event-join-panel event-join-panel-anon">
         <span>{t.loginPrompt}</span>

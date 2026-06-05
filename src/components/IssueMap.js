@@ -131,7 +131,7 @@ function IssueMarker({ issue: rawIssue, interactive, showPopup, content, languag
             </div>
             {issue.title ? (
               <Link
-                href={`/issues/${issue.id}`}
+                href={`/issues/${issue.slug ?? issue.id}`}
                 className="issue-map-popup-title"
               >
                 {issue.title}
@@ -144,7 +144,7 @@ function IssueMarker({ issue: rawIssue, interactive, showPopup, content, languag
               <div className="issue-map-popup-footer">
                 <span className="issue-map-popup-votes">{voteText}</span>
                 <Link
-                  href={`/issues/${issue.id}`}
+                  href={`/issues/${issue.slug ?? issue.id}`}
                   className="issue-map-popup-link"
                 >
                   {content?.card?.viewDetail || "View"} →

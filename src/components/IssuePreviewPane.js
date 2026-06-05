@@ -256,7 +256,7 @@ export function IssuePreviewPane({
           <h2 id="issue-preview-title">
             <Link
               className="event-preview-title-link"
-              href={`/issues/${issue.id}`}
+              href={`/issues/${issue.slug ?? issue.id}`}
             >
               {issue.title}
             </Link>
@@ -352,7 +352,7 @@ export function IssuePreviewPane({
             />
             <Link
               className="event-preview-open"
-              href={`/issues/${issue.id}`}
+              href={`/issues/${issue.slug ?? issue.id}`}
             >
               {preview.openFull}{" "}
               <ArrowRightOutlined aria-hidden="true" />

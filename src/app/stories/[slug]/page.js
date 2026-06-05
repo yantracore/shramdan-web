@@ -105,7 +105,7 @@ export default function StoryDetailPage() {
 
         {linkedEvent ? (
           <aside className="story-detail-source">
-            <Link href={`/events/${linkedEvent.id}`}>
+            <Link href={`/events/${linkedEvent.slug ?? linkedEvent.id}`}>
               <Button type="primary" icon={<ArrowRightOutlined />}>
                 {t.eventLink}
               </Button>

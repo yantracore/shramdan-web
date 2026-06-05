@@ -273,10 +273,11 @@ export default function NewIssuePage() {
       messageApi.success(labels.successMessage);
       clearDraft();
       setSavedAt(null);
-      const newId = response?.data?.id ?? response?.id;
+      const created = response?.data ?? response;
+      const newSlugOrId = created?.slug ?? created?.id;
 
-      if (newId) {
-        router.push(`/issues/${newId}`);
+      if (newSlugOrId) {
+        router.push(`/issues/${newSlugOrId}`);
       } else {
         router.push("/issues");
       }

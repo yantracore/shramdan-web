@@ -206,7 +206,7 @@ export function ContributionIntentPanel({ event, language = "np", onChanged }) {
           <div className="contribution-intent-anon">
             <span>{t.loginPrompt}</span>
             <Link
-              href={`/login?next=${encodeURIComponent(`/events/${event?.id || ""}`)}`}
+              href={`/login?next=${encodeURIComponent(`/events/${event?.slug ?? event?.id ?? ""}`)}`}
             >
               <Button type="primary">{t.loginCta}</Button>
             </Link>

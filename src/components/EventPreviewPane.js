@@ -257,7 +257,7 @@ export function EventPreviewPane({
 
       <div className="event-preview-body">
         <h2 id="event-preview-title">
-          <Link className="event-preview-title-link" href={`/events/${event.id}`}>
+          <Link className="event-preview-title-link" href={`/events/${event.slug ?? event.id}`}>
             {event.title}
           </Link>
         </h2>
@@ -408,7 +408,7 @@ export function EventPreviewPane({
         <div className="event-preview-actions">
           <Link
             className="event-preview-open"
-            href={`/events/${event.id}`}
+            href={`/events/${event.slug ?? event.id}`}
           >
             {t.preview.openFull} <ArrowRightOutlined aria-hidden="true" />
           </Link>

@@ -88,7 +88,7 @@ export default function MeSavedPage() {
               const meta = getDemoIssueById(id);
               return (
                 <li key={id} className="saved-row">
-                  <Link href={`/issues/${id}`} className="saved-row-link">
+                  <Link href={`/issues/${meta?.slug ?? id}`} className="saved-row-link">
                     <span className="saved-row-label">{t.issueLabel}</span>
                     <strong className="saved-row-title">
                       {meta?.title || id}
@@ -100,7 +100,7 @@ export default function MeSavedPage() {
                     ) : null}
                   </Link>
                   <div className="saved-row-actions">
-                    <Link href={`/issues/${id}`} className="saved-row-view">
+                    <Link href={`/issues/${meta?.slug ?? id}`} className="saved-row-view">
                       {t.viewLabel} <ArrowRightOutlined />
                     </Link>
                     <button

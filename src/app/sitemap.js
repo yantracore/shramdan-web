@@ -33,12 +33,12 @@ async function fetchPublicList(endpoint) {
 function withLastMod(items) {
   return items
     .map((item) => {
-      const id = item?.id || item?.uuid || item?.slug;
-      if (!id) return null;
+      const slugOrId = item?.slug || item?.id || item?.uuid;
+      if (!slugOrId) return null;
       const lastModRaw =
         item?.updatedAt || item?.modifiedAt || item?.createdAt || null;
       const lastModified = lastModRaw ? new Date(lastModRaw) : undefined;
-      return { id, lastModified };
+      return { slugOrId, lastModified };
     })
     .filter(Boolean);
 }
@@ -66,15 +66,15 @@ export default async function sitemap() {
     fetchPublicList("/events?limit=500")
   ]);
 
-  const issueEntries = withLastMod(issues).map(({ id, lastModified }) => ({
-    url: `${SITE_URL}/issues/${id}`,
+  const issueEntries = withLastMod(issues).map(({ slugOrId, lastModified }) => ({
+    url: `${SITE_URL}/issues/${slugOrId}`,
     lastModified: lastModified || now,
     changeFrequency: "weekly",
     priority: 0.6
   }));
 
-  const eventEntries = withLastMod(events).map(({ id, lastModified }) => ({
-    url: `${SITE_URL}/events/${id}`,
+  const eventEntries = withLastMod(events).map(({ slugOrId, lastModified }) => ({
+    url: `${SITE_URL}/events/${slugOrId}`,
     lastModified: lastModified || now,
     changeFrequency: "weekly",
     priority: 0.6

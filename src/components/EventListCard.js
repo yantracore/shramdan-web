@@ -192,7 +192,7 @@ export const EventListCard = forwardRef(function EventListCard(
         </p>
       </div>
       <Link
-        href={`/events/${event.id}`}
+        href={`/events/${event.slug ?? event.id}`}
         className="sr-only"
         tabIndex={-1}
         aria-hidden="true"

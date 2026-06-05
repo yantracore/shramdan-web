@@ -144,7 +144,7 @@ export const IssueListCard = forwardRef(function IssueListCard(
         </p>
       </div>
       <Link
-        href={`/issues/${issue.id}`}
+        href={`/issues/${issue.slug ?? issue.id}`}
         className="sr-only"
         tabIndex={-1}
         aria-hidden="true"
