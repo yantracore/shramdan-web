@@ -457,12 +457,14 @@
 /* --- StickyActionBar -----------------------------------------------
  * Mobile-first sticky bottom action. Slides up when the user has
  * scrolled past the in-flow primary CTA (~480px). Glass-tinted chrome.
- * Desktop: bottom-right pill. Mobile: full-width bar.
+ * Desktop: bottom-right pill, stacked ABOVE the global QuickActionFab
+ * (bottom: 18px) so the page-specific CTA and global "+" don't overlap.
+ * Mobile: full-width bar (FAB is pushed to bottom: 84px there).
  */
 
 .sticky-action-bar {
   position: fixed;
-  bottom: 16px;
+  bottom: 84px;
   right: 16px;
   z-index: var(--z-sticky);
   pointer-events: none;
