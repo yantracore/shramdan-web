@@ -57,37 +57,52 @@
   box-shadow: 0 8px 24px rgba(23, 33, 28, 0.08);
 }
 
+/* Corner outer wrappers are flush to their respective walls — no inset.
+ * Per-corner inner chips round ONLY the inward-facing corner, and drop
+ * the border on the two wall-facing edges so the chip reads as part of
+ * the screen edge instead of a floating pill. */
 .site-shell-corner--top-left {
-  top: var(--corner-inset);
-  left: var(--corner-inset);
+  top: 0;
+  left: 0;
 }
 
 .site-shell-corner--top-right {
-  top: var(--corner-inset);
-  right: var(--corner-inset);
+  top: 0;
+  right: 0;
 }
 
 .site-shell-corner--bottom-left {
-  bottom: var(--corner-inset);
-  left: var(--corner-inset);
+  bottom: 0;
+  left: 0;
 }
 
 .site-shell-corner--bottom-right {
-  bottom: var(--corner-inset);
-  right: var(--corner-inset);
-  /* BR holds floating widgets (FAB + BackToTop) that own their own
-   * visual styling; no glass chip wrapper here. */
-  background: transparent;
-  border: 0;
-  padding: 0;
-  box-shadow: none;
+  bottom: 0;
+  right: 0;
 }
 
-/* Scroll-hide only the TOP corners. Bottom corners stay reachable.
- * `:not(:focus-within)` honours WCAG 2.4.11 (focus must not be obscured). */
-.site-shell-corner--top-left.is-hidden:not(:focus-within),
-.site-shell-corner--top-right.is-hidden:not(:focus-within) {
-  transform: translateY(calc(-100% - var(--corner-inset)));
+.site-shell-corner--top-left .site-shell-corner__inner {
+  border-radius: 0 0 14px 0;
+  border-top-width: 0;
+  border-left-width: 0;
+}
+
+.site-shell-corner--top-right .site-shell-corner__inner {
+  border-radius: 0 0 0 14px;
+  border-top-width: 0;
+  border-right-width: 0;
+}
+
+.site-shell-corner--bottom-left .site-shell-corner__inner {
+  border-radius: 0 14px 0 0;
+  border-bottom-width: 0;
+  border-left-width: 0;
+}
+
+.site-shell-corner--bottom-right .site-shell-corner__inner {
+  border-radius: 14px 0 0 0;
+  border-bottom-width: 0;
+  border-right-width: 0;
 }
 
 /* Brand inside corner-tl. */
@@ -183,6 +198,85 @@
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary) 18%, transparent);
 }
 
+/* Highlighted pill item — the build-the-app CTA at the current phase.
+ * Filled accent surface, soft pulsing glow ring, leading bolt icon, and a
+ * small "LIVE" badge in the corner. Distinct from `.is-active` (which is
+ * the current page) so both states can co-exist when the user is *on*
+ * /app-development. */
+.site-shell-pill a.is-highlight {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--accent) 80%, var(--primary)) 0%,
+    var(--primary) 100%
+  );
+  color: #fff;
+  box-shadow:
+    0 4px 14px color-mix(in srgb, var(--accent) 38%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--accent) 32%, transparent);
+  padding-right: 36px;
+}
+
+.site-shell-pill a.is-highlight:hover,
+.site-shell-pill a.is-highlight:focus-visible {
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow:
+    0 8px 22px color-mix(in srgb, var(--accent) 48%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--accent) 48%, transparent);
+}
+
+.site-shell-pill__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.site-shell-pill__icon {
+  font-size: 13px;
+  opacity: 0.92;
+}
+
+.site-shell-pill__badge {
+  position: absolute;
+  top: -6px;
+  right: -2px;
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--accent);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+}
+
+.site-shell-pill__badge::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-right: 4px;
+  border-radius: 999px;
+  background: var(--accent);
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 80%, transparent);
+  animation: shell-pill-badge-pulse 1.8s ease-out infinite;
+}
+
+@keyframes shell-pill-badge-pulse {
+  0%   { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 70%, transparent); }
+  70%  { box-shadow: 0 0 0 6px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-shell-pill__badge::before {
+    animation: none;
+  }
+}
+
 /* Pill entrance: starts shifted up + scaled + transparent; resting state
  * is reached when `.is-entering` is removed by the effect on first paint. */
 .site-shell-pill.is-entering {
@@ -238,21 +332,233 @@
   transform: translateY(-1px);
 }
 
-/* `--inline` modifiers neutralise the fixed-position rules so the widgets
- * become flex children of site-shell-corner--bottom-right. */
-.quick-fab.quick-fab--inline,
+/* --- Apps Start Menu (BL corner) -------------------------------------
+ * The BL chip morphs in place into a full start-menu surface — no
+ * popover, no dropdown. We extend .site-shell-corner__inner so the chip
+ * keeps the wall-attached glass + inward-rounding from the corner shell
+ * and animate dimensions + padding to grow the panel outward (rightward
+ * + upward) from the bottom-left anchor. */
+.site-shell-corner--bottom-left .apps-start-menu {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-end;
+  gap: 0;
+  max-width: 62px;
+  max-height: 54px;
+  width: max-content;
+  padding: 8px 12px;
+  overflow: hidden;
+  transition:
+    max-width 360ms cubic-bezier(0.22, 1, 0.36, 1),
+    max-height 360ms cubic-bezier(0.22, 1, 0.36, 1),
+    padding 360ms cubic-bezier(0.22, 1, 0.36, 1),
+    gap 240ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.site-shell-corner--bottom-left .apps-start-menu.is-expanded {
+  max-width: 420px;
+  max-height: 480px;
+  width: 420px;
+  padding: 18px;
+  gap: 14px;
+}
+
+.apps-start-menu__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 38px;
+  flex-shrink: 0;
+}
+
+.apps-start-menu__trigger {
+  flex-shrink: 0;
+  transition: background 160ms ease, color 160ms ease, transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.apps-start-menu.is-expanded .apps-start-menu__trigger {
+  background: color-mix(in srgb, var(--primary) 14%, var(--surface));
+  color: var(--primary-dark);
+}
+
+.apps-start-menu__title {
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1;
+  color: var(--text);
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(-6px);
+  pointer-events: none;
+  transition: opacity 200ms ease, transform 200ms ease;
+}
+
+.apps-start-menu.is-expanded .apps-start-menu__title {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+  transition: opacity 220ms ease 180ms, transform 220ms ease 180ms;
+}
+
+.apps-start-menu__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  flex: 1 1 auto;
+  min-height: 0;
+  align-content: start;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms ease;
+}
+
+.apps-start-menu.is-expanded .apps-start-menu__grid {
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 260ms ease 160ms;
+}
+
+.apps-start-tile {
+  display: grid;
+  grid-template-rows: auto auto;
+  align-content: center;
+  justify-items: center;
+  gap: 8px;
+  padding: 16px 10px;
+  border: 1px solid color-mix(in srgb, var(--line) 55%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  color: var(--text);
+  text-align: center;
+  text-decoration: none;
+  font: inherit;
+  font-weight: 650;
+  font-size: 13px;
+  line-height: 1.25;
+  cursor: pointer;
+  transition: background 160ms ease, border-color 160ms ease, transform 160ms ease,
+    box-shadow 160ms ease, color 160ms ease;
+}
+
+.apps-start-tile:hover,
+.apps-start-tile:focus-visible {
+  background: color-mix(in srgb, var(--primary) 10%, var(--surface));
+  border-color: color-mix(in srgb, var(--primary) 35%, var(--line));
+  color: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(23, 33, 28, 0.1);
+  outline: none;
+}
+
+.apps-start-tile__icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--primary) 14%, var(--surface));
+  color: var(--primary-dark);
+  font-size: 20px;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.apps-start-tile:hover .apps-start-tile__icon,
+.apps-start-tile:focus-visible .apps-start-tile__icon {
+  background: var(--primary);
+  color: #fff;
+}
+
+.apps-start-tile__label {
+  display: block;
+  word-break: break-word;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-shell-corner--bottom-left .apps-start-menu,
+  .apps-start-menu__title,
+  .apps-start-menu__grid,
+  .apps-start-tile,
+  .apps-start-tile__icon {
+    transition: none !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .site-shell-corner--bottom-left .apps-start-menu.is-expanded {
+    max-width: min(92vw, 360px);
+    width: min(92vw, 360px);
+    max-height: 70vh;
+  }
+}
+
+/* `--inline` modifier neutralises BackToTop's fixed-position rules so it
+ * lives as a normal flex child of site-shell-corner--bottom-right's chip
+ * and matches the .user-icon-trigger button style. */
 .back-to-top.back-to-top--inline {
   position: static;
   right: auto;
   bottom: auto;
   z-index: auto;
+  width: 38px;
+  height: 38px;
+  font-size: 16px;
+  opacity: 1;
+  pointer-events: auto;
+  transform: none;
+  border: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  box-shadow: none;
+  transition: background 160ms ease, color 160ms ease, transform 160ms ease;
 }
 
-.site-shell-corner--bottom-right {
-  /* Stack widgets vertically so QuickActionFab sits below the slim
-   * BackToTop chip and reads as a primary CTA. */
-  flex-direction: column-reverse;
-  align-items: flex-end;
+.back-to-top.back-to-top--inline:hover {
+  background: color-mix(in srgb, var(--primary) 12%, var(--surface));
+  color: var(--primary-dark);
+  border-color: color-mix(in srgb, var(--line) 70%, transparent);
+  transform: translateY(-1px);
+}
+
+/* Corner dropdown menus slide IN from the screen edge they're anchored
+ * to — TR menus enter from the right, BL menu enters from the left. We
+ * override AntD's default vertical slide motion (transform on the
+ * portal overlay) and animate the inner menu/popover instead. */
+.site-corner-menu .ant-dropdown-menu,
+.site-corner-menu .ant-popover-inner,
+.site-corner-menu .ant-popover-arrow {
+  transform-origin: center;
+}
+
+.site-corner-menu--from-right .ant-dropdown-menu,
+.site-corner-menu--from-right .ant-popover-inner {
+  animation: site-corner-menu-from-right 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.site-corner-menu--from-left .ant-dropdown-menu,
+.site-corner-menu--from-left .ant-popover-inner {
+  animation: site-corner-menu-from-left 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes site-corner-menu-from-right {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes site-corner-menu-from-left {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 /* Accessibility + system-preference fallbacks for the corner shell. */
@@ -270,8 +576,12 @@
     opacity: 1;
     transform: none;
   }
-  .site-shell-corner.is-hidden {
-    transform: none !important;
+  .site-corner-menu--from-right .ant-dropdown-menu,
+  .site-corner-menu--from-right .ant-popover-inner,
+  .site-corner-menu--from-left .ant-dropdown-menu,
+  .site-corner-menu--from-left .ant-popover-inner,
+  .mobile-menu-panel {
+    animation: none !important;
   }
 }
 
@@ -343,8 +653,8 @@
  * ancestor — use position:fixed against the viewport instead. */
 .mobile-menu-panel {
   position: fixed;
-  top: calc(var(--corner-inset) + 56px);
-  right: var(--corner-inset);
+  top: 64px;
+  right: 12px;
   display: grid;
   gap: 8px;
   min-width: 220px;
@@ -356,6 +666,7 @@
   backdrop-filter: blur(14px);
   box-shadow: 0 24px 60px rgba(23, 33, 28, 0.2);
   max-width: calc(100vw - 16px);
+  animation: site-corner-menu-from-right 280ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .mobile-menu-panel a,
@@ -8244,6 +8555,69 @@
 
 /* Issues page — toolbar + split layout */
 
+/* "Searching: <query>" chip surfaces the active text filter passed in
+ * via ?q= (typically from the homepage search box). Clear button reverts
+ * to the full list. Glass treatment per CC-1 keeps it consistent with
+ * the rest of the shell. */
+.public-issues-search-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px 8px 14px;
+  margin-bottom: 14px;
+  border: 1px solid color-mix(in srgb, var(--primary) 30%, var(--line));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--primary) 8%, color-mix(in srgb, var(--surface) 76%, transparent));
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  color: var(--primary-dark);
+  font-size: 14px;
+  font-weight: 650;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.public-issues-search-chip-label {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.public-issues-search-chip strong {
+  font-weight: 800;
+  color: var(--primary-dark);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 48ch;
+}
+
+.public-issues-search-chip-clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  color: var(--muted);
+  cursor: pointer;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.public-issues-search-chip-clear:hover {
+  background: color-mix(in srgb, var(--primary) 16%, var(--surface));
+  color: var(--primary-dark);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .public-issues-search-chip {
+    background: color-mix(in srgb, var(--primary) 8%, var(--surface));
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
 .public-issues-toolbar {
   display: flex;
   flex-direction: column;
@@ -13806,6 +14180,360 @@
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   color: var(--text);
+}
+
+/* --- /app-development — builders' Shramdan board --------------------- */
+/* Discussion + voting board for app-dev tasks. Card grid mirrors the
+ * event/issue list shape so the surface reads familiar, with a hero "live
+ * build" callout, sort + category filter toolbar, and vote/comment/take-
+ * lead actions per card. Backed by docs/api-requirements/app-development.md. */
+
+.app-dev-section {
+  display: grid;
+  gap: 24px;
+  padding-bottom: 96px;
+}
+
+.app-dev-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: stretch;
+}
+
+.app-dev-hero__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.app-dev-hero__copy h1 {
+  font-size: clamp(28px, 3.4vw, 40px);
+  line-height: 1.1;
+  margin: 0;
+}
+
+.app-dev-hero__copy p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: color-mix(in srgb, var(--text) 78%, transparent);
+  max-width: 64ch;
+}
+
+.app-dev-hero__live {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px;
+  border-radius: 16px;
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  background: linear-gradient(
+    150deg,
+    color-mix(in srgb, var(--accent) 14%, var(--surface)) 0%,
+    color-mix(in srgb, var(--surface) 92%, transparent) 100%
+  );
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.app-dev-hero__live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.app-dev-hero__live p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: color-mix(in srgb, var(--text) 80%, transparent);
+}
+
+.app-dev-toolbar {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+}
+
+.app-dev-toolbar__filters {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.app-dev-toolbar__filters-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--text) 60%, transparent);
+}
+
+.app-dev-chip-row {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.app-dev-chip {
+  appearance: none;
+  border: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 11px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 140ms ease, border-color 140ms ease, color 140ms ease;
+}
+
+.app-dev-chip:hover {
+  border-color: color-mix(in srgb, var(--primary) 40%, var(--line));
+  color: var(--primary-dark);
+}
+
+.app-dev-chip.is-active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.app-dev-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(440px, 100%), 1fr));
+  gap: 20px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.app-dev-card {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 0;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  overflow: hidden;
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.app-dev-card:hover {
+  border-color: color-mix(in srgb, var(--primary) 30%, var(--line));
+  box-shadow: 0 8px 24px rgba(23, 33, 28, 0.08);
+  transform: translateY(-1px);
+}
+
+.app-dev-card__media {
+  position: relative;
+  overflow: hidden;
+  background: var(--surface-soft);
+}
+
+.app-dev-card__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.app-dev-status {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  color: var(--text);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+.app-dev-status--proposed { color: var(--muted); }
+.app-dev-status--discussion { color: #1d4ed8; }
+.app-dev-status--accepted { color: #047857; }
+.app-dev-status--in_progress { color: #b45309; }
+.app-dev-status--shipped { color: #065f46; background: color-mix(in srgb, #d1fae5 80%, transparent); }
+.app-dev-status--parked { color: #6b7280; }
+
+.app-dev-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 18px;
+  min-width: 0;
+}
+
+.app-dev-card__meta {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.app-dev-branch {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--text) 70%, transparent);
+  background: color-mix(in srgb, var(--text) 6%, transparent);
+}
+
+.app-dev-card__title {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.3;
+}
+
+.app-dev-card__title a {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.app-dev-card__title a:hover {
+  color: var(--primary);
+}
+
+.app-dev-card__summary {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: color-mix(in srgb, var(--text) 78%, transparent);
+}
+
+.app-dev-card__skills {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  font-size: 12px;
+}
+
+.app-dev-card__skills-label {
+  font-weight: 700;
+  color: color-mix(in srgb, var(--text) 60%, transparent);
+}
+
+.app-dev-skill {
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--primary-dark);
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+}
+
+.app-dev-card__footer {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 10px;
+  border-top: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+  flex-wrap: wrap;
+}
+
+.app-dev-card__leader {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: color-mix(in srgb, var(--text) 72%, transparent);
+}
+
+.app-dev-card__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.app-dev-vote,
+.app-dev-comment {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 140ms ease, border-color 140ms ease, color 140ms ease, transform 140ms ease;
+}
+
+.app-dev-vote:hover,
+.app-dev-comment:hover {
+  border-color: color-mix(in srgb, var(--primary) 40%, var(--line));
+  color: var(--primary-dark);
+  transform: translateY(-1px);
+}
+
+.app-dev-vote.is-voted {
+  background: color-mix(in srgb, var(--primary) 14%, var(--surface));
+  border-color: color-mix(in srgb, var(--primary) 50%, transparent);
+  color: var(--primary-dark);
+}
+
+.app-dev-vote__label,
+.app-dev-comment__label {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .app-dev-vote__label,
+  .app-dev-comment__label {
+    display: inline;
+  }
+}
+
+.app-dev-empty {
+  padding: 64px 24px;
+  border: 1px dashed var(--line);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+}
+
+@media (max-width: 880px) {
+  .app-dev-hero {
+    grid-template-columns: 1fr;
+  }
+  .app-dev-toolbar {
+    grid-template-columns: 1fr;
+  }
+  .app-dev-card {
+    grid-template-columns: 1fr;
+  }
+  .app-dev-card__media {
+    aspect-ratio: 16 / 9;
+  }
 }
 
 /* --- /resources directory page --------------------------------------- */

@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { PlusOutlined } from "@ant-design/icons";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { CloseOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import { Button, Select } from "antd";
 import { SiteShell } from "@/components/SiteShell";
 import { ActivityTypeTabs } from "@/components/ActivityTypeTabs";
@@ -63,7 +63,9 @@ const PAGE_COPY = {
       viewSwitchAriaLabel: "दृश्य मोड",
       viewListPreview: "सूची",
       viewMap: "नक्सा",
-      viewThumbnails: "थम्बनेल"
+      viewThumbnails: "थम्बनेल",
+      searchingPrefix: "खोज्दै:",
+      clearSearch: "खोज खाली गर्नुहोस्"
     },
     categoryLabels: {
       ROADSIDE: "सडक र फुटपाथ",
@@ -150,7 +152,9 @@ const PAGE_COPY = {
       viewSwitchAriaLabel: "View mode",
       viewListPreview: "List",
       viewMap: "Map",
-      viewThumbnails: "Thumbnails"
+      viewThumbnails: "Thumbnails",
+      searchingPrefix: "Searching:",
+      clearSearch: "Clear search"
     },
     categoryLabels: {
       ROADSIDE: "Roadside",
@@ -233,19 +237,20 @@ function haversineKm(lat1, lon1, lat2, lon2) {
   return 2 * R * Math.asin(Math.sqrt(a));
 }
 
-export default function EventsListPage() {
+function EventsListPageContent() {
   const { language } = usePreferences();
   const t = PAGE_COPY[language] || PAGE_COPY.np;
   const router = useRouter();
   const searchParams = useSearchParams();
 
   // ----- filter state (status / category / district / sort + view) -------
-  // URL params: ?show=status&category=KEY&district=NAME&sort=VALUE&event=ID
+  // URL params: ?show=status&category=KEY&district=NAME&sort=VALUE&q=TEXT&event=ID
   const readFiltersFromUrl = useCallback(() => {
     const show = searchParams?.get("show");
     const categoryParam = searchParams?.get("category");
     const districtParam = searchParams?.get("district");
     const sortParam = searchParams?.get("sort");
+    const qParam = searchParams?.get("q");
     return {
       status: show && FILTER_KEYS.has(show) ? show : "all",
       category:
@@ -254,7 +259,8 @@ export default function EventsListPage() {
           : undefined,
       district: districtParam || undefined,
       sort:
-        sortParam && SORT_VALUES.has(sortParam) ? sortParam : "participantCount"
+        sortParam && SORT_VALUES.has(sortParam) ? sortParam : "participantCount",
+      q: qParam ? qParam.trim() : ""
     };
   }, [searchParams]);
 
@@ -266,7 +272,8 @@ export default function EventsListPage() {
       prev.status === next.status &&
       prev.category === next.category &&
       prev.district === next.district &&
-      prev.sort === next.sort
+      prev.sort === next.sort &&
+      prev.q === next.q
         ? prev
         : next
     );
@@ -313,6 +320,8 @@ export default function EventsListPage() {
       else params.delete("district");
       if (next.sort && next.sort !== "participantCount") params.set("sort", next.sort);
       else params.delete("sort");
+      if (next.q) params.set("q", next.q);
+      else params.delete("q");
       const query = params.toString();
       router.replace(query ? `/events?${query}` : "/events", { scroll: false });
     },
@@ -445,6 +454,18 @@ export default function EventsListPage() {
       filtered = filtered.filter(
         (entry) => entry.event.category === filters.category
       );
+    }
+    if (filters.q) {
+      // Substring match on title + addressText. Case-insensitive,
+      // Devanagari-safe because we compare against the original strings
+      // rather than ASCII-folded ones (matches what users type into the
+      // homepage search box).
+      const needle = filters.q.toLowerCase();
+      filtered = filtered.filter((entry) => {
+        const title = (entry.event.title || "").toLowerCase();
+        const addr = (entry.event.addressText || "").toLowerCase();
+        return title.includes(needle) || addr.includes(needle);
+      });
     }
     return filtered;
   }, [live, upcoming, past, filters, nearMe]);
@@ -717,6 +738,25 @@ export default function EventsListPage() {
           <p>{t.intro}</p>
         </div>
 
+        {filters.q ? (
+          <div className="public-issues-search-chip" role="status">
+            <SearchOutlined aria-hidden="true" />
+            <span className="public-issues-search-chip-label">
+              {t.filters.searchingPrefix}
+            </span>
+            <strong>{filters.q}</strong>
+            <button
+              type="button"
+              className="public-issues-search-chip-clear"
+              aria-label={t.filters.clearSearch}
+              title={t.filters.clearSearch}
+              onClick={() => applyFilters({ ...filters, q: "" })}
+            >
+              <CloseOutlined aria-hidden="true" />
+            </button>
+          </div>
+        ) : null}
+
         <div className="public-issues-toolbar">
           <ActivityStatsRow language={language} variant="events" />
           <div className="public-issues-context-row">
@@ -871,5 +911,13 @@ export default function EventsListPage() {
         ) : null}
       </section>
     </SiteShell>
+  );
+}
+
+export default function EventsListPage() {
+  return (
+    <Suspense fallback={null}>
+      <EventsListPageContent />
+    </Suspense>
   );
 }
