@@ -1,7 +1,15 @@
 .site-shell {
-  --header-height: 74px;
+  /* --header-height kept at 0 on desktop so legacy consumers don't push
+   * content down for a band that no longer exists. --corner-clear-zone is
+   * the new token sticky elements should pin against (covers the floating
+   * corner chip + breathing). */
+  --header-height: 0px;
+  --corner-clear-zone: 64px;
+  --corner-inset: 18px;
+  --corner-gap: 10px;
+  --corner-z: 50;
+  --pill-z: 55;
   min-height: 100vh;
-  padding-top: var(--header-height);
   /* `hidden` would make this a containing block for descendant `position: sticky`
    * elements and break pinning; `clip` does not. Hidden stays as fallback. */
   overflow-x: hidden;
@@ -11,33 +19,79 @@
     linear-gradient(180deg, var(--bg) 0%, var(--surface-soft) 100%);
 }
 
-.topbar {
+/* Banner is a landmark for AT but contributes no visual box of its own —
+ * the four corner blocks are independently positioned. */
+.site-shell-banner {
+  display: contents;
+}
+
+/* Outer corner wrapper: positioning + click pass-through. Empty space
+ * around the inner chip stays click-through to body content underneath. */
+.site-shell-corner {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 50;
-  display: grid;
-  grid-template-columns: auto 1fr auto;
+  z-index: var(--corner-z);
+  display: flex;
   align-items: center;
-  gap: 24px;
-  width: 100%;
-  min-height: var(--header-height);
-  padding: 14px max(16px, calc((100% - 1180px) / 2));
-  background: color-mix(in srgb, var(--bg) 88%, transparent);
-  backdrop-filter: blur(18px);
-  border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
-  transition: transform 220ms ease, box-shadow 220ms ease;
-  will-change: transform;
+  gap: var(--corner-gap);
+  pointer-events: none;
+  transition: transform 220ms ease;
 }
 
-.topbar-hidden {
-  transform: translateY(-100%);
+.site-shell-corner > *,
+.site-shell-corner__inner {
+  pointer-events: auto;
 }
 
+.site-shell-corner__inner {
+  display: flex;
+  align-items: center;
+  gap: var(--corner-gap);
+  min-height: 44px;
+  padding: 8px 12px;
+  /* Glass treatment — CC-1 cross-cutting principle. */
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border: 1px solid color-mix(in srgb, var(--line) 60%, transparent);
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(23, 33, 28, 0.08);
+}
+
+.site-shell-corner--top-left {
+  top: var(--corner-inset);
+  left: var(--corner-inset);
+}
+
+.site-shell-corner--top-right {
+  top: var(--corner-inset);
+  right: var(--corner-inset);
+}
+
+.site-shell-corner--bottom-left {
+  bottom: var(--corner-inset);
+  left: var(--corner-inset);
+}
+
+.site-shell-corner--bottom-right {
+  bottom: var(--corner-inset);
+  right: var(--corner-inset);
+  /* BR holds floating widgets (FAB + BackToTop) that own their own
+   * visual styling; no glass chip wrapper here. */
+  background: transparent;
+  border: 0;
+  padding: 0;
+  box-shadow: none;
+}
+
+/* Scroll-hide only the TOP corners. Bottom corners stay reachable.
+ * `:not(:focus-within)` honours WCAG 2.4.11 (focus must not be obscured). */
+.site-shell-corner--top-left.is-hidden:not(:focus-within),
+.site-shell-corner--top-right.is-hidden:not(:focus-within) {
+  transform: translateY(calc(-100% - var(--corner-inset)));
+}
+
+/* Brand inside corner-tl. */
 .brand,
-.nav-links,
-.toolbar,
 .hero-actions,
 .footer {
   display: flex;
@@ -49,6 +103,10 @@
   font-size: 20px;
   font-weight: 850;
   color: var(--primary-dark);
+}
+
+.brand-name {
+  white-space: nowrap;
 }
 
 .brand-mark {
@@ -71,69 +129,192 @@
   object-fit: contain;
 }
 
-.nav-links {
-  justify-content: center;
-  gap: 6px;
+/* Top-center pill nav — CSS-only visibility at >= 1180px so SSR/hydration
+ * stays stable; DOM is always present. */
+.site-shell-pill {
+  display: none;
+  position: fixed;
+  top: var(--corner-inset);
+  left: 50%;
+  z-index: var(--pill-z);
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
   color: var(--muted);
   font-size: 14px;
   font-weight: 650;
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border: 1px solid color-mix(in srgb, var(--line) 60%, transparent);
+  border-radius: 999px;
+  box-shadow: 0 12px 32px rgba(23, 33, 28, 0.1);
+  transform: translateX(-50%);
+  transition:
+    opacity 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.nav-links a {
+@media (min-width: 1180px) {
+  .site-shell-pill {
+    display: inline-flex;
+  }
+}
+
+.site-shell-pill a {
   position: relative;
   min-height: 38px;
-  padding: 9px 14px;
-  border-radius: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
   transition:
     background 180ms ease,
-    color 180ms ease,
-    box-shadow 180ms ease;
+    color 180ms ease;
 }
 
-.nav-links a::after {
-  position: absolute;
-  left: 50%;
-  bottom: 5px;
-  width: 18px;
-  height: 3px;
-  border-radius: 999px;
-  background: var(--accent);
-  content: "";
-  opacity: 0;
-  transform: translateX(-50%) scaleX(0.35);
-  transition:
-    opacity 180ms ease,
-    transform 180ms ease;
-}
-
-.nav-links a:hover {
+.site-shell-pill a:hover {
   color: var(--primary);
 }
 
-.nav-links a.is-active {
+.site-shell-pill a.is-active {
   background:
-    linear-gradient(180deg, color-mix(in srgb, var(--primary) 12%, transparent), transparent),
-    color-mix(in srgb, var(--surface) 78%, transparent);
+    linear-gradient(180deg, color-mix(in srgb, var(--primary) 14%, transparent), transparent),
+    color-mix(in srgb, var(--surface) 82%, transparent);
   color: var(--primary-dark);
-  box-shadow:
-    inset 0 0 0 1px color-mix(in srgb, var(--primary) 16%, transparent),
-    0 10px 24px rgba(23, 107, 92, 0.1);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary) 18%, transparent);
 }
 
-.nav-links a.is-active::after {
-  opacity: 1;
-  transform: translateX(-50%) scaleX(1);
+/* Pill entrance: starts shifted up + scaled + transparent; resting state
+ * is reached when `.is-entering` is removed by the effect on first paint. */
+.site-shell-pill.is-entering {
+  opacity: 0;
+  transform: translateX(-50%) translateY(-12px) scale(0.96);
 }
 
-.toolbar {
-  justify-content: flex-end;
-  gap: 10px;
+.site-shell-pill.is-entering a {
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 320ms ease, transform 320ms ease;
 }
+
+.site-shell-pill a {
+  transition:
+    background 180ms ease,
+    color 180ms ease,
+    opacity 320ms ease,
+    transform 320ms ease;
+}
+
+.site-shell-pill a:nth-child(1) { transition-delay: 0ms; }
+.site-shell-pill a:nth-child(2) { transition-delay: 60ms; }
+.site-shell-pill a:nth-child(3) { transition-delay: 120ms; }
+.site-shell-pill a:nth-child(4) { transition-delay: 180ms; }
+.site-shell-pill a:nth-child(5) { transition-delay: 240ms; }
 
 .preference-controls {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+.user-icon-trigger,
+.apps-grid-trigger {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  color: var(--text);
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.user-icon-trigger:hover,
+.apps-grid-trigger:hover {
+  background: color-mix(in srgb, var(--primary) 12%, var(--surface));
+  color: var(--primary-dark);
+  transform: translateY(-1px);
+}
+
+/* `--inline` modifiers neutralise the fixed-position rules so the widgets
+ * become flex children of site-shell-corner--bottom-right. */
+.quick-fab.quick-fab--inline,
+.back-to-top.back-to-top--inline {
+  position: static;
+  right: auto;
+  bottom: auto;
+  z-index: auto;
+}
+
+.site-shell-corner--bottom-right {
+  /* Stack widgets vertically so QuickActionFab sits below the slim
+   * BackToTop chip and reads as a primary CTA. */
+  flex-direction: column-reverse;
+  align-items: flex-end;
+}
+
+/* Accessibility + system-preference fallbacks for the corner shell. */
+@media (prefers-reduced-motion: reduce) {
+  .site-shell-corner,
+  .site-shell-pill,
+  .site-shell-pill a {
+    transition: none !important;
+  }
+  .site-shell-pill.is-entering {
+    opacity: 1;
+    transform: translateX(-50%);
+  }
+  .site-shell-pill.is-entering a {
+    opacity: 1;
+    transform: none;
+  }
+  .site-shell-corner.is-hidden {
+    transform: none !important;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .site-shell-corner__inner,
+  .site-shell-pill,
+  .mobile-menu-panel {
+    background: var(--surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .site-shell-corner__inner,
+  .site-shell-pill {
+    background: Canvas;
+    border: 1px solid CanvasText;
+  }
+  .site-shell-pill a.is-active {
+    background: Highlight;
+    color: HighlightText;
+  }
+}
+
+@media print {
+  .site-shell-corner,
+  .site-shell-pill,
+  .mobile-menu {
+    display: none !important;
+  }
+}
+
+/* chromeMode="corners-only" hides the pill but keeps the four corners
+ * (useful for cinematic intro pages that still want quick access). */
+.site-shell[data-chrome-mode="corners-only"] .site-shell-pill {
+  display: none !important;
+}
+
+/* chromeMode="none" hides everything except the skip-to-main link —
+ * reserved for fully immersive surfaces (e.g. a future map-only view). */
+.site-shell[data-chrome-mode="none"] .site-shell-banner {
+  display: none;
 }
 
 .mobile-menu {
@@ -143,12 +324,12 @@
 
 .mobile-menu summary {
   display: grid;
-  width: 40px;
-  height: 40px;
+  width: 38px;
+  height: 38px;
   place-items: center;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
   color: var(--text);
   cursor: pointer;
   list-style: none;
@@ -158,18 +339,23 @@
   display: none;
 }
 
+/* Banner is display:contents, so the panel needs an explicit positioning
+ * ancestor — use position:fixed against the viewport instead. */
 .mobile-menu-panel {
-  position: absolute;
-  right: 0;
-  top: 50px;
+  position: fixed;
+  top: calc(var(--corner-inset) + 56px);
+  right: var(--corner-inset);
   display: grid;
   gap: 8px;
   min-width: 220px;
   padding: 12px;
   border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--surface);
-  box-shadow: 0 18px 50px rgba(23, 33, 28, 0.16);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface) 96%, transparent);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 24px 60px rgba(23, 33, 28, 0.2);
+  max-width: calc(100vw - 16px);
 }
 
 .mobile-menu-panel a,
@@ -1144,7 +1330,7 @@
   gap: 18px;
   min-width: 0;
   padding: 24px;
-  scroll-margin-top: calc(var(--header-height) + 16px);
+  scroll-margin-top: calc(var(--corner-clear-zone, 64px) + 16px);
   background:
     linear-gradient(180deg, color-mix(in srgb, var(--surface) 98%, transparent), color-mix(in srgb, var(--surface-soft) 76%, transparent)),
     var(--surface);
@@ -5157,12 +5343,31 @@
     align-self: start;
   }
 
-  .topbar {
-    grid-template-columns: auto 1fr auto;
-    align-items: center;
-    gap: 16px;
-    min-height: var(--header-height);
-    padding-block: 8px;
+  /* Tablet / mobile collapse: the four-corner shell becomes a 56px-tall
+   * "compact bar" — top corners stay at left/right edges, BL hides
+   * entirely (apps grid moves into the mobile drawer), BR stays for
+   * FAB + BackToTop. */
+  .site-shell-corner--top-left,
+  .site-shell-corner--top-right {
+    top: 8px;
+  }
+
+  .site-shell-corner--top-left {
+    left: 8px;
+  }
+
+  .site-shell-corner--top-right {
+    right: 8px;
+  }
+
+  .site-shell-corner--bottom-left {
+    display: none;
+  }
+
+  .site-shell-corner__inner {
+    min-height: 40px;
+    padding: 6px 10px;
+    gap: 6px;
   }
 
   .brand {
@@ -5174,39 +5379,26 @@
   }
 
   .brand-mark {
-    width: 34px;
-    height: 34px;
+    width: 30px;
+    height: 30px;
   }
 
-  .toolbar,
-  .preference-controls {
-    align-items: center;
-  }
-
-  .nav-links,
-  .toolbar-cta {
+  .brand-name {
+    /* Narrow tablet: hide brand text, keep the mark. Brand text is
+     * available in the footer and the mobile drawer if needed. */
     display: none;
-  }
-
-  .toolbar {
-    justify-self: end;
   }
 
   .mobile-menu {
     display: grid;
     align-items: center;
-    justify-self: end;
     line-height: 0;
   }
 
   .mobile-menu summary {
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
     margin: 0;
-  }
-
-  .mobile-menu-panel {
-    top: calc(100% + 8px);
   }
 
   .hero-section,
@@ -5320,12 +5512,28 @@
     flex-shrink: 0;
   }
 
-  .topbar {
-    grid-template-columns: auto 1fr auto;
+  /* Narrowest viewports: hide Settings + Bell from corner-tr to keep
+   * the bar fitting at 360px. The mobile drawer surfaces both anyway. */
+  .site-shell-corner--top-right .preference-controls {
+    display: none;
   }
 
-  .toolbar {
-    display: none;
+  /* Backdrop-filter drops at 720px and below — low-end Android jank
+   * shows up at this width. Glass falls back to opaque-ish surfaces. */
+  .site-shell-corner__inner,
+  .site-shell-pill,
+  .mobile-menu-panel {
+    background: color-mix(in srgb, var(--surface) 99%, transparent);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  /* MobileBottomNav (60-80px tall) sits at the bottom on phones — shift
+   * the inline FAB + BackToTop chips above it. env() respects iOS notch /
+   * gesture bar via safe-area-inset-bottom. */
+  .site-shell-corner--bottom-right {
+    bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+    right: 12px;
   }
 
   .mobile-menu-preferences {
@@ -5371,11 +5579,6 @@
   .page-section,
   .footer {
     width: min(100% - 24px, 1180px);
-  }
-
-  .topbar {
-    gap: 14px;
-    padding-inline: 12px;
   }
 
   .hero-section {
@@ -14143,7 +14346,7 @@
 }
 
 @media print {
-  .topbar,
+  .site-shell-banner,
   .footer,
   .quick-fab,
   .notifications-trigger,

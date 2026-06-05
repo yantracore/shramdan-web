@@ -36,11 +36,12 @@ const COPY = {
 
 const HIDDEN_PREFIXES = ["/issues/new", "/admin", "/me", "/login", "/signup", "/donate"];
 
-export function QuickActionFab({ language = "np" }) {
+export function QuickActionFab({ language = "np", variant }) {
   const t = COPY[language] || COPY.np;
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const containerRef = useRef(null);
+  const variantClass = variant === "inline" ? " quick-fab--inline" : "";
 
   // Close menu on route change.
   useEffect(() => {
@@ -80,7 +81,7 @@ export function QuickActionFab({ language = "np" }) {
   ];
 
   return (
-    <div ref={containerRef} className={`quick-fab${open ? " is-open" : ""}`}>
+    <div ref={containerRef} className={`quick-fab${open ? " is-open" : ""}${variantClass}`}>
       {open ? (
         <div className="quick-fab-menu" role="menu">
           {actions.map(({ href, label, Icon, accent }) => (

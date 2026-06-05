@@ -110,10 +110,10 @@ export function IssuePreviewPane({
         const stickyTop =
           (parseInt(
             getComputedStyle(document.documentElement).getPropertyValue(
-              "--header-height"
-            ) || "74",
+              "--corner-clear-zone"
+            ) || "64",
             10
-          ) || 74) + 14;
+          ) || 64) + 14;
         if (rect.top < stickyTop - 4 || rect.top > window.innerHeight - 120) {
           node.scrollIntoView({
             block: "start",
@@ -132,22 +132,22 @@ export function IssuePreviewPane({
   useEffect(() => {
     const node = sentinelRef.current;
     if (!node || typeof IntersectionObserver === "undefined") return undefined;
-    const headerHeight =
+    const cornerClear =
       typeof window !== "undefined"
         ? parseInt(
             getComputedStyle(document.documentElement).getPropertyValue(
-              "--header-height"
-            ) || "74",
+              "--corner-clear-zone"
+            ) || "64",
             10
-          ) || 74
-        : 74;
+          ) || 64
+        : 64;
     const observer = new IntersectionObserver(
       ([entry]) => {
         setIsPinned(
           !entry.isIntersecting && entry.boundingClientRect.top < 0
         );
       },
-      { rootMargin: `-${headerHeight + 14}px 0px 0px 0px`, threshold: [0, 1] }
+      { rootMargin: `-${cornerClear + 14}px 0px 0px 0px`, threshold: [0, 1] }
     );
     observer.observe(node);
     return () => observer.disconnect();

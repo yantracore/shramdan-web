@@ -4,14 +4,20 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import {
   AppstoreOutlined,
   BellOutlined,
+  BookOutlined,
+  ControlOutlined,
   HeartOutlined,
   LogoutOutlined,
   MenuOutlined,
+  ReadOutlined,
+  RocketOutlined,
+  SettingOutlined,
   SolutionOutlined,
+  TeamOutlined,
   UserAddOutlined,
   UserOutlined
 } from "@ant-design/icons";
-import { Avatar, Button, Dropdown, Tag } from "antd";
+import { Avatar, Button, Dropdown, Popover, Tag } from "antd";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -28,6 +34,9 @@ import { copy } from "@/lib/siteContent";
 import { getAuthSession, isAdminUser, subscribeAuthSession } from "@/lib/authSession";
 import { logoutAndClearSession } from "@/lib/apiClient";
 import { buildLoginHref } from "@/lib/loginRedirect";
+
+const PILL_INTRO_SESSION_KEY = "shramdan.pill.intro.v1";
+const PILL_MIN_WIDTH_PX = 1180;
 
 function getInitials(user) {
   const source = user?.name || user?.username || user?.email || "";
@@ -48,9 +57,10 @@ const socialIcons = {
   youtube: FaYoutube
 };
 
-export function SiteShell({ children, pageTitle }) {
+export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
   const { language, mode, toggleLanguage, toggleMode } = usePreferences();
-  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
+  const [isTopHidden, setIsTopHidden] = useState(false);
+  const [isPillEntering, setIsPillEntering] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const mobileMenuRef = useRef(null);
@@ -79,6 +89,7 @@ export function SiteShell({ children, pageTitle }) {
     document.addEventListener("pointerdown", handlePointerDown);
     return () => document.removeEventListener("pointerdown", handlePointerDown);
   }, []);
+
   const session = useSyncExternalStore(subscribeAuthSession, getAuthSession, () => null);
   const t = copy[language];
   const titles = t.pageTitles;
@@ -89,18 +100,41 @@ export function SiteShell({ children, pageTitle }) {
   useEffect(() => {
     document.title = documentTitle;
   }, [documentTitle]);
+
   const activePath = pathname === "/" ? "/" : `/${pathname.split("/").filter(Boolean)[0]}`;
   const isAuthenticated = Boolean(session?.user);
   const isAdmin = isAuthenticated && isAdminUser(session.user);
-  const navItems = [
+
+  // Pill nav (>= 1180px): pure navigation, no auth. Login + Join live in the
+  // TR user-icon dropdown for anonymous visitors per the 2026-06-05 pivot.
+  const pillNavItems = [
     { href: "/", label: t.nav.home },
     { href: "/events", label: t.nav.events },
     { href: "/issues", label: t.nav.issues },
-    { href: "/join", label: t.nav.join },
-    { href: "/feedback", label: t.nav.feedback },
+    { href: "/feedback", label: t.nav.feedback }
+  ];
+
+  // Bottom-left "apps grid" dropdown — secondary nav for places that don't
+  // belong on the top pill (event types, intro, learn, settings, admin).
+  const appsGridItems = [
+    { href: "/event-types", label: t.nav.eventTypes, icon: <TeamOutlined /> },
+    { href: "/intro", label: t.nav.intro, icon: <RocketOutlined /> },
+    { href: "/learn", label: t.nav.learn, icon: <BookOutlined /> },
+    { href: "/settings", label: t.nav.settings, icon: <SettingOutlined /> },
+    ...(isAdmin
+      ? [{ href: "/admin", label: t.me.menu.adminCenter, icon: <ControlOutlined /> }]
+      : [])
+  ];
+
+  // Mobile drawer surfaces everything reachable from the corners — pill nav,
+  // apps grid, and auth — in a single linear list.
+  const mobileMenuItems = [
+    ...pillNavItems,
     isAuthenticated
       ? { href: "/me", label: t.me.navLabel }
-      : { href: buildLoginHref(pathname), label: t.nav.login }
+      : { href: buildLoginHref(pathname), label: t.nav.login },
+    ...(isAuthenticated ? [] : [{ href: "/join", label: t.nav.join }]),
+    ...appsGridItems
   ];
 
   const handleLogout = async () => {
@@ -108,14 +142,34 @@ export function SiteShell({ children, pageTitle }) {
     router.replace("/login");
   };
 
+  const smoothScrollToTop = () => {
+    if (typeof window === "undefined" || window.scrollY <= 0) {
+      return false;
+    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    return true;
+  };
+
   const handleBrandClick = (event) => {
-    if (pathname === "/" && typeof window !== "undefined" && window.scrollY > 0) {
+    if (pathname === "/" && smoothScrollToTop()) {
       event.preventDefault();
-      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
-  const userMenu = isAuthenticated
+  const handleSamePageNavClick = (event, href) => {
+    if (pathname === href && smoothScrollToTop()) {
+      event.preventDefault();
+    }
+  };
+
+  const goToOrScrollTop = (href) => {
+    if (pathname === href && smoothScrollToTop()) {
+      return;
+    }
+    router.push(href);
+  };
+
+  const authedUserMenu = isAuthenticated
     ? {
         items: [
           {
@@ -175,6 +229,48 @@ export function SiteShell({ children, pageTitle }) {
         ]
       }
     : null;
+
+  const guestPopoverContent = (
+    <div className="guest-user-popover">
+      <div className="guest-user-popover__header">
+        <span className="guest-user-popover__avatar" aria-hidden="true">
+          <UserOutlined />
+        </span>
+        <div className="guest-user-popover__identity">
+          <strong>{t.guestPopover.title}</strong>
+          <span>{t.guestPopover.subtitle}</span>
+        </div>
+      </div>
+      <p className="guest-user-popover__body">{t.guestPopover.body}</p>
+      <div className="guest-user-popover__actions">
+        <Button
+          type="primary"
+          icon={<UserAddOutlined />}
+          onClick={() => router.push("/join")}
+          block
+        >
+          {t.guestPopover.join}
+        </Button>
+        <Button
+          icon={<UserOutlined />}
+          onClick={() => router.push(buildLoginHref(pathname))}
+          block
+        >
+          {t.guestPopover.login}
+        </Button>
+      </div>
+    </div>
+  );
+
+  const appsMenu = {
+    items: appsGridItems.map((item) => ({
+      key: item.href,
+      icon: item.icon,
+      label: item.label,
+      onClick: () => goToOrScrollTop(item.href)
+    }))
+  };
+
   const pagesLinks = [
     { href: "/", label: t.nav.home },
     { href: "/events", label: t.nav.events },
@@ -211,172 +307,250 @@ export function SiteShell({ children, pageTitle }) {
     }
   ];
 
+  // Scroll-hide for the TOP corners only. Bottom corners persist so the
+  // primary CTA (FAB + apps grid) stays one tap away regardless of scroll
+  // position. WCAG 2.4.11 focus-not-obscured: if focus lands inside a top
+  // corner, override the hide so the focused element stays visible.
   useEffect(() => {
-    let lastScrollY = window.scrollY;
+    let lastScrollY = typeof window !== "undefined" ? window.scrollY : 0;
     let ticking = false;
 
-    const updateHeader = () => {
+    const update = () => {
       const currentScrollY = window.scrollY;
-      const isNearTop = currentScrollY < 24;
-      const isScrollingUp = currentScrollY < lastScrollY;
+      const nearTop = currentScrollY < 24;
+      const goingUp = currentScrollY < lastScrollY;
+      const focusInsideTop = !!document.activeElement?.closest?.(
+        ".site-shell-corner--top-left, .site-shell-corner--top-right, .site-shell-pill"
+      );
 
-      setIsHeaderVisible(isNearTop || isScrollingUp);
+      setIsTopHidden(!nearTop && !goingUp && !focusInsideTop);
       lastScrollY = Math.max(currentScrollY, 0);
       ticking = false;
     };
 
     const handleScroll = () => {
       if (!ticking) {
-        window.requestAnimationFrame(updateHeader);
+        window.requestAnimationFrame(update);
         ticking = true;
       }
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
-
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
+  // Pill nav entrance — runs once per browser session, only when the
+  // viewport actually shows the pill (>= PILL_MIN_WIDTH_PX) and the user
+  // has not opted out of motion. sessionStorage flag persists for the rest
+  // of the tab session; opening a new tab plays the cinematic again.
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+    if (sessionStorage.getItem(PILL_INTRO_SESSION_KEY)) return undefined;
+
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const pillVisible = window.matchMedia(`(min-width: ${PILL_MIN_WIDTH_PX}px)`).matches;
+
+    if (reducedMotion || !pillVisible) {
+      sessionStorage.setItem(PILL_INTRO_SESSION_KEY, "1");
+      return undefined;
+    }
+
+    // Defer the entrance flip into the next frame so React's effect rule
+    // (`react-hooks/set-state-in-effect`) is satisfied — we synchronize
+    // with the browser paint, not with the effect body.
+    const raf = window.requestAnimationFrame(() => {
+      setIsPillEntering(true);
+    });
+    const id = window.setTimeout(() => {
+      setIsPillEntering(false);
+      sessionStorage.setItem(PILL_INTRO_SESSION_KEY, "1");
+    }, 600);
+
+    return () => {
+      window.cancelAnimationFrame(raf);
+      window.clearTimeout(id);
+    };
+  }, []);
+
+  const hiddenSuffix = isTopHidden ? " is-hidden" : "";
+
   return (
-    <main className="site-shell">
+    <main className="site-shell" data-chrome-mode={chromeMode}>
       <a className="skip-to-main" href="#main-content">
         {t.ariaLabels.skipToMain}
       </a>
-      <header
-        className={`topbar${isHeaderVisible ? "" : " topbar-hidden"}`}
-        aria-label={t.ariaLabels.nav}
-      >
-        <Link className="brand" href="/" aria-label={t.ariaLabels.home} onClick={handleBrandClick}>
-          <span className="brand-mark">
-            <Image alt="" height={96} priority src="/images/logo.png" width={96} />
-          </span>
-          <span>{t.footer.brand}</span>
-        </Link>
 
-        <nav className="nav-links" aria-label={t.ariaLabels.nav}>
-          {navItems.map((item) => {
-            const isActive = activePath === item.href;
-
-            return (
+      {chromeMode !== "none" ? (
+        <header className="site-shell-banner" role="banner" aria-label={t.ariaLabels.nav}>
+          <div className={`site-shell-corner site-shell-corner--top-left${hiddenSuffix}`}>
+            <div className="site-shell-corner__inner">
               <Link
-                aria-current={isActive ? "page" : undefined}
-                className={isActive ? "is-active" : undefined}
-                href={item.href}
-                key={item.href}
+                className="brand"
+                href="/"
+                aria-label={t.ariaLabels.home}
+                onClick={handleBrandClick}
               >
-                {item.label}
+                <span className="brand-mark">
+                  <Image alt="" height={96} priority src="/images/logo.png" width={96} />
+                </span>
+                <span className="brand-name">{t.brand}</span>
               </Link>
-            );
-          })}
-        </nav>
-
-        <div className="toolbar" aria-label={t.ariaLabels.preferences}>
-          <div className="preference-controls">
-            <SettingsPopover />
-            {isAuthenticated ? <NotificationsBell language={language} /> : null}
-          </div>
-          {isAuthenticated ? (
-            <Dropdown menu={userMenu} placement="bottomRight" trigger={["click"]}>
-              <button
-                type="button"
-                className="toolbar-avatar"
-                aria-label={t.ariaLabels.userMenu}
-                title={t.ariaLabels.userMenu}
-              >
-                <Avatar
-                  src={session.user.avatar || undefined}
-                  icon={<UserOutlined />}
-                  size={38}
-                >
-                  {getInitials(session.user)}
-                </Avatar>
-              </button>
-            </Dropdown>
-          ) : (
-            <Button className="toolbar-cta" type="primary" href="/join" icon={<UserAddOutlined />}>
-              {t.nav.join}
-            </Button>
-          )}
-        </div>
-
-        <details className="mobile-menu" ref={mobileMenuRef}>
-          <summary aria-label={t.ariaLabels.openMenu}>
-            <MenuOutlined />
-          </summary>
-          <div className="mobile-menu-panel">
-            {navItems.map((item) => {
-              const isActive = activePath === item.href;
-
-              return (
-                <Link
-                  aria-current={isActive ? "page" : undefined}
-                  className={isActive ? "is-active" : undefined}
-                  href={item.href}
-                  key={item.href}
-                  onClick={closeMobileMenu}
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
-            {isAdmin ? (
-              <Link
-                aria-current={activePath === "/admin" ? "page" : undefined}
-                className={activePath === "/admin" ? "is-active" : undefined}
-                href="/admin"
-                onClick={closeMobileMenu}
-              >
-                {t.me.menu.adminCenter}
-              </Link>
-            ) : null}
-            <Link
-              aria-current={activePath === "/settings" ? "page" : undefined}
-              className={activePath === "/settings" ? "is-active" : undefined}
-              href="/settings"
-              onClick={closeMobileMenu}
-            >
-              {t.nav.settings}
-            </Link>
-            <div className="mobile-menu-preferences" aria-label={t.ariaLabels.preferences}>
-              <button
-                type="button"
-                aria-label={t.controls.themeTooltip}
-                title={t.controls.themeTooltip}
-                onClick={() => {
-                  toggleMode();
-                  closeMobileMenu();
-                }}
-              >
-                {mode === "light" ? t.controls.darkTheme : t.controls.lightTheme}
-              </button>
-              <button
-                type="button"
-                aria-label={t.controls.languageTooltip}
-                title={t.controls.languageTooltip}
-                onClick={() => {
-                  toggleLanguage();
-                  closeMobileMenu();
-                }}
-              >
-                {t.controls.language}
-              </button>
-              {isAuthenticated ? (
-                <button
-                  type="button"
-                  onClick={() => {
-                    closeMobileMenu();
-                    handleLogout();
-                  }}
-                >
-                  {t.me.menu.logout}
-                </button>
-              ) : null}
             </div>
           </div>
-        </details>
-      </header>
+
+          {chromeMode === "full" ? (
+            <nav
+              className={`site-shell-pill${isPillEntering ? " is-entering" : ""}`}
+              aria-label={t.ariaLabels.nav}
+            >
+              {pillNavItems.map((item) => {
+                const isActive = activePath === item.href;
+                return (
+                  <Link
+                    key={item.href}
+                    aria-current={isActive ? "page" : undefined}
+                    className={isActive ? "is-active" : undefined}
+                    href={item.href}
+                    onClick={(event) => handleSamePageNavClick(event, item.href)}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </nav>
+          ) : null}
+
+          <div className={`site-shell-corner site-shell-corner--top-right${hiddenSuffix}`}>
+            <div className="site-shell-corner__inner">
+              <div className="preference-controls">
+                <SettingsPopover />
+                {isAuthenticated ? <NotificationsBell language={language} /> : null}
+              </div>
+              {isAuthenticated ? (
+                <Dropdown menu={authedUserMenu} placement="bottomRight" trigger={["click"]}>
+                  <button
+                    type="button"
+                    className="toolbar-avatar"
+                    aria-label={t.ariaLabels.userMenu}
+                    title={t.ariaLabels.userMenu}
+                  >
+                    <Avatar
+                      src={session.user.avatar || undefined}
+                      icon={<UserOutlined />}
+                      size={38}
+                    >
+                      {getInitials(session.user)}
+                    </Avatar>
+                  </button>
+                </Dropdown>
+              ) : (
+                <Popover
+                  content={guestPopoverContent}
+                  trigger="click"
+                  placement="bottomRight"
+                  arrow={false}
+                  overlayClassName="guest-user-popover-overlay"
+                >
+                  <button
+                    type="button"
+                    className="user-icon-trigger"
+                    aria-label={t.ariaLabels.userMenu}
+                    title={t.ariaLabels.userMenu}
+                  >
+                    <UserOutlined />
+                  </button>
+                </Popover>
+              )}
+              <details className="mobile-menu" ref={mobileMenuRef}>
+                <summary aria-label={t.ariaLabels.openMenu}>
+                  <MenuOutlined />
+                </summary>
+                <div className="mobile-menu-panel">
+                  {mobileMenuItems.map((item) => {
+                    const isActive = activePath === item.href;
+                    return (
+                      <Link
+                        aria-current={isActive ? "page" : undefined}
+                        className={isActive ? "is-active" : undefined}
+                        href={item.href}
+                        key={item.href}
+                        onClick={(event) => {
+                          handleSamePageNavClick(event, item.href);
+                          closeMobileMenu();
+                        }}
+                      >
+                        {item.label}
+                      </Link>
+                    );
+                  })}
+                  <div
+                    className="mobile-menu-preferences"
+                    aria-label={t.ariaLabels.preferences}
+                  >
+                    <button
+                      type="button"
+                      aria-label={t.controls.themeTooltip}
+                      title={t.controls.themeTooltip}
+                      onClick={() => {
+                        toggleMode();
+                        closeMobileMenu();
+                      }}
+                    >
+                      {mode === "light" ? t.controls.darkTheme : t.controls.lightTheme}
+                    </button>
+                    <button
+                      type="button"
+                      aria-label={t.controls.languageTooltip}
+                      title={t.controls.languageTooltip}
+                      onClick={() => {
+                        toggleLanguage();
+                        closeMobileMenu();
+                      }}
+                    >
+                      {t.controls.language}
+                    </button>
+                    {isAuthenticated ? (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          closeMobileMenu();
+                          handleLogout();
+                        }}
+                      >
+                        {t.me.menu.logout}
+                      </button>
+                    ) : null}
+                  </div>
+                </div>
+              </details>
+            </div>
+          </div>
+
+          {chromeMode === "full" ? (
+            <div className="site-shell-corner site-shell-corner--bottom-left">
+              <div className="site-shell-corner__inner">
+                <Dropdown menu={appsMenu} placement="topLeft" trigger={["click"]}>
+                  <button
+                    type="button"
+                    className="apps-grid-trigger"
+                    aria-label={t.ariaLabels.appGrid ?? t.ariaLabels.openMenu}
+                    title={t.ariaLabels.appGrid ?? t.ariaLabels.openMenu}
+                  >
+                    <AppstoreOutlined />
+                  </button>
+                </Dropdown>
+              </div>
+            </div>
+          ) : null}
+
+          <div className="site-shell-corner site-shell-corner--bottom-right">
+            <QuickActionFab language={language} variant="inline" />
+            <BackToTop language={language} variant="inline" />
+          </div>
+        </header>
+      ) : null}
 
       <div id="main-content" tabIndex={-1}>
         <div key={pathname} className="page-transition">
@@ -384,8 +558,6 @@ export function SiteShell({ children, pageTitle }) {
         </div>
       </div>
 
-      <QuickActionFab language={language} />
-      <BackToTop language={language} />
       <KeyboardShortcutsDialog language={language} />
       <OnboardingSpotlight language={language} />
       <MobileBottomNav
@@ -399,7 +571,12 @@ export function SiteShell({ children, pageTitle }) {
 
       <footer className="footer" aria-label={t.footer.ariaLabel}>
         <div className="footer-brand">
-          <Link className="footer-logo" href="/" aria-label={t.ariaLabels.home} onClick={handleBrandClick}>
+          <Link
+            className="footer-logo"
+            href="/"
+            aria-label={t.ariaLabels.home}
+            onClick={handleBrandClick}
+          >
             <span className="brand-mark footer-brand-mark">
               <Image alt="" height={96} src="/images/logo.png" width={96} />
             </span>

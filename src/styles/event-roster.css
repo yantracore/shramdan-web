@@ -1096,8 +1096,8 @@
   .event-detail-side {
     grid-area: side;
     position: sticky;
-    top: calc(var(--header-height, 74px) + 14px);
-    max-height: calc(100vh - var(--header-height, 74px) - 28px);
+    top: calc(var(--corner-clear-zone, 64px) + 14px);
+    max-height: calc(100vh - var(--corner-clear-zone, 64px) - 28px);
     overflow-y: auto;
     padding-right: 4px;
     gap: 14px;

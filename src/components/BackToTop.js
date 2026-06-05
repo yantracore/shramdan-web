@@ -14,9 +14,10 @@ const COPY = {
 
 const SHOW_AFTER = 600;
 
-export function BackToTop({ language = "np" }) {
+export function BackToTop({ language = "np", variant }) {
   const t = COPY[language] || COPY.np;
   const [visible, setVisible] = useState(false);
+  const variantClass = variant === "inline" ? " back-to-top--inline" : "";
 
   useEffect(() => {
     const onScroll = () => {
@@ -39,7 +40,7 @@ export function BackToTop({ language = "np" }) {
   return (
     <button
       type="button"
-      className={`back-to-top${visible ? " is-visible" : ""}`}
+      className={`back-to-top${visible ? " is-visible" : ""}${variantClass}`}
       onClick={handleClick}
       aria-label={t.aria}
       title={t.aria}

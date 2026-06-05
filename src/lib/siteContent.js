@@ -34,7 +34,16 @@ export const copy = {
       openMenu: "नेभिगेसन खोल्नुहोस्",
       heroPanel: "श्रमदान कार्य केन्द्र",
       userMenu: "प्रयोगकर्ता मेनु",
+      appGrid: "ऐप मेनु खोल्नुहोस्",
       skipToMain: "मुख्य सामग्रीमा जानुहोस्"
+    },
+    guestPopover: {
+      title: "अतिथि",
+      subtitle: "तपाईं अहिले लग-इन हुनुभएको छैन",
+      body:
+        "लगइन गरेर अभियान र समस्याहरूमा सहभागी हुनुहोस्, वा श्रमदान योगदानकर्ता बन्न जोडिनुहोस्।",
+      login: "लगइन",
+      join: "जोडिनुहोस्"
     },
     controls: {
       language: "English",
@@ -1657,6 +1666,135 @@ export const copy = {
         OTHER: "अन्य"
       }
     },
+    multiStep: {
+      shell: {
+        stepFmt: "चरण {current} / {total}",
+        back: "पछाडि",
+        next: "अगाडि",
+        submit: "पठाउनुहोस्"
+      },
+      lanes: {
+        legend: "योगदानको लेन छान्नुहोस्",
+        pickLabel: "छानिएको",
+        lanes: {
+          EVENT_PARTICIPATION: {
+            title: "अभियान सहभागिता श्रमदान",
+            description:
+              "वास्तविक अभियानमा काम — सरसफाइ, वृक्षारोपण, फोटो, प्रसारण, सुरक्षा वा लजिस्टिक्स।"
+          },
+          DEVELOPMENT: {
+            title: "विकास श्रमदान",
+            description:
+              "मञ्च निर्माण — कोड, डिजाइन, अनुवाद, लेखन र समुदाय पहुँच।"
+          },
+          COMPANY_MANAGEMENT: {
+            title: "व्यवस्थापन श्रमदान",
+            description:
+              "संस्थागत सञ्चालन — कानुनी, वित्त, मानव संसाधन र साझेदारी।"
+          }
+        }
+      },
+      join: {
+        steps: {
+          intro: {
+            title: "स्वागत",
+            heading: "श्रमदानमा जोडिनुहोस्",
+            intro:
+              "तपाईंको सीप, समय वा उर्जा — जे छ त्यही लिएर समुदायको कामलाई अगाडि बढाउनुहोस्।",
+            cta: "आवेदन सुरु गर्नुहोस्",
+            bullets: [
+              "केवल ५ छोटा चरण।",
+              "आफ्नो भूमिका आफै छान्नुहोस्।",
+              "हाम्रो टोलीले इमेल वा फोनमा सम्पर्क गर्छ।"
+            ]
+          },
+          basics: {
+            title: "विवरण",
+            heading: "आधारभूत विवरण",
+            intro: "तपाईंलाई सम्पर्क गर्न आवश्यक न्यूनतम जानकारी।"
+          },
+          role: {
+            title: "भूमिका",
+            heading: "तपाईंको योगदान कुन लेनमा?",
+            intro: "तीन लेन — आफ्नो काम र समय अनुसार एउटा छान्नुहोस्।",
+            required: "कृपया एक लेन छान्नुहोस्।"
+          },
+          work: {
+            title: "अनुभव",
+            heading: "अनुभव र पोर्टफोलियो",
+            intro: "तपाईंको पृष्ठभूमि बुझ्न मद्दत हुने विवरण।"
+          },
+          motivation: {
+            title: "प्रेरणा",
+            heading: "तपाईं किन जोडिँदै हुनुहुन्छ?",
+            intro: "छोटो, इमानदार जवाफ — हामी पढ्छौँ।"
+          }
+        }
+      },
+      issueNew: {
+        steps: {
+          cover: {
+            title: "तस्वीर",
+            heading: "मुख्य तस्वीर",
+            intro: "समस्या प्रस्ट देखाउने एउटा तस्वीर अपलोड गर्नुहोस्।"
+          },
+          basics: {
+            title: "विवरण",
+            heading: "शीर्षक र विवरण",
+            intro: "के भइरहेको छ — संक्षेपमा र विस्तारमा।"
+          },
+          place: {
+            title: "स्थान",
+            heading: "कहाँ हो?",
+            intro: "नक्सामा पिन राख्नुहोस् र ठेगाना पुष्टि गर्नुहोस्।"
+          },
+          extras: {
+            title: "थप",
+            heading: "श्रेणी र थप तस्वीरहरू",
+            intro: "श्रेणी छान्नुहोस् र चाहेमा थप तस्वीर थप्नुहोस्।"
+          },
+          review: {
+            title: "समीक्षा",
+            heading: "एकपटक हेर्नुहोस्",
+            intro: "पठाउनुअघि सबै विवरण मिलेको पुष्टि गर्नुहोस्।"
+          }
+        }
+      },
+      issueAdmin: {
+        steps: {
+          cover: { title: "Cover", heading: "Cover image", intro: "Upload the primary photo for this issue." },
+          basics: { title: "Basics", heading: "Title & description", intro: "What is happening and who is affected." },
+          place: { title: "Location", heading: "Address & coordinates", intro: "Exact lat/lng plus human-readable address." },
+          admin: { title: "Admin", heading: "Admin metadata", intro: "Municipality, ward, category and any extra images." },
+          review: { title: "Review", heading: "Confirm and create", intro: "Final check before saving the issue." }
+        }
+      },
+      signup: {
+        steps: {
+          intro: {
+            title: "स्वागत",
+            heading: "श्रमदान सदस्य बन्नुहोस्",
+            intro: "फोन नम्बर र छोटो OTP कोडले मात्र — एकै मिनेटमा।",
+            cta: "सुरु गर्नुहोस्"
+          },
+          phone: {
+            title: "फोन",
+            heading: "फोन नम्बरबाट जोडिनुहोस्",
+            intro: "नेपालको १० अंकको मोबाइल नम्बर लेख्नुहोस्।"
+          },
+          otp: {
+            title: "OTP",
+            heading: "OTP कोड लेख्नुहोस्",
+            intro: "तपाईंको फोनमा ६ अंकको कोड पठाइयो।"
+          },
+          done: {
+            title: "स्वागत",
+            heading: "तपाईं श्रमदानमा जोडिनुभयो।",
+            intro: "अब समस्या रिपोर्ट गर्न, समर्थन गर्न र अभियानमा सहभागी हुन तयार।"
+          }
+        }
+      }
+    },
     footer: {
       brand: "श्रमदान",
       ariaLabel: "श्रमदान फुटर",
@@ -1718,7 +1856,16 @@ export const copy = {
       openMenu: "Open navigation",
       heroPanel: "Shramdan action hub",
       userMenu: "User menu",
+      appGrid: "Open app menu",
       skipToMain: "Skip to main content"
+    },
+    guestPopover: {
+      title: "Guest",
+      subtitle: "You're not signed in",
+      body:
+        "Log in to RSVP events and track issues — or join Shramdan as a contributor.",
+      login: "Login",
+      join: "Join"
     },
     controls: {
       language: "नेपाली",
@@ -3347,6 +3494,135 @@ export const copy = {
         PARK_PUBLIC_SPACE: "Park / Public space",
         HIKING_TRAIL: "Hiking trail",
         OTHER: "Other"
+      }
+    },
+    multiStep: {
+      shell: {
+        stepFmt: "Step {current} of {total}",
+        back: "Back",
+        next: "Continue",
+        submit: "Submit"
+      },
+      lanes: {
+        legend: "Choose your contribution lane",
+        pickLabel: "Selected",
+        lanes: {
+          EVENT_PARTICIPATION: {
+            title: "Event-Participation Shramdan",
+            description:
+              "Hands-on event work — cleanup, planting, photography, livestream, safety or logistics."
+          },
+          DEVELOPMENT: {
+            title: "Development Shramdan",
+            description:
+              "Building the platform — code, design, translation, writing, community outreach."
+          },
+          COMPANY_MANAGEMENT: {
+            title: "Company-Management Shramdan",
+            description:
+              "Keeping the operation accountable — legal, finance, HR, partnerships."
+          }
+        }
+      },
+      join: {
+        steps: {
+          intro: {
+            title: "Welcome",
+            heading: "Join Shramdan",
+            intro:
+              "Bring your skill, time or energy — whatever you have — to push community work forward.",
+            cta: "Start Application",
+            bullets: [
+              "Only 5 short steps.",
+              "Pick your own contribution lane.",
+              "Our team reaches out by email or phone."
+            ]
+          },
+          basics: {
+            title: "Basics",
+            heading: "Your basic details",
+            intro: "The minimum we need to reach you."
+          },
+          role: {
+            title: "Role",
+            heading: "Which lane fits your contribution?",
+            intro: "Three lanes — pick the one that fits your work and time.",
+            required: "Please pick a lane."
+          },
+          work: {
+            title: "Experience",
+            heading: "Experience & portfolio",
+            intro: "Details that help us understand your background."
+          },
+          motivation: {
+            title: "Motivation",
+            heading: "Why are you joining?",
+            intro: "Short, honest answer — we read every one."
+          }
+        }
+      },
+      issueNew: {
+        steps: {
+          cover: {
+            title: "Photo",
+            heading: "Cover photo",
+            intro: "Upload one photo that clearly shows the issue."
+          },
+          basics: {
+            title: "Details",
+            heading: "Title & description",
+            intro: "What is happening — short summary, then the full picture."
+          },
+          place: {
+            title: "Location",
+            heading: "Where is it?",
+            intro: "Drop a pin on the map and confirm the address."
+          },
+          extras: {
+            title: "More",
+            heading: "Category & extra photos",
+            intro: "Pick a category and add more photos if you like."
+          },
+          review: {
+            title: "Review",
+            heading: "Take a final look",
+            intro: "Confirm everything looks right before submitting."
+          }
+        }
+      },
+      issueAdmin: {
+        steps: {
+          cover: { title: "Cover", heading: "Cover image", intro: "Upload the primary photo for this issue." },
+          basics: { title: "Basics", heading: "Title & description", intro: "What is happening and who is affected." },
+          place: { title: "Location", heading: "Address & coordinates", intro: "Exact lat/lng plus human-readable address." },
+          admin: { title: "Admin", heading: "Admin metadata", intro: "Municipality, ward, category and any extra images." },
+          review: { title: "Review", heading: "Confirm and create", intro: "Final check before saving the issue." }
+        }
+      },
+      signup: {
+        steps: {
+          intro: {
+            title: "Welcome",
+            heading: "Become a Shramdan member",
+            intro: "Just a phone number and a short OTP — done in a minute.",
+            cta: "Get Started"
+          },
+          phone: {
+            title: "Phone",
+            heading: "Join with your phone",
+            intro: "Enter your 10-digit Nepali mobile number."
+          },
+          otp: {
+            title: "OTP",
+            heading: "Enter the OTP code",
+            intro: "We've sent a 6-digit code to your phone."
+          },
+          done: {
+            title: "Welcome",
+            heading: "You're in.",
+            intro: "You can now report issues, support priorities and join cleanup events."
+          }
+        }
       }
     },
     footer: {
