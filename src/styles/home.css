@@ -2047,6 +2047,17 @@
   align-self: stretch;
 }
 
+.login-intent {
+  display: inline-block;
+  margin: 4px 0 12px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 600;
+}
+
 /* --- Home pulse row (activity ticker + live online) ------------------ */
 .home-pulse-row {
   width: min(1180px, calc(100% - 32px));
@@ -7900,6 +7911,19 @@
   background: #2f9e6b;
 }
 
+.event-pin--live .issue-pin-dot {
+  background: #e5484d;
+  box-shadow: 0 0 0 4px rgba(229, 72, 77, 0.22);
+}
+
+.event-pin--upcoming .issue-pin-dot {
+  background: #2f7ed8;
+}
+
+.event-pin--past .issue-pin-dot {
+  background: #6b7280;
+}
+
 .issue-cluster {
   background: transparent;
   border: none;
@@ -7966,6 +7990,21 @@
 .issue-map-popup-status--COMPLETED {
   background: rgba(47, 158, 107, 0.2);
   color: #1d7a52;
+}
+
+.event-map-popup-status--live {
+  background: rgba(229, 72, 77, 0.16);
+  color: #b3261e;
+}
+
+.event-map-popup-status--upcoming {
+  background: rgba(47, 126, 216, 0.18);
+  color: #1d5fa8;
+}
+
+.event-map-popup-status--past {
+  background: rgba(107, 114, 128, 0.18);
+  color: #4b5563;
 }
 
 .issue-map-popup-category {

@@ -10,6 +10,7 @@ import { ActivityTypeTabs } from "@/components/ActivityTypeTabs";
 import { EventListCard } from "@/components/EventListCard";
 import { EventPreviewPane } from "@/components/EventPreviewPane";
 import { ActivityStatsRow } from "@/components/ActivityStatsRow";
+import EventMapBlock from "@/components/EventMapBlock";
 import { usePreferences } from "@/app/providers";
 import { copy } from "@/lib/siteContent";
 import { injectMockLiveStream } from "@/lib/devMockData";
@@ -71,6 +72,16 @@ const PAGE_COPY = {
     list: {
       loadingMore: "थप अभियान ल्याउँदै…",
       noMore: "सबै अभियान देखाइए।"
+    },
+    map: {
+      statusLabels: {
+        live: "अहिले लाइभ",
+        upcoming: "आउँदै",
+        past: "सम्पन्न"
+      },
+      viewDetail: "विवरण",
+      fullscreenOpen: "पूर्ण-स्क्रिन नक्सा खोल्नुहोस्",
+      fullscreenClose: "पूर्ण-स्क्रिन नक्सा बन्द गर्नुहोस्"
     }
   },
   en: {
@@ -128,6 +139,16 @@ const PAGE_COPY = {
     list: {
       loadingMore: "Loading more campaigns…",
       noMore: "All campaigns shown."
+    },
+    map: {
+      statusLabels: {
+        live: "On now",
+        upcoming: "Upcoming",
+        past: "Completed"
+      },
+      viewDetail: "View",
+      fullscreenOpen: "Open fullscreen map",
+      fullscreenClose: "Close fullscreen map"
     }
   }
 };
@@ -230,6 +251,20 @@ export default function EventsListPage() {
     }
     return filtered;
   }, [live, upcoming, past, filter, city]);
+
+  // Map entries respect the same filter + city as the list so users see the
+  // exact subset they're browsing. Coordinate validity is enforced inside
+  // EventMap, but we pre-filter to avoid rendering an empty section when no
+  // events in the current slice have coords.
+  const mapEntries = useMemo(
+    () =>
+      orderedEvents.filter((entry) => {
+        const lat = Number(entry?.event?.latitude);
+        const lng = Number(entry?.event?.longitude);
+        return Number.isFinite(lat) && Number.isFinite(lng);
+      }),
+    [orderedEvents]
+  );
 
   // ----- selection state --------------------------------------------------
   const [selectedId, setSelectedId] = useState(null);
@@ -594,6 +629,23 @@ export default function EventsListPage() {
             isMobileDrillActive={isMobileDrillActive}
           />
         </section>
+
+        {mapEntries.length > 0 ? (
+          <div className="public-issues-map-section">
+            <div className="live-issues-map-frame">
+              <EventMapBlock
+                entries={mapEntries}
+                t={t.map}
+                language={language}
+                height={360}
+                interactive
+                enableFullscreen
+                fullscreenLabel={t.map.fullscreenOpen}
+                exitFullscreenLabel={t.map.fullscreenClose}
+              />
+            </div>
+          </div>
+        ) : null}
       </section>
     </SiteShell>
   );
