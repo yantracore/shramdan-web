@@ -1,0 +1,155 @@
+# TV-like App Pivot — Phased Work Plan
+
+> Companion plan to the [2026-06-05 ADR](../decisions/2026-06-05-tv-like-app-pivot.md). The ADR captures *why* and *what's decided*; this file captures *the order of work and what each phase ships*.
+>
+> **Scope.** This pivot reshapes the public web surface. Admin control center and the future `/app` follow the same metaphor but are sequenced separately.
+>
+> **Expected length.** 10–50 working sessions. Each phase below is one or more sessions; phases can run partially in parallel where they don't fight each other.
+>
+> **Update protocol.** Mark phases `in progress` / `done` inline as work lands, append `← done: YYYY-MM-DD` like the master roadmap convention. Move newly discovered subtasks under the right phase; don't create a new top-level until a genuinely new theme appears.
+
+---
+
+## Phase 0 — Pre-pivot snapshot ← done: 2026-06-05
+
+Lock in the decision and clear the working tree so the next change is clearly pivot work, not leftover polish.
+
+- [x] Commit pending in-flight work in clean clusters (API docs refresh, loginRedirect rollout, live-stream poster CTA, demo imagery) ← done: 2026-06-05
+- [x] Capture pivot in auto-memory (`project_radical_pivot_tv_app`) ← done: 2026-06-05
+- [x] ADR written ← done: 2026-06-05
+- [x] This plan written ← done: 2026-06-05
+
+---
+
+## Phase 1 — TV layout primitives
+
+Reshape the page chrome before reshaping any specific page. Every later phase depends on these primitives.
+
+- [ ] Remove the full-width header background from `SiteShell`. The header band stops being a visual surface.
+- [ ] Split header into four corner blocks: organization (top-left), user (top-right), app (bottom-left), `+`/quick-icons (bottom-right). Keep them position-sticky so they don't move with content scroll.
+- [ ] Optional curved top-center pill nav (Home · Events · Issues · Join · Feedback · Login) for the largest screens only (`@media (min-width: 1440px)`). Animate in on first session load; respect `prefers-reduced-motion`.
+- [ ] Tablet + mobile fallback: corners collapse into a single compact top bar with a drawer for nav.
+- [ ] Visual verify in Playwright at three widths (desktop, tablet, mobile).
+
+**Backend asks:** none.
+
+---
+
+## Phase 2 — Homepage as search surface
+
+This is the headline change. Replace the current homepage with a Google-style landing.
+
+- [ ] Move current `HomeClient.js` content out — it becomes the source of the new `/intro` page (see Phase 6). Keep the file in git history; do not duplicate.
+- [ ] New `/` (homepage):
+  - [ ] No vertical scrollbar in the default viewport.
+  - [ ] Centered search box, filters button immediately to its right.
+  - [ ] Stats pills row beneath, driven by the public reports API. Active pill highlighted. Clicking a pill scopes the stream + acts as a status filter extension.
+  - [ ] Decent-size map below the pills.
+  - [ ] On scroll-down OR on a `Participate` click → reveal the curated for-you stream, ranked by location proximity (use the existing geolocation hook if it covers this; otherwise add one).
+- [ ] Add a route guard so `/` does not 404 if the curated stream API is empty — show suggested events instead.
+- [ ] Backend ask: confirm the public reports API exposes the counts we need for the pills (status × kind). Capture as `docs/api-requirements/reports.md` if missing.
+- [ ] Visual verify with Playwright: search interaction, pill filtering, scroll-down reveals stream.
+
+**Risks:** the current homepage carries SEO; ensure the new `/intro` ranks for the same terms (canonical + a JSON-LD update may be needed).
+
+---
+
+## Phase 3 — Unified Issues + Events stream component
+
+The list-renderer used by the homepage scrolled section, `/events`, and `/issues` becomes one component with a tabbed Issue/Event switch.
+
+- [ ] Extract a single `<StreamList>` component that renders both. Inputs: `mode: 'issue' | 'event' | 'all'`, `view: 'list' | 'thumbnails' | 'map'`, `filters`.
+- [ ] Replace the current `/events` split-view body and the `/issues` body with `<StreamList>`. The two pages remain valid deep-link entry points but render the same component.
+- [ ] Persist support actions on issues that have already promoted to events, until the linked event finishes. Surface a small "supported via event" affordance.
+- [ ] Stats pills become tabbed filter chips inside `<StreamList>`. Same component on homepage + dedicated pages.
+
+**Backend asks:**
+- `docs/api-requirements/events.md` — confirm "supports continue until event finishes" semantics. Update if needed.
+- Add to `docs/api-requirements/issues.md` (or `incidents.md`): a clear "promoted to event" field with the linked event id + status.
+
+---
+
+## Phase 4 — Three view modes (List · Thumbnails · Map)
+
+- [ ] List view = the current split layout, polished. Tab control becomes the canonical view switcher.
+- [ ] **Fix the sticky `.events-split-preview` scroll-pass-through bug.** When the user wheels over the preview and the preview is already at its end, the body must scroll. Currently the sticky preview traps wheel events. Likely an `overscroll-behavior` + `pointer-events` adjustment.
+- [ ] Thumbnails view = smaller preview + two-row dense thumb grid. Same data shape; different layout primitive.
+- [ ] Map view = existing map results screen, promoted from a separate route into a tab. On the homepage, map results appear below the map; on dedicated pages, map and list-of-results share the screen.
+- [ ] View switch state is URL-synced (`?view=list|thumbs|map`) so it persists across refresh + share.
+
+**Backend asks:** none beyond Phase 3.
+
+---
+
+## Phase 5 — App chrome shrink-down across all pages
+
+Page-by-page audit to remove brochure-style chrome. Each row below is its own session-or-two.
+
+- [ ] `/events` and `/issues` — tiny eyebrow, lean title/desc, compact filter row, single primary action (`Begin Shramdan Registration` on `/issues`).
+- [ ] `/me`, `/me/preview`, `/me/applications`
+- [ ] `/calendar`
+- [ ] `/impact`
+- [ ] `/stories`
+- [ ] `/ledger`
+- [ ] `/polls` + poll detail
+- [ ] `/login` (already lean; verify intent banner placement)
+- [ ] `/feedback` (creation path; see Phase 7 for the new community discussion list)
+
+Pattern for every page: page-name + eyebrow + filters + actions occupy under 96px vertical on desktop. Content owns the screen below that.
+
+---
+
+## Phase 6 — New `/intro` page from the old homepage
+
+- [ ] Move current `HomeClient.js` body to `/intro`.
+- [ ] **Strip** sections: "join us" rally copy, government-partnership claims, "small hands together" duplicate, redundant "five steps one journey" duplicate.
+- [ ] **Keep** the photo-driven steps section (the one with the actual photos of the steps).
+- [ ] **Add** a new section: community collaboration — maintenance, funding, non-profit framing, no-one-owns-it, all funds go to the work and the app itself.
+- [ ] Add a fixed right-side jump navigation that lists the section titles and scrolls to each on click; highlight current section using `IntersectionObserver`.
+- [ ] Link to `/intro` from a discreet corner of the new homepage (e.g. the org block in the top-left) so newcomers can still find the philosophy.
+
+---
+
+## Phase 7 — Discussions + member profiles
+
+The community self-evolution loop.
+
+- [ ] **Member profiles.** Member icons in comments, rosters, contribution lists become click-throughs to `/members/[id]`. Public profile shows: display name (or anonymous), recent activity, supported issues, events participated, leader nominations, etc.
+- [ ] **`/discussions` surface.** List of community topics. Two sub-streams: general topics, and feature proposals.
+- [ ] **Feature voting.** Each proposal accepts upvotes. Threshold logic (configurable; start at `votes ≥ 20 AND distinct_supporters ≥ 10`) promotes the proposal to the roadmap as `[ ] ... ← promoted from discussion #N`.
+- [ ] **Anonymity toggle** when posting feedback or starting a discussion.
+- [ ] **Discussion presence on event pages.** Active thread count + last-activity timestamp on each event page, linking to the thread filtered by that event.
+
+**Backend asks:**
+- `docs/api-requirements/discussions.md` (new) — topic, message, vote, anonymity flag, link-to-entity (issue/event/null).
+- `docs/api-requirements/members.md` — extend with `publicProfile` shape (display fields, opt-in toggle).
+- `docs/api-requirements/feature-votes.md` (new) — proposal entity + vote semantics + promotion event.
+
+---
+
+## Phase 8 — Backend roll-up + spec sweep
+
+After Phases 2–7 ship UI, do one sweep to ensure every `docs/api-requirements/*.md` file reflects what the UI actually consumes now.
+
+- [ ] Re-run the API sync (`node scripts/refresh-api-docs.mjs`).
+- [ ] Diff each updated file against current UI usage.
+- [ ] Open backend-ready flags for everything where the spec is ready but the backend isn't.
+
+---
+
+## Phase 9 — Verification + polish
+
+- [ ] Playwright sweep across every reshaped page at three widths.
+- [ ] Reduced-motion audit on the new entrance animations (corner blocks, pill nav, stream reveal).
+- [ ] Lighthouse run on the homepage; the no-scroll-on-first-paint thesis should pay off in CLS + LCP.
+- [ ] Final visual pass — corner alignment, sticky behaviour, scroll-pass-through fix verified live.
+
+---
+
+## Open questions to resolve as we go
+
+1. **Curated stream ranking** — proximity is the v1 signal. Should "support count" or "freshness" weight in? Decide after Phase 2 ships.
+2. **Issue ↔ event lifecycle copy** — "support continues until event finishes" needs a single clear UI affordance. Mock options during Phase 3.
+3. **Feature-voting threshold** — start at a guess; tune from real usage.
+4. **Header on the smallest screens** — corner-blocks have no good mobile analogue. Single compact bar + drawer is the current plan; revisit during Phase 1.
+5. **SEO continuity** for the `/` → `/intro` move. Need a canonical + redirect strategy decided before Phase 2 ships.
