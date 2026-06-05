@@ -13,6 +13,7 @@ import { SiteShell } from "@/components/SiteShell";
 import { postJson } from "@/lib/apiClient";
 import { ISSUE_CATEGORIES } from "@/lib/adminUtils";
 import { getAuthSession } from "@/lib/authSession";
+import { buildLoginHref } from "@/lib/loginRedirect";
 import { copy } from "@/lib/siteContent";
 import { useToast } from "@/lib/toast";
 
@@ -174,7 +175,7 @@ export default function NewIssuePage() {
 
     if (!session?.user) {
       messageApi.info(labels.authRequiredMessage);
-      router.replace(`/login?next=${encodeURIComponent(NEW_ISSUE_PATH)}`);
+      router.replace(buildLoginHref(NEW_ISSUE_PATH, "report"));
       return;
     }
 

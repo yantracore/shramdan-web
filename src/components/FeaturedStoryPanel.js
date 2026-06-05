@@ -94,7 +94,7 @@ export function FeaturedStoryPanel({ language = "np" }) {
           </div>
           <Link
             className="featured-story-cta"
-            href={`/events/${event.id}`}
+            href={`/events/${event.slug ?? event.id}`}
           >
             {t.cta} <ArrowRightOutlined />
           </Link>

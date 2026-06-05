@@ -312,7 +312,7 @@ export default function LedgerPage() {
                           </td>
                           <td>
                             {event ? (
-                              <Link href={`/events/${event.id}`}>
+                              <Link href={`/events/${event.slug ?? event.id}`}>
                                 {event.title} <ArrowRightOutlined aria-hidden="true" />
                               </Link>
                             ) : (
@@ -356,7 +356,7 @@ export default function LedgerPage() {
                           <td>{formatNPR(expense.amount, language)}</td>
                           <td>
                             {event ? (
-                              <Link href={`/events/${event.id}`}>
+                              <Link href={`/events/${event.slug ?? event.id}`}>
                                 {event.title} <ArrowRightOutlined aria-hidden="true" />
                               </Link>
                             ) : (

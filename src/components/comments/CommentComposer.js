@@ -5,6 +5,7 @@ import { Button, Input, Mentions } from "antd";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { COMMENT_LIMITS } from "@/lib/comments";
+import { buildLoginHref } from "@/lib/loginRedirect";
 
 const COPY = {
   np: {
@@ -91,7 +92,7 @@ export function CommentComposer({
           <strong>{t.loginNeededTitle}</strong>
           <p>{t.loginNeededBody}</p>
         </div>
-        <Link href={`/login?from=${encodeURIComponent(loginRedirect)}`}>
+        <Link href={buildLoginHref(loginRedirect, "comment")}>
           <Button type="primary">{t.loginAction}</Button>
         </Link>
       </div>

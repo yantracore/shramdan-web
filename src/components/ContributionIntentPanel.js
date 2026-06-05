@@ -16,6 +16,7 @@ import { useMemo, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { postJson } from "@/lib/apiClient";
 import { getAuthSession, subscribeAuthSession } from "@/lib/authSession";
+import { buildLoginHref } from "@/lib/loginRedirect";
 import { useToast } from "@/lib/toast";
 
 const isDemoId = (id) => typeof id === "string" && id.startsWith("demo-");
@@ -206,7 +207,7 @@ export function ContributionIntentPanel({ event, language = "np", onChanged }) {
           <div className="contribution-intent-anon">
             <span>{t.loginPrompt}</span>
             <Link
-              href={`/login?next=${encodeURIComponent(`/events/${event?.slug ?? event?.id ?? ""}`)}`}
+              href={buildLoginHref(`/events/${event?.slug ?? event?.id ?? ""}`, "contribute")}
             >
               <Button type="primary">{t.loginCta}</Button>
             </Link>

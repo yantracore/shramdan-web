@@ -27,6 +27,7 @@ import { usePreferences } from "@/app/providers";
 import { copy } from "@/lib/siteContent";
 import { getAuthSession, isAdminUser, subscribeAuthSession } from "@/lib/authSession";
 import { logoutAndClearSession } from "@/lib/apiClient";
+import { buildLoginHref } from "@/lib/loginRedirect";
 
 function getInitials(user) {
   const source = user?.name || user?.username || user?.email || "";
@@ -99,7 +100,7 @@ export function SiteShell({ children, pageTitle }) {
     { href: "/feedback", label: t.nav.feedback },
     isAuthenticated
       ? { href: "/me", label: t.me.navLabel }
-      : { href: "/login", label: t.nav.login }
+      : { href: buildLoginHref(pathname), label: t.nav.login }
   ];
 
   const handleLogout = async () => {

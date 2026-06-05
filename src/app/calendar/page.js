@@ -225,7 +225,7 @@ export default function CalendarPage() {
               <ul className="calendar-day-panel-list">
                 {selectedEvents.map((e) => (
                   <li key={`${e.id}-${e.kind}`} className={`calendar-day-event is-${e.kind}`}>
-                    <Link href={`/events/${e.id}`}>
+                    <Link href={`/events/${e.slug ?? e.id}`}>
                       <span className="calendar-day-event-kind">
                         {t[`legend${e.kind.charAt(0).toUpperCase() + e.kind.slice(1)}`]}
                       </span>

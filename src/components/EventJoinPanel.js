@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import { getJson, postJson } from "@/lib/apiClient";
 import { getAuthSession, subscribeAuthSession } from "@/lib/authSession";
+import { buildLoginHref } from "@/lib/loginRedirect";
 import { useToast } from "@/lib/toast";
 
 const isDemoId = (id) => typeof id === "string" && id.startsWith("demo-");
@@ -178,11 +179,10 @@ export function EventJoinPanel({ event, language = "np", onJoined }) {
   }
 
   if (!viewerId) {
-    const next = encodeURIComponent(`/events/${event?.slug ?? event?.id ?? ""}`);
     return (
       <div className="event-join-panel event-join-panel-anon">
         <span>{t.loginPrompt}</span>
-        <Link href={`/login?next=${next}`}>
+        <Link href={buildLoginHref(`/events/${event?.slug ?? event?.id ?? ""}`, "join")}>
           <Button type="primary" icon={<UserAddOutlined />}>
             {t.loginCta}
           </Button>

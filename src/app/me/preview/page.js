@@ -463,7 +463,7 @@ export default function MeProfilePreview() {
                 <li key={event.id} className="me-preview-event-row">
                   <span className="me-preview-event-title">{event.title}</span>
                   <span className="me-preview-event-place">{event.addressText}</span>
-                  <Link href={`/events/${event.id}`} className="me-preview-event-cta">
+                  <Link href={`/events/${event.slug ?? event.id}`} className="me-preview-event-cta">
                     {t.viewEvent} →
                   </Link>
                 </li>
@@ -485,7 +485,7 @@ export default function MeProfilePreview() {
                 <li key={event.id} className="me-preview-event-row">
                   <span className="me-preview-event-title">{event.title}</span>
                   <span className="me-preview-event-place">{event.addressText}</span>
-                  <Link href={`/events/${event.id}`} className="me-preview-event-cta">
+                  <Link href={`/events/${event.slug ?? event.id}`} className="me-preview-event-cta">
                     {t.viewEvent} →
                   </Link>
                 </li>

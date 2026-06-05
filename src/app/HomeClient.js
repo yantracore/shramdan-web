@@ -525,7 +525,7 @@ export default function HomeClient({ summary }) {
                     <li key={issue.id}>
                       <Link
                         className="live-issues-top-card"
-                        href={`/issues/${issue.id}`}
+                        href={`/issues/${issue.slug ?? issue.id}`}
                       >
                         <div
                           className={`live-issues-top-thumb${coverUrl ? "" : " is-placeholder"}`}

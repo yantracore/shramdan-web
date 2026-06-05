@@ -23,6 +23,7 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 import { usePreferences } from "@/app/providers";
 import { clearAuthSession, getAuthSession, isAdminUser, subscribeAuthSession } from "@/lib/authSession";
 import { logoutAndClearSession } from "@/lib/apiClient";
+import { buildLoginHref } from "@/lib/loginRedirect";
 
 function getUserInitials(name, email) {
   const source = (name || "").trim();
@@ -100,15 +101,15 @@ export function AdminShell({ children, title }) {
 
   useEffect(() => {
     if (!session) {
-      router.replace("/login");
+      router.replace(buildLoginHref(pathname));
       return;
     }
 
     if (!isAdminUser(session.user)) {
       clearAuthSession();
-      router.replace("/login");
+      router.replace(buildLoginHref(pathname));
     }
-  }, [router, session]);
+  }, [pathname, router, session]);
 
   useEffect(() => {
     if (!title) return;

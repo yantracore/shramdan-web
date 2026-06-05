@@ -375,7 +375,7 @@ export default function ImpactPage() {
           <ul className="impact-events-list">
             {past.map((event) => (
               <li key={event.id} className="impact-event-row">
-                <Link href={`/events/${event.id}`} className="impact-event-link">
+                <Link href={`/events/${event.slug ?? event.id}`} className="impact-event-link">
                   <span className="impact-event-title">{event.title}</span>
                   <span className="impact-event-meta">
                     {event.addressText}

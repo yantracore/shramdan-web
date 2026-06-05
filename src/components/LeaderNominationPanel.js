@@ -34,6 +34,7 @@ import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { deleteJson, getJson, postJson } from "@/lib/apiClient";
 import { getAuthSession, subscribeAuthSession } from "@/lib/authSession";
+import { buildLoginHref } from "@/lib/loginRedirect";
 import { useToast } from "@/lib/toast";
 
 const isDemoId = (id) => typeof id === "string" && id.startsWith("demo-");
@@ -164,7 +165,6 @@ export function LeaderNominationPanel({ event, language = "np", onChanged }) {
   const isTie = detectTie(nominations);
 
   if (!viewerId) {
-    const next = encodeURIComponent(`/events/${eventId || ""}`);
     return (
       <section className="leader-nomination-panel leader-nomination-panel-anon">
         <header className="leader-nomination-header">
@@ -174,7 +174,7 @@ export function LeaderNominationPanel({ event, language = "np", onChanged }) {
         </header>
         <div className="leader-nomination-anon-cta">
           <span>{t.loginPrompt}</span>
-          <Link href={`/login?next=${next}`}>
+          <Link href={buildLoginHref(`/events/${eventId || ""}`, "nominate")}>
             <Button type="primary">{t.loginCta}</Button>
           </Link>
         </div>

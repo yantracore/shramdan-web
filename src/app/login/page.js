@@ -17,6 +17,7 @@ import { Form } from "@/components/AppForm";
 import { SiteShell } from "@/components/SiteShell";
 import { loginWithPassword } from "@/lib/apiClient";
 import { getAuthSession, isAdminUser, setAuthSession } from "@/lib/authSession";
+import { isKnownIntent, isSafeNextPath } from "@/lib/loginRedirect";
 import { copy } from "@/lib/siteContent";
 import { useToast } from "@/lib/toast";
 
@@ -52,7 +53,16 @@ const loginCopy = {
       { icon: FlagOutlined, text: "स्थानीय समस्या रिपोर्ट गर्न र समर्थन जुटाउन" },
       { icon: TeamOutlined, text: "सरसफाइ अभियानमा भूमिका छानेर सहभागी हुन" },
       { icon: CheckCircleOutlined, text: "समुदायको प्राथमिकतामा भोट दिन" }
-    ]
+    ],
+    intents: {
+      vote: "मतदान गर्न लगइन गर्नुहोस्",
+      comment: "कमेन्ट गर्न लगइन गर्नुहोस्",
+      join: "सहभागी हुन लगइन गर्नुहोस्",
+      contribute: "योगदान दिन लगइन गर्नुहोस्",
+      nominate: "नेता मनोनयन गर्न लगइन गर्नुहोस्",
+      report: "समस्या रिपोर्ट गर्न लगइन गर्नुहोस्",
+      expired: "तपाईंको session सकिएको छ; पुनः लगइन गर्नुहोस्"
+    }
   },
   en: {
     eyebrow: "Member access",
@@ -85,32 +95,44 @@ const loginCopy = {
       { icon: FlagOutlined, text: "Report local issues and rally support" },
       { icon: TeamOutlined, text: "Pick a role and join nearby cleanup events" },
       { icon: CheckCircleOutlined, text: "Vote on community priorities" }
-    ]
+    ],
+    intents: {
+      vote: "Login to cast your vote",
+      comment: "Login to post your comment",
+      join: "Login to join this event",
+      contribute: "Login to contribute",
+      nominate: "Login to nominate a leader",
+      report: "Login to report an issue",
+      expired: "Your session has expired — please log in again"
+    }
   }
 };
 
-function isSafeRelativePath(path) {
-  return typeof path === "string" && path.startsWith("/") && !path.startsWith("//");
-}
-
 function redirectPathForUser(user, nextParam) {
-  if (isSafeRelativePath(nextParam)) {
+  if (isSafeNextPath(nextParam)) {
+    const targetsAdmin = nextParam === "/admin" || nextParam.startsWith("/admin/");
+    if (targetsAdmin && !isAdminUser(user)) {
+      return "/events";
+    }
     return nextParam;
   }
 
-  return isAdminUser(user) ? "/admin" : "/issues";
+  return isAdminUser(user) ? "/admin" : "/events";
 }
 
 function LoginPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const nextParam = searchParams.get("next");
+  const rawNext = searchParams.get("next") ?? searchParams.get("from");
+  const nextParam = isSafeNextPath(rawNext) ? rawNext : null;
+  const intentParam = searchParams.get("intent");
   const { language } = usePreferences();
   const t = loginCopy[language] ?? loginCopy.np;
   const globalCopy = copy[language] ?? copy.np;
   const [form] = Form.useForm();
   const messageApi = useToast();
   const [submitting, setSubmitting] = useState(false);
+  const intentMessage = isKnownIntent(intentParam) ? t.intents?.[intentParam] : null;
 
   useEffect(() => {
     const session = getAuthSession();
@@ -180,6 +202,11 @@ function LoginPageContent() {
             <header className="form-card-heading">
               <span className="eyebrow">{t.eyebrow}</span>
               <h1>{t.title}</h1>
+              {intentMessage ? (
+                <p className="login-intent" role="status">
+                  {intentMessage}
+                </p>
+              ) : null}
               <p>{t.intro}</p>
             </header>
             <Form form={form} layout="vertical" onFinish={handleLogin} requiredMark={false}>

@@ -10,6 +10,7 @@ import { Button } from "antd";
 import Link from "next/link";
 import { useMemo, useState, useSyncExternalStore } from "react";
 import { getAuthSession, subscribeAuthSession } from "@/lib/authSession";
+import { buildLoginHref } from "@/lib/loginRedirect";
 import { useToast } from "@/lib/toast";
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
@@ -170,7 +171,7 @@ export function PollCard({ poll, language = "np", showDetailCta = true }) {
           </span>
         ) : null}
         {!isAuthenticated ? (
-          <Link href={`/login?next=${encodeURIComponent(`/polls/${poll.slug}`)}`} className="poll-card-login">
+          <Link href={buildLoginHref(`/polls/${poll.slug}`, "vote")} className="poll-card-login">
             {t.loginPrompt} → {t.loginCta}
           </Link>
         ) : null}

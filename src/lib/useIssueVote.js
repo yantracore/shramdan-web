@@ -1,9 +1,10 @@
 "use client";
 
 import { useCallback, useState, useSyncExternalStore } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { voteOnIssue } from "@/lib/apiClient";
 import { getAuthSession, subscribeAuthSession } from "@/lib/authSession";
+import { buildLoginHref } from "@/lib/loginRedirect";
 import { useToast } from "@/lib/toast";
 
 export function useIssueVote({
@@ -13,6 +14,7 @@ export function useIssueVote({
   content
 }) {
   const router = useRouter();
+  const pathname = usePathname();
   const messageApi = useToast();
   const session = useSyncExternalStore(
     subscribeAuthSession,
@@ -42,7 +44,7 @@ export function useIssueVote({
       if (event?.stopPropagation) event.stopPropagation();
 
       if (!isAuthenticated) {
-        router.push("/login");
+        router.push(buildLoginHref(pathname, "vote"));
         return;
       }
       if (voted || voting || !issueId) return;
@@ -74,7 +76,7 @@ export function useIssueVote({
         setVoting(false);
       }
     },
-    [content, isAuthenticated, issueId, messageApi, router, voted, voting]
+    [content, isAuthenticated, issueId, messageApi, pathname, router, voted, voting]
   );
 
   return {

@@ -91,7 +91,7 @@ export function CommandPalette({ language = "np" }) {
       id: `event-${e.id}`,
       label: e.title,
       sublabel: e.addressText,
-      href: `/events/${e.id}`,
+      href: `/events/${e.slug ?? e.id}`,
       icon: AppstoreOutlined,
       kindLabel: t.hintEvent,
       searchable: `${e.title || ""} ${e.addressText || ""}`

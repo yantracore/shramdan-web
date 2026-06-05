@@ -167,7 +167,7 @@ export default function StoriesPage() {
                       </footer>
                     </blockquote>
                   ))}
-                  <Link className="story-cta" href={`/events/${event.id}`}>
+                  <Link className="story-cta" href={`/events/${event.slug ?? event.id}`}>
                     {t.readMore} <ArrowRightOutlined />
                   </Link>
                 </div>

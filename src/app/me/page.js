@@ -20,6 +20,7 @@ import {
   setAuthSession,
   subscribeAuthSession
 } from "@/lib/authSession";
+import { buildLoginHref } from "@/lib/loginRedirect";
 import { copy } from "@/lib/siteContent";
 import { useToast } from "@/lib/toast";
 import { uploadAvatar } from "@/lib/uploads";
@@ -84,7 +85,7 @@ export default function MePage() {
     if (!sessionResolved) return;
 
     if (!session) {
-      router.replace("/login");
+      router.replace(buildLoginHref("/me"));
     }
   }, [router, session, sessionResolved]);
 
