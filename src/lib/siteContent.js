@@ -1570,7 +1570,7 @@ export const copy = {
       successMessage: "तपाईंको रिपोर्ट सफलतापूर्वक पठाइयो।",
       authRequiredMessage: "रिपोर्ट गर्न पहिले लगइन गर्नुहोस्।",
       cta: {
-        list: "नयाँ समस्या रिपोर्ट गर्नुहोस्"
+        list: "नयाँ समस्या"
       },
       fields: {
         cover: "मुख्य फोटो",
@@ -3220,7 +3220,7 @@ export const copy = {
       successMessage: "Your report was submitted successfully.",
       authRequiredMessage: "Please log in to report an issue.",
       cta: {
-        list: "Report New Issue"
+        list: "New Issue"
       },
       fields: {
         cover: "Cover photo",

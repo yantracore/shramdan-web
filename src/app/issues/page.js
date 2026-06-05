@@ -528,7 +528,7 @@ export default function IssuesListPage() {
         </div>
 
         <div className="public-issues-toolbar">
-          <ActivityStatsRow language={language} />
+          <ActivityStatsRow language={language} variant="issues" />
           <div className="public-issues-filters">
             <ActivityTypeTabs active="issue" labels={t.activityTabs} />
             <div className="public-issues-filter-field">

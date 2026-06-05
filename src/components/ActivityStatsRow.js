@@ -1,17 +1,20 @@
 "use client";
 
 import {
+  CalendarOutlined,
   CheckCircleOutlined,
+  FlagOutlined,
+  LikeOutlined,
   RiseOutlined,
   TeamOutlined,
   ThunderboltOutlined
 } from "@ant-design/icons";
 import Link from "next/link";
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
+  getDemoIssues,
   getDemoLiveEvents,
   getDemoPastEvents,
-  getDemoPublicIssues,
   getDemoUpcomingEvents
 } from "@/lib/devMockData";
 
@@ -23,70 +26,187 @@ function localizeDigits(value, language) {
   return str.replace(/\d/g, (d) => NP_DIGITS[Number(d)]);
 }
 
+// Eased count-up from 0 → target over `duration` ms. Honors
+// prefers-reduced-motion by snapping straight to the final value.
+function useCountUp(target, duration = 1000) {
+  const [value, setValue] = useState(() => {
+    if (typeof window === "undefined") return target;
+    const reduced =
+      window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    return reduced ? target : 0;
+  });
+  const startedRef = useRef(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+    const reduced =
+      window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) {
+      setValue(target);
+      return undefined;
+    }
+    if (!Number.isFinite(target)) {
+      setValue(0);
+      return undefined;
+    }
+    startedRef.current = true;
+    const startTime = performance.now();
+    let raf;
+    const tick = (now) => {
+      const elapsed = now - startTime;
+      const t = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - t, 3);
+      setValue(Math.round(target * eased));
+      if (t < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [target, duration]);
+
+  return value;
+}
+
+function StatChipValue({ target, language }) {
+  const value = useCountUp(target);
+  return (
+    <span className="activity-stat-chip-value">
+      {localizeDigits(value, language)}
+    </span>
+  );
+}
+
 const COPY = {
   np: {
-    ariaLabel: "अहिलेको गतिविधि",
-    live: "लाइभ",
-    upcoming: "आउँदै",
-    completed: "सम्पन्न",
-    issues: "खुला समस्या"
+    events: {
+      ariaLabel: "अभियानको झलक",
+      live: "लाइभ",
+      upcoming: "आउँदै",
+      completed: "सम्पन्न",
+      participants: "सहभागी"
+    },
+    issues: {
+      ariaLabel: "समस्याको झलक",
+      open: "खुला",
+      scheduled: "तालिका मिल्यो",
+      completed: "समाधान",
+      votes: "मत"
+    }
   },
   en: {
-    ariaLabel: "Activity at a glance",
-    live: "Live",
-    upcoming: "Upcoming",
-    completed: "Completed",
-    issues: "Open issues"
+    events: {
+      ariaLabel: "Event glance",
+      live: "Live",
+      upcoming: "Upcoming",
+      completed: "Completed",
+      participants: "Participants"
+    },
+    issues: {
+      ariaLabel: "Issue glance",
+      open: "Open",
+      scheduled: "Scheduled",
+      completed: "Resolved",
+      votes: "Votes"
+    }
   }
 };
 
-export function ActivityStatsRow({ language = "np" }) {
-  const t = COPY[language] || COPY.np;
-
-  const counts = useMemo(
-    () => ({
-      live: getDemoLiveEvents().length,
-      upcoming: getDemoUpcomingEvents().length,
-      completed: getDemoPastEvents().length,
-      issues: getDemoPublicIssues().length
-    }),
-    []
+function eventsTiles(t) {
+  const live = getDemoLiveEvents();
+  const upcoming = getDemoUpcomingEvents();
+  const past = getDemoPastEvents();
+  const participants = [...live, ...upcoming, ...past].reduce(
+    (sum, e) => sum + (Number(e?.participantCount) || 0),
+    0
   );
-
-  const tiles = [
+  return [
     {
       key: "live",
       icon: ThunderboltOutlined,
       label: t.live,
-      value: counts.live,
+      value: live.length,
       href: "/events?show=live"
     },
     {
       key: "upcoming",
       icon: RiseOutlined,
       label: t.upcoming,
-      value: counts.upcoming,
+      value: upcoming.length,
       href: "/events?show=upcoming"
     },
     {
       key: "completed",
       icon: CheckCircleOutlined,
       label: t.completed,
-      value: counts.completed,
+      value: past.length,
       href: "/events?show=past"
     },
     {
-      key: "issues",
+      key: "participants",
       icon: TeamOutlined,
-      label: t.issues,
-      value: counts.issues,
-      href: "/issues?status=OPEN"
+      label: t.participants,
+      value: participants,
+      href: "/impact"
     }
   ];
+}
+
+function issuesTiles(t) {
+  const issues = getDemoIssues();
+  const byStatus = (status) => issues.filter((i) => i?.status === status).length;
+  const votes = issues.reduce(
+    (sum, i) => sum + (Number(i?.voteCount) || 0),
+    0
+  );
+  return [
+    {
+      key: "open",
+      icon: FlagOutlined,
+      label: t.open,
+      value: byStatus("OPEN"),
+      href: "/issues?status=OPEN"
+    },
+    {
+      key: "scheduled",
+      icon: CalendarOutlined,
+      label: t.scheduled,
+      value: byStatus("EVENT_SCHEDULED"),
+      href: "/issues?status=EVENT_SCHEDULED"
+    },
+    {
+      key: "completed",
+      icon: CheckCircleOutlined,
+      label: t.completed,
+      value: byStatus("COMPLETED"),
+      href: "/issues?status=COMPLETED"
+    },
+    {
+      key: "votes",
+      icon: LikeOutlined,
+      label: t.votes,
+      value: votes,
+      href: "/issues"
+    }
+  ];
+}
+
+export function ActivityStatsRow({ language = "np", variant = "events" }) {
+  const t =
+    (COPY[language] && COPY[language][variant]) ||
+    COPY.np[variant] ||
+    COPY.np.events;
+
+  const tiles = useMemo(
+    () => (variant === "issues" ? issuesTiles(t) : eventsTiles(t)),
+    [variant, t]
+  );
 
   return (
     <ul
-      className="activity-stats-row"
+      className={`activity-stats-row variant-${variant}`}
       role="list"
       aria-label={t.ariaLabel}
     >
@@ -100,9 +220,7 @@ export function ActivityStatsRow({ language = "np" }) {
             <span className="activity-stat-chip-icon" aria-hidden="true">
               <Icon />
             </span>
-            <span className="activity-stat-chip-value">
-              {localizeDigits(value, language)}
-            </span>
+            <StatChipValue target={value} language={language} />
             <span className="activity-stat-chip-label">{label}</span>
           </Link>
         </li>

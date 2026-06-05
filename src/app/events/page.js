@@ -479,7 +479,7 @@ export default function EventsListPage() {
         </div>
 
         <div className="public-issues-toolbar">
-          <ActivityStatsRow language={language} />
+          <ActivityStatsRow language={language} variant="events" />
           <div className="public-issues-filters">
             <ActivityTypeTabs active="event" labels={localizedCopy.activityTabs} />
             <div className="public-issues-filter-field">

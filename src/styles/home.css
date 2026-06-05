@@ -1508,6 +1508,13 @@
   letter-spacing: 0;
 }
 
+/* /events and /issues share a normal-flow heading — no stickiness, so
+   the chrome scrolls away as the user moves into the list/preview area. */
+.public-issues-section .section-heading,
+.public-issue-detail-section .section-heading {
+  position: static;
+}
+
 .form-card-heading {
   display: grid;
   gap: 10px;
@@ -7714,7 +7721,8 @@
   background: color-mix(in srgb, #e02b20 14%, transparent);
   color: #c41a10;
 }
-.activity-stats-row .stat-upcoming .activity-stat-chip-icon {
+.activity-stats-row .stat-upcoming .activity-stat-chip-icon,
+.activity-stats-row .stat-scheduled .activity-stat-chip-icon {
   background: color-mix(in srgb, #2563eb 14%, transparent);
   color: #1d4ed8;
 }
@@ -7722,9 +7730,15 @@
   background: color-mix(in srgb, #16a34a 14%, transparent);
   color: #15803d;
 }
+.activity-stats-row .stat-open .activity-stat-chip-icon,
 .activity-stats-row .stat-issues .activity-stat-chip-icon {
   background: color-mix(in srgb, #d97706 14%, transparent);
   color: #b45309;
+}
+.activity-stats-row .stat-participants .activity-stat-chip-icon,
+.activity-stats-row .stat-votes .activity-stat-chip-icon {
+  background: color-mix(in srgb, #7c3aed 14%, transparent);
+  color: #6d28d9;
 }
 
 .activity-stat-chip-value {
