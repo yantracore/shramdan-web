@@ -21,26 +21,6 @@ export function ActivityTypeTabs({ active, labels }) {
       aria-label={t.ariaLabel || "Activity type"}
     >
       <Link
-        href="/issues"
-        role="tab"
-        aria-selected={active === "issue" ? "true" : "false"}
-        className={`activity-type-tab${active === "issue" ? " is-active" : ""}`}
-        data-status="upcoming"
-        tabIndex={active === "issue" ? 0 : -1}
-      >
-        <span className="activity-type-tab-icon" aria-hidden="true">
-          <FlagOutlined />
-        </span>
-        <span className="activity-type-tab-body">
-          <span className="activity-type-tab-label">
-            {t.issueLabel || "Issue"}
-          </span>
-          <span className="activity-type-tab-sub">
-            {t.issueSub || "listed"}
-          </span>
-        </span>
-      </Link>
-      <Link
         href="/events"
         role="tab"
         aria-selected={active === "event" ? "true" : "false"}
@@ -57,6 +37,26 @@ export function ActivityTypeTabs({ active, labels }) {
           </span>
           <span className="activity-type-tab-sub">
             {t.eventSub || "in execution"}
+          </span>
+        </span>
+      </Link>
+      <Link
+        href="/issues"
+        role="tab"
+        aria-selected={active === "issue" ? "true" : "false"}
+        className={`activity-type-tab${active === "issue" ? " is-active" : ""}`}
+        data-status="upcoming"
+        tabIndex={active === "issue" ? 0 : -1}
+      >
+        <span className="activity-type-tab-icon" aria-hidden="true">
+          <FlagOutlined />
+        </span>
+        <span className="activity-type-tab-body">
+          <span className="activity-type-tab-label">
+            {t.issueLabel || "Issue"}
+          </span>
+          <span className="activity-type-tab-sub">
+            {t.issueSub || "listed"}
           </span>
         </span>
       </Link>
