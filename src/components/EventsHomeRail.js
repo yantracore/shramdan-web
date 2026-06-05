@@ -254,7 +254,7 @@ function LivePosterCard({ event, copy, language, isActive }) {
   return (
     <article className="events-home-rail-poster-card events-home-rail-poster-card--live">
       <Link
-        href={`/events/${event.id}`}
+        href={`/events/${event.slug ?? event.id}`}
         className="events-home-rail-poster-link"
         aria-label={event.title}
       >
@@ -281,8 +281,14 @@ function LivePosterCard({ event, copy, language, isActive }) {
               ) : null}
             </div>
             <div className="events-home-rail-poster-bottom">
-              <h3>{event.title}</h3>
-              {durationLabel ? <p>{durationLabel}</p> : null}
+              <div className="events-home-rail-poster-bottom-text">
+                <h3>{event.title}</h3>
+                {durationLabel ? <p>{durationLabel}</p> : null}
+              </div>
+              <span className="events-home-rail-poster-cta" aria-hidden="true">
+                {copy?.viewDetails || (language === "np" ? "विवरण" : "View Details")}
+                <ArrowRightOutlined aria-hidden="true" />
+              </span>
             </div>
           </div>
         </div>
@@ -303,7 +309,7 @@ function UpcomingPosterCard({ event, language, copy, isActive }) {
   return (
     <article className="events-home-rail-poster-card events-home-rail-poster-card--upcoming">
       <Link
-        href={`/events/${event.id}`}
+        href={`/events/${event.slug ?? event.id}`}
         className="events-home-rail-poster-link"
         aria-label={event.title}
       >
@@ -329,8 +335,14 @@ function UpcomingPosterCard({ event, language, copy, isActive }) {
               ) : null}
             </div>
             <div className="events-home-rail-poster-bottom">
-              <h3>{event.title}</h3>
-              {event.addressText ? <p>{event.addressText}</p> : null}
+              <div className="events-home-rail-poster-bottom-text">
+                <h3>{event.title}</h3>
+                {event.addressText ? <p>{event.addressText}</p> : null}
+              </div>
+              <span className="events-home-rail-poster-cta" aria-hidden="true">
+                {copy?.viewDetails || (language === "np" ? "विवरण" : "View Details")}
+                <ArrowRightOutlined aria-hidden="true" />
+              </span>
             </div>
           </div>
         </div>

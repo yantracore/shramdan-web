@@ -8,7 +8,7 @@
 // Player is muted autoplay so the visit isn't a surprise sound-blast.
 
 import { EyeOutlined } from "@ant-design/icons";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 
@@ -22,6 +22,7 @@ export function EventLiveStreamPlayer({ liveStream, eventTitle, copy, language =
   const [duration, setDuration] = useState(() =>
     computeDuration(liveStream?.startedAt)
   );
+  const videoRef = useRef(null);
 
   useEffect(() => {
     if (!liveStream?.startedAt) return;
@@ -31,23 +32,58 @@ export function EventLiveStreamPlayer({ liveStream, eventTitle, copy, language =
     return () => clearInterval(id);
   }, [liveStream?.startedAt]);
 
+  // React's JSX `muted` prop occasionally fails to set the IDL property on
+  // first paint, especially across stream URL swaps in the split-view
+  // preview pane. Pin muted=true imperatively so demo footage never
+  // surprise-blasts audio when the user clicks through events.
+  useEffect(() => {
+    const node = videoRef.current;
+    if (!node) return;
+    node.muted = true;
+    node.defaultMuted = true;
+    node.volume = 0;
+  }, [liveStream?.streamUrl]);
+
   if (!liveStream?.isActive || !liveStream?.streamUrl) return null;
 
   const hasViewers = Number.isFinite(liveStream.viewerCount);
   const viewerNumber = hasViewers
     ? toLocalDigits(liveStream.viewerCount.toLocaleString("en-US"), language)
     : null;
+  const isNativeVideo = /\.mp4(\?|$)/i.test(liveStream.streamUrl);
+  const representativeLabel =
+    copy?.representativeFootage ||
+    (language === "np" ? "प्रतिनिधि दृश्य" : "Representative footage");
 
   return (
     <section className="event-live-player" aria-label={copy?.liveAria || "Live stream player"}>
       <div className="event-live-player-frame">
-        <iframe
-          src={liveStream.streamUrl}
-          title={`${eventTitle} — live stream`}
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          loading="lazy"
-          allowFullScreen
-        />
+        {isNativeVideo ? (
+          <video
+            ref={videoRef}
+            src={liveStream.streamUrl}
+            poster={liveStream.thumbnailUrl || undefined}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            aria-label={`${eventTitle} — ${representativeLabel}`}
+          />
+        ) : (
+          <iframe
+            src={liveStream.streamUrl}
+            title={`${eventTitle} — live stream`}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            loading="lazy"
+            allowFullScreen
+          />
+        )}
+        {isNativeVideo ? (
+          <span className="event-live-player-rep-tag" aria-hidden="true">
+            {representativeLabel}
+          </span>
+        ) : null}
       </div>
       <div className="event-live-player-meta">
         <span className="event-live-badge">

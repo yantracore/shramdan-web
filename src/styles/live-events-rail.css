@@ -242,8 +242,54 @@
 
 .events-home-rail-poster-bottom {
   display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.events-home-rail-poster-bottom-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
   flex-direction: column;
   gap: 3px;
+}
+
+/* Glassy "View Details" pill — transparent black + backdrop-blur, sits
+ * bottom-right next to the title block. `pointer-events: none` because
+ * the parent <Link> already handles the click; the pill is a visual
+ * affordance, not a separate target (a nested <a> would be invalid HTML
+ * and would steal focus order from screen readers). */
+.events-home-rail-poster-cta {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 11px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.94);
+  background: rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  pointer-events: none;
+  white-space: nowrap;
+  transition: background-color 200ms ease, border-color 200ms ease,
+    transform 200ms ease;
+}
+
+.events-home-rail-poster-card:hover .events-home-rail-poster-cta,
+.events-home-rail-poster-link:focus-visible .events-home-rail-poster-cta {
+  background: rgba(0, 0, 0, 0.6);
+  border-color: rgba(255, 255, 255, 0.45);
+  transform: translateX(2px);
+}
+
+.events-home-rail-poster-cta .anticon {
+  font-size: 10px;
 }
 
 .events-home-rail-poster-bottom h3 {
@@ -698,12 +744,37 @@
   background: #000;
 }
 
-.event-live-player-frame iframe {
+.event-live-player-frame iframe,
+.event-live-player-frame video {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   border: 0;
+  object-fit: cover;
+  background: #000;
+}
+
+/* "Representative footage" disclosure tag — appears only over native
+ * <video> demo loops, never over real iframe streams. Bottom-right so it
+ * doesn't fight the LIVE badge / viewer counter on the left side. */
+.event-live-player-rep-tag {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  padding: 4px 10px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.92);
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  pointer-events: none;
+  z-index: 2;
+  user-select: none;
 }
 
 .event-live-player-meta {
