@@ -54,7 +54,8 @@ export const copy = {
       languageTooltip: "Change to English language",
       themeTooltip: "थिम बदल्नुहोस्",
       darkTheme: "गाढा थिम",
-      lightTheme: "उज्यालो थिम"
+      lightTheme: "उज्यालो थिम",
+      viewAllSettings: "सबै सेटिङ्स हेर्नुहोस्"
     },
     hero: {
       eyebrow: "",
@@ -1428,6 +1429,81 @@ export const copy = {
         modeTabsAria: "धारा प्रकार"
       }
     },
+    discussions: {
+      pageTitle: "श्रमदान छलफल",
+      eyebrow: "समुदाय छलफल",
+      title: "श्रमदान छलफल",
+      intro: "सदस्यहरूले उठाएका विषय, सुझाव र अनुरोधहरू। समर्थन गर्नुहोस्, थप्नुहोस्, र मतदान गरेर अघि बढाउनुहोस्।",
+      tabs: {
+        all: "सबै छलफल",
+        general: "सामान्य",
+        proposals: "फिचर अनुरोध"
+      },
+      newTopic: "नयाँ विषय",
+      newProposal: "नयाँ फिचर अनुरोध",
+      anonymousAuthor: "अज्ञात सदस्य",
+      anonymousToggleLabel: "मेरो नाम लुकाउनुहोस्",
+      anonymousToggleHint: "तपाईंको पोस्ट अज्ञात रूपमा देखिनेछ; मोडरेसन को लागि सर्भर मा रेकर्ड भने रहन्छ।",
+      messageCount: "{n} सन्देश",
+      lastActivity: "अन्तिम गतिविधि",
+      upvote: "समर्थन गर्नुहोस्",
+      upvoted: "समर्थन गरिएको",
+      promotionEligible: "प्रवर्द्धनको दहलीजमा",
+      promotionPromoted: "रोडम्यापमा सारियो",
+      promotionDeclined: "अस्वीकृत",
+      votesUntilThreshold: "{n} समर्थन अझै चाहिन्छ",
+      supportersUntilThreshold: "{n} थप सदस्य चाहिन्छ",
+      linkedEvent: "अभियानमा जोडिएको:",
+      linkedIssue: "समस्यामा जोडिएको:",
+      filtersAria: "छलफल फिल्टर",
+      sortLabel: "क्रम",
+      sortRecentActivity: "ताजा गतिविधि",
+      sortUpvotes: "सबैभन्दा बढी समर्थन",
+      sortNearThreshold: "दहलीजको नजिक",
+      replyComposerPlaceholder: "जवाफ लेख्नुहोस्…",
+      composerCta: "पठाउनुहोस्",
+      backToList: "सबै छलफल",
+      emptyMessage: "अहिले छलफल छैन। पहिलो विषय खोल्नुहोस्।",
+      eventPresence: {
+        labelOne: "{n} सक्रिय छलफल सन्देश",
+        labelMany: "{n} सक्रिय छलफल सन्देश",
+        viewThread: "थ्रेड हेर्नुहोस्"
+      }
+    },
+    memberProfile: {
+      eyebrow: "श्रमदान सदस्य",
+      memberSinceLabel: "देखि सदस्य",
+      backToList: "सूचीमा फर्कनुहोस्",
+      sections: {
+        recentActivity: "हालैको गतिविधि",
+        supportedIssues: "समर्थन गरिएका समस्या",
+        participatedEvents: "सहभागी अभियान",
+        discussions: "खोलिएका छलफल",
+        proposals: "फिचर अनुरोध"
+      },
+      activityKinds: {
+        "joined-event": "अभियानमा सहभागी",
+        "supported-issue": "समस्या समर्थन",
+        "opened-discussion": "छलफल खोलियो",
+        "opened-proposal": "फिचर अनुरोध",
+        "posted-message": "सन्देश थपियो"
+      },
+      stats: {
+        supported: "समर्थन",
+        participated: "सहभागिता",
+        nominated: "नेता मनोनयन",
+        discussions: "छलफल",
+        proposals: "अनुरोध"
+      },
+      lanesLabel: "योगदान क्षेत्र",
+      laneNames: {
+        EVENT_PARTICIPATION: "अभियान सहभागिता",
+        DEVELOPMENT: "एप निर्माण",
+        COMPANY_MANAGEMENT: "व्यवस्थापन"
+      },
+      privacyNote: "केवल यो सदस्यले सार्वजनिक गर्न चाहेका विवरण देखाइएको छ।",
+      profileDisabled: "यो सदस्यले प्रोफाइल लुकाएको छ।"
+    },
     liveEventsRail: {
       eyebrow: "अहिले भइरहेको",
       liveBadge: "लाइभ",
@@ -1996,7 +2072,8 @@ export const copy = {
       languageTooltip: "नेपाली भाषामा बदल्नुहोस्",
       themeTooltip: "Switch theme",
       darkTheme: "Dark theme",
-      lightTheme: "Light theme"
+      lightTheme: "Light theme",
+      viewAllSettings: "View all settings"
     },
     hero: {
       eyebrow: "",
@@ -3377,6 +3454,81 @@ export const copy = {
         modeIssueLabel: "Issues",
         modeTabsAria: "Stream type"
       }
+    },
+    discussions: {
+      pageTitle: "Shramdan Discussions",
+      eyebrow: "Community discussions",
+      title: "Shramdan Discussions",
+      intro: "Topics, suggestions, and feature asks members opened. Support, reply, and vote to push them forward.",
+      tabs: {
+        all: "All discussions",
+        general: "General",
+        proposals: "Feature proposals"
+      },
+      newTopic: "New Topic",
+      newProposal: "New Feature Proposal",
+      anonymousAuthor: "Anonymous member",
+      anonymousToggleLabel: "Hide my name",
+      anonymousToggleHint: "Your post will appear anonymous publicly; the server still records your id for moderation.",
+      messageCount: "{n} messages",
+      lastActivity: "Last activity",
+      upvote: "Support",
+      upvoted: "Supported",
+      promotionEligible: "On the promotion threshold",
+      promotionPromoted: "Promoted to roadmap",
+      promotionDeclined: "Declined",
+      votesUntilThreshold: "{n} more support needed",
+      supportersUntilThreshold: "{n} more members needed",
+      linkedEvent: "Linked to event:",
+      linkedIssue: "Linked to issue:",
+      filtersAria: "Discussion filters",
+      sortLabel: "Sort",
+      sortRecentActivity: "Recent activity",
+      sortUpvotes: "Most supported",
+      sortNearThreshold: "Near threshold",
+      replyComposerPlaceholder: "Write a reply…",
+      composerCta: "Post",
+      backToList: "All discussions",
+      emptyMessage: "No discussions yet. Open the first one.",
+      eventPresence: {
+        labelOne: "{n} active discussion message",
+        labelMany: "{n} active discussion messages",
+        viewThread: "View thread"
+      }
+    },
+    memberProfile: {
+      eyebrow: "Shramdan member",
+      memberSinceLabel: "Member since",
+      backToList: "Back",
+      sections: {
+        recentActivity: "Recent activity",
+        supportedIssues: "Supported issues",
+        participatedEvents: "Participated events",
+        discussions: "Discussions started",
+        proposals: "Feature proposals"
+      },
+      activityKinds: {
+        "joined-event": "Joined event",
+        "supported-issue": "Supported issue",
+        "opened-discussion": "Opened discussion",
+        "opened-proposal": "Opened feature proposal",
+        "posted-message": "Posted reply"
+      },
+      stats: {
+        supported: "Supported",
+        participated: "Joined",
+        nominated: "Nominated",
+        discussions: "Discussions",
+        proposals: "Proposals"
+      },
+      lanesLabel: "Contribution lanes",
+      laneNames: {
+        EVENT_PARTICIPATION: "Event participation",
+        DEVELOPMENT: "App development",
+        COMPANY_MANAGEMENT: "Management"
+      },
+      privacyNote: "Only the details this member chose to share publicly are shown.",
+      profileDisabled: "This member has hidden their profile."
     },
     liveEventsRail: {
       eyebrow: "Happening now",

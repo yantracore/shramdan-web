@@ -1,0 +1,283 @@
+// Discussion + member-profile mock data for Phase 7 v0. The backend
+// contracts live in:
+//   docs/api-requirements/discussions.md
+//   docs/api-requirements/feature-votes.md
+//   docs/api-requirements/members.md   (the "Public profile" section)
+//
+// This file feeds the /discussions list, /discussions/[slug] detail,
+// /members/[slug] profile, and the discussion-presence affordance on
+// event pages. Once the backend ships, the UI just swaps these readers
+// for the real /discussions, /feature-proposals, and /members endpoints.
+
+const NOW = new Date("2026-06-05T10:00:00+05:45");
+
+function hoursAgoIso(h) {
+  return new Date(NOW.getTime() - h * 60 * 60 * 1000).toISOString();
+}
+function daysAgoIso(d) {
+  return hoursAgoIso(d * 24);
+}
+
+// ---- Mock members (publicProfile projections) -----------------------
+
+const MOCK_MEMBERS = {
+  "muna-gurung": {
+    id: "mem-muna-gurung",
+    slug: "muna-gurung",
+    displayName: "मुना गुरुङ",
+    avatarUrl: "/images/demo-events/sankhu-temple.jpg",
+    bio: "ललितपुरमा सरसफाइ अभियान आयोजना गर्छु। पुस्तकालय शिक्षक।",
+    city: "ललितपुर",
+    memberSince: "2025-09-18T07:32:00+05:45",
+    publicLanes: ["EVENT_PARTICIPATION"],
+    supportedIssueCount: 14,
+    participatedEventCount: 6,
+    leaderNominationCount: 2,
+    discussionsStartedCount: 3,
+    featureProposalsCount: 1,
+    recentActivity: [
+      { kind: "joined-event", when: hoursAgoIso(3), target: { kind: "event", id: "evt-cleaning-around-dharan-market", slug: "cleaning-around-dharan-market", title: "Cleaning Around Dharan Market" } },
+      { kind: "supported-issue", when: daysAgoIso(2), target: { kind: "issue", id: "iss-balaju-cleanup", slug: "balaju-cleanup", title: "बालाजु क्षेत्रमा फोहोर थुप्रिएको" } },
+      { kind: "opened-discussion", when: daysAgoIso(5), target: { kind: "discussion", id: "disc-trail-marker-standards", slug: "trail-marker-standards", title: "हाइकिङ ट्रेलमा एकरूप मार्कर मानक" } }
+    ]
+  },
+  "ramesh-shrestha": {
+    id: "mem-ramesh-shrestha",
+    slug: "ramesh-shrestha",
+    displayName: "रमेश श्रेष्ठ",
+    avatarUrl: "/images/demo-events/nuwakot-darbar.jpg",
+    bio: "Frontend developer, backend curiosity. श्रमदान app निर्माणमा योगदान।",
+    city: "काठमाडौँ",
+    memberSince: "2025-07-04T11:10:00+05:45",
+    publicLanes: ["DEVELOPMENT"],
+    supportedIssueCount: 9,
+    participatedEventCount: 3,
+    leaderNominationCount: 0,
+    discussionsStartedCount: 5,
+    featureProposalsCount: 3,
+    recentActivity: [
+      { kind: "opened-proposal", when: hoursAgoIso(18), target: { kind: "discussion", id: "disc-feature-darkmode-corner-tinting", slug: "feature-darkmode-corner-tinting", title: "Dark mode को corner chrome अझ stronger blur" } },
+      { kind: "supported-issue", when: daysAgoIso(4), target: { kind: "issue", id: "iss-sankhamul-bagmati", slug: "sankhamul-bagmati", title: "साँखमुलमा बागमतीको प्लास्टिक" } }
+    ]
+  },
+  "sita-tamang": {
+    id: "mem-sita-tamang",
+    slug: "sita-tamang",
+    displayName: "सीता तामाङ",
+    avatarUrl: "/images/demo-events/manang-trail.jpg",
+    bio: "कानुनी सल्लाहकार। स्थानीय शासन र पारदर्शिता क्षेत्र।",
+    city: "पोखरा",
+    memberSince: "2025-11-12T08:45:00+05:45",
+    publicLanes: ["COMPANY_MANAGEMENT"],
+    supportedIssueCount: 22,
+    participatedEventCount: 1,
+    leaderNominationCount: 0,
+    discussionsStartedCount: 2,
+    featureProposalsCount: 0,
+    recentActivity: [
+      { kind: "posted-message", when: hoursAgoIso(6), target: { kind: "discussion", id: "disc-feature-darkmode-corner-tinting", slug: "feature-darkmode-corner-tinting", title: "Dark mode को corner chrome अझ stronger blur" } }
+    ]
+  }
+};
+
+// Anonymous-author placeholder. Public profile click-through does NOT
+// route to a member page; it stays in place with this label.
+export const ANONYMOUS_AUTHOR = Object.freeze({
+  anonymous: true,
+  displayName: "अज्ञात सदस्य",
+  displayNameEn: "Anonymous member",
+  avatarUrl: null,
+  slug: null
+});
+
+// ---- Mock discussion topics ----------------------------------------
+
+const MOCK_TOPICS = [
+  {
+    id: "disc-feature-darkmode-corner-tinting",
+    slug: "feature-darkmode-corner-tinting",
+    kind: "FEATURE_PROPOSAL",
+    title: "Dark mode को corner chrome अझ stronger blur",
+    body: "रातको प्रयोगमा corner chips पूरै सेतो जस्तो पोखिएको देखिन्छ। surface alpha अहिले 70% छ; dark mode मा 58% मा झार्ने र blur 22px राख्ने प्रस्ताव।",
+    authorMemberId: "mem-ramesh-shrestha",
+    authorDisplay: { name: "रमेश श्रेष्ठ", avatarUrl: "/images/demo-events/nuwakot-darbar.jpg", slug: "ramesh-shrestha" },
+    anonymous: false,
+    linkedEntity: null,
+    status: "OPEN",
+    messageCount: 7,
+    upvoteCount: 18,
+    distinctSupporters: 14,
+    lastActivityAt: hoursAgoIso(6),
+    createdAt: hoursAgoIso(18),
+    closedAt: null,
+    promotedAt: null,
+    proposalStatus: "OPEN",
+    promotionEligible: false,
+    votesUntilThreshold: 2,
+    supportersUntilThreshold: 0,
+    graceWindowEndsAt: null,
+    promotedAt2: null,
+    promotedBy: null,
+    promotedRoadmapAnchor: null,
+    declineReason: null
+  },
+  {
+    id: "disc-trail-marker-standards",
+    slug: "trail-marker-standards",
+    kind: "GENERAL",
+    title: "हाइकिङ ट्रेलमा एकरूप मार्कर मानक",
+    body: "विभिन्न ट्रेल मर्मत अभियानहरूले फरक रंग र चिह्न प्रयोग गरिरहेका छन्। एकरूपता आवश्यक छ — सायद Department of Tourism का मानक follow गर्ने?",
+    authorMemberId: "mem-muna-gurung",
+    authorDisplay: { name: "मुना गुरुङ", avatarUrl: "/images/demo-events/sankhu-temple.jpg", slug: "muna-gurung" },
+    anonymous: false,
+    linkedEntity: { kind: "issue", id: "iss-nagarkot-trekking", slug: "nagarkot-trekking", title: "Nagarkot Trekking Route Cleanup" },
+    status: "OPEN",
+    messageCount: 12,
+    upvoteCount: 21,
+    distinctSupporters: 17,
+    lastActivityAt: daysAgoIso(1),
+    createdAt: daysAgoIso(5)
+  },
+  {
+    id: "disc-feature-issue-vote-undo",
+    slug: "feature-issue-vote-undo",
+    kind: "FEATURE_PROPOSAL",
+    title: "Issue भोट हटाउन सकिने option",
+    body: "अहिले एकपटक भोट दिए, withdraw गर्न सकिँदैन। बेलाबेला गलत समर्थन भएकोमा हटाउन चाहिन्छ।",
+    authorMemberId: "mem-muna-gurung",
+    authorDisplay: { name: "मुना गुरुङ", avatarUrl: "/images/demo-events/sankhu-temple.jpg", slug: "muna-gurung" },
+    anonymous: false,
+    linkedEntity: null,
+    status: "OPEN",
+    messageCount: 4,
+    upvoteCount: 26,
+    distinctSupporters: 19,
+    lastActivityAt: hoursAgoIso(14),
+    createdAt: daysAgoIso(3),
+    proposalStatus: "OPEN",
+    promotionEligible: true,
+    votesUntilThreshold: 0,
+    supportersUntilThreshold: 0,
+    graceWindowEndsAt: hoursAgoIso(-30)
+  },
+  {
+    id: "disc-anon-feedback-dropdown-flow",
+    slug: "anon-feedback-dropdown-flow",
+    kind: "GENERAL",
+    title: "सहभागिता form मा role drop-down को क्रम अप्ठ्यारो",
+    body: "नयाँ सदस्य भर्ने बेला drop-down मा role list अल्फाबेटिक छैन; प्रयोगकर्तालाई दिक्क बनाउँछ।",
+    authorMemberId: null,
+    authorDisplay: { anonymous: true },
+    anonymous: true,
+    linkedEntity: null,
+    status: "OPEN",
+    messageCount: 2,
+    upvoteCount: 6,
+    distinctSupporters: 6,
+    lastActivityAt: hoursAgoIso(36),
+    createdAt: daysAgoIso(2)
+  },
+  {
+    id: "disc-event-thanks-melamchi",
+    slug: "event-thanks-melamchi",
+    kind: "GENERAL",
+    title: "मेलम्ची नदी किनारको सरसफाइ — सहभागीहरूलाई धन्यवाद",
+    body: "११० जना भाइबहिनी, ३ टन फोहोर — विकल्पको शक्ति। म साथमा रहेर सिक्न पाएको प्रत्येक हातलाई धन्यवाद।",
+    authorMemberId: "mem-sita-tamang",
+    authorDisplay: { name: "सीता तामाङ", avatarUrl: "/images/demo-events/manang-trail.jpg", slug: "sita-tamang" },
+    anonymous: false,
+    linkedEntity: { kind: "event", id: "evt-melamchi-cleanup-week", slug: "melamchi-cleanup-week", title: "मेलम्ची नदी किनार सरसफाइ" },
+    status: "OPEN",
+    messageCount: 18,
+    upvoteCount: 42,
+    distinctSupporters: 31,
+    lastActivityAt: hoursAgoIso(2),
+    createdAt: daysAgoIso(4)
+  },
+  {
+    id: "disc-promoted-app-darkmode-default",
+    slug: "promoted-app-darkmode-default",
+    kind: "FEATURE_PROPOSAL",
+    title: "Dark mode लाई सिस्टम preference अनुसार default",
+    body: "हालका सबै ब्राउजर ले OS-level dark/light preference signal पठाउँछन्। श्रमदान ले त्यो respect गर्नुपर्छ।",
+    authorMemberId: "mem-ramesh-shrestha",
+    authorDisplay: { name: "रमेश श्रेष्ठ", avatarUrl: "/images/demo-events/nuwakot-darbar.jpg", slug: "ramesh-shrestha" },
+    anonymous: false,
+    linkedEntity: null,
+    status: "PROMOTED",
+    messageCount: 24,
+    upvoteCount: 38,
+    distinctSupporters: 22,
+    lastActivityAt: daysAgoIso(7),
+    createdAt: daysAgoIso(12),
+    proposalStatus: "PROMOTED",
+    promotionEligible: false,
+    votesUntilThreshold: 0,
+    supportersUntilThreshold: 0,
+    graceWindowEndsAt: null,
+    promotedAt: daysAgoIso(6),
+    promotedBy: "SYSTEM",
+    promotedRoadmapAnchor: "#discussions-feature-darkmode-default"
+  }
+];
+
+// ---- Reader API ----------------------------------------------------
+
+export function listDiscussionTopics({ kind, linkedEntityKind, linkedEntityId, sort = "recentActivity", limit = 20 } = {}) {
+  let rows = [...MOCK_TOPICS];
+  if (kind) rows = rows.filter((r) => r.kind === kind);
+  if (linkedEntityKind) {
+    rows = rows.filter((r) => r.linkedEntity && r.linkedEntity.kind === linkedEntityKind);
+  }
+  if (linkedEntityId) {
+    rows = rows.filter((r) => r.linkedEntity && (r.linkedEntity.id === linkedEntityId || r.linkedEntity.slug === linkedEntityId));
+  }
+  if (sort === "upvotes") {
+    rows.sort((a, b) => (b.upvoteCount || 0) - (a.upvoteCount || 0));
+  } else if (sort === "nearThreshold") {
+    rows.sort((a, b) => (a.votesUntilThreshold ?? 99) - (b.votesUntilThreshold ?? 99));
+  } else {
+    rows.sort((a, b) => Date.parse(b.lastActivityAt) - Date.parse(a.lastActivityAt));
+  }
+  return Promise.resolve({ items: rows.slice(0, limit), nextCursor: null });
+}
+
+export function getDiscussionTopicBySlug(slug) {
+  const row = MOCK_TOPICS.find((r) => r.slug === slug || r.id === slug);
+  return Promise.resolve(row ?? null);
+}
+
+export function listFeatureProposals({ proposalStatus, sort = "upvotes", limit = 20 } = {}) {
+  let rows = MOCK_TOPICS.filter((r) => r.kind === "FEATURE_PROPOSAL");
+  if (proposalStatus) rows = rows.filter((r) => r.proposalStatus === proposalStatus);
+  if (sort === "nearThreshold") {
+    rows.sort((a, b) => (a.votesUntilThreshold ?? 99) - (b.votesUntilThreshold ?? 99));
+  } else if (sort === "recentActivity") {
+    rows.sort((a, b) => Date.parse(b.lastActivityAt) - Date.parse(a.lastActivityAt));
+  } else {
+    rows.sort((a, b) => (b.upvoteCount || 0) - (a.upvoteCount || 0));
+  }
+  return Promise.resolve({ items: rows.slice(0, limit), nextCursor: null });
+}
+
+export function getMemberPublicProfile(slug) {
+  const row = MOCK_MEMBERS[slug];
+  return Promise.resolve(row ?? null);
+}
+
+export function getFeatureProposalThreshold() {
+  return Promise.resolve({ upvotes: 20, distinctSupporters: 10, gracePeriodHours: 48 });
+}
+
+export function discussionPresenceForEvent(eventSlugOrId) {
+  const linked = MOCK_TOPICS.find(
+    (r) => r.linkedEntity && (r.linkedEntity.id === eventSlugOrId || r.linkedEntity.slug === eventSlugOrId)
+  );
+  if (!linked) return Promise.resolve(null);
+  return Promise.resolve({
+    topicId: linked.id,
+    topicSlug: linked.slug,
+    activeMessageCount: linked.messageCount,
+    lastActivityAt: linked.lastActivityAt
+  });
+}
