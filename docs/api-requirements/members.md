@@ -84,15 +84,7 @@
 
 ## Applications sub-entity
 
-A member's contribution applications (submitted through `/join` and similar surfaces) carry a small set of fields that the member portal surfaces under "My applications":
-
-- **id** (`string`, required, public) — unique identifier.
-- **memberId** (`string`, required, public) — applicant member.
-- **role** (`enum`, required, public) — the role being applied for. Examples: `FRONTEND_DEVELOPER`, `BACKEND_DEVELOPER`, `QA_ENGINEER`, `DEVOPS_ENGINEER`, `CONTENT_WRITER`, `TRANSLATOR`, `DESIGNER`, `PHOTOGRAPHER`, `LIVESTREAMER`, `COMMUNITY_MANAGER`. The enum is closed but extensible.
-- **status** (`enum`, required, public) — one of `SUBMITTED`, `REVIEWING`, `ACCEPTED`, `REJECTED`, `WITHDRAWN`.
-- **submittedAt** (`datetime`, required, public).
-- **decidedAt** (`datetime`, optional, public) — when status transitioned to `ACCEPTED` or `REJECTED`.
-- **note** (`string`, optional, public) — message from the reviewer attached to the decision.
+A member's contribution applications (submitted through `/join` and similar surfaces) are the same records described in full in [`applications.md`](applications.md). The member-portal's "My applications" view reads those records scoped by the authenticated member's email and surfaces a subset of the fields under `id`, `role`, `status`, `submittedAt`, `decidedAt`, and `reviewerNote`. See `applications.md` for the full field list, state machine, attachment model, and admin operations.
 
 The application enum and the event-participant role enum are intentionally disjoint. Applications are about ongoing platform contribution; event participations are about a specific real-world event.
 
@@ -124,4 +116,5 @@ Note that the spec exposes this as the `isVerified` boolean plus an implicit del
 
 ## Recent changes
 
+- `2026-06-05` — Applications sub-entity collapsed to a pointer; full spec now lives in [`applications.md`](applications.md).
 - `2026-06-03` — initial spec draft. Captures the member shape currently exercised through `/users`, `/applications`, and the member portal mocks. Includes the Applications sub-entity since it shares lifetime with the member.
