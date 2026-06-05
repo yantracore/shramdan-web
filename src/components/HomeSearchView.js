@@ -17,6 +17,7 @@ import { useRouter } from "next/navigation";
 import { ActivityStatsRow } from "@/components/ActivityStatsRow";
 import EventMapBlock from "@/components/EventMapBlock";
 import { EventsHomeRail } from "@/components/EventsHomeRail";
+import { HomeForYouStream } from "@/components/HomeForYouStream";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
 import { listAllEvents } from "@/lib/eventsApi";
@@ -158,6 +159,8 @@ export default function HomeSearchView() {
         copy={rail}
         language={language}
       />
+
+      <HomeForYouStream language={language} copy={search.forYou} />
     </SiteShell>
   );
 }

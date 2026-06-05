@@ -1404,6 +1404,18 @@ export const copy = {
         viewDetail: "विवरण",
         fullscreenOpen: "पूर्ण-स्क्रिन नक्सा खोल्नुहोस्",
         fullscreenClose: "पूर्ण-स्क्रिन नक्सा बन्द गर्नुहोस्"
+      },
+      forYou: {
+        eyebrow: "तपाईंका लागि",
+        title: "नजिकैका अभियानहरू",
+        intro: "तपाईंको ठाउँ नजिकैका लाइभ र आउँदै गरेका श्रमदान अभियानहरू।",
+        viewLink: "विवरण",
+        emptyMessage: "अहिले देखाउन कुनै अभियान छैन।",
+        statusLabels: {
+          live: "लाइभ",
+          upcoming: "आउँदै",
+          past: "सम्पन्न"
+        }
       }
     },
     liveEventsRail: {
@@ -3330,6 +3342,18 @@ export const copy = {
         viewDetail: "View detail",
         fullscreenOpen: "Open fullscreen map",
         fullscreenClose: "Exit fullscreen map"
+      },
+      forYou: {
+        eyebrow: "For you",
+        title: "Nearby campaigns",
+        intro: "Live and upcoming Shramdan campaigns near you.",
+        viewLink: "View detail",
+        emptyMessage: "No campaigns to show right now.",
+        statusLabels: {
+          live: "LIVE",
+          upcoming: "Upcoming",
+          past: "Completed"
+        }
       }
     },
     liveEventsRail: {
