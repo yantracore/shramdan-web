@@ -1,0 +1,394 @@
+/* Multi-step form shell — centered, minimal-per-step card used by:
+ *   /join (contributor form)
+ *   /issues/new (member issue creation)
+ *   /admin/issues/create (admin issue creation)
+ *   /signup (phone + OTP)
+ *
+ * The shell exposes:
+ *   .multi-step-shell        wrapper, centered column
+ *   .multi-step-dots         progress dots row
+ *   .multi-step-card         main card holding the current step
+ *   .multi-step-footer       Back / Continue bar
+ */
+
+.multi-step-shell {
+  width: 100%;
+  max-width: 620px;
+  margin: 0 auto;
+  display: grid;
+  gap: 18px;
+}
+
+.multi-step-dots {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex-wrap: wrap;
+  position: relative;
+}
+
+.multi-step-dot {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+  min-width: 0;
+  flex: 0 1 auto;
+  padding: 0 4px;
+  max-width: 120px;
+}
+
+.multi-step-dot:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 14px;
+  left: calc(50% + 18px);
+  right: calc(-50% + 18px);
+  height: 2px;
+  background: var(--line);
+  z-index: 0;
+}
+
+.multi-step-dot.is-done:not(:last-child)::after,
+.multi-step-dot.is-current:not(:last-child)::after {
+  background: color-mix(in srgb, var(--primary) 60%, var(--line));
+}
+
+.multi-step-dot-mark {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 2px solid var(--line);
+  color: var(--muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  position: relative;
+  z-index: 1;
+  transition: background 200ms ease, border-color 200ms ease, color 200ms ease, transform 200ms ease;
+}
+
+.multi-step-dot.is-current .multi-step-dot-mark {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+  transform: scale(1.08);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 18%, transparent);
+}
+
+.multi-step-dot.is-done .multi-step-dot-mark {
+  background: color-mix(in srgb, var(--primary) 85%, white);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.multi-step-dot-label {
+  font-size: 11.5px;
+  color: var(--muted);
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.25;
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.multi-step-dot.is-current .multi-step-dot-label {
+  color: var(--text);
+}
+
+@media (max-width: 560px) {
+  .multi-step-dot-label {
+    display: none;
+  }
+  .multi-step-dot {
+    max-width: none;
+  }
+  .multi-step-dot:not(:last-child)::after {
+    left: calc(50% + 14px);
+    right: calc(-50% + 14px);
+  }
+}
+
+.multi-step-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 32px 28px 24px;
+  display: grid;
+  gap: 22px;
+  box-shadow: 0 6px 28px rgba(15, 32, 26, 0.06);
+  animation: multi-step-card-in 280ms ease;
+}
+
+@keyframes multi-step-card-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .multi-step-card { animation: none; }
+  .multi-step-dot-mark { transition: none; }
+}
+
+.multi-step-card-heading {
+  display: grid;
+  gap: 6px;
+  text-align: center;
+}
+
+.multi-step-stepline {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+
+.multi-step-card-heading h1 {
+  margin: 0;
+  font-size: clamp(22px, 3.2vw, 28px);
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--text);
+}
+
+.multi-step-card-heading h1:focus-visible {
+  outline: none;
+}
+
+.multi-step-card-heading p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14.5px;
+  line-height: 1.6;
+}
+
+.multi-step-card-body {
+  display: grid;
+  gap: 14px;
+}
+
+.multi-step-card-body .ant-form-item {
+  margin-bottom: 12px;
+}
+
+.multi-step-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 6px;
+  border-top: 1px solid var(--section-divider);
+  padding-top: 18px;
+}
+
+.multi-step-back,
+.multi-step-next {
+  min-width: 130px;
+}
+
+.multi-step-footer > span {
+  /* placeholder span keeps "Back" + "Next" on opposite ends when Back is hidden */
+  flex: 0 0 auto;
+  width: 130px;
+}
+
+/* ---------- Role lane selector (cards inside step 3 of /join) ---------- */
+
+.role-lane-list {
+  display: grid;
+  gap: 12px;
+}
+
+.role-lane-card {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1.5px solid var(--line);
+  background: var(--surface);
+  color: var(--text);
+  text-align: start;
+  cursor: pointer;
+  font: inherit;
+  transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
+}
+
+.role-lane-card:hover,
+.role-lane-card:focus-visible {
+  border-color: color-mix(in srgb, var(--primary) 50%, var(--line));
+  background: color-mix(in srgb, var(--primary) 4%, var(--surface));
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.role-lane-card.is-selected {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 8%, var(--surface));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 14%, transparent);
+}
+
+.role-lane-card-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--primary) 12%, var(--surface));
+  color: var(--primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex: 0 0 auto;
+}
+
+.role-lane-card.is-selected .role-lane-card-icon {
+  background: var(--primary);
+  color: #fff;
+}
+
+.role-lane-card-text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.role-lane-card-title {
+  font-weight: 700;
+  font-size: 15.5px;
+  line-height: 1.3;
+  color: var(--text);
+}
+
+.role-lane-card-desc {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.role-lane-card-pick {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--primary);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+
+.role-lane-card.is-selected .role-lane-card-pick {
+  opacity: 1;
+}
+
+.role-lane-card-error {
+  margin: 6px 0 0;
+  color: var(--accent);
+  font-size: 13px;
+}
+
+/* ---------- Step 1 intro / hero variants ---------- */
+
+.multi-step-intro-card {
+  text-align: center;
+  display: grid;
+  gap: 18px;
+}
+
+.multi-step-intro-card ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+  text-align: start;
+}
+
+.multi-step-intro-card ul li {
+  position: relative;
+  padding: 12px 14px 12px 42px;
+  background: color-mix(in srgb, var(--primary) 5%, var(--surface));
+  border-radius: 12px;
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.multi-step-intro-card ul li::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: var(--primary);
+  transform: translateY(-50%);
+  background-image: linear-gradient(135deg, var(--primary), color-mix(in srgb, var(--primary) 60%, #fff));
+}
+
+/* ---------- Review summary on last step ---------- */
+
+.multi-step-review {
+  display: grid;
+  gap: 10px;
+}
+
+.multi-step-review-row {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap: 14px;
+  padding: 10px 12px;
+  background: var(--surface-soft);
+  border-radius: 10px;
+  font-size: 13.5px;
+  line-height: 1.5;
+  align-items: start;
+}
+
+.multi-step-review-row dt {
+  margin: 0;
+  font-weight: 700;
+  color: var(--muted);
+  font-size: 12.5px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.multi-step-review-row dd {
+  margin: 0;
+  color: var(--text);
+  word-break: break-word;
+}
+
+@media (max-width: 540px) {
+  .multi-step-review-row {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+  .multi-step-card {
+    padding: 24px 18px 18px;
+  }
+}
+
+[data-theme="dark"] .multi-step-card {
+  box-shadow: 0 6px 28px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .role-lane-card {
+  background: color-mix(in srgb, var(--surface) 96%, #fff);
+}
+
+[data-theme="dark"] .multi-step-intro-card ul li {
+  background: color-mix(in srgb, var(--primary) 12%, var(--surface));
+}

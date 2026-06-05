@@ -1,9 +1,9 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import Image from "next/image";
 import { Suspense, useState } from "react";
 import { ContributorForm } from "@/components/ContributorForm";
+import { ROLE_LANE_VALUES } from "@/components/RoleLaneSelector";
 import { isHoneypotTriggered } from "@/components/Honeypot";
 import { SiteShell } from "@/components/SiteShell";
 import { SubmissionSuccessCard } from "@/components/SubmissionSuccessCard";
@@ -12,73 +12,50 @@ import { postJson } from "@/lib/apiClient";
 import { copy } from "@/lib/siteContent";
 import { useToast } from "@/lib/toast";
 
-const joinVisualCopy = {
-  np: {
-    alt: "श्रमदानका योगदानकर्ताहरू सामुदायिक कामको योजना बनाउँदै",
-    eyebrow: "किन जोडिने?",
-    title: "तपाईंको सीपले समुदायको काम अघि बढाउँछ",
-    body:
-      "श्रमदानमा विकासकर्ता, डिजाइनर, लेखक, संयोजक वा स्वयंसेवकका रूपमा जोडिँदा तपाईंको योगदान वास्तविक अभियान, रिपोर्ट र सामुदायिक निर्णयमा प्रयोग हुन्छ।",
-    points: [
-      "आफ्नो समय र सीप अनुसार भूमिका छान्नुहोस्।",
-      "हामीले उपयुक्त काम र अभियानसँग जोड्न सम्पर्क गर्छौँ।",
-      "सानो योगदानले पनि सार्वजनिक समस्या समाधानतिर धकेल्छ।"
-    ],
-    stats: [
-      { value: "१२+", label: "योगदान भूमिका" },
-      { value: "१", label: "साझा उद्देश्य" }
-    ]
-  },
-  en: {
-    alt: "Shramdan contributors planning community work together",
-    eyebrow: "Why join?",
-    title: "Your skills can move community work forward",
-    body:
-      "Join as a developer, designer, writer, organiser, or volunteer. Your contribution can support real campaigns, reports, and local decisions.",
-    points: [
-      "Choose a role that matches your time and skills.",
-      "We connect you with relevant work or campaigns.",
-      "Even a small contribution helps local problems move toward action."
-    ],
-    stats: [
-      { value: "12+", label: "Contributor roles" },
-      { value: "1", label: "Shared purpose" }
-    ]
-  }
+// Legacy ?role= URL params (e.g. /join?role=FRONTEND_DEVELOPER) used to
+// pre-select a backend enum value on the old single-page form. After the
+// 2026-06-05 multi-step refactor, the form ships three lane buckets. We map
+// legacy backend enums to their corresponding lane so deep links from the
+// homepage "We need you" rail keep landing on a useful pre-selection.
+const LEGACY_ROLE_TO_LANE = {
+  FRONTEND_DEVELOPER: "DEVELOPMENT",
+  BACKEND_DEVELOPER: "DEVELOPMENT",
+  QA_ENGINEER: "DEVELOPMENT",
+  DEVOPS_ENGINEER: "DEVELOPMENT",
+  UI_UX_DESIGNER: "DEVELOPMENT",
+  GRAPHICS_DESIGNER: "DEVELOPMENT",
+  CONTENT_WRITER: "DEVELOPMENT",
+  TRANSLATOR: "DEVELOPMENT",
+  PHOTOGRAPHER: "EVENT_PARTICIPATION",
+  LIVESTREAMER: "EVENT_PARTICIPATION",
+  VOLUNTEER: "EVENT_PARTICIPATION",
+  COMMUNITY_MANAGER: "COMPANY_MANAGEMENT",
+  LEGAL: "COMPANY_MANAGEMENT",
+  FINANCE: "COMPANY_MANAGEMENT",
+  DONOR: "COMPANY_MANAGEMENT"
 };
+
+function resolveInitialLane(rawRole) {
+  if (!rawRole) return undefined;
+  if (ROLE_LANE_VALUES.includes(rawRole)) return rawRole;
+  return LEGACY_ROLE_TO_LANE[rawRole];
+}
 
 function JoinPageContent() {
   const { language } = usePreferences();
   const searchParams = useSearchParams();
   const t = copy[language];
-  const visual = joinVisualCopy[language] ?? joinVisualCopy.np;
   const messageApi = useToast();
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const selectedRole = searchParams.get("role");
-  const allowedRoles = new Set(t.options.applicationRoles.map((role) => role.value));
-  const initialRole = allowedRoles.has(selectedRole) ? selectedRole : undefined;
 
-  // When the user lands here via /join?role=<X>, surface a small context
-  // banner above the form so they see what they're signing up for before
-  // they fill in their details.
-  const matchedRole = initialRole
-    ? t.volunteerInvite.roles.find((role) => role.value === initialRole)
-    : null;
-  const matchedEventId = searchParams.get("event");
+  const initialLane = resolveInitialLane(searchParams.get("role"));
 
-  const handleSubmit = async (values) => {
-    if (isHoneypotTriggered(values)) {
+  const handleSubmit = async (payload) => {
+    if (isHoneypotTriggered(payload)) {
       setSubmitted(true);
       return true;
     }
-
-    const { consent: _consent, website: _website, resume, ...rest } = values;
-
-    const payload = {
-      ...rest,
-      ...(resume?.id ? { resumeId: resume.id } : {})
-    };
 
     setSubmitting(true);
 
@@ -99,7 +76,7 @@ function JoinPageContent() {
 
   return (
     <SiteShell pageTitle={t.pageTitles.join}>
-      <section className="page-section form-section form-section-wide">
+      <section className="page-section multi-step-section">
         {submitted ? (
           <SubmissionSuccessCard
             language={language}
@@ -123,67 +100,19 @@ function JoinPageContent() {
             onReset={() => setSubmitted(false)}
           />
         ) : (
-          <div className="form-page-layout">
-            <aside className="form-visual-panel" aria-labelledby="join-visual-title">
-              <div className="form-visual-media">
-                <Image
-                  alt={visual.alt}
-                  fill
-                  priority
-                  sizes="(max-width: 900px) 100vw, 520px"
-                  src="/images/forms/join-contributors.webp"
-                />
-              </div>
-              <div className="form-visual-copy">
-                <span className="eyebrow">{visual.eyebrow}</span>
-                <h2 id="join-visual-title">{visual.title}</h2>
-                <p>{visual.body}</p>
-              </div>
-              <div className="form-visual-stats" aria-hidden="true">
-                {visual.stats.map((item) => (
-                  <span className="form-visual-stat" key={`${item.value}-${item.label}`}>
-                    <strong>{item.value}</strong>
-                    <span>{item.label}</span>
-                  </span>
-                ))}
-              </div>
-              <ul className="form-visual-list">
-                {visual.points.map((point) => (
-                  <li key={point}>{point}</li>
-                ))}
-              </ul>
-              {matchedRole ? (
-                <div
-                  className="join-role-context"
-                  aria-label={language === "np" ? "छानिएको भूमिका" : "Selected role"}
-                >
-                  <span className="join-role-context-eyebrow">
-                    {language === "np" ? "तपाईंले छान्नुभएको भूमिका" : "You're joining as"}
-                  </span>
-                  <h3>{matchedRole.title}</h3>
-                  <p>{matchedRole.description}</p>
-                  {matchedEventId ? (
-                    <p className="join-role-context-event">
-                      {language === "np" ? `अभियानका लागि: ${matchedEventId}` : `For event: ${matchedEventId}`}
-                    </p>
-                  ) : null}
-                </div>
-              ) : null}
-            </aside>
-            <ContributorForm
-              content={t}
-              eyebrow={t.join.eyebrow}
-              title={t.join.title}
-              intro={
-                language === "np"
-                  ? "तपाईं कसरी योगदान गर्न चाहनुहुन्छ बताउनुहोस्। हामी तपाईंको भूमिका, उपलब्ध समय र सीप अनुसार उपयुक्त कामसँग जोड्नेछौँ।"
-                  : "Tell us how you want to contribute. We will match your role, availability, and skills with the right work."
-              }
-              initialRole={initialRole}
-              onSubmit={handleSubmit}
-              submitting={submitting}
-            />
-          </div>
+          <ContributorForm
+            content={t}
+            language={language}
+            eyebrow={t.join.eyebrow}
+            intro={
+              language === "np"
+                ? "तपाईं कसरी योगदान गर्न चाहनुहुन्छ बताउनुहोस्। हामी तपाईंको भूमिका, उपलब्ध समय र सीप अनुसार उपयुक्त कामसँग जोड्नेछौँ।"
+                : "Tell us how you want to contribute. We will match your role, availability, and skills with the right work."
+            }
+            initialRole={initialLane}
+            onSubmit={handleSubmit}
+            submitting={submitting}
+          />
         )}
       </section>
     </SiteShell>

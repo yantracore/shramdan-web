@@ -7,14 +7,18 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { AdminShell } from "@/components/AdminShell";
 import { AdminPanelHeading } from "@/components/admin/AdminPanelHeading";
-import { IssueForm } from "@/components/admin/IssueForm";
+import { IssueMultiStepForm } from "@/components/admin/IssueMultiStepForm";
 import { postJson } from "@/lib/apiClient";
+import { copy } from "@/lib/siteContent";
 import { useToast } from "@/lib/toast";
 
 export default function AdminIssueCreatePage() {
   const router = useRouter();
   const toast = useToast();
   const [submitting, setSubmitting] = useState(false);
+  // Admin UI is EN-only (per project_language_scope memory); pull the
+  // English copy block so the multi-step shell can render step titles.
+  const enCopy = copy.en;
 
   const handleFinish = async (values) => {
     setSubmitting(true);
@@ -39,7 +43,7 @@ export default function AdminIssueCreatePage() {
 
   return (
     <AdminShell title="Create issue">
-      <section className="admin-panel">
+      <section className="admin-panel multi-step-section">
         <AdminPanelHeading
           eyebrow="Community issues"
           title="Create issue"
@@ -51,7 +55,8 @@ export default function AdminIssueCreatePage() {
           }
         />
 
-        <IssueForm
+        <IssueMultiStepForm
+          copy={enCopy}
           submitting={submitting}
           submitLabel="Create issue"
           onSubmit={handleFinish}

@@ -1,14 +1,15 @@
 "use client";
 
-import { CloudUploadOutlined, DeleteOutlined, SendOutlined } from "@ant-design/icons";
+import { CloudUploadOutlined, DeleteOutlined } from "@ant-design/icons";
 import { Button, Input, Select, Spin } from "antd";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePreferences } from "@/app/providers";
 import { Form } from "@/components/AppForm";
 import { IssueCoverUpload } from "@/components/admin/IssueCoverUpload";
 import { IssueImagesUpload } from "@/components/admin/IssueImagesUpload";
 import IssueLocationPickerBlock from "@/components/IssueLocationPickerBlock";
+import { MultiStepShell } from "@/components/MultiStepShell";
 import { SiteShell } from "@/components/SiteShell";
 import { postJson } from "@/lib/apiClient";
 import { ISSUE_CATEGORIES } from "@/lib/adminUtils";
@@ -17,10 +18,22 @@ import { buildLoginHref } from "@/lib/loginRedirect";
 import { copy } from "@/lib/siteContent";
 import { useToast } from "@/lib/toast";
 
+/* /issues/new — multi-step issue reporter.
+ *
+ * Five centered steps:
+ *   0. cover    Cover photo upload
+ *   1. basics   Title + Description
+ *   2. place    Map pin + Address text
+ *   3. extras   Category + Additional photos
+ *   4. review   Summary + Submit
+ *
+ * Auth gate, draft-restore prompt and 14-day TTL draft auto-save are preserved
+ * from the pre-refactor implementation. */
+
 const NEW_ISSUE_PATH = "/issues/new";
 const DRAFT_KEY = "shramdan:issue-draft:v1";
 const DRAFT_DEBOUNCE_MS = 800;
-const DRAFT_TTL_MS = 14 * 24 * 60 * 60_000; // 14 days
+const DRAFT_TTL_MS = 14 * 24 * 60 * 60_000;
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 
@@ -103,10 +116,7 @@ function writeDraft(values) {
   }
   const savedAt = Date.now();
   try {
-    window.localStorage.setItem(
-      DRAFT_KEY,
-      JSON.stringify({ values, savedAt })
-    );
+    window.localStorage.setItem(DRAFT_KEY, JSON.stringify({ values, savedAt }));
   } catch {
     // quota / serialization — swallow; draft is best-effort
   }
@@ -132,21 +142,24 @@ const coverImageValidator = (message) => (_rule, cover) =>
   cover?.id ? Promise.resolve() : Promise.reject(new Error(message));
 
 const locationValidator = (message) => (_rule, location) => {
-  if (
-    location &&
-    Number.isFinite(location.lat) &&
-    Number.isFinite(location.lng)
-  ) {
+  if (location && Number.isFinite(location.lat) && Number.isFinite(location.lng)) {
     return Promise.resolve();
   }
   return Promise.reject(new Error(message));
 };
 
 function FormLocationField({ value, onChange, ...rest }) {
-  return (
-    <IssueLocationPickerBlock value={value} onChange={onChange} {...rest} />
-  );
+  return <IssueLocationPickerBlock value={value} onChange={onChange} {...rest} />;
 }
+
+const STEP_KEYS = ["cover", "basics", "place", "extras", "review"];
+const STEP_FIELDS = {
+  cover: ["cover"],
+  basics: ["title", "description"],
+  place: ["location", "addressText"],
+  extras: ["category"],
+  review: []
+};
 
 export default function NewIssuePage() {
   const router = useRouter();
@@ -156,15 +169,16 @@ export default function NewIssuePage() {
   const fields = labels.fields;
   const pickerLabels = fields.picker;
   const dt = DRAFT_COPY[language] || DRAFT_COPY.np;
+  const ms = t.multiStep;
+  const stepCopy = ms.issueNew.steps;
   const messageApi = useToast();
   const [form] = Form.useForm();
   const [authChecked, setAuthChecked] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [locationError, setLocationError] = useState(null);
   const addressTouchedRef = useRef(false);
+  const [stepIndex, setStepIndex] = useState(0);
 
-  // Draft state — banner appears on mount if a usable draft exists.
-  // savedAt drives the "X min ago" status pill near the submit button.
   const [draftPrompt, setDraftPrompt] = useState(null);
   const [savedAt, setSavedAt] = useState(null);
   const [, forceTick] = useState(0);
@@ -172,17 +186,14 @@ export default function NewIssuePage() {
 
   useEffect(() => {
     const session = getAuthSession();
-
     if (!session?.user) {
       messageApi.info(labels.authRequiredMessage);
       router.replace(buildLoginHref(NEW_ISSUE_PATH, "report"));
       return;
     }
-
     setAuthChecked(true);
   }, [router, messageApi, labels.authRequiredMessage]);
 
-  // Surface restore prompt once the form is mounted (post auth-gate).
   useEffect(() => {
     if (!authChecked) return;
     const existing = readDraft();
@@ -191,15 +202,12 @@ export default function NewIssuePage() {
     }
   }, [authChecked]);
 
-  // Re-render every 30s so "X min ago" stays fresh without a timer
-  // on every keystroke.
   useEffect(() => {
     if (!savedAt) return undefined;
     const id = setInterval(() => forceTick((n) => n + 1), 30_000);
     return () => clearInterval(id);
   }, [savedAt]);
 
-  // Flush pending debounce on unmount so a half-typed draft isn't lost.
   useEffect(() => {
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -233,10 +241,10 @@ export default function NewIssuePage() {
     messageApi.info(dt.discardedToast);
   };
 
-  const categoryOptions = ISSUE_CATEGORIES.map((value) => ({
-    value,
-    label: labels.categories[value] ?? value
-  }));
+  const categoryOptions = useMemo(
+    () => ISSUE_CATEGORIES.map((value) => ({ value, label: labels.categories[value] ?? value })),
+    [labels.categories]
+  );
 
   const handleAddressSuggestion = (suggested) => {
     if (addressTouchedRef.current) return;
@@ -248,12 +256,50 @@ export default function NewIssuePage() {
     addressTouchedRef.current = true;
   };
 
-  const handleSubmit = async (values) => {
+  const stepDefs = useMemo(
+    () =>
+      STEP_KEYS.map((key) => ({
+        key,
+        title: stepCopy[key].title,
+        heading: stepCopy[key].heading,
+        intro: stepCopy[key].intro
+      })),
+    [stepCopy]
+  );
+
+  const currentKey = STEP_KEYS[stepIndex];
+  const isLast = currentKey === "review";
+
+  const goNext = async () => {
+    const fieldsToCheck = STEP_FIELDS[currentKey];
+    if (fieldsToCheck.length) {
+      try {
+        await form.validateFields(fieldsToCheck);
+      } catch {
+        return;
+      }
+    }
+    setStepIndex((i) => i + 1);
+  };
+
+  const goBack = () => {
+    setStepIndex((i) => Math.max(0, i - 1));
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const allFields = Object.values(STEP_FIELDS).flat();
+      await form.validateFields(allFields);
+    } catch {
+      messageApi.error(t.messages.submitError);
+      return;
+    }
+
+    const values = form.getFieldsValue(true);
     const cover = values.cover;
     const location = values.location || {};
-    const additionalImages = Array.isArray(values.additionalImages)
-      ? values.additionalImages
-      : [];
+    const additionalImages = Array.isArray(values.additionalImages) ? values.additionalImages : [];
+
     const payload = {
       title: values.title,
       description: values.description,
@@ -276,7 +322,6 @@ export default function NewIssuePage() {
       setSavedAt(null);
       const created = response?.data ?? response;
       const newSlugOrId = created?.slug ?? created?.id;
-
       if (newSlugOrId) {
         router.push(`/issues/${newSlugOrId}`);
       } else {
@@ -318,7 +363,7 @@ export default function NewIssuePage() {
 
   return (
     <SiteShell pageTitle={labels.title}>
-      <section className="page-section new-issue-section">
+      <section className="page-section multi-step-section new-issue-section">
         {draftPrompt ? (
           <aside className="new-issue-draft-banner" role="status">
             <div className="new-issue-draft-banner-text">
@@ -327,27 +372,16 @@ export default function NewIssuePage() {
                 <strong>{dt.foundTitle}</strong>
                 <span>
                   {promptAge
-                    ? dt.foundIntroFmt.replace(
-                        "{time}",
-                        localizeDigits(promptAge, language)
-                      )
+                    ? dt.foundIntroFmt.replace("{time}", localizeDigits(promptAge, language))
                     : dt.foundIntroFmt.replace("{time} ", "")}
                 </span>
               </div>
             </div>
             <div className="new-issue-draft-banner-actions">
-              <Button
-                type="primary"
-                size="small"
-                onClick={handleRestoreDraft}
-              >
+              <Button type="primary" size="small" onClick={handleRestoreDraft}>
                 {dt.restore}
               </Button>
-              <Button
-                size="small"
-                icon={<DeleteOutlined />}
-                onClick={handleDiscardDraft}
-              >
+              <Button size="small" icon={<DeleteOutlined />} onClick={handleDiscardDraft}>
                 {dt.discard}
               </Button>
             </div>
@@ -357,109 +391,165 @@ export default function NewIssuePage() {
         <Form
           form={form}
           layout="vertical"
-          className="content-card form-card new-issue-form"
+          component="div"
           initialValues={{ category: "ROADSIDE" }}
-          onFinish={handleSubmit}
           onValuesChange={scheduleDraftSave}
+          preserve
         >
-          <header className="form-card-heading">
-            <span className="eyebrow">{labels.eyebrow}</span>
-            <h1>{labels.title}</h1>
-            <p>{labels.intro}</p>
-          </header>
-
-          <Form.Item
-            name="cover"
-            label={fields.cover}
-            required
-            valuePropName="value"
-            rules={[{ validator: coverImageValidator(fields.coverRequired) }]}
+          <MultiStepShell
+            steps={stepDefs}
+            current={stepIndex}
+            language={language}
+            onBack={goBack}
+            onNext={goNext}
+            onSubmit={handleSubmit}
+            nextLoading={submitting && isLast}
+            isSubmitStep={isLast}
+            submitLabel={labels.submit}
           >
-            <IssueCoverUpload />
-          </Form.Item>
+            {currentKey === "cover" ? (
+              <Form.Item
+                name="cover"
+                label={fields.cover}
+                required
+                valuePropName="value"
+                rules={[{ validator: coverImageValidator(fields.coverRequired) }]}
+              >
+                <IssueCoverUpload />
+              </Form.Item>
+            ) : null}
 
-          <Form.Item
-            name="additionalImages"
-            label={fields.additionalImages}
-            valuePropName="value"
-          >
-            <IssueImagesUpload />
-          </Form.Item>
+            {currentKey === "basics" ? (
+              <>
+                <Form.Item
+                  name="title"
+                  label={fields.title}
+                  rules={[{ required: true, message: fields.titleRequired }]}
+                >
+                  <Input autoFocus maxLength={140} placeholder={fields.titlePlaceholder} />
+                </Form.Item>
+                <Form.Item
+                  name="description"
+                  label={fields.description}
+                  rules={[{ required: true, message: fields.descriptionRequired }]}
+                >
+                  <Input.TextArea
+                    rows={6}
+                    maxLength={2000}
+                    showCount
+                    placeholder={fields.descriptionPlaceholder}
+                  />
+                </Form.Item>
+              </>
+            ) : null}
 
-          <Form.Item
-            name="title"
-            label={fields.title}
-            rules={[{ required: true, message: fields.titleRequired }]}
-          >
-            <Input maxLength={140} placeholder={fields.titlePlaceholder} />
-          </Form.Item>
+            {currentKey === "place" ? (
+              <>
+                <Form.Item
+                  name="location"
+                  label={fields.location}
+                  rules={[{ validator: locationValidator(fields.locationRequired) }]}
+                >
+                  <FormLocationField
+                    language={language}
+                    labels={pickerLabels}
+                    onAddressSuggestion={handleAddressSuggestion}
+                    onLocationError={setLocationError}
+                  />
+                </Form.Item>
+                {locationError ? (
+                  <p className="new-issue-location-error">{locationError}</p>
+                ) : null}
+                <Form.Item
+                  name="addressText"
+                  label={fields.address}
+                  extra={fields.addressFromMap}
+                  rules={[{ required: true, message: fields.addressRequired }]}
+                >
+                  <Input
+                    placeholder={fields.addressPlaceholder}
+                    onChange={handleAddressFieldChange}
+                  />
+                </Form.Item>
+              </>
+            ) : null}
 
-          <Form.Item
-            name="description"
-            label={fields.description}
-            rules={[{ required: true, message: fields.descriptionRequired }]}
-          >
-            <Input.TextArea
-              rows={6}
-              maxLength={2000}
-              showCount
-              placeholder={fields.descriptionPlaceholder}
-            />
-          </Form.Item>
+            {currentKey === "extras" ? (
+              <>
+                <Form.Item
+                  name="category"
+                  label={fields.category}
+                  rules={[{ required: true, message: fields.categoryRequired }]}
+                >
+                  <Select options={categoryOptions} placeholder={fields.categoryPlaceholder} />
+                </Form.Item>
+                <Form.Item
+                  name="additionalImages"
+                  label={fields.additionalImages}
+                  valuePropName="value"
+                >
+                  <IssueImagesUpload />
+                </Form.Item>
+              </>
+            ) : null}
 
-          <Form.Item
-            name="category"
-            label={fields.category}
-            rules={[{ required: true, message: fields.categoryRequired }]}
-          >
-            <Select options={categoryOptions} placeholder={fields.categoryPlaceholder} />
-          </Form.Item>
+            {currentKey === "review" ? (
+              <ReviewSummary form={form} labels={labels} language={language} />
+            ) : null}
+          </MultiStepShell>
 
-          <Form.Item
-            name="location"
-            label={fields.location}
-            rules={[{ validator: locationValidator(fields.locationRequired) }]}
-          >
-            <FormLocationField
-              language={language}
-              labels={pickerLabels}
-              onAddressSuggestion={handleAddressSuggestion}
-              onLocationError={setLocationError}
-            />
-          </Form.Item>
-          {locationError ? (
-            <p className="new-issue-location-error">{locationError}</p>
-          ) : null}
-
-          <Form.Item
-            name="addressText"
-            label={fields.address}
-            extra={fields.addressFromMap}
-            rules={[{ required: true, message: fields.addressRequired }]}
-          >
-            <Input
-              placeholder={fields.addressPlaceholder}
-              onChange={handleAddressFieldChange}
-            />
-          </Form.Item>
-
-          <Button
-            type="primary"
-            htmlType="submit"
-            size="large"
-            icon={<SendOutlined />}
-            loading={submitting}
-            block
-          >
-            {labels.submit}
-          </Button>
           {savedAgoLabel ? (
-            <p className="new-issue-draft-status" aria-live="polite">
+            <p className="new-issue-draft-status" aria-live="polite" style={{ textAlign: "center" }}>
               <CloudUploadOutlined aria-hidden="true" /> {savedAgoLabel}
             </p>
           ) : null}
         </Form>
       </section>
     </SiteShell>
+  );
+}
+
+function ReviewSummary({ form, labels, language }) {
+  const v = form.getFieldsValue(true);
+  const loc = v.location;
+  const categoryLabel = v.category ? labels.categories[v.category] ?? v.category : "—";
+  const photos = Array.isArray(v.additionalImages) ? v.additionalImages.length : 0;
+  return (
+    <dl className="multi-step-review">
+      <div className="multi-step-review-row">
+        <dt>{labels.fields.title}</dt>
+        <dd>{v.title || "—"}</dd>
+      </div>
+      <div className="multi-step-review-row">
+        <dt>{labels.fields.description}</dt>
+        <dd>{v.description || "—"}</dd>
+      </div>
+      <div className="multi-step-review-row">
+        <dt>{labels.fields.category}</dt>
+        <dd>{categoryLabel}</dd>
+      </div>
+      <div className="multi-step-review-row">
+        <dt>{labels.fields.address}</dt>
+        <dd>{v.addressText || "—"}</dd>
+      </div>
+      <div className="multi-step-review-row">
+        <dt>{labels.fields.location}</dt>
+        <dd>
+          {loc && Number.isFinite(loc.lat)
+            ? `${loc.lat.toFixed(5)}, ${loc.lng.toFixed(5)}`
+            : "—"}
+        </dd>
+      </div>
+      <div className="multi-step-review-row">
+        <dt>{labels.fields.additionalImages}</dt>
+        <dd>
+          {photos > 0
+            ? language === "np"
+              ? `${photos} तस्वीर`
+              : `${photos} photo${photos === 1 ? "" : "s"}`
+            : "—"}
+        </dd>
+      </div>
+    </dl>
   );
 }
