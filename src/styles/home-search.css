@@ -350,7 +350,15 @@
   font-size: 15px;
 }
 
-.home-for-you-view-all {
+.home-for-you-header-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.home-for-you-view-all,
+.home-for-you-location-cta {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -363,13 +371,32 @@
   background: color-mix(in srgb, var(--surface) 70%, transparent);
   -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
+  cursor: pointer;
   transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
 }
 
-.home-for-you-view-all:hover {
+.home-for-you-view-all:hover,
+.home-for-you-location-cta:hover {
   background: color-mix(in srgb, var(--primary) 10%, var(--surface));
   border-color: color-mix(in srgb, var(--primary) 32%, var(--line));
   transform: translateY(-1px);
+}
+
+.home-for-you-location-cta {
+  /* Slight emphasis — this is a one-off opt-in action, not part of
+   * the regular nav flow. */
+  background: color-mix(in srgb, var(--primary) 14%, color-mix(in srgb, var(--surface) 80%, transparent));
+  border-color: color-mix(in srgb, var(--primary) 30%, var(--line));
+}
+
+.home-for-you-location-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: var(--primary-dark);
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .home-for-you-grid {
@@ -478,6 +505,28 @@
   background: color-mix(in srgb, #16a34a 26%, rgba(0, 0, 0, 0.34));
   border-color: rgba(255, 255, 255, 0.34);
   color: #fff;
+}
+
+/* Distance pill — bottom-right of the poster. Distinguishable from
+ * the status badge (top-left) so users can scan both at a glance. */
+.home-for-you-card-distance {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.46);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: #fff;
+  white-space: nowrap;
 }
 
 .home-for-you-card-badge .live-dot {

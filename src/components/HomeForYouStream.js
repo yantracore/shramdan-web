@@ -1,24 +1,29 @@
 "use client";
 
-// Phase 2 v3 — "For you" curated event grid that sits below the carousel.
-// Scroll-revealed naturally (no JS-gated reveal): the homepage's
-// above-the-fold (brand + search + pills + map + carousel) fills the
-// viewport, and this grid is what users find when they scroll down.
+// Phase 2 v3+v4 — "For you" curated event grid that sits below the
+// carousel. Scroll-revealed naturally (no JS-gated reveal): the
+// homepage's above-the-fold (brand + search + pills + map + carousel)
+// fills the viewport, and this grid is what users find when they
+// scroll down.
 //
-// Ranking v0:
-//   1. Live events first
-//   2. Upcoming events sorted by scheduledAt (soonest first)
-//   3. Past events at the bottom (recency-sorted)
+// Ranking — adaptive:
+//   v4 (preferred): geolocation granted → entries sorted by Haversine
+//     distance from the user. Each card shows a "{n} km दूर" badge.
+//     Live events still get a status badge; distance is additive.
+//   v0 (fallback): live → upcoming (soonest first) → past (newest first).
+//     Used until permission is granted (or when denied / unsupported).
 //
-// Geolocation-based proximity ranking is Phase 2 v4 work — adds a
-// useGeolocation hook + Haversine distance. v0 is the same ordering the
-// rail uses, just laid out as a denser grid so visitors can see more at
-// a glance than the carousel allows.
+// Permission flow: silent — we attempt request() once after the grid
+// has loaded data. If the user declines or the browser blocks the
+// prompt, we leave a "नजिकैका देखाउनुहोस्" / "Show nearby" affordance
+// in the header so they can opt in later.
 
-import { ArrowRightOutlined, CalendarOutlined, EnvironmentOutlined } from "@ant-design/icons";
+import { AimOutlined, ArrowRightOutlined, CalendarOutlined, EnvironmentOutlined } from "@ant-design/icons";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { listAllEvents } from "@/lib/eventsApi";
+import { distanceKmOrNull } from "@/lib/haversine";
+import { useGeolocation } from "@/lib/useGeolocation";
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 const NP_MONTHS_SHORT = [
@@ -54,9 +59,18 @@ function formatScheduledLabel(iso, language) {
   }
 }
 
-function ForYouCard({ event, status, language, copy }) {
+function formatDistance(km, language, copy) {
+  if (km == null) return null;
+  if (km < 1) return copy?.distanceNearby || (language === "np" ? "नजिकै" : "Nearby");
+  const rounded = km < 10 ? km.toFixed(1) : Math.round(km).toString();
+  const suffix = copy?.distanceSuffix || (language === "np" ? "किमी दूर" : "km away");
+  return `${localizeDigits(rounded, language)} ${suffix}`;
+}
+
+function ForYouCard({ event, status, distanceKm, language, copy }) {
   const dateLabel = formatScheduledLabel(event.scheduledAt, language);
   const statusLabel = copy?.statusLabels?.[status] || status;
+  const distanceLabel = formatDistance(distanceKm, language, copy);
   const poster = event.thumbnailUrl || "/images/event-types/cleanup.jpg";
 
   return (
@@ -75,6 +89,12 @@ function ForYouCard({ event, status, language, copy }) {
             ) : null}
             {statusLabel}
           </span>
+          {distanceLabel ? (
+            <span className="home-for-you-card-distance" aria-label={distanceLabel}>
+              <AimOutlined aria-hidden="true" />
+              {distanceLabel}
+            </span>
+          ) : null}
         </div>
         <div className="home-for-you-card-body">
           <h3>{event.title}</h3>
@@ -106,6 +126,8 @@ export function HomeForYouStream({ language = "np", copy }) {
   const t = copy ?? {};
   const [buckets, setBuckets] = useState({ live: [], upcoming: [], past: [] });
   const [loaded, setLoaded] = useState(false);
+  const { position, busy, error, request } = useGeolocation();
+  const [autoRequested, setAutoRequested] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -130,29 +152,74 @@ export function HomeForYouStream({ language = "np", copy }) {
     };
   }, [language]);
 
-  // v0 ranking: live → upcoming (soonest first) → past (newest first).
-  // Caps the visible count at 12 so the grid stays scannable; "View
-  // all" link sits in the header for the full list.
+  // Auto-request geolocation once data has loaded. Silent — if the user
+  // denies or the browser blocks, we keep the v0 ranking and surface a
+  // "Show nearby" affordance so they can opt in later.
+  useEffect(() => {
+    if (!loaded) return;
+    if (autoRequested) return;
+    if (position || error) return;
+    // Defer to the next frame so React's effect rule
+    // (react-hooks/set-state-in-effect) is satisfied — the flag is set
+    // alongside the geolocation call, not synchronously in the body.
+    const raf = window.requestAnimationFrame(() => {
+      setAutoRequested(true);
+      request();
+    });
+    return () => window.cancelAnimationFrame(raf);
+  }, [loaded, position, error, autoRequested, request]);
+
   const entries = useMemo(() => {
     const tag = (events, status) =>
-      (events ?? []).map((event) => ({ event, status }));
+      (events ?? []).map((event) => ({
+        event,
+        status,
+        distanceKm: distanceKmOrNull(position, event.latitude, event.longitude)
+      }));
+
     const live = tag(buckets.live, "live");
-    const upcoming = tag(buckets.upcoming, "upcoming").sort((a, b) => {
+    const upcoming = tag(buckets.upcoming, "upcoming");
+    const past = tag(buckets.past, "past");
+    const all = [...live, ...upcoming, ...past];
+
+    if (position) {
+      // v4 ranking: distance-first (ascending). Entries without coords
+      // sink to the bottom, preserving their relative status order.
+      const ranked = [...all].sort((a, b) => {
+        const aD = a.distanceKm;
+        const bD = b.distanceKm;
+        if (aD == null && bD == null) return 0;
+        if (aD == null) return 1;
+        if (bD == null) return -1;
+        return aD - bD;
+      });
+      return ranked.slice(0, 12);
+    }
+
+    // v0 fallback: live → upcoming (soonest first) → past (newest first).
+    upcoming.sort((a, b) => {
       const aAt = a.event?.scheduledAt ? new Date(a.event.scheduledAt).getTime() : Infinity;
       const bAt = b.event?.scheduledAt ? new Date(b.event.scheduledAt).getTime() : Infinity;
       return aAt - bAt;
     });
-    const past = tag(buckets.past, "past").sort((a, b) => {
+    past.sort((a, b) => {
       const aAt = a.event?.scheduledAt ? new Date(a.event.scheduledAt).getTime() : 0;
       const bAt = b.event?.scheduledAt ? new Date(b.event.scheduledAt).getTime() : 0;
       return bAt - aAt;
     });
     return [...live, ...upcoming, ...past].slice(0, 12);
-  }, [buckets]);
+  }, [buckets, position]);
 
   if (loaded && entries.length === 0) {
     return null; // empty state handled by the rail's existing empty message
   }
+
+  // "Show nearby" CTA appears when (a) location isn't granted yet and
+  // (b) the user has either had a silent attempt complete with no
+  // result, or hit an explicit error. We hide it while busy so we don't
+  // flicker a button under a system prompt.
+  const showLocationCta = !position && !busy && (error || autoRequested);
+  const locationGranted = Boolean(position);
 
   return (
     <section className="home-for-you" aria-labelledby="home-for-you-title">
@@ -162,20 +229,39 @@ export function HomeForYouStream({ language = "np", copy }) {
             <span className="eyebrow home-for-you-eyebrow">{t.eyebrow}</span>
           ) : null}
           <h2 id="home-for-you-title">{t.title}</h2>
-          {t.intro ? <p>{t.intro}</p> : null}
+          {locationGranted && t.locationGranted ? (
+            <p className="home-for-you-location-note">
+              <AimOutlined aria-hidden="true" /> {t.locationGranted}
+            </p>
+          ) : t.intro ? (
+            <p>{t.intro}</p>
+          ) : null}
         </div>
-        <Link className="home-for-you-view-all" href="/events">
-          {language === "np" ? "सबै हेर्नुहोस्" : "View all"}
-          <ArrowRightOutlined aria-hidden="true" />
-        </Link>
+        <div className="home-for-you-header-actions">
+          {showLocationCta ? (
+            <button
+              type="button"
+              className="home-for-you-location-cta"
+              onClick={() => request()}
+            >
+              <AimOutlined aria-hidden="true" />
+              {t.locationCta || (language === "np" ? "नजिकैका देखाउनुहोस्" : "Show nearby")}
+            </button>
+          ) : null}
+          <Link className="home-for-you-view-all" href="/events">
+            {language === "np" ? "सबै हेर्नुहोस्" : "View all"}
+            <ArrowRightOutlined aria-hidden="true" />
+          </Link>
+        </div>
       </header>
 
       <div className="home-for-you-grid">
-        {entries.map(({ event, status }) => (
+        {entries.map(({ event, status, distanceKm }) => (
           <ForYouCard
             key={`${status}-${event.id ?? event.slug}`}
             event={event}
             status={status}
+            distanceKm={distanceKm}
             language={language}
             copy={t}
           />

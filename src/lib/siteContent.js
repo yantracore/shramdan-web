@@ -1415,7 +1415,11 @@ export const copy = {
           live: "लाइभ",
           upcoming: "आउँदै",
           past: "सम्पन्न"
-        }
+        },
+        distanceNearby: "नजिकै",
+        distanceSuffix: "किमी दूर",
+        locationCta: "नजिकैका देखाउनुहोस्",
+        locationGranted: "तपाईंको ठाउँअनुसार क्रम मिलाइयो"
       }
     },
     liveEventsRail: {
@@ -3355,7 +3359,11 @@ export const copy = {
           live: "LIVE",
           upcoming: "Upcoming",
           past: "Completed"
-        }
+        },
+        distanceNearby: "Nearby",
+        distanceSuffix: "km away",
+        locationCta: "Show nearby",
+        locationGranted: "Sorted by your location"
       }
     },
     liveEventsRail: {
