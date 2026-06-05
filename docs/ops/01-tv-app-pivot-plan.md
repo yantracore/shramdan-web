@@ -10,6 +10,26 @@
 
 ---
 
+## Cross-cutting design principles (apply to every phase below)
+
+These are not phases — they are constraints every phase must honour. Each principle has its own memory entry; this section exists so the plan does not have to repeat them inside each phase.
+
+### CC-1. Glassiness is the default for overlay surfaces
+
+Any surface that sits *above* page content — corner-block chrome, the curved top-center pill nav, sticky filter bars, hover affordances on cards, sticky modal headers, search-box surrounds when floating over imagery — uses a glassy treatment by default. Reference recipe lives in the existing `.events-home-rail-poster-cta` class in [src/styles/live-events-rail.css](../../src/styles/live-events-rail.css) (`background: rgba(0, 0, 0, 0.42); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.22)`).
+
+Phases that introduce a new overlay (Phase 1 corner blocks + pill nav, Phase 2 search-box surround, Phase 4 view-switch tab pill, Phase 5 sticky filter rows, Phase 7 discussion thread floats) all default to glass. Form inputs, dense data tables, and body cards in a list stay opaque — readability beats theatricality.
+
+### CC-2. Representative Image, always (staging mode)
+
+While the app is in staging mode, every image-bearing UI element renders a **real-looking demo image** — never a transparent placeholder, empty skeleton, or "no image" string. Existing demo assets live under [public/images/demo-events/](../../public/images/demo-events/); add to that folder (or a sibling like `demo-members/`, `demo-stories/`) whenever a new image-bearing surface ships.
+
+Phases that introduce new image-bearing surfaces (Phase 4 thumbnails view, Phase 6 intro photo strip, Phase 7 member profile photos + discussion topic art) MUST ship with representative imagery committed under `public/images/`. A new surface without a representative image is not "done."
+
+When the app flips out of staging (see [[project-api-base-url-staging]]), this constraint relaxes and real user-uploaded content takes over.
+
+---
+
 ## Phase 0 — Pre-pivot snapshot ← done: 2026-06-05
 
 Lock in the decision and clear the working tree so the next change is clearly pivot work, not leftover polish.
