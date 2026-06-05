@@ -20,6 +20,7 @@ import { ActivityStatsRow } from "@/components/ActivityStatsRow";
 import { IssueListCard } from "@/components/IssueListCard";
 import { IssuePreviewPane } from "@/components/IssuePreviewPane";
 import { SiteShell } from "@/components/SiteShell";
+import { ViewSwitch } from "@/components/ViewSwitch";
 import { usePreferences } from "@/app/providers";
 import { getJson } from "@/lib/apiClient";
 import { copy } from "@/lib/siteContent";
@@ -60,7 +61,12 @@ function filterDemoIssues(filters, alreadyHaveIds) {
     .filter((issue) => !filters.status || issue.status === filters.status)
     .filter(
       (issue) => !filters.category || issue.category === filters.category
-    );
+    )
+    .filter((issue) => {
+      if (!filters.district) return true;
+      const tail = (issue.addressText || "").split(",").pop()?.trim();
+      return tail === filters.district;
+    });
 }
 
 export default function IssuesListPage() {
@@ -78,11 +84,16 @@ export default function IssuesListPage() {
   const readFiltersFromUrl = useCallback(() => {
     const statusParam = searchParams?.get("status");
     const categoryParam = searchParams?.get("category");
+    const districtParam = searchParams?.get("district");
     const sortParam = searchParams?.get("sort");
     return {
       status: statusParam && STATUS_VALUES.has(statusParam) ? statusParam : undefined,
       category:
         categoryParam && categorySet.has(categoryParam) ? categoryParam : undefined,
+      // District list is derived from the addressText tail on loaded items,
+      // so we accept any non-empty string here and the dropdown will surface
+      // matching options as data lands. Server filtering uses `municipality`.
+      district: districtParam || undefined,
       sort: sortParam && SORT_VALUES.has(sortParam) ? sortParam : "voteCount"
     };
   }, [searchParams, categorySet]);
@@ -98,6 +109,10 @@ export default function IssuesListPage() {
   const [geoBusy, setGeoBusy] = useState(false);
   const [geoError, setGeoError] = useState("");
   const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE);
+  // View switch is UI-only for this iteration: the chrome ships now so both
+  // /issues and /events expose identical toolbars, and the actual layout
+  // swaps (full-bleed map, thumbnail grid) land in a follow-up.
+  const [view, setView] = useState("list-preview");
 
   // Re-sync state from URL on back/forward navigation.
   useEffect(() => {
@@ -106,6 +121,7 @@ export default function IssuesListPage() {
       if (
         prev.status === next.status &&
         prev.category === next.category &&
+        prev.district === next.district &&
         prev.sort === next.sort
       ) {
         return prev;
@@ -120,6 +136,10 @@ export default function IssuesListPage() {
         params: {
           status: filters.status,
           category: filters.category,
+          // Server uses `municipality` for the district-style filter; the UI
+          // surfaces it as "District" since that's how members talk about
+          // their location.
+          municipality: filters.district,
           // Server only knows voteCount and createdAt; client-only sorts
           // (e.g. "nearest") fall back to voteCount and re-sort locally.
           sort: CLIENT_ONLY_SORTS.has(filters.sort) ? undefined : filters.sort,
@@ -172,6 +192,7 @@ export default function IssuesListPage() {
           params: {
             status: filters.status,
             category: filters.category,
+            municipality: filters.district,
             limit: MAP_FETCH_LIMIT
           }
         });
@@ -198,7 +219,7 @@ export default function IssuesListPage() {
     return () => {
       cancelled = true;
     };
-  }, [filters.status, filters.category]);
+  }, [filters.status, filters.category, filters.district]);
 
   const applyFilters = useCallback(
     (next) => {
@@ -208,6 +229,8 @@ export default function IssuesListPage() {
       else params.delete("status");
       if (next.category) params.set("category", next.category);
       else params.delete("category");
+      if (next.district) params.set("district", next.district);
+      else params.delete("district");
       if (next.sort && next.sort !== "voteCount") params.set("sort", next.sort);
       else params.delete("sort");
       const query = params.toString();
@@ -509,6 +532,20 @@ export default function IssuesListPage() {
     value: option.value,
     label: content.filters[option.labelKey]
   }));
+  // District options are derived from the addressText tail across all
+  // currently-loaded items (mirrors how /events builds its district list).
+  // The dropdown grows as data lands; server filtering goes via
+  // `municipality` so the selection persists across paginated reads.
+  const districtOptions = useMemo(() => {
+    const set = new Set();
+    items.forEach((issue) => {
+      const tail = (issue.addressText || "").split(",").pop()?.trim();
+      if (tail) set.add(tail);
+    });
+    return Array.from(set)
+      .sort()
+      .map((d) => ({ value: d, label: d }));
+  }, [items]);
 
   const selectedIssue = sortedItems.find((i) => i.id === selectedId) || null;
   const isMobileDrillActive = mobileView === "detail";
@@ -529,8 +566,21 @@ export default function IssuesListPage() {
 
         <div className="public-issues-toolbar">
           <ActivityStatsRow language={language} variant="issues" />
-          <div className="public-issues-filters">
+          <div className="public-issues-context-row">
             <ActivityTypeTabs active="issue" labels={t.activityTabs} />
+            <ViewSwitch
+              value={view}
+              onChange={setView}
+              labels={{
+                ariaLabel: content.filters.viewSwitchAriaLabel,
+                listPreview: content.filters.viewListPreview,
+                map: content.filters.viewMap,
+                thumbnails: content.filters.viewThumbnails
+              }}
+              disabled
+            />
+          </div>
+          <div className="public-issues-filters">
             <div className="public-issues-filter-field">
               <label
                 className="public-issues-filter-label"
@@ -561,6 +611,22 @@ export default function IssuesListPage() {
                 options={categoryOptions}
                 placeholder={content.filters.categoryPlaceholder}
                 value={filters.category}
+              />
+            </div>
+            <div className="public-issues-filter-field">
+              <label
+                className="public-issues-filter-label"
+                htmlFor="issues-filter-district"
+              >
+                {content.filters.districtLabel}
+              </label>
+              <Select
+                id="issues-filter-district"
+                allowClear
+                onChange={(value) => setFilter("district", value)}
+                options={districtOptions}
+                placeholder={content.filters.districtPlaceholder}
+                value={filters.district}
               />
             </div>
             <div className="public-issues-filter-field public-issues-sort-field">

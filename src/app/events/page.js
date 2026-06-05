@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { PlusOutlined, CheckCircleFilled } from "@ant-design/icons";
+import { PlusOutlined } from "@ant-design/icons";
 import { Button, Select } from "antd";
 import { SiteShell } from "@/components/SiteShell";
 import { ActivityTypeTabs } from "@/components/ActivityTypeTabs";
@@ -11,10 +11,12 @@ import { EventListCard } from "@/components/EventListCard";
 import { EventPreviewPane } from "@/components/EventPreviewPane";
 import { ActivityStatsRow } from "@/components/ActivityStatsRow";
 import EventMapBlock from "@/components/EventMapBlock";
+import { ViewSwitch } from "@/components/ViewSwitch";
 import { usePreferences } from "@/app/providers";
 import { copy } from "@/lib/siteContent";
 import { injectMockLiveStream } from "@/lib/devMockData";
 import { listAllEvents } from "@/lib/eventsApi";
+import { ISSUE_CATEGORIES } from "@/lib/adminUtils";
 
 const PAGE_COPY = {
   np: {
@@ -45,12 +47,32 @@ const PAGE_COPY = {
       past: "सम्पन्न",
       statusLabel: "स्थिति",
       statusPlaceholder: "सबै स्थिति",
+      categoryLabel: "क्षेत्र",
+      categoryPlaceholder: "सबै क्षेत्र",
       districtLabel: "जिल्ला",
       districtPlaceholder: "सबै जिल्ला",
       allDistricts: "सबै जिल्ला",
-      eventTypeLabel: "अभियानको प्रकार",
-      eventTypeCleanup: "सरसफाइ",
-      eventTypeChipSuffix: "अहिले सक्रिय"
+      sortLabel: "क्रमबद्ध",
+      sortPlaceholder: "क्रम छान्नुहोस्",
+      sortMostJoined: "सबैभन्दा बढी सहभागी",
+      sortNewest: "नयाँ पहिले",
+      sortNearest: "नजिकैका पहिले",
+      sortLocating: "स्थान खोज्दै…",
+      sortLocationDenied: "स्थान अनुमति अस्वीकृत भयो",
+      sortLocationUnsupported: "ब्राउजरले स्थान समर्थन गर्दैन",
+      viewSwitchAriaLabel: "दृश्य मोड",
+      viewListPreview: "सूची",
+      viewMap: "नक्सा",
+      viewThumbnails: "थम्बनेल"
+    },
+    categoryLabels: {
+      ROADSIDE: "सडक र फुटपाथ",
+      VACANT_LAND: "खाली जग्गा",
+      RIVERBANK: "नदी किनार",
+      DRAINAGE: "ढल र नाला",
+      PARK_PUBLIC_SPACE: "पार्क र सार्वजनिक स्थान",
+      HIKING_TRAIL: "पदयात्रा मार्ग",
+      OTHER: "अन्य"
     },
     preview: {
       empty: "बायाँबाट कुनै अभियान छान्नुहोस्।",
@@ -112,12 +134,32 @@ const PAGE_COPY = {
       past: "Past",
       statusLabel: "Status",
       statusPlaceholder: "All Statuses",
+      categoryLabel: "Category",
+      categoryPlaceholder: "All Categories",
       districtLabel: "District",
       districtPlaceholder: "All Districts",
       allDistricts: "All Districts",
-      eventTypeLabel: "Event Type",
-      eventTypeCleanup: "Cleanup",
-      eventTypeChipSuffix: "currently active"
+      sortLabel: "Sort By",
+      sortPlaceholder: "Sort",
+      sortMostJoined: "Most Joined",
+      sortNewest: "Newest First",
+      sortNearest: "Nearest to Me",
+      sortLocating: "Locating…",
+      sortLocationDenied: "Location permission denied",
+      sortLocationUnsupported: "Browser does not support location",
+      viewSwitchAriaLabel: "View mode",
+      viewListPreview: "List",
+      viewMap: "Map",
+      viewThumbnails: "Thumbnails"
+    },
+    categoryLabels: {
+      ROADSIDE: "Roadside",
+      VACANT_LAND: "Vacant land",
+      RIVERBANK: "Riverbank",
+      DRAINAGE: "Drainage",
+      PARK_PUBLIC_SPACE: "Park / public space",
+      HIKING_TRAIL: "Hiking trail",
+      OTHER: "Other"
     },
     preview: {
       empty: "Pick a campaign from the list to see details here.",
@@ -157,11 +199,38 @@ const FILTER_KEYS = new Set(["all", "live", "upcoming", "past"]);
 const INITIAL_VISIBLE = 8;
 const LOAD_MORE_STEP = 6;
 
+// Sort options mirror /issues for visual parity. They re-order events
+// *within* each status group (live, upcoming, past) so the page's coarse
+// timeline structure stays intact. `nearest` is client-only and uses the
+// browser geolocation API; the others map to backend sorts once the events
+// list endpoint accepts the same `sort=` param /issues already supports.
+const SORT_OPTIONS = [
+  { value: "participantCount", labelKey: "sortMostJoined", clientOnly: false },
+  { value: "createdAt", labelKey: "sortNewest", clientOnly: false },
+  { value: "nearest", labelKey: "sortNearest", clientOnly: true }
+];
+const SORT_VALUES = new Set(SORT_OPTIONS.map((o) => o.value));
+const CLIENT_ONLY_SORTS = new Set(
+  SORT_OPTIONS.filter((o) => o.clientOnly).map((o) => o.value)
+);
+const CATEGORY_VALUES = new Set(ISSUE_CATEGORIES);
+
 function byScheduledAsc(a, b) {
   return Date.parse(a.scheduledAt) - Date.parse(b.scheduledAt);
 }
 function byCompletedDesc(a, b) {
   return Date.parse(b.completedAt) - Date.parse(a.completedAt);
+}
+
+function haversineKm(lat1, lon1, lat2, lon2) {
+  const toRad = (d) => (d * Math.PI) / 180;
+  const R = 6371;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(a));
 }
 
 export default function EventsListPage() {
@@ -170,18 +239,43 @@ export default function EventsListPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // ----- filter state (status select, event type disabled placeholder) -----
-  const initialFilter = (() => {
+  // ----- filter state (status / category / district / sort + view) -------
+  // URL params: ?show=status&category=KEY&district=NAME&sort=VALUE&event=ID
+  const readFiltersFromUrl = useCallback(() => {
     const show = searchParams?.get("show");
-    return show && FILTER_KEYS.has(show) ? show : "all";
-  })();
-  const [filter, setFilter] = useState(initialFilter);
+    const categoryParam = searchParams?.get("category");
+    const districtParam = searchParams?.get("district");
+    const sortParam = searchParams?.get("sort");
+    return {
+      status: show && FILTER_KEYS.has(show) ? show : "all",
+      category:
+        categoryParam && CATEGORY_VALUES.has(categoryParam)
+          ? categoryParam
+          : undefined,
+      district: districtParam || undefined,
+      sort:
+        sortParam && SORT_VALUES.has(sortParam) ? sortParam : "participantCount"
+    };
+  }, [searchParams]);
+
+  const [filters, setFilters] = useState(() => readFiltersFromUrl());
 
   useEffect(() => {
-    const show = searchParams?.get("show");
-    const next = show && FILTER_KEYS.has(show) ? show : "all";
-    setFilter((prev) => (prev === next ? prev : next));
-  }, [searchParams]);
+    const next = readFiltersFromUrl();
+    setFilters((prev) =>
+      prev.status === next.status &&
+      prev.category === next.category &&
+      prev.district === next.district &&
+      prev.sort === next.sort
+        ? prev
+        : next
+    );
+  }, [readFiltersFromUrl]);
+
+  // View switch is UI-only for this iteration: the chrome ships now so both
+  // /issues and /events expose identical toolbars, and the actual layout
+  // swaps (full-bleed map, thumbnail grid) land in a follow-up.
+  const [view, setView] = useState("list-preview");
 
   // ----- raw data + ordered/flattened list ------------------------------
   const [live, setLive] = useState([]);
@@ -207,55 +301,158 @@ export default function EventsListPage() {
     };
   }, [language]);
 
-  // ----- city filter ----------------------------------------------------
-  const initialCity = searchParams?.get("city") || "all";
-  const [city, setCity] = useState(initialCity);
-  useEffect(() => {
-    const c = searchParams?.get("city") || "all";
-    setCity((prev) => (prev === c ? prev : c));
-  }, [searchParams]);
-
-  const cityOptions = useMemo(() => {
-    const set = new Set();
-    [...live, ...upcoming, ...past].forEach((e) => {
-      const tail = (e.addressText || "").split(",").pop()?.trim();
-      if (tail) set.add(tail);
-    });
-    return Array.from(set).sort();
-  }, [live, upcoming, past]);
-
-  const updateCity = useCallback(
+  const applyFilters = useCallback(
     (next) => {
-      setCity(next);
+      setFilters(next);
       const params = new URLSearchParams(searchParams?.toString() || "");
-      if (!next || next === "all") params.delete("city");
-      else params.set("city", next);
+      if (next.status && next.status !== "all") params.set("show", next.status);
+      else params.delete("show");
+      if (next.category) params.set("category", next.category);
+      else params.delete("category");
+      if (next.district) params.set("district", next.district);
+      else params.delete("district");
+      if (next.sort && next.sort !== "participantCount") params.set("sort", next.sort);
+      else params.delete("sort");
       const query = params.toString();
       router.replace(query ? `/events?${query}` : "/events", { scroll: false });
     },
     [router, searchParams]
   );
 
+  // ----- geolocation (for sort=nearest) ----------------------------------
+  const [nearMe, setNearMe] = useState(null);
+  const [geoBusy, setGeoBusy] = useState(false);
+  const [geoError, setGeoError] = useState("");
+
+  const requestNearMe = useCallback(
+    (onGranted) => {
+      if (typeof window === "undefined" || !navigator?.geolocation) {
+        setGeoError(t.filters.sortLocationUnsupported);
+        return;
+      }
+      setGeoError("");
+      setGeoBusy(true);
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setGeoBusy(false);
+          const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+          setNearMe(loc);
+          onGranted?.(loc);
+        },
+        () => {
+          setGeoBusy(false);
+          setGeoError(t.filters.sortLocationDenied);
+        },
+        { enableHighAccuracy: false, timeout: 8000, maximumAge: 60_000 }
+      );
+    },
+    [t.filters.sortLocationDenied, t.filters.sortLocationUnsupported]
+  );
+
+  useEffect(() => {
+    if (filters.sort === "nearest" && !nearMe && !geoBusy && !geoError) {
+      requestNearMe();
+    }
+  }, [filters.sort, nearMe, geoBusy, geoError, requestNearMe]);
+
+  const setFilter = useCallback(
+    (key, value) => {
+      if (key === "sort" && value === "nearest") {
+        applyFilters({ ...filters, sort: "nearest" });
+        if (!nearMe) requestNearMe();
+        return;
+      }
+      if (key === "sort") setGeoError("");
+      applyFilters({ ...filters, [key]: value });
+    },
+    [filters, applyFilters, nearMe, requestNearMe]
+  );
+
+  // District options derived from the addressText tail on loaded events,
+  // mirroring how /issues builds the same dropdown. Server filtering will
+  // use `municipality` once the events endpoint accepts it.
+  const districtOptions = useMemo(() => {
+    const set = new Set();
+    [...live, ...upcoming, ...past].forEach((e) => {
+      const tail = (e.addressText || "").split(",").pop()?.trim();
+      if (tail) set.add(tail);
+    });
+    return Array.from(set)
+      .sort()
+      .map((d) => ({ value: d, label: d }));
+  }, [live, upcoming, past]);
+
   const orderedEvents = useMemo(() => {
+    // Secondary sort applied within each status group (live > upcoming >
+    // past). Primary status grouping stays so the page's coarse timeline
+    // structure remains predictable when users only narrow by category /
+    // district. `nearest` falls back to the default scheduled-asc order
+    // until a geolocation fix lands.
+    const sortFn = (eA, eB) => {
+      if (filters.sort === "participantCount") {
+        return (eB.participantCount || 0) - (eA.participantCount || 0);
+      }
+      if (filters.sort === "createdAt") {
+        return Date.parse(eB.scheduledAt || 0) - Date.parse(eA.scheduledAt || 0);
+      }
+      if (filters.sort === "nearest" && nearMe) {
+        const aLat = Number(eA.latitude);
+        const aLng = Number(eA.longitude);
+        const bLat = Number(eB.latitude);
+        const bLng = Number(eB.longitude);
+        const aOk = Number.isFinite(aLat) && Number.isFinite(aLng);
+        const bOk = Number.isFinite(bLat) && Number.isFinite(bLng);
+        if (!aOk && !bOk) return 0;
+        if (!aOk) return 1;
+        if (!bOk) return -1;
+        return (
+          haversineKm(nearMe.lat, nearMe.lng, aLat, aLng) -
+          haversineKm(nearMe.lat, nearMe.lng, bLat, bLng)
+        );
+      }
+      return 0;
+    };
+
+    const liveSorted =
+      filters.sort === "participantCount" || filters.sort === "createdAt" || (filters.sort === "nearest" && nearMe)
+        ? [...live].sort(sortFn)
+        : live;
+    const upcomingSorted =
+      filters.sort === "participantCount" || (filters.sort === "nearest" && nearMe)
+        ? [...upcoming].sort(sortFn)
+        : [...upcoming].sort(byScheduledAsc);
+    const pastSorted =
+      filters.sort === "participantCount" || (filters.sort === "nearest" && nearMe)
+        ? [...past].sort(sortFn)
+        : [...past].sort(byCompletedDesc);
+
     const items = [
-      ...live.map((event) => ({ event, status: "live" })),
-      ...[...upcoming].sort(byScheduledAsc).map((event) => ({ event, status: "upcoming" })),
-      ...[...past].sort(byCompletedDesc).map((event) => ({ event, status: "past" }))
+      ...liveSorted.map((event) => ({ event, status: "live" })),
+      ...upcomingSorted.map((event) => ({ event, status: "upcoming" })),
+      ...pastSorted.map((event) => ({ event, status: "past" }))
     ];
-    let filtered = filter === "all" ? items : items.filter((entry) => entry.status === filter);
-    if (city && city !== "all") {
+    let filtered =
+      filters.status === "all"
+        ? items
+        : items.filter((entry) => entry.status === filters.status);
+    if (filters.district) {
       filtered = filtered.filter((entry) => {
         const tail = (entry.event.addressText || "").split(",").pop()?.trim();
-        return tail === city;
+        return tail === filters.district;
       });
     }
+    if (filters.category) {
+      filtered = filtered.filter(
+        (entry) => entry.event.category === filters.category
+      );
+    }
     return filtered;
-  }, [live, upcoming, past, filter, city]);
+  }, [live, upcoming, past, filters, nearMe]);
 
-  // Map entries respect the same filter + city as the list so users see the
-  // exact subset they're browsing. Coordinate validity is enforced inside
-  // EventMap, but we pre-filter to avoid rendering an empty section when no
-  // events in the current slice have coords.
+  // Map entries respect the same filters as the list so users see the exact
+  // subset they're browsing. Coordinate validity is enforced inside EventMap,
+  // but we pre-filter here to avoid rendering an empty section when nothing
+  // in the current slice has coords.
   const mapEntries = useMemo(
     () =>
       orderedEvents.filter((entry) => {
@@ -324,10 +521,10 @@ export default function EventsListPage() {
   // ----- visible window (load-more) ---------------------------------------
   const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE);
 
-  // Reset window when filter changes.
+  // Reset window when filters change.
   useEffect(() => {
     setVisibleCount(INITIAL_VISIBLE);
-  }, [filter]);
+  }, [filters]);
 
   const visibleEvents = useMemo(
     () => orderedEvents.slice(0, visibleCount),
@@ -408,29 +605,20 @@ export default function EventsListPage() {
     setMobileView("list");
   }, []);
 
-  // ----- filter Select -----------------------------------------------------
-  const updateFilter = useCallback(
-    (next) => {
-      setFilter(next);
-      const params = new URLSearchParams(searchParams?.toString() || "");
-      if (next === "all") params.delete("show");
-      else params.set("show", next);
-      const query = params.toString();
-      router.replace(query ? `/events?${query}` : "/events", { scroll: false });
-    },
-    [router, searchParams]
-  );
-
+  // ----- filter options ----------------------------------------------------
   const statusOptions = [
-    { value: "all", label: t.filters.allStatuses },
     { value: "live", label: t.filters.live },
     { value: "upcoming", label: t.filters.upcoming },
     { value: "past", label: t.filters.past }
   ];
-  const districtOptions = [
-    { value: "all", label: t.filters.allDistricts },
-    ...cityOptions.map((c) => ({ value: c, label: c }))
-  ];
+  const categoryOptions = ISSUE_CATEGORIES.map((value) => ({
+    value,
+    label: t.categoryLabels?.[value] || value
+  }));
+  const sortOptions = SORT_OPTIONS.map((option) => ({
+    value: option.value,
+    label: t.filters[option.labelKey]
+  }));
 
   const localizedCopy = copy[language] || copy.np;
   const reportIssueCtaLabel =
@@ -531,29 +719,21 @@ export default function EventsListPage() {
 
         <div className="public-issues-toolbar">
           <ActivityStatsRow language={language} variant="events" />
-          <div className="public-issues-filters">
+          <div className="public-issues-context-row">
             <ActivityTypeTabs active="event" labels={localizedCopy.activityTabs} />
-            <div className="public-issues-filter-field">
-              <span className="public-issues-filter-label">
-                {t.filters.eventTypeLabel}
-              </span>
-              <div
-                className="events-eventtype-chip"
-                role="status"
-                aria-label={`${t.filters.eventTypeCleanup} — ${t.filters.eventTypeChipSuffix}`}
-              >
-                <CheckCircleFilled
-                  aria-hidden="true"
-                  className="events-eventtype-chip-icon"
-                />
-                <span className="events-eventtype-chip-label">
-                  {t.filters.eventTypeCleanup}
-                </span>
-                <span className="events-eventtype-chip-suffix">
-                  {t.filters.eventTypeChipSuffix}
-                </span>
-              </div>
-            </div>
+            <ViewSwitch
+              value={view}
+              onChange={setView}
+              labels={{
+                ariaLabel: t.filters.viewSwitchAriaLabel,
+                listPreview: t.filters.viewListPreview,
+                map: t.filters.viewMap,
+                thumbnails: t.filters.viewThumbnails
+              }}
+              disabled
+            />
+          </div>
+          <div className="public-issues-filters">
             <div className="public-issues-filter-field">
               <label
                 className="public-issues-filter-label"
@@ -563,9 +743,27 @@ export default function EventsListPage() {
               </label>
               <Select
                 id="events-filter-status"
-                onChange={(value) => updateFilter(value || "all")}
+                allowClear
+                onChange={(value) => setFilter("status", value || "all")}
                 options={statusOptions}
-                value={filter}
+                placeholder={t.filters.statusPlaceholder}
+                value={filters.status === "all" ? undefined : filters.status}
+              />
+            </div>
+            <div className="public-issues-filter-field">
+              <label
+                className="public-issues-filter-label"
+                htmlFor="events-filter-category"
+              >
+                {t.filters.categoryLabel}
+              </label>
+              <Select
+                id="events-filter-category"
+                allowClear
+                onChange={(value) => setFilter("category", value)}
+                options={categoryOptions}
+                placeholder={t.filters.categoryPlaceholder}
+                value={filters.category}
               />
             </div>
             <div className="public-issues-filter-field">
@@ -577,10 +775,35 @@ export default function EventsListPage() {
               </label>
               <Select
                 id="events-filter-district"
-                onChange={(value) => updateCity(value || "all")}
+                allowClear
+                onChange={(value) => setFilter("district", value)}
                 options={districtOptions}
-                value={city}
+                placeholder={t.filters.districtPlaceholder}
+                value={filters.district}
               />
+            </div>
+            <div className="public-issues-filter-field public-issues-sort-field">
+              <label
+                className="public-issues-filter-label"
+                htmlFor="events-filter-sort"
+              >
+                {t.filters.sortLabel}
+              </label>
+              <Select
+                id="events-filter-sort"
+                onChange={(value) => setFilter("sort", value)}
+                options={sortOptions}
+                value={filters.sort}
+                loading={geoBusy}
+              />
+              {filters.sort === "nearest" && (geoBusy || geoError) ? (
+                <span
+                  className={`public-issues-sort-hint${geoError ? " is-error" : ""}`}
+                  role={geoError ? "alert" : "status"}
+                >
+                  {geoBusy ? t.filters.sortLocating : geoError}
+                </span>
+              ) : null}
             </div>
             <Link className="public-issues-filters-cta" href="/issues/new">
               <Button type="primary" icon={<PlusOutlined />} size="large">
