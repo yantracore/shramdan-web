@@ -36,8 +36,7 @@ const loginCopy = {
     emailInvalid: "कृपया सही इमेल ठेगाना लेख्नुहोस्।",
     success: "लगइन सफल भयो।",
     joinPrompt: "श्रमदानको सदस्य हुनुहुन्न?",
-    joinCta: "सदस्य बन्नुहोस्",
-    otpAlt: "वा OTP बाट द्रुत सदस्यता",
+    joinCta: "श्रमदानमा सहभागी हुनुहोस्।",
     forgot: "पासवर्ड बिर्सनुभयो?",
     benefitsTitle: "सदस्यले के गर्न पाउँछन्",
     visualAlt: "समुदायका स्वयंसेवकहरूले सफा गरिएको बाटो छेउमा बिरुवा रोप्दै",
@@ -77,9 +76,8 @@ const loginCopy = {
     required: "This field is required.",
     emailInvalid: "Please enter a valid email address.",
     success: "Login successful.",
-    joinPrompt: "Not a member?",
-    joinCta: "Become a Member",
-    otpAlt: "Or quick signup with OTP",
+    joinPrompt: "Not a Shramdan member?",
+    joinCta: "Join Shramdan.",
     forgot: "Forgot password?",
     benefitsTitle: "What members can do",
     visualAlt: "Community volunteers planting saplings beside a freshly cleaned street",
@@ -247,9 +245,6 @@ function LoginPageContent() {
               {t.joinPrompt}{" "}
               <Link href="/join">{t.joinCta}</Link>
             </p>
-            <Link className="login-otp-link" href="/signup">
-              {t.otpAlt} →
-            </Link>
           </div>
         </div>
       </section>

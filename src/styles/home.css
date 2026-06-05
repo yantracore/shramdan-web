@@ -3731,31 +3731,6 @@
   background: var(--accent);
 }
 
-.login-otp-link {
-  display: block;
-  margin-top: 14px;
-  padding: 12px 16px;
-  border-radius: var(--radius-md);
-  background: color-mix(in srgb, var(--accent) 8%, var(--surface));
-  border: 1px dashed color-mix(in srgb, var(--accent) 35%, transparent);
-  color: var(--text);
-  font-weight: 600;
-  font-size: 14px;
-  text-align: center;
-  text-decoration: none;
-  transition: background 160ms ease;
-}
-
-.login-otp-link:hover {
-  background: color-mix(in srgb, var(--accent) 14%, var(--surface));
-  color: var(--accent);
-}
-
-.login-otp-link:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
-}
-
 /* --- Signup (Phone + OTP) --------------------------------------------- */
 .signup-section {
   width: 100%;
