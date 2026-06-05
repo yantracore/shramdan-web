@@ -117,6 +117,46 @@
   --swiper-pagination-bullet-horizontal-gap: 6px;
 }
 
+/* Phase 9 a11y — WCAG 2.2 SC 2.5.8 (target size). Swiper default bullets
+ * are 9px squares with 18px gap centers; axe-core flags both as below
+ * the 24×24 minimum. We keep the visual dot tiny (so the carousel reads
+ * as elegant) and expand only the hit target by moving the colour to a
+ * pseudo-element and letting the outer span be transparent + 24×24. */
+.events-home-rail .swiper-pagination-bullet {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  background: transparent !important;
+  opacity: 1 !important;
+  margin: 0 2px;
+}
+
+.events-home-rail .swiper-pagination-bullet::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--swiper-pagination-bullet-size, 9px);
+  height: var(--swiper-pagination-bullet-size, 9px);
+  border-radius: 50%;
+  background: var(--swiper-pagination-bullet-inactive-color, var(--muted));
+  opacity: var(--swiper-pagination-bullet-inactive-opacity, 0.45);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  transition: background 160ms ease, opacity 160ms ease;
+}
+
+.events-home-rail .swiper-pagination-bullet-active::after {
+  background: var(--swiper-pagination-color, var(--primary));
+  opacity: 1;
+}
+
+.events-home-rail .swiper-pagination-bullet:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 /* The rail (and ONLY the rail — header still respects the page's
  * 1180px container) expands to the viewport edges, capped at 1920px
  * on ultra-wide displays. With slidesPerView=3 this gives the center
