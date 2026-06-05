@@ -1,84 +1,17 @@
 {
-  "previousFetchedAt": "2026-05-29T12:03:42+05:45",
-  "currentFetchedAt": "2026-06-04T12:31:11+05:45",
-  "comparedAt": "2026-06-04T06:46:11.390Z",
+  "previousFetchedAt": "2026-06-04T13:22:25+05:45",
+  "currentFetchedAt": "2026-06-05T12:13:36+05:45",
+  "comparedAt": "2026-06-05T06:28:36.081Z",
   "totals": {
-    "added": 20,
+    "added": 2,
     "removed": 0,
-    "modified": 8
+    "modified": 0
   },
   "added": [
-    "DELETE /api/v1/comments/{id}",
-    "DELETE /api/v1/comments/{id}/reactions",
-    "DELETE /api/v1/events/{id}/participants/{participantId}",
-    "DELETE /api/v1/users/{id}",
-    "GET /api/v1/comments",
-    "GET /api/v1/comments/stream",
-    "GET /api/v1/comments/{id}",
-    "GET /api/v1/events/{id}/participants",
-    "GET /api/v1/events/{id}/participants/me",
-    "PATCH /api/v1/comments/{id}",
-    "PATCH /api/v1/events/{id}/participants/{participantId}",
-    "PATCH /api/v1/users/{id}/leader-eligibility",
-    "POST /api/v1/comments",
-    "POST /api/v1/comments/{id}/reactions",
-    "POST /api/v1/events/{id}/participants",
-    "POST /api/v1/events/{id}/participants/invite",
-    "POST /api/v1/events/{id}/participants/{participantId}/check-in",
-    "POST /api/v1/issues/{id}/after-uploads",
-    "POST /api/v1/users/{id}/verify-medical-credential",
-    "PUT /api/v1/events/{id}/role-plan"
+    "POST /api/v1/events/bulk",
+    "POST /api/v1/issues/bulk"
   ],
   "removed": [],
-  "modified": [
-    {
-      "endpoint": "GET /api/v1/issues",
-      "changes": [
-        "params 5→17"
-      ]
-    },
-    {
-      "endpoint": "GET /api/v1/issues/me",
-      "changes": [
-        "params 5→16"
-      ]
-    },
-    {
-      "endpoint": "GET /api/v1/issues/me/votes",
-      "changes": [
-        "params 3→5"
-      ]
-    },
-    {
-      "endpoint": "GET /api/v1/users",
-      "changes": [
-        "responses [200,401,403]→[200]"
-      ]
-    },
-    {
-      "endpoint": "GET /api/v1/users/{id}",
-      "changes": [
-        "responses [200,401,403,404]→[200,410]"
-      ]
-    },
-    {
-      "endpoint": "GET /api/v1/users/{id}/profile",
-      "changes": [
-        "responses [200,404]→[200,404,410]"
-      ]
-    },
-    {
-      "endpoint": "PATCH /api/v1/users/{id}/role",
-      "changes": [
-        "responses [200,401,403,404]→[200,403,404]"
-      ]
-    },
-    {
-      "endpoint": "POST /api/v1/users",
-      "changes": [
-        "responses [201,400,401,403,409]→[201,409]"
-      ]
-    }
-  ],
-  "acknowledgedAt": "2026-06-04T12:31:11+05:45"
+  "modified": [],
+  "acknowledgedAt": null
 }
