@@ -14,6 +14,7 @@
 import { FilterOutlined, SearchOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { ActivityStatsRow } from "@/components/ActivityStatsRow";
 import { EventsHomeRail } from "@/components/EventsHomeRail";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
@@ -100,6 +101,10 @@ export default function HomeSearchView() {
               <SearchOutlined aria-hidden="true" />
             </button>
           </form>
+
+          <div className="home-search-stats">
+            <ActivityStatsRow language={language} variant="events" />
+          </div>
         </div>
       </section>
 

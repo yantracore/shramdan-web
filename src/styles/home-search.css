@@ -188,3 +188,52 @@
     backdrop-filter: none;
   }
 }
+
+/* Stats pills row sits between the search bar and the event carousel. The
+ * underlying ActivityStatsRow ships with opaque-surface chips; on the
+ * homepage hero we override to the glass recipe (CC-1) so the row reads
+ * as part of the search band, not a separate brochure section. */
+.home-search-stats {
+  width: 100%;
+}
+
+.home-search-stats .activity-stats-row {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.home-search-stats .activity-stat-chip-link {
+  padding: 12px 14px;
+  border: 1px solid color-mix(in srgb, var(--line) 45%, transparent);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  backdrop-filter: blur(18px) saturate(1.2);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.32) inset,
+    0 12px 32px rgba(23, 33, 28, 0.12);
+}
+
+.home-search-stats .activity-stat-chip-link:hover {
+  border-color: color-mix(in srgb, var(--primary) 32%, var(--line));
+  background: color-mix(in srgb, var(--primary) 8%, color-mix(in srgb, var(--surface) 76%, transparent));
+  transform: translateY(-1px);
+}
+
+@media (max-width: 720px) {
+  .home-search-stats .activity-stats-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .home-search-stats .activity-stat-chip-link {
+    padding: 10px 12px;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .home-search-stats .activity-stat-chip-link {
+    background: var(--surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
