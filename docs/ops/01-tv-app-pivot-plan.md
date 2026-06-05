@@ -57,18 +57,60 @@ Reshape the page chrome before reshaping any specific page. Every later phase de
 
 ## Phase 2 — Homepage as search surface
 
-This is the headline change. Replace the current homepage with a Google-style landing.
+This is the headline change. Replace the current homepage with a Google-style landing — but **not** Google's centered-in-viewport layout. Search sits closer to the top edge so the **event carousel** can be the main highlight directly below it. The brand title + slogan share that hero band with the search box.
+
+### Above-the-fold layout (विवेक 2026-06-05 clarifications)
+
+```text
++--------------------------------------------------------------------------+
+|  [corners + top-center pill nav]                                         |
+|                                                                          |
+|                       श्रमदान                                            |   <- brand title + slogan
+|             "हाम्रो श्रम, हाम्रो समाज, हाम्रो भविष्य।"                       |       (small block above search)
+|                                                                          |
+|          [   🔍  search events / issues / places         ]  [filters]    |   <- search bar slightly above-center,
+|                                                                          |       closer to top edge but not too close
+|     [ EVENT CAROUSEL — main highlight, large posters, snap-scroll ]      |   <- THE main highlight below search
+|     [   ◀  card  card  card  card  card  card  card  ▶   ]               |
+|                                                                          |
++--------------------------------------------------------------------------+
+```
+
+- Search bar is **not exactly center** like Google — closer to top edge, ~20–28% from the top, so the carousel earns the eye.
+- Brand title (श्रमदान / Shramdan) + slogan share the same vertical column as the search box; small typography so they don't outshine the search.
+- The event carousel is the **single most important visual** on first paint. Re-use the existing poster card component (the one with the glassy "View Details" pill); only the count/scaling logic changes.
+- Stats pills + map move **below** the carousel (still above the fold on tall screens; otherwise on first scroll).
+
+### Carousel scaling by viewport (विवेक 2026-06-05)
+
+Item count adapts to screen real estate. Use container queries (or width breakpoints if container queries aren't available):
+
+| Viewport width | Visible items | Notes |
+| --- | --- | --- |
+| `< 600px` (mobile) | **1** | Existing behaviour. Snap-scroll, large poster. |
+| `600–899px` (small tablet) | **2** | Optional intermediate; default to 1 if too tight. |
+| `900–1279px` (tablet / small laptop) | **3** | Max for narrow desktops. |
+| `1280–1599px` (HD / 1920×1080) | **3 to 5** | Test live; aim for cards that don't get squeezed. |
+| `1600–2199px` (QHD 2K) | **5** | Comfortable proportion. |
+| `≥ 2200px` (4K and above) | **up to 7** | Maximum density; no more. |
+
+- Card aspect ratio stays fixed (taller-than-wide poster) so density change does not warp the artwork.
+- No squeeze — if 5 cards at 1920px would force cards below ~280px wide, drop to 3.
+- Carousel scroll is one-card-per-step on every viewport so peek-of-next-card stays consistent.
+
+### Other Phase 2 mechanics (unchanged from original plan)
 
 - [ ] Move current `HomeClient.js` content out — it becomes the source of the new `/intro` page (see Phase 6). Keep the file in git history; do not duplicate.
 - [ ] New `/` (homepage):
-  - [ ] No vertical scrollbar in the default viewport.
-  - [ ] Centered search box, filters button immediately to its right.
-  - [ ] Stats pills row beneath, driven by the public reports API. Active pill highlighted. Clicking a pill scopes the stream + acts as a status filter extension.
+  - [ ] No default vertical scrollbar in the above-the-fold viewport.
+  - [ ] Brand title + slogan + search bar + filters button (top band).
+  - [ ] Event carousel directly below — the main highlight; viewport-scaled count per the table above.
+  - [ ] Stats pills row beneath the carousel, driven by the public reports API. Active pill highlighted. Clicking a pill scopes the stream + acts as a status filter extension.
   - [ ] Decent-size map below the pills.
-  - [ ] On scroll-down OR on a `Participate` click → reveal the curated for-you stream, ranked by location proximity (use the existing geolocation hook if it covers this; otherwise add one).
+  - [ ] On further scroll-down OR on a `Participate` click → reveal the curated for-you stream, ranked by location proximity (use the existing geolocation hook if it covers this; otherwise add one).
 - [ ] Add a route guard so `/` does not 404 if the curated stream API is empty — show suggested events instead.
 - [ ] Backend ask: confirm the public reports API exposes the counts we need for the pills (status × kind). Capture as `docs/api-requirements/reports.md` if missing.
-- [ ] Visual verify with Playwright: search interaction, pill filtering, scroll-down reveals stream.
+- [ ] Visual verify with Playwright at 360px / 1280px / 1920px / 2560px / 3840px — assert carousel item count matches the table.
 
 **Risks:** the current homepage carries SEO; ensure the new `/intro` ranks for the same terms (canonical + a JSON-LD update may be needed).
 
