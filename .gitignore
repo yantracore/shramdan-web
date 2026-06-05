@@ -17,3 +17,8 @@ pnpm-debug.log*
 .codex-*.log
 .codex/
 .claude/
+
+# verify / screenshot artifacts (Playwright, manual captures)
+/*.png
+.verify/
+.playwright-mcp/
