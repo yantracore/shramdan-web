@@ -1805,11 +1805,10 @@ export const copy = {
         steps: {
           intro: {
             title: "स्वागत",
-            heading: "तपाईंको सीपले समुदायको काम अघि बढाउँछ",
+            heading: "परिवर्तनको हिस्सा बनौँ",
             intro:
-              "श्रमदानमा विकासकर्ता, डिजाइनर, लेखक, संयोजक वा स्वयंसेवकका रूपमा जोडिँदा तपाईंको योगदान वास्तविक अभियान, रिपोर्ट र सामुदायिक निर्णयमा प्रयोग हुन्छ।",
-            cta: "आवेदन सुरु गर्नुहोस्",
-            eyebrow: "किन जोडिने?",
+              "आफ्नो समय र श्रम लगाएर समस्या समाधानमा सहयोग गरौँ — मिलेर अझ राम्रो नेपाल बनाऔँ।",
+            cta: "सुरु गरौँ",
             imageAlt: "श्रमदानका योगदानकर्ताहरू सामुदायिक कामको योजना बनाउँदै",
             imageSrc: "/images/forms/join-contributors.webp",
             stats: [
@@ -1818,24 +1817,27 @@ export const copy = {
             ],
             bullets: [
               "आफ्नो समय र सीप अनुसार जोडिनुहोस्।",
-              "हामीले उपयुक्त काम र अभियानसँग जोड्न सम्पर्क गर्छौँ।",
+              "तपाईंको योगदान वास्तविक अभियानमा प्रयोग हुन्छ।",
               "सानो योगदानले पनि सार्वजनिक समस्या समाधानतिर धकेल्छ।"
             ]
           },
           basics: {
-            title: "विवरण",
-            heading: "आधारभूत विवरण",
-            intro: "तपाईंलाई सम्पर्क गर्न आवश्यक जानकारी।"
+            title: "सम्पर्क",
+            heading: "लगइन र सम्पर्क विवरण",
+            intro:
+              "फोन नम्बर श्रमदानमा तपाईंको लगइन हुनेछ। नाम र इमेलले आवेदन समीक्षाका बेला तपाईंलाई चिनाउँछ।"
           },
           work: {
             title: "अनुभव",
-            heading: "अनुभव र पोर्टफोलियो",
-            intro: "तपाईंको पृष्ठभूमि बुझ्न मद्दत हुने विवरण — सबै वैकल्पिक।"
+            heading: "पृष्ठभूमि र अनुभव",
+            intro:
+              "तपाईंको सीप र अनुभव साझा गर्नुहोस् — कुन कामले तपाईंको योगदान अझ अर्थपूर्ण हुन्छ बुझ्न मद्दत पुग्छ। सबै फिल्ड वैकल्पिक।"
           },
           motivation: {
             title: "प्रेरणा",
-            heading: "तपाईं किन जोडिँदै हुनुहुन्छ?",
-            intro: "छोटो, इमानदार जवाफ — हामी पढ्छौँ।"
+            heading: "तपाईंको प्रेरणा",
+            intro:
+              "केही हरफमा — तपाईं किन योगदान दिन चाहनुहुन्छ। यो जवाफ समुदायले समीक्षाका बेला पढ्ने हो।"
           }
         }
       },
@@ -3743,11 +3745,10 @@ export const copy = {
         steps: {
           intro: {
             title: "Welcome",
-            heading: "Your skills can move community work forward",
+            heading: "Become a part of the change",
             intro:
-              "Join as a developer, designer, writer, organiser, or volunteer. Your contribution can support real campaigns, reports, and local decisions.",
-            cta: "Start Application",
-            eyebrow: "Why join?",
+              "Let's contribute our time and labour — together, help solve real problems and build a better Nepal.",
+            cta: "Let's Start",
             imageAlt: "Shramdan contributors planning community work together",
             imageSrc: "/images/forms/join-contributors.webp",
             stats: [
@@ -3756,24 +3757,27 @@ export const copy = {
             ],
             bullets: [
               "Show up with whatever time and skills you have.",
-              "We connect you with relevant work or campaigns.",
+              "Your contribution lands on real campaigns.",
               "Even a small contribution helps local problems move toward action."
             ]
           },
           basics: {
-            title: "Basics",
-            heading: "Your basic details",
-            intro: "What we need to reach you."
+            title: "Contact",
+            heading: "Login & contact details",
+            intro:
+              "Your phone number doubles as your Shramdan login. Name and email identify the application during community review."
           },
           work: {
             title: "Experience",
-            heading: "Experience & portfolio",
-            intro: "Background details that help us understand you — all optional."
+            heading: "Background & experience",
+            intro:
+              "Share what you can do — helps the community see where your skills make the most sense. All fields are optional."
           },
           motivation: {
             title: "Motivation",
-            heading: "Why are you joining?",
-            intro: "Short, honest answer — we read every one."
+            heading: "Your motivation",
+            intro:
+              "In a few lines — why you want to contribute. This answer is read by the community during review."
           }
         }
       },

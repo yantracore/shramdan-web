@@ -120,13 +120,13 @@
 }
 
 .multi-step-card {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 18px;
-  padding: 32px 28px 24px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 12px 4px 0;
   display: grid;
   gap: 22px;
-  box-shadow: 0 6px 28px rgba(15, 32, 26, 0.06);
+  box-shadow: none;
   animation: multi-step-card-in 280ms ease;
 }
 
@@ -421,12 +421,8 @@
     gap: 4px;
   }
   .multi-step-card {
-    padding: 24px 18px 18px;
+    padding: 8px 0 0;
   }
-}
-
-[data-theme="dark"] .multi-step-card {
-  box-shadow: 0 6px 28px rgba(0, 0, 0, 0.3);
 }
 
 [data-theme="dark"] .role-lane-card {
