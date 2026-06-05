@@ -1,0 +1,190 @@
+/* Phase 2 v0: TV-app homepage above-the-fold band.
+ *
+ * Layout per विवेक 2026-06-05 brief:
+ *   - Brand title + slogan (compact, share the column with the search box)
+ *   - Search bar + filters chip + submit
+ *   - EventsHomeRail directly below as the main highlight
+ *
+ * Search sits slightly above center — NOT exactly center like Google. The
+ * carousel earns the eye while the brand band sits comfortably above.
+ */
+
+.home-search-hero {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  /* Clear the four-corner shell (--corner-clear-zone) and add breathing
+   * so the brand sits in the upper third of the viewport. */
+  padding: calc(var(--corner-clear-zone, 64px) + 32px) 32px 32px;
+  min-height: 38vh;
+}
+
+.home-search-hero-inner {
+  display: grid;
+  gap: 28px;
+  width: min(100%, 720px);
+  /* Pull the search column slightly toward the top so the carousel
+   * below it earns the eye. */
+  margin-top: clamp(8px, 4vh, 56px);
+  text-align: center;
+}
+
+.home-search-brand {
+  display: grid;
+  gap: 6px;
+}
+
+.home-search-brand h1 {
+  margin: 0;
+  color: var(--primary-dark);
+  font-size: clamp(48px, 6vw, 84px);
+  line-height: 0.96;
+  letter-spacing: -0.01em;
+}
+
+.home-search-brand p {
+  margin: 0;
+  color: var(--muted);
+  font-size: clamp(16px, 1.4vw, 20px);
+  line-height: 1.35;
+}
+
+/* The search bar is the headline interactive element. Glass treatment
+ * matches the corner shell (CC-1) — but heavier shadow so it floats. */
+.home-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  backdrop-filter: blur(18px) saturate(1.2);
+  border: 1px solid color-mix(in srgb, var(--line) 45%, transparent);
+  border-radius: 16px;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.32) inset,
+    0 18px 48px rgba(23, 33, 28, 0.16);
+}
+
+.home-search-input {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  min-width: 0;
+  color: var(--text);
+  font-size: 16px;
+}
+
+.home-search-input > :first-child {
+  color: var(--muted);
+  font-size: 18px;
+}
+
+.home-search-input input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  outline: none;
+}
+
+.home-search-input input::placeholder {
+  color: color-mix(in srgb, var(--muted) 80%, transparent);
+}
+
+.home-search-filters,
+.home-search-submit {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  min-height: 40px;
+  border: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: background 160ms ease, color 160ms ease, transform 160ms ease, border-color 160ms ease;
+}
+
+.home-search-filters:hover,
+.home-search-submit:hover {
+  background: color-mix(in srgb, var(--primary) 12%, var(--surface));
+  color: var(--primary-dark);
+  border-color: color-mix(in srgb, var(--primary) 24%, var(--line));
+  transform: translateY(-1px);
+}
+
+.home-search-submit {
+  /* Submit is a primary action — slightly heavier visual weight. */
+  background: var(--primary);
+  color: #fff;
+  border-color: transparent;
+  padding: 10px 16px;
+  font-size: 16px;
+}
+
+.home-search-submit:hover {
+  background: var(--primary-dark);
+  color: #fff;
+  border-color: transparent;
+}
+
+@media (max-width: 720px) {
+  .home-search-hero {
+    padding: calc(var(--corner-clear-zone, 64px) + 16px) 16px 16px;
+    min-height: 32vh;
+  }
+
+  .home-search-hero-inner {
+    margin-top: 0;
+    gap: 20px;
+  }
+
+  .home-search-filters span {
+    /* Hide the "Filter" label below 720px; icon stays for tap target. */
+    display: none;
+  }
+
+  .home-search-filters {
+    padding: 10px 12px;
+  }
+}
+
+@media (max-width: 540px) {
+  .home-search-bar {
+    padding: 6px;
+    gap: 6px;
+  }
+
+  .home-search-input {
+    padding: 10px 10px;
+    font-size: 15px;
+  }
+
+  .home-search-submit {
+    padding: 8px 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-search-filters,
+  .home-search-submit {
+    transition: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .home-search-bar {
+    background: var(--surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}

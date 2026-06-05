@@ -1,7 +1,5 @@
-import HomeClient from "./HomeClient";
-import { getRoadmapSummary } from "@/lib/roadmap";
+import HomeSearchView from "@/components/HomeSearchView";
 
 export default function Page() {
-  const summary = getRoadmapSummary();
-  return <HomeClient summary={summary} />;
+  return <HomeSearchView />;
 }

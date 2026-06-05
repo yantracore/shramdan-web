@@ -11,7 +11,11 @@ export const copy = {
       login: "लगइन",
       intro: "परिचय",
       learn: "सिकौँ",
-      settings: "सेटिङ्स"
+      settings: "सेटिङ्स",
+      appDev: "एप निर्माण",
+      appDevTooltip: "सहभागी हुनुहोस्",
+      appDevBadge: "लाइभ",
+      resources: "स्रोत भण्डार"
     },
     pageTitles: {
       brandSuffix: "श्रमदान | Shramdan",
@@ -919,6 +923,78 @@ export const copy = {
         }
       ]
     },
+    appDev: {
+      pageTitle: "एप निर्माण सहभागिता",
+      eyebrow: "एप निर्माणमा सहभागी हुनुहोस्",
+      title: "श्रमदान एप — निर्माणकर्ताहरूको श्रमदान",
+      intro:
+        "श्रमदान एप अहिले सामूहिक निर्माणमा छ। फिचर, बग, डिजाइन र कागजातका प्रस्तावहरू यहाँ छन् — पढ्नुहोस्, मतदान गर्नुहोस्, छलफलमा सामेल हुनुहोस्, र चाहेमा अगुवा बनेर कुनै प्रस्ताव आफैँ बोक्नुहोस्। यो डेभलपर, डिजाइनर, लेखक, परीक्षक र सिक्न चाहनेहरूको श्रमदान हो।",
+      live: {
+        badge: "लाइभ निर्माण",
+        body:
+          "हरेक प्रस्ताव सार्वजनिक छ। मतदान सक्किंदा प्रस्ताव अगुवाको हातमा जान्छ, र काम पूरा हुने बित्तिकै सार्वजनिक खातामा देखिन्छ।"
+      },
+      sortLabels: {
+        top: "सबैभन्दा बढी मत",
+        new: "नवीनतम",
+        discussed: "सर्वाधिक छलफल"
+      },
+      filters: {
+        all: "सबै",
+        category: "क्षेत्र",
+        difficulty: "कठिनाइ",
+        skill: "सीप"
+      },
+      categories: {
+        frontend: "फ्रन्टएन्ड",
+        backend: "ब्याकएन्ड",
+        design: "डिजाइन",
+        content: "सामग्री",
+        docs: "कागजात",
+        qa: "परीक्षण",
+        ops: "सञ्चालन",
+        community: "समुदाय"
+      },
+      difficulty: {
+        easy: "सहज",
+        medium: "मध्यम",
+        hard: "कठिन"
+      },
+      status: {
+        proposed: "प्रस्तावित",
+        discussion: "छलफलमा",
+        accepted: "अगुवा छनोट",
+        in_progress: "काम जारी",
+        shipped: "सम्पन्न",
+        parked: "स्थगित"
+      },
+      labels: {
+        votes: "मत",
+        comments: "टिप्पणी",
+        leader: "अगुवा",
+        proposedBy: "प्रस्तावक",
+        skills: "चाहिने सीप",
+        branches: "उप-क्षेत्र",
+        unassigned: "अगुवा छनोट हुन बाँकी"
+      },
+      actions: {
+        vote: "मत दिनुहोस्",
+        voted: "मत दिइयो",
+        comment: "छलफलमा सामेल",
+        takeLead: "अगुवा बन्नुहोस्",
+        viewDetail: "विवरण हेर्नुहोस्",
+        propose: "नयाँ प्रस्ताव राख्नुहोस्"
+      },
+      empty: {
+        title: "अहिले सक्रिय प्रस्ताव छैन",
+        body: "नयाँ प्रस्ताव थप्नुहोस् वा सम्पन्न भएका कामहरूको सूची हेर्नुहोस्।"
+      },
+      loginPrompt: {
+        body: "मतदान र छलफलमा सामेल हुन लग-इन आवश्यक छ।",
+        login: "लगइन",
+        join: "जोडिनुहोस्"
+      }
+    },
     join: {
       eyebrow: "समुदायमा सामेल हुनुहोस्",
       title: "योगदानकर्ता आवेदन",
@@ -1310,6 +1386,13 @@ export const copy = {
       issueSub: "सूचीमा",
       eventLabel: "अभियान",
       eventSub: "सञ्चालनमा"
+    },
+    homeSearch: {
+      slogan: "हाम्रो श्रम, हाम्रो समाज, हाम्रो भविष्य।",
+      searchPlaceholder: "अभियान, समस्या वा ठाउँ खोज्नुहोस्…",
+      searchAria: "श्रमदानमा खोज्नुहोस्",
+      filtersLabel: "फिल्टर",
+      submitAria: "खोज सुरु गर्नुहोस्"
     },
     liveEventsRail: {
       eyebrow: "अहिले भइरहेको",
@@ -1833,7 +1916,11 @@ export const copy = {
       login: "Login",
       intro: "Intro",
       learn: "Learn",
-      settings: "Settings"
+      settings: "Settings",
+      appDev: "App Development",
+      appDevTooltip: "Participate",
+      appDevBadge: "LIVE",
+      resources: "Resources"
     },
     pageTitles: {
       brandSuffix: "श्रमदान | Shramdan",
@@ -2749,6 +2836,78 @@ export const copy = {
         }
       ]
     },
+    appDev: {
+      pageTitle: "App development · Participate",
+      eyebrow: "Participate in building the app",
+      title: "Shramdan App — the builders' Shramdan",
+      intro:
+        "The Shramdan app is being built in public. Feature proposals, bugs, design explorations, and docs all live here — read them, upvote what you want next, join the discussion, and take a proposal as its leader if you want to ship it. This is the Shramdan for developers, designers, writers, testers, and anyone who wants to learn.",
+      live: {
+        badge: "Live build",
+        body:
+          "Every proposal is public. When the vote settles, a leader takes the work, and the result lands on the public ledger the moment it ships."
+      },
+      sortLabels: {
+        top: "Most votes",
+        new: "Newest",
+        discussed: "Most discussion"
+      },
+      filters: {
+        all: "All",
+        category: "Area",
+        difficulty: "Difficulty",
+        skill: "Skill"
+      },
+      categories: {
+        frontend: "Frontend",
+        backend: "Backend",
+        design: "Design",
+        content: "Content",
+        docs: "Docs",
+        qa: "QA",
+        ops: "Ops",
+        community: "Community"
+      },
+      difficulty: {
+        easy: "Easy",
+        medium: "Medium",
+        hard: "Hard"
+      },
+      status: {
+        proposed: "Proposed",
+        discussion: "In discussion",
+        accepted: "Leader picked",
+        in_progress: "In progress",
+        shipped: "Shipped",
+        parked: "Parked"
+      },
+      labels: {
+        votes: "votes",
+        comments: "comments",
+        leader: "Leader",
+        proposedBy: "Proposed by",
+        skills: "Skills needed",
+        branches: "Branches",
+        unassigned: "Leader not yet picked"
+      },
+      actions: {
+        vote: "Vote",
+        voted: "Voted",
+        comment: "Join the discussion",
+        takeLead: "Take the Lead",
+        viewDetail: "View Details",
+        propose: "Propose a New Task"
+      },
+      empty: {
+        title: "No active proposals right now",
+        body: "Add a new proposal or browse the shipped ledger to see what's already been built."
+      },
+      loginPrompt: {
+        body: "Voting and discussion need a login.",
+        login: "Login",
+        join: "Join"
+      }
+    },
     join: {
       eyebrow: "Join the community",
       title: "Contributor Application",
@@ -3140,6 +3299,13 @@ export const copy = {
       issueSub: "Listed",
       eventLabel: "Event",
       eventSub: "In execution"
+    },
+    homeSearch: {
+      slogan: "Our labor, our society, our future.",
+      searchPlaceholder: "Search events, issues, or places…",
+      searchAria: "Search Shramdan",
+      filtersLabel: "Filters",
+      submitAria: "Submit search"
     },
     liveEventsRail: {
       eyebrow: "Happening now",

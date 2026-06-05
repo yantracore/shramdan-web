@@ -11,6 +11,7 @@
 @import "../styles/comments.css";
 @import "../styles/scrollbars.css";
 @import "../styles/antd-dropdown.css";
+@import "../styles/home-search.css";
 
 :root {
   color-scheme: light;

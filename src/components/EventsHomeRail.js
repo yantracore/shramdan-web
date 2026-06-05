@@ -64,13 +64,27 @@ const COVERFLOW_PARAMS = Object.freeze({
 const COVERFLOW_SPEED_DEFAULT = 900;
 const COVERFLOW_SPEED_REDUCED = 0;
 
-// Exactly 3 cards on desktop (1 active centered + 1 tilted on each side).
-// Breakpoints are min-width: at ≥1024px → 3, 640–1023px → 2, <640px → 1.2
-// (gives a small peek on mobile so the swipe gesture is discoverable).
+// Slide count adapts to the viewport per the 2026-06-05 TV-app pivot —
+// the carousel is the homepage's main highlight, so density grows on
+// wider screens instead of staying capped at 3.
+//
+//   < 640px (phone)    → 1.2 (peek of next)
+//   640-1023 (tablet)  → 2
+//   1024-1599 (HD)     → 3   ← prior cap; still the default desktop look
+//   1600-2199 (QHD)    → 5
+//   ≥ 2200 (4K+)       → 7   ← maximum density
+//
+// No "squeeze" — these counts assume the rail is given the full viewport
+// width minus a comfortable side padding. If the rail is placed inside
+// a narrower container (a 1180px-max wrapper), the higher counts simply
+// won't kick in because the container width caps each card to its
+// minimum legible size.
 const SLIDES_BREAKPOINTS = Object.freeze({
   0: { slidesPerView: 1.2, spaceBetween: 16 },
   640: { slidesPerView: 2, spaceBetween: 20 },
-  1024: { slidesPerView: 3, spaceBetween: 24 }
+  1024: { slidesPerView: 3, spaceBetween: 24 },
+  1600: { slidesPerView: 5, spaceBetween: 24 },
+  2200: { slidesPerView: 7, spaceBetween: 24 }
 });
 
 const AUTOPLAY_OPTIONS = Object.freeze({
