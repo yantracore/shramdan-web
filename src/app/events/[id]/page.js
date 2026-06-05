@@ -39,7 +39,7 @@ import { CommentSection } from "@/components/comments";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
 import { getJson } from "@/lib/apiClient";
-import { getDemoEventById, injectMockLiveStream } from "@/lib/devMockData";
+import { injectMockLiveStream } from "@/lib/devMockData";
 import { buildRolesNeeded, countActiveParticipants } from "@/lib/eventParticipants";
 import { getAuthSession, subscribeAuthSession } from "@/lib/authSession";
 import { copy } from "@/lib/siteContent";
@@ -116,17 +116,6 @@ export default function EventDetailPage() {
     setError("");
     setNotFound(false);
 
-    // Dev mock: demo-* IDs short-circuit the backend so the live-stream
-    // UX can be demoed without backend support. See src/lib/devMockData.js.
-    if (typeof eventId === "string" && eventId.startsWith("demo-")) {
-      const demoEvent = getDemoEventById(eventId);
-      if (demoEvent) {
-        setEventData(demoEvent);
-        setLoading(false);
-        return;
-      }
-    }
-
     try {
       const response = await getJson(`/events/${eventId}`);
       const data = getResponseData(response, null);
@@ -195,14 +184,10 @@ export default function EventDetailPage() {
   const session = useSyncExternalStore(subscribeAuthSession, getAuthSession, () => null);
   const linkedIssue = eventData?.issue ? localizeIssue(eventData.issue, language) : null;
   const leader = eventData?.eventLeader ?? null;
-  const isDemoEvent = typeof eventId === "string" && eventId.startsWith("demo-");
-  // Demo events have no real eventLeaderId in the mock payload; we surface
-  // leader controls to any authenticated viewer so the leader UX can be
-  // demoed end-to-end without backend signup.
   const isLeader = Boolean(
     session?.user?.id &&
-      (isDemoEvent ||
-        (eventData?.eventLeaderId && session.user.id === eventData.eventLeaderId))
+      eventData?.eventLeaderId &&
+      session.user.id === eventData.eventLeaderId
   );
   const canScheduleEvent = isLeader && eventData?.status === "DRAFT";
   const canActivateEvent = isLeader && eventData?.status === "SCHEDULED";
@@ -283,6 +268,32 @@ export default function EventDetailPage() {
   const hasCoords = Number.isFinite(meetupLat) && Number.isFinite(meetupLng);
   const meetupAddress = eventData?.meetupAddress || linkedIssue?.addressText || "";
   const mapsLink = buildMapsLink(meetupAddress, meetupLat, meetupLng);
+
+  const showLeaderControlsZone =
+    canScheduleEvent ||
+    canCompleteEvent ||
+    canActivateEvent ||
+    canManageReminders ||
+    (eventData?.status === "COMPLETED" && canUploadVideo);
+
+  const hasCampaignArtifacts =
+    Boolean(eventData?.completedAt) ||
+    Boolean(eventData?.resultSummary) ||
+    Boolean(eventData?.beforeAfter?.before && eventData?.beforeAfter?.after) ||
+    imageUploads.length > 0 ||
+    (Array.isArray(eventData?.testimonials) && eventData.testimonials.length > 0) ||
+    eventData?.status === "COMPLETED";
+
+  const leaderZoneEyebrow = language === "np" ? "नेताको नियन्त्रण" : "Leader controls";
+  const leaderZoneIntro =
+    language === "np"
+      ? "तपाईं यो अभियानको नेता हुनुहुन्छ — व्यवस्थापनका कुराहरू यहाँ छन्।"
+      : "You're leading this campaign — manage scheduling, safety and follow-up here.";
+  const afterZoneEyebrow = language === "np" ? "अभियानपछि" : "After the campaign";
+  const afterZoneIntro =
+    language === "np"
+      ? "अभियानले छोडेका साक्षीहरू — परिणाम, तस्बिर र अनुभव।"
+      : "What this campaign left behind — outcome, photos and voices.";
 
   const pageTitle =
     eventData && (linkedIssue?.title || eventData.meetupAddress || content.detail.defaultTitle);
@@ -374,7 +385,8 @@ export default function EventDetailPage() {
             ) : null}
 
             <div className="public-issue-detail-body event-detail-body">
-              <div className="event-detail-main">
+              {/* ZONE 1 — ESSENTIALS: what this campaign is, when, where, who's in */}
+              <div className="event-detail-main event-detail-main--top">
                 <div className="public-issue-detail-topline">
                   <div className="public-issue-detail-topline-tags">
                     <Tag color={EVENT_STATUS_COLORS[eventData.status] || "default"}>
@@ -414,6 +426,30 @@ export default function EventDetailPage() {
                   </span>
                 </div>
 
+                {linkedIssue?.description ? (
+                  <section className="public-issue-detail-section-block">
+                    <h2>{content.detail.goalTitle}</h2>
+                    <p>{linkedIssue.description}</p>
+                  </section>
+                ) : (
+                  <section className="public-issue-detail-section-block">
+                    <h2>{content.detail.goalTitle}</h2>
+                    <p className="public-issue-detail-muted">{content.detail.goalEmpty}</p>
+                  </section>
+                )}
+
+                {meetupAddress || eventData.meetupNotes ? (
+                  <section className="public-issue-detail-section-block">
+                    <h2>{content.detail.meetupTitle}</h2>
+                    {meetupAddress ? (
+                      <p>
+                        <EnvironmentOutlined /> {meetupAddress}
+                      </p>
+                    ) : null}
+                    {eventData.meetupNotes ? <p>{eventData.meetupNotes}</p> : null}
+                  </section>
+                ) : null}
+
                 {totalParticipantCount > 0 ? (
                   <PeopleChipRow
                     title={language === "np" ? "सहभागीहरू" : "Participants"}
@@ -428,239 +464,9 @@ export default function EventDetailPage() {
                     language={language}
                   />
                 ) : null}
-
-                {canScheduleEvent ? (
-                  <div className="leader-schedule-banner">
-                    <div className="leader-schedule-banner-copy">
-                      <span className="eyebrow">{leaderScheduleCopy.eyebrow}</span>
-                      <p>{leaderScheduleCopy.intro}</p>
-                    </div>
-                    <LeaderScheduleEditor
-                      event={eventData}
-                      content={leaderScheduleCopy}
-                      onSaved={fetchEvent}
-                    />
-                  </div>
-                ) : null}
-
-                {canCompleteEvent ? (
-                  <div className="leader-schedule-banner leader-complete-banner">
-                    <div className="leader-schedule-banner-copy">
-                      <span className="eyebrow">{leaderCompleteCopy.eyebrow}</span>
-                      <p>{leaderCompleteCopy.intro}</p>
-                    </div>
-                    <LeaderCompleteEditor
-                      event={eventData}
-                      content={leaderCompleteCopy}
-                      onSaved={handleEventCompleted}
-                    />
-                  </div>
-                ) : null}
-
-                {canActivateEvent ? (
-                  <SafetyChecklistPanel
-                    event={eventData}
-                    language={language}
-                    onActivated={handleEventCompleted}
-                  />
-                ) : null}
-
-                {canManageReminders ? (
-                  <ReminderCadencePanel
-                    event={eventData}
-                    language={language}
-                    onSaved={handleEventCompleted}
-                  />
-                ) : null}
-
-                {canShowNominations ? (
-                  <LeaderNominationPanel
-                    event={eventData}
-                    language={language}
-                    onChanged={handleEventCompleted}
-                  />
-                ) : null}
-
-                {canShowIncidents ? (
-                  <IncidentPanel
-                    event={eventData}
-                    language={language}
-                    canSeeFull={canSeeFullIncidents}
-                    onChanged={handleEventCompleted}
-                  />
-                ) : null}
-
-                <ContributionIntentPanel
-                  event={eventData}
-                  language={language}
-                  onChanged={handleEventCompleted}
-                />
-
-                {eventData.status !== "COMPLETED" && eventData.status !== "CANCELLED" ? (
-                  <ShareAsContribution event={eventData} language={language} />
-                ) : null}
-
-                {eventData.status === "COMPLETED" ? (
-                  <VideoUploadPanel
-                    event={eventData}
-                    language={language}
-                    canUpload={canUploadVideo}
-                    onChanged={handleEventCompleted}
-                  />
-                ) : null}
-
-                {eventData.status === "COMPLETED" && canUploadVideo ? (
-                  <AttendanceVerifyPanel
-                    event={eventData}
-                    language={language}
-                    onChanged={handleEventCompleted}
-                  />
-                ) : null}
-
-
-                {Array.isArray(eventData.rolesNeeded) && eventData.rolesNeeded.length > 0 ? (
-                  <>
-                    <EventJoinPanel
-                      event={eventData}
-                      language={language}
-                      onJoined={handleEventCompleted}
-                    />
-                    <EventRosterPanel
-                      rolesNeeded={eventData.rolesNeeded}
-                      language={language}
-                      eventId={eventData.id}
-                    />
-                  </>
-                ) : null}
-
-                {linkedIssue?.description ? (
-                  <section className="public-issue-detail-section-block">
-                    <h2>{content.detail.goalTitle}</h2>
-                    <p>{linkedIssue.description}</p>
-                  </section>
-                ) : (
-                  <section className="public-issue-detail-section-block">
-                    <h2>{content.detail.goalTitle}</h2>
-                    <p className="public-issue-detail-muted">{content.detail.goalEmpty}</p>
-                  </section>
-                )}
-
-                {meetupAddress || eventData.meetupNotes ? (
-                <section className="public-issue-detail-section-block">
-                  <h2>{content.detail.meetupTitle}</h2>
-                  {meetupAddress ? (
-                    <p>
-                      <EnvironmentOutlined /> {meetupAddress}
-                    </p>
-                  ) : null}
-                  {eventData.meetupNotes ? <p>{eventData.meetupNotes}</p> : null}
-                </section>
-              ) : null}
-
-              {eventData.completedAt || eventData.resultSummary ? (
-                <section className="public-issue-detail-section-block">
-                  <h2>{content.detail.completedAt}</h2>
-                  {eventData.completedAt ? (
-                    <p>{formatCompletedAt(eventData.completedAt, language)}</p>
-                  ) : null}
-                  {eventData.resultSummary ? (
-                    <>
-                      <h3>{content.detail.resultSummary}</h3>
-                      <p>{eventData.resultSummary}</p>
-                    </>
-                  ) : null}
-                </section>
-              ) : null}
-
-              {eventData.beforeAfter?.before && eventData.beforeAfter?.after ? (
-                <section className="public-issue-detail-section-block before-after-section">
-                  <h2>
-                    {language === "np" ? "अघि र पछि" : "Before and after"}
-                  </h2>
-                  <p className="public-issue-detail-muted">
-                    {language === "np"
-                      ? "थोप्ने बटन तानेर अघि र पछिको दृश्य तुलना गर्नुहोस्।"
-                      : "Drag the handle to compare before and after."}
-                  </p>
-                  <BeforeAfterSlider
-                    beforeUrl={eventData.beforeAfter.before}
-                    afterUrl={eventData.beforeAfter.after}
-                    beforeAlt={language === "np" ? "अघिको दृश्य" : "Before"}
-                    afterAlt={language === "np" ? "पछिको दृश्य" : "After"}
-                    beforeLabel={language === "np" ? "अघि" : "BEFORE"}
-                    afterLabel={language === "np" ? "पछि" : "AFTER"}
-                    ariaLabel={
-                      language === "np"
-                        ? "अघि र पछिको तुलना"
-                        : "Before/after comparison"
-                    }
-                  />
-                </section>
-              ) : null}
-
-              {imageUploads.length > 0 ? (
-                <section className="public-issue-detail-section-block">
-                  <h2>{content.detail.photosTitle}</h2>
-                  <IssuePhotoGallery
-                    content={issueContent}
-                    images={imageUploads}
-                    title={linkedIssue?.title || content.detail.defaultTitle}
-                  />
-                </section>
-              ) : null}
-
-              {Array.isArray(eventData.testimonials) && eventData.testimonials.length > 0 ? (
-                <section className="event-testimonials" aria-labelledby="event-testimonials-title">
-                  <header className="event-testimonials-header">
-                    <h2 id="event-testimonials-title">
-                      {language === "np" ? "दिनको आवाज" : "Voices from the day"}
-                    </h2>
-                    <p>
-                      {language === "np"
-                        ? "अभियानमा सहभागी भएकाहरूले के भने।"
-                        : "What people who showed up said."}
-                    </p>
-                  </header>
-                  <ul className="event-testimonials-list">
-                    {eventData.testimonials.map((entry, i) => (
-                      <li key={i} className="event-testimonial">
-                        <blockquote className="event-testimonial-quote">{entry.quote}</blockquote>
-                        <footer className="event-testimonial-attrib">
-                          <span className="event-testimonial-name">{entry.name}</span>
-                          {entry.role ? (
-                            <span className="event-testimonial-role">{entry.role}</span>
-                          ) : null}
-                        </footer>
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-              ) : null}
-
-              <CommentSection
-                targetType="event"
-                targetId={eventData.id}
-                language={language}
-                mentionPool={(Array.isArray(eventData.rolesNeeded)
-                  ? eventData.rolesNeeded.flatMap((r) =>
-                      (r.filledNames || []).map((name) => ({
-                        id: `roster:${r.role}:${name}`,
-                        name,
-                        role: r.role
-                      }))
-                    )
-                  : [])}
-              />
-
-              {linkedIssue?.id ? (
-                <div className="public-issue-detail-actions-bar">
-                  <Link href={`/issues/${linkedIssue.id}`}>
-                    <Button icon={<ArrowLeftOutlined />}>{content.detail.backToIssue}</Button>
-                  </Link>
-                </div>
-              ) : null}
               </div>
 
+              {/* ASIDE — map: sticky right rail on desktop, inline-after-essentials on mobile */}
               {hasCoords ? (
                 <aside className="event-detail-side">
                   <section
@@ -707,6 +513,247 @@ export default function EventDetailPage() {
                   </section>
                 </aside>
               ) : null}
+
+              {/* ZONES 2-5 — action / leader / after-the-campaign / discussion */}
+              <div className="event-detail-main event-detail-main--rest">
+                {/* ZONE 2 — ACTION: how a visitor takes part */}
+                {Array.isArray(eventData.rolesNeeded) && eventData.rolesNeeded.length > 0 ? (
+                  <>
+                    <EventJoinPanel
+                      event={eventData}
+                      language={language}
+                      onJoined={handleEventCompleted}
+                    />
+                    <EventRosterPanel
+                      rolesNeeded={eventData.rolesNeeded}
+                      language={language}
+                      eventId={eventData.id}
+                    />
+                  </>
+                ) : null}
+
+                <ContributionIntentPanel
+                  event={eventData}
+                  language={language}
+                  onChanged={handleEventCompleted}
+                />
+
+                {eventData.status !== "COMPLETED" && eventData.status !== "CANCELLED" ? (
+                  <ShareAsContribution event={eventData} language={language} />
+                ) : null}
+
+                {canShowNominations ? (
+                  <LeaderNominationPanel
+                    event={eventData}
+                    language={language}
+                    onChanged={handleEventCompleted}
+                  />
+                ) : null}
+
+                {canShowIncidents ? (
+                  <IncidentPanel
+                    event={eventData}
+                    language={language}
+                    canSeeFull={canSeeFullIncidents}
+                    onChanged={handleEventCompleted}
+                  />
+                ) : null}
+
+                {/* ZONE 3 — LEADER CONTROLS: visible only when the viewer can act */}
+                {showLeaderControlsZone ? (
+                  <section
+                    className="event-detail-zone event-detail-zone--leader"
+                    aria-labelledby="event-zone-leader-title"
+                  >
+                    <header className="event-detail-zone-header">
+                      <span className="event-detail-zone-eyebrow">{leaderZoneEyebrow}</span>
+                      <h2 id="event-zone-leader-title" className="event-detail-zone-title">
+                        {leaderZoneIntro}
+                      </h2>
+                    </header>
+
+                    {canScheduleEvent ? (
+                      <div className="leader-schedule-banner">
+                        <div className="leader-schedule-banner-copy">
+                          <span className="eyebrow">{leaderScheduleCopy.eyebrow}</span>
+                          <p>{leaderScheduleCopy.intro}</p>
+                        </div>
+                        <LeaderScheduleEditor
+                          event={eventData}
+                          content={leaderScheduleCopy}
+                          onSaved={fetchEvent}
+                        />
+                      </div>
+                    ) : null}
+
+                    {canCompleteEvent ? (
+                      <div className="leader-schedule-banner leader-complete-banner">
+                        <div className="leader-schedule-banner-copy">
+                          <span className="eyebrow">{leaderCompleteCopy.eyebrow}</span>
+                          <p>{leaderCompleteCopy.intro}</p>
+                        </div>
+                        <LeaderCompleteEditor
+                          event={eventData}
+                          content={leaderCompleteCopy}
+                          onSaved={handleEventCompleted}
+                        />
+                      </div>
+                    ) : null}
+
+                    {canActivateEvent ? (
+                      <SafetyChecklistPanel
+                        event={eventData}
+                        language={language}
+                        onActivated={handleEventCompleted}
+                      />
+                    ) : null}
+
+                    {canManageReminders ? (
+                      <ReminderCadencePanel
+                        event={eventData}
+                        language={language}
+                        onSaved={handleEventCompleted}
+                      />
+                    ) : null}
+
+                    {eventData.status === "COMPLETED" && canUploadVideo ? (
+                      <AttendanceVerifyPanel
+                        event={eventData}
+                        language={language}
+                        onChanged={handleEventCompleted}
+                      />
+                    ) : null}
+                  </section>
+                ) : null}
+
+                {/* ZONE 4 — AFTER THE CAMPAIGN: results, photos, voices */}
+                {hasCampaignArtifacts ? (
+                  <section
+                    className="event-detail-zone event-detail-zone--after"
+                    aria-labelledby="event-zone-after-title"
+                  >
+                    <header className="event-detail-zone-header">
+                      <span className="event-detail-zone-eyebrow">{afterZoneEyebrow}</span>
+                      <h2 id="event-zone-after-title" className="event-detail-zone-title">
+                        {afterZoneIntro}
+                      </h2>
+                    </header>
+
+                    {eventData.completedAt || eventData.resultSummary ? (
+                      <section className="public-issue-detail-section-block">
+                        <h2>{content.detail.completedAt}</h2>
+                        {eventData.completedAt ? (
+                          <p>{formatCompletedAt(eventData.completedAt, language)}</p>
+                        ) : null}
+                        {eventData.resultSummary ? (
+                          <>
+                            <h3>{content.detail.resultSummary}</h3>
+                            <p>{eventData.resultSummary}</p>
+                          </>
+                        ) : null}
+                      </section>
+                    ) : null}
+
+                    {eventData.status === "COMPLETED" ? (
+                      <VideoUploadPanel
+                        event={eventData}
+                        language={language}
+                        canUpload={canUploadVideo}
+                        onChanged={handleEventCompleted}
+                      />
+                    ) : null}
+
+                    {eventData.beforeAfter?.before && eventData.beforeAfter?.after ? (
+                      <section className="public-issue-detail-section-block before-after-section">
+                        <h2>
+                          {language === "np" ? "अघि र पछि" : "Before and after"}
+                        </h2>
+                        <p className="public-issue-detail-muted">
+                          {language === "np"
+                            ? "थोप्ने बटन तानेर अघि र पछिको दृश्य तुलना गर्नुहोस्।"
+                            : "Drag the handle to compare before and after."}
+                        </p>
+                        <BeforeAfterSlider
+                          beforeUrl={eventData.beforeAfter.before}
+                          afterUrl={eventData.beforeAfter.after}
+                          beforeAlt={language === "np" ? "अघिको दृश्य" : "Before"}
+                          afterAlt={language === "np" ? "पछिको दृश्य" : "After"}
+                          beforeLabel={language === "np" ? "अघि" : "BEFORE"}
+                          afterLabel={language === "np" ? "पछि" : "AFTER"}
+                          ariaLabel={
+                            language === "np"
+                              ? "अघि र पछिको तुलना"
+                              : "Before/after comparison"
+                          }
+                        />
+                      </section>
+                    ) : null}
+
+                    {imageUploads.length > 0 ? (
+                      <section className="public-issue-detail-section-block">
+                        <h2>{content.detail.photosTitle}</h2>
+                        <IssuePhotoGallery
+                          content={issueContent}
+                          images={imageUploads}
+                          title={linkedIssue?.title || content.detail.defaultTitle}
+                        />
+                      </section>
+                    ) : null}
+
+                    {Array.isArray(eventData.testimonials) && eventData.testimonials.length > 0 ? (
+                      <section className="event-testimonials" aria-labelledby="event-testimonials-title">
+                        <header className="event-testimonials-header">
+                          <h2 id="event-testimonials-title">
+                            {language === "np" ? "दिनको आवाज" : "Voices from the day"}
+                          </h2>
+                          <p>
+                            {language === "np"
+                              ? "अभियानमा सहभागी भएकाहरूले के भने।"
+                              : "What people who showed up said."}
+                          </p>
+                        </header>
+                        <ul className="event-testimonials-list">
+                          {eventData.testimonials.map((entry, i) => (
+                            <li key={i} className="event-testimonial">
+                              <blockquote className="event-testimonial-quote">{entry.quote}</blockquote>
+                              <footer className="event-testimonial-attrib">
+                                <span className="event-testimonial-name">{entry.name}</span>
+                                {entry.role ? (
+                                  <span className="event-testimonial-role">{entry.role}</span>
+                                ) : null}
+                              </footer>
+                            </li>
+                          ))}
+                        </ul>
+                      </section>
+                    ) : null}
+                  </section>
+                ) : null}
+
+                {/* ZONE 5 — DISCUSSION & NAVIGATION */}
+                <CommentSection
+                  targetType="event"
+                  targetId={eventData.id}
+                  language={language}
+                  mentionPool={(Array.isArray(eventData.rolesNeeded)
+                    ? eventData.rolesNeeded.flatMap((r) =>
+                        (r.filledNames || []).map((name) => ({
+                          id: `roster:${r.role}:${name}`,
+                          name,
+                          role: r.role
+                        }))
+                      )
+                    : [])}
+                />
+
+                {linkedIssue?.id ? (
+                  <div className="public-issue-detail-actions-bar">
+                    <Link href={`/issues/${linkedIssue.id}`}>
+                      <Button icon={<ArrowLeftOutlined />}>{content.detail.backToIssue}</Button>
+                    </Link>
+                  </div>
+                ) : null}
+              </div>
             </div>
           </article>
         ) : null}

@@ -15,13 +15,10 @@ import {
   ThunderboltOutlined
 } from "@ant-design/icons";
 import Link from "next/link";
-import { useMemo } from "react";
-import {
-  getDemoLiveEvents,
-  getDemoPastEvents,
-  getDemoPublicIssues,
-  getDemoUpcomingEvents
-} from "@/lib/devMockData";
+import { useEffect, useState } from "react";
+import { listAllEvents } from "@/lib/eventsApi";
+import { getJson } from "@/lib/apiClient";
+import { getListItems } from "@/lib/adminUtils";
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 
@@ -57,15 +54,28 @@ const COPY = {
 export function ImpactPulseStrip({ language = "np" }) {
   const t = COPY[language] || COPY.np;
 
-  const counts = useMemo(
-    () => ({
-      live: getDemoLiveEvents().length,
-      upcoming: getDemoUpcomingEvents().length,
-      completed: getDemoPastEvents().length,
-      issues: getDemoPublicIssues().length
-    }),
-    []
-  );
+  const [counts, setCounts] = useState({ live: 0, upcoming: 0, completed: 0, issues: 0 });
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const [buckets, issuesRes] = await Promise.all([
+          listAllEvents({ language }),
+          getJson("/issues", { params: { status: "OPEN", limit: 50 } })
+        ]);
+        if (cancelled) return;
+        setCounts({
+          live: buckets.live.length,
+          upcoming: buckets.upcoming.length,
+          completed: buckets.past.length,
+          issues: getListItems(issuesRes).length
+        });
+      } catch {
+        if (!cancelled) setCounts({ live: 0, upcoming: 0, completed: 0, issues: 0 });
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [language]);
 
   const tiles = [
     {

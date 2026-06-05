@@ -13,10 +13,11 @@ import {
 } from "@ant-design/icons";
 import { Button, Empty, Select } from "antd";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
-import { getDemoPublicIssues } from "@/lib/devMockData";
+import { getJson } from "@/lib/apiClient";
+import { getListItems } from "@/lib/adminUtils";
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 
@@ -74,7 +75,19 @@ export default function AppIssuesPage() {
   const t = COPY[language] || COPY.np;
   const [statusFilter, setStatusFilter] = useState("ALL");
 
-  const issues = useMemo(() => getDemoPublicIssues(), []);
+  const [issues, setIssues] = useState([]);
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await getJson("/issues", { params: { limit: 50 } });
+        if (!cancelled) setIssues(getListItems(res));
+      } catch {
+        if (!cancelled) setIssues([]);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
   const filtered = useMemo(() => {
     if (statusFilter === "ALL") return issues;
     return issues.filter((i) => i.status === statusFilter);

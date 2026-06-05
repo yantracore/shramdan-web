@@ -13,10 +13,11 @@ import {
   WalletOutlined
 } from "@ant-design/icons";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
-import { getDemoLedger, getDemoPastEvents } from "@/lib/devMockData";
+import { getDemoLedger } from "@/lib/devMockData";
+import { listPastEvents } from "@/lib/eventsApi";
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 
@@ -182,7 +183,19 @@ export default function LedgerPage() {
   const [tab, setTab] = useState("donations");
 
   const { donations, expenses } = useMemo(() => getDemoLedger(), []);
-  const pastEvents = useMemo(() => getDemoPastEvents(), []);
+  const [pastEvents, setPastEvents] = useState([]);
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const items = await listPastEvents({ language });
+        if (!cancelled) setPastEvents(items);
+      } catch {
+        if (!cancelled) setPastEvents([]);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [language]);
 
   const totals = useMemo(() => {
     const donated = donations

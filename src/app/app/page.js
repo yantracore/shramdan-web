@@ -19,17 +19,17 @@ import {
 import { Button, Empty } from "antd";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { PushOptInPanel } from "@/components/PushOptInPanel";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
 import {
   getDemoApplications,
-  getDemoNotifications,
-  getDemoPastEvents,
-  getDemoPublicIssues,
-  getDemoUpcomingEvents
+  getDemoNotifications
 } from "@/lib/devMockData";
+import { getJson } from "@/lib/apiClient";
+import { getListItems } from "@/lib/adminUtils";
+import { listPastEvents, listUpcomingEvents } from "@/lib/eventsApi";
 import { getAuthSession, subscribeAuthSession } from "@/lib/authSession";
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
@@ -130,11 +130,36 @@ export default function AppDashboardPage() {
     if (session === null) return; // initial null state, not "logged out"
   }, [session]);
 
-  // Aggregates today come from demo mocks; once /me/dashboard ships,
-  // swap these useMemo for a fetched response.
-  const upcomingEvents = useMemo(() => getDemoUpcomingEvents().slice(0, 3), []);
-  const pastEvents = useMemo(() => getDemoPastEvents(), []);
-  const supportedIssues = useMemo(() => getDemoPublicIssues().slice(0, 4), []);
+  // Aggregates: events + issues come from the API. Applications +
+  // notifications still flow from demo mocks pending member-scoped
+  // backend endpoints (admin /applications and notifications stack).
+  const [upcomingEvents, setUpcomingEvents] = useState([]);
+  const [pastEvents, setPastEvents] = useState([]);
+  const [supportedIssues, setSupportedIssues] = useState([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const [upcoming, past, issuesRes] = await Promise.all([
+          listUpcomingEvents({ language, limit: 3 }),
+          listPastEvents({ language }),
+          getJson("/issues", { params: { sort: "voteCount", limit: 4, status: "OPEN" } })
+        ]);
+        if (cancelled) return;
+        setUpcomingEvents(upcoming.slice(0, 3));
+        setPastEvents(past);
+        setSupportedIssues(getListItems(issuesRes).slice(0, 4));
+      } catch {
+        if (cancelled) return;
+        setUpcomingEvents([]);
+        setPastEvents([]);
+        setSupportedIssues([]);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [language]);
+
   const applications = useMemo(() => getDemoApplications(), []);
   const notifications = useMemo(() => getDemoNotifications(), []);
   const unreadNotifications = useMemo(

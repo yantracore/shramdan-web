@@ -9,8 +9,8 @@
 
 import { ArrowRightOutlined, TrophyOutlined } from "@ant-design/icons";
 import Link from "next/link";
-import { useMemo } from "react";
-import { getDemoPastEvents } from "@/lib/devMockData";
+import { useEffect, useState } from "react";
+import { listPastEvents } from "@/lib/eventsApi";
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 
@@ -33,18 +33,25 @@ const COPY = {
   }
 };
 
-function pickFeatured() {
-  const all = getDemoPastEvents();
-  if (all.length === 0) return null;
-  // Highest-participant past event — usually the most photogenic.
-  return [...all].sort(
-    (a, b) => (b.participantCount || 0) - (a.participantCount || 0)
-  )[0];
-}
-
 export function FeaturedStoryPanel({ language = "np" }) {
   const t = COPY[language] || COPY.np;
-  const event = useMemo(() => pickFeatured(), []);
+  const [event, setEvent] = useState(null);
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const past = await listPastEvents({ language });
+        if (cancelled) return;
+        const sorted = [...past].sort(
+          (a, b) => (b.participantCount || 0) - (a.participantCount || 0)
+        );
+        setEvent(sorted[0] || null);
+      } catch {
+        if (!cancelled) setEvent(null);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [language]);
   if (!event) return null;
 
   const quote = event.testimonials?.[0];

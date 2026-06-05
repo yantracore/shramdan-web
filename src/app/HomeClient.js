@@ -53,7 +53,8 @@ import { SectionVideoBackground } from "@/components/SectionVideoBackground";
 import { TertiaryButton } from "@/components/TertiaryButton";
 import { TimeOfDayGreeting } from "@/components/TimeOfDayGreeting";
 import { SiteShell } from "@/components/SiteShell";
-import { getDemoLiveEvents } from "@/lib/devMockData";
+import { listLiveEvents } from "@/lib/eventsApi";
+import { injectMockLiveStream } from "@/lib/devMockData";
 import { usePreferences } from "@/app/providers";
 import { getJson } from "@/lib/apiClient";
 import {
@@ -276,6 +277,23 @@ export default function HomeClient({ summary }) {
 
   const [activeIssues, setActiveIssues] = useState([]);
   const [activeIssuesLoaded, setActiveIssuesLoaded] = useState(false);
+  const [liveEvents, setLiveEvents] = useState([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const events = await listLiveEvents({ language });
+        const enriched = events.map((ev) => injectMockLiveStream(ev.id, ev));
+        if (!cancelled) setLiveEvents(enriched);
+      } catch {
+        if (!cancelled) setLiveEvents([]);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [language]);
 
   useEffect(() => {
     let cancelled = false;
@@ -422,7 +440,7 @@ export default function HomeClient({ summary }) {
 
       <MotionSection as="div">
         <EventsHomeRail
-          liveEvents={getDemoLiveEvents()}
+          liveEvents={liveEvents}
           copy={t.liveEventsRail}
           language={language}
         />

@@ -19,11 +19,7 @@ import {
 } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
-import {
-  getDemoLiveEvents,
-  getDemoPastEvents,
-  getDemoUpcomingEvents
-} from "@/lib/devMockData";
+import { listAllEvents } from "@/lib/eventsApi";
 
 const STATIC_ROUTES = [
   { id: "home", labels: ["गृहपृष्ठ", "Home"], href: "/", icon: HomeOutlined },
@@ -74,13 +70,23 @@ export function CommandPalette({ language = "np" }) {
   const [activeIdx, setActiveIdx] = useState(0);
   const inputRef = useRef(null);
 
-  // Compile dataset once.
+  // Compile dataset. Events come from the API; routes are static.
+  const [eventBuckets, setEventBuckets] = useState({ live: [], upcoming: [], past: [] });
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const data = await listAllEvents({ language });
+        if (!cancelled) setEventBuckets(data);
+      } catch {
+        if (!cancelled) setEventBuckets({ live: [], upcoming: [], past: [] });
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [language]);
+
   const dataset = useMemo(() => {
-    const events = [
-      ...getDemoLiveEvents().map((e) => ({ ...e, _kind: "event" })),
-      ...getDemoUpcomingEvents().map((e) => ({ ...e, _kind: "event" })),
-      ...getDemoPastEvents().map((e) => ({ ...e, _kind: "event" }))
-    ];
+    const events = [...eventBuckets.live, ...eventBuckets.upcoming, ...eventBuckets.past];
     const eventRows = events.map((e) => ({
       id: `event-${e.id}`,
       label: e.title,
@@ -100,7 +106,7 @@ export function CommandPalette({ language = "np" }) {
       searchable: r.labels.join(" ")
     }));
     return [...routeRows, ...eventRows];
-  }, [t.hintRoute, t.hintEvent]);
+  }, [t.hintRoute, t.hintEvent, eventBuckets]);
 
   // Keyboard: cmd/ctrl+K toggles.
   useEffect(() => {

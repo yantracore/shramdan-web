@@ -18,15 +18,11 @@ import {
 } from "@ant-design/icons";
 import { message } from "antd";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
-import {
-  getDemoLiveEvents,
-  getDemoNotifications,
-  getDemoUpcomingEvents,
-  getDemoPastEvents
-} from "@/lib/devMockData";
+import { getDemoNotifications } from "@/lib/devMockData";
+import { listLiveEvents, listPastEvents, listUpcomingEvents } from "@/lib/eventsApi";
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 
@@ -176,10 +172,31 @@ export default function MeProfilePreview() {
   const [messageApi, messageContextHolder] = message.useMessage();
   const [copied, setCopied] = useState(false);
 
-  const upcoming = useMemo(() => getDemoUpcomingEvents().slice(0, 2), []);
-  const past = useMemo(() => getDemoPastEvents().slice(0, 2), []);
+  const [upcoming, setUpcoming] = useState([]);
+  const [past, setPast] = useState([]);
+  const [live, setLive] = useState([]);
   const notifications = useMemo(() => getDemoNotifications().slice(0, 4), []);
-  const live = useMemo(() => getDemoLiveEvents().slice(0, 1), []);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const [up, ps, lv] = await Promise.all([
+          listUpcomingEvents({ language, limit: 2 }),
+          listPastEvents({ language, limit: 2 }),
+          listLiveEvents({ language })
+        ]);
+        if (cancelled) return;
+        setUpcoming(up.slice(0, 2));
+        setPast(ps.slice(0, 2));
+        setLive(lv.slice(0, 1));
+      } catch {
+        if (cancelled) return;
+        setUpcoming([]); setPast([]); setLive([]);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [language]);
   const heatmap = useMemo(() => buildHeatmap(), []);
 
   const stats = [

@@ -12,11 +12,8 @@ import { EventPreviewPane } from "@/components/EventPreviewPane";
 import { ActivityStatsRow } from "@/components/ActivityStatsRow";
 import { usePreferences } from "@/app/providers";
 import { copy } from "@/lib/siteContent";
-import {
-  getDemoLiveEvents,
-  getDemoUpcomingEvents,
-  getDemoPastEvents
-} from "@/lib/devMockData";
+import { injectMockLiveStream } from "@/lib/devMockData";
+import { listAllEvents } from "@/lib/eventsApi";
 
 const PAGE_COPY = {
   np: {
@@ -166,9 +163,28 @@ export default function EventsListPage() {
   }, [searchParams]);
 
   // ----- raw data + ordered/flattened list ------------------------------
-  const live = useMemo(() => getDemoLiveEvents(), []);
-  const upcoming = useMemo(() => getDemoUpcomingEvents(), []);
-  const past = useMemo(() => getDemoPastEvents(), []);
+  const [live, setLive] = useState([]);
+  const [upcoming, setUpcoming] = useState([]);
+  const [past, setPast] = useState([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const { live: liveEv, upcoming: upEv, past: pastEv } = await listAllEvents({ language });
+        if (cancelled) return;
+        setLive(liveEv.map((ev) => injectMockLiveStream(ev.id, ev)));
+        setUpcoming(upEv);
+        setPast(pastEv);
+      } catch {
+        if (cancelled) return;
+        setLive([]); setUpcoming([]); setPast([]);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [language]);
 
   // ----- city filter ----------------------------------------------------
   const initialCity = searchParams?.get("city") || "all";

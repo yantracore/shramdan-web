@@ -7,14 +7,10 @@
 
 import { ArrowLeftOutlined, ArrowRightOutlined } from "@ant-design/icons";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
-import {
-  getDemoLiveEvents,
-  getDemoPastEvents,
-  getDemoUpcomingEvents
-} from "@/lib/devMockData";
+import { listAllEvents } from "@/lib/eventsApi";
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 
@@ -84,6 +80,22 @@ export default function CalendarPage() {
   const months = language === "np" ? NP_MONTHS : EN_MONTHS;
   const weekdays = language === "np" ? NP_WEEKDAYS : EN_WEEKDAYS;
 
+  const [buckets, setBuckets] = useState({ live: [], upcoming: [], past: [] });
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const data = await listAllEvents({ language });
+        if (!cancelled) setBuckets(data);
+      } catch {
+        if (!cancelled) setBuckets({ live: [], upcoming: [], past: [] });
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [language]);
+
   // Collect all dated events, indexed by ISO date key.
   const eventsByDay = useMemo(() => {
     const map = new Map();
@@ -95,11 +107,11 @@ export default function CalendarPage() {
       if (!map.has(key)) map.set(key, []);
       map.get(key).push({ ...event, kind, date: d });
     };
-    getDemoLiveEvents().forEach((e) => push(e, e.scheduledAt || e.liveStream?.startedAt, "live"));
-    getDemoUpcomingEvents().forEach((e) => push(e, e.scheduledAt, "upcoming"));
-    getDemoPastEvents().forEach((e) => push(e, e.completedAt, "past"));
+    buckets.live.forEach((e) => push(e, e.scheduledAt, "live"));
+    buckets.upcoming.forEach((e) => push(e, e.scheduledAt, "upcoming"));
+    buckets.past.forEach((e) => push(e, e.completedAt, "past"));
     return map;
-  }, []);
+  }, [buckets]);
 
   const today = new Date();
   const [cursor, setCursor] = useState(() => new Date(today.getFullYear(), today.getMonth(), 1));

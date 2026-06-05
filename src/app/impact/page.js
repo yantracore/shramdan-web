@@ -14,10 +14,10 @@ import {
   TrophyOutlined
 } from "@ant-design/icons";
 import Link from "next/link";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
-import { getDemoPastEvents } from "@/lib/devMockData";
+import { listPastEvents } from "@/lib/eventsApi";
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 
@@ -141,7 +141,19 @@ function formatCompletedAt(iso, language) {
 export default function ImpactPage() {
   const { language } = usePreferences();
   const t = COPY[language] || COPY.np;
-  const past = useMemo(() => getDemoPastEvents(), []);
+  const [past, setPast] = useState([]);
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const items = await listPastEvents({ language });
+        if (!cancelled) setPast(items);
+      } catch {
+        if (!cancelled) setPast([]);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [language]);
 
   const totals = useMemo(() => {
     const events = past.length;

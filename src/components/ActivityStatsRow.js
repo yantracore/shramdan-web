@@ -11,12 +11,9 @@ import {
 } from "@ant-design/icons";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
-import {
-  getDemoIssues,
-  getDemoLiveEvents,
-  getDemoPastEvents,
-  getDemoUpcomingEvents
-} from "@/lib/devMockData";
+import { listAllEvents } from "@/lib/eventsApi";
+import { getJson } from "@/lib/apiClient";
+import { getListItems } from "@/lib/adminUtils";
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 
@@ -114,10 +111,8 @@ const COPY = {
   }
 };
 
-function eventsTiles(t) {
-  const live = getDemoLiveEvents();
-  const upcoming = getDemoUpcomingEvents();
-  const past = getDemoPastEvents();
+function eventsTiles(t, buckets) {
+  const { live, upcoming, past } = buckets;
   const participants = [...live, ...upcoming, ...past].reduce(
     (sum, e) => sum + (Number(e?.participantCount) || 0),
     0
@@ -154,8 +149,7 @@ function eventsTiles(t) {
   ];
 }
 
-function issuesTiles(t) {
-  const issues = getDemoIssues();
+function issuesTiles(t, issues) {
   const byStatus = (status) => issues.filter((i) => i?.status === status).length;
   const votes = issues.reduce(
     (sum, i) => sum + (Number(i?.voteCount) || 0),
@@ -199,9 +193,33 @@ export function ActivityStatsRow({ language = "np", variant = "events" }) {
     COPY.np[variant] ||
     COPY.np.events;
 
+  const [buckets, setBuckets] = useState({ live: [], upcoming: [], past: [] });
+  const [issues, setIssues] = useState([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        if (variant === "issues") {
+          const res = await getJson("/issues", { params: { limit: 100 } });
+          if (!cancelled) setIssues(getListItems(res));
+        } else {
+          const data = await listAllEvents({ language });
+          if (!cancelled) setBuckets(data);
+        }
+      } catch {
+        if (!cancelled) {
+          setBuckets({ live: [], upcoming: [], past: [] });
+          setIssues([]);
+        }
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [language, variant]);
+
   const tiles = useMemo(
-    () => (variant === "issues" ? issuesTiles(t) : eventsTiles(t)),
-    [variant, t]
+    () => (variant === "issues" ? issuesTiles(t, issues) : eventsTiles(t, buckets)),
+    [variant, t, issues, buckets]
   );
 
   return (
