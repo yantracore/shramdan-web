@@ -16,6 +16,7 @@ import {
 } from "react";
 import IssueMapBlock from "@/components/IssueMapBlock";
 import { ActivityTypeTabs } from "@/components/ActivityTypeTabs";
+import { ActivityStatsRow } from "@/components/ActivityStatsRow";
 import { IssueListCard } from "@/components/IssueListCard";
 import { IssuePreviewPane } from "@/components/IssuePreviewPane";
 import { SiteShell } from "@/components/SiteShell";
@@ -527,6 +528,7 @@ export default function IssuesListPage() {
         </div>
 
         <div className="public-issues-toolbar">
+          <ActivityStatsRow language={language} />
           <div className="public-issues-filters">
             <ActivityTypeTabs active="issue" labels={t.activityTabs} />
             <div className="public-issues-filter-field">

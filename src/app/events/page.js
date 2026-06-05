@@ -9,7 +9,7 @@ import { SiteShell } from "@/components/SiteShell";
 import { ActivityTypeTabs } from "@/components/ActivityTypeTabs";
 import { EventListCard } from "@/components/EventListCard";
 import { EventPreviewPane } from "@/components/EventPreviewPane";
-import { ImpactPulseStrip } from "@/components/ImpactPulseStrip";
+import { ActivityStatsRow } from "@/components/ActivityStatsRow";
 import { usePreferences } from "@/app/providers";
 import { copy } from "@/lib/siteContent";
 import {
@@ -471,16 +471,15 @@ export default function EventsListPage() {
 
   return (
     <SiteShell pageTitle={t.pageTitle}>
-      <article className="events-list-page">
-        <header className="events-list-header">
+      <section className="page-section public-issues-section">
+        <div className="section-heading">
           <span className="eyebrow">{t.eyebrow}</span>
           <h1>{t.title}</h1>
           <p>{t.intro}</p>
-        </header>
-
-        <ImpactPulseStrip language={language} />
+        </div>
 
         <div className="public-issues-toolbar">
+          <ActivityStatsRow language={language} />
           <div className="public-issues-filters">
             <ActivityTypeTabs active="event" labels={localizedCopy.activityTabs} />
             <div className="public-issues-filter-field">
@@ -579,7 +578,7 @@ export default function EventsListPage() {
             isMobileDrillActive={isMobileDrillActive}
           />
         </section>
-      </article>
+      </section>
     </SiteShell>
   );
 }
