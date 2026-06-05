@@ -528,6 +528,7 @@ export default function EventDetailPage() {
                       rolesNeeded={eventData.rolesNeeded}
                       language={language}
                       eventId={eventData.id}
+                      onJoined={() => handleEventCompleted()}
                     />
                   </>
                 ) : null}
@@ -748,7 +749,7 @@ export default function EventDetailPage() {
 
                 {linkedIssue?.id ? (
                   <div className="public-issue-detail-actions-bar">
-                    <Link href={`/issues/${linkedIssue.id}`}>
+                    <Link href={`/issues/${linkedIssue.slug ?? linkedIssue.id}`}>
                       <Button icon={<ArrowLeftOutlined />}>{content.detail.backToIssue}</Button>
                     </Link>
                   </div>

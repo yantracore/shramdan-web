@@ -2,8 +2,13 @@
 
 // Roster panel for the event detail page. Shows who's joining grouped
 // by role, with filled/needed counts. Each filled member is a small
-// avatar chip (initial in a colored circle); each unfilled slot is a
-// dashed-outline "+" inviting click → /join?role=<ROLE>.
+// avatar chip (initial in a colored circle); each unfilled slot pill is
+// a click target that POSTs the viewer into that role directly.
+//
+// Click semantics on the open-pill:
+//   - anon viewer  → redirect to /login?next=/events/{id}
+//   - already in   → no-op (parent's <EventJoinPanel> already shows joined state)
+//   - logged in    → POST /events/{id}/participants with { role } and toast
 //
 // Data shape:
 //   rolesNeeded: [{
@@ -14,7 +19,11 @@
 //     filledNames: string[]
 //   }, ...]
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState, useSyncExternalStore } from "react";
+import { postJson } from "@/lib/apiClient";
+import { getAuthSession, subscribeAuthSession } from "@/lib/authSession";
+import { useToast } from "@/lib/toast";
 
 const ROLE_COLORS = {
   WORKER: "#2e7d32",
@@ -41,6 +50,12 @@ const COPY = {
     fullPill: "पूरा",
     unfilled: "खाली",
     joinAs: "जोडिनुहोस्",
+    joining: "जोडिँदै…",
+    joinedToast: "तपाईं {role} भूमिकामा जोडिनुभयो।",
+    waitlistToast: "भूमिका भरिएको छ — प्रतीक्षा सूचीमा हुनुहुन्छ।",
+    alreadyJoinedToast: "तपाईं पहिले अर्को भूमिकामा जोडिनुभएको छ।",
+    medicCredentialError: "स्वास्थ्यकर्मी भूमिकाको लागि प्रमाणित मेडिकल क्रेडेन्सियल चाहिन्छ।",
+    errorToast: "जोडिन सकिएन। फेरि प्रयास गर्नुहोस्।",
     roles: {
       WORKER: "कामदार",
       PHOTOGRAPHER: "फोटोग्राफर",
@@ -72,6 +87,12 @@ const COPY = {
     fullPill: "Full",
     unfilled: "open",
     joinAs: "Join",
+    joining: "Joining…",
+    joinedToast: "You're in as {role}.",
+    waitlistToast: "Role full — you're on the waitlist.",
+    alreadyJoinedToast: "You've already joined this event in a different role.",
+    medicCredentialError: "The Medic role requires verified medical credentials.",
+    errorToast: "Could not join. Please try again.",
     roles: {
       WORKER: "Worker",
       PHOTOGRAPHER: "Photographer",
@@ -93,9 +114,55 @@ const COPY = {
   }
 };
 
-export function EventRosterPanel({ rolesNeeded, language = "np", eventId }) {
+export function EventRosterPanel({ rolesNeeded, language = "np", eventId, viewerRole = null, onJoined }) {
   if (!Array.isArray(rolesNeeded) || rolesNeeded.length === 0) return null;
   const t = COPY[language] || COPY.np;
+  const session = useSyncExternalStore(subscribeAuthSession, getAuthSession, () => null);
+  const router = useRouter();
+  const messageApi = useToast();
+  const [pendingRole, setPendingRole] = useState(null);
+
+  const handleRoleClick = async (role) => {
+    // Anon viewer → login redirect, preserving return path.
+    if (!session?.user?.id) {
+      const next = encodeURIComponent(`/events/${eventId}`);
+      router.push(`/login?next=${next}`);
+      return;
+    }
+    // Already participating in some role: no direct re-apply — surface a
+    // gentle toast so the user understands why nothing happens.
+    if (viewerRole) {
+      messageApi.warning(t.alreadyJoinedToast);
+      return;
+    }
+    setPendingRole(role);
+    try {
+      const response = await postJson(
+        `/events/${eventId}/participants`,
+        { role },
+        { requireAuth: true }
+      );
+      const data = response?.data ?? response;
+      const roleLabel = t.roles[role] || role;
+      if (data?.status === "INVITED") {
+        messageApi.info(t.waitlistToast);
+      } else {
+        messageApi.success(t.joinedToast.replace("{role}", roleLabel));
+      }
+      onJoined?.({ role, status: data?.status });
+    } catch (err) {
+      if (err?.status === 403 && /MEDIC/i.test(err?.errorCode || err?.message || "")) {
+        messageApi.error(t.medicCredentialError);
+      } else if (err?.status === 409) {
+        messageApi.warning(t.alreadyJoinedToast);
+        onJoined?.({ refetch: true });
+      } else {
+        messageApi.error(err?.message || t.errorToast);
+      }
+    } finally {
+      setPendingRole(null);
+    }
+  };
 
   const totalSlots = rolesNeeded.reduce((sum, row) => sum + (row.count || 0), 0);
   const filledSlots = rolesNeeded.reduce(
@@ -148,7 +215,8 @@ export function EventRosterPanel({ rolesNeeded, language = "np", eventId }) {
           const visibleNames = filledNames.slice(0, MAX_VISIBLE_CHIPS);
           const hiddenCount = Math.max(0, filledNames.length - visibleNames.length);
           const openCount = Math.max(0, row.count - row.filled);
-          const joinHref = `/join?role=${encodeURIComponent(row.role)}${eventId ? `&event=${eventId}` : ""}`;
+          const isPending = pendingRole === row.role;
+          const isOwnRole = viewerRole === row.role;
           return (
             <li key={row.role} className="event-roster-row">
               <span
@@ -182,13 +250,15 @@ export function EventRosterPanel({ rolesNeeded, language = "np", eventId }) {
                 ) : null}
               </span>
               {openCount > 0 ? (
-                <Link
+                <button
+                  type="button"
                   className="event-roster-open-pill"
-                  href={joinHref}
+                  onClick={() => handleRoleClick(row.role)}
+                  disabled={isPending || isOwnRole}
                   aria-label={`${t.joinAs} — ${roleLabel}`}
                 >
-                  {t.openPill.replace("{n}", openCount)}
-                </Link>
+                  {isPending ? t.joining : t.openPill.replace("{n}", openCount)}
+                </button>
               ) : (
                 <span className="event-roster-full-pill">{t.fullPill}</span>
               )}

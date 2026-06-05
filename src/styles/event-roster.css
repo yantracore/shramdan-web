@@ -386,14 +386,22 @@
   color: var(--primary);
   border: 1px dashed color-mix(in srgb, var(--primary) 50%, var(--line));
   background: color-mix(in srgb, var(--primary) 6%, transparent);
+  cursor: pointer;
+  font-family: inherit;
   transition:
     background var(--duration-fast) var(--ease-out-soft),
     border-color var(--duration-fast) var(--ease-out-soft);
 }
 
-.event-roster-open-pill:hover {
+.event-roster-open-pill:hover:not(:disabled),
+.event-roster-open-pill:focus-visible {
   background: color-mix(in srgb, var(--primary) 14%, transparent);
   border-color: var(--primary);
+}
+
+.event-roster-open-pill:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 
 .event-roster-full-pill {
@@ -936,11 +944,18 @@
   gap: 14px;
 }
 
-/* --- /events/[id] YouTube-style detail card ---------------------------
- * One card containing the video player flush at top, then a two-column
- * body on desktop: main content (title, meta, description, sections)
- * on the left and the participant roster pinned in a sticky right rail.
- * Mobile collapses to a single column with roster after the main flow. */
+/* --- /events/[id] zoned detail card -----------------------------------
+ * One card containing the video player flush at top, then a body with
+ * five vertical zones in source order — essentials, aside (map),
+ * action, leader controls, after-the-campaign, discussion.
+ *
+ * Layout:
+ *   Mobile (<1024px): single column. Aside flows inline between the
+ *     essentials block and the action block, so the map sits next to
+ *     "where to meet" instead of being stranded at the bottom.
+ *   Desktop (>=1024px): two columns via grid-template-areas. The aside
+ *     occupies a sticky right rail that visually spans the full body
+ *     height, while top + rest stack in the left column. */
 
 .event-detail-card {
   overflow: hidden;
@@ -974,17 +989,25 @@
   min-width: 0;
 }
 
-.event-detail-main > .public-issue-detail-topline {
+.event-detail-main--top {
+  gap: 16px;
+}
+
+.event-detail-main--rest {
+  gap: 18px;
+}
+
+.event-detail-main--top > .public-issue-detail-topline {
   margin-bottom: -6px;
 }
 
-.event-detail-main > h1 {
+.event-detail-main--top > h1 {
   font-size: clamp(22px, 2.6vw, 30px);
   line-height: 1.25;
   margin: 0;
 }
 
-.event-detail-main > .public-issue-detail-meta {
+.event-detail-main--top > .public-issue-detail-meta {
   font-size: 13.5px;
 }
 
@@ -1015,15 +1038,63 @@
   border-radius: 10px;
 }
 
+/* ---- Zone grouping (Leader controls, After the campaign) ---- */
+
+.event-detail-zone {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 6px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.event-detail-zone-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 2px;
+}
+
+.event-detail-zone-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.event-detail-zone-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+.event-detail-zone--leader .event-detail-zone-eyebrow {
+  color: var(--primary, var(--accent));
+}
+
 @media (min-width: 1024px) {
   .event-detail-body {
     grid-template-columns: minmax(0, 1fr) clamp(280px, 28%, 340px);
+    grid-template-areas:
+      "top  side"
+      "rest side";
     column-gap: 28px;
     row-gap: 22px;
     align-items: start;
     padding: 24px 28px 30px;
   }
+  .event-detail-main--top {
+    grid-area: top;
+  }
+  .event-detail-main--rest {
+    grid-area: rest;
+  }
   .event-detail-side {
+    grid-area: side;
     position: sticky;
     top: calc(var(--header-height, 74px) + 14px);
     max-height: calc(100vh - var(--header-height, 74px) - 28px);
@@ -1031,13 +1102,14 @@
     padding-right: 4px;
     gap: 14px;
   }
-  .event-detail-main {
-    gap: 16px;
-  }
 }
 
 @media (max-width: 1023px) {
   .event-detail-body {
     padding: 18px 18px 22px;
+  }
+  /* Cap the inline map height on phones so it doesn't dominate the scroll */
+  .event-detail-side-location .public-issue-location-map .issue-map-wrap {
+    max-height: 280px;
   }
 }
