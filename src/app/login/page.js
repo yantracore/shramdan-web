@@ -8,6 +8,7 @@ import {
   TeamOutlined
 } from "@ant-design/icons";
 import { Button, Input } from "antd";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
@@ -38,6 +39,15 @@ const loginCopy = {
     otpAlt: "वा OTP बाट द्रुत सदस्यता",
     forgot: "पासवर्ड बिर्सनुभयो?",
     benefitsTitle: "सदस्यले के गर्न पाउँछन्",
+    visualAlt: "समुदायका स्वयंसेवकहरूले सफा गरिएको बाटो छेउमा बिरुवा रोप्दै",
+    proofEyebrow: "समुदायसँग जोडिएको खाता",
+    proofTitle: "समस्या देखेपछि चुप बस्नु नपर्ने ठाउँ",
+    proofBody:
+      "लगइन गरेपछि तपाईंले रिपोर्ट, मतदान र अभियान सहभागिता एउटै खाताबाट सम्हाल्न सक्नुहुन्छ।",
+    highlights: [
+      { value: "३", label: "मुख्य काम" },
+      { value: "१", label: "सदस्य खाता" }
+    ],
     benefits: [
       { icon: FlagOutlined, text: "स्थानीय समस्या रिपोर्ट गर्न र समर्थन जुटाउन" },
       { icon: TeamOutlined, text: "सरसफाइ अभियानमा भूमिका छानेर सहभागी हुन" },
@@ -62,6 +72,15 @@ const loginCopy = {
     otpAlt: "Or quick signup with OTP",
     forgot: "Forgot password?",
     benefitsTitle: "What members can do",
+    visualAlt: "Community volunteers planting saplings beside a freshly cleaned street",
+    proofEyebrow: "A community-connected account",
+    proofTitle: "A place to act when local problems appear",
+    proofBody:
+      "Once signed in, you can manage reports, votes, and campaign participation from one member account.",
+    highlights: [
+      { value: "3", label: "Core actions" },
+      { value: "1", label: "Member account" }
+    ],
     benefits: [
       { icon: FlagOutlined, text: "Report local issues and rally support" },
       { icon: TeamOutlined, text: "Pick a role and join nearby cleanup events" },
@@ -122,9 +141,30 @@ function LoginPageContent() {
       <section className="page-section login-section">
         <div className="login-layout">
           <aside className="login-benefits" aria-labelledby="login-benefits-title">
-            <h2 id="login-benefits-title" className="login-benefits-title">
-              {t.benefitsTitle}
-            </h2>
+            <div className="login-benefits-media">
+              <Image
+                alt={t.visualAlt}
+                fill
+                priority
+                sizes="(max-width: 820px) 100vw, 520px"
+                src="/images/login/member-access.webp"
+              />
+            </div>
+            <div className="login-benefits-copy">
+              <span className="eyebrow">{t.proofEyebrow}</span>
+              <h2 id="login-benefits-title" className="login-benefits-title">
+                {t.proofTitle}
+              </h2>
+              <p>{t.proofBody}</p>
+            </div>
+            <div className="login-proof-grid" aria-label={t.benefitsTitle}>
+              {t.highlights.map((item) => (
+                <span className="login-proof-pill" key={`${item.value}-${item.label}`}>
+                  <strong>{item.value}</strong>
+                  <span>{item.label}</span>
+                </span>
+              ))}
+            </div>
             <ul className="login-benefits-list">
               {t.benefits.map(({ icon: Icon, text }, i) => (
                 <li key={i}>
