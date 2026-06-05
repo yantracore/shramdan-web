@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useEffect } from "react";
 import { Form } from "@/components/AppForm";
 import { Honeypot } from "@/components/Honeypot";
+import { PublicAttachmentField } from "@/components/PublicAttachmentField";
 import { toSelectOptions } from "@/lib/siteContent";
 
 export function ContributorForm({ content, eyebrow, title, intro, initialRole, onSubmit, submitting = false }) {
@@ -65,8 +66,8 @@ export function ContributorForm({ content, eyebrow, title, intro, initialRole, o
         <Form.Item name="portfolio" label={labels.portfolio}>
           <Input placeholder={content.placeholders.portfolio} />
         </Form.Item>
-        <Form.Item name="resumeUrl" label={labels.resumeUrl}>
-          <Input placeholder={content.placeholders.resumeUrl} />
+        <Form.Item name="resume" label={labels.resume} className="wide-field" valuePropName="value">
+          <PublicAttachmentField copy={labels.resumeUpload} />
         </Form.Item>
         <Form.Item name="experience" label={labels.experience} className="wide-field">
           <Input.TextArea rows={4} maxLength={500} showCount placeholder={content.placeholders.experience} />

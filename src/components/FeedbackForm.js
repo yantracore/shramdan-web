@@ -4,6 +4,7 @@ import { MessageOutlined } from "@ant-design/icons";
 import { Button, Input, Rate, Select } from "antd";
 import { Form } from "@/components/AppForm";
 import { Honeypot } from "@/components/Honeypot";
+import { PublicAttachmentField } from "@/components/PublicAttachmentField";
 import { toSelectOptions } from "@/lib/siteContent";
 
 export function FeedbackForm({ content, eyebrow, title, intro, onSubmit, submitting = false }) {
@@ -51,8 +52,8 @@ export function FeedbackForm({ content, eyebrow, title, intro, onSubmit, submitt
         <Form.Item name="message" label={labels.message} className="wide-field" rules={[requiredRule]}>
           <Input.TextArea rows={6} maxLength={1000} showCount placeholder={content.placeholders.feedback} />
         </Form.Item>
-        <Form.Item name="screenshot" label={labels.screenshot} className="wide-field">
-          <Input placeholder={content.placeholders.screenshot} />
+        <Form.Item name="screenshot" label={labels.screenshot} className="wide-field" valuePropName="value">
+          <PublicAttachmentField copy={labels.screenshotUpload} />
         </Form.Item>
       </div>
       <Honeypot />

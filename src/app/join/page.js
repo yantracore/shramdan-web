@@ -36,7 +36,12 @@ function JoinPageContent() {
       return true;
     }
 
-    const { consent: _consent, website: _website, ...payload } = values;
+    const { consent: _consent, website: _website, resume, ...rest } = values;
+
+    const payload = {
+      ...rest,
+      ...(resume?.id ? { resumeId: resume.id } : {})
+    };
 
     setSubmitting(true);
 

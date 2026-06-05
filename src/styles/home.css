@@ -4699,6 +4699,81 @@
   align-self: end;
 }
 
+.public-attachment-field .ant-upload-drag {
+  border-radius: 12px;
+  background: var(--surface-elevated, #fafafa);
+}
+
+.public-attachment-field .ant-upload-drag p.ant-upload-text {
+  margin: 8px 0 4px;
+  font-weight: 600;
+}
+
+.public-attachment-field .ant-upload-drag p.ant-upload-hint {
+  font-size: 0.875rem;
+  color: var(--text-muted, #6b7280);
+}
+
+.public-attachment-field.has-file {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.public-attachment-file {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 10px;
+  background: var(--surface-elevated, #fafafa);
+}
+
+.public-attachment-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+  text-decoration: none;
+  color: var(--text-color, #111827);
+}
+
+.public-attachment-name:hover {
+  text-decoration: underline;
+}
+
+.public-attachment-remove {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: none;
+  background: transparent;
+  color: var(--accent, #b91c1c);
+  font-size: 0.875rem;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.public-attachment-remove:hover:not(:disabled) {
+  background: rgba(185, 28, 28, 0.08);
+}
+
+.public-attachment-remove:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.public-attachment-hint {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--text-muted, #6b7280);
+}
+
 .footer {
   display: grid;
   grid-template-columns: minmax(280px, 1.4fr) minmax(0, 2fr);

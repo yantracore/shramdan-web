@@ -3,7 +3,7 @@
 > A feedback record is the public-facing message any visitor can submit through the `/feedback` form — a bug report, a suggestion, a question, or a general comment. Feedback is submitted anonymously (no login required); the admin team triages each entry inside the control center, optionally replying via email and transitioning the record through a lightweight workflow. Bug-report entries in particular benefit from visual evidence — screenshots and short PDF repros — which must be uploaded as actual files rather than as URLs (asking ordinary visitors to host their own screenshots and paste a link is unrealistic).
 
 **Spec status:** `draft`
-**Last updated:** 2026-06-05
+**Last updated:** 2026-06-05 (later same day — backend chose the public-presign path)
 
 ---
 
@@ -15,7 +15,7 @@
 - **type** (`enum`, required, public) — one of `SUGGESTION`, `BUG_REPORT`, `QUESTION`, `GENERAL`.
 - **experienceRating** (`integer`, optional, public) — 1 through 5 inclusive. Used when the submitter is rating their overall experience; primarily attached to `GENERAL` and `SUGGESTION` entries.
 - **message** (`string`, required, public) — the body of the feedback. No fixed length cap, but the frontend currently soft-limits at 1000 characters.
-- **screenshotIds** (`array of string`, optional, public) — IDs of confirmed `Upload` records attached as supporting evidence. Each entry is a UUID returned by the upload pipeline (see *Attachment upload mechanism* below). Replaces the legacy single-value `screenshot` URL field; see *Recent changes*.
+- **screenshot** (`string`, optional, public) — URL of a confirmed `Upload` attached as supporting evidence. Today the field carries a single download URL (returned by the public-confirm endpoint) rather than an `Upload` id. The spec target is to migrate to `screenshotIds: string[]` carrying up to five `Upload` UUIDs; that work is pending. See *Pending multi-attachment work* below.
 - **status** (`enum`, required, public) — one of `OPEN`, `IN_PROGRESS`, `RESOLVED`, `DISMISSED`. Default on creation: `OPEN`.
 - **submittedAt** (`datetime`, required, public) — ISO 8601 timestamp.
 - **resolvedAt** (`datetime`, optional, public) — set when status transitions to `RESOLVED` or `DISMISSED`.
@@ -30,7 +30,7 @@
 - `message` must be non-empty after trimming whitespace.
 - `type` must be one of the supported enum values.
 - `experienceRating`, when present, is an integer between 1 and 5 inclusive.
-- `screenshotIds` may carry at most **five** entries. Each id must reference an `Upload` whose `status` is `CONFIRMED` and whose `fileType` is `IMAGE` or `DOCUMENT` (see *Allowed file formats* below).
+- `screenshot`, when present, is a download URL pointing to a confirmed `Upload` created through the public presign path; the frontend obtains this URL from `POST /uploads/public/{id}/confirm`. The spec target (`screenshotIds` array, up to five entries each referencing a `CONFIRMED` `Upload` with `userId = null`) requires the array migration described in *Pending multi-attachment work*.
 - `status` transitions: `OPEN` → `IN_PROGRESS` → (`RESOLVED` | `DISMISSED`). Backward transitions are rejected. `OPEN` → `DISMISSED` is allowed as a triage fast-path for spam.
 - `resolvedAt` must be present whenever `status` is `RESOLVED` or `DISMISSED`, and must not be present otherwise.
 
@@ -40,7 +40,7 @@
 
 | Operation | Transport | RBAC | Description |
 |-----------|-----------|------|-------------|
-| Submit feedback | REST POST | Public | Anonymous submission from `/feedback`. Accepts the public field set including `screenshotIds`. Honeypot-protected at the frontend; backend may add per-IP rate limiting. |
+| Submit feedback | REST POST | Public | Anonymous submission from `/feedback`. Accepts the public field set including the single `screenshot` URL (and, when the array migration lands, `screenshotIds`). Honeypot-protected at the frontend; backend may add per-IP rate limiting. |
 | List feedback | REST GET | Admin | Paginated list with filters described below. Used by the admin control center's feedback queue. |
 | Get feedback by id | REST GET | Admin | Returns a single feedback record with `screenshotIds` expanded into downloadable URLs. |
 | Update feedback status | REST PATCH | Admin | Transitions along the state machine. Accepts `{ status }`. |
@@ -81,11 +81,23 @@ DISMISSED     → (terminal)
 
 ## Attachment upload mechanism
 
-The feedback form is open to anonymous users (no authentication required to POST `/feedback`). Like the contributor-application form, file uploads from this surface cannot ride the existing `bearerAuth`-gated `Upload` pipeline as-is.
+The feedback form is open to anonymous users (no authentication required to POST `/feedback`). The shared `POST /uploads/public/presign` + `POST /uploads/public/{id}/confirm` pair (shipped 2026-06-05) is described in full in [`applications.md` → *Attachment upload mechanism*](applications.md#attachment-upload-mechanism); the feedback surface uses the same endpoints with no per-surface specialization at the upload layer.
 
-The mechanism — submission-token-scoped anonymous uploads, or a dedicated anonymous endpoint — is shared with the contributor-application surface and is fully described in [`applications.md` → *Attachment upload mechanism*](applications.md#attachment-upload-mechanism). Backend's chosen approach (Option A or Option B in that document) applies uniformly to both surfaces; the only per-surface differences are the destination array field name (`screenshotIds` here vs. `resumeIds` / `portfolioIds` there) and the file-format allowlist below.
+The per-surface differences are:
 
-The token / endpoint scope must distinguish "this upload is destined for a feedback record" from "this upload is destined for an application", so that submission tokens issued for one surface cannot attach uploads to records on the other.
+- **Destination field today.** Feedback's `screenshot` carries a download URL string; applications' `resumeId` carries an `Upload` UUID. The frontend reads both from the confirm response (`{ data: { downloadUrl }, data: { upload: { id } } }`) and routes them to the right field.
+- **Spec target.** Both surfaces want a multi-id array (`screenshotIds`, `resumeIds`) — see *Pending multi-attachment work* below and the matching section in `applications.md`.
+- **Allowlist.** Feedback accepts `image/gif` (for animated bug repros); applications has no functional difference at the upload layer, since the public presign endpoint allows the same `image/*` + `application/pdf` family for both.
+
+### Pending multi-attachment work
+
+The original spec proposed a `screenshotIds: string[]` field carrying up to five `Upload` UUIDs. The 2026-06-05 backend implementation keeps the legacy single-value `screenshot` URL string. Multi-attachment support requires:
+
+- Feedback schema: `screenshot` (single URL string) → `screenshotIds: string[]` (up to five UUIDs).
+- Validation: each id must reference a `CONFIRMED` `Upload` whose `userId` is null and that is not already attached to another feedback record.
+- Admin read shape: expand the array into downloadable URLs for the reviewer.
+
+Until that lands, the frontend uploads one screenshot per submission and includes its confirm-response `downloadUrl` as the legacy single `screenshot` field.
 
 ---
 
@@ -120,4 +132,5 @@ Anonymous uploads are restricted to a tight allowlist. The backend enforces this
 
 ## Recent changes
 
-- `2026-06-05` — initial spec. Introduces the multi-attachment `screenshotIds` array (replacing the legacy single `screenshot` URL field), references the shared anonymous-upload mechanism documented in [`applications.md`](applications.md), and defines the screenshot file-format allowlist with `application/pdf` included for multi-step bug repros.
+- `2026-06-05` (later same day) — backend shipped `POST /uploads/public/presign` and `POST /uploads/public/{id}/confirm`. Frontend now ships a single-screenshot Dragger using that path, sending the confirm-response `downloadUrl` as the legacy single `screenshot` field. Multi-attachment array migration (`screenshotIds`) moved to *Pending multi-attachment work*.
+- `2026-06-05` — initial spec. Proposed the multi-attachment `screenshotIds` array (replacing the legacy single `screenshot` URL field), referenced the shared anonymous-upload mechanism documented in [`applications.md`](applications.md), and defined the screenshot file-format allowlist with `application/pdf` included for multi-step bug repros.

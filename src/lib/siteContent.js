@@ -919,7 +919,22 @@ export const copy = {
       phone: "फोन नम्बर",
       role: "भूमिका",
       portfolio: "Portfolio URL",
-      resumeUrl: "Resume URL",
+      resume: "रेज्युमे / CV",
+      resumeUpload: {
+        dragText: "फाइल यहाँ तान्नुहोस् वा क्लिक गर्नुहोस्",
+        uploadingText: "अपलोड हुँदैछ…",
+        hint: "PDF, JPG, PNG, WebP वा GIF — अधिकतम ५ MB। एक फाइल मात्र।",
+        removeCta: "हटाउनुहोस्",
+        removeAria: "रेज्युमे हटाउनुहोस्",
+        attachedFallback: "रेज्युमे संलग्न",
+        replaceHint: "अर्को फाइल राख्नुपरे पहिले हटाएर पुनः अपलोड गर्नुहोस्।",
+        errors: {
+          mime: "PDF वा image (JPG, PNG, WebP, GIF) मात्र समर्थित छ।",
+          size: "फाइल ५ MB भन्दा ठूलो हुनुहुँदैन।",
+          busy: "अघिल्लो अपलोड पूरा नभई अर्को अपलोड गर्न मिल्दैन।",
+          generic: "रेज्युमे अपलोड गर्न सकिएन। फेरि प्रयास गर्नुहोस्।"
+        }
+      },
       experience: "तपाईंको अनुभव",
       motivation: "तपाईं श्रमदानमा किन योगदान गर्न चाहनुहुन्छ?",
       additionalInfo: "थप जानकारी",
@@ -944,7 +959,22 @@ export const copy = {
       type: "प्रतिक्रियाको प्रकार",
       experienceRating: "अनुभवको मूल्याङ्कन",
       message: "तपाईंको प्रतिक्रिया",
-      screenshot: "Screenshot URL",
+      screenshot: "स्क्रिनशट",
+      screenshotUpload: {
+        dragText: "फाइल यहाँ तान्नुहोस् वा क्लिक गर्नुहोस्",
+        uploadingText: "अपलोड हुँदैछ…",
+        hint: "PNG, JPG, WebP, GIF वा PDF — अधिकतम ५ MB। एक फाइल मात्र।",
+        removeCta: "हटाउनुहोस्",
+        removeAria: "स्क्रिनशट हटाउनुहोस्",
+        attachedFallback: "स्क्रिनशट संलग्न",
+        replaceHint: "अर्को फाइल राख्नुपरे पहिले हटाएर पुनः अपलोड गर्नुहोस्।",
+        errors: {
+          mime: "Image (PNG, JPG, WebP, GIF) वा PDF मात्र समर्थित छ।",
+          size: "फाइल ५ MB भन्दा ठूलो हुनुहुँदैन।",
+          busy: "अघिल्लो अपलोड पूरा नभई अर्को अपलोड गर्न मिल्दैन।",
+          generic: "स्क्रिनशट अपलोड गर्न सकिएन। फेरि प्रयास गर्नुहोस्।"
+        }
+      },
       submit: "प्रतिक्रिया पठाउनुहोस्"
     },
     placeholders: {
@@ -954,13 +984,11 @@ export const copy = {
       phone: "+9779800000000",
       role: "भूमिका छान्नुहोस्",
       portfolio: "https://example.com",
-      resumeUrl: "https://example.com/resume.pdf",
       experience: "तपाईंको पृष्ठभूमि, अनुभव वा उपलब्धि लेख्नुहोस्...",
       motivation: "तपाईंको प्रेरणा लेख्नुहोस्...",
       additionalInfo: "उपलब्ध समय, रुचि वा अरू सन्देश लेख्नुहोस्...",
       feedbackType: "प्रकार छान्नुहोस्",
-      feedback: "तपाईंको प्रतिक्रिया, सुझाव वा चिन्ता लेख्नुहोस्...",
-      screenshot: "https://example.com/screenshot.png"
+      feedback: "तपाईंको प्रतिक्रिया, सुझाव वा चिन्ता लेख्नुहोस्..."
     },
     options: {
       applicationRoles: [
@@ -2569,7 +2597,22 @@ export const copy = {
       phone: "Phone number",
       role: "Role",
       portfolio: "Portfolio URL",
-      resumeUrl: "Resume URL",
+      resume: "Resume / CV",
+      resumeUpload: {
+        dragText: "Drag a file here, or click to choose",
+        uploadingText: "Uploading…",
+        hint: "PDF, JPG, PNG, WebP, or GIF — up to 5 MB. One file.",
+        removeCta: "Remove",
+        removeAria: "Remove resume",
+        attachedFallback: "Resume attached",
+        replaceHint: "To replace, remove the current file first and upload again.",
+        errors: {
+          mime: "Only PDF or image (JPG, PNG, WebP, GIF) is supported.",
+          size: "File must be 5 MB or smaller.",
+          busy: "An upload is already in progress.",
+          generic: "Could not upload resume. Please try again."
+        }
+      },
       experience: "Your experience",
       motivation: "Why do you want to contribute to Shramdan?",
       additionalInfo: "Additional information",
@@ -2594,7 +2637,22 @@ export const copy = {
       type: "Feedback type",
       experienceRating: "Experience rating",
       message: "Your feedback",
-      screenshot: "Screenshot URL",
+      screenshot: "Screenshot",
+      screenshotUpload: {
+        dragText: "Drag a file here, or click to choose",
+        uploadingText: "Uploading…",
+        hint: "PNG, JPG, WebP, GIF, or PDF — up to 5 MB. One file.",
+        removeCta: "Remove",
+        removeAria: "Remove screenshot",
+        attachedFallback: "Screenshot attached",
+        replaceHint: "To replace, remove the current file first and upload again.",
+        errors: {
+          mime: "Only image (PNG, JPG, WebP, GIF) or PDF is supported.",
+          size: "File must be 5 MB or smaller.",
+          busy: "An upload is already in progress.",
+          generic: "Could not upload screenshot. Please try again."
+        }
+      },
       submit: "Submit Feedback"
     },
     placeholders: {
@@ -2604,13 +2662,11 @@ export const copy = {
       phone: "+9779800000000",
       role: "Select a role",
       portfolio: "https://example.com",
-      resumeUrl: "https://example.com/resume.pdf",
       experience: "Write your background, experience, or achievements...",
       motivation: "Write your motivation...",
       additionalInfo: "Write your availability, interests, or other notes...",
       feedbackType: "Select a type",
-      feedback: "Write your feedback, suggestion, or concern...",
-      screenshot: "https://example.com/screenshot.png"
+      feedback: "Write your feedback, suggestion, or concern..."
     },
     options: {
       applicationRoles: [

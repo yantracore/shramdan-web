@@ -3,7 +3,7 @@
 > A contribution application is the public-facing form an aspiring contributor submits at `/join` to offer their skills to the Shramdan platform — frontend / backend development, design, legal counsel, finance, community management, livestreaming, photography, translation, and so on. Applications are submitted anonymously (no login required); the admin team reviews each one inside the control center and either accepts the applicant into the appropriate working group or rejects with a note. Once accepted, the applicant becomes a member with the corresponding role attached. Applications are persistent records — they outlive their decision so the admin team has an audit trail of who applied, when, for what role, and why.
 
 **Spec status:** `draft`
-**Last updated:** 2026-06-05
+**Last updated:** 2026-06-05 (later same day — backend chose the public-presign path)
 
 ---
 
@@ -17,8 +17,8 @@
 - **experience** (`string`, optional, public) — narrative description of the applicant's relevant background. Max 500 characters.
 - **motivation** (`string`, required, public) — narrative answer to "why do you want to contribute". Max 500 characters.
 - **additionalInfo** (`string`, optional, public) — availability, time commitment, other notes. Max 300 characters.
-- **portfolioIds** (`array of string`, optional, public) — IDs of confirmed `Upload` records attached as portfolio documents. Each entry is a UUID returned by the upload pipeline (see *Attachment upload mechanism* below). Replaces the legacy single-value `portfolioId` field; see *Recent changes*.
-- **resumeIds** (`array of string`, optional, public) — IDs of confirmed `Upload` records attached as resume / CV documents. Each entry is a UUID. Replaces the legacy single-value `resumeId` field; see *Recent changes*.
+- **resumeId** (`string`, optional, public) — UUID of a confirmed `Upload` record attached as the resume / CV document. Created through the public upload pipeline described in *Attachment upload mechanism* below. The spec target is the array form `resumeIds` (up to five entries); the array is pending backend work and the single-id field is what ships today.
+- **portfolioId** (`string`, optional, public) — UUID of a confirmed `Upload` record attached as the portfolio document. Same multi-attachment caveat as `resumeId`. The contributor form currently surfaces this as a free-text URL field rather than the Dragger flow; converting it follows the array migration.
 - **status** (`enum`, required, public) — one of `SUBMITTED`, `REVIEWING`, `ACCEPTED`, `REJECTED`, `WITHDRAWN`. Default on creation: `SUBMITTED`.
 - **submittedAt** (`datetime`, required, public) — ISO 8601 timestamp of submission.
 - **decidedAt** (`datetime`, optional, public) — set when status transitions to `ACCEPTED` or `REJECTED`.
@@ -32,8 +32,8 @@
 - `email` must be RFC-5322-shaped. The backend does not need to verify deliverability synchronously.
 - `motivation` must be present and non-empty (after trimming whitespace).
 - `role` must be one of the supported enum values; unknown roles are rejected with a 400.
-- `resumeIds` and `portfolioIds` may each carry at most **five** entries. Each id must reference an `Upload` record whose `status` is `CONFIRMED` and whose `fileType` is `DOCUMENT` or `IMAGE` (see *Allowed file formats* below for the MIME filter the upload layer enforces).
-- The same `Upload` id may not appear in both `resumeIds` and `portfolioIds` on the same application.
+- `resumeId` (and, once the array form lands, each entry in `resumeIds` / `portfolioIds`) must reference an `Upload` record whose `status` is `CONFIRMED`, whose `userId` is null (created through the public presign path), and whose MIME passes the public-upload allowlist (`image/*` or `application/pdf` — see *Allowed file formats* below).
+- The same `Upload` id may not appear in both `resumeId` and `portfolioId` (or, in the array form, in both arrays) on the same application.
 - `status` transitions: `SUBMITTED` → `REVIEWING` → (`ACCEPTED` | `REJECTED`). `WITHDRAWN` may be reached from `SUBMITTED` or `REVIEWING` and is terminal. Backward transitions are rejected.
 - `decidedAt` must be present whenever `status` is `ACCEPTED` or `REJECTED`, and must not be present otherwise.
 
@@ -43,7 +43,7 @@
 
 | Operation | Transport | RBAC | Description |
 |-----------|-----------|------|-------------|
-| Submit application | REST POST | Public | Anonymous submission from `/join`. Accepts the public field set including `resumeIds` and `portfolioIds`. Honeypot-protected at the frontend; the backend may add per-IP rate limiting. |
+| Submit application | REST POST | Public | Anonymous submission from `/join`. Accepts the public field set including `resumeId` (and, when the array migration lands, `resumeIds` / `portfolioIds`). Honeypot-protected at the frontend; the backend may add per-IP rate limiting. |
 | List applications | REST GET | Admin | Paginated list with filters described below. Used by the admin control center. |
 | Get application by id | REST GET | Admin | Returns a single application with attachment `Upload` records expanded into downloadable URLs. |
 | Update application status | REST PATCH | Admin | Transitions the application along the state machine. Accepts `{ status, reviewerNote }`. Sends the acceptance / rejection notice when reaching a terminal state. |
@@ -88,29 +88,26 @@ WITHDRAWN  → (terminal)
 
 ## Attachment upload mechanism
 
-The submission form is open to anonymous users (no authentication required to POST `/applications`). The current `Upload` pipeline — `POST /uploads/presign` followed by direct PUT to R2 and `POST /uploads/{id}/confirm` — is gated by `bearerAuth`. This mismatch must be resolved before resume / portfolio file uploads can ship from the `/join` page.
+The submission form is open to anonymous users (no authentication required to POST `/applications`). The original `Upload` pipeline (`POST /uploads/presign` → PUT → `POST /uploads/{id}/confirm`) is gated by `bearerAuth` and cannot be used from anonymous flows.
 
-Two acceptable approaches; backend picks one and the frontend implements against the chosen surface.
+**Implemented (2026-06-05):** backend added a parallel public pair that mirrors the authenticated pipeline but accepts unauthenticated requests:
 
-### Option A — anonymous mode on the existing pipeline
+1. Frontend calls `POST /uploads/public/presign` with `{ filename, mimeType, size, metadata? }`. No `Authorization` header. The endpoint validates `mimeType` against an `image/*` + `application/pdf` allowlist server-side (client claims are not trusted as truth). Response shape mirrors the authed presign: `{ data: { upload: { id, ... }, presignedUrl, expiresIn } }`.
+2. Frontend PUTs the file bytes directly to `presignedUrl` (Cloudflare R2). The presigned URL carries the MIME constraint; PUTs with a mismatching `Content-Type` are rejected by R2.
+3. Frontend calls `POST /uploads/public/{id}/confirm` with no body and no `Authorization` header. The endpoint refuses to confirm uploads that have an owner (i.e. uploads that were initiated through the authed presign path), so anonymous and authenticated upload trails cannot cross. Response: `{ data: { downloadUrl, ... } }`.
+4. Frontend includes the resulting `Upload` id in `resumeId` / `portfolioId` on the `POST /applications` body. Backend currently accepts one id per attachment kind — multi-attachment arrays are pending; see *Pending multi-attachment work* below.
 
-Extend `POST /uploads/presign` to accept an unauthenticated mode when the request includes a server-issued **submission token**:
+The resulting `Upload` record is created with `userId = null` and stored privately. Anonymous rate limiting, magic-byte verification, EXIF strip, and `Content-Disposition: attachment` on downloads remain backend's responsibility — see *Defence-in-depth* below.
 
-1. Frontend calls `POST /applications/submission-token` with no body. The endpoint is anonymous and rate-limited per IP (suggested: 10 tokens per IP per hour). Response: `{ submissionToken: string, expiresAt: datetime }`. The token's TTL is short (e.g. 30 minutes) and it carries an internal claim restricting it to the application-submission scope.
-2. Frontend calls `POST /uploads/presign` with `Authorization: SubmissionToken <token>` (or an equivalent header that the backend can distinguish from `bearerAuth`). The presign endpoint accepts this header for `fileType` values `DOCUMENT` and `IMAGE` only, and only when `isPublic` is `false`. It refuses `VIDEO`, `AUDIO`, `ARCHIVE`, `OTHER`.
-3. The resulting `Upload` record is created in a temporary state owned by the submission token, not by any member. The presigned PUT proceeds normally.
-4. Frontend calls `POST /uploads/{id}/confirm` with the same submission-token header. The `Upload` transitions to `CONFIRMED` but remains owned by the token, not by a member.
-5. Frontend includes the resulting `Upload` ids in the `resumeIds` / `portfolioIds` arrays on the `POST /applications` body. The application creation handler verifies that every referenced `Upload` is owned by the same submission token that the frontend can prove via a final header on the application POST itself.
-6. Uploads orphaned (not bound to an application within the token TTL) are garbage-collected on a daily sweep.
+### Pending multi-attachment work
 
-### Option B — dedicated application-upload endpoint
+The original spec proposed `resumeIds` / `portfolioIds` arrays carrying up to five entries each. The 2026-06-05 backend implementation keeps the legacy single-value `resumeId` / `portfolioId` UUIDs. Multi-attachment support requires:
 
-Add a single anonymous endpoint that handles the entire upload in one call, scoped to application attachments:
+- Application schema: `resumeId` → `resumeIds: string[]`, `portfolioId` → `portfolioIds: string[]`, each capped at five entries.
+- Validation: each id must reference a `CONFIRMED` `Upload` whose `userId` is null (created through the public presign path) and that is not already attached to another application.
+- Admin read shape: expand both arrays into downloadable URLs for the reviewer.
 
-- `POST /applications/uploads` — multipart form upload, anonymous, per-IP rate-limited (suggested: 10 uploads per IP per hour). Accepts a single file per request. Validates MIME and size server-side (no client trust) and returns `{ uploadId, downloadUrl, expiresAt }`. The `uploadId` is then included in the application body's `resumeIds` or `portfolioIds`.
-- This option avoids touching `/uploads/presign` and is simpler to reason about, at the cost of routing the file bytes through the API server instead of directly to R2. For resume- and screenshot-scale files (under 10 MB each) the throughput is acceptable.
-
-Backend's pick is captured in *Recent changes* once decided.
+Until that lands, the frontend uploads one resume per submission and includes its id as the legacy single `resumeId` field. Portfolio is currently a free-text URL on the form; converting it to the same Dragger flow waits on the array work.
 
 ---
 
@@ -118,7 +115,7 @@ Backend's pick is captured in *Recent changes* once decided.
 
 Anonymous uploads are restricted to a tight allowlist. The backend enforces this regardless of the client's claimed MIME — see *Defence-in-depth* below.
 
-**Resume / portfolio (`resumeIds`, `portfolioIds`):**
+**Resume / portfolio (`resumeId`, `portfolioId`, and the future array fields):**
 
 | MIME | Extension | Notes |
 |---|---|---|
@@ -126,13 +123,14 @@ Anonymous uploads are restricted to a tight allowlist. The backend enforces this
 | `image/jpeg` | `.jpg`, `.jpeg` | Phone-shot resumes. |
 | `image/png` | `.png` | Scanned resumes. |
 | `image/webp` | `.webp` | Modern compressed images. |
-| `application/msword` | `.doc` | Accepted under business pressure. See *Defence-in-depth* — admin reviewers must open with macros disabled. |
-| `application/vnd.openxmlformats-officedocument.wordprocessingml.document` | `.docx` | Same caveat as `.doc`. |
+| `image/gif` | `.gif` | Rare for resumes but accepted; the public presign endpoint allows the full `image/*` family. |
 
-**Explicitly rejected** for resume / portfolio uploads (these are listed so the rejection is visible in the spec, not silent): `image/svg+xml`, `text/html`, `image/heic`, `image/heif`, all archive types (`zip`, `7z`, `rar`, `tar`), all executables, all scripts. iOS HEIC: the form surfaces a clear "use JPEG or PNG" error message; iOS share-sheets convert to JPEG automatically when sharing from camera roll, so this rejection rarely bites users in practice.
+**Explicitly rejected:** `image/svg+xml`, `text/html`, `image/heic`, `image/heif`, all `.doc` / `.docx` and other Office formats, all archive types (`zip`, `7z`, `rar`, `tar`), all executables, all scripts. The `image/*` + `application/pdf` allowlist is enforced server-side at `POST /uploads/public/presign`; anything else returns 400. iOS HEIC: the form surfaces a clear "use JPEG or PNG" error message; iOS share-sheets convert to JPEG automatically when sharing from camera roll, so this rejection rarely bites users in practice.
 
 **Per-file size cap:** 5 MB.
-**Array cap:** at most five attachments per array (so up to ten attachments total per application).
+**Array cap (when arrays land):** at most five attachments per array (so up to ten attachments total per application).
+
+**Note on Office formats.** An earlier draft of this spec included `.doc` / `.docx` under business pressure. The 2026-06-05 backend implementation deliberately excluded them — the macro / embedded-object risk in admin reviewers' browsers and download tools outweighs the friction of asking applicants to export to PDF. Re-adding `.docx` would require server-side macro stripping or conversion, and is not in scope.
 
 ---
 
@@ -164,4 +162,5 @@ The anonymous upload surface is the highest-trust-stretch in the public API. The
 
 ## Recent changes
 
-- `2026-06-05` — initial standalone spec, split out from the Applications sub-entity in [`members.md`](members.md). Introduces multi-attachment `resumeIds` and `portfolioIds` arrays (replacing the legacy single-id `resumeId` / `portfolioId` fields), the anonymous attachment-upload mechanism (Options A and B for the backend to choose between), the file-format allowlist with `.doc` / `.docx` inclusion, and the defence-in-depth requirements that gate the anonymous upload surface.
+- `2026-06-05` (later same day) — backend shipped `POST /uploads/public/presign` and `POST /uploads/public/{id}/confirm`. Spec rewritten to reflect this path (replacing the earlier Option A / Option B proposal), `.doc` / `.docx` removed from the allowlist (backend declined them on macro-risk grounds), and the multi-attachment array migration moved to *Pending multi-attachment work*. The `/join` page now ships a single-resume Dragger using the new public pipeline.
+- `2026-06-05` — initial standalone spec, split out from the Applications sub-entity in [`members.md`](members.md). Proposed multi-attachment `resumeIds` and `portfolioIds` arrays (replacing the legacy single-id `resumeId` / `portfolioId` fields), the anonymous attachment-upload mechanism (Options A and B for the backend to choose between), the file-format allowlist with `.doc` / `.docx` inclusion, and the defence-in-depth requirements that gate the anonymous upload surface.

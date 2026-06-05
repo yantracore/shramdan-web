@@ -23,10 +23,17 @@ export default function FeedbackPage() {
       return true;
     }
 
+    const { screenshot, ...rest } = values;
+
+    const payload = {
+      ...rest,
+      ...(screenshot?.url ? { screenshot: screenshot.url } : {})
+    };
+
     setSubmitting(true);
 
     try {
-      await postJson("/feedback", values);
+      await postJson("/feedback", payload);
       setSubmitted(true);
       return true;
     } catch (error) {
