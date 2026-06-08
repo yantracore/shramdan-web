@@ -13,8 +13,10 @@
 
 import { FilterOutlined, SearchOutlined } from "@ant-design/icons";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { ActivityStatsRow } from "@/components/ActivityStatsRow";
+import EventMapBlock from "@/components/EventMapBlock";
 import { EventsHomeRail } from "@/components/EventsHomeRail";
 import { StreamList } from "@/components/StreamList";
 import { SiteShell } from "@/components/SiteShell";
@@ -56,6 +58,16 @@ export default function HomeSearchView() {
       cancelled = true;
     };
   }, [language]);
+
+  const mapEntries = useMemo(() => {
+    const tag = (events, status) =>
+      (events ?? []).map((event) => ({ event, status }));
+    return [
+      ...tag(liveEvents, "live"),
+      ...tag(upcomingEvents, "upcoming"),
+      ...tag(pastEvents, "past")
+    ];
+  }, [liveEvents, upcomingEvents, pastEvents]);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -125,6 +137,37 @@ export default function HomeSearchView() {
             </button>
           </form>
 
+          <div className="home-search-stats">
+            <ActivityStatsRow language={language} variant="events" />
+          </div>
+
+          {mapEntries.length > 0 ? (
+            <section
+              className="home-search-map"
+              aria-labelledby="home-search-map-title"
+            >
+              <header className="home-search-map-header">
+                <span className="eyebrow home-search-map-eyebrow">
+                  {search.mapEyebrow}
+                </span>
+              </header>
+              <h2 id="home-search-map-title" className="sr-only">
+                {search.mapEyebrow}
+              </h2>
+              <div className="home-search-map-frame">
+                <EventMapBlock
+                  entries={mapEntries}
+                  t={search.map}
+                  language={language}
+                  height={320}
+                  interactive
+                  enableFullscreen
+                  fullscreenLabel={search.map.fullscreenOpen}
+                  exitFullscreenLabel={search.map.fullscreenClose}
+                />
+              </div>
+            </section>
+          ) : null}
         </div>
       </section>
 
