@@ -353,40 +353,10 @@
   outline: none;
 }
 
-/* Quick settings stack — TR corner is the always-visible quick panel
- * (Language + Theme + User toggles, with a "View all settings" link
- * footer linking to the full /settings page). The 38px circular chips
- * share the .user-icon-trigger chassis above, and the corner chip flips
- * to a column flex so the link sits centred under the buttons. */
-.site-shell-corner--top-right .site-shell-corner__inner {
-  flex-direction: column;
-  align-items: stretch;
-  gap: 6px;
-}
-
 .quick-settings-row {
   display: flex;
   align-items: center;
   gap: var(--corner-gap);
-}
-
-.quick-settings-link {
-  align-self: center;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  color: color-mix(in srgb, var(--text) 64%, transparent);
-  text-decoration: none;
-  padding: 2px 10px;
-  border-radius: 999px;
-  transition: color 160ms ease, background 160ms ease;
-}
-
-.quick-settings-link:hover,
-.quick-settings-link:focus-visible {
-  color: var(--primary-dark);
-  background: color-mix(in srgb, var(--primary) 10%, transparent);
-  outline: none;
 }
 
 /* --- Apps Start Menu (BL corner) -------------------------------------
@@ -5881,10 +5851,9 @@
   }
 
   /* Narrowest viewports: hide quick-settings toggles (Lang + Theme +
-   * Bell) and the "View all settings" link from corner-tr to keep the
-   * bar fitting at 360px. The mobile drawer surfaces all of this. */
-  .site-shell-corner--top-right .preference-controls,
-  .site-shell-corner--top-right .quick-settings-link {
+   * Bell) from corner-tr to keep the bar fitting at 360px. The mobile
+   * drawer surfaces all of this. */
+  .site-shell-corner--top-right .preference-controls {
     display: none;
   }
 

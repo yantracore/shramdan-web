@@ -6,29 +6,33 @@ import {
   BellOutlined,
   BookOutlined,
   ControlOutlined,
+  FolderOpenOutlined,
   HeartOutlined,
   LogoutOutlined,
   MenuOutlined,
+  MoonOutlined,
   ReadOutlined,
   RocketOutlined,
   SettingOutlined,
   SolutionOutlined,
+  SunOutlined,
   TeamOutlined,
+  ThunderboltOutlined,
+  TranslationOutlined,
   UserAddOutlined,
   UserOutlined
 } from "@ant-design/icons";
-import { Avatar, Button, Dropdown, Popover, Tag } from "antd";
+import { Avatar, Button, Dropdown, Popover, Tag, Tooltip } from "antd";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { FaFacebookF, FaTiktok, FaXTwitter, FaYoutube } from "react-icons/fa6";
+import { AppsStartMenu } from "@/components/AppsStartMenu";
 import { BackToTop } from "@/components/BackToTop";
 import { KeyboardShortcutsDialog } from "@/components/KeyboardShortcutsDialog";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { NotificationsBell } from "@/components/NotificationsBell";
 import { OnboardingSpotlight } from "@/components/OnboardingSpotlight";
-import { QuickActionFab } from "@/components/QuickActionFab";
-import { SettingsPopover } from "@/components/SettingsPopover";
 import { usePreferences } from "@/app/providers";
 import { copy } from "@/lib/siteContent";
 import { getAuthSession, isAdminUser, subscribeAuthSession } from "@/lib/authSession";
@@ -59,7 +63,6 @@ const socialIcons = {
 
 export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
   const { language, mode, toggleLanguage, toggleMode } = usePreferences();
-  const [isTopHidden, setIsTopHidden] = useState(false);
   const [isPillEntering, setIsPillEntering] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
@@ -106,19 +109,32 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
   const isAdmin = isAuthenticated && isAdminUser(session.user);
 
   // Pill nav (>= 1180px): pure navigation, no auth. Login + Join live in the
-  // TR user-icon dropdown for anonymous visitors per the 2026-06-05 pivot.
+  // TR user-icon popover for anonymous visitors per the 2026-06-05 pivot.
+  // The 5th item (App Development) is the highlighted build-the-app CTA at
+  // the current phase — tooltip surfaces "Participate" since the label
+  // describes the destination, not the verb.
   const pillNavItems = [
     { href: "/", label: t.nav.home },
     { href: "/events", label: t.nav.events },
     { href: "/issues", label: t.nav.issues },
-    { href: "/feedback", label: t.nav.feedback }
+    { href: "/feedback", label: t.nav.feedback },
+    {
+      href: "/app-development",
+      label: t.nav.appDev,
+      highlight: true,
+      tooltip: t.nav.appDevTooltip,
+      badge: t.nav.appDevBadge
+    }
   ];
 
   // Bottom-left "apps grid" dropdown — secondary nav for places that don't
-  // belong on the top pill (event types, intro, learn, settings, admin).
+  // belong on the top pill (event types, intro, learn, resources, settings,
+  // admin). Resources surfaced here per the 2026-06-05 pivot — its content
+  // moved off the homepage.
   const appsGridItems = [
     { href: "/event-types", label: t.nav.eventTypes, icon: <TeamOutlined /> },
     { href: "/intro", label: t.nav.intro, icon: <RocketOutlined /> },
+    { href: "/resources", label: t.nav.resources, icon: <FolderOpenOutlined /> },
     { href: "/learn", label: t.nav.learn, icon: <BookOutlined /> },
     { href: "/settings", label: t.nav.settings, icon: <SettingOutlined /> },
     ...(isAdmin
@@ -160,13 +176,6 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
     if (pathname === href && smoothScrollToTop()) {
       event.preventDefault();
     }
-  };
-
-  const goToOrScrollTop = (href) => {
-    if (pathname === href && smoothScrollToTop()) {
-      return;
-    }
-    router.push(href);
   };
 
   const authedUserMenu = isAuthenticated
@@ -262,13 +271,10 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
     </div>
   );
 
-  const appsMenu = {
-    items: appsGridItems.map((item) => ({
-      key: item.href,
-      icon: item.icon,
-      label: item.label,
-      onClick: () => goToOrScrollTop(item.href)
-    }))
+  const handleAppsTileSelect = (event, item) => {
+    if (pathname === item.href && smoothScrollToTop()) {
+      event.preventDefault();
+    }
   };
 
   const pagesLinks = [
@@ -307,40 +313,6 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
     }
   ];
 
-  // Scroll-hide for the TOP corners only. Bottom corners persist so the
-  // primary CTA (FAB + apps grid) stays one tap away regardless of scroll
-  // position. WCAG 2.4.11 focus-not-obscured: if focus lands inside a top
-  // corner, override the hide so the focused element stays visible.
-  useEffect(() => {
-    let lastScrollY = typeof window !== "undefined" ? window.scrollY : 0;
-    let ticking = false;
-
-    const update = () => {
-      const currentScrollY = window.scrollY;
-      const nearTop = currentScrollY < 24;
-      const goingUp = currentScrollY < lastScrollY;
-      const focusInsideTop = !!document.activeElement?.closest?.(
-        ".site-shell-corner--top-left, .site-shell-corner--top-right, .site-shell-pill"
-      );
-
-      setIsTopHidden(!nearTop && !goingUp && !focusInsideTop);
-      lastScrollY = Math.max(currentScrollY, 0);
-      ticking = false;
-    };
-
-    const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(update);
-        ticking = true;
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
-
   // Pill nav entrance — runs once per browser session, only when the
   // viewport actually shows the pill (>= PILL_MIN_WIDTH_PX) and the user
   // has not opted out of motion. sessionStorage flag persists for the rest
@@ -374,8 +346,6 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
     };
   }, []);
 
-  const hiddenSuffix = isTopHidden ? " is-hidden" : "";
-
   return (
     <main className="site-shell" data-chrome-mode={chromeMode}>
       <a className="skip-to-main" href="#main-content">
@@ -384,7 +354,7 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
 
       {chromeMode !== "none" ? (
         <header className="site-shell-banner" role="banner" aria-label={t.ariaLabels.nav}>
-          <div className={`site-shell-corner site-shell-corner--top-left${hiddenSuffix}`}>
+          <div className="site-shell-corner site-shell-corner--top-left">
             <div className="site-shell-corner__inner">
               <Link
                 className="brand"
@@ -407,147 +377,193 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
             >
               {pillNavItems.map((item) => {
                 const isActive = activePath === item.href;
-                return (
+                const classes = [
+                  isActive ? "is-active" : "",
+                  item.highlight ? "is-highlight" : ""
+                ]
+                  .filter(Boolean)
+                  .join(" ");
+                const link = (
                   <Link
                     key={item.href}
                     aria-current={isActive ? "page" : undefined}
-                    className={isActive ? "is-active" : undefined}
+                    className={classes || undefined}
                     href={item.href}
                     onClick={(event) => handleSamePageNavClick(event, item.href)}
                   >
-                    {item.label}
+                    <span className="site-shell-pill__label">
+                      <ThunderboltOutlined
+                        aria-hidden="true"
+                        className="site-shell-pill__icon"
+                        style={{ display: item.highlight ? "inline-flex" : "none" }}
+                      />
+                      {item.label}
+                    </span>
+                    {item.badge ? (
+                      <span className="site-shell-pill__badge" aria-hidden="true">
+                        {item.badge}
+                      </span>
+                    ) : null}
                   </Link>
                 );
+                if (item.tooltip) {
+                  return (
+                    <Tooltip key={item.href} title={item.tooltip} placement="bottom">
+                      {link}
+                    </Tooltip>
+                  );
+                }
+                return link;
               })}
             </nav>
           ) : null}
 
-          <div className={`site-shell-corner site-shell-corner--top-right${hiddenSuffix}`}>
+          <div className="site-shell-corner site-shell-corner--top-right">
             <div className="site-shell-corner__inner">
-              <div className="preference-controls">
-                <SettingsPopover />
-                {isAuthenticated ? <NotificationsBell language={language} /> : null}
-              </div>
-              {isAuthenticated ? (
-                <Dropdown menu={authedUserMenu} placement="bottomRight" trigger={["click"]}>
-                  <button
-                    type="button"
-                    className="toolbar-avatar"
-                    aria-label={t.ariaLabels.userMenu}
-                    title={t.ariaLabels.userMenu}
-                  >
-                    <Avatar
-                      src={session.user.avatar || undefined}
-                      icon={<UserOutlined />}
-                      size={38}
-                    >
-                      {getInitials(session.user)}
-                    </Avatar>
-                  </button>
-                </Dropdown>
-              ) : (
-                <Popover
-                  content={guestPopoverContent}
-                  trigger="click"
-                  placement="bottomRight"
-                  arrow={false}
-                  overlayClassName="guest-user-popover-overlay"
-                >
-                  <button
-                    type="button"
-                    className="user-icon-trigger"
-                    aria-label={t.ariaLabels.userMenu}
-                    title={t.ariaLabels.userMenu}
-                  >
-                    <UserOutlined />
-                  </button>
-                </Popover>
-              )}
-              <details className="mobile-menu" ref={mobileMenuRef}>
-                <summary aria-label={t.ariaLabels.openMenu}>
-                  <MenuOutlined />
-                </summary>
-                <div className="mobile-menu-panel">
-                  {mobileMenuItems.map((item) => {
-                    const isActive = activePath === item.href;
-                    return (
-                      <Link
-                        aria-current={isActive ? "page" : undefined}
-                        className={isActive ? "is-active" : undefined}
-                        href={item.href}
-                        key={item.href}
-                        onClick={(event) => {
-                          handleSamePageNavClick(event, item.href);
-                          closeMobileMenu();
-                        }}
-                      >
-                        {item.label}
-                      </Link>
-                    );
-                  })}
-                  <div
-                    className="mobile-menu-preferences"
-                    aria-label={t.ariaLabels.preferences}
-                  >
+              <div className="quick-settings-row">
+                <div className="preference-controls">
+                  <Tooltip title={t.controls.languageTooltip}>
                     <button
                       type="button"
-                      aria-label={t.controls.themeTooltip}
-                      title={t.controls.themeTooltip}
-                      onClick={() => {
-                        toggleMode();
-                        closeMobileMenu();
-                      }}
-                    >
-                      {mode === "light" ? t.controls.darkTheme : t.controls.lightTheme}
-                    </button>
-                    <button
-                      type="button"
+                      className="quick-settings-button"
                       aria-label={t.controls.languageTooltip}
-                      title={t.controls.languageTooltip}
-                      onClick={() => {
-                        toggleLanguage();
-                        closeMobileMenu();
-                      }}
+                      onClick={toggleLanguage}
                     >
-                      {t.controls.language}
+                      <TranslationOutlined />
                     </button>
-                    {isAuthenticated ? (
+                  </Tooltip>
+                  <Tooltip title={t.controls.themeTooltip}>
+                    <button
+                      type="button"
+                      className="quick-settings-button"
+                      aria-label={t.controls.themeTooltip}
+                      onClick={toggleMode}
+                    >
+                      {mode === "light" ? <MoonOutlined /> : <SunOutlined />}
+                    </button>
+                  </Tooltip>
+                  {isAuthenticated ? <NotificationsBell language={language} /> : null}
+                </div>
+                {isAuthenticated ? (
+                  <Dropdown
+                    menu={authedUserMenu}
+                    placement="bottomRight"
+                    trigger={["click"]}
+                    overlayClassName="site-corner-menu site-corner-menu--from-right"
+                  >
+                    <button
+                      type="button"
+                      className="toolbar-avatar"
+                      aria-label={t.ariaLabels.userMenu}
+                      title={t.ariaLabels.userMenu}
+                    >
+                      <Avatar
+                        src={session.user.avatar || undefined}
+                        icon={<UserOutlined />}
+                        size={38}
+                      >
+                        {getInitials(session.user)}
+                      </Avatar>
+                    </button>
+                  </Dropdown>
+                ) : (
+                  <Popover
+                    content={guestPopoverContent}
+                    trigger="click"
+                    placement="bottomRight"
+                    arrow={false}
+                    overlayClassName="guest-user-popover-overlay site-corner-menu site-corner-menu--from-right"
+                  >
+                    <button
+                      type="button"
+                      className="user-icon-trigger"
+                      aria-label={t.ariaLabels.userMenu}
+                      title={t.ariaLabels.userMenu}
+                    >
+                      <UserOutlined />
+                    </button>
+                  </Popover>
+                )}
+                <details className="mobile-menu" ref={mobileMenuRef}>
+                  <summary aria-label={t.ariaLabels.openMenu}>
+                    <MenuOutlined />
+                  </summary>
+                  <div className="mobile-menu-panel">
+                    {mobileMenuItems.map((item) => {
+                      const isActive = activePath === item.href;
+                      return (
+                        <Link
+                          aria-current={isActive ? "page" : undefined}
+                          className={isActive ? "is-active" : undefined}
+                          href={item.href}
+                          key={item.href}
+                          onClick={(event) => {
+                            handleSamePageNavClick(event, item.href);
+                            closeMobileMenu();
+                          }}
+                        >
+                          {item.label}
+                        </Link>
+                      );
+                    })}
+                    <div
+                      className="mobile-menu-preferences"
+                      aria-label={t.ariaLabels.preferences}
+                    >
                       <button
                         type="button"
+                        aria-label={t.controls.themeTooltip}
+                        title={t.controls.themeTooltip}
                         onClick={() => {
+                          toggleMode();
                           closeMobileMenu();
-                          handleLogout();
                         }}
                       >
-                        {t.me.menu.logout}
+                        {mode === "light" ? t.controls.darkTheme : t.controls.lightTheme}
                       </button>
-                    ) : null}
+                      <button
+                        type="button"
+                        aria-label={t.controls.languageTooltip}
+                        title={t.controls.languageTooltip}
+                        onClick={() => {
+                          toggleLanguage();
+                          closeMobileMenu();
+                        }}
+                      >
+                        {t.controls.language}
+                      </button>
+                      {isAuthenticated ? (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            closeMobileMenu();
+                            handleLogout();
+                          }}
+                        >
+                          {t.me.menu.logout}
+                        </button>
+                      ) : null}
+                    </div>
                   </div>
-                </div>
-              </details>
+                </details>
+              </div>
             </div>
           </div>
 
           {chromeMode === "full" ? (
             <div className="site-shell-corner site-shell-corner--bottom-left">
-              <div className="site-shell-corner__inner">
-                <Dropdown menu={appsMenu} placement="topLeft" trigger={["click"]}>
-                  <button
-                    type="button"
-                    className="apps-grid-trigger"
-                    aria-label={t.ariaLabels.appGrid ?? t.ariaLabels.openMenu}
-                    title={t.ariaLabels.appGrid ?? t.ariaLabels.openMenu}
-                  >
-                    <AppstoreOutlined />
-                  </button>
-                </Dropdown>
-              </div>
+              <AppsStartMenu
+                items={appsGridItems}
+                language={language}
+                onItemSelect={handleAppsTileSelect}
+              />
             </div>
           ) : null}
 
           <div className="site-shell-corner site-shell-corner--bottom-right">
-            <QuickActionFab language={language} variant="inline" />
-            <BackToTop language={language} variant="inline" />
+            <div className="site-shell-corner__inner">
+              <BackToTop language={language} variant="inline" />
+            </div>
           </div>
         </header>
       ) : null}

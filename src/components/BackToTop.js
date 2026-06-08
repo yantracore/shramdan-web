@@ -16,12 +16,13 @@ const SHOW_AFTER = 600;
 
 export function BackToTop({ language = "np", variant }) {
   const t = COPY[language] || COPY.np;
-  const [visible, setVisible] = useState(false);
-  const variantClass = variant === "inline" ? " back-to-top--inline" : "";
+  const isInline = variant === "inline";
+  const [scrolled, setScrolled] = useState(false);
+  const variantClass = isInline ? " back-to-top--inline" : "";
 
   useEffect(() => {
     const onScroll = () => {
-      setVisible(window.scrollY > SHOW_AFTER);
+      setScrolled(window.scrollY > SHOW_AFTER);
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -36,6 +37,11 @@ export function BackToTop({ language = "np", variant }) {
       behavior: reduced ? "auto" : "smooth"
     });
   };
+
+  // Inline variant lives inside the bottom-right corner chip and is part
+  // of the persistent shell — always visible, always focusable. The
+  // floating (non-inline) variant keeps its scroll-based fade-in.
+  const visible = isInline || scrolled;
 
   return (
     <button
