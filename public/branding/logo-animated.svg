@@ -35,6 +35,74 @@
       <feDropShadow dx="0" dy="7" stdDeviation="8" flood-color="#0f4f44" flood-opacity=".22"/>
     </filter>
   </defs>
+  <style>
+    #tool-plow,
+    #tool-broom,
+    #tool-wrench,
+    #tool-laptop,
+    #tool-flower {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: tool-breathe 5.2s ease-in-out infinite;
+    }
+
+    #tool-flower { animation-name: flower-bloom; }
+    #tool-plow { animation-delay: .05s; }
+    #tool-wrench { animation-delay: .18s; }
+    #tool-laptop { animation-delay: .31s; }
+    #tool-broom { animation-delay: .44s; }
+
+    #shared-heart {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: heart-pulse 3.6s ease-in-out infinite;
+    }
+
+    #organic-tool-ring {
+      stroke-dasharray: 620;
+      stroke-dashoffset: 620;
+      animation: ring-draw 2.8s ease-out forwards, ring-breathe 6s ease-in-out 2.8s infinite;
+    }
+
+    @keyframes ring-draw {
+      to { stroke-dashoffset: 0; }
+    }
+
+    @keyframes ring-breathe {
+      0%, 100% { opacity: .72; }
+      50% { opacity: .95; }
+    }
+
+    @keyframes tool-breathe {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-2px) scale(1.035); }
+    }
+
+    @keyframes flower-bloom {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-3px) scale(1.08); }
+    }
+
+    @keyframes heart-pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.12); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #tool-plow,
+      #tool-broom,
+      #tool-wrench,
+      #tool-laptop,
+      #tool-flower,
+      #shared-heart,
+      #organic-tool-ring {
+        animation: none;
+      }
+      #organic-tool-ring {
+        stroke-dashoffset: 0;
+      }
+    }
+  </style>
 
   <circle cx="256" cy="256" r="226" fill="url(#glowGradient)"/>
 
