@@ -178,7 +178,7 @@
   z-index: var(--pill-z);
   align-items: center;
   gap: 4px;
-  padding: 6px 12px 8px;
+  padding: 6px 20px 8px;
   color: var(--muted);
   font-size: 14px;
   font-weight: 650;
