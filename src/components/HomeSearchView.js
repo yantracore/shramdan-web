@@ -12,10 +12,9 @@
 // IntroCinematic at /intro is a separate, already-polished page.
 
 import { FilterOutlined, SearchOutlined } from "@ant-design/icons";
-import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ActivityStatsRow } from "@/components/ActivityStatsRow";
-import EventMapBlock from "@/components/EventMapBlock";
 import { EventsHomeRail } from "@/components/EventsHomeRail";
 import { StreamList } from "@/components/StreamList";
 import { SiteShell } from "@/components/SiteShell";
@@ -58,19 +57,6 @@ export default function HomeSearchView() {
     };
   }, [language]);
 
-  // Build map entries from all three buckets. EventMap filters to entries
-  // with finite lat/lng internally; we just tag each with its status so
-  // the pin colour matches reality.
-  const mapEntries = useMemo(() => {
-    const tag = (events, status) =>
-      (events ?? []).map((event) => ({ event, status }));
-    return [
-      ...tag(liveEvents, "live"),
-      ...tag(upcomingEvents, "upcoming"),
-      ...tag(pastEvents, "past")
-    ];
-  }, [liveEvents, upcomingEvents, pastEvents]);
-
   const handleSubmit = (event) => {
     event.preventDefault();
     const trimmed = query.trim();
@@ -85,10 +71,30 @@ export default function HomeSearchView() {
       <section className="home-search-hero" aria-labelledby="home-search-title">
         <div className="home-search-hero-inner">
           <header className="home-search-brand">
+            <Image
+              className="home-search-brand-logo"
+              src="/branding/logo.png"
+              alt=""
+              width={112}
+              height={112}
+              priority
+            />
             <h1 id="home-search-title">{t.brand ?? t.footer?.brand ?? "श्रमदान"}</h1>
             <p>{search.slogan}</p>
           </header>
 
+        </div>
+      </section>
+
+      <EventsHomeRail
+        liveEvents={liveEvents}
+        upcomingEvents={upcomingEvents}
+        copy={rail}
+        language={language}
+      />
+
+      <section className="home-search-panel" aria-label={search.searchAria}>
+        <div className="home-search-panel-inner">
           <form className="home-search-bar" onSubmit={handleSubmit} role="search">
             <label className="home-search-input">
               <SearchOutlined aria-hidden="true" />
@@ -119,46 +125,8 @@ export default function HomeSearchView() {
             </button>
           </form>
 
-          <div className="home-search-stats">
-            <ActivityStatsRow language={language} variant="events" />
-          </div>
-
-          {mapEntries.length > 0 ? (
-            <section
-              className="home-search-map"
-              aria-labelledby="home-search-map-title"
-            >
-              <header className="home-search-map-header">
-                <span className="eyebrow home-search-map-eyebrow">
-                  {search.mapEyebrow}
-                </span>
-              </header>
-              <h2 id="home-search-map-title" className="sr-only">
-                {search.mapEyebrow}
-              </h2>
-              <div className="home-search-map-frame">
-                <EventMapBlock
-                  entries={mapEntries}
-                  t={search.map}
-                  language={language}
-                  height={320}
-                  interactive
-                  enableFullscreen
-                  fullscreenLabel={search.map.fullscreenOpen}
-                  exitFullscreenLabel={search.map.fullscreenClose}
-                />
-              </div>
-            </section>
-          ) : null}
         </div>
       </section>
-
-      <EventsHomeRail
-        liveEvents={liveEvents}
-        upcomingEvents={upcomingEvents}
-        copy={rail}
-        language={language}
-      />
 
       <StreamList language={language} copy={search.forYou} defaultMode="event" />
     </SiteShell>

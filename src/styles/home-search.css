@@ -14,33 +14,34 @@
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  /* Clear the four-corner shell (--corner-clear-zone) and add breathing
-   * so the brand sits in the upper third of the viewport. */
-  padding: calc(var(--corner-clear-zone, 64px) + 32px) 32px 32px;
-  min-height: 38vh;
+  padding: calc(var(--corner-clear-zone, 64px) + 20px) 32px 18px;
 }
 
 .home-search-hero-inner {
   display: grid;
-  gap: 28px;
+  gap: 18px;
   width: min(100%, 720px);
-  /* Pull the search column slightly toward the top so the carousel
-   * below it earns the eye. */
-  margin-top: clamp(8px, 4vh, 56px);
   text-align: center;
 }
 
 .home-search-brand {
   display: grid;
-  gap: 6px;
+  justify-items: center;
+  gap: 8px;
+}
+
+.home-search-brand-logo {
+  width: clamp(76px, 10vw, 112px);
+  height: auto;
+  filter: drop-shadow(0 18px 32px rgba(23, 33, 28, 0.16));
 }
 
 .home-search-brand h1 {
   margin: 0;
   color: var(--primary-dark);
-  font-size: clamp(48px, 6vw, 84px);
-  line-height: 0.96;
-  letter-spacing: -0.01em;
+  font-size: clamp(28px, 4vw, 48px);
+  line-height: 1;
+  letter-spacing: 0;
 }
 
 .home-search-brand p {
@@ -48,6 +49,17 @@
   color: var(--muted);
   font-size: clamp(16px, 1.4vw, 20px);
   line-height: 1.35;
+}
+
+.home-search-panel {
+  width: min(100%, 920px);
+  margin: 28px auto 0;
+  padding: 0 32px;
+}
+
+.home-search-panel-inner {
+  width: min(100%, 720px);
+  margin: 0 auto;
 }
 
 /* The search bar is the headline interactive element. Glass treatment
@@ -139,13 +151,16 @@
 
 @media (max-width: 720px) {
   .home-search-hero {
-    padding: calc(var(--corner-clear-zone, 64px) + 16px) 16px 16px;
-    min-height: 32vh;
+    padding: calc(var(--corner-clear-zone, 64px) + 12px) 16px 12px;
   }
 
   .home-search-hero-inner {
-    margin-top: 0;
-    gap: 20px;
+    gap: 14px;
+  }
+
+  .home-search-panel {
+    margin-top: 20px;
+    padding: 0 16px;
   }
 
   .home-search-filters span {
