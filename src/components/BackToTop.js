@@ -1,8 +1,7 @@
 "use client";
 
-// Floating "back to top" button. Fades in once the user has scrolled
-// past ~600 px so it never competes with the QuickActionFab at the
-// fold; tap it to smooth-scroll back to the top of the page.
+// Floating "back to top" button. Standalone usage fades in once the user has
+// scrolled past ~600 px; inline usage lets its parent shell own visibility.
 
 import { ArrowUpOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
@@ -14,20 +13,24 @@ const COPY = {
 
 const SHOW_AFTER = 600;
 
-export function BackToTop({ language = "np", variant }) {
+export function BackToTop({ language = "np", variant, visible: controlledVisible }) {
   const t = COPY[language] || COPY.np;
   const isInline = variant === "inline";
   const [scrolled, setScrolled] = useState(false);
   const variantClass = isInline ? " back-to-top--inline" : "";
 
   useEffect(() => {
+    if (isInline) {
+      return undefined;
+    }
+
     const onScroll = () => {
       setScrolled(window.scrollY > SHOW_AFTER);
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [isInline]);
 
   const handleClick = () => {
     if (typeof window === "undefined") return;
@@ -38,10 +41,9 @@ export function BackToTop({ language = "np", variant }) {
     });
   };
 
-  // Inline variant lives inside the bottom-right corner chip and is part
-  // of the persistent shell — always visible, always focusable. The
-  // floating (non-inline) variant keeps its scroll-based fade-in.
-  const visible = isInline || scrolled;
+  // Inline visibility is controlled by the shell panel; standalone usage
+  // keeps this component's scroll-based fade-in.
+  const visible = isInline ? Boolean(controlledVisible) : scrolled;
 
   return (
     <button

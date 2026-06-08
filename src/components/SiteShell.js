@@ -41,6 +41,7 @@ import { buildLoginHref } from "@/lib/loginRedirect";
 
 const PILL_INTRO_SESSION_KEY = "shramdan.pill.intro.v1";
 const PILL_MIN_WIDTH_PX = 1180;
+const BOTTOM_RIGHT_PANEL_SHOW_AFTER = 100;
 const APP_DEV_LIVE_TIME_ZONE = "Asia/Kathmandu";
 const APP_DEV_LIVE_START_MINUTE = 12 * 60;
 const APP_DEV_LIVE_END_MINUTE = APP_DEV_LIVE_START_MINUTE + 30;
@@ -87,6 +88,7 @@ const socialIcons = {
 export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
   const { language, mode, toggleLanguage, toggleMode } = usePreferences();
   const [isPillEntering, setIsPillEntering] = useState(false);
+  const [isBottomRightPanelVisible, setIsBottomRightPanelVisible] = useState(false);
   const [showAppDevLiveBadge, setShowAppDevLiveBadge] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
@@ -114,6 +116,16 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
       window.cancelAnimationFrame(raf);
       window.clearInterval(id);
     };
+  }, []);
+
+  useEffect(() => {
+    const syncBottomRightPanel = () => {
+      setIsBottomRightPanelVisible(window.scrollY > BOTTOM_RIGHT_PANEL_SHOW_AFTER);
+    };
+
+    syncBottomRightPanel();
+    window.addEventListener("scroll", syncBottomRightPanel, { passive: true });
+    return () => window.removeEventListener("scroll", syncBottomRightPanel);
   }, []);
 
   useEffect(() => {
@@ -598,9 +610,17 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
             </div>
           ) : null}
 
-          <div className="site-shell-corner site-shell-corner--bottom-right">
+          <div
+            className={`site-shell-corner site-shell-corner--bottom-right${
+              isBottomRightPanelVisible ? " is-visible" : ""
+            }`}
+          >
             <div className="site-shell-corner__inner">
-              <BackToTop language={language} variant="inline" />
+              <BackToTop
+                language={language}
+                variant="inline"
+                visible={isBottomRightPanelVisible}
+              />
             </div>
           </div>
         </header>

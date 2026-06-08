@@ -84,6 +84,22 @@
 .site-shell-corner--bottom-right {
   bottom: 0;
   right: 0;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(100%);
+  transition:
+    opacity var(--duration-base) var(--ease-out-soft),
+    transform var(--duration-base) var(--ease-out-soft);
+}
+
+.site-shell-corner--bottom-right.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(0);
+}
+
+.site-shell-corner--bottom-right:not(.is-visible) .site-shell-corner__inner {
+  pointer-events: none;
 }
 
 .site-shell-corner--top-left .site-shell-corner__inner {
@@ -594,6 +610,10 @@
   .site-shell-pill,
   .site-shell-pill a {
     transition: none !important;
+  }
+  .site-shell-corner--bottom-right,
+  .site-shell-corner--bottom-right.is-visible {
+    transform: none;
   }
   .site-shell-pill.is-entering {
     opacity: 1;
