@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
   <title id="title">Shramdan logo</title>
-  <desc id="desc">An abstract civic mark showing four community paths gathering around a shared seed of action.</desc>
+  <desc id="desc">An abstract civic tree holding traditional and modern tools for repairing society together.</desc>
   <defs>
     <linearGradient id="leafGradient" x1="108" x2="404" y1="90" y2="422" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#28a37f"/>
@@ -76,13 +76,29 @@
   </g>
 
   <g filter="url(#innerLift)">
-    <circle cx="256" cy="251" r="61" fill="url(#sunGradient)"/>
-    <path
-      fill="#fff7df"
-      d="M256 207c15 24 31 40 55 55-24 15-40 31-55 55-15-24-31-40-55-55 24-15 40-31 55-55Z"
-      opacity=".95"
-    />
-    <circle cx="256" cy="262" r="21" fill="#176b5c"/>
+    <circle cx="256" cy="252" r="68" fill="url(#sunGradient)"/>
+    <circle cx="256" cy="252" r="54" fill="#fff7df" opacity=".18"/>
+
+    <g fill="none" stroke="#fff7df" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M210 211 301 302" stroke-width="13"/>
+      <path d="M303 203 215 291" stroke-width="12"/>
+      <path d="M205 214c-12 5-18 15-20 27 12-2 22-8 27-20" stroke-width="9"/>
+      <path d="M294 205c17-3 31 4 40 18-18 1-31 9-40 24" stroke-width="9"/>
+      <path d="M229 287c-7 9-11 20-12 32 13-3 23-8 32-17" stroke-width="8"/>
+    </g>
+
+    <g fill="#176b5c">
+      <rect x="221" y="288" width="70" height="43" rx="7"/>
+      <rect x="211" y="330" width="90" height="10" rx="5"/>
+      <rect x="233" y="299" width="46" height="22" rx="3" fill="#fff7df" opacity=".9"/>
+      <circle cx="328" cy="249" r="12"/>
+      <path d="M318 221c7-8 19-9 27-3l-12 12 10 10 12-12c6 9 4 21-4 28-9 8-22 8-31 0l-35 35-12-12 36-35c-6-8-5-17 9-23Z"/>
+      <circle cx="184" cy="259" r="8"/>
+      <circle cx="196" cy="277" r="6"/>
+      <path d="M184 259h32m-20 18h30" fill="none" stroke="#176b5c" stroke-linecap="round" stroke-width="7"/>
+    </g>
+
+    <circle cx="256" cy="252" r="17" fill="#176b5c"/>
   </g>
 
   <g fill="none" stroke-linecap="round" stroke-linejoin="round">
