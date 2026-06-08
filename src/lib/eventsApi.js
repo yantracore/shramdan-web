@@ -18,6 +18,10 @@
 import { getJson } from "@/lib/apiClient";
 import { getListItems, getIssueCoverImageUrl, localizeIssue } from "@/lib/adminUtils";
 
+const ISSUE_COVER_INDEX_LIMIT = 200;
+let issueCoverIndexPromise = null;
+const issueCoverDetailPromises = new Map();
+
 // Backend gap: GET /events embeds `issue` without its `translations` array,
 // so localizeIssue() returns no title and the card renders blank. Until the
 // backend includes translations (or events expose their own title), fall
@@ -61,6 +65,103 @@ export function normalizeEvent(rawEvent, language = "np") {
   };
 }
 
+function addIssueCoverIndexEntry(index, issue) {
+  const url = getIssueCoverImageUrl(issue);
+  if (!url) return;
+  if (issue?.id) index.set(`id:${issue.id}`, url);
+  if (issue?.slug) index.set(`slug:${issue.slug}`, url);
+}
+
+async function getIssueCoverIndex() {
+  if (!issueCoverIndexPromise) {
+    issueCoverIndexPromise = getJson("/issues", {
+      params: { limit: ISSUE_COVER_INDEX_LIMIT }
+    }).then((response) => {
+      const index = new Map();
+      getListItems(response).forEach((issue) => addIssueCoverIndexEntry(index, issue));
+      return index;
+    }).catch((error) => {
+      issueCoverIndexPromise = null;
+      throw error;
+    });
+  }
+  return issueCoverIndexPromise;
+}
+
+function getEventIssueKeys(event) {
+  const issue = event?.issue || event?.linkedIssue || null;
+  return [
+    issue?.id ? `id:${issue.id}` : null,
+    issue?.slug ? `slug:${issue.slug}` : null,
+    event?.slug ? `slug:${event.slug}` : null
+  ].filter(Boolean);
+}
+
+function getEventIssueId(event) {
+  return event?.issue?.id || event?.linkedIssue?.id || null;
+}
+
+function getIndexedIssueCoverUrl(index, event) {
+  for (const key of getEventIssueKeys(event)) {
+    const url = index.get(key);
+    if (url) return url;
+  }
+  return null;
+}
+
+async function getIssueCoverById(issueId) {
+  if (!issueId) return null;
+  if (!issueCoverDetailPromises.has(issueId)) {
+    issueCoverDetailPromises.set(
+      issueId,
+      getJson(`/issues/${issueId}`)
+        .then((response) => getIssueCoverImageUrl(response?.data ?? response))
+        .catch(() => null)
+    );
+  }
+  return issueCoverDetailPromises.get(issueId);
+}
+
+async function enrichEventsWithIssueCovers(events) {
+  const missing = events.filter((event) => !event.thumbnailUrl);
+  if (missing.length === 0) return events;
+
+  let issueCoverIndex = new Map();
+  try {
+    issueCoverIndex = await getIssueCoverIndex();
+  } catch {
+    issueCoverIndex = new Map();
+  }
+
+  const indexed = events.map((event) => {
+    if (event.thumbnailUrl) return event;
+    const indexedCover = getIndexedIssueCoverUrl(issueCoverIndex, event);
+    return indexedCover ? { ...event, thumbnailUrl: indexedCover } : event;
+  });
+
+  const detailIds = [
+    ...new Set(
+      indexed
+        .filter((event) => !event.thumbnailUrl)
+        .map(getEventIssueId)
+        .filter(Boolean)
+    )
+  ];
+
+  if (detailIds.length === 0) return indexed;
+
+  const detailEntries = await Promise.all(
+    detailIds.map(async (issueId) => [issueId, await getIssueCoverById(issueId)])
+  );
+  const detailCovers = new Map(detailEntries.filter(([, url]) => Boolean(url)));
+
+  return indexed.map((event) => {
+    if (event.thumbnailUrl) return event;
+    const detailCover = detailCovers.get(getEventIssueId(event));
+    return detailCover ? { ...event, thumbnailUrl: detailCover } : event;
+  });
+}
+
 const DEFAULT_LIMIT = 50;
 
 // Raw list — single status filter.
@@ -70,7 +171,8 @@ async function fetchEvents({ status, limit = DEFAULT_LIMIT, fromDate, toDate, la
   if (fromDate) params.fromDate = fromDate;
   if (toDate) params.toDate = toDate;
   const response = await getJson("/events", { params });
-  return getListItems(response).map((ev) => normalizeEvent(ev, language));
+  const events = getListItems(response).map((ev) => normalizeEvent(ev, language));
+  return enrichEventsWithIssueCovers(events);
 }
 
 // "Live now" = ACTIVE + SCHEDULED-with-past-scheduledAt (backend doesn't

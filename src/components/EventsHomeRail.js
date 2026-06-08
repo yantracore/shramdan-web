@@ -248,7 +248,7 @@ export function EventsHomeRail({
 
 function LivePosterCard({ event, copy, language, isActive }) {
   const durationLabel = formatLiveDuration(event?.liveStream?.startedAt, copy);
-  const thumbnailUrl = event?.liveStream?.thumbnailUrl;
+  const thumbnailUrl = event?.liveStream?.thumbnailUrl || event?.thumbnailUrl;
   const participantsLabel = formatParticipantsLabel(
     getParticipantCount(event),
     language,
