@@ -1389,7 +1389,7 @@ export const copy = {
       eventSub: "सञ्चालनमा"
     },
     homeSearch: {
-      slogan: "हाम्रो समाज, हाम्रो श्रम हाम्रो भविष्य।",
+      slogan: "हाम्रो समाज, हाम्रो श्रम, हाम्रो भविष्य।",
       searchPlaceholder: "अभियान, समस्या वा ठाउँ खोज्नुहोस्…",
       searchAria: "श्रमदानमा खोज्नुहोस्",
       filtersLabel: "फिल्टर",
@@ -3415,7 +3415,7 @@ export const copy = {
       eventSub: "In execution"
     },
     homeSearch: {
-      slogan: "Our labor, our society, our future.",
+      slogan: "Our society, our labor, our future.",
       searchPlaceholder: "Search events, issues, or places…",
       searchAria: "Search Shramdan",
       filtersLabel: "Filters",
