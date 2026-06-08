@@ -41,6 +41,29 @@ import { buildLoginHref } from "@/lib/loginRedirect";
 
 const PILL_INTRO_SESSION_KEY = "shramdan.pill.intro.v1";
 const PILL_MIN_WIDTH_PX = 1180;
+const APP_DEV_LIVE_TIME_ZONE = "Asia/Kathmandu";
+const APP_DEV_LIVE_START_MINUTE = 12 * 60;
+const APP_DEV_LIVE_END_MINUTE = APP_DEV_LIVE_START_MINUTE + 30;
+
+const appDevLiveTimeFormatter = new Intl.DateTimeFormat("en-US", {
+  hour: "numeric",
+  hour12: false,
+  minute: "numeric",
+  timeZone: APP_DEV_LIVE_TIME_ZONE
+});
+
+function isAppDevLiveWindow(date = new Date()) {
+  const parts = appDevLiveTimeFormatter.formatToParts(date);
+  const hour = Number(parts.find((part) => part.type === "hour")?.value);
+  const minute = Number(parts.find((part) => part.type === "minute")?.value);
+
+  if (!Number.isFinite(hour) || !Number.isFinite(minute)) {
+    return false;
+  }
+
+  const minuteOfDay = hour * 60 + minute;
+  return minuteOfDay >= APP_DEV_LIVE_START_MINUTE && minuteOfDay < APP_DEV_LIVE_END_MINUTE;
+}
 
 function getInitials(user) {
   const source = user?.name || user?.username || user?.email || "";
@@ -64,6 +87,7 @@ const socialIcons = {
 export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
   const { language, mode, toggleLanguage, toggleMode } = usePreferences();
   const [isPillEntering, setIsPillEntering] = useState(false);
+  const [showAppDevLiveBadge, setShowAppDevLiveBadge] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const mobileMenuRef = useRef(null);
@@ -77,6 +101,20 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
   useEffect(() => {
     closeMobileMenu();
   }, [pathname]);
+
+  useEffect(() => {
+    const raf = window.requestAnimationFrame(() => {
+      setShowAppDevLiveBadge(isAppDevLiveWindow());
+    });
+    const id = window.setInterval(() => {
+      setShowAppDevLiveBadge(isAppDevLiveWindow());
+    }, 15000);
+
+    return () => {
+      window.cancelAnimationFrame(raf);
+      window.clearInterval(id);
+    };
+  }, []);
 
   useEffect(() => {
     const handlePointerDown = (event) => {
@@ -123,7 +161,7 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
       label: t.nav.appDev,
       highlight: true,
       tooltip: t.nav.appDevTooltip,
-      badge: t.nav.appDevBadge
+      badge: showAppDevLiveBadge ? t.nav.appDevBadge : null
     }
   ];
 
