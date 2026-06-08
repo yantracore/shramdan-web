@@ -52,13 +52,15 @@
 }
 
 .home-search-panel {
-  width: min(100%, 920px);
+  width: min(100%, 1280px);
   margin: 28px auto 0;
   padding: 0 32px;
 }
 
 .home-search-panel-inner {
-  width: min(100%, 720px);
+  display: grid;
+  gap: 22px;
+  width: 100%;
   margin: 0 auto;
 }
 
@@ -68,6 +70,8 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  justify-self: center;
+  width: min(100%, 720px);
   padding: 8px;
   background: color-mix(in srgb, var(--surface) 70%, transparent);
   -webkit-backdrop-filter: blur(18px) saturate(1.2);
@@ -209,7 +213,8 @@
  * homepage hero we override to the glass recipe (CC-1) so the row reads
  * as part of the search band, not a separate brochure section. */
 .home-search-stats {
-  width: 100%;
+  justify-self: center;
+  width: min(100%, 720px);
 }
 
 .home-search-stats .activity-stats-row {
@@ -259,7 +264,8 @@
 .home-search-map {
   width: 100%;
   display: grid;
-  gap: 10px;
+  gap: 12px;
+  margin-top: 4px;
 }
 
 .home-search-map-header {
