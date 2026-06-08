@@ -113,9 +113,19 @@ export function isImageUpload(upload) {
   return /\.(png|jpe?g|webp|gif|avif)$/i.test(upload.url);
 }
 
+function isUsableImageUrl(url) {
+  if (!url || typeof url !== "string") return false;
+  try {
+    const parsed = new URL(url, "https://shramdan.org");
+    return parsed.hostname !== "cdn.shramdan.org";
+  } catch {
+    return true;
+  }
+}
+
 export function getFirstIssueImage(issue) {
   const uploads = Array.isArray(issue?.uploads) ? issue.uploads : [];
-  return uploads.find(isImageUpload) || null;
+  return uploads.find((upload) => isImageUpload(upload) && isUsableImageUrl(upload.url)) || null;
 }
 
 export function getIssueCoverImageUrl(issue) {
@@ -123,11 +133,11 @@ export function getIssueCoverImageUrl(issue) {
   const uploads = Array.isArray(issue.uploads) ? issue.uploads : [];
   if (issue.coverImageId) {
     const match = uploads.find((upload) => upload?.id === issue.coverImageId);
-    if (match?.url) return match.url;
+    if (isUsableImageUrl(match?.url)) return match.url;
   }
   const raw = issue.coverImage;
-  if (typeof raw === "string" && raw) return raw;
-  if (raw && typeof raw === "object" && typeof raw.url === "string" && raw.url) return raw.url;
+  if (typeof raw === "string" && isUsableImageUrl(raw)) return raw;
+  if (raw && typeof raw === "object" && isUsableImageUrl(raw.url)) return raw.url;
   return getFirstIssueImage(issue)?.url || null;
 }
 

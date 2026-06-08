@@ -40,6 +40,12 @@ const NP_MONTHS_SHORT = [
 const NP_WEEKDAYS_SHORT = ["आइत", "सोम", "मंगल", "बुध", "बिहि", "शुक्र", "शनि"];
 
 const PUBLIC_ISSUE_STATUSES = ["OPEN", "EVENT_SCHEDULED", "COMPLETED"];
+const FALLBACK_POSTER = "/images/event-types/cleanup.jpg";
+
+function fallBackPoster(event) {
+  event.currentTarget.onerror = null;
+  event.currentTarget.src = FALLBACK_POSTER;
+}
 
 function localizeDigits(value, language) {
   const str = String(value ?? "");
@@ -84,7 +90,7 @@ function eventToEntry(event, status) {
     slug: event.slug ?? event.id,
     title: event.title,
     addressText: event.addressText,
-    poster: event.thumbnailUrl || "/images/event-types/cleanup.jpg",
+    poster: event.thumbnailUrl || FALLBACK_POSTER,
     status,
     scheduledAt: event.scheduledAt,
     latitude: event.latitude,
@@ -103,7 +109,7 @@ function issueToEntry(rawIssue, language) {
     slug: issue.slug ?? issue.id,
     title: issue.title || issue.addressText || "—",
     addressText: issue.addressText,
-    poster: getIssueCoverImageUrl(issue) || "/images/event-types/cleanup.jpg",
+    poster: getIssueCoverImageUrl(issue) || FALLBACK_POSTER,
     status: issue.status, // OPEN | EVENT_SCHEDULED | COMPLETED
     scheduledAt: null,
     latitude: issue.latitude,
@@ -132,7 +138,12 @@ function StreamCard({ entry, distanceKm, language, copy }) {
       >
         <div className="home-for-you-card-poster">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={entry.poster} alt={entry.title} loading="lazy" />
+          <img
+            src={entry.poster}
+            alt={entry.title}
+            loading="lazy"
+            onError={fallBackPoster}
+          />
           <span className={`home-for-you-card-badge ${badgeClass}`}>
             {entry.kind === "event" && entry.status === "live" ? (
               <span className="live-dot" aria-hidden="true" />

@@ -83,6 +83,12 @@ const AUTOPLAY_OPTIONS = Object.freeze({
   disableOnInteraction: false,
   pauseOnMouseEnter: true
 });
+const FALLBACK_POSTER = "/images/event-types/cleanup.jpg";
+
+function fallBackPoster(event) {
+  event.currentTarget.onerror = null;
+  event.currentTarget.src = FALLBACK_POSTER;
+}
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 
@@ -266,7 +272,12 @@ function LivePosterCard({ event, copy, language, isActive }) {
         <div className="events-home-rail-poster">
           {thumbnailUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={thumbnailUrl} alt={event.title} loading="lazy" />
+            <img
+              src={thumbnailUrl}
+              alt={event.title}
+              loading="lazy"
+              onError={fallBackPoster}
+            />
           ) : (
             <div className="events-home-rail-poster-fallback" aria-hidden="true">
               <span>श्रमदान</span>
@@ -321,9 +332,10 @@ function UpcomingPosterCard({ event, language, copy, isActive }) {
         <div className="events-home-rail-poster">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={event.thumbnailUrl || "/images/event-types/cleanup.jpg"}
+            src={event.thumbnailUrl || FALLBACK_POSTER}
             alt={event.title}
             loading="lazy"
+            onError={fallBackPoster}
           />
 
           <div className="events-home-rail-poster-overlay">
