@@ -42,7 +42,7 @@ function JoinPageContent() {
 
   return (
     <SiteShell pageTitle={t.pageTitles.join}>
-      <section className="page-section multi-step-section">
+      <section className="page-section multi-step-section join-multi-step-section">
         {submitted ? (
           <SubmissionSuccessCard
             language={language}

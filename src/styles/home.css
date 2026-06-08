@@ -1063,6 +1063,16 @@
   padding: 40px 0;
 }
 
+.join-multi-step-section {
+  padding-top: 96px;
+}
+
+@media (max-width: 720px) {
+  .join-multi-step-section {
+    padding-top: 84px;
+  }
+}
+
 .cleanup-areas-section {
   position: relative;
   display: grid;
