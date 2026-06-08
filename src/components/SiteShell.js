@@ -38,6 +38,7 @@ import { copy } from "@/lib/siteContent";
 import { getAuthSession, isAdminUser, subscribeAuthSession } from "@/lib/authSession";
 import { logoutAndClearSession } from "@/lib/apiClient";
 import { buildLoginHref } from "@/lib/loginRedirect";
+import { getCachedPublicCounts } from "@/lib/publicStats";
 
 const PILL_INTRO_SESSION_KEY = "shramdan.pill.intro.v1";
 const PILL_MIN_WIDTH_PX = 1180;
@@ -45,6 +46,7 @@ const BOTTOM_RIGHT_PANEL_SHOW_AFTER = 100;
 const APP_DEV_LIVE_TIME_ZONE = "Asia/Kathmandu";
 const APP_DEV_LIVE_START_MINUTE = 12 * 60;
 const APP_DEV_LIVE_END_MINUTE = APP_DEV_LIVE_START_MINUTE + 30;
+const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 
 const appDevLiveTimeFormatter = new Intl.DateTimeFormat("en-US", {
   hour: "numeric",
@@ -78,6 +80,18 @@ function getInitials(user) {
   return parts.map((part) => part[0]?.toUpperCase() ?? "").join("");
 }
 
+function localizeDigits(value, language) {
+  const str = String(value ?? "");
+  if (language !== "np") return str;
+  return str.replace(/\d/g, (digit) => NP_DIGITS[Number(digit)]);
+}
+
+function formatNavCount(value, language) {
+  if (!Number.isFinite(Number(value))) return "";
+  const formatted = Number(value).toLocaleString("en-US");
+  return localizeDigits(formatted, language);
+}
+
 const socialIcons = {
   facebook: FaFacebookF,
   twitter: FaXTwitter,
@@ -90,6 +104,7 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
   const [isPillEntering, setIsPillEntering] = useState(false);
   const [isBottomRightPanelVisible, setIsBottomRightPanelVisible] = useState(false);
   const [showAppDevLiveBadge, setShowAppDevLiveBadge] = useState(false);
+  const [publicCounts, setPublicCounts] = useState(null);
   const pathname = usePathname();
   const router = useRouter();
   const mobileMenuRef = useRef(null);
@@ -115,6 +130,25 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
     return () => {
       window.cancelAnimationFrame(raf);
       window.clearInterval(id);
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    getCachedPublicCounts()
+      .then((counts) => {
+        if (!cancelled) {
+          setPublicCounts(counts);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setPublicCounts(null);
+        }
+      });
+
+    return () => {
+      cancelled = true;
     };
   }, []);
 
@@ -165,13 +199,22 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
   // describes the destination, not the verb.
   const pillNavItems = [
     { href: "/", label: t.nav.home },
-    { href: "/events", label: t.nav.events },
-    { href: "/issues", label: t.nav.issues },
+    {
+      href: "/events",
+      label: t.nav.events,
+      count: formatNavCount(publicCounts?.events, language)
+    },
+    {
+      href: "/issues",
+      label: t.nav.issues,
+      count: formatNavCount(publicCounts?.issues, language)
+    },
     { href: "/feedback", label: t.nav.feedback },
     {
       href: "/app-development",
       label: t.nav.appDev,
       highlight: true,
+      separatorBefore: true,
       tooltip: t.nav.appDevTooltip,
       badge: showAppDevLiveBadge ? t.nav.appDevBadge : null
     }
@@ -429,7 +472,8 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
                 const isActive = activePath === item.href;
                 const classes = [
                   isActive ? "is-active" : "",
-                  item.highlight ? "is-highlight" : ""
+                  item.highlight ? "is-highlight" : "",
+                  item.separatorBefore ? "has-separator" : ""
                 ]
                   .filter(Boolean)
                   .join(" ");
@@ -448,6 +492,11 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
                         style={{ display: item.highlight ? "inline-flex" : "none" }}
                       />
                       {item.label}
+                      {item.count ? (
+                        <span className="site-shell-pill__count" aria-label={`${item.count}`}>
+                          {item.count}
+                        </span>
+                      ) : null}
                     </span>
                     {item.badge ? (
                       <span className="site-shell-pill__badge" aria-hidden="true">
@@ -636,6 +685,10 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
       <OnboardingSpotlight language={language} />
       <MobileBottomNav
         language={language}
+        counts={{
+          events: formatNavCount(publicCounts?.events, language),
+          issues: formatNavCount(publicCounts?.issues, language)
+        }}
         onMore={() => {
           if (mobileMenuRef.current) {
             mobileMenuRef.current.open = !mobileMenuRef.current.open;

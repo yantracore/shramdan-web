@@ -225,6 +225,21 @@
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary) 18%, transparent);
 }
 
+.site-shell-pill a.has-separator {
+  margin-left: 12px;
+}
+
+.site-shell-pill a.has-separator::before {
+  content: "";
+  position: absolute;
+  top: -6px;
+  bottom: -8px;
+  left: -8px;
+  width: 1px;
+  background: color-mix(in srgb, var(--line) 74%, transparent);
+  box-shadow: 1px 0 0 color-mix(in srgb, #fff 36%, transparent);
+}
+
 /* Highlighted pill item — the build-the-app CTA at the current phase.
  * Filled accent surface, soft pulsing glow ring, leading bolt icon, and a
  * small "LIVE" badge in the corner. Distinct from `.is-active` (which is
@@ -256,6 +271,22 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
+}
+
+.site-shell-pill__count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 20px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--primary) 12%, var(--surface));
+  color: var(--primary-dark);
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary) 18%, transparent);
 }
 
 .site-shell-pill__icon {
@@ -15345,6 +15376,22 @@
 
 .mobile-bottom-nav-tab .anticon {
   font-size: 18px;
+}
+
+.mobile-bottom-nav-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 16px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--primary) 12%, var(--surface));
+  color: var(--primary-dark);
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary) 20%, transparent);
 }
 
 .mobile-bottom-nav-tab.is-active {

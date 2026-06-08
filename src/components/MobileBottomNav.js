@@ -38,12 +38,12 @@ const COPY = {
 
 const TABS = [
   { id: "home", href: "/", icon: HomeOutlined, match: (p) => p === "/" },
-  { id: "issues", href: "/issues", icon: FlagOutlined, match: (p) => p?.startsWith("/issues") },
   { id: "events", href: "/events", icon: AppstoreOutlined, match: (p) => p?.startsWith("/events") },
+  { id: "issues", href: "/issues", icon: FlagOutlined, match: (p) => p?.startsWith("/issues") },
   { id: "me", href: "/me/preview", icon: UserOutlined, match: (p) => p?.startsWith("/me") }
 ];
 
-export function MobileBottomNav({ language = "np", onMore }) {
+export function MobileBottomNav({ language = "np", counts = {}, onMore }) {
   const t = COPY[language] || COPY.np;
   const pathname = usePathname();
 
@@ -65,6 +65,11 @@ export function MobileBottomNav({ language = "np", onMore }) {
             }}
           >
             <Icon aria-hidden="true" />
+            {counts[id] ? (
+              <span className="mobile-bottom-nav-count" aria-label={`${counts[id]}`}>
+                {counts[id]}
+              </span>
+            ) : null}
             <span>{t[id]}</span>
           </Link>
         );
