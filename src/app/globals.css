@@ -26,6 +26,12 @@
   --accent: #e75f1b;
   --line: #dce5df;
   --section-divider: rgba(0, 0, 0, 0.04);
+  --ambient-backdrop:
+    radial-gradient(circle at 16% -8%, rgba(92, 191, 159, 0.18), transparent 34rem),
+    radial-gradient(circle at 92% 18%, rgba(231, 95, 27, 0.08), transparent 28rem),
+    repeating-radial-gradient(ellipse at 18% 24%, rgba(23, 107, 92, 0.032) 0 1px, transparent 1px 34px),
+    repeating-linear-gradient(120deg, rgba(23, 107, 92, 0.024) 0 1px, transparent 1px 30px),
+    linear-gradient(180deg, #fbfaf6 0%, var(--bg) 42%, #f1f6f0 100%);
 }
 
 :root[data-theme="dark"] {
@@ -40,6 +46,12 @@
   --accent: #ff8b3d;
   --line: #2b3b36;
   --section-divider: rgba(255, 255, 255, 0.04);
+  --ambient-backdrop:
+    radial-gradient(circle at 18% -10%, rgba(92, 191, 159, 0.14), transparent 34rem),
+    radial-gradient(circle at 88% 14%, rgba(255, 139, 61, 0.08), transparent 30rem),
+    repeating-radial-gradient(ellipse at 20% 22%, rgba(217, 244, 232, 0.045) 0 1px, transparent 1px 36px),
+    repeating-linear-gradient(120deg, rgba(217, 244, 232, 0.03) 0 1px, transparent 1px 32px),
+    linear-gradient(180deg, #0c1312 0%, var(--bg) 46%, #0d1816 100%);
 }
 
 * {
@@ -52,10 +64,12 @@ html {
 
 body {
   margin: 0;
-  background: var(--bg);
+  background: var(--ambient-backdrop);
+  background-attachment: fixed, fixed, fixed, scroll, scroll;
   color: var(--text);
   font-family: var(--font-nunito), var(--font-baloo-2), ui-sans-serif, system-ui, sans-serif;
   line-height: 1.55;
+  min-height: 100vh;
 }
 
 /* Devanagari needs slightly more vertical breathing room than Latin so the
