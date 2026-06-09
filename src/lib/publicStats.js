@@ -8,6 +8,21 @@ const PUBLIC_COUNT_CACHE_MS = 5 * 60 * 1000;
 let publicCountsCache = null;
 let publicCountsPromise = null;
 
+export async function getFallbackPublicCounts() {
+  if (process.env.NODE_ENV === "production") return null;
+
+  const { getDemoAllEvents, getDemoIssues } = await import("@/lib/devMockData");
+  const eventGroups = getDemoAllEvents();
+
+  return {
+    events:
+      eventGroups.live.length +
+      eventGroups.upcoming.length +
+      eventGroups.past.length,
+    issues: getDemoIssues().length
+  };
+}
+
 function getItems(response) {
   const data = getResponseData(response, []);
   if (Array.isArray(data)) return data;
@@ -56,12 +71,22 @@ async function countPublicList(path) {
 }
 
 async function loadPublicCounts() {
-  const [events, issues] = await Promise.all([
+  const fallback = await getFallbackPublicCounts();
+  const [eventsResult, issuesResult] = await Promise.allSettled([
     countPublicList("/events"),
     countPublicList("/issues")
   ]);
 
-  return { events, issues };
+  return {
+    events:
+      eventsResult.status === "fulfilled"
+        ? eventsResult.value
+        : fallback?.events ?? null,
+    issues:
+      issuesResult.status === "fulfilled"
+        ? issuesResult.value
+        : fallback?.issues ?? null
+  };
 }
 
 export function getCachedPublicCounts() {

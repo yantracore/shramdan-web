@@ -38,7 +38,7 @@ import { copy } from "@/lib/siteContent";
 import { getAuthSession, isAdminUser, subscribeAuthSession } from "@/lib/authSession";
 import { logoutAndClearSession } from "@/lib/apiClient";
 import { buildLoginHref } from "@/lib/loginRedirect";
-import { getCachedPublicCounts } from "@/lib/publicStats";
+import { getCachedPublicCounts, getFallbackPublicCounts } from "@/lib/publicStats";
 
 const PILL_INTRO_SESSION_KEY = "shramdan.pill.intro.v1";
 const PILL_MIN_WIDTH_PX = 1180;
@@ -67,6 +67,10 @@ function formatNavCount(value, language) {
   if (!Number.isFinite(Number(value))) return "";
   const formatted = Number(value).toLocaleString("en-US");
   return localizeDigits(formatted, language);
+}
+
+function hasNavCount(value) {
+  return value !== null && value !== undefined && value !== "";
 }
 
 const socialIcons = {
@@ -99,6 +103,14 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
 
   useEffect(() => {
     let cancelled = false;
+    getFallbackPublicCounts()
+      .then((counts) => {
+        if (!cancelled && counts) {
+          setPublicCounts((current) => current ?? counts);
+        }
+      })
+      .catch(() => {});
+
     getCachedPublicCounts()
       .then((counts) => {
         if (!cancelled) {
@@ -494,7 +506,7 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
                         style={{ display: item.highlight ? "inline-flex" : "none" }}
                       />
                       <span>{item.label}</span>
-                      {item.count ? (
+                      {hasNavCount(item.count) ? (
                         <span
                           className="nav-count-badge site-shell-pill__count"
                           aria-label={`${item.label}: ${item.count}`}
@@ -607,7 +619,7 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
                           }}
                         >
                           <span className="mobile-menu-link-label">{item.label}</span>
-                          {item.count ? (
+                          {hasNavCount(item.count) ? (
                             <span
                               className="nav-count-badge mobile-menu-count"
                               aria-label={`${item.label}: ${item.count}`}

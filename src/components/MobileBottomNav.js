@@ -43,6 +43,10 @@ const TABS = [
   { id: "me", href: "/me/preview", icon: UserOutlined, match: (p) => p?.startsWith("/me") }
 ];
 
+function hasNavCount(value) {
+  return value !== null && value !== undefined && value !== "";
+}
+
 export function MobileBottomNav({ language = "np", counts = {}, onMore }) {
   const t = COPY[language] || COPY.np;
   const pathname = usePathname();
@@ -65,7 +69,7 @@ export function MobileBottomNav({ language = "np", counts = {}, onMore }) {
             }}
           >
             <Icon aria-hidden="true" />
-            {counts[id] ? (
+            {hasNavCount(counts[id]) ? (
               <span
                 className="nav-count-badge mobile-bottom-nav-count"
                 aria-label={`${t[id]}: ${counts[id]}`}
