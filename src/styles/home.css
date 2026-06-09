@@ -14,9 +14,7 @@
    * elements and break pinning; `clip` does not. Hidden stays as fallback. */
   overflow-x: hidden;
   overflow-x: clip;
-  background:
-    radial-gradient(circle at 8% 12%, rgba(245, 143, 56, 0.12), transparent 32%),
-    linear-gradient(180deg, var(--bg) 0%, var(--surface-soft) 100%);
+  background: transparent;
 }
 
 /* Banner is a landmark for AT but contributes no visual box of its own —
@@ -143,6 +141,58 @@
 
 .brand-name {
   white-space: nowrap;
+  letter-spacing: 0;
+}
+
+.brand-intro-popover-overlay .ant-popover-inner {
+  max-width: min(320px, calc(100vw - 28px));
+  padding: 0;
+  overflow: hidden;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  border: 1px solid color-mix(in srgb, var(--line) 62%, transparent);
+  box-shadow: var(--shadow-3);
+}
+
+.brand-intro-popover {
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+  color: var(--text);
+}
+
+.brand-intro-popover__eyebrow {
+  width: max-content;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--primary) 10%, var(--surface));
+  color: var(--primary-dark);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.brand-intro-popover strong {
+  font-size: 16px;
+  line-height: 1.25;
+}
+
+.brand-intro-popover p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+
+.brand-intro-popover__link {
+  justify-self: start;
+  color: var(--primary-dark);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.brand-intro-popover__link:hover {
+  text-decoration: underline;
 }
 
 .brand-mark {
@@ -346,6 +396,12 @@
 .site-shell-pill.is-entering {
   opacity: 0;
   transform: translateX(-50%) translateY(-100%);
+}
+
+.site-shell-pill.is-tucked {
+  opacity: 0.08;
+  pointer-events: none;
+  transform: translateX(-50%) translateY(calc(-100% + 8px));
 }
 
 .site-shell-pill.is-entering a {
@@ -646,9 +702,11 @@
   .site-shell-corner--bottom-right.is-visible {
     transform: none;
   }
-  .site-shell-pill.is-entering {
+  .site-shell-pill.is-entering,
+  .site-shell-pill.is-tucked {
     opacity: 1;
     transform: translateX(-50%);
+    pointer-events: auto;
   }
   .site-shell-pill.is-entering a {
     opacity: 1;
@@ -1118,8 +1176,20 @@
   padding-top: 96px;
 }
 
+.new-issue-section,
+.login-section,
+.signup-section {
+  padding-top: 96px;
+}
+
 @media (max-width: 720px) {
   .join-multi-step-section {
+    padding-top: 84px;
+  }
+
+  .new-issue-section,
+  .login-section,
+  .signup-section {
     padding-top: 84px;
   }
 }
@@ -1849,6 +1919,7 @@
   width: 100%;
   max-width: 720px;
   margin-inline: auto;
+  padding-top: 84px;
 }
 
 .form-section-wide {
@@ -2028,6 +2099,12 @@
 @media (max-width: 900px) {
   .form-page-layout {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .form-section {
+    padding-top: 76px;
   }
 }
 

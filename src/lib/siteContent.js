@@ -18,7 +18,7 @@ export const copy = {
       resources: "स्रोत भण्डार"
     },
     pageTitles: {
-      brandSuffix: "श्रमदान | Shramdan",
+      brandSuffix: "श्रमदान | SHRAMDAN",
       home: "हाम्रो श्रम, हाम्रो समाज, हाम्रो भविष्य।",
       issues: "समस्याहरू",
       join: "जोडिनुहोस्",
@@ -2018,7 +2018,7 @@ export const copy = {
     }
   },
   en: {
-    brand: "Shramdan",
+    brand: "SHRAMDAN",
     nav: {
       home: "Home",
       issues: "Issues",
@@ -2036,7 +2036,7 @@ export const copy = {
       resources: "Resources"
     },
     pageTitles: {
-      brandSuffix: "श्रमदान | Shramdan",
+      brandSuffix: "श्रमदान | SHRAMDAN",
       home: "Our labor, our society, our future.",
       issues: "Issues",
       join: "Join",
@@ -2049,12 +2049,12 @@ export const copy = {
       newIssue: "Report a New Issue"
     },
     ariaLabels: {
-      home: "Shramdan home",
+      home: "SHRAMDAN home",
       nav: "Main navigation",
       preferences: "Site preferences",
       toggleTheme: "Toggle theme",
       openMenu: "Open navigation",
-      heroPanel: "Shramdan action hub",
+      heroPanel: "SHRAMDAN action hub",
       userMenu: "User menu",
       appGrid: "Open app menu",
       skipToMain: "Skip to main content"
@@ -2063,7 +2063,7 @@ export const copy = {
       title: "Guest",
       subtitle: "You're not signed in",
       body:
-        "Log in to RSVP events and track issues — or join Shramdan as a contributor.",
+        "Log in to RSVP events and track issues — or join SHRAMDAN as a contributor.",
       login: "Login",
       join: "Join"
     },
@@ -2077,17 +2077,17 @@ export const copy = {
     },
     hero: {
       eyebrow: "",
-      title: "Shramdan",
+      title: "SHRAMDAN",
       subtitle: "Our labor, our society, our future.",
-      support: "Not every problem in the country will be solved by waiting for the government. As citizens, we can come together to move basic work forward ourselves, from cleanups and repairs to tree planting and neighborhood improvement. Shramdan is the beginning of that shared responsibility. Small hands together can make big change possible. Our Shramdan today builds a better society tomorrow.",
+      support: "Not every problem in the country will be solved by waiting for the government. As citizens, we can come together to move basic work forward ourselves, from cleanups and repairs to tree planting and neighborhood improvement. SHRAMDAN is the beginning of that shared responsibility. Small hands together can make big change possible. Our SHRAMDAN today builds a better society tomorrow.",
       join: "Contribute"
     },
     heroPanel: {
       kicker: "Help us build the app",
-      title: "Build the Shramdan App with shramdan",
+      title: "Build the SHRAMDAN App with SHRAMDAN",
       body:
-        "Shramdan is now in its app-building phase. Contributors can donate their time, skill, ideas, and coordination to help shape the platform itself.",
-      resourcesLabel: "Useful Shramdan links",
+        "SHRAMDAN is now in its app-building phase. Contributors can donate their time, skill, ideas, and coordination to help shape the platform itself.",
+      resourcesLabel: "Useful SHRAMDAN links",
       liveBadge: "LIVE",
       liveAria: "Live right now",
       resources: [
@@ -4018,9 +4018,9 @@ export const copy = {
       }
     },
     footer: {
-      brand: "Shramdan",
-      ariaLabel: "Shramdan footer",
-      intro: "Not every problem in the country will be solved by waiting for the government. As citizens, we can come together to move basic work forward ourselves, from cleanups and repairs to tree planting and neighborhood improvement. Shramdan is the beginning of that shared responsibility. Small hands together can make big change possible. Our Shramdan today builds a better society tomorrow.",
+      brand: "SHRAMDAN",
+      ariaLabel: "SHRAMDAN footer",
+      intro: "Not every problem in the country will be solved by waiting for the government. As citizens, we can come together to move basic work forward ourselves, from cleanups and repairs to tree planting and neighborhood improvement. SHRAMDAN is the beginning of that shared responsibility. Small hands together can make big change possible. Our SHRAMDAN today builds a better society tomorrow.",
       note: "Our labor, our society, our future.",
       columns: {
         pages: "Pages",

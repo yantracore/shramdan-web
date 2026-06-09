@@ -230,19 +230,6 @@
   }
 }
 
-/* --- Language switch crossfade ---------------------------------------- */
-/* When setLanguage runs (in providers.js), it sets
- * data-language-switching="true" on <html> for ~220ms. The shell dims
- * mid-swap so the content change feels intentional, not snap. Skipped
- * automatically for reduced-motion users (providers.js short-circuits). */
-.site-shell {
-  transition: opacity 180ms var(--ease-out-soft);
-}
-
-:root[data-language-switching="true"] .site-shell {
-  opacity: 0.35;
-}
-
 /* --- Page transitions (App Router) ------------------------------------ */
 /* SiteShell keys the children wrapper by pathname so React re-mounts it
  * on route change. Each mount plays a small fade-up that overlaps the

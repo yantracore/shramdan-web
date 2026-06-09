@@ -43,30 +43,7 @@ import { getCachedPublicCounts } from "@/lib/publicStats";
 const PILL_INTRO_SESSION_KEY = "shramdan.pill.intro.v1";
 const PILL_MIN_WIDTH_PX = 1180;
 const BOTTOM_RIGHT_PANEL_SHOW_AFTER = 100;
-const APP_DEV_LIVE_TIME_ZONE = "Asia/Kathmandu";
-const APP_DEV_LIVE_START_MINUTE = 12 * 60;
-const APP_DEV_LIVE_END_MINUTE = APP_DEV_LIVE_START_MINUTE + 30;
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
-
-const appDevLiveTimeFormatter = new Intl.DateTimeFormat("en-US", {
-  hour: "numeric",
-  hour12: false,
-  minute: "numeric",
-  timeZone: APP_DEV_LIVE_TIME_ZONE
-});
-
-function isAppDevLiveWindow(date = new Date()) {
-  const parts = appDevLiveTimeFormatter.formatToParts(date);
-  const hour = Number(parts.find((part) => part.type === "hour")?.value);
-  const minute = Number(parts.find((part) => part.type === "minute")?.value);
-
-  if (!Number.isFinite(hour) || !Number.isFinite(minute)) {
-    return false;
-  }
-
-  const minuteOfDay = hour * 60 + minute;
-  return minuteOfDay >= APP_DEV_LIVE_START_MINUTE && minuteOfDay < APP_DEV_LIVE_END_MINUTE;
-}
 
 function getInitials(user) {
   const source = user?.name || user?.username || user?.email || "";
@@ -102,12 +79,13 @@ const socialIcons = {
 export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
   const { language, mode, toggleLanguage, toggleMode } = usePreferences();
   const [isPillEntering, setIsPillEntering] = useState(false);
+  const [isPillTucked, setIsPillTucked] = useState(false);
   const [isBottomRightPanelVisible, setIsBottomRightPanelVisible] = useState(false);
-  const [showAppDevLiveBadge, setShowAppDevLiveBadge] = useState(false);
   const [publicCounts, setPublicCounts] = useState(null);
   const pathname = usePathname();
   const router = useRouter();
   const mobileMenuRef = useRef(null);
+  const lastScrollYRef = useRef(0);
 
   const closeMobileMenu = () => {
     if (mobileMenuRef.current) {
@@ -118,20 +96,6 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
   useEffect(() => {
     closeMobileMenu();
   }, [pathname]);
-
-  useEffect(() => {
-    const raf = window.requestAnimationFrame(() => {
-      setShowAppDevLiveBadge(isAppDevLiveWindow());
-    });
-    const id = window.setInterval(() => {
-      setShowAppDevLiveBadge(isAppDevLiveWindow());
-    }, 15000);
-
-    return () => {
-      window.cancelAnimationFrame(raf);
-      window.clearInterval(id);
-    };
-  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -153,13 +117,25 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
   }, []);
 
   useEffect(() => {
-    const syncBottomRightPanel = () => {
-      setIsBottomRightPanelVisible(window.scrollY > BOTTOM_RIGHT_PANEL_SHOW_AFTER);
+    const syncFloatingChrome = () => {
+      const currentY = window.scrollY;
+      const scrollingDown = currentY > lastScrollYRef.current + 8;
+      const scrollingUp = currentY < lastScrollYRef.current - 8;
+
+      setIsBottomRightPanelVisible(currentY > BOTTOM_RIGHT_PANEL_SHOW_AFTER);
+      if (currentY < 80) {
+        setIsPillTucked(false);
+      } else if (scrollingDown) {
+        setIsPillTucked(true);
+      } else if (scrollingUp) {
+        setIsPillTucked(false);
+      }
+      lastScrollYRef.current = currentY;
     };
 
-    syncBottomRightPanel();
-    window.addEventListener("scroll", syncBottomRightPanel, { passive: true });
-    return () => window.removeEventListener("scroll", syncBottomRightPanel);
+    syncFloatingChrome();
+    window.addEventListener("scroll", syncFloatingChrome, { passive: true });
+    return () => window.removeEventListener("scroll", syncFloatingChrome);
   }, []);
 
   useEffect(() => {
@@ -213,10 +189,8 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
     {
       href: "/app-development",
       label: t.nav.appDev,
-      highlight: true,
       separatorBefore: true,
-      tooltip: t.nav.appDevTooltip,
-      badge: showAppDevLiveBadge ? t.nav.appDevBadge : null
+      tooltip: t.nav.appDevTooltip
     }
   ];
 
@@ -364,6 +338,23 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
     </div>
   );
 
+  const brandIntroContent = (
+    <div className="brand-intro-popover">
+      <span className="brand-intro-popover__eyebrow">
+        {language === "np" ? "परिचय" : "About"}
+      </span>
+      <strong>{language === "np" ? "श्रमदान के हो?" : "What is SHRAMDAN?"}</strong>
+      <p>
+        {language === "np"
+          ? "नागरिकहरू मिलेर स्थानीय समस्या रिपोर्ट, समर्थन र अभियानमा बदल्ने साझा प्लेटफर्म।"
+          : "A citizen-led platform for turning local issues into shared action, support, and campaigns."}
+      </p>
+      <Link className="brand-intro-popover__link" href="/intro">
+        {language === "np" ? "थप जान्नुहोस्" : "Learn more"}
+      </Link>
+    </div>
+  );
+
   const handleAppsTileSelect = (event, item) => {
     if (pathname === item.href && smoothScrollToTop()) {
       event.preventDefault();
@@ -449,23 +440,34 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
         <header className="site-shell-banner" role="banner" aria-label={t.ariaLabels.nav}>
           <div className="site-shell-corner site-shell-corner--top-left">
             <div className="site-shell-corner__inner">
-              <Link
-                className="brand"
-                href="/"
-                aria-label={t.ariaLabels.home}
-                onClick={handleBrandClick}
+              <Popover
+                content={brandIntroContent}
+                trigger={["hover", "focus"]}
+                placement="bottomLeft"
+                arrow={false}
+                mouseEnterDelay={0.45}
+                overlayClassName="brand-intro-popover-overlay site-corner-menu site-corner-menu--from-left"
               >
-                <span className="brand-mark">
-                  <Image alt="" height={96} priority src="/images/logo.png" width={96} />
-                </span>
-                <span className="brand-name">{t.brand}</span>
-              </Link>
+                <Link
+                  className="brand"
+                  href="/"
+                  aria-label={t.ariaLabels.home}
+                  onClick={handleBrandClick}
+                >
+                  <span className="brand-mark">
+                    <Image alt="" height={96} priority src="/images/logo.png" width={96} />
+                  </span>
+                  <span className="brand-name">{t.brand}</span>
+                </Link>
+              </Popover>
             </div>
           </div>
 
           {chromeMode === "full" ? (
             <nav
-              className={`site-shell-pill${isPillEntering ? " is-entering" : ""}`}
+              className={`site-shell-pill${isPillEntering ? " is-entering" : ""}${
+                isPillTucked ? " is-tucked" : ""
+              }`}
               aria-label={t.ariaLabels.nav}
             >
               {pillNavItems.map((item) => {

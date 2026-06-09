@@ -173,25 +173,7 @@ export function Providers({ children }) {
       if (value !== "en" && value !== "np") return;
       if (value === current) return;
 
-      const root = typeof document !== "undefined" ? document.documentElement : null;
-      const reduced =
-        typeof window !== "undefined" &&
-        window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-
-      if (!root || reduced) {
-        updatePreference(LANGUAGE_STORAGE_KEY, value);
-        return;
-      }
-
-      // Soft crossfade: dim the shell, swap content during the dim, undim.
-      // The 160ms dim hides the abrupt content swap; total UX cost ~360ms.
-      root.dataset.languageSwitching = "true";
-      window.setTimeout(() => {
-        updatePreference(LANGUAGE_STORAGE_KEY, value);
-        window.setTimeout(() => {
-          delete root.dataset.languageSwitching;
-        }, 60);
-      }, 160);
+      updatePreference(LANGUAGE_STORAGE_KEY, value);
     },
     [updatePreference]
   );
