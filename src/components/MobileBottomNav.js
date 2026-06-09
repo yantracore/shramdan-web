@@ -66,7 +66,10 @@ export function MobileBottomNav({ language = "np", counts = {}, onMore }) {
           >
             <Icon aria-hidden="true" />
             {counts[id] ? (
-              <span className="mobile-bottom-nav-count" aria-label={`${counts[id]}`}>
+              <span
+                className="nav-count-badge mobile-bottom-nav-count"
+                aria-label={`${t[id]}: ${counts[id]}`}
+              >
                 {counts[id]}
               </span>
             ) : null}

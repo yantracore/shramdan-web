@@ -169,10 +169,8 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
   const isAdmin = isAuthenticated && isAdminUser(session.user);
 
   // Pill nav (>= 1180px): pure navigation, no auth. Login + Join live in the
-  // TR user-icon popover for anonymous visitors per the 2026-06-05 pivot.
-  // The 5th item (App Development) is the highlighted build-the-app CTA at
-  // the current phase — tooltip surfaces "Participate" since the label
-  // describes the destination, not the verb.
+  // TR user-icon popover. Events and issues carry public count badges across
+  // desktop and mobile nav.
   const pillNavItems = [
     { href: "/", label: t.nav.home },
     {
@@ -493,9 +491,12 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
                         className="site-shell-pill__icon"
                         style={{ display: item.highlight ? "inline-flex" : "none" }}
                       />
-                      {item.label}
+                      <span>{item.label}</span>
                       {item.count ? (
-                        <span className="site-shell-pill__count" aria-label={`${item.count}`}>
+                        <span
+                          className="nav-count-badge site-shell-pill__count"
+                          aria-label={`${item.label}: ${item.count}`}
+                        >
                           {item.count}
                         </span>
                       ) : null}
@@ -603,7 +604,15 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
                             closeMobileMenu();
                           }}
                         >
-                          {item.label}
+                          <span className="mobile-menu-link-label">{item.label}</span>
+                          {item.count ? (
+                            <span
+                              className="nav-count-badge mobile-menu-count"
+                              aria-label={`${item.label}: ${item.count}`}
+                            >
+                              {item.count}
+                            </span>
+                          ) : null}
                         </Link>
                       );
                     })}

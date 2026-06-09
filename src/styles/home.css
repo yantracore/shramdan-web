@@ -323,20 +323,25 @@
   gap: 6px;
 }
 
-.site-shell-pill__count {
+.nav-count-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 22px;
-  height: 20px;
-  padding: 0 7px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 6px;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--primary) 12%, var(--surface));
-  color: var(--primary-dark);
-  font-size: 11px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 10px;
   font-weight: 800;
   line-height: 1;
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary) 18%, transparent);
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--surface) 88%, transparent);
+}
+
+.site-shell-pill__count {
+  margin-left: 1px;
 }
 
 .site-shell-pill__icon {
@@ -810,6 +815,7 @@
   position: relative;
   display: flex;
   align-items: center;
+  gap: 10px;
   min-height: 40px;
   padding: 10px 12px;
   border: 0;
@@ -819,6 +825,16 @@
   font: inherit;
   line-height: 1.4;
   text-align: left;
+}
+
+.mobile-menu-link-label {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.mobile-menu-count {
+  margin-left: auto;
+  flex: 0 0 auto;
 }
 
 .mobile-menu-preferences {
@@ -15436,6 +15452,7 @@
 }
 
 .mobile-bottom-nav-tab {
+  position: relative;
   background: transparent;
   border: 0;
   font: inherit;
@@ -15456,19 +15473,13 @@
 }
 
 .mobile-bottom-nav-count {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 20px;
-  height: 16px;
-  padding: 0 6px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--primary) 12%, var(--surface));
-  color: var(--primary-dark);
-  font-size: 10px;
-  font-weight: 800;
-  line-height: 1;
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary) 20%, transparent);
+  position: absolute;
+  top: 3px;
+  left: calc(50% + 4px);
+  min-width: 17px;
+  height: 17px;
+  padding: 0 5px;
+  font-size: 9.5px;
 }
 
 .mobile-bottom-nav-tab.is-active {
