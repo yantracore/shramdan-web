@@ -188,12 +188,14 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
     {
       href: "/events",
       label: t.nav.events,
-      count: formatNavCount(publicCounts?.events, language)
+      count: formatNavCount(publicCounts?.events, language),
+      countTone: "events"
     },
     {
       href: "/issues",
       label: t.nav.issues,
-      count: formatNavCount(publicCounts?.issues, language)
+      count: formatNavCount(publicCounts?.issues, language),
+      countTone: "issues"
     },
     { href: "/feedback", label: t.nav.feedback },
     {
@@ -508,7 +510,7 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
                       <span>{item.label}</span>
                       {hasNavCount(item.count) ? (
                         <span
-                          className="nav-count-badge site-shell-pill__count"
+                          className={`nav-count-badge nav-count-badge--${item.countTone} site-shell-pill__count`}
                           aria-label={`${item.label}: ${item.count}`}
                         >
                           {item.count}
@@ -621,7 +623,7 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
                           <span className="mobile-menu-link-label">{item.label}</span>
                           {hasNavCount(item.count) ? (
                             <span
-                              className="nav-count-badge mobile-menu-count"
+                              className={`nav-count-badge nav-count-badge--${item.countTone} mobile-menu-count`}
                               aria-label={`${item.label}: ${item.count}`}
                             >
                               {item.count}

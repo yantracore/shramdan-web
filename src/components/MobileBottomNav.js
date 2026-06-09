@@ -71,7 +71,7 @@ export function MobileBottomNav({ language = "np", counts = {}, onMore }) {
             <Icon aria-hidden="true" />
             {hasNavCount(counts[id]) ? (
               <span
-                className="nav-count-badge mobile-bottom-nav-count"
+                className={`nav-count-badge nav-count-badge--${id} mobile-bottom-nav-count`}
                 aria-label={`${t[id]}: ${counts[id]}`}
               >
                 {counts[id]}

@@ -340,6 +340,14 @@
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--surface) 88%, transparent);
 }
 
+.nav-count-badge--events {
+  background: #dc2626;
+}
+
+.nav-count-badge--issues {
+  background: #2563eb;
+}
+
 .site-shell-pill__count {
   margin-left: 1px;
 }
