@@ -70,7 +70,7 @@ export function IssueLocationCard({
             issues={[mapIssue]}
             content={content}
             language={language}
-            height={360}
+            height={612}
             interactive
             showPopup={false}
             enableFullscreen

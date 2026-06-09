@@ -187,6 +187,8 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
     {
       href: "/app-development",
       label: t.nav.appDev,
+      highlight: true,
+      badge: "LIVE",
       separatorBefore: true,
       tooltip: t.nav.appDevTooltip
     }

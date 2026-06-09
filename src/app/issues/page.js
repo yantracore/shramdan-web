@@ -788,7 +788,7 @@ export default function IssuesListPage() {
                 issues={mapIssues}
                 content={content}
                 language={language}
-                height={360}
+                height={612}
                 interactive
                 enableFullscreen
                 fullscreenLabel={

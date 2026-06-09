@@ -880,7 +880,7 @@ function EventsListPageContent() {
                 entries={mapEntries}
                 t={t.map}
                 language={language}
-                height={360}
+                height={612}
                 interactive
                 enableFullscreen
                 fullscreenLabel={t.map.fullscreenOpen}
