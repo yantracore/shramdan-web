@@ -4,6 +4,7 @@ import { getResponseData } from "@/lib/adminUtils";
 const PUBLIC_COUNT_LIMIT = 500;
 const PUBLIC_COUNT_MAX_PAGES = 20;
 const PUBLIC_COUNT_CACHE_MS = 5 * 60 * 1000;
+const LIVE_SCHEDULED_WINDOW_MS = 6 * 60 * 60 * 1000;
 
 let publicCountsCache = null;
 let publicCountsPromise = null;
@@ -17,8 +18,7 @@ export async function getFallbackPublicCounts() {
   return {
     events:
       eventGroups.live.length +
-      eventGroups.upcoming.length +
-      eventGroups.past.length,
+      eventGroups.upcoming.length,
     issues: getDemoIssues().length
   };
 }
@@ -45,22 +45,23 @@ function getReportedTotal(response) {
   return found == null ? null : Number(found);
 }
 
-async function countPublicList(path) {
+async function countPublicList(path, params = {}, filterItem = null) {
   let cursor = null;
   let total = 0;
 
   for (let page = 0; page < PUBLIC_COUNT_MAX_PAGES; page += 1) {
     const response = await getJson(path, {
       params: {
+        ...params,
         limit: PUBLIC_COUNT_LIMIT,
         ...(cursor ? { cursor } : {})
       }
     });
     const reportedTotal = getReportedTotal(response);
-    if (reportedTotal != null) return reportedTotal;
+    if (!filterItem && reportedTotal != null) return reportedTotal;
 
     const items = getItems(response);
-    total += items.length;
+    total += filterItem ? items.filter(filterItem).length : items.length;
 
     const data = getResponseData(response, null);
     cursor = data?.nextCursor || response?.nextCursor || null;
@@ -70,10 +71,28 @@ async function countPublicList(path) {
   return total;
 }
 
+function isLiveOrUpcomingScheduledEvent(event) {
+  if (!event?.scheduledAt) return false;
+  const scheduledAt = new Date(event.scheduledAt).getTime();
+  if (!Number.isFinite(scheduledAt)) return false;
+
+  const now = Date.now();
+  return scheduledAt > now || now - scheduledAt <= LIVE_SCHEDULED_WINDOW_MS;
+}
+
+async function countOngoingEvents() {
+  const [active, scheduled] = await Promise.all([
+    countPublicList("/events", { status: "ACTIVE" }),
+    countPublicList("/events", { status: "SCHEDULED" }, isLiveOrUpcomingScheduledEvent)
+  ]);
+
+  return active + scheduled;
+}
+
 async function loadPublicCounts() {
   const fallback = await getFallbackPublicCounts();
   const [eventsResult, issuesResult] = await Promise.allSettled([
-    countPublicList("/events"),
+    countOngoingEvents(),
     countPublicList("/issues")
   ]);
 
