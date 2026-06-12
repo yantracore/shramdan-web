@@ -71,7 +71,7 @@ const STATUS_COLOR = {
 };
 
 const GITHUB_ROADMAP_URL =
-  "https://github.com/yantracore/shramdan-web/blob/staging/docs/ops/00-master-roadmap.md";
+  "https://github.com/yantracore/shramdan-web/blob/stage/docs/ops/00-master-roadmap.md";
 
 function formatDate(iso, language) {
   if (!iso) return "—";
