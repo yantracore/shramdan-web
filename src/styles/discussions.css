@@ -627,3 +627,108 @@
     backdrop-filter: none;
   }
 }
+
+/* ---- New-topic form ------------------------------------------- */
+.discussions-new-topic-form {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  margin: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.discussions-new-topic-form h2 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.discussions-new-topic-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.discussions-new-topic-field label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.discussions-new-topic-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--input-bg, var(--surface-raised));
+  color: var(--text);
+  font-size: 0.9rem;
+  font-family: inherit;
+  transition: border-color var(--duration-fast) var(--ease-out-soft);
+}
+
+.discussions-new-topic-input:focus {
+  outline: none;
+  border-color: var(--brand-green);
+}
+
+.discussions-new-topic-anon,
+.discussions-anon-row {
+  display: flex;
+  align-items: center;
+}
+
+.discussions-anon-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.discussions-new-topic-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+/* ---- Local replies list --------------------------------------- */
+.discussion-local-replies {
+  list-style: none;
+  padding: 0;
+  margin: 0.75rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.discussion-local-reply {
+  background: var(--surface-raised);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+}
+
+.discussion-local-reply-author {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 0.35rem;
+}
+
+/* ---- Composer (enabled state) --------------------------------- */
+.discussion-detail-composer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.discussion-detail-composer-anon {
+  display: flex;
+  align-items: center;
+}

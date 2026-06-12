@@ -12,15 +12,10 @@ import { Segmented } from "antd";
 // `value` is the current view mode ("list-preview" | "map" | "thumbnails").
 // `onChange` receives the next mode string.
 // `labels` carries localized strings: { listPreview, map, thumbnails, ariaLabel }.
-// `disabled` greys out the segments — used while the view-switch wiring is
-// still in development so the buttons exist for visual review but cannot
-// trigger a layout change yet.
-
 export function ViewSwitch({
   value,
   onChange,
-  labels,
-  disabled = false
+  labels
 }) {
   const t = labels || {};
   return (
@@ -33,7 +28,6 @@ export function ViewSwitch({
         size="middle"
         value={value}
         onChange={onChange}
-        disabled={disabled}
         options={[
           {
             value: "list-preview",

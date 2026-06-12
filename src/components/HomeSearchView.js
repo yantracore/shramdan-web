@@ -13,6 +13,7 @@
 
 import { FilterOutlined, SearchOutlined } from "@ant-design/icons";
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ActivityStatsRow } from "@/components/ActivityStatsRow";
@@ -93,6 +94,11 @@ export default function HomeSearchView() {
             />
             <h1 id="home-search-title">{t.brand ?? t.footer?.brand ?? "श्रमदान"}</h1>
             <p>{search.slogan}</p>
+            <div className="home-search-intro-link">
+              <Link href="/intro">
+                {language === "np" ? "श्रमदान के हो? हेर्नुहोस् →" : "What is Shramdan? Learn more →"}
+              </Link>
+            </div>
           </header>
 
         </div>

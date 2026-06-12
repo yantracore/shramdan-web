@@ -1,14 +1,14 @@
 "use client";
 
-// Phase 7 v0 — /discussions/[slug] detail. Read-only in v0 (no posting
-// or voting writes); the composer + vote UI are rendered but disabled
-// so the layout reads right, and re-enable arrives with the backend.
+// Phase 7 v1 — /discussions/[slug] detail. Enabled composer + vote + anonymity
+// utilizing gracefully-degrading API client fallback to demo-mode stub helpers.
 
 import {
   ArrowLeftOutlined,
   CommentOutlined,
   EnvironmentOutlined,
   LikeOutlined,
+  LikeFilled,
   ThunderboltFilled
 } from "@ant-design/icons";
 import Link from "next/link";
@@ -18,6 +18,7 @@ import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
 import { copy } from "@/lib/siteContent";
 import { getDiscussionTopicBySlug } from "@/lib/discussionsStub";
+import { apiCastVote, apiWithdrawVote, apiPostMessage } from "@/lib/discussionsApi";
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 
@@ -34,6 +35,14 @@ export default function DiscussionDetailPage({ params }) {
   const [topic, setTopic] = useState(null);
   const [loaded, setLoaded] = useState(false);
 
+  const [upvoteCount, setUpvoteCount] = useState(0);
+  const [hasVoted, setHasVoted] = useState(false);
+  const [localMessageCount, setLocalMessageCount] = useState(0);
+  const [replyBody, setReplyBody] = useState("");
+  const [replyAnonymous, setReplyAnonymous] = useState(false);
+  const [replySubmitting, setReplySubmitting] = useState(false);
+  const [localReplies, setLocalReplies] = useState([]);
+
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -41,6 +50,8 @@ export default function DiscussionDetailPage({ params }) {
         const row = await getDiscussionTopicBySlug(slug);
         if (cancelled) return;
         setTopic(row);
+        setUpvoteCount(row.upvoteCount ?? 0);
+        setLocalMessageCount(row.messageCount ?? 0);
       } catch {
         if (cancelled) return;
         setTopic(null);
@@ -52,6 +63,45 @@ export default function DiscussionDetailPage({ params }) {
       cancelled = true;
     };
   }, [slug]);
+
+  const handleVote = async () => {
+    if (!topic) return;
+    const isDemoId = true;
+    try {
+      if (hasVoted) {
+        await apiWithdrawVote(topic.slug ?? topic.id, { isDemoId });
+        setUpvoteCount((n) => Math.max(0, n - 1));
+        setHasVoted(false);
+      } else {
+        await apiCastVote(topic.slug ?? topic.id, { isDemoId });
+        setUpvoteCount((n) => n + 1);
+        setHasVoted(true);
+      }
+    } catch (err) {
+      console.error("Failed to vote:", err);
+    }
+  };
+
+  const handleReply = async () => {
+    if (!replyBody.trim() || !topic) return;
+    setReplySubmitting(true);
+    try {
+      const isDemoId = true;
+      const newMsg = await apiPostMessage(
+        topic.slug ?? topic.id,
+        { body: replyBody.trim(), anonymous: replyAnonymous },
+        { isDemoId }
+      );
+      setReplyBody("");
+      setReplyAnonymous(false);
+      setLocalMessageCount((n) => n + 1);
+      setLocalReplies((prev) => [...prev, newMsg]);
+    } catch (err) {
+      console.error("Failed to reply:", err);
+    } finally {
+      setReplySubmitting(false);
+    }
+  };
 
   if (!loaded) {
     return (
@@ -130,13 +180,18 @@ export default function DiscussionDetailPage({ params }) {
           </div>
 
           <div className="discussion-detail-stats">
-            <span><LikeOutlined aria-hidden="true" /> {localizeDigits(topic.upvoteCount ?? 0, language)}</span>
-            <span><CommentOutlined aria-hidden="true" /> {localizeDigits(topic.messageCount ?? 0, language)}</span>
+            <span>
+              {hasVoted ? <LikeFilled aria-hidden="true" /> : <LikeOutlined aria-hidden="true" />}{" "}
+              {localizeDigits(upvoteCount, language)}
+            </span>
+            <span>
+              <CommentOutlined aria-hidden="true" /> {localizeDigits(localMessageCount, language)}
+            </span>
             <Button
-              type="default"
-              icon={<LikeOutlined />}
-              disabled
+              type={hasVoted ? "primary" : "default"}
+              icon={hasVoted ? <LikeFilled /> : <LikeOutlined />}
               title={t.upvote}
+              onClick={handleVote}
             >
               {t.upvote}
             </Button>
@@ -160,19 +215,55 @@ export default function DiscussionDetailPage({ params }) {
 
         <section className="discussion-detail-replies" aria-label={t.sections?.recentActivity || "Replies"}>
           <h2>{language === "np" ? "जवाफहरू" : "Replies"}</h2>
+
+          {localReplies.length > 0 ? (
+            <ul className="discussion-local-replies">
+              {localReplies.map((reply) => {
+                const replyAuthorName = reply.anonymous
+                  ? (t.anonymousAuthor || (language === "np" ? "अज्ञात सदस्य" : "Anonymous member"))
+                  : (language === "np" ? "तपाईं" : "You");
+                return (
+                  <li key={reply.id} className="discussion-local-reply">
+                    <div className="discussion-local-reply-author">{replyAuthorName}</div>
+                    <div className="discussion-local-reply-body">{reply.body}</div>
+                  </li>
+                );
+              })}
+            </ul>
+          ) : null}
+
           <p className="discussion-detail-replies-empty">
             {language === "np"
               ? "जवाफ list backend तयार भएपछि देखाइनेछ।"
               : "Replies appear here once the backend is live."}
           </p>
+
           <div className="discussion-detail-composer">
             <textarea
               className="discussion-detail-composer-input"
               placeholder={t.replyComposerPlaceholder}
-              disabled
+              value={replyBody}
+              onChange={(e) => setReplyBody(e.target.value)}
               rows={3}
             />
-            <Button type="primary" disabled>
+            <div className="discussion-detail-composer-anon">
+              <label className="discussions-anon-label">
+                <input
+                  type="checkbox"
+                  checked={replyAnonymous}
+                  onChange={(e) => setReplyAnonymous(e.target.checked)}
+                />
+                <span>
+                  {language === "np" ? "अज्ञात रूपमा पठाउनुहोस्" : "Reply anonymously"}
+                </span>
+              </label>
+            </div>
+            <Button
+              type="primary"
+              loading={replySubmitting}
+              disabled={!replyBody.trim()}
+              onClick={handleReply}
+            >
               {t.composerCta}
             </Button>
           </div>

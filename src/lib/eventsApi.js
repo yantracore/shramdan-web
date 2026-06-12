@@ -165,11 +165,13 @@ async function enrichEventsWithIssueCovers(events) {
 const DEFAULT_LIMIT = 50;
 
 // Raw list — single status filter.
-async function fetchEvents({ status, limit = DEFAULT_LIMIT, fromDate, toDate, language = "np" } = {}) {
+async function fetchEvents({ status, limit = DEFAULT_LIMIT, fromDate, toDate, provinceId, districtId, language = "np" } = {}) {
   const params = { limit };
   if (status) params.status = status;
   if (fromDate) params.fromDate = fromDate;
   if (toDate) params.toDate = toDate;
+  if (provinceId) params.provinceId = provinceId;
+  if (districtId) params.districtId = districtId;
   const response = await getJson("/events", { params });
   const events = getListItems(response).map((ev) => normalizeEvent(ev, language));
   return enrichEventsWithIssueCovers(events);
@@ -180,12 +182,12 @@ async function fetchEvents({ status, limit = DEFAULT_LIMIT, fromDate, toDate, la
 // Window: events whose scheduledAt is within the last 6h and not yet
 // completed — anything older than that is treated as past and surfaces
 // via listPastEvents instead.
-export async function listLiveEvents({ language = "np" } = {}) {
+export async function listLiveEvents({ language = "np", provinceId, districtId } = {}) {
   const SIX_HOURS = 6 * 60 * 60_000;
   const now = Date.now();
   const [active, scheduled] = await Promise.all([
-    fetchEvents({ status: "ACTIVE", language }),
-    fetchEvents({ status: "SCHEDULED", language })
+    fetchEvents({ status: "ACTIVE", language, provinceId, districtId }),
+    fetchEvents({ status: "SCHEDULED", language, provinceId, districtId })
   ]);
   const live = [...active];
   for (const ev of scheduled) {
@@ -203,25 +205,25 @@ export async function listLiveEvents({ language = "np" } = {}) {
   });
 }
 
-export async function listUpcomingEvents({ language = "np", limit = DEFAULT_LIMIT } = {}) {
+export async function listUpcomingEvents({ language = "np", limit = DEFAULT_LIMIT, provinceId, districtId } = {}) {
   const now = Date.now();
-  const scheduled = await fetchEvents({ status: "SCHEDULED", limit, language });
+  const scheduled = await fetchEvents({ status: "SCHEDULED", limit, language, provinceId, districtId });
   return scheduled.filter((ev) => {
     if (!ev.scheduledAt) return false;
     return new Date(ev.scheduledAt).getTime() > now;
   });
 }
 
-export async function listPastEvents({ language = "np", limit = DEFAULT_LIMIT } = {}) {
-  return fetchEvents({ status: "COMPLETED", limit, language });
+export async function listPastEvents({ language = "np", limit = DEFAULT_LIMIT, provinceId, districtId } = {}) {
+  return fetchEvents({ status: "COMPLETED", limit, language, provinceId, districtId });
 }
 
 // All buckets in parallel — handy for /events page + /calendar.
-export async function listAllEvents({ language = "np" } = {}) {
+export async function listAllEvents({ language = "np", provinceId, districtId } = {}) {
   const [live, upcoming, past] = await Promise.all([
-    listLiveEvents({ language }),
-    listUpcomingEvents({ language }),
-    listPastEvents({ language })
+    listLiveEvents({ language, provinceId, districtId }),
+    listUpcomingEvents({ language, provinceId, districtId }),
+    listPastEvents({ language, provinceId, districtId })
   ]);
   return { live, upcoming, past };
 }

@@ -300,6 +300,16 @@
   overflow: hidden;
 }
 
+/* Prevent the glass frame from trapping the fixed-position fullscreen map */
+.home-search-map-frame:has(.issue-map-wrap--fullscreen) {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  overflow: visible;
+  border-radius: 0;
+  border: none;
+  z-index: 9999;
+}
+
 @media (max-width: 720px) {
   .home-search-map-frame {
     border-radius: 12px;
@@ -773,4 +783,22 @@
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }
+}
+
+/* ---- Brand block intro link -------------------------------------- */
+.home-search-intro-link {
+  margin-top: 4px;
+}
+
+.home-search-intro-link a {
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: opacity 180ms ease;
+}
+
+.home-search-intro-link a:hover {
+  opacity: 0.85;
+  text-decoration: underline;
 }

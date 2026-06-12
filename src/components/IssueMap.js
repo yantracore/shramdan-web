@@ -8,7 +8,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
-import { localizeIssue } from "@/lib/adminUtils";
+import { getIssueCoverImageUrl, localizeIssue } from "@/lib/adminUtils";
 
 const NEPAL_BOUNDS = [
   [26.3, 80.0],
@@ -81,6 +81,22 @@ function InvalidateOnResize({ trigger }) {
   return null;
 }
 
+function ClosePopupOnOutsideClick() {
+  const map = useMap();
+  useEffect(() => {
+    const handleOutsideClick = (e) => {
+      if (map.getContainer() && !map.getContainer().contains(e.target)) {
+        map.closePopup();
+      }
+    };
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    };
+  }, [map]);
+  return null;
+}
+
 function toLocalDigits(value, language) {
   const str = String(value ?? "");
   if (language !== "np") return str;
@@ -105,6 +121,7 @@ function IssueMarker({ issue: rawIssue, interactive, showPopup, content, languag
         );
 
   const markerLabel = issue.title || issue.addressText || statusLabel || "Map marker";
+  const coverUrl = getIssueCoverImageUrl(rawIssue);
 
   return (
     <Marker
@@ -117,40 +134,47 @@ function IssueMarker({ issue: rawIssue, interactive, showPopup, content, languag
       {interactive && showPopup ? (
         <Popup>
           <div className="issue-map-popup">
-            <div className="issue-map-popup-meta">
-              <span
-                className={`issue-map-popup-status issue-map-popup-status--${issue.status || "OPEN"}`}
-              >
-                {statusLabel}
-              </span>
-              {categoryLabel ? (
-                <span className="issue-map-popup-category">
-                  {categoryLabel}
-                </span>
-              ) : null}
-            </div>
-            {issue.title ? (
-              <Link
-                href={`/issues/${issue.slug ?? issue.id}`}
-                className="issue-map-popup-title"
-              >
-                {issue.title}
-              </Link>
-            ) : null}
-            {issue.addressText ? (
-              <p className="issue-map-popup-address">{issue.addressText}</p>
-            ) : null}
-            {issue.id && (issue.title || issue.voteCount != null) ? (
-              <div className="issue-map-popup-footer">
-                <span className="issue-map-popup-votes">{voteText}</span>
-                <Link
-                  href={`/issues/${issue.slug ?? issue.id}`}
-                  className="issue-map-popup-link"
-                >
-                  {content?.card?.viewDetail || "View"} →
-                </Link>
+            {coverUrl ? (
+              <div className="issue-map-popup-thumb">
+                <img src={coverUrl} alt="" />
               </div>
             ) : null}
+            <div className="issue-map-popup-body">
+              <div className="issue-map-popup-meta">
+                <span
+                  className={`issue-map-popup-status issue-map-popup-status--${issue.status || "OPEN"}`}
+                >
+                  {statusLabel}
+                </span>
+                {categoryLabel ? (
+                  <span className="issue-map-popup-category">
+                    {categoryLabel}
+                  </span>
+                ) : null}
+              </div>
+              {issue.title ? (
+                <Link
+                  href={`/issues/${issue.slug ?? issue.id}`}
+                  className="issue-map-popup-title"
+                >
+                  {issue.title}
+                </Link>
+              ) : null}
+              {issue.addressText ? (
+                <p className="issue-map-popup-address">{issue.addressText}</p>
+              ) : null}
+              {issue.id && (issue.title || issue.voteCount != null) ? (
+                <div className="issue-map-popup-footer">
+                  <span className="issue-map-popup-votes">{voteText}</span>
+                  <Link
+                    href={`/issues/${issue.slug ?? issue.id}`}
+                    className="issue-map-popup-link"
+                  >
+                    {content?.card?.viewDetail || "View"} →
+                  </Link>
+                </div>
+              ) : null}
+            </div>
           </div>
         </Popup>
       ) : null}
@@ -253,6 +277,7 @@ export default function IssueMap({
         />
         <FitView focus={focus} />
         <InvalidateOnResize trigger={isFullscreen} />
+        <ClosePopupOnOutsideClick />
         {useCluster ? (
           <MarkerClusterGroup
             chunkedLoading

@@ -281,3 +281,75 @@ export function discussionPresenceForEvent(eventSlugOrId) {
     lastActivityAt: linked.lastActivityAt
   });
 }
+
+// ---- Mutation helpers (demo-mode only) ----------------------------
+// These mutate the in-memory MOCK_TOPICS array so that demo interactions
+// feel live within the current session. The backend counterparts are
+// specified in docs/api-requirements/discussions.md.
+
+export function demoPostTopic({ kind = 'GENERAL', title, body, anonymous = false, linkedEntity = null } = {}) {
+  const slug = title
+    .toLowerCase()
+    .replace(/[^a-z0-9\u0900-\u097F]+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 60) + '-' + Math.random().toString(36).slice(2, 6);
+  const id = 'disc-' + slug;
+  const author = anonymous
+    ? { anonymous: true }
+    : { name: 'तपाईं', avatarUrl: null, slug: null };
+  const newTopic = {
+    id,
+    slug,
+    kind,
+    title,
+    body,
+    authorMemberId: null,
+    authorDisplay: author,
+    anonymous,
+    linkedEntity,
+    status: 'OPEN',
+    messageCount: 0,
+    upvoteCount: 0,
+    distinctSupporters: 0,
+    lastActivityAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
+    ...(kind === 'FEATURE_PROPOSAL' ? {
+      proposalStatus: 'OPEN',
+      promotionEligible: false,
+      votesUntilThreshold: 20,
+      supportersUntilThreshold: 10,
+    } : {})
+  };
+  MOCK_TOPICS.unshift(newTopic);
+  return Promise.resolve(newTopic);
+}
+
+export function demoPostMessage(topicSlug, { body, anonymous = false } = {}) {
+  const topic = MOCK_TOPICS.find((r) => r.slug === topicSlug || r.id === topicSlug);
+  if (topic) {
+    topic.messageCount = (topic.messageCount || 0) + 1;
+    topic.lastActivityAt = new Date().toISOString();
+  }
+  return Promise.resolve({ id: 'msg-' + Math.random().toString(36).slice(2, 8), body, anonymous });
+}
+
+export function demoCastVote(topicSlug) {
+  const topic = MOCK_TOPICS.find((r) => r.slug === topicSlug || r.id === topicSlug);
+  if (topic) {
+    topic.upvoteCount = (topic.upvoteCount || 0) + 1;
+    topic.distinctSupporters = (topic.distinctSupporters || 0) + 1;
+    if (topic.votesUntilThreshold > 0) topic.votesUntilThreshold--;
+    if (topic.supportersUntilThreshold > 0) topic.supportersUntilThreshold--;
+  }
+  return Promise.resolve({ ok: true });
+}
+
+export function demoWithdrawVote(topicSlug) {
+  const topic = MOCK_TOPICS.find((r) => r.slug === topicSlug || r.id === topicSlug);
+  if (topic) {
+    topic.upvoteCount = Math.max(0, (topic.upvoteCount || 0) - 1);
+    topic.distinctSupporters = Math.max(0, (topic.distinctSupporters || 0) - 1);
+    if (topic.votesUntilThreshold !== undefined) topic.votesUntilThreshold++;
+  }
+  return Promise.resolve({ ok: true });
+}

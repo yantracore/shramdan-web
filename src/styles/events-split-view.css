@@ -930,3 +930,16 @@
     animation: none;
   }
 }
+
+/* ==========================================================================
+   Map primary view  (/issues?view=map  &  /events?view=map)
+   ========================================================================== */
+
+.stream-map-primary {
+  margin-top: 24px;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  box-shadow: 0 6px 20px -14px color-mix(in srgb, var(--primary) 30%, transparent);
+}
+

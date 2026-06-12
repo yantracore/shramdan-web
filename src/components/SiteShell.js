@@ -198,6 +198,7 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
       countTone: "issues"
     },
     { href: "/feedback", label: t.nav.feedback },
+    { href: "/contribute", label: t.nav.contribute },
     {
       href: "/app-development",
       label: t.nav.appDev,

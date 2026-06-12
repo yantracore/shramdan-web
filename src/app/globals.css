@@ -13,6 +13,7 @@
 @import "../styles/antd-dropdown.css";
 @import "../styles/home-search.css";
 @import "../styles/discussions.css";
+@import "../styles/contribute.css";
 
 :root {
   color-scheme: light;

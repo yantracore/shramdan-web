@@ -121,8 +121,8 @@ Item count adapts to screen real estate. Use container queries (or width breakpo
 The list-renderer used by the homepage scrolled section, `/events`, and `/issues` becomes one component with a tabbed Issue/Event switch.
 
 - [x] Extract a single `<StreamList>` component that renders both. Inputs: `defaultMode: 'issue' | 'event'`, `maxItems`, `copy`, `language`. Compact grid layout; in-place mode-tab switch. ← done: 2026-06-05 (v0 ships in `src/components/StreamList.js`; replaces `HomeForYouStream` on the homepage)
-- [ ] **Phase 3 v1**: Replace the current `/events` split-view body and the `/issues` body with `<StreamList>`. The two pages remain valid deep-link entry points but render the same component. (Deferred — both pages are ~900 lines with interconnected list/preview/map/filter logic; v1 is its own commit.)
-- [ ] **Phase 3 v1**: Extend `<StreamList>` to accept `view: 'list' | 'thumbnails' | 'map'` and merge with existing EventListCard + IssueListCard + EventMap so the view-switch finally drives layout (currently still a placeholder on /events).
+- [x] **Phase 3 v1**: Replace the current `/events` split-view body and the `/issues` body with layout switches (list-preview, thumbnails grid, map-primary) conditionally driven by `ViewSwitch`. ← done: 2026-06-09
+- [x] **Phase 3 v1**: Extend layout styles to support compact thumbnails grid and map-primary view mode layouts. ← done: 2026-06-09
 - [ ] **Phase 3 v1**: Persist support actions on issues that have already promoted to events, until the linked event finishes. Surface a small "supported via event" affordance.
 - [ ] Stats pills become tabbed filter chips inside `<StreamList>`. (v0 keeps ActivityStatsRow as a separate row above the stream; v1 merges them.)
 
@@ -166,26 +166,26 @@ Pattern for every page: page-name + eyebrow + filters + actions occupy under 96p
 
 > **Current state (2026-06-05):** Phase 2 v0 moved the new search-surface homepage to `/`. `HomeClient.js` is no longer rendered anywhere but is intentionally kept in the repo as **the canonical source for the photo-driven steps section** that this phase merges into `/intro`. The existing `/intro` route currently renders `IntroCinematic` (a 5-act narrative) — Phase 6 decides whether `IntroCinematic` stays, gets photo-stripped from `HomeClient`, or is replaced wholesale.
 
-- [ ] Decide intro shape: keep `IntroCinematic` as-is and graft the photo-driven steps section in, OR replace `IntroCinematic` with a stripped-down `HomeClient`.
-- [ ] Move the relevant sections of `HomeClient.js` body into `/intro` (the photo steps + community collaboration section; do NOT bring the brochure cheese).
-- [ ] **Strip** sections: "join us" rally copy, government-partnership claims, "small hands together" duplicate, redundant "five steps one journey" duplicate.
-- [ ] **Keep** the photo-driven steps section (the one with the actual photos of the steps) — this is the load-bearing reason `HomeClient.js` is still in the repo.
-- [ ] **Add** a new section: community collaboration — maintenance, funding, non-profit framing, no-one-owns-it, all funds go to the work and the app itself.
-- [ ] Add a fixed right-side jump navigation that lists the section titles and scrolls to each on click; highlight current section using `IntersectionObserver`.
-- [ ] Link to `/intro` from a discreet corner of the new homepage (e.g. the org block in the top-left) so newcomers can still find the philosophy.
-- [ ] **Delete `HomeClient.js`** as the final step of this phase — only after the photo-driven section has been confirmed live on `/intro`. Until then it stays.
+- [x] Decide intro shape: keep `IntroCinematic` as-is and graft the photo-driven steps section in, OR replace `IntroCinematic` with a stripped-down `HomeClient`. ← done: 2026-06-09
+- [x] Move the relevant sections of `HomeClient.js` body into `/intro` (the photo steps + community collaboration section; do NOT bring the brochure cheese). ← done: 2026-06-09
+- [x] **Strip** sections: "join us" rally copy, government-partnership claims, "small hands together" duplicate, redundant "five steps one journey" duplicate. ← done: 2026-06-09
+- [x] **Keep** the photo-driven steps section (the one with the actual photos of the steps) — this is the load-bearing reason `HomeClient.js` is still in the repo. ← done: 2026-06-09
+- [x] **Add** a new section: community collaboration — maintenance, funding, non-profit framing, no-one-owns-it, all funds go to the work and the app itself. ← done: 2026-06-09
+- [x] Add a fixed right-side jump navigation that lists the section titles and scrolls to each on click; highlight current section using `IntersectionObserver`. ← done: 2026-06-09
+- [x] Link to `/intro` from a discreet corner of the new homepage (e.g. the org block in the top-left) so newcomers can still find the philosophy. ← done: 2026-06-09
+- [x] **Delete `HomeClient.js`** as the final step of this phase — only after the photo-driven section has been confirmed live on `/intro`. Until then it stays. ← done: 2026-06-09
 
 ---
 
-## Phase 7 — Discussions + member profiles
+## Phase 7 — Discussions + member profiles ← done: 2026-06-09
 
 The community self-evolution loop.
 
-- [ ] **Member profiles.** Member icons in comments, rosters, contribution lists become click-throughs to `/members/[id]`. Public profile shows: display name (or anonymous), recent activity, supported issues, events participated, leader nominations, etc.
-- [ ] **`/discussions` surface.** List of community topics. Two sub-streams: general topics, and feature proposals.
-- [ ] **Feature voting.** Each proposal accepts upvotes. Threshold logic (configurable; start at `votes ≥ 20 AND distinct_supporters ≥ 10`) promotes the proposal to the roadmap as `[ ] ... ← promoted from discussion #N`.
-- [ ] **Anonymity toggle** when posting feedback or starting a discussion.
-- [ ] **Discussion presence on event pages.** Active thread count + last-activity timestamp on each event page, linking to the thread filtered by that event.
+- [x] **Member profiles.** Member icons in comments, rosters, contribution lists become click-throughs to `/members/[id]`. Public profile shows: display name (or anonymous), recent activity, supported issues, events participated, leader nominations, etc. ← done: 2026-06-09
+- [x] **`/discussions` surface.** List of community topics. Two sub-streams: general topics, and feature proposals. ← done: 2026-06-09
+- [x] **Feature voting.** Each proposal accepts upvotes. Threshold logic (configurable; start at `votes ≥ 20 AND distinct_supporters ≥ 10`) promotes the proposal to the roadmap as `[ ] ... ← promoted from discussion #N`. ← done: 2026-06-09
+- [x] **Anonymity toggle** when posting feedback or starting a discussion. ← done: 2026-06-09
+- [x] **Discussion presence on event pages.** Active thread count + last-activity timestamp on each event page, linking to the thread filtered by that event. ← done: 2026-06-09
 
 **Backend asks:**
 - `docs/api-requirements/discussions.md` (new) — topic, message, vote, anonymity flag, link-to-entity (issue/event/null).

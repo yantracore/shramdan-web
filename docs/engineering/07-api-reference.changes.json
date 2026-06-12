@@ -1,17 +1,43 @@
 {
-  "previousFetchedAt": "2026-06-05T12:13:36+05:45",
-  "currentFetchedAt": "2026-06-05T13:09:33+05:45",
-  "comparedAt": "2026-06-05T07:24:33.515Z",
+  "previousFetchedAt": "2026-06-05T13:09:33+05:45",
+  "currentFetchedAt": "2026-06-10T12:55:00+05:45",
+  "comparedAt": "2026-06-10T07:10:00.563Z",
   "totals": {
-    "added": 2,
+    "added": 3,
     "removed": 0,
-    "modified": 0
+    "modified": 4
   },
   "added": [
-    "POST /api/v1/uploads/public/presign",
-    "POST /api/v1/uploads/public/{id}/confirm"
+    "GET /api/v1/districts",
+    "GET /api/v1/provinces",
+    "PATCH /api/v1/issues/{id}"
   ],
   "removed": [],
-  "modified": [],
-  "acknowledgedAt": null
+  "modified": [
+    {
+      "endpoint": "GET /api/v1/events",
+      "changes": [
+        "params 5→19"
+      ]
+    },
+    {
+      "endpoint": "GET /api/v1/issues",
+      "changes": [
+        "params 17→19"
+      ]
+    },
+    {
+      "endpoint": "GET /api/v1/issues/me",
+      "changes": [
+        "params 16→18"
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/issues",
+      "changes": [
+        "responses [201,401,403]→[201,400,401,403]"
+      ]
+    }
+  ],
+  "acknowledgedAt": "2026-06-10T07:34:00+05:45"
 }

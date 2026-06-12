@@ -124,13 +124,13 @@ function isUsableImageUrl(url) {
 }
 
 export function getFirstIssueImage(issue) {
-  const uploads = Array.isArray(issue?.uploads) ? issue.uploads : [];
+  const uploads = Array.isArray(issue?.uploads) ? issue.uploads : (Array.isArray(issue?.images) ? issue.images : []);
   return uploads.find((upload) => isImageUpload(upload) && isUsableImageUrl(upload.url)) || null;
 }
 
 export function getIssueCoverImageUrl(issue) {
   if (!issue) return null;
-  const uploads = Array.isArray(issue.uploads) ? issue.uploads : [];
+  const uploads = Array.isArray(issue.uploads) ? issue.uploads : (Array.isArray(issue.images) ? issue.images : []);
   if (issue.coverImageId) {
     const match = uploads.find((upload) => upload?.id === issue.coverImageId);
     if (isUsableImageUrl(match?.url)) return match.url;

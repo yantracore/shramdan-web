@@ -79,6 +79,22 @@ function InvalidateOnResize({ trigger }) {
   return null;
 }
 
+function ClosePopupOnOutsideClick() {
+  const map = useMap();
+  useEffect(() => {
+    const handleOutsideClick = (e) => {
+      if (map.getContainer() && !map.getContainer().contains(e.target)) {
+        map.closePopup();
+      }
+    };
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    };
+  }, [map]);
+  return null;
+}
+
 function toLocalDigits(value, language) {
   const str = String(value ?? "");
   if (language !== "np") return str;
@@ -111,6 +127,8 @@ function formatScheduleLine(event, status, statusLabel, language) {
   }
 }
 
+import { getIssueCoverImageUrl } from "@/lib/adminUtils";
+
 function EventMarker({ entry, interactive, showPopup, t, language }) {
   const { event, status } = entry;
   const lat = Number(event.latitude);
@@ -118,6 +136,7 @@ function EventMarker({ entry, interactive, showPopup, t, language }) {
   const statusLabel = t?.statusLabels?.[status] || status || "";
   const meta = formatScheduleLine(event, status, statusLabel, language);
   const markerLabel = event.title || event.addressText || statusLabel || "Map marker";
+  const coverUrl = getIssueCoverImageUrl(event);
 
   return (
     <Marker
@@ -130,34 +149,41 @@ function EventMarker({ entry, interactive, showPopup, t, language }) {
       {interactive && showPopup ? (
         <Popup>
           <div className="issue-map-popup">
-            <div className="issue-map-popup-meta">
-              <span
-                className={`issue-map-popup-status event-map-popup-status--${status || "upcoming"}`}
-              >
-                {meta}
-              </span>
-            </div>
-            {event.title ? (
-              <Link
-                href={`/events/${event.slug ?? event.id}`}
-                className="issue-map-popup-title"
-              >
-                {event.title}
-              </Link>
-            ) : null}
-            {event.addressText ? (
-              <p className="issue-map-popup-address">{event.addressText}</p>
-            ) : null}
-            {event.id ? (
-              <div className="issue-map-popup-footer">
-                <Link
-                  href={`/events/${event.slug ?? event.id}`}
-                  className="issue-map-popup-link"
-                >
-                  {t?.viewDetail || "View"} →
-                </Link>
+            {coverUrl ? (
+              <div className="issue-map-popup-thumb">
+                <img src={coverUrl} alt="" />
               </div>
             ) : null}
+            <div className="issue-map-popup-body">
+              <div className="issue-map-popup-meta">
+                <span
+                  className={`issue-map-popup-status event-map-popup-status--${status || "upcoming"}`}
+                >
+                  {meta}
+                </span>
+              </div>
+              {event.title ? (
+                <Link
+                  href={`/events/${event.slug ?? event.id}`}
+                  className="issue-map-popup-title"
+                >
+                  {event.title}
+                </Link>
+              ) : null}
+              {event.addressText ? (
+                <p className="issue-map-popup-address">{event.addressText}</p>
+              ) : null}
+              {event.id ? (
+                <div className="issue-map-popup-footer">
+                  <Link
+                    href={`/events/${event.slug ?? event.id}`}
+                    className="issue-map-popup-link"
+                  >
+                    {t?.viewDetail || "View"} →
+                  </Link>
+                </div>
+              ) : null}
+            </div>
           </div>
         </Popup>
       ) : null}
@@ -261,6 +287,7 @@ export default function EventMap({
         />
         <FitView focus={focus} />
         <InvalidateOnResize trigger={isFullscreen} />
+        <ClosePopupOnOutsideClick />
         {useCluster ? (
           <MarkerClusterGroup
             chunkedLoading

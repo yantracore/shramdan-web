@@ -83,7 +83,7 @@ function formatDistance(km, language, copy) {
 }
 
 // --- Event → unified entry shape -----------------------------------
-function eventToEntry(event, status) {
+export function eventToEntry(event, status) {
   return {
     kind: "event",
     id: event.id ?? event.slug,
@@ -101,7 +101,7 @@ function eventToEntry(event, status) {
 }
 
 // --- Issue → unified entry shape -----------------------------------
-function issueToEntry(rawIssue, language) {
+export function issueToEntry(rawIssue, language) {
   const issue = localizeIssue(rawIssue, language);
   return {
     kind: "issue",
@@ -119,7 +119,7 @@ function issueToEntry(rawIssue, language) {
   };
 }
 
-function StreamCard({ entry, distanceKm, language, copy }) {
+export function StreamCard({ entry, distanceKm, language, copy }) {
   const dateLabel = entry.kind === "event"
     ? formatScheduledLabel(entry.scheduledAt, language)
     : "";

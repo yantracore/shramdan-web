@@ -1,0 +1,438 @@
+/* contribute.css — /contribute page styles
+ * Wires Cost Cards, Progress Bars, Bank Transfers, and QR scan boxes.
+ * Supports light & dark mode variables seamlessly.
+ */
+
+.contribute-section {
+  max-width: 1000px;
+  margin-inline: auto;
+  padding-top: 96px;
+  display: grid;
+  gap: 32px;
+}
+
+@media (max-width: 720px) {
+  .contribute-section {
+    padding-top: 84px;
+    gap: 20px;
+  }
+}
+
+.contribute-hero {
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.contribute-hero h1 {
+  margin: 0 0 12px;
+  color: var(--primary-dark);
+  font-size: clamp(28px, 4vw, 44px);
+  line-height: 1.15;
+}
+
+.contribute-hero p {
+  max-width: 720px;
+  margin: 0 auto;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* Cost Breakdown Cards */
+.contribute-cost-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+
+@media (max-width: 768px) {
+  .contribute-cost-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+.cost-card {
+  padding: 24px;
+  display: grid;
+  gap: 16px;
+}
+
+.cost-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.cost-icon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.cl-icon {
+  background: color-mix(in srgb, var(--accent) 14%, var(--surface));
+  color: var(--accent);
+}
+
+.web-icon {
+  background: color-mix(in srgb, var(--primary) 14%, var(--surface));
+  color: var(--primary);
+}
+
+.cost-header h2 {
+  margin: 0;
+  font-size: 18px;
+  color: var(--text);
+}
+
+.cost-price {
+  font-size: 16px;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.cost-desc {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.cost-progress-bar {
+  display: grid;
+  gap: 8px;
+}
+
+.cost-progress-bar::before {
+  content: "";
+  height: 8px;
+  border-radius: 4px;
+  background: var(--line);
+  grid-row: 1;
+  grid-column: 1;
+}
+
+.cost-progress-fill {
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  grid-row: 1;
+  grid-column: 1;
+  z-index: 2;
+  transition: width 0.6s ease;
+}
+
+.cost-progress-text {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+/* Action & Transfer Layout */
+.contribute-layout-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+@media (max-width: 768px) {
+  .contribute-layout-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+.contribute-action-box,
+.contribute-info-box {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 18px;
+}
+
+.contribute-action-box h2,
+.contribute-info-box h2 {
+  margin: 0;
+  font-size: 20px;
+  color: var(--primary-dark);
+}
+
+.contribute-form {
+  display: grid;
+  gap: 14px;
+}
+
+.contribute-input {
+  border-color: var(--line) !important;
+  background: var(--bg) !important;
+  color: var(--text) !important;
+}
+
+.contribute-input:focus,
+.contribute-input-focused {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 20%, transparent) !important;
+}
+
+.contribute-error {
+  color: #ff4d4f;
+  font-size: 13px;
+  margin-top: 4px;
+  display: block;
+}
+
+.contribute-impact-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: rgba(23, 107, 92, 0.08);
+  border: 1px solid rgba(23, 107, 92, 0.16);
+  color: var(--primary-dark);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.contribute-hint {
+  font-size: 11px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.contribute-submit-btn {
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
+  font-weight: 700;
+  height: auto;
+  padding: 10px 0;
+}
+
+.contribute-submit-btn:hover {
+  background: var(--primary-dark) !important;
+  border-color: var(--primary-dark) !important;
+  transform: translateY(-1px);
+}
+
+/* Info Details */
+.info-transfer-details h3 {
+  margin: 0 0 12px;
+  font-size: 16px;
+  color: var(--text);
+}
+
+.bank-details-list {
+  display: grid;
+  gap: 12px;
+}
+
+.bank-detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bank-detail-item span {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.bank-detail-item strong {
+  font-size: 14px;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bank-detail-item .anticon-copy {
+  cursor: pointer;
+  color: var(--primary);
+  transition: color 150ms ease;
+}
+
+.bank-detail-item .anticon-copy:hover {
+  color: var(--accent);
+}
+
+/* QR Code Section */
+.qr-scan-section {
+  padding: 30px;
+  text-align: center;
+  display: grid;
+  gap: 20px;
+  justify-items: center;
+}
+
+.qr-scan-section h2 {
+  margin: 0;
+  font-size: 20px;
+  color: var(--primary-dark);
+}
+
+.qr-container {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+}
+
+.qr-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.qr-mock-image {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  background: #fff;
+  border: 4px solid var(--line);
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  box-shadow: var(--shadow-1);
+}
+
+/* Mock QR Corner Squares */
+.qr-corner {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  border: 8px solid var(--primary-dark);
+  background: #fff;
+}
+
+.qr-top-left {
+  top: 14px;
+  left: 14px;
+}
+
+.qr-top-right {
+  top: 14px;
+  right: 14px;
+}
+
+.qr-bottom-left {
+  bottom: 14px;
+  left: 14px;
+}
+
+.qr-center-logo {
+  position: absolute;
+  z-index: 10;
+  background: #fff;
+  padding: 4px;
+  border-radius: 6px;
+  border: 2px solid var(--line);
+  box-shadow: var(--shadow-1);
+}
+
+/* Simulated QR Code pattern using repeating gradients */
+.qr-pattern-grid {
+  position: absolute;
+  inset: 52px;
+  background: 
+    repeating-linear-gradient(90deg, var(--text) 0 4px, transparent 4px 8px),
+    repeating-linear-gradient(0deg, var(--text) 0 4px, transparent 4px 8px);
+  opacity: 0.82;
+}
+
+.qr-scan-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.qr-hint-text {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+  max-width: 320px;
+}
+
+/* Success State Override */
+.contribute-success {
+  padding: 48px 24px;
+  text-align: center;
+  max-width: 520px;
+  margin-inline: auto;
+  display: grid;
+  gap: 20px;
+  justify-items: center;
+}
+
+.contribute-success-seal {
+  font-size: 64px;
+  color: var(--primary);
+  display: grid;
+}
+
+.contribute-success h1 {
+  margin: 0;
+  font-size: 28px;
+  color: var(--primary-dark);
+}
+
+.contribute-success p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.contribute-success-amount {
+  font-size: 32px;
+  font-weight: 850;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.contribute-success-receipt {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.contribute-success-receipt code {
+  background: var(--bg);
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--line);
+  font-family: monospace;
+}
+
+.contribute-success-actions {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.contribute-cta-primary {
+  flex: 1;
+  padding: 10px 0;
+  border-radius: 8px;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 150ms ease;
+  display: inline-block;
+}
+
+.contribute-cta-primary:hover {
+  background: var(--primary-dark);
+}
