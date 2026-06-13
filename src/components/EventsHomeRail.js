@@ -63,6 +63,14 @@ const COVERFLOW_PARAMS = Object.freeze({
 });
 const COVERFLOW_SPEED_DEFAULT = 900;
 const COVERFLOW_SPEED_REDUCED = 0;
+const MAX_RAIL_ITEMS = 5;
+const RESTROVERSE_BUSINESS_IMAGES = Object.freeze([
+  "/images/homepage/business/restroverse/restroverse-business-1.jpg",
+  "/images/homepage/business/restroverse/restroverse-business-2.jpg",
+  "/images/homepage/business/restroverse/restroverse-business-3.jpg",
+  "/images/homepage/business/restroverse/restroverse-business-4.jpg",
+  "/images/homepage/business/restroverse/restroverse-business-5.jpg"
+]);
 
 // Slide count is capped at 3 on every viewport (locked 2026-06-05).
 // Wider screens render the same 3-up layout filling a similar share of
@@ -88,6 +96,25 @@ const FALLBACK_POSTER = "/images/event-types/cleanup.jpg";
 function fallBackPoster(event) {
   event.currentTarget.onerror = null;
   event.currentTarget.src = FALLBACK_POSTER;
+}
+
+function hideBrokenImage(event) {
+  event.currentTarget.hidden = true;
+}
+
+function getBusinessImages(event) {
+  const haystack = [
+    event?.title,
+    event?.slug,
+    event?.id,
+    event?.linkedIssue?.title,
+    event?.linkedIssue?.slug,
+    event?.issue?.title,
+    event?.issue?.slug
+  ].filter(Boolean).join(" ").toLowerCase();
+
+  if (!haystack.includes("restroverse")) return [];
+  return RESTROVERSE_BUSINESS_IMAGES;
 }
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
@@ -162,7 +189,7 @@ export function EventsHomeRail({
   const items = [
     ...liveEvents.map((event) => ({ kind: "live", event })),
     ...upcomingEvents.map((event) => ({ kind: "upcoming", event }))
-  ];
+  ].slice(0, MAX_RAIL_ITEMS);
   const isEmpty = items.length === 0;
 
   const [activeIndex, setActiveIndex] = useState(0);
@@ -260,6 +287,7 @@ function LivePosterCard({ event, copy, language, isActive }) {
     language,
     copy
   );
+  const businessImages = getBusinessImages(event);
   void isActive;
 
   return (
@@ -298,6 +326,7 @@ function LivePosterCard({ event, copy, language, isActive }) {
             </div>
             <div className="events-home-rail-poster-bottom">
               <div className="events-home-rail-poster-bottom-text">
+                <BusinessImageStrip images={businessImages} title={event.title} />
                 <h3>{event.title}</h3>
                 {durationLabel ? <p>{durationLabel}</p> : null}
               </div>
@@ -320,6 +349,7 @@ function UpcomingPosterCard({ event, language, copy, isActive }) {
     language,
     copy
   );
+  const businessImages = getBusinessImages(event);
   void isActive;
 
   return (
@@ -353,6 +383,7 @@ function UpcomingPosterCard({ event, language, copy, isActive }) {
             </div>
             <div className="events-home-rail-poster-bottom">
               <div className="events-home-rail-poster-bottom-text">
+                <BusinessImageStrip images={businessImages} title={event.title} />
                 <h3>{event.title}</h3>
                 {event.addressText ? <p>{event.addressText}</p> : null}
               </div>
@@ -365,6 +396,26 @@ function UpcomingPosterCard({ event, language, copy, isActive }) {
         </div>
       </Link>
     </article>
+  );
+}
+
+function BusinessImageStrip({ images, title }) {
+  if (!images?.length) return null;
+
+  return (
+    <span className="events-home-rail-business-strip" aria-label={`${title} business images`}>
+      {images.map((src) => (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          key={src}
+          src={src}
+          alt=""
+          loading="lazy"
+          onError={hideBrokenImage}
+          aria-hidden="true"
+        />
+      ))}
+    </span>
   );
 }
 

@@ -300,6 +300,31 @@
  * the parent <Link> already handles the click; the pill is a visual
  * affordance, not a separate target (a nested <a> would be invalid HTML
  * and would steal focus order from screen readers). */
+.events-home-rail-business-strip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  width: fit-content;
+  max-width: 100%;
+  margin-bottom: 5px;
+}
+
+.events-home-rail-business-strip img {
+  position: static;
+  inset: auto;
+  width: clamp(30px, 4.2vw, 42px);
+  height: clamp(30px, 4.2vw, 42px);
+  flex: 0 0 auto;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.86);
+  border-radius: 8px;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.32);
+}
+
+.events-home-rail-business-strip img + img {
+  margin-left: -12px;
+}
+
 .events-home-rail-poster-cta {
   flex-shrink: 0;
   display: inline-flex;
