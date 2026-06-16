@@ -1,9 +1,11 @@
 "use client";
 
-// /impact — community impact aggregate. Sums the demo past-events into
-// headline numbers so anyone arriving cold sees "what the platform has
-// already moved" at a glance. UI-only for now; once a real /reports
-// endpoint lands, swap the useMemo aggregate for a fetch.
+// /impact — community impact aggregate. Headline KPIs come from the
+// backend's official public report (GET /reports/public) for signed-in
+// visitors; logged-out visitors fall back to a client-side sum over the
+// public completed-events list, so the page works for everyone. The
+// per-event list, category mix, and time series below stay sourced from
+// the public events list regardless.
 
 import {
   ArrowRightOutlined,
@@ -18,6 +20,7 @@ import { useEffect, useMemo, useState } from "react";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
 import { listPastEvents } from "@/lib/eventsApi";
+import { fetchPublicReport } from "@/lib/reportsApi";
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 
@@ -142,6 +145,7 @@ export default function ImpactPage() {
   const { language } = usePreferences();
   const t = COPY[language] || COPY.np;
   const [past, setPast] = useState([]);
+  const [report, setReport] = useState(null);
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -152,12 +156,23 @@ export default function ImpactPage() {
         if (!cancelled) setPast([]);
       }
     })();
+    // Official figures — signed-in only. Logged-out viewers 401 here and
+    // keep the client-side fallback below; never block the page on it.
+    (async () => {
+      try {
+        const data = await fetchPublicReport({ sections: ["overview", "issues", "events"] });
+        if (!cancelled) setReport(data);
+      } catch {
+        if (!cancelled) setReport(null);
+      }
+    })();
     return () => { cancelled = true; };
   }, [language]);
 
   const totals = useMemo(() => {
-    const events = past.length;
-    const participants = past.reduce(
+    // Client-side fallback from the public completed-events list.
+    const derivedEvents = past.length;
+    const derivedParticipants = past.reduce(
       (sum, e) => sum + (Number(e.participantCount) || 0),
       0
     );
@@ -165,13 +180,25 @@ export default function ImpactPage() {
       (sum, e) => sum + (Number(e.durationMinutes) || 0) * (Number(e.participantCount) || 0),
       0
     );
-    const locations = new Set(
+    const derivedLocations = new Set(
       past
         .map((e) => (e.addressText || "").split(",").pop()?.trim().toLowerCase())
         .filter(Boolean)
     ).size;
-    return { events, participants, minutes, locations };
-  }, [past]);
+
+    // Prefer official backend figures when the report resolved (signed-in).
+    const events =
+      report?.events?.byStatus?.COMPLETED ??
+      report?.events?.completionRate?.completed ??
+      derivedEvents;
+    const participants =
+      report?.events?.attendance?.totalAttendees ?? derivedParticipants;
+    const locations = Array.isArray(report?.issues?.byMunicipality)
+      ? report.issues.byMunicipality.length
+      : derivedLocations;
+
+    return { events, participants, minutes, locations, official: Boolean(report) };
+  }, [past, report]);
 
   const statTiles = [
     { value: totals.events, label: t.stats.events, icon: CheckCircleOutlined },

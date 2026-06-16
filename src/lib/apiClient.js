@@ -274,6 +274,45 @@ export function changePassword(values) {
   return postJson("/auth/change-password", values, { requireAuth: true });
 }
 
+// Member registration → SMS OTP flow.
+//   register: { name, email, password, phone(E.164) } → 201 (no token,
+//             OTP sent). Returns the created user (email, role, name).
+//   verifyOtp: { phone, otp } → 200 { user(partial), accessToken,
+//             refreshToken }. Merge the partial user with the register
+//             user to build a full session (getAuthSession needs email +
+//             role).
+//   resendOtp: { phone } → 200 (429 when the cooldown is active).
+export function registerMember(values) {
+  return postJson("/auth/register", values);
+}
+
+export function verifyOtp(values) {
+  return postJson("/auth/verify-otp", values);
+}
+
+export function resendOtp(phone) {
+  return postJson("/auth/resend-otp", { phone });
+}
+
 export function voteOnIssue(issueId, voterRole = "INTERESTED") {
   return postJson(`/issues/${issueId}/vote`, { voterRole }, { requireAuth: true });
+}
+
+// Retract a vote. Backend allows this only while the issue is still OPEN
+// (returns 409 otherwise) and responds with { data: { voteCount } }.
+export function retractVoteOnIssue(issueId) {
+  return deleteJson(`/issues/${issueId}/vote`, { requireAuth: true });
+}
+
+// Issues the caller has voted on — full issue objects decorated with
+// `voterRole` + `votedAt`, paginated ({ items, nextCursor }).
+export function fetchMyIssueVotes(params = {}) {
+  return getJson("/issues/me/votes", { params, requireAuth: true });
+}
+
+// Public member profile (no auth). `idOrSlug` is a user id (UUID); the
+// backend returns { id, name, username, avatar, city, bio, isVerified,
+// createdAt, stats: { issuesReported, votesCast, eventsLed, eventsJoined } }.
+export function fetchUserPublicProfile(idOrSlug) {
+  return getJson(`/users/${idOrSlug}/profile`);
 }

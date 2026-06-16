@@ -1032,7 +1032,11 @@ export const copy = {
         voteSuccess: "तपाईंको समर्थन रेकर्ड भयो।",
         voteAlreadyVoted: "तपाईंले पहिले नै यो समस्यामा समर्थन गर्नुभएको छ।",
         voteForbidden: "समर्थन गर्न खाता प्रमाणित गर्न आवश्यक छ।",
-        voteError: "समर्थन रेकर्ड गर्न सकिएन। कृपया फेरि प्रयास गर्नुहोस्।"
+        voteError: "समर्थन रेकर्ड गर्न सकिएन। कृपया फेरि प्रयास गर्नुहोस्।",
+        voteWithdraw: "समर्थन फिर्ता",
+        voteWithdrawn: "तपाईंको समर्थन फिर्ता भयो।",
+        voteWithdrawNotOpen: "अभियान तय भइसकेकाले अब समर्थन फिर्ता गर्न मिल्दैन।",
+        voteWithdrawError: "समर्थन फिर्ता गर्न सकिएन। फेरि प्रयास गर्नुहोस्।"
       },
       states: {
         loading: "समस्याहरू लोड हुँदै...",
@@ -1693,13 +1697,13 @@ export const copy = {
           intro: {
             title: "स्वागत",
             heading: "श्रमदान सदस्य बन्नुहोस्",
-            intro: "फोन नम्बर र छोटो OTP कोडले मात्र — एकै मिनेटमा।",
+            intro: "नाम, इमेल, पासवर्ड र फोन — अनि फोनमा आउने OTP कोडले पुष्टि।",
             cta: "सुरु गर्नुहोस्"
           },
           phone: {
-            title: "फोन",
-            heading: "फोन नम्बरबाट जोडिनुहोस्",
-            intro: "नेपालको १० अंकको मोबाइल नम्बर लेख्नुहोस्।"
+            title: "विवरण",
+            heading: "तपाईंको विवरण भर्नुहोस्",
+            intro: "नाम, इमेल, पासवर्ड र नेपालको १० अंकको मोबाइल नम्बर।"
           },
           otp: {
             title: "OTP",
@@ -2777,7 +2781,11 @@ export const copy = {
         voteSuccess: "Your support has been recorded.",
         voteAlreadyVoted: "You have already supported this issue.",
         voteForbidden: "Your account needs to be verified to vote.",
-        voteError: "Could not record your support. Please try again."
+        voteError: "Could not record your support. Please try again.",
+        voteWithdraw: "Withdraw support",
+        voteWithdrawn: "Your support has been withdrawn.",
+        voteWithdrawNotOpen: "This issue is already scheduled, so support can't be withdrawn now.",
+        voteWithdrawError: "Could not withdraw support. Please try again."
       },
       states: {
         loading: "Loading issues...",
@@ -3438,13 +3446,13 @@ export const copy = {
           intro: {
             title: "Welcome",
             heading: "Become a Shramdan member",
-            intro: "Just a phone number and a short OTP — done in a minute.",
+            intro: "Your name, email, password and phone — then confirm with the OTP we send.",
             cta: "Get Started"
           },
           phone: {
-            title: "Phone",
-            heading: "Join with your phone",
-            intro: "Enter your 10-digit Nepali mobile number."
+            title: "Details",
+            heading: "Your details",
+            intro: "Name, email, password, and your 10-digit Nepali mobile number."
           },
           otp: {
             title: "OTP",

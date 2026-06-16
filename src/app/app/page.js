@@ -3,8 +3,11 @@
 // /app — mobile-first member dashboard shell (roadmap Phase 2).
 // MVP scope covers 2.2 (dashboard tiles), 2.5 (issues quick-vote
 // hand-off — links to /issues for now), and 2.7 (profile basics).
-// Data flows from dummy mocks today; once backend ships
-// /me/dashboard, the useMemo aggregates swap for a fetch.
+// Events + supported issues are personalized from the backend:
+//   GET /events/me        → events the caller leads or voted on
+//   GET /issues/me/votes  → issues the caller has actually supported
+// Applications + notifications still use demo mocks — no member-scoped
+// backend endpoint exists for those yet.
 
 import {
   ArrowRightOutlined,
@@ -27,9 +30,9 @@ import {
   getDemoApplications,
   getDemoNotifications
 } from "@/lib/devMockData";
-import { getJson } from "@/lib/apiClient";
-import { getListItems } from "@/lib/adminUtils";
-import { listPastEvents, listUpcomingEvents } from "@/lib/eventsApi";
+import { fetchMyIssueVotes } from "@/lib/apiClient";
+import { getListItems, localizeIssue } from "@/lib/adminUtils";
+import { listMyEvents } from "@/lib/eventsApi";
 import { getAuthSession, subscribeAuthSession } from "@/lib/authSession";
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
@@ -130,35 +133,42 @@ export default function AppDashboardPage() {
     if (session === null) return; // initial null state, not "logged out"
   }, [session]);
 
-  // Aggregates: events + issues come from the API. Applications +
-  // notifications still flow from demo mocks pending member-scoped
-  // backend endpoints (admin /applications and notifications stack).
-  const [upcomingEvents, setUpcomingEvents] = useState([]);
-  const [pastEvents, setPastEvents] = useState([]);
+  // Personalized from the backend: events the caller is involved in
+  // (GET /events/me) and issues the caller actually voted on
+  // (GET /issues/me/votes). Applications + notifications stay on demo
+  // mocks — no member-scoped endpoint exists for those yet.
+  const [myEvents, setMyEvents] = useState([]);
   const [supportedIssues, setSupportedIssues] = useState([]);
 
+  const userId = session?.user?.id;
   useEffect(() => {
+    if (!userId) return undefined;
     let cancelled = false;
     (async () => {
       try {
-        const [upcoming, past, issuesRes] = await Promise.all([
-          listUpcomingEvents({ language, limit: 3 }),
-          listPastEvents({ language }),
-          getJson("/issues", { params: { sort: "voteCount", limit: 4, status: "OPEN" } })
+        const [events, votesRes] = await Promise.all([
+          listMyEvents({ language, as: "all", limit: 50 }),
+          fetchMyIssueVotes({ limit: 6 })
         ]);
         if (cancelled) return;
-        setUpcomingEvents(upcoming.slice(0, 3));
-        setPastEvents(past);
-        setSupportedIssues(getListItems(issuesRes).slice(0, 4));
+        setMyEvents(events);
+        setSupportedIssues(
+          getListItems(votesRes).map((issue) => localizeIssue(issue, language))
+        );
       } catch {
         if (cancelled) return;
-        setUpcomingEvents([]);
-        setPastEvents([]);
+        setMyEvents([]);
         setSupportedIssues([]);
       }
     })();
     return () => { cancelled = true; };
-  }, [language]);
+  }, [language, userId]);
+
+  const upcomingEvents = [...myEvents]
+    .filter((e) => e.status === "SCHEDULED" || e.status === "ACTIVE")
+    .sort((a, b) => new Date(a.scheduledAt || 0) - new Date(b.scheduledAt || 0))
+    .slice(0, 3);
+  const pastEvents = myEvents.filter((e) => e.status === "COMPLETED");
 
   const applications = useMemo(() => getDemoApplications(), []);
   const notifications = useMemo(() => getDemoNotifications(), []);
@@ -183,9 +193,9 @@ export default function AppDashboardPage() {
 
   const name = session.user.name || t.greetingFallback;
   const stats = {
-    events: upcomingEvents.length + Math.min(pastEvents.length, 5),
+    events: myEvents.length,
     issues: supportedIssues.length,
-    led: 1,
+    led: myEvents.filter((e) => e.isLeader).length,
     pending: applications.filter((a) => a.status !== "ACCEPTED" && a.status !== "REJECTED").length
   };
 

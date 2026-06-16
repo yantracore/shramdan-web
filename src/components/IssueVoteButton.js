@@ -13,31 +13,30 @@ function toLocalDigits(value, language) {
   return str.replace(/\d/g, (d) => NP_DIGITS[Number(d)]);
 }
 
+// voterRole values MUST match the backend enum on POST /issues/{id}/vote:
+// INTERESTED | GOING | WANT_TO_LEAD (used later to assign roles when the
+// issue converts to an event). Do not reintroduce WOULD_* values — the
+// backend rejects them.
 const ROLE_COPY = {
   np: {
     modalTitle: "तपाईंको समर्थन कस्तो हो?",
     modalIntro:
-      "यो समस्या समाधानमा तपाईंले कसरी सहयोग गर्न चाहनुहुन्छ? पछि परिवर्तन गर्न सकिन्छ।",
+      "यो समस्या समाधानमा तपाईं कसरी सहयोग गर्न चाहनुहुन्छ? पछि परिवर्तन गर्न सकिन्छ।",
     options: [
       {
         value: "INTERESTED",
-        label: "रुचिकर्ता",
-        hint: "यो समस्या सुनिनुपर्छ — मैले समर्थन गरेँ।"
+        label: "रुचि छ",
+        hint: "यो समस्या महत्त्वपूर्ण छ — म समर्थन गर्छु।"
       },
       {
-        value: "WOULD_VOLUNTEER",
-        label: "स्वयंसेवक",
-        hint: "अभियान भएमा शारीरिक श्रममा सहयोग गर्न तयार।"
+        value: "GOING",
+        label: "सामेल हुन्छु",
+        hint: "अभियान भएमा म आफैँ आएर श्रममा सामेल हुन्छु।"
       },
       {
-        value: "WOULD_DONATE",
-        label: "योगदानकर्ता",
-        hint: "औजार, सामग्री वा रकम योगदान गर्न तयार।"
-      },
-      {
-        value: "WOULD_ORGANIZE",
-        label: "नेतृत्व",
-        hint: "अभियान आयोजना वा समन्वयमा अग्रसर हुन सकौँ।"
+        value: "WANT_TO_LEAD",
+        label: "नेतृत्व गर्छु",
+        hint: "अभियान आयोजना वा नेतृत्व गर्न तयार छु।"
       }
     ],
     submit: "समर्थन गर्नुहोस्",
@@ -54,19 +53,14 @@ const ROLE_COPY = {
         hint: "I think this matters — I'm registering my support."
       },
       {
-        value: "WOULD_VOLUNTEER",
-        label: "Would Volunteer",
-        hint: "Ready to show up for physical labour if a campaign happens."
+        value: "GOING",
+        label: "I'll Join",
+        hint: "I'll show up and pitch in if a campaign happens."
       },
       {
-        value: "WOULD_DONATE",
-        label: "Would Donate",
-        hint: "Ready to contribute tools, materials, or funds."
-      },
-      {
-        value: "WOULD_ORGANIZE",
-        label: "Would Organize",
-        hint: "Willing to help organize or coordinate the campaign."
+        value: "WANT_TO_LEAD",
+        label: "Want to Lead",
+        hint: "Ready to help organize or lead the campaign."
       }
     ],
     submit: "Support",
@@ -86,7 +80,7 @@ export function IssueVoteButton({
   showLabel = true,
   className
 }) {
-  const { isAuthenticated, voteCount, voted, voting, handleVoteClick } =
+  const { isAuthenticated, voteCount, voted, voting, handleVoteClick, handleRetract } =
     useIssueVote({
       issueId,
       initialVoteCount,
@@ -108,7 +102,11 @@ export function IssueVoteButton({
   }, [voteCount]);
 
   const label = voted ? content.card.voteActionDone : content.card.voteAction;
-  const tooltipTitle = !isAuthenticated ? content.card.voteDisabledTooltip : "";
+  const tooltipTitle = !isAuthenticated
+    ? content.card.voteDisabledTooltip
+    : voted
+      ? content.card.voteWithdraw
+      : "";
 
   const handleClick = (event) => {
     if (event?.preventDefault) event.preventDefault();
@@ -118,7 +116,13 @@ export function IssueVoteButton({
       handleVoteClick(event);
       return;
     }
-    if (voted || voting || !issueId) return;
+    if (voting || !issueId) return;
+    // Voted already → tapping withdraws support (issue must still be OPEN;
+    // the hook surfaces a graceful message when the backend rejects with 409).
+    if (voted) {
+      handleRetract(event);
+      return;
+    }
     setPickerRole("INTERESTED");
     setPickerOpen(true);
   };
@@ -132,8 +136,8 @@ export function IssueVoteButton({
     <>
       <Tooltip title={tooltipTitle}>
         <Button
+          aria-pressed={voted}
           className={className}
-          disabled={voted}
           icon={voted ? <CheckOutlined /> : <LikeOutlined />}
           loading={voting}
           onClick={handleClick}

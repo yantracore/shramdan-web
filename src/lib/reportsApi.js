@@ -81,6 +81,26 @@ export async function fetchReport(filters = {}) {
   return response?.data ?? null;
 }
 
+// Public community-impact report — a curated, PII-free subset of the admin
+// report. Backend exposes it to ANY signed-in user (not fully public), so
+// callers must degrade gracefully when the viewer is logged out (401).
+// Shape mirrors fetchReport but omits feedback/applications/uploads and
+// per-user emails. See GET /api/v1/reports/public.
+export const PUBLIC_REPORT_SECTIONS = [
+  "overview",
+  "community",
+  "issues",
+  "events",
+  "engagement",
+  "geographic"
+];
+
+export async function fetchPublicReport(filters = {}) {
+  const params = buildReportParams(filters);
+  const response = await getJson("/reports/public", { params, requireAuth: true });
+  return response?.data ?? null;
+}
+
 export function formatBytes(bytes) {
   if (bytes === undefined || bytes === null || Number.isNaN(Number(bytes))) return "—";
   const value = Number(bytes);

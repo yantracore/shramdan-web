@@ -1,8 +1,10 @@
 "use client";
 
-// Phase 7 v0 — public member profile at /members/[slug].
-// Reads from src/lib/discussionsStub.js. The contract lives in
-// docs/api-requirements/members.md under "Public profile (Phase 7)".
+// Phase 7 — public member profile at /members/[slug].
+// Prefers the real backend (GET /users/{id}/profile); falls back to the
+// discussions stub when the slug isn't a real user id (e.g. anonymous /
+// demo discussion authors). Contract: docs/api-requirements/members.md
+// "Public profile (Phase 7)".
 
 import { ArrowLeftOutlined, EnvironmentOutlined, CalendarOutlined } from "@ant-design/icons";
 import Link from "next/link";
@@ -10,7 +12,30 @@ import { use, useEffect, useState } from "react";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
 import { copy } from "@/lib/siteContent";
+import { fetchUserPublicProfile } from "@/lib/apiClient";
 import { getMemberPublicProfile } from "@/lib/discussionsStub";
+
+// Map the backend profile shape onto the fields this page renders. The
+// real endpoint exposes four contribution stats; nomination / discussion /
+// proposal counts and the activity feed have no backend source yet, so
+// they stay empty (their sections self-hide).
+function mapBackendProfile(raw) {
+  if (!raw || typeof raw !== "object") return null;
+  return {
+    displayName: raw.name || raw.username || "—",
+    avatarUrl: raw.avatar || null,
+    bio: raw.bio || null,
+    city: raw.city || null,
+    memberSince: raw.createdAt || null,
+    supportedIssueCount: raw.stats?.votesCast ?? 0,
+    participatedEventCount: raw.stats?.eventsJoined ?? 0,
+    leaderNominationCount: 0,
+    discussionsStartedCount: 0,
+    featureProposalsCount: 0,
+    publicLanes: [],
+    recentActivity: []
+  };
+}
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 const NP_MONTHS = ["जनवरी", "फेब्रुअरी", "मार्च", "अप्रिल", "मे", "जुन", "जुलाई", "अगस्ट", "सेप्टेम्बर", "अक्टोबर", "नोभेम्बर", "डिसेम्बर"];
@@ -65,12 +90,19 @@ export default function MemberProfilePage({ params }) {
     let cancelled = false;
     (async () => {
       try {
-        const row = await getMemberPublicProfile(slug);
+        // Real backend first — the slug is treated as a user id.
+        const raw = await fetchUserPublicProfile(slug);
+        const data = raw?.data ?? raw;
         if (cancelled) return;
-        setProfile(row);
+        setProfile(mapBackendProfile(data));
       } catch {
-        if (cancelled) return;
-        setProfile(null);
+        // Not a real user (anonymous / demo discussion author) → stub.
+        try {
+          const row = await getMemberPublicProfile(slug);
+          if (!cancelled) setProfile(row);
+        } catch {
+          if (!cancelled) setProfile(null);
+        }
       } finally {
         if (!cancelled) setLoaded(true);
       }

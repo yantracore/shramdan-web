@@ -233,3 +233,14 @@ export async function getEventById(eventId, { language = "np" } = {}) {
   const data = response?.data;
   return data ? normalizeEvent(data, language) : null;
 }
+
+// Events the authenticated caller is involved in (GET /events/me). `as`
+// scopes to leader | voter | all (default all). Each normalized item keeps
+// the caller-relationship decorations the backend adds — `isLeader` and
+// `voterRole` (their commitment on the linked issue, or null).
+export async function listMyEvents({ language = "np", as = "all", status, limit = DEFAULT_LIMIT } = {}) {
+  const params = { as, limit };
+  if (status) params.status = status;
+  const response = await getJson("/events/me", { params, requireAuth: true });
+  return getListItems(response).map((ev) => normalizeEvent(ev, language));
+}

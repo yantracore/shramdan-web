@@ -1,7 +1,9 @@
 import { getJson } from "@/lib/apiClient";
 import { getResponseData } from "@/lib/adminUtils";
 
-const PUBLIC_COUNT_LIMIT = 500;
+// Backend caps list `limit` at 100 — requesting more returns 400. We page
+// through with the cursor loop below, so 100/page is plenty for counting.
+const PUBLIC_COUNT_LIMIT = 100;
 const PUBLIC_COUNT_MAX_PAGES = 20;
 const PUBLIC_COUNT_CACHE_MS = 5 * 60 * 1000;
 const LIVE_SCHEDULED_WINDOW_MS = 6 * 60 * 60 * 1000;
