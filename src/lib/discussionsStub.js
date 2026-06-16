@@ -221,7 +221,41 @@ const MOCK_TOPICS = [
   }
 ];
 
+// ---- Mock thread messages (seed replies per topic) -----------------
+// Gives the /discussions/[slug] thread a lived-in feel before the
+// backend ships GET /discussions/:slug/messages. Newly posted replies
+// (demoPostMessage) are appended client-side on top of these.
+
+const AUTHOR_MUNA = { name: "मुना गुरुङ", avatarUrl: "/images/demo-events/sankhu-temple.jpg", slug: "muna-gurung" };
+const AUTHOR_RAMESH = { name: "रमेश श्रेष्ठ", avatarUrl: "/images/demo-events/nuwakot-darbar.jpg", slug: "ramesh-shrestha" };
+const AUTHOR_SITA = { name: "सीता तामाङ", avatarUrl: "/images/demo-events/manang-trail.jpg", slug: "sita-tamang" };
+
+const MOCK_MESSAGES = {
+  "disc-feature-darkmode-corner-tinting": [
+    { id: "msg-dm-1", authorDisplay: AUTHOR_SITA, anonymous: false, body: "रातमा प्रयोग गर्दा साँच्चै आँखामा बिझाउँछ। ५८% मा झार्ने प्रस्ताव ठीक लाग्यो।", upvoteCount: 5, createdAt: hoursAgoIso(16) },
+    { id: "msg-dm-2", authorDisplay: AUTHOR_MUNA, anonymous: false, body: "blur २२px राख्दा पुराना फोनमा थोरै लाग होला कि? कम-end device मा एकपटक जाँच्नुपर्ला।", upvoteCount: 3, createdAt: hoursAgoIso(12) },
+    { id: "msg-dm-3", authorDisplay: AUTHOR_RAMESH, anonymous: false, body: "राम्रो point — `backdrop-filter` लाई `@media (prefers-reduced-transparency)` ले पहिले नै off गर्छ, त्यसैले low-end मा fallback छँदैछ।", upvoteCount: 7, createdAt: hoursAgoIso(6) }
+  ],
+  "disc-trail-marker-standards": [
+    { id: "msg-tm-1", authorDisplay: AUTHOR_RAMESH, anonymous: false, body: "Department of Tourism को मानक follow गर्ने हो भने नक्साको रङ-कोड पनि उतैबाट लिऔं। एकरूपता दुवैतिर चाहिन्छ।", upvoteCount: 9, createdAt: daysAgoIso(4) },
+    { id: "msg-tm-2", authorDisplay: AUTHOR_SITA, anonymous: false, body: "स्थानीय समुदायलाई पनि सोध्नुपर्छ — कतिपय ट्रेलमा परम्परागत चिह्न प्रयोग हुन्छन्, ती मेटाउनु हुँदैन।", upvoteCount: 6, createdAt: daysAgoIso(3) },
+    { id: "msg-tm-3", authorDisplay: { anonymous: true }, anonymous: true, body: "एउटा साझा PDF guide बनाएर सबै अभियान संयोजकलाई पठाए कसो होला?", upvoteCount: 4, createdAt: daysAgoIso(1) }
+  ],
+  "disc-event-thanks-melamchi": [
+    { id: "msg-mc-1", authorDisplay: AUTHOR_MUNA, anonymous: false, body: "धन्यवाद सीता दिदी! त्यो दिन साँच्चै ऐतिहासिक थियो। अर्को पटक सँगै।", upvoteCount: 12, createdAt: hoursAgoIso(20) },
+    { id: "msg-mc-2", authorDisplay: AUTHOR_RAMESH, anonymous: false, body: "३ टन! फोटोहरू कतै राख्न मिल्छ? gallery मा थप्न पाए हुन्थ्यो।", upvoteCount: 8, createdAt: hoursAgoIso(8) },
+    { id: "msg-mc-3", authorDisplay: AUTHOR_SITA, anonymous: false, body: "अवश्य — अभियान page मा photos थपिसकेँ। आउने हप्ता report पनि राख्छु।", upvoteCount: 6, createdAt: hoursAgoIso(2) }
+  ]
+};
+
 // ---- Reader API ----------------------------------------------------
+
+export function listDiscussionMessages(topicSlugOrId) {
+  const topic = MOCK_TOPICS.find((r) => r.slug === topicSlugOrId || r.id === topicSlugOrId);
+  const key = topic?.id ?? topicSlugOrId;
+  const rows = MOCK_MESSAGES[key] ?? [];
+  return Promise.resolve({ items: [...rows], nextCursor: null });
+}
 
 export function listDiscussionTopics({ kind, linkedEntityKind, linkedEntityId, sort = "recentActivity", limit = 20 } = {}) {
   let rows = [...MOCK_TOPICS];
