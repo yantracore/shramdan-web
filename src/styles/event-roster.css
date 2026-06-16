@@ -410,6 +410,53 @@
   border: 1px solid var(--line);
 }
 
+/* The role the viewer already holds — green "you're in" confirmation in
+   place of the open-slot pill, with a soft green wash on the whole row. */
+.event-roster-joined-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 11px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  line-height: 1.4;
+  color: #2e7d32;
+  background: color-mix(in srgb, #2e7d32 12%, transparent);
+  border: 1px solid color-mix(in srgb, #2e7d32 40%, var(--line));
+}
+
+.event-roster-joined-pill > .anticon {
+  font-size: 13px;
+}
+
+.event-roster-row.is-own-role {
+  border-color: color-mix(in srgb, #2e7d32 45%, var(--line));
+  background: color-mix(in srgb, #2e7d32 7%, var(--surface));
+}
+
+:root[data-theme="dark"] .event-roster-joined-pill {
+  color: #4ade80;
+  background: color-mix(in srgb, #4ade80 14%, transparent);
+  border-color: color-mix(in srgb, #4ade80 36%, var(--line));
+}
+
+:root[data-theme="dark"] .event-roster-row.is-own-role {
+  border-color: color-mix(in srgb, #4ade80 38%, var(--line));
+  background: color-mix(in srgb, #4ade80 9%, var(--surface));
+}
+
+/* Other rows lock once the viewer has committed to a role — dim the row,
+   but keep the disabled pill itself legible (no compounded fade). */
+.event-roster-row.is-locked {
+  opacity: 0.6;
+}
+
+.event-roster-row.is-locked .event-roster-open-pill:disabled {
+  opacity: 1;
+}
+
 @media (max-width: 620px) {
   .event-roster-list {
     grid-template-columns: 1fr;

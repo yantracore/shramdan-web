@@ -19,6 +19,7 @@
 //     filledNames: string[]
 //   }, ...]
 
+import { CheckCircleFilled } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import { useState, useSyncExternalStore } from "react";
 import { postJson } from "@/lib/apiClient";
@@ -51,6 +52,10 @@ const COPY = {
     unfilled: "खाली",
     joinAs: "जोडिनुहोस्",
     joining: "जोडिँदै…",
+    youreInPill: "जोडिनुभयो",
+    waitlistedPill: "प्रतीक्षामा",
+    checkedInPill: "चेक-इन",
+    lockedHint: "एक पटकमा एउटै भूमिकामा जोडिन सकिन्छ।",
     joinedToast: "तपाईं {role} भूमिकामा जोडिनुभयो।",
     waitlistToast: "भूमिका भरिएको छ — प्रतीक्षा सूचीमा हुनुहुन्छ।",
     alreadyJoinedToast: "तपाईं पहिले अर्को भूमिकामा जोडिनुभएको छ।",
@@ -88,6 +93,10 @@ const COPY = {
     unfilled: "open",
     joinAs: "Join",
     joining: "Joining…",
+    youreInPill: "You're in",
+    waitlistedPill: "Waitlisted",
+    checkedInPill: "Checked in",
+    lockedHint: "You can only join one role per event.",
     joinedToast: "You're in as {role}.",
     waitlistToast: "Role full — you're on the waitlist.",
     alreadyJoinedToast: "You've already joined this event in a different role.",
@@ -114,13 +123,23 @@ const COPY = {
   }
 };
 
-export function EventRosterPanel({ rolesNeeded, language = "np", eventId, viewerRole = null, onJoined }) {
-  if (!Array.isArray(rolesNeeded) || rolesNeeded.length === 0) return null;
+export function EventRosterPanel({
+  rolesNeeded,
+  language = "np",
+  eventId,
+  viewerRole = null,
+  viewerStatus = null,
+  onJoined
+}) {
   const t = COPY[language] || COPY.np;
   const session = useSyncExternalStore(subscribeAuthSession, getAuthSession, () => null);
   const router = useRouter();
   const messageApi = useToast();
   const [pendingRole, setPendingRole] = useState(null);
+
+  // Hooks above run unconditionally; the empty-roster guard comes after them
+  // so hook order stays stable (react-hooks/rules-of-hooks).
+  if (!Array.isArray(rolesNeeded) || rolesNeeded.length === 0) return null;
 
   const handleRoleClick = async (role) => {
     // Anon viewer → login redirect, preserving return path.
@@ -217,8 +236,22 @@ export function EventRosterPanel({ rolesNeeded, language = "np", eventId, viewer
           const openCount = Math.max(0, row.count - row.filled);
           const isPending = pendingRole === row.role;
           const isOwnRole = viewerRole === row.role;
+          // Already committed to a different role → this row is locked: one
+          // person can hold only a single role on an event.
+          const lockedByOtherRole = Boolean(viewerRole) && !isOwnRole;
+          const joinedLabel =
+            viewerStatus === "INVITED"
+              ? t.waitlistedPill
+              : viewerStatus === "CHECKED_IN"
+                ? t.checkedInPill
+                : t.youreInPill;
           return (
-            <li key={row.role} className="event-roster-row">
+            <li
+              key={row.role}
+              className={`event-roster-row${isOwnRole ? " is-own-role" : ""}${
+                lockedByOtherRole ? " is-locked" : ""
+              }`}
+            >
               <span
                 className="event-roster-role"
                 style={{ "--role-color": roleColor }}
@@ -249,12 +282,18 @@ export function EventRosterPanel({ rolesNeeded, language = "np", eventId, viewer
                   </span>
                 ) : null}
               </span>
-              {openCount > 0 ? (
+              {isOwnRole ? (
+                <span className="event-roster-joined-pill">
+                  <CheckCircleFilled aria-hidden="true" />
+                  {joinedLabel}
+                </span>
+              ) : openCount > 0 ? (
                 <button
                   type="button"
                   className="event-roster-open-pill"
                   onClick={() => handleRoleClick(row.role)}
-                  disabled={isPending || isOwnRole}
+                  disabled={isPending || lockedByOtherRole}
+                  title={lockedByOtherRole ? t.lockedHint : undefined}
                   aria-label={`${t.joinAs} — ${roleLabel}`}
                 >
                   {isPending ? t.joining : t.openPill.replace("{n}", openCount)}

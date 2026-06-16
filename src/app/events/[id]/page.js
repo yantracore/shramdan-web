@@ -40,7 +40,11 @@ import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
 import { getJson } from "@/lib/apiClient";
 import { injectMockLiveStream } from "@/lib/devMockData";
-import { buildRolesNeeded, countActiveParticipants } from "@/lib/eventParticipants";
+import {
+  buildRolesNeeded,
+  countActiveParticipants,
+  findViewerRoleByName
+} from "@/lib/eventParticipants";
 import { getAuthSession, subscribeAuthSession } from "@/lib/authSession";
 import { copy } from "@/lib/siteContent";
 import { discussionPresenceForEvent } from "@/lib/discussionsStub";
@@ -118,6 +122,9 @@ export default function EventDetailPage() {
   const [error, setError] = useState("");
   const [notFound, setNotFound] = useState(false);
   const [discussionPresence, setDiscussionPresence] = useState(null);
+  // Viewer's own participation record — single source of truth shared by the
+  // join CTA and the roster panel so both agree on "you're already in as X".
+  const [myParticipation, setMyParticipation] = useState(null);
 
   useEffect(() => {
     if (!eventId) return;
@@ -161,8 +168,10 @@ export default function EventDetailPage() {
       let merged = data;
       if (Array.isArray(data?.rolePlan) && !Array.isArray(data?.rolesNeeded)) {
         try {
+          // Participant sub-resources are keyed by the event UUID — the URL
+          // param may be a slug, so always use the resolved `data.id` here.
           const rosterResponse = await getJson(
-            `/events/${eventId}/participants?limit=200`
+            `/events/${data.id}/participants?limit=200`
           );
           const rosterData = getResponseData(rosterResponse, null);
           const participants = Array.isArray(rosterData?.items)
@@ -208,6 +217,45 @@ export default function EventDetailPage() {
   }, [fetchEvent]);
 
   const session = useSyncExternalStore(subscribeAuthSession, getAuthSession, () => null);
+
+  const isDemoEvent = typeof eventId === "string" && eventId.startsWith("demo-");
+  const viewerId = session?.user?.id || null;
+  const viewerName = session?.user?.name || null;
+  // Participant sub-resources are keyed by the event UUID, but the URL param
+  // can be a slug — use the resolved id from the fetched event.
+  const resolvedEventId = eventData?.id || null;
+
+  const fetchMyParticipation = useCallback(async () => {
+    if (!resolvedEventId || isDemoEvent || !viewerId) {
+      setMyParticipation(null);
+      return;
+    }
+    try {
+      const response = await getJson(`/events/${resolvedEventId}/participants/me`, {
+        requireAuth: true
+      });
+      const data = response?.data ?? response;
+      setMyParticipation(
+        data?.role ? { id: data.id, role: data.role, status: data.status } : null
+      );
+    } catch {
+      // 404 = not joined yet; any other error soft-fails to the name-match
+      // path below so a transient hiccup never hides the join CTA.
+      setMyParticipation(null);
+    }
+  }, [resolvedEventId, isDemoEvent, viewerId]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchMyParticipation();
+  }, [fetchMyParticipation]);
+
+  // Backend record wins; demo events (and soft-failed fetches) fall back to
+  // matching the viewer's name against the roster's filledNames.
+  const viewerRole =
+    myParticipation?.role || findViewerRoleByName(eventData?.rolesNeeded, viewerName);
+  const viewerStatus = myParticipation?.status || null;
+
   const linkedIssue = eventData?.issue ? localizeIssue(eventData.issue, language) : null;
   const leader = eventData?.eventLeader ?? null;
   const isLeader = Boolean(
@@ -248,6 +296,34 @@ export default function EventDetailPage() {
       fetchEvent();
     },
     [fetchEvent]
+  );
+
+  // The join CTA and roster panel report participation changes here. We flip
+  // local state optimistically for instant feedback, then reconcile with the
+  // server (real events only — demo events have no backend to reconcile with).
+  const handleJoinChanged = useCallback(
+    (payload) => {
+      // Demo join: the panel hands back the locally-mutated event (its
+      // rolesNeeded now lists the viewer's name) — merge it; the name-match
+      // in `viewerRole` then flips both panels to the joined state.
+      if (payload && typeof payload === "object" && Array.isArray(payload.rolesNeeded)) {
+        setEventData((prev) => ({ ...(prev || {}), ...payload }));
+        return;
+      }
+      // Real join: optimistically record the role for an instant flip.
+      if (payload && typeof payload === "object" && payload.role) {
+        setMyParticipation({
+          id: payload.id || null,
+          role: payload.role,
+          status: payload.status || "CONFIRMED"
+        });
+      }
+      if (!isDemoEvent) {
+        fetchEvent();
+        fetchMyParticipation();
+      }
+    },
+    [fetchEvent, fetchMyParticipation, isDemoEvent]
   );
   const uploads = Array.isArray(eventData?.uploads) ? eventData.uploads : [];
   const imageUploads = uploads.filter(isImageUpload);
@@ -548,13 +624,17 @@ export default function EventDetailPage() {
                     <EventJoinPanel
                       event={eventData}
                       language={language}
-                      onJoined={handleEventCompleted}
+                      viewerRole={viewerRole}
+                      viewerStatus={viewerStatus}
+                      onJoined={handleJoinChanged}
                     />
                     <EventRosterPanel
                       rolesNeeded={eventData.rolesNeeded}
                       language={language}
                       eventId={eventData.id}
-                      onJoined={() => handleEventCompleted()}
+                      viewerRole={viewerRole}
+                      viewerStatus={viewerStatus}
+                      onJoined={handleJoinChanged}
                     />
                   </>
                 ) : null}

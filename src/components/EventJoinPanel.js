@@ -3,8 +3,8 @@
 import { CheckCircleFilled, UserAddOutlined } from "@ant-design/icons";
 import { Button, Modal, Radio, Space } from "antd";
 import Link from "next/link";
-import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
-import { getJson, postJson } from "@/lib/apiClient";
+import { useState, useSyncExternalStore } from "react";
+import { postJson } from "@/lib/apiClient";
 import { getAuthSession, subscribeAuthSession } from "@/lib/authSession";
 import { buildLoginHref } from "@/lib/loginRedirect";
 import { useToast } from "@/lib/toast";
@@ -78,22 +78,16 @@ const COPY = {
 
 const JOINABLE_STATUSES = new Set(["SCHEDULED", "ACTIVE", "DRAFT"]);
 
-function findViewerRoleByName(rolesNeeded, viewerName) {
-  if (!viewerName || !Array.isArray(rolesNeeded)) return null;
-  for (const row of rolesNeeded) {
-    if (Array.isArray(row.filledNames) && row.filledNames.includes(viewerName)) {
-      return row.role;
-    }
-  }
-  return null;
-}
-
-function unwrap(response) {
-  if (!response || typeof response !== "object") return response ?? null;
-  return response.data ?? response;
-}
-
-export function EventJoinPanel({ event, language = "np", onJoined }) {
+// `viewerRole` / `viewerStatus` are owned by the event detail page (single
+// source of truth shared with EventRosterPanel), so this panel renders the
+// joined/waitlisted/checked-in banner straight from props — no fetch here.
+export function EventJoinPanel({
+  event,
+  language = "np",
+  viewerRole = null,
+  viewerStatus = null,
+  onJoined
+}) {
   const t = COPY[language] || COPY.np;
   const session = useSyncExternalStore(subscribeAuthSession, getAuthSession, () => null);
   const messageApi = useToast();
@@ -108,47 +102,6 @@ export function EventJoinPanel({ event, language = "np", onJoined }) {
   const viewerName = session?.user?.name || null;
 
   const rolesNeeded = Array.isArray(event?.rolesNeeded) ? event.rolesNeeded : [];
-
-  // myParticipation: the real-backend record for the current viewer on this
-  // event. Null until fetched; { role, status } once known. Demo events skip
-  // the network call and fall back to filledNames-name matching.
-  const [myParticipation, setMyParticipation] = useState(null);
-
-  const fetchMyParticipation = useCallback(async () => {
-    if (!eventId || isDemo || !viewerId) {
-      setMyParticipation(null);
-      return;
-    }
-    try {
-      const response = await getJson(`/events/${eventId}/participants/me`, {
-        requireAuth: true
-      });
-      const data = unwrap(response);
-      if (data && data.role) {
-        setMyParticipation({ id: data.id, role: data.role, status: data.status });
-      } else {
-        setMyParticipation(null);
-      }
-    } catch (error) {
-      if (error?.status === 404) {
-        setMyParticipation(null);
-        return;
-      }
-      // Soft-fail: a transient error shouldn't break the join button.
-      // We fall back to the name-match heuristic below.
-      setMyParticipation(null);
-    }
-  }, [eventId, isDemo, viewerId]);
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchMyParticipation();
-  }, [fetchMyParticipation]);
-
-  const viewerRoleFromBackend = myParticipation?.role || null;
-  const viewerRoleFromNames = findViewerRoleByName(rolesNeeded, viewerName);
-  const viewerRole = viewerRoleFromBackend || viewerRoleFromNames;
-  const viewerStatus = myParticipation?.status || null;
 
   if (rolesNeeded.length === 0) return null;
 
@@ -230,30 +183,27 @@ export function EventJoinPanel({ event, language = "np", onJoined }) {
         { role: selectedRole },
         { requireAuth: true }
       );
-      const created = unwrap(response);
+      const created = response?.data ?? response;
       if (created && created.role) {
-        setMyParticipation({
-          id: created.id,
-          role: created.role,
-          status: created.status
-        });
         if (created.status === "INVITED") {
           messageApi.info(t.waitlistToast);
         } else {
           messageApi.success(t.successToast);
         }
+        onJoined?.({ id: created.id, role: created.role, status: created.status });
       } else {
         messageApi.success(t.successToast);
+        onJoined?.();
       }
       setOpen(false);
-      onJoined?.();
     } catch (apiError) {
       if (apiError?.status === 403) {
         messageApi.error(t.medicCredentialError);
       } else if (apiError?.status === 409) {
         messageApi.warning(t.alreadyJoinedDifferentRole);
-        // Re-pull the participation so the UI flips to "joined" state.
-        fetchMyParticipation();
+        // Already in under another role — ask the page to reconcile so the
+        // UI flips to "joined" state.
+        onJoined?.({ refetch: true });
       } else {
         messageApi.error(apiError?.message || t.errorToast);
       }

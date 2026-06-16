@@ -41,3 +41,17 @@ export function countActiveParticipants(participants) {
   }
   return n;
 }
+
+// Which role (if any) the current viewer already occupies, found by matching
+// their display name against each role's filledNames. Demo events have no
+// /participants/me endpoint, so this is their only signal; real events fall
+// back to it when the participation fetch soft-fails.
+export function findViewerRoleByName(rolesNeeded, viewerName) {
+  if (!viewerName || !Array.isArray(rolesNeeded)) return null;
+  for (const row of rolesNeeded) {
+    if (Array.isArray(row.filledNames) && row.filledNames.includes(viewerName)) {
+      return row.role;
+    }
+  }
+  return null;
+}
