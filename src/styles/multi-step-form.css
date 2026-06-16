@@ -425,6 +425,177 @@
   }
 }
 
+/* ---------- Issue preview card (review step of /issues/new) ---------- */
+
+.issue-review-card {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--surface);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.07);
+}
+
+.issue-review-hero {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  background: var(--surface-soft);
+  overflow: hidden;
+}
+
+.issue-review-hero-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.issue-review-hero-empty {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  gap: 8px;
+  color: var(--muted);
+}
+
+.issue-review-hero-empty .anticon {
+  font-size: 38px;
+}
+
+.issue-review-hero-empty span {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.issue-review-hero-tag {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #fff;
+  background: color-mix(in srgb, #07150f 52%, transparent);
+  backdrop-filter: blur(10px) saturate(150%);
+  -webkit-backdrop-filter: blur(10px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+
+.issue-review-body {
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+}
+
+.issue-review-title {
+  margin: 0;
+  font-size: clamp(19px, 2.6vw, 23px);
+  font-weight: 800;
+  line-height: 1.3;
+  color: var(--text);
+}
+
+.issue-review-address {
+  margin: -6px 0 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  font-size: 13.5px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.issue-review-address .anticon {
+  color: var(--primary);
+  margin-top: 2px;
+  flex: 0 0 auto;
+}
+
+.issue-review-desc {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.65;
+  color: var(--text);
+  white-space: pre-line;
+  word-break: break-word;
+}
+
+.issue-review-section {
+  display: grid;
+  gap: 10px;
+}
+
+.issue-review-section-title {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.issue-review-section-title .anticon {
+  color: var(--primary);
+  font-size: 13px;
+}
+
+.issue-review-map {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--surface-soft);
+}
+
+.issue-review-map .issue-map-thumb {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.issue-review-map .issue-map-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.issue-review-coords {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.issue-review-photos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+  gap: 8px;
+}
+
+.issue-review-photo {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  display: block;
+}
+
+[data-theme="dark"] .issue-review-card {
+  background: color-mix(in srgb, var(--surface) 96%, #fff);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+}
+
 [data-theme="dark"] .role-lane-card {
   background: color-mix(in srgb, var(--surface) 96%, #fff);
 }

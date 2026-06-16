@@ -1537,9 +1537,14 @@ export const copy = {
       eyebrow: "समस्या रिपोर्ट",
       title: "नयाँ समस्या रिपोर्ट गर्नुहोस्",
       intro: "तपाईंको टोल वा आसपासको कुनै समस्या समुदायलाई बताउनुहोस् — समुदायले भोट दिएर अभियानमा परिणत गर्नेछ।",
-      submit: "रिपोर्ट पठाउनुहोस्",
+      submit: "समस्या पठाउनुहोस्",
       successMessage: "तपाईंको रिपोर्ट सफलतापूर्वक पठाइयो।",
       authRequiredMessage: "रिपोर्ट गर्न पहिले लगइन गर्नुहोस्।",
+      review: {
+        locationTitle: "स्थान",
+        photosTitle: "तस्वीरहरू",
+        noCover: "मुख्य तस्वीर छैन"
+      },
       cta: {
         list: "नयाँ समस्या"
       },
@@ -3286,9 +3291,14 @@ export const copy = {
       eyebrow: "Issue report",
       title: "Report a New Issue",
       intro: "Tell the community about a problem in your neighborhood — the community will vote on it and turn it into a campaign.",
-      submit: "Submit Report",
+      submit: "Submit Issue",
       successMessage: "Your report was submitted successfully.",
       authRequiredMessage: "Please log in to report an issue.",
+      review: {
+        locationTitle: "Location",
+        photosTitle: "Photos",
+        noCover: "No cover photo"
+      },
       cta: {
         list: "New Issue"
       },

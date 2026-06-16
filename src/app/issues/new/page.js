@@ -1,6 +1,11 @@
 "use client";
 
-import { CloudUploadOutlined, DeleteOutlined } from "@ant-design/icons";
+import {
+  CloudUploadOutlined,
+  DeleteOutlined,
+  EnvironmentOutlined,
+  PictureOutlined
+} from "@ant-design/icons";
 import { Button, Input, Select, Spin } from "antd";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -8,6 +13,7 @@ import { usePreferences } from "@/app/providers";
 import { Form } from "@/components/AppForm";
 import { IssueCoverUpload } from "@/components/admin/IssueCoverUpload";
 import { IssueImagesUpload } from "@/components/admin/IssueImagesUpload";
+import { IssueMapThumb } from "@/components/IssueMapThumb";
 import IssueLocationPickerBlock from "@/components/IssueLocationPickerBlock";
 import { MultiStepShell } from "@/components/MultiStepShell";
 import { SiteShell } from "@/components/SiteShell";
@@ -303,6 +309,12 @@ export default function NewIssuePage() {
     const payload = {
       title: values.title,
       description: values.description,
+      // The author wrote the issue in whatever language the form is
+      // showing. Tell the backend the source locale ("np" → "ne") so it
+      // can auto-translate to the other locale — POST /issues requires
+      // `language` (enum ne|en) for exactly this. See localizeIssue() for
+      // how both stored translations are picked back apart on read.
+      language: language === "np" ? "ne" : "en",
       category: values.category,
       addressText: values.addressText,
       latitude: location.lat,
@@ -512,44 +524,84 @@ export default function NewIssuePage() {
 function ReviewSummary({ form, labels, language }) {
   const v = form.getFieldsValue(true);
   const loc = v.location;
-  const categoryLabel = v.category ? labels.categories[v.category] ?? v.category : "—";
-  const photos = Array.isArray(v.additionalImages) ? v.additionalImages.length : 0;
+  const hasCoords = loc && Number.isFinite(loc.lat) && Number.isFinite(loc.lng);
+  const categoryLabel = v.category ? labels.categories[v.category] ?? v.category : null;
+  const coverUrl = v.cover?.url || null;
+  const photos = Array.isArray(v.additionalImages) ? v.additionalImages : [];
+  const r = labels.review;
+  const photosLabel =
+    language === "np"
+      ? `${localizeDigits(photos.length, "np")} तस्वीर`
+      : `${photos.length} photo${photos.length === 1 ? "" : "s"}`;
+
   return (
-    <dl className="multi-step-review">
-      <div className="multi-step-review-row">
-        <dt>{labels.fields.title}</dt>
-        <dd>{v.title || "—"}</dd>
+    <div className="issue-review-card">
+      <div className="issue-review-hero">
+        {coverUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img className="issue-review-hero-img" src={coverUrl} alt="" />
+        ) : (
+          <div className="issue-review-hero-empty">
+            <PictureOutlined aria-hidden="true" />
+            <span>{r.noCover}</span>
+          </div>
+        )}
+        {categoryLabel ? (
+          <span className="issue-review-hero-tag">{categoryLabel}</span>
+        ) : null}
       </div>
-      <div className="multi-step-review-row">
-        <dt>{labels.fields.description}</dt>
-        <dd>{v.description || "—"}</dd>
+
+      <div className="issue-review-body">
+        <h2 className="issue-review-title">{v.title || "—"}</h2>
+
+        {v.addressText ? (
+          <p className="issue-review-address">
+            <EnvironmentOutlined aria-hidden="true" /> {v.addressText}
+          </p>
+        ) : null}
+
+        {v.description ? (
+          <p className="issue-review-desc">{v.description}</p>
+        ) : null}
+
+        {hasCoords ? (
+          <section className="issue-review-section">
+            <h3 className="issue-review-section-title">
+              <EnvironmentOutlined aria-hidden="true" /> {r.locationTitle}
+            </h3>
+            <div className="issue-review-map">
+              <IssueMapThumb
+                latitude={loc.lat}
+                longitude={loc.lng}
+                zoom={15}
+                alt=""
+              />
+            </div>
+            <p className="issue-review-coords">
+              {loc.lat.toFixed(5)}, {loc.lng.toFixed(5)}
+            </p>
+          </section>
+        ) : null}
+
+        {photos.length ? (
+          <section className="issue-review-section">
+            <h3 className="issue-review-section-title">
+              <PictureOutlined aria-hidden="true" /> {r.photosTitle} · {photosLabel}
+            </h3>
+            <div className="issue-review-photos">
+              {photos.map((p, i) => (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  key={p.id || p.url || i}
+                  className="issue-review-photo"
+                  src={p.url}
+                  alt=""
+                />
+              ))}
+            </div>
+          </section>
+        ) : null}
       </div>
-      <div className="multi-step-review-row">
-        <dt>{labels.fields.category}</dt>
-        <dd>{categoryLabel}</dd>
-      </div>
-      <div className="multi-step-review-row">
-        <dt>{labels.fields.address}</dt>
-        <dd>{v.addressText || "—"}</dd>
-      </div>
-      <div className="multi-step-review-row">
-        <dt>{labels.fields.location}</dt>
-        <dd>
-          {loc && Number.isFinite(loc.lat)
-            ? `${loc.lat.toFixed(5)}, ${loc.lng.toFixed(5)}`
-            : "—"}
-        </dd>
-      </div>
-      <div className="multi-step-review-row">
-        <dt>{labels.fields.additionalImages}</dt>
-        <dd>
-          {photos > 0
-            ? language === "np"
-              ? `${photos} तस्वीर`
-              : `${photos} photo${photos === 1 ? "" : "s"}`
-            : "—"}
-        </dd>
-      </div>
-    </dl>
+    </div>
   );
 }
