@@ -1719,6 +1719,10 @@ export const copy = {
       ariaLabel: "श्रमदान फुटर",
       intro: "देशका हरेक समस्या सरकारको प्रतीक्षा गरेर समाधान हुँदैन। हामी नागरिकहरू आफैं मिलेर सरसफाइ, मर्मत, वृक्षारोपण, टोल सुधार जस्ता आधारभूत काम अघि बढाउन सक्छौँ। श्रमदान त्यही सामूहिक जिम्मेवारीको सुरुवात हो। साना साना हातहरू मिलेर ठूला परिवर्तन सम्भव हुन्छ। आज हाम्रो श्रमदान, भोलि सुन्दर समाजको निर्माण।",
       note: "हाम्रो समाज, हाम्रो श्रम हाम्रो भविष्य।",
+      quote: {
+        kicker: "आजको भनाइ",
+        ariaLabel: "आजको भनाइ"
+      },
       columns: {
         pages: "पृष्ठहरू",
         learn: "सिकौँ",
@@ -3460,6 +3464,10 @@ export const copy = {
       ariaLabel: "SHRAMDAN footer",
       intro: "Not every problem in the country will be solved by waiting for the government. As citizens, we can come together to move basic work forward ourselves, from cleanups and repairs to tree planting and neighborhood improvement. SHRAMDAN is the beginning of that shared responsibility. Small hands together can make big change possible. Our SHRAMDAN today builds a better society tomorrow.",
       note: "Our labor, our society, our future.",
+      quote: {
+        kicker: "Quote for Today",
+        ariaLabel: "Quote of the day"
+      },
       columns: {
         pages: "Pages",
         learn: "Learn",
@@ -3481,6 +3489,39 @@ export const copy = {
       ]
     }
   }
+};
+
+// Footer "quote for today" band — rendered above the site footer with both
+// languages shown at once (see SiteShell). Rotates once per calendar day;
+// index 0 is the featured quote for the current live-development session
+// (live stream runs Mon–Fri, 12 PM Nepal time). Wording is provisional and
+// meant to be refined — edit/add entries freely.
+export const footerQuotes = [
+  {
+    ne: "प्रविधिले हाम्रो सेवा गर्न सक्छ, वा यत्तिकै बितेर जान सक्छ। साँचो परिवर्तन त समुदाय सँगै उभिने निर्णय गर्ने क्षणबाटै सुरु हुन्छ।",
+    en: "Technology can serve us, or pass us by. Real change begins the moment a community decides to stand together."
+  },
+  {
+    ne: "प्रविधिलाई हामी भलाइका लागि चलाउँछौं, वा चलाउँदैनौं। समाजका समस्याहरूले सबैलाई छुन्छन् — तिनले हाम्रो अनुमति पर्खँदैनन्। तर समुदाय सँगै उभिएर प्रविधिलाई सही ढंगले चलायो भने, ती समस्याहरू हामी आफैंले सुधार्न सक्ने बन्छन्।",
+    en: "We either use technology for good, or we don't. The problems in our society reach everyone — they don't wait for our permission. But when a community stands together and uses technology the right way, those problems become ours to fix."
+  },
+  {
+    ne: "बेवास्ता गरेको समस्याले पनि तपाईंलाई भेट्छ। तर एकजुट समुदायले त्यसलाई जित्न सक्छ — र सही ढंगले चलाएको प्रविधिले हामीलाई झन् बलियो बनाउँछ।",
+    en: "A problem ignored still finds you. A community gathered can outgrow it — and technology, used well, only makes us stronger."
+  }
+];
+
+// Index of the quote to feature today. Anchored to 2026-06-16 so the current
+// session shows footerQuotes[0]; advances by one each calendar day. Computed
+// from the local date — call from the client (effect) to avoid SSR mismatch.
+export const getDailyQuoteIndex = (date = new Date()) => {
+  if (!footerQuotes.length) {
+    return 0;
+  }
+  const anchor = Date.UTC(2026, 5, 16);
+  const today = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
+  const days = Math.floor((today - anchor) / 86400000);
+  return ((days % footerQuotes.length) + footerQuotes.length) % footerQuotes.length;
 };
 
 export const toSelectOptions = (items) =>

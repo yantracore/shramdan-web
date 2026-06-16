@@ -12,7 +12,6 @@ import {
   MenuOutlined,
   MoonOutlined,
   ReadOutlined,
-  RocketOutlined,
   SettingOutlined,
   SolutionOutlined,
   SunOutlined,
@@ -34,7 +33,7 @@ import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { NotificationsBell } from "@/components/NotificationsBell";
 import { OnboardingSpotlight } from "@/components/OnboardingSpotlight";
 import { usePreferences } from "@/app/providers";
-import { copy } from "@/lib/siteContent";
+import { copy, footerQuotes, getDailyQuoteIndex } from "@/lib/siteContent";
 import { getAuthSession, isAdminUser, subscribeAuthSession } from "@/lib/authSession";
 import { logoutAndClearSession } from "@/lib/apiClient";
 import { buildLoginHref } from "@/lib/loginRedirect";
@@ -86,6 +85,7 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
   const [isPillTucked, setIsPillTucked] = useState(false);
   const [isBottomRightPanelVisible, setIsBottomRightPanelVisible] = useState(false);
   const [publicCounts, setPublicCounts] = useState(null);
+  const [quoteIndex, setQuoteIndex] = useState(0);
   const pathname = usePathname();
   const router = useRouter();
   const mobileMenuRef = useRef(null);
@@ -100,6 +100,13 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
   useEffect(() => {
     closeMobileMenu();
   }, [pathname]);
+
+  // Pick the day's footer quote on the client so the date is computed in the
+  // visitor's timezone (avoids an SSR/CSR hydration mismatch). SSR renders
+  // index 0 — today's featured session quote — so there is no flicker today.
+  useEffect(() => {
+    setQuoteIndex(getDailyQuoteIndex());
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -167,6 +174,9 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
 
   const session = useSyncExternalStore(subscribeAuthSession, getAuthSession, () => null);
   const t = copy[language];
+  const footerQuote = footerQuotes[quoteIndex] ?? footerQuotes[0];
+  const footerQuotePrimary = language === "en" ? footerQuote.en : footerQuote.ne;
+  const footerQuoteSecondary = language === "en" ? footerQuote.ne : footerQuote.en;
   const titles = t.pageTitles;
   const documentTitle = pageTitle
     ? `${pageTitle} · ${titles.brandSuffix}`
@@ -215,7 +225,6 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
   // moved off the homepage.
   const appsGridItems = [
     { href: "/event-types", label: t.nav.eventTypes, icon: <TeamOutlined /> },
-    { href: "/intro", label: t.nav.intro, icon: <RocketOutlined /> },
     { href: "/resources", label: t.nav.resources, icon: <FolderOpenOutlined /> },
     { href: "/learn", label: t.nav.learn, icon: <BookOutlined /> },
     { href: "/settings", label: t.nav.settings, icon: <SettingOutlined /> },
@@ -353,22 +362,7 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
     </div>
   );
 
-  const brandIntroContent = (
-    <div className="brand-intro-popover">
-      <span className="brand-intro-popover__eyebrow">
-        {language === "np" ? "परिचय" : "About"}
-      </span>
-      <strong>{language === "np" ? "श्रमदान के हो?" : "What is SHRAMDAN?"}</strong>
-      <p>
-        {language === "np"
-          ? "नागरिकहरू मिलेर स्थानीय समस्या रिपोर्ट, समर्थन र अभियानमा बदल्ने साझा प्लेटफर्म।"
-          : "A citizen-led platform for turning local issues into shared action, support, and campaigns."}
-      </p>
-      <Link className="brand-intro-popover__link" href="/intro">
-        {language === "np" ? "थप जान्नुहोस्" : "Learn more"}
-      </Link>
-    </div>
-  );
+
 
   const handleAppsTileSelect = (event, item) => {
     if (pathname === item.href && smoothScrollToTop()) {
@@ -382,7 +376,6 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
     { href: "/event-types", label: t.nav.eventTypes }
   ];
   const learnLinks = [
-    { href: "/intro", label: t.nav.intro },
     { href: "/event-types", label: t.nav.eventTypes },
     { href: "/learn", label: t.footer.links.documents }
   ];
@@ -455,26 +448,17 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
         <header className="site-shell-banner" role="banner" aria-label={t.ariaLabels.nav}>
           <div className="site-shell-corner site-shell-corner--top-left">
             <div className="site-shell-corner__inner">
-              <Popover
-                content={brandIntroContent}
-                trigger={["hover", "focus"]}
-                placement="bottomLeft"
-                arrow={false}
-                mouseEnterDelay={0.45}
-                overlayClassName="brand-intro-popover-overlay site-corner-menu site-corner-menu--from-left"
+              <Link
+                className="brand"
+                href="/"
+                aria-label={t.ariaLabels.home}
+                onClick={handleBrandClick}
               >
-                <Link
-                  className="brand"
-                  href="/"
-                  aria-label={t.ariaLabels.home}
-                  onClick={handleBrandClick}
-                >
-                  <span className="brand-mark">
-                    <Image alt="" height={96} priority src="/images/logo.png" width={96} />
-                  </span>
-                  <span className="brand-name">{t.brand}</span>
-                </Link>
-              </Popover>
+                <span className="brand-mark">
+                  <Image alt="" height={96} priority src="/images/logo.png" width={96} />
+                </span>
+                <span className="brand-name">{t.brand}</span>
+              </Link>
             </div>
           </div>
 
@@ -723,6 +707,20 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
           }
         }}
       />
+
+      <section className="footer-quote" aria-label={t.footer.quote.ariaLabel}>
+        <div className="footer-quote-inner">
+          <span className="footer-quote-kicker">{t.footer.quote.kicker}</span>
+          <blockquote className="footer-quote-text">
+            <p className="footer-quote-primary" lang={language === "en" ? "en" : "ne"}>
+              {footerQuotePrimary}
+            </p>
+            <p className="footer-quote-secondary" lang={language === "en" ? "ne" : "en"}>
+              {footerQuoteSecondary}
+            </p>
+          </blockquote>
+        </div>
+      </section>
 
       <footer className="footer" aria-label={t.footer.ariaLabel}>
         <div className="footer-brand">
