@@ -15,19 +15,16 @@ import { IssuePhotoGallery } from "@/components/IssuePhotoGallery";
 import { IssueShareRow } from "@/components/IssueShareRow";
 import { IssueStatusTimeline } from "@/components/IssueStatusTimeline";
 import { IssueVoteButton } from "@/components/IssueVoteButton";
-import { PeopleChipRow } from "@/components/PeopleChipRow";
 import { ShareButton } from "@/components/ShareButton";
 import { CommentSection } from "@/components/comments";
 import { IssueReactions } from "@/components/IssueReactions";
 import { PublicIssueCard, formatSupporters } from "@/components/PublicIssueCard";
-import { VoteSparkline } from "@/components/VoteSparkline";
 import { ScrollProgressBar } from "@/components/ScrollProgressBar";
 import { SiteShell } from "@/components/SiteShell";
 import { StickyActionBar } from "@/components/StickyActionBar";
 import { TertiaryButton } from "@/components/TertiaryButton";
 import { usePreferences } from "@/app/providers";
 import { getJson } from "@/lib/apiClient";
-import { getDemoSupporters } from "@/lib/devMockData";
 import { copy } from "@/lib/siteContent";
 import { useTrackVisit } from "@/lib/useRecentlyViewed";
 import {
@@ -42,19 +39,6 @@ import {
 const PUBLIC_ISSUE_STATUSES = ["OPEN", "EVENT_SCHEDULED", "COMPLETED"];
 const RELATED_LIMIT = 6;
 const RELATED_DISPLAY = 3;
-
-const SUPPORTERS_COPY = {
-  np: {
-    title: "समर्थनकर्ता",
-    intro: "जसले अहिले सम्म यो समस्यालाई समर्थन गरेका छन्।",
-    more: "थप {n}"
-  },
-  en: {
-    title: "Supporters",
-    intro: "Who has backed this issue so far.",
-    more: "+{n} more"
-  }
-};
 
 function formatIssueDate(value, language) {
   if (!value) return "";
@@ -291,23 +275,6 @@ export default function IssueDetailPage() {
                 />
               ) : null}
 
-              <div className="public-issue-detail-trend">
-                <VoteSparkline issueId={issue.id} language={language} />
-              </div>
-
-              <PeopleChipRow
-                title={(SUPPORTERS_COPY[language] || SUPPORTERS_COPY.np).title}
-                intro={(SUPPORTERS_COPY[language] || SUPPORTERS_COPY.np).intro}
-                people={getDemoSupporters(issue.voteCount)}
-                extraCount={Math.max(
-                  0,
-                  (Number(issue.voteCount) || 0) -
-                    getDemoSupporters(issue.voteCount).length
-                )}
-                moreLabel={(SUPPORTERS_COPY[language] || SUPPORTERS_COPY.np).more}
-                language={language}
-              />
-
               <section className="public-issue-detail-section-block public-issue-timeline-block">
                 <IssueStatusTimeline status={issue.status} content={content} />
               </section>
@@ -335,11 +302,6 @@ export default function IssueDetailPage() {
                 targetType="issue"
                 targetId={issue.id}
                 language={language}
-                mentionPool={getDemoSupporters(issue.voteCount).map((name) => ({
-                  id: `supporter:${name}`,
-                  name,
-                  role: language === "np" ? "समर्थक" : "Supporter"
-                }))}
               />
             </div>
           </article>

@@ -4,12 +4,10 @@ import Link from "next/link";
 import {
   ClockCircleOutlined,
   EnvironmentOutlined,
-  MessageOutlined,
   PictureOutlined,
   RiseOutlined
 } from "@ant-design/icons";
-import { forwardRef, useEffect, useState } from "react";
-import { countVisible, loadComments } from "@/lib/comments";
+import { forwardRef } from "react";
 import { getIssueCoverImageUrl, localizeIssue } from "@/lib/adminUtils";
 import { IssueMapThumb } from "@/components/IssueMapThumb";
 
@@ -64,14 +62,6 @@ export const IssueListCard = forwardRef(function IssueListCard(
   const handleClick = () => {
     if (typeof onSelect === "function") onSelect(issue.id);
   };
-
-  const [commentCount, setCommentCount] = useState(0);
-  useEffect(() => {
-    if (!issue?.id) return;
-    setCommentCount(
-      countVisible(loadComments({ targetType: "issue", targetId: issue.id }))
-    );
-  }, [issue?.id]);
 
   const voteCount = Number(issue.voteCount) || 0;
   const agoLabel = timeAgoShort(issue.createdAt, language);
@@ -133,12 +123,6 @@ export const IssueListCard = forwardRef(function IssueListCard(
             <span>
               <ClockCircleOutlined aria-hidden="true" />
               {agoLabel} {language === "np" ? "अघि" : "ago"}
-            </span>
-          ) : null}
-          {commentCount > 0 ? (
-            <span>
-              <MessageOutlined aria-hidden="true" />
-              {localizeDigits(commentCount, language)}
             </span>
           ) : null}
         </p>

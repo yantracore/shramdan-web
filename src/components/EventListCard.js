@@ -5,11 +5,9 @@ import {
   CalendarOutlined,
   ClockCircleOutlined,
   EnvironmentOutlined,
-  MessageOutlined,
   TeamOutlined
 } from "@ant-design/icons";
-import { forwardRef, useEffect, useState } from "react";
-import { countVisible, loadComments } from "@/lib/comments";
+import { forwardRef } from "react";
 
 function computeParticipantCount(event) {
   if (Number.isFinite(event?.participantCount)) return event.participantCount;
@@ -92,15 +90,6 @@ export const EventListCard = forwardRef(function EventListCard(
         : t.filters.past;
 
   const participantCount = computeParticipantCount(event);
-  // localStorage-backed; only resolves post-hydration. Seed thread is
-  // hash-deterministic per event id so the count is stable across loads.
-  const [commentCount, setCommentCount] = useState(0);
-  useEffect(() => {
-    if (!event?.id) return;
-    setCommentCount(
-      countVisible(loadComments({ targetType: "event", targetId: event.id }))
-    );
-  }, [event?.id]);
 
   return (
     <li
@@ -181,12 +170,6 @@ export const EventListCard = forwardRef(function EventListCard(
             <span>
               <TeamOutlined aria-hidden="true" />
               {localizeDigits(event.participantCount, language)} {t.meta.participants}
-            </span>
-          ) : null}
-          {commentCount > 0 ? (
-            <span>
-              <MessageOutlined aria-hidden="true" />
-              {localizeDigits(commentCount, language)}
             </span>
           ) : null}
         </p>

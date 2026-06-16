@@ -19,7 +19,6 @@ import {
   getIssueCoverImageUrl,
   localizeIssue
 } from "@/lib/adminUtils";
-import { getDemoSupporters } from "@/lib/devMockData";
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 
@@ -193,11 +192,6 @@ export function IssuePreviewPane({
   const lng = Number(issue.longitude);
   const hasCoords = Number.isFinite(lat) && Number.isFinite(lng);
   const dateText = formatDateLong(issue.createdAt, language);
-  const supporters = getDemoSupporters(issue.voteCount);
-  const remaining = Math.max(
-    0,
-    (Number(issue.voteCount) || 0) - supporters.length
-  );
   const descTooLong =
     typeof issue.description === "string" && issue.description.length > 220;
 
@@ -307,31 +301,6 @@ export function IssuePreviewPane({
                 </button>
               ) : null}
             </>
-          ) : null}
-
-          {supporters.length > 0 ? (
-            <section className="event-preview-section">
-              <h3>{preview.supporters}</h3>
-              <div className="issue-supporters-chips">
-                {supporters.slice(0, 8).map((name, i) => (
-                  <span
-                    key={i}
-                    className="issue-supporters-chip"
-                    title={name}
-                  >
-                    {Array.from(name.trim())[0] || "?"}
-                  </span>
-                ))}
-                {remaining > 0 ? (
-                  <span className="issue-supporters-chip issue-supporters-chip-more">
-                    {preview.supportersMore.replace(
-                      "{n}",
-                      localizeDigits(remaining, language)
-                    )}
-                  </span>
-                ) : null}
-              </div>
-            </section>
           ) : null}
 
           <CommentsSummary

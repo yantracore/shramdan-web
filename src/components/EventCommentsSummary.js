@@ -9,7 +9,7 @@
 import { ArrowRightOutlined, MessageOutlined } from "@ant-design/icons";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { countVisible, loadComments } from "@/lib/comments";
+import { fetchComments } from "@/lib/commentsApi";
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 function localizeDigits(value, language) {
@@ -77,19 +77,30 @@ export function CommentsSummary({
   const [comments, setComments] = useState([]);
 
   useEffect(() => {
-    if (!targetId || !targetType) return;
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setComments(loadComments({ targetType, targetId }));
-    setHydrated(true);
+    if (!targetId || !targetType) return undefined;
+    let cancelled = false;
+    (async () => {
+      try {
+        const list = await fetchComments({ targetType, targetId, limit: 100 });
+        if (!cancelled) setComments(Array.isArray(list) ? list : []);
+      } catch {
+        if (!cancelled) setComments([]);
+      } finally {
+        if (!cancelled) setHydrated(true);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [targetType, targetId]);
 
   const { count, latest } = useMemo(() => {
-    if (!comments.length) return { count: 0, latest: null };
     const visible = comments.filter((c) => !c.deleted);
+    if (!visible.length) return { count: 0, latest: null };
     const recent = [...visible].sort(
       (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
     )[0];
-    return { count: countVisible(comments), latest: recent || null };
+    return { count: visible.length, latest: recent || null };
   }, [comments]);
 
   if (!targetId || !targetType) return null;
