@@ -107,6 +107,12 @@ export default function AdminIssueEditPage() {
     const nextCoverId = cover?.id || null;
 
     const payload = { ...rest };
+    // PATCH /issues/{id} requires `language` whenever title or description
+    // is part of the update — it tells the backend which locale the edited
+    // text is in so it can re-translate. Admin is EN-only, so "en".
+    if ("title" in rest || "description" in rest) {
+      payload.language = "en";
+    }
     if (nextCoverId !== originalCoverId) {
       payload.coverImageId = nextCoverId;
     }

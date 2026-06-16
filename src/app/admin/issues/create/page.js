@@ -24,7 +24,11 @@ export default function AdminIssueCreatePage() {
     setSubmitting(true);
 
     const { cover, additionalImages, ...rest } = values;
-    const payload = { ...rest };
+    // Admin control center is EN-only (project_language_scope), so the
+    // title/description are authored in English. POST /issues requires
+    // `language` (enum ne|en) — the source locale the backend auto-
+    // translates from — so send "en".
+    const payload = { ...rest, language: "en" };
     if (cover?.id) payload.coverImageId = cover.id;
     if (Array.isArray(additionalImages) && additionalImages.length) {
       payload.uploadIds = additionalImages.map((image) => image.id);
