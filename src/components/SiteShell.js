@@ -42,6 +42,8 @@ import { getCachedPublicCounts, getFallbackPublicCounts } from "@/lib/publicStat
 const PILL_INTRO_SESSION_KEY = "shramdan.pill.intro.v1";
 const PILL_MIN_WIDTH_PX = 1180;
 const BOTTOM_RIGHT_PANEL_SHOW_AFTER = 100;
+// Footer "quote for today" band — hidden for now. Flip to true to re-enable.
+const FOOTER_QUOTE_ENABLED = false;
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 
 function getInitials(user) {
@@ -708,19 +710,21 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
         }}
       />
 
-      <section className="footer-quote" aria-label={t.footer.quote.ariaLabel}>
-        <div className="footer-quote-inner">
-          <span className="footer-quote-kicker">{t.footer.quote.kicker}</span>
-          <blockquote className="footer-quote-text">
-            <p className="footer-quote-primary" lang={language === "en" ? "en" : "ne"}>
-              {footerQuotePrimary}
-            </p>
-            <p className="footer-quote-secondary" lang={language === "en" ? "ne" : "en"}>
-              {footerQuoteSecondary}
-            </p>
-          </blockquote>
-        </div>
-      </section>
+      {FOOTER_QUOTE_ENABLED && (
+        <section className="footer-quote" aria-label={t.footer.quote.ariaLabel}>
+          <div className="footer-quote-inner">
+            <span className="footer-quote-kicker">{t.footer.quote.kicker}</span>
+            <blockquote className="footer-quote-text">
+              <p className="footer-quote-primary" lang={language === "en" ? "en" : "ne"}>
+                {footerQuotePrimary}
+              </p>
+              <p className="footer-quote-secondary" lang={language === "en" ? "ne" : "en"}>
+                {footerQuoteSecondary}
+              </p>
+            </blockquote>
+          </div>
+        </section>
+      )}
 
       <footer className="footer" aria-label={t.footer.ariaLabel}>
         <div className="footer-brand">
