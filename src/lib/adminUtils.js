@@ -63,12 +63,16 @@ export const EVENT_STATUS_COLORS = {
   CANCELLED: "red"
 };
 
-export const EVENT_RISK_LEVELS = ["NORMAL", "ELEVATED", "HIGH"];
+// Aligned to the backend enum (PATCH /events/{id} riskLevel + the demo data
+// and IncidentPanel, which already used these). The previous NORMAL/ELEVATED/
+// HIGH values were drift and left WATCH/URGENT/CRITICAL tags colourless.
+export const EVENT_RISK_LEVELS = ["NORMAL", "WATCH", "URGENT", "CRITICAL"];
 
 export const EVENT_RISK_COLORS = {
-  NORMAL: "default",
-  ELEVATED: "orange",
-  HIGH: "red"
+  NORMAL: "green",
+  WATCH: "gold",
+  URGENT: "orange",
+  CRITICAL: "red"
 };
 
 export const LEADER_VOTING_STATUS_COLORS = {

@@ -4830,6 +4830,10 @@
   gap: 8px;
 }
 
+.admin-modal-actions {
+  margin-top: 14px;
+}
+
 .admin-modal-description {
   margin: 0;
   white-space: pre-wrap;

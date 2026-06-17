@@ -309,6 +309,19 @@ export function retractVoteOnIssue(issueId) {
   return deleteJson(`/issues/${issueId}/vote`, { requireAuth: true });
 }
 
+// Event logistics edit + cancel (event leader or admin). updateEvent takes a
+// partial of { scheduledAt, durationMinutes, meetupLatitude, meetupLongitude,
+// meetupAddress, meetupNotes, coordinationLink, whatToBring, planningNotes,
+// riskLevel(NORMAL|WATCH|URGENT|CRITICAL) }. cancelEvent posts an optional
+// reason that rides along in the participant notification.
+export function updateEvent(eventId, values) {
+  return patchJson(`/events/${eventId}`, values, { requireAuth: true });
+}
+
+export function cancelEvent(eventId, reason) {
+  return postJson(`/events/${eventId}/cancel`, { reason }, { requireAuth: true });
+}
+
 // Report an issue for moderation (authenticated). `values` is
 // { reason, details? } where reason ∈ SPAM | ABUSE | HARASSMENT |
 // MISINFORMATION | INAPPROPRIATE | OTHER and details is ≤1000 chars. 201 on

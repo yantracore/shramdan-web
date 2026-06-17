@@ -162,9 +162,11 @@ Pin remains a localStorage overlay (`src/lib/comments.js`) — admin-only, not y
 | `PATCH /events/{id}/leader` | `patchJson` | "Assign leader" modal — admin picks a verified user via `GET /users` search |
 | `PATCH /events/{id}/leader-voting/tie-break` | `patchJson` | "Tie-break voting" modal — admin picks from tied candidates when voting status is `PENDING_ADMIN` |
 | `POST /events/{id}/leader-voting/settle` | `postJson` | "Settle voting" `Popconfirm` — time-driven, safe to re-call |
+| `PATCH /events/{id}` | `updateEvent` | "Edit logistics" modal — scheduledAt, durationMinutes, meetup coords/address/notes, coordinationLink, whatToBring, planningNotes, riskLevel (`NORMAL`/`WATCH`/`URGENT`/`CRITICAL`). Partial update; `compactPayload` drops blanks so it sets/edits but can't clear a field |
+| `POST /events/{id}/cancel` | `cancelEvent` | "Cancel event" modal — optional reason (≤1000) rides along in the participant notification. Hidden for already-cancelled/completed events |
 | `GET /users` | `getJson` | Leader assignment modal search — params: `search`, `isVerified=true`, `limit=20` |
 
-Scheduling (`PATCH /events/{id}/schedule`) and completion (`POST /events/{id}/complete`) are restricted to the assigned event leader by the API, so they are not exposed in the admin UI.
+Scheduling (`PATCH /events/{id}/schedule`) and completion (`POST /events/{id}/complete`) are restricted to the assigned event leader by the API, so they are not exposed in the admin UI. Edit-logistics + cancel landed 2026-06-17. Note: the backend `riskLevel` enum (`NORMAL`/`WATCH`/`URGENT`/`CRITICAL`) was reconciled into `adminUtils.EVENT_RISK_LEVELS` — the previous `NORMAL`/`ELEVATED`/`HIGH` was drift that left risk tags colourless.
 
 ## Notifications
 
