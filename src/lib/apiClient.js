@@ -278,6 +278,33 @@ export function changePassword(values) {
   return postJson("/auth/change-password", values, { requireAuth: true });
 }
 
+// Account security (all authenticated).
+//   fetchSessions → { sessions: [{ id, userAgent, ip, createdAt, expiresAt }] }
+//   revokeSession(id) — revoke one session (200/404).
+//   logoutAllSessions → { revoked: N } (signs out everywhere, incl. this one).
+//   deleteAccount(password) — self-service account deletion; 403 on a wrong
+//     password. Clear the local session + redirect after either of the last
+//     two, since the current token is no longer valid.
+export function fetchSessions() {
+  return getJson("/auth/sessions", { requireAuth: true });
+}
+
+export function revokeSession(sessionId) {
+  return deleteJson(`/auth/sessions/${sessionId}`, { requireAuth: true });
+}
+
+export function logoutAllSessions() {
+  return postJson("/auth/logout-all", {}, { requireAuth: true });
+}
+
+export function deleteAccount(password) {
+  return apiRequest("/auth/me", {
+    method: "DELETE",
+    body: { password },
+    requireAuth: true
+  });
+}
+
 // Application-based signup → email OTP flow (replaced the retired
 // /auth/register + /auth/verify-otp SMS flow on 2026-06-17).
 //   requestApplicationOtp: { email } → 200 (6-digit code emailed). 409

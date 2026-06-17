@@ -56,6 +56,15 @@ Base URL: `process.env.NEXT_PUBLIC_API_BASE_URL` (falls back to `https://backend
 | `src/app/signup/page.js` | `POST /applications/request-otp` | `requestApplicationOtp` | Anonymous; emails a 6-digit code as the user leaves the details step. 409 `USER_ALREADY_EXISTS` / 429 cooldown keep the user on the step with the backend message |
 | `src/app/signup/page.js` | `POST /applications` | `submitApplication` | Anonymous; body adds `otp` + `password` (+ default `role: VOLUNTEER`, default `motivation`). 201 creates a **verified** account and returns `{ user, application, accessToken, refreshToken }` → fed straight into `setAuthSession` (the user lands signed in) |
 
+### Account security (`src/components/AccountSecurity.js`, mounted on `src/app/me/page.js`)
+
+| Method + path | apiClient fn | Trigger |
+| --- | --- | --- |
+| `GET /auth/sessions` | `fetchSessions` | Mount of the `/me` security card — lists active sessions (`{ id, userAgent, ip, createdAt, expiresAt }`) |
+| `DELETE /auth/sessions/{id}` | `revokeSession` | Per-session "Revoke" `Popconfirm` |
+| `POST /auth/logout-all` | `logoutAllSessions` | "Sign out everywhere" — clears the local session + redirects to `/login` |
+| `DELETE /auth/me` | `deleteAccount` | Danger-zone "Delete account" modal; body `{ password }`, 403 on wrong password. Clears the session + redirects home |
+
 > **2026-06-17 signup rewrite.** `POST /auth/register` + `POST /auth/verify-otp` (the SMS-OTP member flow) were retired on the backend. Member signup now runs through the application-signup endpoints above (email OTP), which **create the account and the application together**. `/app/signup` still 302-redirects to `/signup`. The old `registerMember` / `verifyOtp` / `resendOtp` apiClient helpers were removed.
 
 ## Public submission pages

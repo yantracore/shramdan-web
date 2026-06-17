@@ -11,6 +11,7 @@ import {
 } from "@ant-design/icons";
 import { Alert, Avatar, Button, Input, Spin, Tag } from "antd";
 import { usePreferences } from "@/app/providers";
+import { AccountSecurity } from "@/components/AccountSecurity";
 import { Form } from "@/components/AppForm";
 import { SiteShell } from "@/components/SiteShell";
 import { changePassword, fetchMe, updateMe } from "@/lib/apiClient";
@@ -125,6 +126,9 @@ export default function MePage() {
 
   useEffect(() => {
     if (!session) return;
+    // Intentional fetch-on-mount/session-change; the setState inside
+    // loadProfile is the point of the effect.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadProfile();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session?.accessToken]);
@@ -452,6 +456,8 @@ export default function MePage() {
             description={t.password.oauthDisabled}
           />
         )}
+
+        <AccountSecurity language={language} />
       </section>
     </SiteShell>
   );
