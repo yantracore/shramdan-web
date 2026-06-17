@@ -6,6 +6,7 @@ import {
   BellOutlined,
   BookOutlined,
   ControlOutlined,
+  EnvironmentOutlined,
   FolderOpenOutlined,
   HeartOutlined,
   LogoutOutlined,
@@ -302,6 +303,12 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
             icon: <UserOutlined />,
             label: t.me.menu.myProfile,
             onClick: () => router.push("/me")
+          },
+          {
+            key: "my-issues",
+            icon: <EnvironmentOutlined />,
+            label: t.me.menu.myIssues,
+            onClick: () => router.push("/me/issues")
           },
           {
             key: "applications",

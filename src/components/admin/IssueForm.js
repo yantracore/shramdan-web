@@ -9,20 +9,60 @@ import { IssueCoverUpload } from "@/components/admin/IssueCoverUpload";
 import { IssueImagesUpload } from "@/components/admin/IssueImagesUpload";
 import { ISSUE_CATEGORIES, buildEnumOptions } from "@/lib/adminUtils";
 
-const coverImageValidator = (_, cover) =>
-  cover?.url
-    ? Promise.resolve()
-    : Promise.reject(new Error("Cover image is required."));
+// English defaults keep the admin control center (EN-only) behaving exactly
+// as before when no `labels` prop is passed. Member-facing surfaces pass a
+// localized `labels` object (and optionally `categoryOptions`) so the same
+// form renders bilingually without forking the component.
+const DEFAULT_LABELS = {
+  cover: "Cover image",
+  coverRequired: "Cover image is required.",
+  additionalImages: "Additional images (optional)",
+  title: "Title",
+  titleRequired: "Title is required.",
+  titlePlaceholder: "Short, specific summary of the issue",
+  description: "Description",
+  descriptionRequired: "Description is required.",
+  descriptionPlaceholder: "What is happening, who is affected, and what needs to change?",
+  category: "Category",
+  categoryRequired: "Category is required.",
+  categoryPlaceholder: "Select category",
+  address: "Address",
+  addressRequired: "Address is required.",
+  addressPlaceholder: "Lakeside, Pokhara",
+  latitude: "Latitude",
+  latitudeRequired: "Latitude is required.",
+  latitudeRange: "Latitude must be between -90 and 90.",
+  longitude: "Longitude",
+  longitudeRequired: "Longitude is required.",
+  longitudeRange: "Longitude must be between -180 and 180.",
+  municipality: "Municipality (optional)",
+  municipalityPlaceholder: "Pokhara Metropolitan City",
+  ward: "Ward (optional)",
+  wardPlaceholder: "6",
+  cancel: "Cancel"
+};
 
 export function IssueForm({
   initialValues,
   onSubmit,
   submitting = false,
   submitLabel = "Save",
-  cancelHref = "/admin/issues"
+  cancelHref = "/admin/issues",
+  labels,
+  categoryOptions
 }) {
   const [form] = Form.useForm();
-  const categoryOptions = useMemo(() => buildEnumOptions(ISSUE_CATEGORIES), []);
+  const L = useMemo(() => ({ ...DEFAULT_LABELS, ...(labels || {}) }), [labels]);
+  const categorySelectOptions = useMemo(
+    () => categoryOptions || buildEnumOptions(ISSUE_CATEGORIES),
+    [categoryOptions]
+  );
+
+  const coverImageValidator = useMemo(
+    () => (_, cover) =>
+      cover?.url ? Promise.resolve() : Promise.reject(new Error(L.coverRequired)),
+    [L.coverRequired]
+  );
 
   useEffect(() => {
     if (initialValues) {
@@ -42,7 +82,7 @@ export function IssueForm({
         <Form.Item
           className="admin-form-wide"
           name="cover"
-          label="Cover image"
+          label={L.cover}
           required
           rules={[{ validator: coverImageValidator }]}
           valuePropName="value"
@@ -53,7 +93,7 @@ export function IssueForm({
         <Form.Item
           className="admin-form-wide"
           name="additionalImages"
-          label="Additional images (optional)"
+          label={L.additionalImages}
           valuePropName="value"
         >
           <IssueImagesUpload />
@@ -62,49 +102,49 @@ export function IssueForm({
         <Form.Item
           className="admin-form-wide"
           name="title"
-          label="Title"
-          rules={[{ required: true, message: "Title is required." }]}
+          label={L.title}
+          rules={[{ required: true, message: L.titleRequired }]}
         >
-          <Input maxLength={140} placeholder="Short, specific summary of the issue" />
+          <Input maxLength={140} placeholder={L.titlePlaceholder} />
         </Form.Item>
 
         <Form.Item
           className="admin-form-wide"
           name="description"
-          label="Description"
-          rules={[{ required: true, message: "Description is required." }]}
+          label={L.description}
+          rules={[{ required: true, message: L.descriptionRequired }]}
         >
           <Input.TextArea
             rows={6}
             maxLength={2000}
             showCount
-            placeholder="What is happening, who is affected, and what needs to change?"
+            placeholder={L.descriptionPlaceholder}
           />
         </Form.Item>
 
         <Form.Item
           name="category"
-          label="Category"
-          rules={[{ required: true, message: "Category is required." }]}
+          label={L.category}
+          rules={[{ required: true, message: L.categoryRequired }]}
         >
-          <Select options={categoryOptions} placeholder="Select category" />
+          <Select options={categorySelectOptions} placeholder={L.categoryPlaceholder} />
         </Form.Item>
 
         <Form.Item
           className="admin-form-wide"
           name="addressText"
-          label="Address"
-          rules={[{ required: true, message: "Address is required." }]}
+          label={L.address}
+          rules={[{ required: true, message: L.addressRequired }]}
         >
-          <Input placeholder="Lakeside, Pokhara" />
+          <Input placeholder={L.addressPlaceholder} />
         </Form.Item>
 
         <Form.Item
           name="latitude"
-          label="Latitude"
+          label={L.latitude}
           rules={[
-            { required: true, message: "Latitude is required." },
-            { type: "number", min: -90, max: 90, message: "Latitude must be between -90 and 90." }
+            { required: true, message: L.latitudeRequired },
+            { type: "number", min: -90, max: 90, message: L.latitudeRange }
           ]}
         >
           <InputNumber style={{ width: "100%" }} step={0.0001} placeholder="28.2130" />
@@ -112,27 +152,27 @@ export function IssueForm({
 
         <Form.Item
           name="longitude"
-          label="Longitude"
+          label={L.longitude}
           rules={[
-            { required: true, message: "Longitude is required." },
-            { type: "number", min: -180, max: 180, message: "Longitude must be between -180 and 180." }
+            { required: true, message: L.longitudeRequired },
+            { type: "number", min: -180, max: 180, message: L.longitudeRange }
           ]}
         >
           <InputNumber style={{ width: "100%" }} step={0.0001} placeholder="83.9570" />
         </Form.Item>
 
-        <Form.Item name="municipality" label="Municipality (optional)">
-          <Input placeholder="Pokhara Metropolitan City" />
+        <Form.Item name="municipality" label={L.municipality}>
+          <Input placeholder={L.municipalityPlaceholder} />
         </Form.Item>
 
-        <Form.Item name="ward" label="Ward (optional)">
-          <Input placeholder="6" />
+        <Form.Item name="ward" label={L.ward}>
+          <Input placeholder={L.wardPlaceholder} />
         </Form.Item>
       </div>
 
       <div className="admin-form-actions">
         <Link href={cancelHref}>
-          <Button>Cancel</Button>
+          <Button>{L.cancel}</Button>
         </Link>
         <Button
           type="primary"

@@ -853,6 +853,7 @@ export const copy = {
       menu: {
         adminCenter: "एड्मिन कन्ट्रोल सेन्टर",
         myProfile: "मेरो प्रोफाइल",
+        myIssues: "मेरा समस्याहरू",
         applications: "मेरा अनुरोधहरू",
         saved: "सेभ गरिएका",
         notifications: "सूचनाहरू",
@@ -2628,6 +2629,7 @@ export const copy = {
       menu: {
         adminCenter: "Admin Control Center",
         myProfile: "My Profile",
+        myIssues: "My Issues",
         applications: "My Applications",
         saved: "Saved",
         notifications: "Notifications",
