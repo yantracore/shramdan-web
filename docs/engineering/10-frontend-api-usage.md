@@ -64,6 +64,8 @@ Base URL: `process.env.NEXT_PUBLIC_API_BASE_URL` (falls back to `https://backend
 | `DELETE /auth/sessions/{id}` | `revokeSession` | Per-session "Revoke" `Popconfirm` |
 | `POST /auth/logout-all` | `logoutAllSessions` | "Sign out everywhere" — clears the local session + redirects to `/login` |
 | `DELETE /auth/me` | `deleteAccount` | Danger-zone "Delete account" modal; body `{ password }`, 403 on wrong password. Clears the session + redirects home |
+| `POST /auth/phone/send-otp` | `sendPhoneOtp` | "Verify phone" card (`PhoneVerify`) on `/me` — sends an SMS code. 503 = SMS unavailable, surfaced as a soft notice |
+| `POST /auth/phone/verify` | `verifyPhoneOtp` | OTP modal; body `{ otp }`. On success refreshes the profile so the verified state flips. Optional surface (only shown when a phone is on file and unverified) |
 
 > **2026-06-17 signup rewrite.** `POST /auth/register` + `POST /auth/verify-otp` (the SMS-OTP member flow) were retired on the backend. Member signup now runs through the application-signup endpoints above (email OTP), which **create the account and the application together**. `/app/signup` still 302-redirects to `/signup`. The old `registerMember` / `verifyOtp` / `resendOtp` apiClient helpers were removed.
 

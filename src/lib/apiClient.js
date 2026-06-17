@@ -305,6 +305,19 @@ export function deleteAccount(password) {
   });
 }
 
+// Optional SMS phone verification (authenticated).
+//   sendPhoneOtp(phone?) — sends an SMS code; an optional E.164 `phone`
+//     attaches/replaces the number first. 503 = SMS service unavailable.
+//   verifyPhoneOtp(otp) — confirms the 6-digit code → { user: { phone,
+//     phoneVerifiedAt } }. 400 = bad/expired code, 404 = no pending code.
+export function sendPhoneOtp(phone) {
+  return postJson("/auth/phone/send-otp", phone ? { phone } : {}, { requireAuth: true });
+}
+
+export function verifyPhoneOtp(otp) {
+  return postJson("/auth/phone/verify", { otp }, { requireAuth: true });
+}
+
 // Application-based signup → email OTP flow (replaced the retired
 // /auth/register + /auth/verify-otp SMS flow on 2026-06-17).
 //   requestApplicationOtp: { email } → 200 (6-digit code emailed). 409

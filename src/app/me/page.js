@@ -13,6 +13,7 @@ import { Alert, Avatar, Button, Input, Spin, Tag } from "antd";
 import { usePreferences } from "@/app/providers";
 import { AccountSecurity } from "@/components/AccountSecurity";
 import { Form } from "@/components/AppForm";
+import { PhoneVerify } from "@/components/PhoneVerify";
 import { SiteShell } from "@/components/SiteShell";
 import { changePassword, fetchMe, updateMe } from "@/lib/apiClient";
 import { setFieldErrorsAndScroll } from "@/lib/formErrors";
@@ -456,6 +457,13 @@ export default function MePage() {
             description={t.password.oauthDisabled}
           />
         )}
+
+        <PhoneVerify
+          language={language}
+          phone={profile?.phone}
+          verified={Boolean(profile?.phoneVerifiedAt)}
+          onVerified={loadProfile}
+        />
 
         <AccountSecurity language={language} />
       </section>

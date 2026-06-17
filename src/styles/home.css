@@ -5699,6 +5699,15 @@
   border-radius: 8px;
 }
 
+.me-phone-verified {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #1a7f37;
+}
+
 /* Account security (sessions + danger zone) on /me */
 .me-security-loading {
   padding: 24px;
