@@ -90,12 +90,14 @@ All admin requests are sent with `requireAuth: true`.
 
 ### `src/app/admin/issues/page.js`
 
-Mutations beyond create/edit (status change, notes, delete) are still blocked by missing backend endpoints — see `09-backend-admin-gaps.md`.
+Status change + delete landed 2026-06-17 (via `useAdminItemMutation`, mirroring the applications/feedback pattern). Edit + admin-notes are still blocked — see `09-backend-admin-gaps.md`.
 
 | Method + path | apiClient fn | Trigger |
 | --- | --- | --- |
 | `GET /issues` | `getJson` | Initial load; params: `status`, `category`, `sort`, `limit=100` |
 | `GET /issues/{id}` | `getJson` | "View detail" on a row (fetches uploads + reporter info) |
+| `PATCH /issues/{id}/status` | `patchStatus` (hook) | Per-row status `Select` (`OPEN`/`COMPLETED`/`REJECTED`/`DUPLICATE` only — `ISSUE_MODERATION_STATUSES`) |
+| `DELETE /issues/{id}` | `deleteItem` (hook) | Delete `Popconfirm` (moderation takedown) |
 
 ### `src/app/admin/issues/create/page.js`
 
@@ -137,7 +139,9 @@ All comment requests funnel through `src/lib/commentsApi.js` (`fetchComments` / 
 | `POST /comments/{id}/reactions` | `postJson` | Emoji picker selection — fires when the local overlay flip records a new pick; body `{ emoji }`. |
 | `DELETE /comments/{id}/reactions?emoji=…` | `deleteJson` | Same handler reverses the toggle when the viewer's pick flips off. |
 
-Pin and flag remain a localStorage overlay (`src/lib/comments.js`) — admin-only features the backend does not yet expose. The `myReactions` field is also not returned by staging, so the local overlay also keeps a per-viewer `picks` list so reaction chips can render their toggled-on state across reloads.
+| `POST /comments/{id}/report` | `reportCommentRemote` | "Report" on another user's comment — `CommentFlagModal` collects `{ reason, details }` (reason enum matches the backend). 409 = already reported (treated as success). |
+
+Pin remains a localStorage overlay (`src/lib/comments.js`) — admin-only, not yet exposed by the backend. **Flag now hits the real `POST /comments/{id}/report`** (2026-06-17) and *also* keeps the local overlay for the per-viewer "Reported" state + auto-hide threshold, since staging doesn't echo a per-viewer report flag. The `myReactions` field is likewise not returned by staging, so the local overlay also keeps a per-viewer `picks` list so reaction chips can render their toggled-on state across reloads.
 
 ### Public issue pages
 
@@ -146,6 +150,7 @@ Pin and flag remain a localStorage overlay (`src/lib/comments.js`) — admin-onl
 | `src/app/issues/page.js` | `GET /issues` | `getJson` | Anonymous; params: `status`, `category`, `sort`, `limit=50`; client-side filters out non-public statuses. When the user is logged in, `apiClient` attaches the bearer token automatically and the response includes a per-issue `isVoted` boolean used to seed the "already supported" state |
 | `src/app/issues/[id]/page.js` | `GET /issues/{id}` | `getJson` | Anonymous; loads detail + a second `GET /issues` call (by category) for "Other issues in this category". `isVoted` is **not** returned on this endpoint today — see `09-backend-admin-gaps.md` |
 | `src/components/IssueVoteButton.js` (via `useIssueVote`) | `POST /issues/{id}/vote` | `voteOnIssue` | Authenticated; verified users only; hard-coded `voterRole: "INTERESTED"`; flips local `voted` state on success/409 |
+| `src/app/issues/[id]/page.js` (via `ReportDialog`) | `POST /issues/{id}/report` | `reportIssue` | Authenticated; "रिपोर्ट" trigger under the share row opens the shared `ReportDialog` (reason enum + optional details). 409 = already reported |
 
 ### `src/app/admin/events/page.js`
 

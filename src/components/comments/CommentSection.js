@@ -24,6 +24,7 @@ import {
   deleteCommentRemote,
   fetchComments,
   removeReactionRemote,
+  reportCommentRemote,
   updateComment
 } from "@/lib/commentsApi";
 import { getAuthSession, isAdminUser, subscribeAuthSession } from "@/lib/authSession";
@@ -298,20 +299,30 @@ export function CommentSection({
   );
 
   const handleSubmitFlag = useCallback(
-    ({ reason, note }) => {
+    async ({ reason, note }) => {
       if (!currentUser?.id || !flagTarget?.id) return;
-      const count = flagComment({
+      const commentId = flagTarget.id;
+      // Send the real moderation report. 409 means the backend already has a
+      // report from this viewer — treat it as success and fall through to the
+      // local overlay so the button still flips to "Reported".
+      try {
+        await reportCommentRemote({ id: commentId, reason, details: note || undefined });
+      } catch (error) {
+        if (error?.status !== 409) {
+          messageApi.error(error?.message || t.errorGeneric);
+          return;
+        }
+      }
+      // Local overlay carries the viewer-flagged state + auto-hide threshold
+      // (the backend doesn't echo a per-viewer "reported" flag yet).
+      flagComment({
         targetType,
         targetId,
-        commentId: flagTarget.id,
+        commentId,
         reason,
         note,
         userId: currentUser.id
       });
-      if (count === null) {
-        messageApi.error(t.errorGeneric);
-        return;
-      }
       setFlagTarget(null);
       setComments((prev) => applyLocalOverlay({ targetType, targetId, list: prev }));
       messageApi.success(t.successFlagged);

@@ -19,12 +19,13 @@ import { ShareButton } from "@/components/ShareButton";
 import { CommentSection } from "@/components/comments";
 import { IssueReactions } from "@/components/IssueReactions";
 import { PublicIssueCard, formatSupporters } from "@/components/PublicIssueCard";
+import { ReportDialog } from "@/components/ReportDialog";
 import { ScrollProgressBar } from "@/components/ScrollProgressBar";
 import { SiteShell } from "@/components/SiteShell";
 import { StickyActionBar } from "@/components/StickyActionBar";
 import { TertiaryButton } from "@/components/TertiaryButton";
 import { usePreferences } from "@/app/providers";
-import { getJson } from "@/lib/apiClient";
+import { getJson, reportIssue } from "@/lib/apiClient";
 import { copy } from "@/lib/siteContent";
 import { useTrackVisit } from "@/lib/useRecentlyViewed";
 import {
@@ -265,6 +266,13 @@ export default function IssueDetailPage() {
                   content={content}
                   language={language}
                 />
+                <div className="public-issue-report-row">
+                  <ReportDialog
+                    language={language}
+                    targetKind="issue"
+                    onReport={(values) => reportIssue(issue.id, values)}
+                  />
+                </div>
               </div>
 
               {imageUploads.length > 0 ? (

@@ -3556,6 +3556,34 @@
   color: var(--muted);
 }
 
+/* Moderation report trigger (issue detail + reused elsewhere) */
+.public-issue-report-row {
+  margin-top: 10px;
+}
+
+.report-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 0;
+  padding: 4px 2px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.report-trigger:hover {
+  color: #b42318;
+}
+
+.report-dialog-intro {
+  margin: 0 0 14px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
 /* Notification channel preferences (on /me/notifications) */
 .notif-prefs-panel {
   margin-top: 28px;

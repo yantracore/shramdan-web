@@ -3,6 +3,7 @@
 import { Input, Modal, Select } from "antd";
 import { useState } from "react";
 
+// Reasons match the backend enum for POST /comments/{id}/report.
 const COPY = {
   np: {
     title: "टिप्पणी रिपोर्ट गर्नुहोस्",
@@ -11,10 +12,12 @@ const COPY = {
     submit: "रिपोर्ट पठाउनुहोस्",
     cancel: "रद्द",
     reasons: {
-      spam: "स्प्याम वा विज्ञापन",
-      abuse: "अपमानजनक भाषा",
-      offtopic: "विषयभन्दा बाहिर",
-      other: "अरू कारण"
+      SPAM: "स्प्याम वा विज्ञापन",
+      ABUSE: "दुर्व्यवहार",
+      HARASSMENT: "उत्पीडन",
+      MISINFORMATION: "गलत सूचना",
+      INAPPROPRIATE: "अनुपयुक्त सामग्री",
+      OTHER: "अरू कारण"
     },
     chooseReason: "एउटा कारण छान्नुहोस्…"
   },
@@ -25,10 +28,12 @@ const COPY = {
     submit: "Submit Report",
     cancel: "Cancel",
     reasons: {
-      spam: "Spam or promotion",
-      abuse: "Abusive language",
-      offtopic: "Off-topic",
-      other: "Other"
+      SPAM: "Spam or promotion",
+      ABUSE: "Abuse",
+      HARASSMENT: "Harassment",
+      MISINFORMATION: "Misinformation",
+      INAPPROPRIATE: "Inappropriate",
+      OTHER: "Other"
     },
     chooseReason: "Pick a reason…"
   }

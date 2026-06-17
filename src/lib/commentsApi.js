@@ -127,3 +127,11 @@ export async function removeReactionRemote({ id, emoji }) {
   });
   return true;
 }
+
+// Report a comment for moderation. `reason` ∈ SPAM | ABUSE | HARASSMENT |
+// MISINFORMATION | INAPPROPRIATE | OTHER; `details` is optional (≤1000 chars).
+// Throws ApiError on failure (the caller branches on 409 = already reported).
+export async function reportCommentRemote({ id, reason, details }) {
+  if (!id || !reason) return false;
+  return postJson(`/comments/${id}/report`, { reason, details }, { requireAuth: true });
+}

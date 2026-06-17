@@ -35,13 +35,19 @@ route.
 
 ### Missing for admin CRUD
 
-The `/admin/issues` page is otherwise read-only because the API does not yet provide:
+The `/admin/issues` page gained inline status + delete on 2026-06-17. Still
+missing for full CRUD:
 
-- `PATCH /issues/{id}/status` — set lifecycle status (e.g. `OPEN` → `EVENT_SCHEDULED`, `REJECTED`, `DUPLICATE`, `COMPLETED`)
-- `PATCH /issues/{id}` — edit title, description, category, location, or merge metadata (needed for `/admin/issues/{id}/edit`)
-- `PATCH /issues/{id}/notes` — store admin-side notes (parallel to `applications` / `feedback` admin notes)
-- `DELETE /issues/{id}` — remove spam, abusive, or duplicate reports
-- Optional: `GET /issues/{id}/votes` — list voters with their `voterRole` so admins can plan event roles
+- ~~`PATCH /issues/{id}/status`~~ — ✅ **landed 2026-06-17.** Enum is `OPEN | COMPLETED | REJECTED | DUPLICATE` (not `EVENT_SCHEDULED` — that's set by the scheduling flow). Wired as a per-row status `Select` in `/admin/issues` via `useAdminItemMutation`.
+- `PATCH /issues/{id}` — edit title, description, category, location, or merge metadata (needed for `/admin/issues/{id}/edit`). **Still missing.**
+- `PATCH /issues/{id}/notes` — store admin-side notes (parallel to `applications` / `feedback` admin notes). **Still missing.**
+- ~~`DELETE /issues/{id}`~~ — ✅ **landed 2026-06-17.** Wired as a Delete `Popconfirm` in `/admin/issues` (moderation takedown).
+- Optional: `GET /issues/{id}/votes` — list voters with their `voterRole` so admins can plan event roles. Still missing.
+
+Public moderation reporting also landed 2026-06-17: `POST /issues/{id}/report`
+and `POST /comments/{id}/report` (reason enum `SPAM | ABUSE | HARASSMENT |
+MISINFORMATION | INAPPROPRIATE | OTHER`, optional `details`). Wired via the
+shared `ReportDialog` on issue detail and the comment flag flow.
 
 ### `isVoted` missing on `GET /issues/{id}`
 

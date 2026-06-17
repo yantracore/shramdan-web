@@ -1,13 +1,14 @@
 "use client";
 
 import {
+  DeleteOutlined,
   EditOutlined,
   EnvironmentOutlined,
   EyeOutlined,
   PlusOutlined,
   RiseOutlined
 } from "@ant-design/icons";
-import { Button, Empty, Select, Table, Tag } from "antd";
+import { Button, Empty, Popconfirm, Select, Table, Tag } from "antd";
 import Image from "next/image";
 import Link from "next/link";
 import { useMemo } from "react";
@@ -16,8 +17,10 @@ import { AdminShell } from "@/components/AdminShell";
 import { AdminFilters } from "@/components/admin/AdminFilters";
 import { AdminListCard } from "@/components/admin/AdminListCard";
 import { AdminPanelHeading } from "@/components/admin/AdminPanelHeading";
+import { AdminStatusSelect } from "@/components/admin/AdminStatusSelect";
 import {
   ISSUE_CATEGORIES,
+  ISSUE_MODERATION_STATUSES,
   ISSUE_STATUSES,
   ISSUE_STATUS_COLORS,
   buildEnumOptions,
@@ -26,7 +29,9 @@ import {
   getIssueCoverImageUrl,
   getListItems
 } from "@/lib/adminUtils";
+import { useAdminItemMutation } from "@/hooks/useAdminItemMutation";
 import { useAdminListResource } from "@/hooks/useAdminListResource";
+import { useToast } from "@/lib/toast";
 
 const issueSorts = [
   { label: "Most votes", value: "voteCount" },
@@ -36,8 +41,10 @@ const issueSorts = [
 const ISSUE_EXTRA_PARAMS = { limit: 100 };
 
 export default function AdminIssuesPage() {
+  const messageApi = useToast();
   const {
     items: issues,
+    setItems: setIssues,
     loading: loadingIssues,
     error: issueError,
     filters,
@@ -51,8 +58,36 @@ export default function AdminIssuesPage() {
     errorMessage: "Could not load issues."
   });
 
+  const { updatingId, patchStatus, deleteItem } = useAdminItemMutation({
+    messageApi,
+    setItems: setIssues
+  });
+
+  // Status filter offers every lifecycle value; the inline editor offers only
+  // the four an admin may set manually (PATCH /issues/{id}/status).
   const statusOptions = useMemo(() => buildEnumOptions(ISSUE_STATUSES), []);
+  const moderationStatusOptions = useMemo(
+    () => buildEnumOptions(ISSUE_MODERATION_STATUSES),
+    []
+  );
   const categoryOptions = useMemo(() => buildEnumOptions(ISSUE_CATEGORIES), []);
+
+  const handleStatusChange = (issue, status) =>
+    patchStatus({
+      path: `/issues/${issue.id}/status`,
+      item: issue,
+      body: { status },
+      successMsg: "Issue status updated.",
+      errorMsg: "Could not update status."
+    });
+
+  const handleDeleteIssue = (issue) =>
+    deleteItem({
+      path: `/issues/${issue.id}`,
+      item: issue,
+      successMsg: "Issue deleted.",
+      errorMsg: "Could not delete issue."
+    });
 
   const columns = [
     {
@@ -92,7 +127,14 @@ export default function AdminIssuesPage() {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (status) => <Tag color={ISSUE_STATUS_COLORS[status]}>{formatEnum(status)}</Tag>
+      render: (status, issue) => (
+        <AdminStatusSelect
+          value={status}
+          options={moderationStatusOptions}
+          loading={updatingId === issue.id}
+          onChange={(nextStatus) => handleStatusChange(issue, nextStatus)}
+        />
+      )
     },
     {
       title: "Votes",
@@ -121,6 +163,17 @@ export default function AdminIssuesPage() {
           <Link href={`/admin/issues/${issue.id}/edit`}>
             <Button icon={<EditOutlined />}>Edit</Button>
           </Link>
+          <Popconfirm
+            title="Delete this issue?"
+            description="This removes the issue as a moderation takedown."
+            okButtonProps={{ danger: true }}
+            okText="Delete"
+            onConfirm={() => handleDeleteIssue(issue)}
+          >
+            <Button danger icon={<DeleteOutlined />} loading={updatingId === issue.id}>
+              Delete
+            </Button>
+          </Popconfirm>
         </div>
       )
     }
@@ -222,6 +275,17 @@ export default function AdminIssuesPage() {
                   <Tag color={ISSUE_STATUS_COLORS[issue.status]}>{formatEnum(issue.status)}</Tag>
                 </>
               }
+              control={
+                <>
+                  <span>Status</span>
+                  <AdminStatusSelect
+                    value={issue.status}
+                    options={moderationStatusOptions}
+                    loading={updatingId === issue.id}
+                    onChange={(nextStatus) => handleStatusChange(issue, nextStatus)}
+                  />
+                </>
+              }
               detail={
                 <>
                   <p>
@@ -236,14 +300,25 @@ export default function AdminIssuesPage() {
                 </>
               }
               actions={
-                <div className="admin-row-actions">
+                <>
                   <Link href={`/admin/issues/${issue.id}/view`}>
                     <Button icon={<EyeOutlined />}>View</Button>
                   </Link>
                   <Link href={`/admin/issues/${issue.id}/edit`}>
                     <Button icon={<EditOutlined />}>Edit</Button>
                   </Link>
-                </div>
+                  <Popconfirm
+                    title="Delete this issue?"
+                    description="This removes the issue as a moderation takedown."
+                    okButtonProps={{ danger: true }}
+                    okText="Delete"
+                    onConfirm={() => handleDeleteIssue(issue)}
+                  >
+                    <Button danger icon={<DeleteOutlined />} loading={updatingId === issue.id}>
+                      Delete
+                    </Button>
+                  </Popconfirm>
+                </>
               }
             />
             );

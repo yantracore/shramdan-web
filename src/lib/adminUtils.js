@@ -17,6 +17,16 @@ export const ISSUE_STATUSES = [
   "DUPLICATE"
 ];
 
+// Statuses an admin may set manually via PATCH /issues/{id}/status. Excludes
+// EVENT_SCHEDULED (driven by the scheduling flow, not a manual override) — the
+// backend enum for that endpoint is OPEN | COMPLETED | REJECTED | DUPLICATE.
+export const ISSUE_MODERATION_STATUSES = [
+  "OPEN",
+  "COMPLETED",
+  "REJECTED",
+  "DUPLICATE"
+];
+
 export const ISSUE_CATEGORIES = [
   "ROADSIDE",
   "VACANT_LAND",

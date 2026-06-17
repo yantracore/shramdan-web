@@ -309,6 +309,16 @@ export function retractVoteOnIssue(issueId) {
   return deleteJson(`/issues/${issueId}/vote`, { requireAuth: true });
 }
 
+// Report an issue for moderation (authenticated). `values` is
+// { reason, details? } where reason ∈ SPAM | ABUSE | HARASSMENT |
+// MISINFORMATION | INAPPROPRIATE | OTHER and details is ≤1000 chars. 201 on
+// success; 409 if the viewer already reported this issue. (Admin issue
+// status/delete go through useAdminItemMutation, which calls patchJson /
+// deleteJson directly; the comment-report helper lives in commentsApi.js.)
+export function reportIssue(issueId, values) {
+  return postJson(`/issues/${issueId}/report`, values, { requireAuth: true });
+}
+
 // Issues the caller has voted on — full issue objects decorated with
 // `voterRole` + `votedAt`, paginated ({ items, nextCursor }).
 export function fetchMyIssueVotes(params = {}) {
