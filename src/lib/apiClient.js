@@ -241,6 +241,10 @@ export function patchJson(path, values, options) {
   return apiRequest(path, { ...options, body: values, method: "PATCH" });
 }
 
+export function putJson(path, values, options) {
+  return apiRequest(path, { ...options, body: values, method: "PUT" });
+}
+
 export function deleteJson(path, options) {
   return apiRequest(path, { ...options, method: "DELETE" });
 }
@@ -311,9 +315,45 @@ export function fetchMyIssueVotes(params = {}) {
   return getJson("/issues/me/votes", { params, requireAuth: true });
 }
 
+// Issues the caller has reported (authored) — same shape/filters as
+// GET /issues but scoped to `reportedById = me`, default sort=createdAt.
+// Paginated ({ items, nextCursor }). Powers the member "My issues" surface.
+export function fetchMyReportedIssues(params = {}) {
+  return getJson("/issues/me", { params, requireAuth: true });
+}
+
 // Public member profile (no auth). `idOrSlug` is a user id (UUID); the
 // backend returns { id, name, username, avatar, city, bio, isVerified,
 // createdAt, stats: { issuesReported, votesCast, eventsLed, eventsJoined } }.
 export function fetchUserPublicProfile(idOrSlug) {
   return getJson(`/users/${idOrSlug}/profile`);
+}
+
+// Notifications (all authenticated).
+//   fetchNotifications: params { unreadOnly?, limit?, cursor? } → cursor page
+//     { items: [{ id, type, title, body, data:{targetType,targetId,slug},
+//       readAt, createdAt }], unreadCount, nextCursor }.
+//   fetchUnreadNotificationCount → { unreadCount }.
+//   markNotificationRead(id) — idempotent single read.
+//   markAllNotificationsRead — read everything.
+//   updateNotificationPreferences({ sms, email, push }) — channel prefs.
+// Consumer-side mapping onto the bell/inbox shape lives in notificationsApi.js.
+export function fetchNotifications(params = {}) {
+  return getJson("/notifications", { params, requireAuth: true });
+}
+
+export function fetchUnreadNotificationCount() {
+  return getJson("/notifications/unread-count", { requireAuth: true });
+}
+
+export function markNotificationRead(id) {
+  return patchJson(`/notifications/${id}/read`, {}, { requireAuth: true });
+}
+
+export function markAllNotificationsRead() {
+  return postJson("/notifications/read-all", {}, { requireAuth: true });
+}
+
+export function updateNotificationPreferences(values) {
+  return putJson("/notifications/preferences", values, { requireAuth: true });
 }

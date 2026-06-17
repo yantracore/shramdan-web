@@ -161,6 +161,23 @@ Pin and flag remain a localStorage overlay (`src/lib/comments.js`) — admin-onl
 
 Scheduling (`PATCH /events/{id}/schedule`) and completion (`POST /events/{id}/complete`) are restricted to the assigned event leader by the API, so they are not exposed in the admin UI.
 
+## Notifications
+
+All notification requests are authenticated and flow through
+`src/lib/notificationsApi.js`, which maps the backend shape (`type`, plain
+`title`/`body` strings, `data.{targetType,targetId,slug}`, `readAt`) onto the
+`{ kind, title:{np,en}, body:{np,en}, href, isRead }` shape the UI renders, and
+soft-fails to an empty feed. Full contract: [`../api-requirements/notifications.md`](../api-requirements/notifications.md).
+
+| Page / component | Method + path | apiClient fn | Trigger |
+| --- | --- | --- | --- |
+| `src/components/NotificationsBell.js` | `GET /notifications?limit=8` | `fetchNotifications` (via `fetchNotificationFeed`) | Mount; topbar dropdown (authenticated only — mounted by `SiteShell`). Badge trusts the server `unreadCount` |
+| `src/components/NotificationsBell.js` | `PATCH /notifications/{id}/read` | `markNotificationRead` | Optimistic on opening a notification link |
+| `src/components/NotificationsBell.js` | `POST /notifications/read-all` | `markAllNotificationsRead` | "Mark all read" |
+| `src/app/me/notifications/page.js` | `GET /notifications?limit=50` | `fetchNotificationFeed` | Mount; full inbox with all/unread/read tabs |
+| `src/app/me/notifications/page.js` | `PATCH /notifications/{id}/read` · `POST /notifications/read-all` | `markNotificationRead` · `markAllNotificationsRead` | Per-row read + "Mark all as read" |
+| `src/components/NotificationChannelPrefs.js` | `PUT /notifications/preferences` | `updateNotificationPreferences` | "Save" on the channel toggles. Starts from defaults (`email/push` on, `sms` off) — no backend GET to seed current state yet (gap noted in the api-requirements doc) |
+
 ## Public URL filter convention (roadmap 13.4)
 
 KPI tiles, activity strips, and impact summaries deep-link into the public list pages with a shared query-param contract. The contract is intentionally short — only what the frontend list pages already honor.

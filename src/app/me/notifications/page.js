@@ -1,9 +1,9 @@
 "use client";
 
 // /me/notifications — full inbox page that mirrors NotificationsBell's
-// dropdown but with tabs, larger cards, and a Mark-all-read button.
-// Pre-backend: data comes from getDemoNotifications() and read-state
-// lives in component state only (resets on refresh).
+// dropdown but with tabs, larger cards, and a Mark-all-read button. Wired to
+// the real `/notifications` backend; read-state mutations are optimistic and
+// hit markNotificationRead / markAllNotificationsRead.
 
 import {
   BellOutlined,
@@ -15,10 +15,17 @@ import {
 } from "@ant-design/icons";
 import { Empty } from "antd";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+import { NotificationChannelPrefs } from "@/components/NotificationChannelPrefs";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
-import { getDemoNotifications } from "@/lib/devMockData";
+import {
+  fetchNotificationFeed,
+  markAllNotificationsRead,
+  markNotificationRead
+} from "@/lib/notificationsApi";
+
+const INBOX_FEED_LIMIT = 50;
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 
@@ -97,9 +104,18 @@ function relativeTime(iso, t, language) {
 export default function NotificationsInboxPage() {
   const { language } = usePreferences();
   const t = COPY[language] || COPY.np;
-  const seed = useMemo(() => getDemoNotifications(), []);
-  const [items, setItems] = useState(seed);
+  const [items, setItems] = useState([]);
   const [tab, setTab] = useState("all");
+
+  useEffect(() => {
+    let alive = true;
+    fetchNotificationFeed({ limit: INBOX_FEED_LIMIT }).then((feed) => {
+      if (alive) setItems(feed.items);
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   const unreadCount = items.filter((n) => !n.isRead).length;
 
@@ -111,12 +127,14 @@ export default function NotificationsInboxPage() {
 
   const markAllRead = () => {
     setItems((prev) => prev.map((n) => ({ ...n, isRead: true })));
+    markAllNotificationsRead().catch(() => {});
   };
 
   const markRead = (id) => {
     setItems((prev) =>
       prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
     );
+    markNotificationRead(id).catch(() => {});
   };
 
   const emptyMessage =
@@ -229,6 +247,8 @@ export default function NotificationsInboxPage() {
             })}
           </ul>
         )}
+
+        <NotificationChannelPrefs language={language} />
       </section>
     </SiteShell>
   );

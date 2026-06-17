@@ -1,14 +1,13 @@
 "use client";
 
-// Topbar notifications bell (Phase 8 — UI-only, pre-backend).
+// Topbar notifications bell — wired to the real `/notifications` backend.
 //
-// Demo notifications come from getDemoNotifications() in devMockData.
-// Once the real `/notifications` endpoint lands, swap the useState seed
-// for a useEffect + getJson("/notifications") call — the rest of the
-// component (read-toggle, relative time, dropdown panel) carries over.
-//
-// `isRead` toggles live in component state so "Mark all read" has
-// immediate effect, even though we're not persisting anywhere yet.
+// Mounted only for authenticated users (see SiteShell). On mount it pulls a
+// short page via fetchNotificationFeed(); read-state mutations hit the API
+// optimistically (markNotificationRead / markAllNotificationsRead) so the
+// badge updates instantly and reverts only on a hard reload if the server
+// rejected. The unread badge prefers the server's unreadCount, which can
+// exceed the few items shown in the dropdown.
 
 import {
   BellOutlined,
@@ -20,8 +19,14 @@ import {
 } from "@ant-design/icons";
 import { Badge, Dropdown } from "antd";
 import Link from "next/link";
-import { useMemo, useState } from "react";
-import { getDemoNotifications } from "@/lib/devMockData";
+import { useEffect, useState } from "react";
+import {
+  fetchNotificationFeed,
+  markAllNotificationsRead,
+  markNotificationRead
+} from "@/lib/notificationsApi";
+
+const BELL_FEED_LIMIT = 8;
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 
@@ -79,20 +84,35 @@ function relativeTime(iso, t, language) {
 
 export function NotificationsBell({ language = "np" }) {
   const t = COPY[language] || COPY.np;
-  const seed = useMemo(() => getDemoNotifications(), []);
-  const [items, setItems] = useState(seed);
+  const [items, setItems] = useState([]);
+  const [unread, setUnread] = useState(0);
   const [open, setOpen] = useState(false);
 
-  if (!items || items.length === 0) return null;
-
-  const unread = items.filter((n) => !n.isRead).length;
+  useEffect(() => {
+    let alive = true;
+    fetchNotificationFeed({ limit: BELL_FEED_LIMIT }).then((feed) => {
+      if (!alive) return;
+      setItems(feed.items);
+      setUnread(feed.unreadCount);
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   const markAllRead = () => {
     setItems((prev) => prev.map((n) => ({ ...n, isRead: true })));
+    setUnread(0);
+    markAllNotificationsRead().catch(() => {});
   };
 
   const markRead = (id) => {
-    setItems((prev) => prev.map((n) => (n.id === id ? { ...n, isRead: true } : n)));
+    setItems((prev) => {
+      const target = prev.find((n) => n.id === id);
+      if (target && !target.isRead) setUnread((c) => Math.max(0, c - 1));
+      return prev.map((n) => (n.id === id ? { ...n, isRead: true } : n));
+    });
+    markNotificationRead(id).catch(() => {});
   };
 
   const panel = (
@@ -105,6 +125,9 @@ export function NotificationsBell({ language = "np" }) {
           </button>
         ) : null}
       </header>
+      {items.length === 0 ? (
+        <p className="notifications-empty">{t.empty}</p>
+      ) : (
       <ul className="notifications-list">
         {items.map((n) => {
           const Icon = KIND_ICON[n.kind] || BellOutlined;
@@ -144,6 +167,7 @@ export function NotificationsBell({ language = "np" }) {
           );
         })}
       </ul>
+      )}
       <footer className="notifications-panel-footer">
         <Link
           href="/me/notifications"
