@@ -232,7 +232,7 @@ function LoginPageContent() {
               </Form.Item>
 
               <div className="login-forgot">
-                <Link href="/feedback?type=ACCOUNT">{t.forgot}</Link>
+                <Link href="/reset-password">{t.forgot}</Link>
               </div>
 
               <div className="login-actions">

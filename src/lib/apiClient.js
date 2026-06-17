@@ -253,6 +253,24 @@ export function loginWithPassword(credentials) {
   return postJson("/auth/login", credentials);
 }
 
+// Password reset via email OTP (anonymous).
+//   forgotPassword({ email }) → 200 (reset code emailed); 429 on cooldown.
+//   resetPassword({ email, otp, newPassword }) → 200; 400 bad OTP, 404 no
+//     pending code, 429 too many attempts.
+export function forgotPassword(email) {
+  return postJson("/auth/forgot-password", { email });
+}
+
+export function resetPassword(values) {
+  return postJson("/auth/reset-password", values);
+}
+
+// Resend a pending verification OTP for the current user (authenticated).
+// `channel` ∈ email | phone. 409 if nothing is pending, 429 on cooldown.
+export function resendOtp(channel) {
+  return postJson("/auth/resend-otp", { channel }, { requireAuth: true });
+}
+
 export async function logoutAndClearSession() {
   const refreshToken = getStoredRefreshToken();
   if (refreshToken) {

@@ -135,3 +135,18 @@ export async function reportCommentRemote({ id, reason, details }) {
   if (!id || !reason) return false;
   return postJson(`/comments/${id}/report`, { reason, details }, { requireAuth: true });
 }
+
+// Cursor-paginated direct replies of one comment. Available for lazy-loading
+// deep threads; the section currently fetches the whole tree at once via
+// fetchComments, so this is a future-optimization hook. Returns
+// { items: normalizedComment[], nextCursor }.
+export async function fetchCommentReplies({ id, cursor, limit } = {}) {
+  if (!id) return { items: [], nextCursor: null };
+  const params = {};
+  if (cursor) params.cursor = cursor;
+  if (limit) params.limit = limit;
+  const res = await getJson(`/comments/${id}/replies`, { params });
+  const data = res?.data ?? res ?? {};
+  const items = Array.isArray(data.items) ? data.items.map(normalizeComment) : [];
+  return { items, nextCursor: data.nextCursor ?? null };
+}

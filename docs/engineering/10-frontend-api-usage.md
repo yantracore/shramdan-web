@@ -52,7 +52,9 @@ Base URL: `process.env.NEXT_PUBLIC_API_BASE_URL` (falls back to `https://backend
 
 | Page | Method + path | apiClient fn | Notes |
 | --- | --- | --- | --- |
-| `src/app/login/page.js` | `POST /auth/login` | `loginWithPassword` | Stores `accessToken` + `user` via `setAuthSession`; routes `ADMIN` to `/admin` |
+| `src/app/login/page.js` | `POST /auth/login` | `loginWithPassword` | Stores `accessToken` + `user` via `setAuthSession`; routes `ADMIN` to `/admin`. The "Forgot password?" link now points to `/reset-password` (was a `/feedback` dead-link) |
+| `src/app/reset-password/page.js` | `POST /auth/forgot-password` | `forgotPassword` | Phase 1: email → emails a 6-digit reset code. 429 on cooldown |
+| `src/app/reset-password/page.js` | `POST /auth/reset-password` | `resetPassword` | Phase 2: `{ email, otp, newPassword }` → success redirects to `/login`. 400 bad OTP, 404 no pending code, 429 too many attempts |
 | `src/app/signup/page.js` | `POST /applications/request-otp` | `requestApplicationOtp` | Anonymous; emails a 6-digit code as the user leaves the details step. 409 `USER_ALREADY_EXISTS` / 429 cooldown keep the user on the step with the backend message |
 | `src/app/signup/page.js` | `POST /applications` | `submitApplication` | Anonymous; body adds `otp` + `password` (+ default `role: VOLUNTEER`, default `motivation`). 201 creates a **verified** account and returns `{ user, application, accessToken, refreshToken }` → fed straight into `setAuthSession` (the user lands signed in) |
 
@@ -139,7 +141,7 @@ Uses the same `IssueForm` component as the create page (see "One shared form com
 
 ### Comments (issue + event detail pages)
 
-All comment requests funnel through `src/lib/commentsApi.js` (`fetchComments` / `createComment` / `updateComment` / `deleteCommentRemote` / `addReactionRemote` / `removeReactionRemote`). The consumer is `src/components/comments/CommentSection.js`, mounted from both `src/app/issues/[id]/page.js` and `src/app/events/[id]/page.js`.
+All comment requests funnel through `src/lib/commentsApi.js` (`fetchComments` / `createComment` / `updateComment` / `deleteCommentRemote` / `addReactionRemote` / `removeReactionRemote` / `reportCommentRemote` / `fetchCommentReplies`). `fetchCommentReplies` (`GET /comments/{id}/replies`, cursor-paginated) is wired in the API layer but not yet consumed — the section still fetches the whole tree at once via `fetchComments?limit=200`, so it's a future lazy-load hook for deep threads. The consumer is `src/components/comments/CommentSection.js`, mounted from both `src/app/issues/[id]/page.js` and `src/app/events/[id]/page.js`.
 
 | Method + path | apiClient fn | Trigger |
 | --- | --- | --- |
