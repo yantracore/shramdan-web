@@ -274,24 +274,25 @@ export function changePassword(values) {
   return postJson("/auth/change-password", values, { requireAuth: true });
 }
 
-// Member registration → SMS OTP flow.
-//   register: { name, email, password, phone(E.164) } → 201 (no token,
-//             OTP sent). Returns the created user (email, role, name).
-//   verifyOtp: { phone, otp } → 200 { user(partial), accessToken,
-//             refreshToken }. Merge the partial user with the register
-//             user to build a full session (getAuthSession needs email +
-//             role).
-//   resendOtp: { phone } → 200 (429 when the cooldown is active).
-export function registerMember(values) {
-  return postJson("/auth/register", values);
+// Application-based signup → email OTP flow (replaced the retired
+// /auth/register + /auth/verify-otp SMS flow on 2026-06-17).
+//   requestApplicationOtp: { email } → 200 (6-digit code emailed). 409
+//             USER_ALREADY_EXISTS when the email already has an account;
+//             429 OTP_RESEND_COOLDOWN while the resend cooldown is active.
+//   submitApplication: { name, email, otp, password, role, motivation,
+//             phone?, experience?, additionalInfo?, portfolioId?, resumeId? }
+//             → 201 { user, application, accessToken, refreshToken }. This
+//             creates a VERIFIED account AND signs the user in — feed the
+//             returned user + tokens straight into setAuthSession. The user
+//             is full (email + role), so no merge step is needed. Errors:
+//             400 OTP_INVALID, 404 OTP_NOT_FOUND, 409 USER_ALREADY_EXISTS,
+//             429 OTP_TOO_MANY_ATTEMPTS.
+export function requestApplicationOtp(email) {
+  return postJson("/applications/request-otp", { email });
 }
 
-export function verifyOtp(values) {
-  return postJson("/auth/verify-otp", values);
-}
-
-export function resendOtp(phone) {
-  return postJson("/auth/resend-otp", { phone });
+export function submitApplication(values) {
+  return postJson("/applications", values);
 }
 
 export function voteOnIssue(issueId, voterRole = "INTERESTED") {

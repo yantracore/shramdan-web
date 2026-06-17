@@ -3739,6 +3739,13 @@
   font-variant-numeric: tabular-nums;
 }
 
+.signup-otp-expiry {
+  margin: 6px 0 0 !important;
+  text-align: center;
+  font-size: 12px;
+  color: var(--muted);
+}
+
 .signup-resend {
   align-self: center;
   background: transparent;

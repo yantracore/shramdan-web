@@ -1,12 +1,15 @@
 "use client";
 
-// Phone + OTP membership (roadmap Phase 2.1) — wired to the real backend.
-//   POST /auth/register   { name, email, password, phone(E.164) } → OTP SMS
-//   POST /auth/verify-otp { phone, otp } → { user, accessToken, refreshToken }
-//   POST /auth/resend-otp { phone }
-// verify-otp returns only a partial user, so we merge it with the user the
-// register call returned to build a full session (getAuthSession needs
-// email + role). Step keys: intro → phone(details) → otp → done.
+// Email + OTP membership signup — wired to the application-signup backend.
+//   POST /applications/request-otp { email } → 6-digit code emailed
+//   POST /applications { name, email, otp, password, role, motivation, phone? }
+//        → 201 { user, application, accessToken, refreshToken }
+// The submit creates a VERIFIED account and signs the user in, so the
+// returned user + tokens go straight into setAuthSession (no merge step —
+// the user object already carries email + role). Every quick signup lands
+// as a generic Shramdan member (role: VOLUNTEER) with a default motivation;
+// the richer contributor application lives at /join.
+// Step keys: intro → details → otp → done.
 
 import {
   ArrowRightOutlined,
@@ -24,77 +27,93 @@ import { usePreferences } from "@/app/providers";
 import { ConfettiBurst } from "@/components/ConfettiBurst";
 import { MultiStepShell } from "@/components/MultiStepShell";
 import { SiteShell } from "@/components/SiteShell";
-import { registerMember, resendOtp, verifyOtp } from "@/lib/apiClient";
+import { requestApplicationOtp, submitApplication } from "@/lib/apiClient";
 import { setAuthSession } from "@/lib/authSession";
 import { copy as siteCopy } from "@/lib/siteContent";
 import { useToast } from "@/lib/toast";
 
 const RESEND_COOLDOWN_SECONDS = 30;
 
+// Every quick signup creates an application row; supply a neutral default so
+// the required `motivation` field is satisfied without asking for prose here.
+// The full contributor application at /join collects a real motivation.
+const DEFAULT_MOTIVATION = "Signed up as a Shramdan member via quick signup.";
+const DEFAULT_ROLE = "VOLUNTEER";
+
 const COPY = {
   np: {
-    pageTitle: "OTP बाट सदस्यता",
+    pageTitle: "इमेल OTP बाट सदस्यता",
     nameLabel: "पूरा नाम",
     namePlaceholder: "तपाईंको नाम",
     emailLabel: "इमेल",
     emailPlaceholder: "you@example.com",
     passwordLabel: "पासवर्ड",
     passwordPlaceholder: "कम्तीमा ६ अक्षर",
-    phoneLabel: "मोबाइल नम्बर",
+    confirmPasswordLabel: "पासवर्ड पुष्टि गर्नुहोस्",
+    confirmPasswordPlaceholder: "पासवर्ड फेरि लेख्नुहोस्",
+    phoneLabel: "मोबाइल नम्बर (वैकल्पिक)",
     phonePlaceholder: "9XXXXXXXXX",
-    phoneHint: "नेपालको मोबाइल नम्बर — १० अंक, ९ बाट सुरु।",
-    sendOtp: "OTP पठाउनुहोस्",
+    phoneHint: "नेपालको मोबाइल नम्बर — १० अंक, ९ बाट सुरु। वैकल्पिक।",
+    detailsHint: "नाम, इमेल र पासवर्ड अनिवार्य। इमेलमा पुष्टि कोड पठाइन्छ।",
+    sendOtp: "कोड पठाउनुहोस्",
     otpResend: "फेरि पठाउनुहोस्",
     otpResendIn: "{n} सेकेन्डमा फेरि पठाउन सकिन्छ",
-    otpResent: "OTP फेरि पठाइयो।",
+    otpResent: "कोड फेरि पठाइयो।",
     otpVerify: "पुष्टि गर्नुहोस्",
-    otpSentTo: "OTP कोड यहाँ पठाइयो:",
+    otpSentTo: "पुष्टि कोड यहाँ पठाइयो:",
     goDashboard: "ड्यासबोर्डमा जानुहोस्",
     goEvents: "अभियानहरू हेर्नुहोस्",
     errorNameRequired: "कृपया आफ्नो नाम लेख्नुहोस्।",
     errorEmailInvalid: "सही इमेल ठेगाना लेख्नुहोस्।",
     errorPasswordShort: "पासवर्ड कम्तीमा ६ अक्षरको हुनुपर्छ।",
-    errorPhoneInvalid: "१० अंकको ९ बाट सुरु हुने मोबाइल नम्बर लेख्नुहोस्।",
+    errorPasswordMismatch: "दुवै पासवर्ड मिलेनन्।",
+    errorPhoneInvalid: "१० अंकको ९ बाट सुरु हुने मोबाइल नम्बर लेख्नुहोस् वा खाली छोड्नुहोस्।",
     errorOtpInvalid: "६ अंकको OTP कोड लेख्नुहोस्।",
-    otpHint: "तपाईंको फोनमा आएको ६ अंकको कोड लेख्नुहोस्।",
+    otpHint: "तपाईंको इमेलमा आएको ६ अंकको कोड लेख्नुहोस्।",
+    otpExpiryHint: "ढुक्क हुनुहोस् — कोड १५ मिनेटसम्म मान्य हुन्छ।",
     alreadyPrompt: "पहिले नै खाता छ?",
     loginCta: "लगइन गर्नुहोस्।",
     introBullets: [
-      "नाम, इमेल र फोन नम्बर।",
-      "फोनमा OTP कोड पठाइन्छ।",
+      "नाम, इमेल र पासवर्ड।",
+      "इमेलमा ६ अंकको पुष्टि कोड पठाइन्छ।",
       "पुष्टि भएपछि तुरुन्तै श्रमदान सदस्य।"
     ]
   },
   en: {
-    pageTitle: "OTP Signup",
+    pageTitle: "Email OTP Signup",
     nameLabel: "Full name",
     namePlaceholder: "Your name",
     emailLabel: "Email",
     emailPlaceholder: "you@example.com",
     passwordLabel: "Password",
     passwordPlaceholder: "At least 6 characters",
-    phoneLabel: "Mobile number",
+    confirmPasswordLabel: "Confirm password",
+    confirmPasswordPlaceholder: "Re-enter your password",
+    phoneLabel: "Mobile number (optional)",
     phonePlaceholder: "9XXXXXXXXX",
-    phoneHint: "Nepali mobile number — 10 digits, starts with 9.",
-    sendOtp: "Send OTP",
+    phoneHint: "Nepali mobile number — 10 digits, starts with 9. Optional.",
+    detailsHint: "Name, email and password are required. We email a verification code.",
+    sendOtp: "Send Code",
     otpResend: "Resend",
     otpResendIn: "Resend available in {n}s",
-    otpResent: "OTP resent.",
+    otpResent: "Code resent.",
     otpVerify: "Verify",
-    otpSentTo: "OTP sent to:",
+    otpSentTo: "Verification code sent to:",
     goDashboard: "Go to Dashboard",
     goEvents: "Browse Campaigns",
     errorNameRequired: "Please enter your name.",
     errorEmailInvalid: "Enter a valid email address.",
     errorPasswordShort: "Password must be at least 6 characters.",
-    errorPhoneInvalid: "Enter a 10-digit mobile number that starts with 9.",
+    errorPasswordMismatch: "The two passwords don't match.",
+    errorPhoneInvalid: "Enter a 10-digit mobile number starting with 9, or leave it blank.",
     errorOtpInvalid: "Enter the 6-digit OTP code.",
-    otpHint: "Enter the 6-digit code sent to your phone.",
+    otpHint: "Enter the 6-digit code sent to your email.",
+    otpExpiryHint: "No rush — the code stays valid for 15 minutes.",
     alreadyPrompt: "Already have an account?",
     loginCta: "Log in.",
     introBullets: [
-      "Your name, email and phone.",
-      "We send an OTP code to your phone.",
+      "Your name, email and password.",
+      "We email you a 6-digit verification code.",
       "Verified, you're a Shramdan member instantly."
     ]
   }
@@ -117,7 +136,7 @@ function toE164(raw) {
   return `+977${String(raw || "").replace(/\D/g, "")}`;
 }
 
-const STEP_KEYS = ["intro", "phone", "otp", "done"];
+const STEP_KEYS = ["intro", "details", "otp", "done"];
 
 export default function SignupPage() {
   const router = useRouter();
@@ -130,16 +149,14 @@ export default function SignupPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
   const [fieldError, setFieldError] = useState("");
   const [otpError, setOtpError] = useState("");
-  const [registering, setRegistering] = useState(false);
+  const [requesting, setRequesting] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
-  // The register response carries the full user (email + role); verify-otp
-  // returns only a partial user, so we keep this to merge into the session.
-  const pendingUserRef = useRef(null);
   const otpInputRef = useRef(null);
 
   const currentKey = STEP_KEYS[stepIndex];
@@ -171,7 +188,7 @@ export default function SignupPage() {
     [ms]
   );
 
-  const handleRegister = async () => {
+  const handleRequestOtp = async () => {
     setFieldError("");
     if (!name.trim()) {
       setFieldError(t.errorNameRequired);
@@ -185,28 +202,27 @@ export default function SignupPage() {
       setFieldError(t.errorPasswordShort);
       return;
     }
-    if (!isValidNepaliMobile(phone)) {
+    if (confirmPassword !== password) {
+      setFieldError(t.errorPasswordMismatch);
+      return;
+    }
+    // Phone is optional now (OTP arrives by email). Validate only when filled.
+    if (phone.trim() && !isValidNepaliMobile(phone)) {
       setFieldError(t.errorPhoneInvalid);
       return;
     }
 
-    setRegistering(true);
+    setRequesting(true);
     try {
-      const response = await registerMember({
-        name: name.trim(),
-        email: email.trim(),
-        password,
-        phone: toE164(phone)
-      });
-      pendingUserRef.current = response?.data?.user ?? null;
+      await requestApplicationOtp(email.trim());
       setStepIndex(STEP_KEYS.indexOf("otp"));
       setResendCooldown(RESEND_COOLDOWN_SECONDS);
     } catch (error) {
-      // Backend is the source of truth — surface its message (e.g. phone /
-      // email already registered, weak password).
-      setFieldError(error?.message || t.errorPhoneInvalid);
+      // Backend is the source of truth — surface its message (email already
+      // registered, resend cooldown, etc.).
+      setFieldError(error?.message || t.errorEmailInvalid);
     } finally {
-      setRegistering(false);
+      setRequesting(false);
     }
   };
 
@@ -218,15 +234,21 @@ export default function SignupPage() {
     }
     setVerifying(true);
     try {
-      const response = await verifyOtp({ phone: toE164(phone), otp: otp.trim() });
+      const response = await submitApplication({
+        name: name.trim(),
+        email: email.trim(),
+        otp: otp.trim(),
+        password,
+        role: DEFAULT_ROLE,
+        motivation: DEFAULT_MOTIVATION,
+        ...(phone.trim() ? { phone: toE164(phone) } : {})
+      });
       const data = response?.data ?? {};
-      // Merge the partial verify user over the fuller register user so the
-      // session has email + role (required by getAuthSession).
-      const user = { ...(pendingUserRef.current || {}), ...(data.user || {}) };
+      // The 201 user is full (email + role), so no merge is needed.
       setAuthSession({
         accessToken: data.accessToken,
         refreshToken: data.refreshToken ?? null,
-        user
+        user: data.user
       });
       setStepIndex(STEP_KEYS.indexOf("done"));
     } catch (error) {
@@ -237,23 +259,23 @@ export default function SignupPage() {
   };
 
   const handleResend = async () => {
-    if (resendCooldown > 0 || !isValidNepaliMobile(phone)) return;
+    if (resendCooldown > 0 || !isValidEmail(email)) return;
     try {
-      await resendOtp(toE164(phone));
+      await requestApplicationOtp(email.trim());
       setResendCooldown(RESEND_COOLDOWN_SECONDS);
       messageApi.success(t.otpResent);
     } catch (error) {
-      messageApi.error(error?.message || t.errorOtpInvalid);
+      messageApi.error(error?.message || t.errorEmailInvalid);
     }
   };
 
   const handleNext = () => {
     if (currentKey === "intro") {
-      setStepIndex(STEP_KEYS.indexOf("phone"));
+      setStepIndex(STEP_KEYS.indexOf("details"));
       return;
     }
-    if (currentKey === "phone") {
-      handleRegister();
+    if (currentKey === "details") {
+      handleRequestOtp();
       return;
     }
     if (currentKey === "otp") {
@@ -265,21 +287,21 @@ export default function SignupPage() {
     if (currentKey === "otp") {
       setOtp("");
       setOtpError("");
-      setStepIndex(STEP_KEYS.indexOf("phone"));
+      setStepIndex(STEP_KEYS.indexOf("details"));
       return;
     }
-    if (currentKey === "phone") {
+    if (currentKey === "details") {
       setStepIndex(STEP_KEYS.indexOf("intro"));
     }
   };
 
   const isDone = currentKey === "done";
   const nextLoading =
-    (currentKey === "phone" && registering) || (currentKey === "otp" && verifying);
+    (currentKey === "details" && requesting) || (currentKey === "otp" && verifying);
 
   let nextLabel;
   if (currentKey === "intro") nextLabel = ms.intro.cta;
-  else if (currentKey === "phone") nextLabel = t.sendOtp;
+  else if (currentKey === "details") nextLabel = t.sendOtp;
   else if (currentKey === "otp") nextLabel = t.otpVerify;
 
   return (
@@ -326,7 +348,7 @@ export default function SignupPage() {
               </div>
             ) : null}
 
-            {currentKey === "phone" ? (
+            {currentKey === "details" ? (
               <div className="signup-field signup-field-group">
                 <label htmlFor="signup-name">{t.nameLabel}</label>
                 <Input
@@ -363,6 +385,18 @@ export default function SignupPage() {
                   autoComplete="new-password"
                 />
 
+                <label htmlFor="signup-confirm-password">{t.confirmPasswordLabel}</label>
+                <Input.Password
+                  id="signup-confirm-password"
+                  size="large"
+                  placeholder={t.confirmPasswordPlaceholder}
+                  prefix={<LockOutlined />}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  onPressEnter={handleRequestOtp}
+                  autoComplete="new-password"
+                />
+
                 <label htmlFor="signup-phone">{t.phoneLabel}</label>
                 <Input
                   id="signup-phone"
@@ -373,12 +407,12 @@ export default function SignupPage() {
                   addonBefore="+977"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  onPressEnter={handleRegister}
+                  onPressEnter={handleRequestOtp}
                   status={fieldError ? "error" : undefined}
                   autoComplete="tel-national"
                 />
                 <span className={`signup-field-hint${fieldError ? " is-error" : ""}`}>
-                  {fieldError || t.phoneHint}
+                  {fieldError || t.detailsHint}
                 </span>
                 <p className="signup-login-prompt">
                   {t.alreadyPrompt} <Link href="/login">{t.loginCta}</Link>
@@ -389,7 +423,7 @@ export default function SignupPage() {
             {currentKey === "otp" ? (
               <div className="signup-field">
                 <p className="signup-phone-echo">
-                  {t.otpSentTo} +977 {phone}
+                  {t.otpSentTo} {email}
                 </p>
                 <Input
                   ref={otpInputRef}
@@ -407,6 +441,7 @@ export default function SignupPage() {
                 <span className={`signup-field-hint${otpError ? " is-error" : ""}`}>
                   {otpError || t.otpHint}
                 </span>
+                <p className="signup-otp-expiry">{t.otpExpiryHint}</p>
                 <button
                   type="button"
                   className="signup-resend"

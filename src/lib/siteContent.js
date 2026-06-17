@@ -757,6 +757,21 @@ export const copy = {
         and: ", र ",
         suffix: " स्वीकार गर्छु।",
         required: "जारी राख्न शर्तहरूमा सहमत हुनुपर्छ।"
+      },
+      verify: {
+        sendCode: "कोड पठाउनुहोस्",
+        sentTo: "पुष्टि कोड यहाँ पठाइयो:",
+        password: "पासवर्ड बनाउनुहोस्",
+        passwordPlaceholder: "कम्तीमा ६ अक्षर",
+        passwordShort: "पासवर्ड कम्तीमा ६ अक्षरको हुनुपर्छ।",
+        confirmPassword: "पासवर्ड पुष्टि गर्नुहोस्",
+        confirmPasswordPlaceholder: "पासवर्ड फेरि लेख्नुहोस्",
+        passwordMismatch: "दुवै पासवर्ड मिलेनन्।",
+        otp: "इमेलमा आएको OTP कोड",
+        otpInvalid: "६ अंकको OTP कोड लेख्नुहोस्।",
+        otpExpiry: "ढुक्क हुनुहोस् — कोड १५ मिनेटसम्म मान्य हुन्छ।",
+        resend: "कोड फेरि पठाउनुहोस्",
+        resendIn: "{n} सेकेन्डमा फेरि पठाउन सकिन्छ"
       }
     },
     feedback: {
@@ -1643,7 +1658,7 @@ export const copy = {
             title: "सम्पर्क",
             heading: "लगइन र सम्पर्क विवरण",
             intro:
-              "फोन नम्बर श्रमदानमा तपाईंको लगइन हुनेछ। नाम र इमेलले आवेदन समीक्षाका बेला तपाईंलाई चिनाउँछ।"
+              "इमेल श्रमदानमा तपाईंको लगइन हुनेछ। फोन नम्बरले अभियानका बेला सम्पर्कमा सहयोग गर्छ।"
           },
           work: {
             title: "अनुभव",
@@ -1656,6 +1671,12 @@ export const copy = {
             heading: "तपाईंको प्रेरणा",
             intro:
               "केही हरफमा — तपाईं किन योगदान दिन चाहनुहुन्छ। यो जवाफ समुदायले समीक्षाका बेला पढ्ने हो।"
+          },
+          verify: {
+            title: "पुष्टि",
+            heading: "इमेल पुष्टि र पासवर्ड",
+            intro:
+              "तपाईंको इमेलमा पठाइएको ६ अंकको कोड र नयाँ पासवर्ड हाल्नुहोस् — यसले तपाईंको खाता बनाउँछ।"
           }
         }
       },
@@ -1702,18 +1723,18 @@ export const copy = {
           intro: {
             title: "स्वागत",
             heading: "श्रमदान सदस्य बन्नुहोस्",
-            intro: "नाम, इमेल, पासवर्ड र फोन — अनि फोनमा आउने OTP कोडले पुष्टि।",
+            intro: "नाम, इमेल र पासवर्ड — अनि इमेलमा आउने OTP कोडले पुष्टि।",
             cta: "सुरु गर्नुहोस्"
           },
-          phone: {
+          details: {
             title: "विवरण",
             heading: "तपाईंको विवरण भर्नुहोस्",
-            intro: "नाम, इमेल, पासवर्ड र नेपालको १० अंकको मोबाइल नम्बर।"
+            intro: "नाम, इमेल र पासवर्ड भर्नुहोस्। मोबाइल नम्बर वैकल्पिक।"
           },
           otp: {
             title: "OTP",
             heading: "OTP कोड लेख्नुहोस्",
-            intro: "तपाईंको फोनमा ६ अंकको कोड पठाइयो।"
+            intro: "तपाईंको इमेलमा ६ अंकको कोड पठाइयो।"
           },
           done: {
             title: "स्वागत",
@@ -2511,6 +2532,21 @@ export const copy = {
         and: ", and ",
         suffix: ".",
         required: "You must agree to the terms to continue."
+      },
+      verify: {
+        sendCode: "Send Code",
+        sentTo: "Verification code sent to:",
+        password: "Create a password",
+        passwordPlaceholder: "At least 6 characters",
+        passwordShort: "Password must be at least 6 characters.",
+        confirmPassword: "Confirm password",
+        confirmPasswordPlaceholder: "Re-enter your password",
+        passwordMismatch: "The two passwords don't match.",
+        otp: "Email verification code",
+        otpInvalid: "Enter the 6-digit OTP code.",
+        otpExpiry: "No rush — the code stays valid for 15 minutes.",
+        resend: "Resend code",
+        resendIn: "Resend available in {n}s"
       }
     },
     feedback: {
@@ -3397,7 +3433,7 @@ export const copy = {
             title: "Contact",
             heading: "Login & contact details",
             intro:
-              "Your phone number doubles as your Shramdan login. Name and email identify the application during community review."
+              "Your email is your Shramdan login. Your phone number helps us reach you during campaigns."
           },
           work: {
             title: "Experience",
@@ -3410,6 +3446,12 @@ export const copy = {
             heading: "Your motivation",
             intro:
               "In a few lines — why you want to contribute. This answer is read by the community during review."
+          },
+          verify: {
+            title: "Verify",
+            heading: "Verify email & set a password",
+            intro:
+              "Enter the 6-digit code we emailed you and choose a password — this creates your account."
           }
         }
       },
@@ -3456,18 +3498,18 @@ export const copy = {
           intro: {
             title: "Welcome",
             heading: "Become a Shramdan member",
-            intro: "Your name, email, password and phone — then confirm with the OTP we send.",
+            intro: "Your name, email and password — then confirm with the OTP we email you.",
             cta: "Get Started"
           },
-          phone: {
+          details: {
             title: "Details",
             heading: "Your details",
-            intro: "Name, email, password, and your 10-digit Nepali mobile number."
+            intro: "Enter your name, email and password. Mobile number is optional."
           },
           otp: {
             title: "OTP",
             heading: "Enter the OTP code",
-            intro: "We've sent a 6-digit code to your phone."
+            intro: "We've sent a 6-digit code to your email."
           },
           done: {
             title: "Welcome",

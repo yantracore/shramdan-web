@@ -175,15 +175,21 @@ shared enum.
 
 ### Application role enum expansion
 
-The homepage "We need you" section now invites three additional dev-phase roles
-that the backend `ApplicationRole` enum does not yet accept:
+The homepage "We need you" section invites three dev-phase roles that the
+backend `ApplicationRole` enum still does not accept (re-confirmed against the
+2026-06-17 spec — the live enum is `FRONTEND_DEVELOPER`, `BACKEND_DEVELOPER`,
+`UI_UX_DESIGNER`, `GRAPHICS_DESIGNER`, `LEGAL`, `FINANCE`, `DONOR`,
+`COMMUNITY_MANAGER`, `VOLUNTEER`, `OTHER`):
 
 - `QA_ENGINEER`
 - `DEVOPS_ENGINEER`
 - `CONTENT_WRITER`
 
-The frontend cards link to `/join?role=<VALUE>` and the join-form dropdown
-(`src/lib/siteContent.js → options.applicationRoles`) lists them, but
-`POST /applications` will reject submissions with one of these values until
-the backend enum is extended. Add the three values to the enum (and to the
-admin filter list) when convenient — no other contract change is needed.
+These appear in `src/lib/siteContent.js → options.applicationRoles` and the
+homepage cards deep-link to `/join?role=<VALUE>`. **This does not break signup
+today**: both `/join` (`ContributorForm`) and `/signup` hard-code
+`role: "VOLUNTEER"` on submit, so the dropdown values are not actually sent to
+`POST /applications`. The mismatch only matters if/when the role selector is
+re-surfaced. Add the three values to the enum (and the admin filter list) when
+convenient, or prune them from `applicationRoles` — no other contract change
+is needed.

@@ -9,12 +9,20 @@ import { Honeypot } from "@/components/Honeypot";
 import { MultiStepShell } from "@/components/MultiStepShell";
 import { PublicAttachmentField } from "@/components/PublicAttachmentField";
 
-/* Multi-step contributor application — four steps:
+/* Multi-step contributor application — five steps:
  *
  *   0. intro       Visual hero card + Apply CTA (no fields)
  *   1. basics      name, email, phone (all required)
  *   2. work        portfolio, resume, experience (all optional)
- *   3. motivation  motivation textarea + consent + submit
+ *   3. motivation  motivation textarea + consent
+ *   4. verify      password + 6-digit email OTP + submit
+ *
+ * Submitting an application now creates a VERIFIED account and signs the
+ * user in (backend moved member signup onto POST /applications, email-OTP
+ * gated, on 2026-06-17). So the "next" on the motivation step requests an
+ * email OTP (onRequestOtp) before advancing to the verify step, where the
+ * user sets a password and enters the code; the final submit posts
+ * { ...details, otp, password } and the page stores the returned session.
  *
  * Role selector was removed 2026-06-05 (later same day) — every applicant
  * lands as a generic Shramdan member (`role: "VOLUNTEER"` on the API).
@@ -25,15 +33,18 @@ import { PublicAttachmentField } from "@/components/PublicAttachmentField";
  * Form values persist to localStorage (debounced) so a page refresh
  * doesn't wipe what the user has typed. The resume upload is intentionally
  * NOT persisted — it's a confirmed file reference and re-uploading is the
- * safer recovery path. */
+ * safer recovery path. Password + OTP are never persisted. */
 
-const STEP_KEYS = ["intro", "basics", "work", "motivation"];
+const STEP_KEYS = ["intro", "basics", "work", "motivation", "verify"];
 const STEP_FIELDS = {
   intro: [],
   basics: ["name", "email", "phone"],
   work: ["portfolio", "experience"],
-  motivation: ["motivation", "consent"]
+  motivation: ["motivation", "consent"],
+  verify: ["password", "confirmPassword", "otp"]
 };
+
+const RESEND_COOLDOWN_SECONDS = 30;
 
 const DRAFT_KEY = "shramdan:join-draft:v1";
 const DRAFT_TTL_MS = 14 * 24 * 60 * 60_000;
@@ -93,17 +104,30 @@ export function ContributorForm({
   eyebrow,
   intro,
   onSubmit,
+  onRequestOtp,
   submitting = false
 }) {
   const [form] = Form.useForm();
   const ms = content.multiStep;
   const joinSteps = ms.join.steps;
   const labels = content.join;
+  const verifyCopy = labels.verify;
   const requiredRule = { required: true, message: content.messages.required };
 
   const [stepIndex, setStepIndex] = useState(0);
+  const [requestingOtp, setRequestingOtp] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
   const draftLoadedRef = useRef(false);
   const debounceRef = useRef(null);
+
+  // Resend cooldown tick for the verify step.
+  useEffect(() => {
+    if (resendCooldown <= 0) return undefined;
+    const id = window.setInterval(() => {
+      setResendCooldown((n) => (n <= 1 ? 0 : n - 1));
+    }, 1000);
+    return () => window.clearInterval(id);
+  }, [resendCooldown]);
 
   // Restore draft on mount.
   useEffect(() => {
@@ -146,6 +170,20 @@ export function ContributorForm({
         return;
       }
     }
+    // Leaving the motivation step emails the verification code before the
+    // verify step renders. If the request fails (e.g. the email already has
+    // an account), stay put — the page surfaces the backend message.
+    if (currentKey === "motivation") {
+      const email = form.getFieldValue("email");
+      setRequestingOtp(true);
+      try {
+        const ok = await onRequestOtp?.(email);
+        if (ok === false) return;
+      } finally {
+        setRequestingOtp(false);
+      }
+      setResendCooldown(RESEND_COOLDOWN_SECONDS);
+    }
     setStepIndex((i) => i + 1);
   };
 
@@ -153,18 +191,40 @@ export function ContributorForm({
     setStepIndex((i) => Math.max(0, i - 1));
   };
 
+  const handleResend = async () => {
+    if (resendCooldown > 0) return;
+    const email = form.getFieldValue("email");
+    setRequestingOtp(true);
+    try {
+      const ok = await onRequestOtp?.(email);
+      if (ok !== false) setResendCooldown(RESEND_COOLDOWN_SECONDS);
+    } finally {
+      setRequestingOtp(false);
+    }
+  };
+
   const handleSubmit = async () => {
     try {
-      await form.validateFields(STEP_FIELDS.motivation);
+      await form.validateFields(STEP_FIELDS.verify);
     } catch {
       return;
     }
 
     const values = form.getFieldsValue(true);
-    const { consent: _consent, website: _website, resume, ...rest } = values;
+    const {
+      consent: _consent,
+      website: _website,
+      confirmPassword: _confirmPassword,
+      resume,
+      otp,
+      password,
+      ...rest
+    } = values;
 
     const payload = {
       ...rest,
+      otp: String(otp || "").trim(),
+      password,
       // Every applicant lands as a generic Shramdan member. Promotion to
       // specific lanes happens later through event participation.
       role: "VOLUNTEER",
@@ -178,10 +238,11 @@ export function ContributorForm({
       form.resetFields();
       clearDraft();
       setStepIndex(0);
+      setResendCooldown(0);
     }
   };
 
-  const isLastStep = currentKey === "motivation";
+  const isLastStep = currentKey === "verify";
   const introCopy = joinSteps.intro;
 
   return (
@@ -201,8 +262,14 @@ export function ContributorForm({
         onBack={goBack}
         onNext={goNext}
         onSubmit={handleSubmit}
-        nextLoading={submitting && isLastStep}
-        nextLabel={currentKey === "intro" ? introCopy.cta : undefined}
+        nextLoading={(currentKey === "motivation" && requestingOtp) || (isLastStep && submitting)}
+        nextLabel={
+          currentKey === "intro"
+            ? introCopy.cta
+            : currentKey === "motivation"
+              ? verifyCopy.sendCode
+              : undefined
+        }
         isSubmitStep={isLastStep}
         submitLabel={labels.submit}
         cardClassName={currentKey === "intro" ? "multi-step-shell-intro" : ""}
@@ -333,6 +400,71 @@ export function ContributorForm({
               </Checkbox>
             </Form.Item>
           </>
+        ) : null}
+
+        {currentKey === "verify" ? (
+          <div className="signup-field signup-field-group">
+            <p className="signup-phone-echo">
+              {verifyCopy.sentTo} {form.getFieldValue("email")}
+            </p>
+            <Form.Item
+              name="password"
+              label={verifyCopy.password}
+              rules={[requiredRule, { min: 6, message: verifyCopy.passwordShort }]}
+            >
+              <Input.Password
+                size="large"
+                placeholder={verifyCopy.passwordPlaceholder}
+                autoComplete="new-password"
+              />
+            </Form.Item>
+            <Form.Item
+              name="confirmPassword"
+              label={verifyCopy.confirmPassword}
+              dependencies={["password"]}
+              rules={[
+                requiredRule,
+                ({ getFieldValue }) => ({
+                  validator: (_rule, value) =>
+                    !value || getFieldValue("password") === value
+                      ? Promise.resolve()
+                      : Promise.reject(new Error(verifyCopy.passwordMismatch))
+                })
+              ]}
+            >
+              <Input.Password
+                size="large"
+                placeholder={verifyCopy.confirmPasswordPlaceholder}
+                autoComplete="new-password"
+              />
+            </Form.Item>
+            <Form.Item
+              name="otp"
+              label={verifyCopy.otp}
+              getValueFromEvent={(e) => e.target.value.replace(/\D/g, "").slice(0, 6)}
+              rules={[requiredRule, { pattern: /^\d{6}$/, message: verifyCopy.otpInvalid }]}
+            >
+              <Input
+                size="large"
+                inputMode="numeric"
+                maxLength={6}
+                placeholder="••••••"
+                autoComplete="one-time-code"
+                className="signup-otp-input"
+              />
+            </Form.Item>
+            <p className="signup-otp-expiry">{verifyCopy.otpExpiry}</p>
+            <button
+              type="button"
+              className="signup-resend"
+              onClick={handleResend}
+              disabled={resendCooldown > 0 || requestingOtp}
+            >
+              {resendCooldown > 0
+                ? verifyCopy.resendIn.replace("{n}", String(resendCooldown))
+                : verifyCopy.resend}
+            </button>
+          </div>
         ) : null}
       </MultiStepShell>
     </Form>

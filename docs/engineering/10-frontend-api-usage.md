@@ -53,12 +53,17 @@ Base URL: `process.env.NEXT_PUBLIC_API_BASE_URL` (falls back to `https://backend
 | Page | Method + path | apiClient fn | Notes |
 | --- | --- | --- | --- |
 | `src/app/login/page.js` | `POST /auth/login` | `loginWithPassword` | Stores `accessToken` + `user` via `setAuthSession`; routes `ADMIN` to `/admin` |
+| `src/app/signup/page.js` | `POST /applications/request-otp` | `requestApplicationOtp` | Anonymous; emails a 6-digit code as the user leaves the details step. 409 `USER_ALREADY_EXISTS` / 429 cooldown keep the user on the step with the backend message |
+| `src/app/signup/page.js` | `POST /applications` | `submitApplication` | Anonymous; body adds `otp` + `password` (+ default `role: VOLUNTEER`, default `motivation`). 201 creates a **verified** account and returns `{ user, application, accessToken, refreshToken }` → fed straight into `setAuthSession` (the user lands signed in) |
+
+> **2026-06-17 signup rewrite.** `POST /auth/register` + `POST /auth/verify-otp` (the SMS-OTP member flow) were retired on the backend. Member signup now runs through the application-signup endpoints above (email OTP), which **create the account and the application together**. `/app/signup` still 302-redirects to `/signup`. The old `registerMember` / `verifyOtp` / `resendOtp` apiClient helpers were removed.
 
 ## Public submission pages
 
 | Page | Method + path | apiClient fn | Notes |
 | --- | --- | --- | --- |
-| `src/app/join/page.js` | `POST /applications` | `postJson` | Anonymous; role selected from `copy.en.options.applicationRoles` |
+| `src/app/join/page.js` | `POST /applications/request-otp` | `requestApplicationOtp` | Anonymous; `ContributorForm` calls it (via `onRequestOtp`) on the motivation→verify transition. Failure keeps the user on the motivation step |
+| `src/app/join/page.js` | `POST /applications` | `submitApplication` | Anonymous; the contributor form now collects `password` + `otp` on a 5th "verify" step. Body is `{ name, email, phone, motivation, otp, password, role: VOLUNTEER, additionalInfo: "n/a", resumeId? }`. 201 creates a verified account + application and signs the applicant in (`setAuthSession`) |
 | `src/app/feedback/page.js` | `POST /feedback` | `postJson` | Anonymous; type from `copy.en.options.feedbackTypes` |
 
 ## Admin pages
