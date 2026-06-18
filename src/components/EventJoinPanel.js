@@ -1,10 +1,10 @@
 "use client";
 
-import { CheckCircleFilled, UserAddOutlined } from "@ant-design/icons";
-import { Button, Modal, Radio, Space } from "antd";
+import { CheckCircleFilled, LogoutOutlined, UserAddOutlined } from "@ant-design/icons";
+import { Button, Modal, Popconfirm, Radio, Space } from "antd";
 import Link from "next/link";
 import { useState, useSyncExternalStore } from "react";
-import { postJson } from "@/lib/apiClient";
+import { deleteJson, postJson } from "@/lib/apiClient";
 import { getAuthSession, subscribeAuthSession } from "@/lib/authSession";
 import { buildLoginHref } from "@/lib/loginRedirect";
 import { useToast } from "@/lib/toast";
@@ -31,6 +31,13 @@ const COPY = {
     errorToast: "जोडिन सकिएन। फेरि प्रयास गर्नुहोस्।",
     medicCredentialError: "स्वास्थ्यकर्मी भूमिकाको लागि प्रमाणित मेडिकल क्रेडेन्सियल चाहिन्छ।",
     alreadyJoinedDifferentRole: "तपाईं पहिले अर्को भूमिकामा जोडिनुभएको छ।",
+    leaveCta: "यो अभियानबाट हट्ने",
+    leaveConfirm: "साँच्चै हट्ने? तपाईंको भूमिका अरूका लागि खाली हुनेछ।",
+    leaveConfirmOk: "हट्नुहोस्",
+    leaveConfirmCancel: "रद्द गर्नुहोस्",
+    leftToast: "तपाईं अभियानबाट हट्नुभयो।",
+    demoLeftToast: "तपाईं डेमो अभियानबाट हट्नुभयो (स्थानीय)।",
+    leaveError: "हट्न सकिएन। फेरि प्रयास गर्नुहोस्।",
     loginPrompt: "जोडिन पहिले लग-इन गर्नुहोस्",
     loginCta: "लग-इन गर्नुहोस्",
     roles: {
@@ -62,6 +69,13 @@ const COPY = {
     errorToast: "Could not join. Please try again.",
     medicCredentialError: "The Medic role requires verified medical credentials.",
     alreadyJoinedDifferentRole: "You've already joined this event in a different role.",
+    leaveCta: "Leave this event",
+    leaveConfirm: "Leave this event? Your spot will open up for someone else.",
+    leaveConfirmOk: "Leave",
+    leaveConfirmCancel: "Cancel",
+    leftToast: "You've left the event.",
+    demoLeftToast: "You left this demo event (local only).",
+    leaveError: "Could not leave. Please try again.",
     loginPrompt: "Sign in to join",
     loginCta: "Sign In",
     roles: {
@@ -86,7 +100,9 @@ export function EventJoinPanel({
   language = "np",
   viewerRole = null,
   viewerStatus = null,
-  onJoined
+  viewerParticipantId = null,
+  onJoined,
+  onLeft
 }) {
   const t = COPY[language] || COPY.np;
   const session = useSyncExternalStore(subscribeAuthSession, getAuthSession, () => null);
@@ -95,6 +111,7 @@ export function EventJoinPanel({
   const [open, setOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [leaving, setLeaving] = useState(false);
 
   const eventId = event?.id;
   const isDemo = isDemoId(eventId);
@@ -123,10 +140,75 @@ export function EventJoinPanel({
     } else if (viewerStatus === "CHECKED_IN") {
       label = t.checkedIn.replace("{role}", roleLabel);
     }
+
+    // Withdraw is offered only while the event is still open to join and the
+    // viewer hasn't been checked in on-site. Real events need the participant
+    // record id (from /participants/me); demo events leave by name match.
+    const canLeave =
+      JOINABLE_STATUSES.has(event?.status) &&
+      viewerStatus !== "CHECKED_IN" &&
+      (isDemo || Boolean(viewerParticipantId));
+
+    const handleLeave = async () => {
+      setLeaving(true);
+      try {
+        if (isDemo) {
+          await new Promise((resolve) => setTimeout(resolve, 300));
+          const nextRoles = rolesNeeded.map((row) => {
+            if (row.role !== viewerRole) return row;
+            const filledNames = (Array.isArray(row.filledNames) ? row.filledNames : []).filter(
+              (name) => name !== viewerName
+            );
+            return {
+              ...row,
+              filled: Math.max(0, (row.filled || 0) - 1),
+              filledNames
+            };
+          });
+          messageApi.success(t.demoLeftToast);
+          onLeft?.({
+            ...event,
+            participantCount: Math.max(0, (event?.participantCount || 0) - 1),
+            rolesNeeded: nextRoles
+          });
+          return;
+        }
+
+        await deleteJson(`/events/${eventId}/participants/${viewerParticipantId}`, {
+          requireAuth: true
+        });
+        messageApi.success(t.leftToast);
+        onLeft?.({ left: true });
+      } catch (apiError) {
+        messageApi.error(apiError?.message || t.leaveError);
+      } finally {
+        setLeaving(false);
+      }
+    };
+
     return (
       <div className="event-join-panel event-join-panel-joined">
         <CheckCircleFilled aria-hidden="true" />
         <span>{label}</span>
+        {canLeave ? (
+          <Popconfirm
+            title={t.leaveConfirm}
+            okText={t.leaveConfirmOk}
+            cancelText={t.leaveConfirmCancel}
+            okButtonProps={{ danger: true, loading: leaving }}
+            onConfirm={handleLeave}
+          >
+            <Button
+              type="text"
+              size="small"
+              icon={<LogoutOutlined />}
+              loading={leaving}
+              className="event-join-leave"
+            >
+              {t.leaveCta}
+            </Button>
+          </Popconfirm>
+        ) : null}
       </div>
     );
   }

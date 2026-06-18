@@ -357,8 +357,15 @@ export function submitApplication(values) {
   return postJson("/applications", values);
 }
 
-export function voteOnIssue(issueId, voterRole = "INTERESTED") {
-  return postJson(`/issues/${issueId}/vote`, { voterRole }, { requireAuth: true });
+// `eventRole` is REQUIRED when voterRole === "GOING" (the participant role the
+// voter signs up to take at the eventual event — WORKER | PHOTOGRAPHER |
+// LIVESTREAMER | MEDIC | SAFETY_LEAD | COORDINATOR | LOGISTICS) and MUST be
+// omitted for INTERESTED / WANT_TO_LEAD. On conversion, GOING voters carrying a
+// role are auto-added as CONFIRMED participants.
+export function voteOnIssue(issueId, voterRole = "INTERESTED", eventRole) {
+  const body = { voterRole };
+  if (eventRole) body.eventRole = eventRole;
+  return postJson(`/issues/${issueId}/vote`, body, { requireAuth: true });
 }
 
 // Retract a vote. Backend allows this only while the issue is still OPEN

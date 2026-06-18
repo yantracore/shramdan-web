@@ -9712,6 +9712,19 @@
   flex-shrink: 0;
 }
 
+/* Withdraw button sits inside the green "you're in" panel; margin-left:auto
+   pushes it to the trailing edge so the check + label stay grouped left. */
+.event-join-leave {
+  margin-left: auto;
+  flex-shrink: 0;
+  color: var(--muted);
+}
+
+.event-join-leave:hover,
+.event-join-leave:focus-visible {
+  color: #c0392b;
+}
+
 .event-join-intro {
   margin: 0 0 16px;
   font-size: 13px;
@@ -9757,6 +9770,29 @@
 .voter-role-modal-option-hint {
   display: block;
   margin-top: 2px;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+/* Event-role sub-picker — only shown when voterRole === GOING. Separated from
+   the commitment options by a hairline so the two questions read distinctly. */
+.voter-role-modal-event-role {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.voter-role-modal-event-role-prompt {
+  margin: 0;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.voter-role-modal-event-role-hint {
+  margin: 2px 0 10px;
   font-size: 12px;
   color: var(--muted);
   line-height: 1.5;

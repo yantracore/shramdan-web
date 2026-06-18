@@ -39,6 +39,17 @@ const ROLE_COPY = {
         hint: "अभियान आयोजना वा नेतृत्व गर्न तयार छु।"
       }
     ],
+    eventRolePrompt: "कुन भूमिकामा आएर श्रम गर्नुहुन्छ?",
+    eventRoleHint: "अभियानमा परिणत भएपछि तपाईं यही भूमिकामा सहभागी हुनुहुन्छ।",
+    eventRoles: {
+      WORKER: "कामदार",
+      PHOTOGRAPHER: "फोटोग्राफर",
+      LIVESTREAMER: "लाइभस्ट्रिमर",
+      MEDIC: "स्वास्थ्यकर्मी",
+      SAFETY_LEAD: "सुरक्षा प्रमुख",
+      COORDINATOR: "संयोजक",
+      LOGISTICS: "लजिस्टिक्स"
+    },
     submit: "समर्थन गर्नुहोस्",
     cancel: "रद्द गर्नुहोस्"
   },
@@ -63,10 +74,33 @@ const ROLE_COPY = {
         hint: "Ready to help organize or lead the campaign."
       }
     ],
+    eventRolePrompt: "Which role would you take on the day?",
+    eventRoleHint: "When this becomes a campaign, you'll join in this role.",
+    eventRoles: {
+      WORKER: "Worker",
+      PHOTOGRAPHER: "Photographer",
+      LIVESTREAMER: "Livestreamer",
+      MEDIC: "Medic",
+      SAFETY_LEAD: "Safety Lead",
+      COORDINATOR: "Coordinator",
+      LOGISTICS: "Logistics"
+    },
     submit: "Support",
     cancel: "Cancel"
   }
 };
+
+// Order the event-role options are offered in. Mirrors the backend enum on
+// POST /issues/{id}/vote and EventJoinPanel's role list.
+const EVENT_ROLE_ORDER = [
+  "WORKER",
+  "PHOTOGRAPHER",
+  "LIVESTREAMER",
+  "MEDIC",
+  "SAFETY_LEAD",
+  "COORDINATOR",
+  "LOGISTICS"
+];
 
 export function IssueVoteButton({
   issueId,
@@ -91,6 +125,9 @@ export function IssueVoteButton({
   const roleCopy = ROLE_COPY[language] || ROLE_COPY.np;
   const [pickerOpen, setPickerOpen] = useState(false);
   const [pickerRole, setPickerRole] = useState("INTERESTED");
+  // Required only when pickerRole === "GOING" — the participant role the voter
+  // would take once the issue becomes a campaign.
+  const [pickerEventRole, setPickerEventRole] = useState(null);
 
   const previousCountRef = useRef(voteCount);
   const [pulseKey, setPulseKey] = useState(0);
@@ -124,12 +161,19 @@ export function IssueVoteButton({
       return;
     }
     setPickerRole("INTERESTED");
+    setPickerEventRole(null);
     setPickerOpen(true);
   };
 
+  const goingNeedsRole = pickerRole === "GOING" && !pickerEventRole;
+
   const handleConfirmRole = () => {
+    if (goingNeedsRole) return;
     setPickerOpen(false);
-    handleVoteClick(pickerRole);
+    handleVoteClick({
+      voterRole: pickerRole,
+      eventRole: pickerRole === "GOING" ? pickerEventRole : undefined
+    });
   };
 
   return (
@@ -166,12 +210,18 @@ export function IssueVoteButton({
         okText={roleCopy.submit}
         cancelText={roleCopy.cancel}
         confirmLoading={voting}
+        okButtonProps={{ disabled: goingNeedsRole }}
         width={520}
       >
         <p className="voter-role-modal-intro">{roleCopy.modalIntro}</p>
         <Radio.Group
           value={pickerRole}
-          onChange={(e) => setPickerRole(e.target.value)}
+          onChange={(e) => {
+            setPickerRole(e.target.value);
+            // eventRole only applies to GOING; clear it when switching away so
+            // we never send a stray role the backend would reject.
+            if (e.target.value !== "GOING") setPickerEventRole(null);
+          }}
           disabled={voting}
           className="voter-role-modal-options"
         >
@@ -184,6 +234,26 @@ export function IssueVoteButton({
             ))}
           </Space>
         </Radio.Group>
+
+        {pickerRole === "GOING" ? (
+          <div className="voter-role-modal-event-role">
+            <p className="voter-role-modal-event-role-prompt">{roleCopy.eventRolePrompt}</p>
+            <p className="voter-role-modal-event-role-hint">{roleCopy.eventRoleHint}</p>
+            <Radio.Group
+              value={pickerEventRole}
+              onChange={(e) => setPickerEventRole(e.target.value)}
+              disabled={voting}
+            >
+              <Space direction="vertical" style={{ width: "100%" }}>
+                {EVENT_ROLE_ORDER.map((role) => (
+                  <Radio key={role} value={role} className="voter-role-modal-option">
+                    {roleCopy.eventRoles[role] || role}
+                  </Radio>
+                ))}
+              </Space>
+            </Radio.Group>
+          </div>
+        ) : null}
       </Modal>
     </>
   );

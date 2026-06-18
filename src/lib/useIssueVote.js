@@ -30,13 +30,19 @@ export function useIssueVote({
   const handleVoteClick = useCallback(
     async (eventOrRole, maybeEvent) => {
       // Backward-compatible signature: handleVoteClick(event) OR
-      // handleVoteClick(role, event). When `eventOrRole` is a string we
-      // treat it as the selected voter role; the caller (the modal
-      // confirm) already prevented default on the original click.
+      // handleVoteClick(role, event) OR handleVoteClick({ voterRole,
+      // eventRole }, event). When `eventOrRole` is a string we treat it as
+      // the voter role; when it's a plain object carrying `voterRole` we
+      // read role + eventRole from it; otherwise it's the click event. The
+      // caller (the modal confirm) already prevented default.
       let voterRole = "INTERESTED";
+      let eventRole;
       let event = maybeEvent;
       if (typeof eventOrRole === "string") {
         voterRole = eventOrRole;
+      } else if (eventOrRole && typeof eventOrRole === "object" && "voterRole" in eventOrRole) {
+        voterRole = eventOrRole.voterRole;
+        eventRole = eventOrRole.eventRole;
       } else {
         event = eventOrRole;
       }
@@ -53,7 +59,7 @@ export function useIssueVote({
       setVoteCount((current) => current + 1);
 
       try {
-        const response = await voteOnIssue(issueId, voterRole);
+        const response = await voteOnIssue(issueId, voterRole, eventRole);
         const serverCount = response?.data?.voteCount;
         if (typeof serverCount === "number") {
           setVoteCount(serverCount);

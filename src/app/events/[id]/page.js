@@ -325,6 +325,24 @@ export default function EventDetailPage() {
     },
     [fetchEvent, fetchMyParticipation, isDemoEvent]
   );
+
+  // Withdraw path — mirror of handleJoinChanged. Demo events hand back the
+  // locally-mutated event (viewer's name pulled from filledNames); real events
+  // clear local participation and reconcile with the server.
+  const handleLeaveChanged = useCallback(
+    (payload) => {
+      setMyParticipation(null);
+      if (payload && typeof payload === "object" && Array.isArray(payload.rolesNeeded)) {
+        setEventData((prev) => ({ ...(prev || {}), ...payload }));
+        return;
+      }
+      if (!isDemoEvent) {
+        fetchEvent();
+        fetchMyParticipation();
+      }
+    },
+    [fetchEvent, fetchMyParticipation, isDemoEvent]
+  );
   const uploads = Array.isArray(eventData?.uploads) ? eventData.uploads : [];
   const imageUploads = uploads.filter(isImageUpload);
 
@@ -626,7 +644,9 @@ export default function EventDetailPage() {
                       language={language}
                       viewerRole={viewerRole}
                       viewerStatus={viewerStatus}
+                      viewerParticipantId={myParticipation?.id || null}
                       onJoined={handleJoinChanged}
+                      onLeft={handleLeaveChanged}
                     />
                     <EventRosterPanel
                       rolesNeeded={eventData.rolesNeeded}
