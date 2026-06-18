@@ -404,7 +404,7 @@ function BusinessImageStrip({ images, title }) {
 
   return (
     <span className="events-home-rail-business-strip" aria-label={`${title} business images`}>
-      {images.map((src) => (
+      {images.map((src, index) => (
         // eslint-disable-next-line @next/next/no-img-element
         <img
           key={src}
@@ -413,6 +413,7 @@ function BusinessImageStrip({ images, title }) {
           loading="lazy"
           onError={hideBrokenImage}
           aria-hidden="true"
+          style={{ "--business-image-index": index }}
         />
       ))}
     </span>

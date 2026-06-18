@@ -310,8 +310,12 @@
 }
 
 .events-home-rail-business-strip img {
-  position: static;
+  /* relative (not static) so --business-image-index, set per image in
+     BusinessImageStrip, can drive paint order: the leftmost thumbnail sits
+     on top of the ones it overlaps, like a stacked-avatar cluster. */
+  position: relative;
   inset: auto;
+  z-index: calc(100 - var(--business-image-index, 0));
   width: clamp(30px, 4.2vw, 42px);
   height: clamp(30px, 4.2vw, 42px);
   flex: 0 0 auto;
