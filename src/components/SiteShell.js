@@ -213,7 +213,11 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
     { href: "/feedback", label: t.nav.feedback },
     { href: "/contribute", label: t.nav.contribute },
     {
-      href: "/app-development",
+      // The "एप निर्माण / App Development LIVE" entry leads into the live,
+      // participatory build-Shramdan surface — which is /discussions (feature
+      // proposals → roadmap), NOT the standalone /app-development task board
+      // (being retired; see docs/ops/00-polish-backlog.md, 2026-06-18).
+      href: "/discussions",
       label: t.nav.appDev,
       highlight: true,
       badge: "LIVE",
