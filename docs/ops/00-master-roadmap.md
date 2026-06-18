@@ -8,10 +8,10 @@
 >
 > **Companion folder:** backend API contracts the frontend depends on live in [`../api-requirements/`](../api-requirements/), introduced by the [2026-06-03 pivot ADR](../decisions/2026-06-03-ui-first-and-two-meeting-pivot.md). When a UI feature touches an entity covered there, update the matching domain file in the same session.
 
-## Overall Progress — 68%
+## Overall Progress — 71%
 
 ```
-0% [====================================================================--------------------------------] 100%
+0% [=======================================================================-----------------------------] 100%
 ```
 
 The bar is 100 characters wide so each `=` equals exactly one percentage point. Recompute and redraw the bar in the same edit that changes any phase percentage — see [Aggregate Progress](#aggregate-progress) for the per-phase breakdown that feeds this number.
@@ -131,12 +131,14 @@ If the user gives a high-level instruction like "let's continue", read this file
 
 This is the active end of the [Launch Critical Path](#launch-critical-path--tier-0). Items collapse forward as Tier 0 sequence steps complete — agents may rewrite this list freely but must keep it consistent with the Tier 0 ladder above. When proposing "what's next", agents must also consult open `P1` items in [00-polish-backlog.md](00-polish-backlog.md) and prefer Tier-0-tagged polish over fresh feature leaves.
 
-1. **11.7 Security baseline audit** — should land before first real event. XSS / CSRF / secret handling / rate-limit sweep across existing surfaces.
-2. **Backend follow-up: ship the join + activate + complete endpoints** with the contracts now spec'd in [`../api-requirements/events.md`](../api-requirements/events.md) and [`../api-requirements/event-participants.md`](../api-requirements/event-participants.md). The frontend already degrades gracefully when these 404 / 501.
-3. **3.2.3 volunteers progress strip** — small aggregate "X of Y spots filled" above the existing `EventRosterPanel`. Funds + materials still gated on Phase 5.
-4. **Tier 1 begins** — phone+OTP signup (2.1), member portal `/app` (2.2–2.7), reminder cadence (3.7), member-side leader nomination (3.4.2 / 3.4.3).
+*Reconciled 2026-06-18: a wave of backend endpoints landed (the 2026-06-17 staging deploy), so several leaves that read "blocked: backend pending" are now live and wired — `3.4` leader voting (`leader-voting`/`leader-vote` family), `3.6` join + roster (`participants` family), `1.5` un-vote, and `9.5` issue status/delete/edit. They flipped to `[x]` this session. The remaining blocked leaves below are the ones whose backend endpoints are still genuinely absent from the staging spec.*
 
-*Earlier suggestions (9.11.1, Phase 2 stack decision, 3.2 deferral, 3.3 promotion, 3.2.1, 3.5.1, 3.5.2, 3.6, 3.2.2) superseded as work ships. Phase 2 stack decision moves to Tier 1; 9.11.1 cancelled.*
+1. **Next backend asks (UI already shipped + degrades gracefully):** `4.6.2` activate (`POST /events/{id}/activate`), `3.7.2` reminders (`PATCH /events/{id}/reminders`), `5.6` contribution intent (`POST /events/{id}/contributions`), `4.2.2` incidents (`POST /events/{id}/incidents`). Each frontend already 404/501-degrades; wiring is unblocked the moment the endpoint appears.
+2. **Member aggregates still on mock data:** `2.2.4` `GET /me/dashboard` and `2.8.2` `POST /me/kyc` — the surfaces render from `devMockData` until these land.
+3. **Transparency lane:** `6.1.2`/`6.2.2`/`6.4.2` donations + expenses + fund-summary, `13.1` public-reports, `14.3.1` polls — all UI-complete, all awaiting their list/aggregate endpoints.
+4. **Tier 1 feature work:** member portal `/app` polish (2.2–2.7), `7.3`/`7.4` video + attendance persistence (`participants/{id}/check-in` now exists for attendance — wire it), `8.1`/`8.2` email + SMS reminders. Note: signup pivoted to **email-OTP** (`/applications/request-otp` + `/applications`); the phone-OTP signup path (`2.1.5` `/auth/otp/*`) never shipped on the backend and is effectively superseded — phone verification now lives on `/me` (`/auth/phone/*`).
+
+*Earlier suggestions (9.11.1, Phase 2 stack decision, 3.2 deferral, 3.3 promotion, 3.2.1, 3.5.1, 3.5.2, 3.6, 3.2.2, 11.7, join/activate/complete batch) superseded as work shipped or reconciled.*
 
 ---
 
@@ -162,7 +164,7 @@ Goal: A live public site, deployable, with the basic surfaces users currently se
 - [x] 0.6 Docs 01–10 set authored `w:1` ← done: 2026-05-20
 - [x] 0.7 Bilingual EN/NE on every existing public surface `w:1` ← done: 2026-05-25 *(homepage, `/join`, `/feedback`, public footer, form validation, error toasts — all wired through `copy[language]` in `src/lib/siteContent.js`. Admin shell stays EN-only per product decision. New public pages must add `np` + `en` entries when built; tracked under their own phases, not here.)*
 
-## Phase 1 — Public Issue Discovery & Voting `w:15` 📊 77%
+## Phase 1 — Public Issue Discovery & Voting `w:15` 📊 88%
 
 Goal: Anyone (logged-in or not) can browse listed issues, see detail, and — once authenticated — vote.
 
@@ -178,8 +180,8 @@ Goal: Anyone (logged-in or not) can browse listed issues, see detail, and — on
 - [x] 1.4 Public sharing `w:2` ← done: 2026-05-27
   - [x] 1.4.1 Share buttons (Facebook / Twitter / WhatsApp / Telegram / LinkedIn + copy link) on `/issues/[id]` `w:1` ← done: 2026-05-26 *(`IssueShareRow` via `react-share`; wired into issue detail page.)*
   - [x] 1.4.2 OG tags + `generateMetadata` on `/issues/[id]` for rich link previews `w:1` ← done: 2026-05-27 *(`src/app/issues/[id]/layout.js` server layout; openGraph + twitter card with cover image; 5-min revalidation cache.)*
-- [~] 1.5 Voting wired end-to-end `w:4` *(POST + optimistic UI live for any logged-in user against existing `/login` email+password flow; DELETE un-vote and `votedByMe` initial-state check still pending backend.)*
-  - [~] 1.5.1 `POST /issues/{id}/vote` + `DELETE` un-vote `w:1` *(POST shipped; DELETE UI pending — needs "I'm withdrawing support" affordance once initial voted state is readable.)*
+- [x] 1.5 Voting wired end-to-end `w:4` ← done: 2026-06-18 *(POST + optimistic UI + DELETE un-vote all live; `retractVoteOnIssue` (apiClient) is wired into `useIssueVote`, and `votedByMe` initial state is derivable from `GET /issues/me/votes` (`fetchMyIssueVotes`). Backend ships `DELETE /issues/{id}/vote` — 409 while the issue is not OPEN.)*
+  - [x] 1.5.1 `POST /issues/{id}/vote` + `DELETE` un-vote `w:1` ← done: 2026-06-18 *(both wired — `useIssueVote` calls `voteOnIssue` / `retractVoteOnIssue` (apiClient.js:360-367); `DELETE /issues/{id}/vote` confirmed in the staging spec.)*
   - [x] 1.5.2 Optimistic UI + auth gating (prompt sign-in) `w:2` ← done: 2026-05-27 *(`useIssueVote` increments optimistically, rolls back on error; un-auth click pushes `/login`; post-login redirect now lands non-admin users on `/issues`.)*
   - [x] 1.5.3 Voter role tagging (volunteer / donor / etc.) `w:1` ← done: 2026-06-03 *(`IssueVoteButton` now opens a Modal with four `voterRole` options before commit — `INTERESTED` (default), `WOULD_VOLUNTEER`, `WOULD_DONATE`, `WOULD_ORGANIZE` — each with a label + hint line. `useIssueVote.handleVoteClick` accepts a backward-compatible role-or-event first arg and threads the role into `voteOnIssue(issueId, voterRole)`. Bilingual EN+NE inline copy.)*
 - [x] 1.6 Citizen public issue submission `w:2` ← done: 2026-05-28 *(**Tier 0 launch-critical.** Public `/issues/new` form on the website using the existing `POST /issues` endpoint. Reuses the admin `IssueCoverUpload` (R2 presign flow). Form has citizen-friendly bilingual labels under `siteContent.issueNew`, browser-geolocation "Use my location" button with manual coord fallback, category dropdown with localized labels, and a CTA button on the `/issues` list header.)*
@@ -213,7 +215,7 @@ Goal: Authenticated member experience that ships before the native mobile app an
   - [x] 2.8.1 UI form + demo submit `w:1` ← done: 2026-06-03 *(`/app/kyc` form — ID type (citizenship / passport / national ID / driving licence), ID number, full name on document, DOB, permanent address, document upload (front + back), consent checkbox. Demo mode shows submitted-success state. Bilingual EN+NE; demo banner explicit.)*
   - [!] 2.8.2 Backend `POST /me/kyc` multipart + admin verification queue `w:1` ← blocked: backend pending
 
-## Phase 3 — Campaign / Event Execution `w:18` 📊 83%
+## Phase 3 — Campaign / Event Execution `w:18` 📊 94%
 
 Goal: A promoted issue becomes a real-world campaign with leader, schedule, roster, and completion. Each event runs through two planning meetings on the canonical happy path — a kickoff meeting (role counts, logistics, date) and a pre-execution review meeting (final roster, last-minute changes) separated by a one-to-two-week public signup window. See [08-operational-safety-and-event-model.md](08-operational-safety-and-event-model.md#event-lifecycle-meetings) for the full meeting flow and the [2026-06-03 pivot ADR](../decisions/2026-06-03-ui-first-and-two-meeting-pivot.md) for the decision that introduced it.
 
@@ -225,17 +227,17 @@ Goal: A promoted issue becomes a real-world campaign with leader, schedule, rost
 - [x] 3.3 Issue → campaign promotion `w:2` ← done: 2026-05-26
   - [x] 3.3.1 Vote-threshold rule + admin trigger `w:1` ← done: 2026-05-26 *(admin force-convert button on `/admin/issues/[id]/view` calls `POST /issues/{id}/convert-to-event`; backend owns the vote-threshold auto-promote rule)*
   - [x] 3.3.2 Auto-create campaign record on promote `w:1` ← done: 2026-05-26 *(backend `convert-to-event` endpoint creates the event record server-side; frontend trigger shipped in e776f29)*
-- [~] 3.4 Leader nomination + voting `w:4` *(UI shipped 2026-06-03; backend nomination + tie-break endpoints pending.)*
+- [x] 3.4 Leader nomination + voting `w:4` ← done: 2026-06-18 *(UI shipped 2026-06-03; backend landed under the `leader-voting` naming — `GET /events/{id}/leader-voting`, `POST`/`DELETE /events/{id}/leader-vote`, `PATCH .../leader-voting/tie-break`, `POST .../leader-voting/settle`. Frontend wired: `LeaderNominationPanel` reads `leader-voting` + posts/retracts `leader-vote`; `/admin/events` settles ties.)*
   - [x] 3.4.1 Admin leader assignment (exists in `/admin/events`) ← done: 2026-05-19
   - [x] 3.4.2 Member nomination flow `w:1` ← done: 2026-06-03 *(`LeaderNominationPanel` on `/events/[id]` surfaces when `status === DRAFT && !eventLeaderId`. One-click self-nomination + per-nomination vote toggle. List sorted by support count; demo events update local state, real events POST / DELETE to `/events/{id}/nominations[/{id}/vote]` and degrade on 404/501. Bilingual EN+NE inline copy. Originally scoped to `/app`; built on public `/events/[id]` since `/app` shell shipped in the same batch (2.2/2.5/2.7) — same component reusable from `/app` once member-portal routes hook into events.)*
   - [x] 3.4.3 Member-side tie-break + settle surface `w:1` ← done: 2026-06-03 *(`LeaderNominationPanel` includes tie detection: when 2+ candidates share the top support count, a "Tied — the community can decide" banner renders with an amber warning icon. Voting continues to surface; admin can still force-assign via `/admin/events` to settle. Demo `demo-draft-1` event pre-populates a tied state for showcase.)*
-  - [!] 3.4.4 Backend nomination + tie-break endpoints (`POST` / `DELETE /events/{id}/nominations`) `w:1` ← blocked: backend pending
+  - [x] 3.4.4 Backend nomination + tie-break endpoints `w:1` ← done: 2026-06-18 *(shipped as the `leader-vote` / `leader-voting` family rather than `/nominations`: `POST`/`DELETE /events/{id}/leader-vote`, `GET /events/{id}/leader-voting`, `PATCH .../tie-break`, `POST .../settle`. All consumed by `LeaderNominationPanel` + `/admin/events`.)*
 - [x] 3.5 Scheduling + completion (leader-only) `w:3` ← done: 2026-06-03
   - [x] 3.5.1 Leader UI for `PATCH /events/{id}/schedule` `w:2` ← done: 2026-05-29 *(`LeaderScheduleEditor` component renders a leader-only banner + Ant Design Modal on `/events/[id]` when the current user matches `eventLeaderId` AND status is `DRAFT`. Form covers `scheduledAt` (DatePicker showTime, future-only), `durationMinutes` (15-min steps), `meetupAddress`, `meetupNotes`, `meetupLatitude/Longitude` (with "Use issue location" shortcut prefilled from linked issue), and `planningNotes`. Submits via `patchJson('/events/${id}/schedule', payload, { requireAuth: true })`; surfaces 403 / 409 / generic toasts. Verified end-to-end with Playwright as admin-leader: DRAFT → SCHEDULED transition, banner auto-hides afterward.)*
   - [x] 3.5.2 Leader UI for `POST /events/{id}/complete` `w:1` ← done: 2026-06-03 *(`LeaderCompleteEditor` component renders a leader-only success-accented banner + modal on `/events/[id]` when the current user is the leader AND status is `ACTIVE` or `SCHEDULED`. Form captures `completedAt` (DatePicker, past-or-now only, defaults to now) and `resultSummary` (required, ≥12 chars, max 2000). Submits via `postJson('/events/${id}/complete', payload, { requireAuth: true })`; 403/409/generic toasts. Demo events (`demo-*` ids) simulate completion via local state instead of round-tripping the backend; the parent page accepts a partial-event payload from `onSaved` and merges it in.)*
-- [~] 3.6 Participation roster — volunteer / cameraman `w:3` *(UI shipped 2026-06-03; backend join endpoint pending.)*
+- [x] 3.6 Participation roster — volunteer / cameraman `w:3` ← done: 2026-06-18 *(UI shipped 2026-06-03; backend join landed as the `participants` family — `POST`/`GET /events/{id}/participants`, `GET .../participants/me`, plus `PATCH`/`DELETE .../participants/{participantId}`, `.../check-in`, `.../invite`. `EventJoinPanel` posts to `/events/{id}/participants` (EventJoinPanel.js:181); the detail page reads `/participants/me` for joined state.)*
   - [x] 3.6.1 UI roster + join panel `w:2` ← done: 2026-06-03 *(`EventJoinPanel` component renders an inline "Join this event" CTA on `/events/[id]` above the roster, opening a role-picker modal sourced from the event's `rolesNeeded` shape. Demo events update the roster locally; real events POST to `/events/{id}/join`. 404/501 responses surface a "backend pending" info toast instead of hard-failing. Viewer detection uses the auth session display name against `filledNames` to render a "you're in as X" badge.)*
-  - [!] 3.6.2 Backend `POST /events/{id}/join` + roster fetch `w:1` ← blocked: backend pending — see [`../engineering/09-backend-admin-gaps.md`](../engineering/09-backend-admin-gaps.md)
+  - [x] 3.6.2 Backend join + roster fetch `w:1` ← done: 2026-06-18 *(shipped as `POST /events/{id}/participants` (join) + `GET /events/{id}/participants` (roster) + `GET .../participants/me` (joined state), not the anticipated `/join`. Frontend `EventJoinPanel` + event detail page consume them.)*
 - [~] 3.7 Reminder cadence: 3d / 24h / 1h `w:2` *(UI shipped 2026-06-03; backend reminders endpoint + scheduler dispatch pending.)*
   - [x] 3.7.1 UI cadence panel `w:1` ← done: 2026-06-03 *(`ReminderCadencePanel` shows on `/events/[id]` when the current user is the leader AND status is `SCHEDULED` or `ACTIVE`. Three independent checkboxes auto-save on toggle. Demo events update `reminderCadence` locally; real events PATCH `/events/{id}/reminders` with `{ reminderCadence: array of enum }` and degrade gracefully on 404/501 (saves locally + "backend pending" toast). Spec field added to [`../api-requirements/events.md`](../api-requirements/events.md). Default is `["3d", "24h"]`. Bilingual EN+NE inline copy.)*
   - [!] 3.7.2 Backend `PATCH /events/{id}/reminders` + scheduler dispatch `w:1` ← blocked: backend pending
@@ -301,7 +303,7 @@ Goal: Safety leads, medical professionals, and admins can manage real-world risk
   - [!] 8.3.2 Backend VAPID key + push subscription store + dispatch endpoint `w:1` ← blocked: backend pending
 - [ ] 8.4 AI assistant on WhatsApp / Messenger / IG `w:2` *(future / Meta API)*
 
-## Phase 9 — Admin Control Center Expansion `w:10` 📊 67%
+## Phase 9 — Admin Control Center Expansion `w:10` 📊 77%
 
 Goal: Every public-facing entity has an admin counterpart with full CRUD + audit, gated by role.
 
@@ -311,7 +313,7 @@ Goal: Every public-facing entity has an admin counterpart with full CRUD + audit
 - [x] 9.4 Events module (assign leader, tie-break, settle) `w:1` ← done: 2026-05-19
 - [x] 9.5a Issues admin create page (`/admin/issues/create` via existing `POST /issues`) `w:0` ← done: 2026-05-25
 - [x] 9.5b Issues admin edit page wired (`/admin/issues/[id]/edit`, shared `IssueForm`, `PATCH /issues/{id}` submit) `w:0` ← done: 2026-05-25 *(UI ready; PATCH endpoint not yet shipped on backend — submit errors with toast until then; see [09-backend-admin-gaps.md](../engineering/09-backend-admin-gaps.md))*
-- [!] 9.5 Issues full CRUD (status, notes, delete; PATCH endpoint for edit) `w:1` ← blocked: see [09-backend-admin-gaps.md](../engineering/09-backend-admin-gaps.md)
+- [x] 9.5 Issues full CRUD (status, notes, delete; PATCH endpoint for edit) `w:1` ← done: 2026-06-18 *(backend now ships `PATCH /issues/{id}` (edit), `PATCH /issues/{id}/status`, and `DELETE /issues/{id}`. Frontend: admin status/delete go through `useAdminItemMutation` (patchJson/deleteJson per apiClient.js:386-388 note); `/admin/issues/[id]/edit` + member `/me/issues/[id]/edit` both PATCH `/issues/{id}`.)*
 - [ ] 9.6 Incidents admin view `w:1`
 - [ ] 9.7 Roles / KYC verification panel `w:1`
 - [ ] 9.8 Notifications admin (templates + queue) `w:1`
@@ -391,22 +393,22 @@ Weighted across all phases (sum of phase weights = 157):
 | Phase | Weight | Progress |
 | --- | --- | --- |
 | 0 Foundation | 10 | 100% |
-| 1 Public Issue Discovery & Voting | 15 | 77% |
+| 1 Public Issue Discovery & Voting | 15 | 88% |
 | 2 Member Portal `/app` | 24 | 75% |
-| 3 Campaign Execution | 18 | 83% |
+| 3 Campaign Execution | 18 | 94% |
 | 4 Operational Safety | 10 | 70% |
 | 5 Contribution Channels | 12 | 50% |
 | 6 Transparency & Ledger | 12 | 50% |
 | 7 Impact Stories | 7 | 71% |
 | 8 Notifications & Outreach | 7 | 14% |
-| 9 Admin Control Center | 10 | 67% |
+| 9 Admin Control Center | 10 | 77% |
 | 10 Native Mobile App | 5 | 0% |
 | 11 Cross-cutting | 10 | 100% |
 | 12 Documentation & Community | 5 | 40% |
 | 13 Public Reports & Transparency Surface | 6 | 67% |
 | 14 Building in Public (Process Transparency) | 6 | 83% |
 
-**Overall: ≈ 68%** (weighted sum / total weight; recompute on every edit, and redraw the [Overall Progress](#overall-progress--68) bar near the top of this file in the same edit).
+**Overall: ≈ 71%** (weighted sum / total weight; recompute on every edit, and redraw the [Overall Progress](#overall-progress--71) bar near the top of this file in the same edit).
 
 # How To Update This Document
 
