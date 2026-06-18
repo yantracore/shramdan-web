@@ -10,6 +10,16 @@
 
 const ACTIVE_STATUSES = new Set(["CONFIRMED", "CHECKED_IN"]);
 
+// Statuses that mean the viewer currently HOLDS a spot (or is waitlisted for
+// one). LEFT / NO_SHOW are terminal tombstones the backend retains for audit —
+// the record keeps its old `role`, so role-presence alone never implies
+// membership. Anything outside this set must read as "not joined".
+const MEMBERSHIP_STATUSES = new Set(["CONFIRMED", "CHECKED_IN", "INVITED"]);
+
+export function isActiveParticipationStatus(status) {
+  return MEMBERSHIP_STATUSES.has(status);
+}
+
 export function buildRolesNeeded(rolePlan, participants) {
   if (!Array.isArray(rolePlan)) return [];
   const safeParticipants = Array.isArray(participants) ? participants : [];

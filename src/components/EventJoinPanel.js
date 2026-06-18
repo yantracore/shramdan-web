@@ -5,6 +5,7 @@ import { Button, Modal, Popconfirm, Radio, Space } from "antd";
 import Link from "next/link";
 import { useState, useSyncExternalStore } from "react";
 import { deleteJson, postJson } from "@/lib/apiClient";
+import { isActiveParticipationStatus } from "@/lib/eventParticipants";
 import { getAuthSession, subscribeAuthSession } from "@/lib/authSession";
 import { buildLoginHref } from "@/lib/loginRedirect";
 import { useToast } from "@/lib/toast";
@@ -31,6 +32,7 @@ const COPY = {
     errorToast: "जोडिन सकिएन। फेरि प्रयास गर्नुहोस्।",
     medicCredentialError: "स्वास्थ्यकर्मी भूमिकाको लागि प्रमाणित मेडिकल क्रेडेन्सियल चाहिन्छ।",
     alreadyJoinedDifferentRole: "तपाईं पहिले अर्को भूमिकामा जोडिनुभएको छ।",
+    rejoinBlocked: "अहिले फेरि जोडिन सकिएन — पहिले छाड्नुभएको रेकर्ड सर्भरले पुनः सक्रिय गरेन। कृपया आयोजकलाई सम्पर्क गर्नुहोस्।",
     leaveCta: "यो अभियानबाट हट्ने",
     leaveConfirm: "साँच्चै हट्ने? तपाईंको भूमिका अरूका लागि खाली हुनेछ।",
     leaveConfirmOk: "हट्नुहोस्",
@@ -69,6 +71,7 @@ const COPY = {
     errorToast: "Could not join. Please try again.",
     medicCredentialError: "The Medic role requires verified medical credentials.",
     alreadyJoinedDifferentRole: "You've already joined this event in a different role.",
+    rejoinBlocked: "Couldn't re-join right now — a signup you previously left wasn't reactivated by the server. Please contact an organizer.",
     leaveCta: "Leave this event",
     leaveConfirm: "Leave this event? Your spot will open up for someone else.",
     leaveConfirmOk: "Leave",
@@ -266,7 +269,13 @@ export function EventJoinPanel({
         { requireAuth: true }
       );
       const created = response?.data ?? response;
-      if (created && created.role) {
+      if (created && created.role && !isActiveParticipationStatus(created.status)) {
+        // Backend bug: re-joining after leaving returns 201 but hands back the
+        // stale terminal record (status LEFT / NO_SHOW) instead of reactivating
+        // it — so the member isn't actually on the roster. Don't claim success.
+        messageApi.error(t.rejoinBlocked);
+        onJoined?.({ refetch: true });
+      } else if (created && created.role) {
         if (created.status === "INVITED") {
           messageApi.info(t.waitlistToast);
         } else {

@@ -23,6 +23,7 @@ import { CheckCircleFilled } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import { useState, useSyncExternalStore } from "react";
 import { postJson } from "@/lib/apiClient";
+import { isActiveParticipationStatus } from "@/lib/eventParticipants";
 import { getAuthSession, subscribeAuthSession } from "@/lib/authSession";
 import { useToast } from "@/lib/toast";
 
@@ -60,6 +61,7 @@ const COPY = {
     waitlistToast: "भूमिका भरिएको छ — प्रतीक्षा सूचीमा हुनुहुन्छ।",
     alreadyJoinedToast: "तपाईं पहिले अर्को भूमिकामा जोडिनुभएको छ।",
     medicCredentialError: "स्वास्थ्यकर्मी भूमिकाको लागि प्रमाणित मेडिकल क्रेडेन्सियल चाहिन्छ।",
+    rejoinBlocked: "अहिले फेरि जोडिन सकिएन — पहिले छाड्नुभएको रेकर्ड सर्भरले पुनः सक्रिय गरेन। कृपया आयोजकलाई सम्पर्क गर्नुहोस्।",
     errorToast: "जोडिन सकिएन। फेरि प्रयास गर्नुहोस्।",
     roles: {
       WORKER: "कामदार",
@@ -101,6 +103,7 @@ const COPY = {
     waitlistToast: "Role full — you're on the waitlist.",
     alreadyJoinedToast: "You've already joined this event in a different role.",
     medicCredentialError: "The Medic role requires verified medical credentials.",
+    rejoinBlocked: "Couldn't re-join right now — a signup you previously left wasn't reactivated by the server. Please contact an organizer.",
     errorToast: "Could not join. Please try again.",
     roles: {
       WORKER: "Worker",
@@ -163,12 +166,19 @@ export function EventRosterPanel({
       );
       const data = response?.data ?? response;
       const roleLabel = t.roles[role] || role;
-      if (data?.status === "INVITED") {
-        messageApi.info(t.waitlistToast);
+      if (data?.status && !isActiveParticipationStatus(data.status)) {
+        // Backend bug: re-join after leaving returns 201 with the stale
+        // terminal record (LEFT / NO_SHOW) instead of reactivating it.
+        messageApi.error(t.rejoinBlocked);
+        onJoined?.({ refetch: true });
       } else {
-        messageApi.success(t.joinedToast.replace("{role}", roleLabel));
+        if (data?.status === "INVITED") {
+          messageApi.info(t.waitlistToast);
+        } else {
+          messageApi.success(t.joinedToast.replace("{role}", roleLabel));
+        }
+        onJoined?.({ role, status: data?.status });
       }
-      onJoined?.({ role, status: data?.status });
     } catch (err) {
       if (err?.status === 403 && /MEDIC/i.test(err?.errorCode || err?.message || "")) {
         messageApi.error(t.medicCredentialError);

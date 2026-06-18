@@ -43,7 +43,8 @@ import { injectMockLiveStream } from "@/lib/devMockData";
 import {
   buildRolesNeeded,
   countActiveParticipants,
-  findViewerRoleByName
+  findViewerRoleByName,
+  isActiveParticipationStatus
 } from "@/lib/eventParticipants";
 import { getAuthSession, subscribeAuthSession } from "@/lib/authSession";
 import { copy } from "@/lib/siteContent";
@@ -239,10 +240,8 @@ export default function EventDetailPage() {
       // rather than 404ing, so a stale LEFT/NO_SHOW record must NOT count as
       // membership — otherwise a refresh re-reads it and the UI flips back to
       // "you're in". Only active states (joined / waitlisted / checked-in) hold.
-      const isActiveParticipation =
-        data?.role && ["CONFIRMED", "CHECKED_IN", "INVITED"].includes(data.status);
       setMyParticipation(
-        isActiveParticipation
+        data?.role && isActiveParticipationStatus(data.status)
           ? { id: data.id, role: data.role, status: data.status }
           : null
       );
