@@ -185,9 +185,11 @@ When you (the coding agent) are working in this repo:
 - [x] P2 [from 11] Mobile menu missing Settings link — effort:S ← done: 2026-06-02 *(desktop toolbar gear icon hides under 980px; mobile menu now carries a Settings link between the Admin Center (admin only) and the preferences button row)*
 - [x] P2 [from 1.2] `/issues/[id]` hero cover image alt fallback chain — effort:S ← done: 2026-06-02 *(same Next.js Image strip-alt bug as PublicIssueCard; new coverAlt cascade — title → addressText → categoryLabel → statusLabel → galleryAria → "Issue" — also flows into IssuePhotoGallery so lightbox images inherit it)*
 
----
+## Phase 7 — Discussions & Feature Voting
 
-# How Polish Feeds "What's Next?"
+- [x] P1 [from 7] `/discussions` list redesign — sticky left category rail (DESIGN/FRONTEND/BACKEND/PRODUCT/COMMUNITY), accessible proper tabs, reusable `components/discussions/*`, brochure hero + stats strip removed (app-not-brochure) — effort:M ← done: 2026-06-18 *(extracted `discussionFormat.js` shared utils, `DiscussionTabs` roving-tabindex tablist, `DiscussionCategoryRail`, `NewTopicModal` w/ category chips; added `category` field to topics + backend contract; faceted category/tab counts client-side)*
+- [ ] P1 [from 7] `/discussions/[slug]` detail redesign (Phase 2 of the makeover) — apply the same app-style language: category chip in header, reuse `discussionFormat` utils (drop the duplicated localizeDigits/formatRelative in the detail page), tighten the support card, threaded replies polish — effort:M
+- [ ] P3 [from 7] Animated sliding active-thumb under the proper tabs (currently a background pill swap, no slide) — effort:S
 
 When the user asks for the next task, the agent reads both files together and proposes a mix:
 

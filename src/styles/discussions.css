@@ -20,108 +20,207 @@
   padding-bottom: 96px;
 }
 
-/* ── List page heading band ──────────────────────────────────────── */
-.discussions-section .section-heading,
-.discussions-section .discussions-heading {
-  display: grid;
-  gap: 6px;
+/* ── App-style shell: sticky category rail + main column ─────────── */
+.discussions-section {
   padding-top: 8px;
 }
 
-.discussions-section .eyebrow {
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--primary);
-}
-
-.discussions-section .discussions-heading h1 {
-  margin: 0;
-  font-size: clamp(24px, 2.6vw, 34px);
-  line-height: 1.12;
-  letter-spacing: -0.01em;
-}
-
-.discussions-section .discussions-heading p {
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.55;
-  color: var(--muted);
-  max-width: 64ch;
-}
-
-/* ── Stats strip ─────────────────────────────────────────────────── */
-.discussions-stats {
+.discussions-shell {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  list-style: none;
-  padding: 0;
-  margin: 0;
+  grid-template-columns: 248px minmax(0, 1fr);
+  gap: 22px;
+  align-items: start;
 }
 
-.discussions-stat {
-  position: relative;
+.discussions-rail-wrap {
+  position: sticky;
+  top: 88px;
+}
+
+/* Left category rail (DiscussionCategoryRail) */
+.d-rail {
   display: grid;
-  grid-template-columns: auto 1fr;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
+  gap: 16px;
+  padding: 16px;
   border-radius: var(--radius-lg);
   background: color-mix(in srgb, var(--surface) 72%, transparent);
   -webkit-backdrop-filter: blur(18px) saturate(1.2);
   backdrop-filter: blur(18px) saturate(1.2);
   border: 1px solid color-mix(in srgb, var(--line) 45%, transparent);
   box-shadow: var(--shadow-1);
-  overflow: hidden;
 }
 
-.discussions-stat::after {
-  content: "";
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 4px;
-  background: var(--stat-accent, var(--primary));
+.d-rail-head {
+  display: grid;
+  gap: 2px;
+  padding: 4px 8px 0;
 }
 
-.discussions-stat-icon {
+.d-rail-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.d-rail-subtitle {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.d-rail-list {
+  display: grid;
+  gap: 2px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.d-rail-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-out-soft),
+    color var(--duration-fast) var(--ease-out-soft);
+}
+
+.d-rail-item:hover {
+  background: color-mix(in srgb, var(--cat-accent) 10%, transparent);
+  color: var(--text);
+}
+
+.d-rail-item-icon {
   display: grid;
   place-items: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  font-size: 18px;
-  color: var(--stat-accent, var(--primary));
-  background: color-mix(in srgb, var(--stat-accent, var(--primary)) 14%, transparent);
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--cat-accent);
+  background: color-mix(in srgb, var(--cat-accent) 12%, transparent);
+  flex-shrink: 0;
+  transition: background var(--duration-fast) var(--ease-out-soft),
+    color var(--duration-fast) var(--ease-out-soft);
 }
 
-.discussions-stat-text {
-  display: grid;
-  gap: 1px;
+.d-rail-item-label {
+  flex: 1;
   min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.discussions-stat-value {
-  font-size: 22px;
-  font-weight: 800;
-  line-height: 1.1;
+.d-rail-item-count {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  padding: 1px 8px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--surface-soft) 60%, transparent);
+}
+
+.d-rail-item.is-active {
+  background: color-mix(in srgb, var(--cat-accent) 14%, transparent);
   color: var(--text);
+  font-weight: 700;
+}
+
+.d-rail-item.is-active .d-rail-item-icon {
+  background: var(--cat-accent);
+  color: #fff;
+}
+
+.d-rail-item.is-active .d-rail-item-count {
+  background: color-mix(in srgb, var(--cat-accent) 22%, transparent);
+  color: color-mix(in srgb, var(--cat-accent) 75%, var(--text));
+}
+
+.d-rail-item:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--cat-accent) 60%, transparent);
+  outline-offset: 1px;
+}
+
+/* "How a proposal moves" quiet explainer (folded in from the old aside) */
+.d-rail-how {
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--surface-soft) 45%, transparent);
+  border: 1px solid color-mix(in srgb, var(--line) 40%, transparent);
+}
+
+.d-rail-how-title {
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.d-rail-how-title .anticon {
+  color: var(--primary);
+}
+
+.d-rail-how-steps {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 6px;
+}
+
+.d-rail-how-step {
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.d-rail-tally {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-top: 2px;
+  padding-top: 8px;
+  border-top: 1px solid color-mix(in srgb, var(--line) 40%, transparent);
+}
+
+.d-rail-tally strong {
+  font-size: 18px;
+  font-weight: 800;
+  color: #15803d;
   font-variant-numeric: tabular-nums;
 }
 
-.discussions-stat-label {
+.d-rail-tally span {
   font-size: 11.5px;
   font-weight: 600;
-  letter-spacing: 0.04em;
-  color: var(--muted);
+  letter-spacing: 0.03em;
   text-transform: uppercase;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  color: var(--muted);
 }
 
-/* ── Toolbar (tabs + search + sort + new) ────────────────────────── */
+/* ── Main column ─────────────────────────────────────────────────── */
+.discussions-main {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+
 .discussions-toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -130,10 +229,11 @@
   gap: 12px;
 }
 
-.discussions-tabs {
+/* ── Proper tabs (DiscussionTabs) ────────────────────────────────── */
+.d-tabs {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   padding: 4px;
   border-radius: var(--radius-pill);
   background: color-mix(in srgb, var(--surface) 70%, transparent);
@@ -143,27 +243,61 @@
   box-shadow: var(--shadow-1);
 }
 
-.discussions-tab {
+.d-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   border: 0;
   background: transparent;
-  padding: 8px 16px;
+  padding: 8px 15px;
   border-radius: var(--radius-pill);
+  font: inherit;
   font-size: 14px;
   font-weight: 700;
   color: var(--muted);
   cursor: pointer;
-  transition: background var(--duration-fast) var(--ease-out-soft),
-    color var(--duration-fast) var(--ease-out-soft);
+  transition: background var(--duration-base) var(--ease-out-soft),
+    color var(--duration-base) var(--ease-out-soft),
+    box-shadow var(--duration-base) var(--ease-out-soft);
 }
 
-.discussions-tab:hover {
+.d-tab:hover {
   color: var(--primary-dark);
 }
 
-.discussions-tab.is-active {
+.d-tab:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--primary) 60%, transparent);
+  outline-offset: 2px;
+}
+
+.d-tab-icon {
+  display: inline-flex;
+  font-size: 13px;
+}
+
+.d-tab-count {
+  font-size: 11.5px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  padding: 0 7px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--surface-soft) 70%, transparent);
+  color: var(--muted);
+}
+
+.d-tab.is-active {
   background: var(--primary);
   color: #fff;
   box-shadow: 0 6px 16px rgba(23, 107, 92, 0.22);
+}
+
+.d-tab.is-active .d-tab-count {
+  background: rgba(255, 255, 255, 0.24);
+  color: #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .d-tab { transition: none; }
 }
 
 .discussions-toolbar-right {
@@ -239,117 +373,6 @@
   color: var(--text);
   font-size: 14px;
   cursor: pointer;
-}
-
-/* ── List layout (main + aside) ──────────────────────────────────── */
-.discussions-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 290px;
-  gap: 22px;
-  align-items: start;
-}
-
-.discussions-aside {
-  position: sticky;
-  top: 88px;
-  display: grid;
-  gap: 14px;
-}
-
-.discussions-aside-card {
-  padding: 18px;
-  border-radius: var(--radius-lg);
-  background: color-mix(in srgb, var(--surface) 72%, transparent);
-  -webkit-backdrop-filter: blur(18px) saturate(1.2);
-  backdrop-filter: blur(18px) saturate(1.2);
-  border: 1px solid color-mix(in srgb, var(--line) 45%, transparent);
-  box-shadow: var(--shadow-1);
-}
-
-.discussions-aside-card h2 {
-  margin: 0 0 4px;
-  font-size: 14px;
-  font-weight: 800;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.discussions-aside-card h2 .anticon {
-  color: var(--primary);
-}
-
-.discussions-howto-steps {
-  list-style: none;
-  margin: 12px 0 0;
-  padding: 0;
-  display: grid;
-  gap: 0;
-  counter-reset: howto;
-}
-
-.discussions-howto-step {
-  position: relative;
-  display: grid;
-  grid-template-columns: 26px 1fr;
-  gap: 10px;
-  padding: 0 0 16px 0;
-}
-
-.discussions-howto-step:last-child {
-  padding-bottom: 0;
-}
-
-.discussions-howto-step::before {
-  counter-increment: howto;
-  content: counter(howto);
-  display: grid;
-  place-items: center;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  background: color-mix(in srgb, var(--primary) 14%, transparent);
-  color: var(--primary-dark);
-  font-size: 12px;
-  font-weight: 800;
-  z-index: 1;
-}
-
-/* connector line between numbered steps */
-.discussions-howto-step:not(:last-child)::after {
-  content: "";
-  position: absolute;
-  left: 12.5px;
-  top: 26px;
-  bottom: 0;
-  width: 1px;
-  background: color-mix(in srgb, var(--line) 80%, transparent);
-}
-
-.discussions-howto-step span {
-  font-size: 13px;
-  line-height: 1.5;
-  color: var(--muted);
-  padding-top: 3px;
-}
-
-.discussions-howto-step strong {
-  color: var(--text);
-  font-weight: 700;
-}
-
-.discussions-legend {
-  display: grid;
-  gap: 10px;
-  margin-top: 12px;
-}
-
-.discussions-legend-row {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12.5px;
-  color: var(--muted);
 }
 
 /* ── List ────────────────────────────────────────────────────────── */
@@ -431,6 +454,7 @@
 
 /* ── DiscussionListCard — vote rail + content ───────────────────── */
 .discussion-card {
+  position: relative;
   display: flex;
   align-items: stretch;
   gap: 0;
@@ -460,8 +484,11 @@
   border-left: 3px solid color-mix(in srgb, #2563eb 55%, transparent);
 }
 
-/* Vote rail (a real button — sibling of the content link) */
+/* Vote rail (a real button — sibling of the content). Sits above the
+   title's stretched-link overlay so it stays independently clickable. */
 .discussion-vote-rail {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -539,6 +566,29 @@
   white-space: nowrap;
 }
 
+/* Category chip — accent-dotted, mirrors the left-rail taxonomy */
+.discussion-card-cat {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px 3px 8px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  color: color-mix(in srgb, var(--cat-accent) 72%, var(--text));
+  background: color-mix(in srgb, var(--cat-accent) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--cat-accent) 26%, transparent);
+}
+
+.discussion-card-cat-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--cat-accent);
+  flex-shrink: 0;
+}
+
 .discussion-card-kind {
   display: inline-flex;
   align-items: center;
@@ -604,6 +654,27 @@
   color: var(--primary-dark);
 }
 
+/* Title is the card's primary link; its ::after stretches over the whole
+   card so the entire surface is clickable — without nesting <a> inside <a>
+   (the author chip stays a separate, independently-clickable link). */
+.discussion-card-title-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.discussion-card-title-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.discussion-card-title-link:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--primary) 60%, transparent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
 .discussion-card-body {
   margin: 0;
   font-size: 13.5px;
@@ -650,6 +721,8 @@
 }
 
 .discussion-card-author {
+  position: relative;
+  z-index: 1;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -860,6 +933,44 @@
   outline: none;
   border-color: color-mix(in srgb, var(--primary) 55%, var(--line));
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 16%, transparent);
+}
+
+/* Category picker (chips) inside the composer */
+.discussions-modal-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.discussions-modal-chip {
+  padding: 6px 13px;
+  border-radius: var(--radius-pill);
+  border: 1px solid color-mix(in srgb, var(--line) 65%, transparent);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  color: var(--muted);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color var(--duration-fast) var(--ease-out-soft),
+    background var(--duration-fast) var(--ease-out-soft),
+    color var(--duration-fast) var(--ease-out-soft);
+}
+
+.discussions-modal-chip:hover {
+  border-color: color-mix(in srgb, var(--cat-accent) 45%, var(--line));
+  color: var(--text);
+}
+
+.discussions-modal-chip.is-selected {
+  border-color: color-mix(in srgb, var(--cat-accent) 55%, transparent);
+  background: color-mix(in srgb, var(--cat-accent) 14%, transparent);
+  color: color-mix(in srgb, var(--cat-accent) 72%, var(--text));
+}
+
+.discussions-modal-chip:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--cat-accent) 55%, transparent);
+  outline-offset: 2px;
 }
 
 .discussions-anon-label {
@@ -1504,14 +1615,44 @@
  * Responsive
  * =================================================================== */
 @media (max-width: 980px) {
-  .discussions-layout,
+  .discussions-shell,
   .discussion-detail-grid {
     grid-template-columns: 1fr;
   }
 
-  .discussions-aside {
+  /* Rail un-sticks and becomes a horizontal category scroller above the list */
+  .discussions-rail-wrap {
     position: static;
-    order: 2;
+  }
+
+  .d-rail {
+    gap: 12px;
+  }
+
+  .d-rail-head {
+    padding: 0;
+  }
+
+  .d-rail-subtitle {
+    display: none;
+  }
+
+  .d-rail-list {
+    grid-auto-flow: column;
+    grid-auto-columns: max-content;
+    overflow-x: auto;
+    gap: 8px;
+    padding-bottom: 4px;
+    scrollbar-width: thin;
+  }
+
+  .d-rail-item {
+    width: auto;
+    white-space: nowrap;
+  }
+
+  .d-rail-how {
+    display: none;
   }
 
   .discussion-detail-aside {
@@ -1521,18 +1662,15 @@
 }
 
 @media (max-width: 640px) {
-  .discussions-stats {
-    grid-template-columns: 1fr;
-  }
-
   .discussions-toolbar {
     flex-direction: column;
     align-items: stretch;
   }
 
-  .discussions-tabs {
+  .d-tabs {
     overflow-x: auto;
     justify-content: flex-start;
+    width: 100%;
   }
 
   .discussions-toolbar-right {
@@ -1567,9 +1705,8 @@
 
 @media (prefers-reduced-transparency: reduce) {
   .discussion-card,
-  .discussions-stat,
-  .discussions-tabs,
-  .discussions-aside-card,
+  .d-rail,
+  .d-tabs,
   .discussion-detail-header,
   .discussion-detail-replies,
   .discussion-support-card,

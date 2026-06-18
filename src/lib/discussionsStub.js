@@ -97,6 +97,7 @@ const MOCK_TOPICS = [
     id: "disc-feature-darkmode-corner-tinting",
     slug: "feature-darkmode-corner-tinting",
     kind: "FEATURE_PROPOSAL",
+    category: "DESIGN",
     title: "Dark mode को corner chrome अझ stronger blur",
     body: "रातको प्रयोगमा corner chips पूरै सेतो जस्तो पोखिएको देखिन्छ। surface alpha अहिले 70% छ; dark mode मा 58% मा झार्ने र blur 22px राख्ने प्रस्ताव।",
     authorMemberId: "mem-ramesh-shrestha",
@@ -125,6 +126,7 @@ const MOCK_TOPICS = [
     id: "disc-trail-marker-standards",
     slug: "trail-marker-standards",
     kind: "GENERAL",
+    category: "COMMUNITY",
     title: "हाइकिङ ट्रेलमा एकरूप मार्कर मानक",
     body: "विभिन्न ट्रेल मर्मत अभियानहरूले फरक रंग र चिह्न प्रयोग गरिरहेका छन्। एकरूपता आवश्यक छ — सायद Department of Tourism का मानक follow गर्ने?",
     authorMemberId: "mem-muna-gurung",
@@ -142,6 +144,7 @@ const MOCK_TOPICS = [
     id: "disc-feature-issue-vote-undo",
     slug: "feature-issue-vote-undo",
     kind: "FEATURE_PROPOSAL",
+    category: "FRONTEND",
     title: "Issue भोट हटाउन सकिने option",
     body: "अहिले एकपटक भोट दिए, withdraw गर्न सकिँदैन। बेलाबेला गलत समर्थन भएकोमा हटाउन चाहिन्छ।",
     authorMemberId: "mem-muna-gurung",
@@ -164,6 +167,7 @@ const MOCK_TOPICS = [
     id: "disc-anon-feedback-dropdown-flow",
     slug: "anon-feedback-dropdown-flow",
     kind: "GENERAL",
+    category: "FRONTEND",
     title: "सहभागिता form मा role drop-down को क्रम अप्ठ्यारो",
     body: "नयाँ सदस्य भर्ने बेला drop-down मा role list अल्फाबेटिक छैन; प्रयोगकर्तालाई दिक्क बनाउँछ।",
     authorMemberId: null,
@@ -181,6 +185,7 @@ const MOCK_TOPICS = [
     id: "disc-event-thanks-melamchi",
     slug: "event-thanks-melamchi",
     kind: "GENERAL",
+    category: "COMMUNITY",
     title: "मेलम्ची नदी किनारको सरसफाइ — सहभागीहरूलाई धन्यवाद",
     body: "११० जना भाइबहिनी, ३ टन फोहोर — विकल्पको शक्ति। म साथमा रहेर सिक्न पाएको प्रत्येक हातलाई धन्यवाद।",
     authorMemberId: "mem-sita-tamang",
@@ -198,6 +203,7 @@ const MOCK_TOPICS = [
     id: "disc-promoted-app-darkmode-default",
     slug: "promoted-app-darkmode-default",
     kind: "FEATURE_PROPOSAL",
+    category: "PRODUCT",
     title: "Dark mode लाई सिस्टम preference अनुसार default",
     body: "हालका सबै ब्राउजर ले OS-level dark/light preference signal पठाउँछन्। श्रमदान ले त्यो respect गर्नुपर्छ।",
     authorMemberId: "mem-ramesh-shrestha",
@@ -218,6 +224,47 @@ const MOCK_TOPICS = [
     promotedAt: daysAgoIso(6),
     promotedBy: "SYSTEM",
     promotedRoadmapAnchor: "#discussions-feature-darkmode-default"
+  },
+  {
+    id: "disc-feature-offline-action-queue",
+    slug: "feature-offline-action-queue",
+    kind: "FEATURE_PROPOSAL",
+    category: "BACKEND",
+    title: "अफलाइन हुँदा गरेका action पछि अटो-sync",
+    body: "फिल्डमा सरसफाइ गर्दा प्रायः इन्टरनेट हुँदैन। समर्थन, उपस्थिति, फोटो जस्ता action लाई device मा queue गरेर नेट आएपछि server सँग sync गर्ने हो भने मैदानमै app प्रयोग गर्न सजिलो हुन्छ।",
+    authorMemberId: "mem-ramesh-shrestha",
+    authorDisplay: { name: "रमेश श्रेष्ठ", avatarUrl: "/images/demo-events/nuwakot-darbar.jpg", slug: "ramesh-shrestha" },
+    anonymous: false,
+    linkedEntity: null,
+    status: "OPEN",
+    messageCount: 9,
+    upvoteCount: 15,
+    distinctSupporters: 12,
+    lastActivityAt: hoursAgoIso(9),
+    createdAt: daysAgoIso(2),
+    proposalStatus: "OPEN",
+    promotionEligible: false,
+    votesUntilThreshold: 5,
+    supportersUntilThreshold: 0,
+    graceWindowEndsAt: null
+  },
+  {
+    id: "disc-notification-delivery-window",
+    slug: "notification-delivery-window",
+    kind: "GENERAL",
+    category: "BACKEND",
+    title: "सूचना कति छिटो आउनुपर्छ — SSE कि push?",
+    body: "अभियान लाइभ हुँदा वा भोट दहलीज नाघ्दा सूचना तुरुन्तै आउनुपर्छ। अहिलेलाई SSE राम्रो कि web-push? ब्याट्री र विश्वसनीयता दुवै हेरेर छलफल गरौं।",
+    authorMemberId: "mem-sita-tamang",
+    authorDisplay: { name: "सीता तामाङ", avatarUrl: "/images/demo-events/manang-trail.jpg", slug: "sita-tamang" },
+    anonymous: false,
+    linkedEntity: null,
+    status: "OPEN",
+    messageCount: 5,
+    upvoteCount: 11,
+    distinctSupporters: 9,
+    lastActivityAt: hoursAgoIso(20),
+    createdAt: daysAgoIso(3)
   }
 ];
 
@@ -321,7 +368,7 @@ export function discussionPresenceForEvent(eventSlugOrId) {
 // feel live within the current session. The backend counterparts are
 // specified in docs/api-requirements/discussions.md.
 
-export function demoPostTopic({ kind = 'GENERAL', title, body, anonymous = false, linkedEntity = null } = {}) {
+export function demoPostTopic({ kind = 'GENERAL', category = 'COMMUNITY', title, body, anonymous = false, linkedEntity = null } = {}) {
   const slug = title
     .toLowerCase()
     .replace(/[^a-z0-9\u0900-\u097F]+/g, '-')
@@ -335,6 +382,7 @@ export function demoPostTopic({ kind = 'GENERAL', title, body, anonymous = false
     id,
     slug,
     kind,
+    category,
     title,
     body,
     authorMemberId: null,

@@ -1,10 +1,12 @@
 "use client";
 
-// Phase 7 — compact card for a discussion topic in the /discussions list.
+// Compact card for a discussion topic in the /discussions list.
 //
-// 2026-06-16 makeover: the card now leads with a Canny/ProductBoard-style
-// vote rail (support without opening the thread) and, for feature
-// proposals, a live progress meter toward the roadmap-promotion threshold.
+// Leads with a Canny/ProductBoard-style vote rail (support without opening
+// the thread) and, for feature proposals, a live progress meter toward the
+// roadmap-promotion threshold. The 2026-06-18 makeover adds a category chip
+// (left-rail taxonomy) and moves all formatting to the shared
+// components/discussions/discussionFormat.js module.
 //
 // Anonymous topics render with the "अज्ञात सदस्य" / "Anonymous member"
 // placeholder; clicking the author chip does NOT navigate.
@@ -20,41 +22,12 @@ import {
 import Link from "next/link";
 import { useState } from "react";
 import { apiCastVote, apiWithdrawVote } from "@/lib/discussionsApi";
-
-// Promotion thresholds — mirror getFeatureProposalThreshold() in the stub.
-const THRESHOLD_VOTES = 20;
-
-const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
-
-function localizeDigits(value, language) {
-  const str = String(value ?? "");
-  if (language !== "np") return str;
-  return str.replace(/\d/g, (d) => NP_DIGITS[Number(d)]);
-}
-
-function formatRelative(iso, language) {
-  if (!iso) return "";
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) return "";
-  const diffMin = Math.round((Date.now() - date.getTime()) / 60000);
-  if (diffMin < 60) {
-    if (language === "np") return `${localizeDigits(Math.max(1, diffMin), "np")} मि. अघि`;
-    return `${Math.max(1, diffMin)}m ago`;
-  }
-  const diffHr = Math.round(diffMin / 60);
-  if (diffHr < 24) {
-    if (language === "np") return `${localizeDigits(diffHr, "np")} घन्टा अघि`;
-    return `${diffHr}h ago`;
-  }
-  const diffDay = Math.round(diffHr / 24);
-  if (language === "np") return `${localizeDigits(diffDay, "np")} दिन अघि`;
-  return `${diffDay}d ago`;
-}
-
-function formatTokenized(template, n, language) {
-  if (!template) return "";
-  return template.replace("{n}", localizeDigits(n, language));
-}
+import {
+  THRESHOLD_VOTES,
+  categoryMeta,
+  formatRelative,
+  localizeDigits
+} from "@/components/discussions/discussionFormat";
 
 export function DiscussionListCard({ topic, language = "np", copy }) {
   const t = copy ?? {};
@@ -94,6 +67,9 @@ export function DiscussionListCard({ topic, language = "np", copy }) {
   const meterPct = Math.min(100, Math.round((voteCount / THRESHOLD_VOTES) * 100));
   const meterMod = isEligible || meterPct >= 100 ? "eligible" : "";
 
+  const cat = categoryMeta(topic.category);
+  const catLabel = topic.category ? t.categories?.[topic.category] : null;
+
   const promotionBadge = (() => {
     if (!isProposal) return null;
     if (isPromoted) return { kind: "promoted", label: t.promotionPromoted };
@@ -125,8 +101,14 @@ export function DiscussionListCard({ topic, language = "np", copy }) {
         <span className="discussion-vote-rail-label">{np ? "समर्थन" : "Vote"}</span>
       </button>
 
-      <Link href={`/discussions/${topic.slug ?? topic.id}`} className="discussion-card-link" aria-label={topic.title}>
+      <div className="discussion-card-link">
         <header className="discussion-card-header">
+          {catLabel ? (
+            <span className="discussion-card-cat" style={{ "--cat-accent": cat?.accent || "var(--primary)" }}>
+              <span className="discussion-card-cat-dot" aria-hidden="true" />
+              {catLabel}
+            </span>
+          ) : null}
           <span className={`discussion-card-kind discussion-card-kind--${topic.kind?.toLowerCase().replace(/_/g, "-")}`}>
             {isProposal ? (np ? "फिचर अनुरोध" : "Feature proposal") : (np ? "छलफल" : "Discussion")}
           </span>
@@ -140,7 +122,15 @@ export function DiscussionListCard({ topic, language = "np", copy }) {
           </span>
         </header>
 
-        <h3 className="discussion-card-title">{topic.title}</h3>
+        <h3 className="discussion-card-title">
+          <Link
+            href={`/discussions/${topic.slug ?? topic.id}`}
+            className="discussion-card-title-link"
+            aria-label={topic.title}
+          >
+            {topic.title}
+          </Link>
+        </h3>
         <p className="discussion-card-body">{topic.body}</p>
 
         {showMeter ? (
@@ -198,7 +188,7 @@ export function DiscussionListCard({ topic, language = "np", copy }) {
             </span>
           </div>
         </footer>
-      </Link>
+      </div>
     </article>
   );
 }

@@ -1178,10 +1178,30 @@ export const copy = {
       title: "श्रमदान छलफल",
       intro: "सदस्यहरूले उठाएका विषय, सुझाव र अनुरोधहरू। समर्थन गर्नुहोस्, थप्नुहोस्, र मतदान गरेर अघि बढाउनुहोस्।",
       tabs: {
-        all: "सबै छलफल",
-        general: "सामान्य",
+        all: "सबै",
+        general: "छलफल",
         proposals: "फिचर अनुरोध"
       },
+      categoriesTitle: "छलफल",
+      categoriesSubtitle: "मिलेर श्रमदान बनाऔं",
+      categoriesAria: "छलफलका विषयहरू",
+      categories: {
+        all: "सबै",
+        DESIGN: "डिजाइन",
+        FRONTEND: "फ्रन्टएन्ड",
+        BACKEND: "ब्याकएन्ड",
+        PRODUCT: "प्रोडक्ट",
+        COMMUNITY: "समुदाय"
+      },
+      categoryLabel: "विषय",
+      categoryHint: "तपाईंको विषय कुन क्षेत्रसँग मिल्छ?",
+      howTitle: "अनुरोध कसरी अघि बढ्छ",
+      howSteps: [
+        "विषय खोल्नुहोस् — सामान्य छलफल वा फिचर अनुरोध।",
+        "समर्थन बटुल्नुहोस् — {n} समर्थन पुगे दहलीजमा।",
+        "रोडम्यापमा — दहलीज नाघेका अनुरोध टोलीले सार्छ।"
+      ],
+      roadmapTallyLabel: "रोडम्यापमा पुगेका",
       newTopic: "नयाँ विषय",
       newProposal: "नयाँ फिचर अनुरोध",
       anonymousAuthor: "अज्ञात सदस्य",
@@ -2954,10 +2974,30 @@ export const copy = {
       title: "Shramdan Discussions",
       intro: "Topics, suggestions, and feature asks members opened. Support, reply, and vote to push them forward.",
       tabs: {
-        all: "All discussions",
-        general: "General",
-        proposals: "Feature proposals"
+        all: "All",
+        general: "Discussions",
+        proposals: "Proposals"
       },
+      categoriesTitle: "Discussions",
+      categoriesSubtitle: "Build Shramdan together",
+      categoriesAria: "Discussion topics",
+      categories: {
+        all: "All",
+        DESIGN: "Design",
+        FRONTEND: "Frontend",
+        BACKEND: "Backend",
+        PRODUCT: "Product",
+        COMMUNITY: "Community"
+      },
+      categoryLabel: "Topic",
+      categoryHint: "Which area does your topic belong to?",
+      howTitle: "How a proposal moves",
+      howSteps: [
+        "Open a topic — a general discussion or a feature ask.",
+        "Gather support — {n} votes reaches the threshold.",
+        "Onto the roadmap — threshold-passing asks get promoted."
+      ],
+      roadmapTallyLabel: "On the roadmap",
       newTopic: "New Topic",
       newProposal: "New Feature Proposal",
       anonymousAuthor: "Anonymous member",

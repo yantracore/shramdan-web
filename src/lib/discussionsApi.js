@@ -21,14 +21,14 @@ function isGraceful(err) {
   return GRACEFUL_STATUSES.has(status) || err?.message?.includes('fetch');
 }
 
-export async function apiPostTopic({ kind, title, body, anonymous = false, linkedEntity = null }, { isDemoId } = {}) {
+export async function apiPostTopic({ kind, category = 'COMMUNITY', title, body, anonymous = false, linkedEntity = null }, { isDemoId } = {}) {
   if (isDemoId) {
-    return demoPostTopic({ kind, title, body, anonymous, linkedEntity });
+    return demoPostTopic({ kind, category, title, body, anonymous, linkedEntity });
   }
   try {
-    return await postJson('/discussions', { kind, title, body, anonymous, linkedEntity }, { requireAuth: true });
+    return await postJson('/discussions', { kind, category, title, body, anonymous, linkedEntity }, { requireAuth: true });
   } catch (err) {
-    if (isGraceful(err)) return demoPostTopic({ kind, title, body, anonymous, linkedEntity });
+    if (isGraceful(err)) return demoPostTopic({ kind, category, title, body, anonymous, linkedEntity });
     throw err;
   }
 }
