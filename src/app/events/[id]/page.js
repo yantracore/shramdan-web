@@ -326,22 +326,38 @@ export default function EventDetailPage() {
     [fetchEvent, fetchMyParticipation, isDemoEvent]
   );
 
-  // Withdraw path — mirror of handleJoinChanged. Demo events hand back the
-  // locally-mutated event (viewer's name pulled from filledNames); real events
-  // clear local participation and reconcile with the server.
+  // Withdraw path. The DELETE returning 200 is authoritative, so we update
+  // optimistically and deliberately do NOT refetch /participants here: an
+  // immediate read can race the delete's propagation and hand back the just-
+  // removed record, flipping the UI straight back to "you're in" (the bug
+  // विवेक hit on first test). Clearing myParticipation AND stripping the viewer
+  // from the local roster makes `viewerRole` (which falls back to a name match
+  // against rolesNeeded) resolve to null deterministically; a later navigation
+  // or manual refresh reconciles exact counts with the server.
   const handleLeaveChanged = useCallback(
     (payload) => {
       setMyParticipation(null);
-      if (payload && typeof payload === "object" && Array.isArray(payload.rolesNeeded)) {
-        setEventData((prev) => ({ ...(prev || {}), ...payload }));
-        return;
-      }
-      if (!isDemoEvent) {
-        fetchEvent();
-        fetchMyParticipation();
-      }
+      setEventData((prev) => {
+        if (!prev) return prev;
+        // Demo events hand back a fully-rebuilt event payload.
+        if (payload && typeof payload === "object" && Array.isArray(payload.rolesNeeded)) {
+          return { ...(prev || {}), ...payload };
+        }
+        // Real events: drop the viewer's chip from the roster locally.
+        if (!Array.isArray(prev.rolesNeeded) || !viewerName) return prev;
+        const rolesNeeded = prev.rolesNeeded.map((row) => {
+          const filledNames = Array.isArray(row.filledNames) ? row.filledNames : [];
+          if (!filledNames.includes(viewerName)) return row;
+          return {
+            ...row,
+            filled: Math.max(0, (row.filled || 0) - 1),
+            filledNames: filledNames.filter((name) => name !== viewerName)
+          };
+        });
+        return { ...prev, rolesNeeded };
+      });
     },
-    [fetchEvent, fetchMyParticipation, isDemoEvent]
+    [viewerName]
   );
   const uploads = Array.isArray(eventData?.uploads) ? eventData.uploads : [];
   const imageUploads = uploads.filter(isImageUpload);
