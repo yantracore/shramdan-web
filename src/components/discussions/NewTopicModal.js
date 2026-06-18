@@ -19,7 +19,7 @@ const SELECTABLE = DISCUSSION_CATEGORIES.filter((c) => c.key !== "all");
 export function NewTopicModal({
   open,
   kind = "GENERAL",
-  defaultCategory = "COMMUNITY",
+  defaultCategory = "OTHER",
   labels,
   language = "np",
   onClose,

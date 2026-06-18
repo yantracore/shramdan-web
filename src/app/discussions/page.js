@@ -131,7 +131,7 @@ export default function DiscussionsPage() {
   const isProposalTab = tab === "proposals";
   const ctaLabel = isProposalTab ? t.newProposal : t.newTopic;
   // Preselect the composer's category from the active rail filter.
-  const composerCategory = category === ALL_CATEGORY ? "COMMUNITY" : category;
+  const composerCategory = category === ALL_CATEGORY ? "OTHER" : category;
 
   const tabs = [
     { key: "all", label: t.tabs?.all, count: tabCounts.all },

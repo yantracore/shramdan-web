@@ -12,7 +12,7 @@
 - **id** (`string`, required, public) — unique identifier, server-generated.
 - **slug** (`string`, required, public) — URL-safe slug derived from title. Lowercase alphanumeric and hyphens, max 80 chars.
 - **kind** (`enum`, required, public) — one of `GENERAL`, `FEATURE_PROPOSAL`.
-- **category** (`enum`, required, public) — subject taxonomy that drives the left-rail navigation on `/discussions`: one of `DESIGN`, `FRONTEND`, `BACKEND`, `PRODUCT`, `COMMUNITY`. Orthogonal to `kind` (a `FEATURE_PROPOSAL` can be a `DESIGN` topic). Defaults to `COMMUNITY` when the author does not pick one. Author-set at creation; editable by author within the same 5-minute grace as `title`/`body`, and by moderators thereafter (for re-filing mis-categorised topics).
+- **category** (`enum`, required, public) — subject taxonomy that drives the left-rail navigation on `/discussions`: one of `DESIGN`, `FRONTEND`, `BACKEND`, `OTHER`. `OTHER` is the catch-all (a residual bucket for anything outside the dev lanes; it can graduate to a dedicated category once one theme piles up). Orthogonal to `kind` (a `FEATURE_PROPOSAL` can be a `DESIGN` topic). Defaults to `OTHER` when the author does not pick one. Author-set at creation; editable by author within the same 5-minute grace as `title`/`body`, and by moderators thereafter (for re-filing mis-categorised topics).
 - **title** (`string`, required, public) — short topic headline. Max 140 chars.
 - **body** (`string`, required, public) — opening message body (markdown allowed; sanitized on read). Min 20 chars, max 8000 chars.
 - **authorMemberId** (`string`, required, internal) — id of the member who opened the topic. Always recorded server-side, even when `anonymous` is `true`, so moderators can act.
@@ -90,7 +90,7 @@ A member can hold at most one vote per `(targetKind, targetId)`. Posting a new v
 ## Filters (for List topics)
 
 - **kind** (`enum`) — `GENERAL` or `FEATURE_PROPOSAL`.
-- **category** (`enum`) — `DESIGN`, `FRONTEND`, `BACKEND`, `PRODUCT`, `COMMUNITY`. Powers the left-rail category filter. Combinable with `kind` and `sort`. The UI also derives per-category counts client-side; a future `GET /discussions/category-counts` (faceted counts honouring the active `kind` + search) would remove that round-trip.
+- **category** (`enum`) — `DESIGN`, `FRONTEND`, `BACKEND`, `OTHER`. Powers the left-rail category filter. Combinable with `kind` and `sort`. The UI also derives per-category counts client-side; a future `GET /discussions/category-counts` (faceted counts honouring the active `kind` + search) would remove that round-trip.
 - **linkedEntityKind** (`enum`) — `issue`, `event`, or `none`.
 - **linkedEntityId** (`string`) — restrict to topics tied to a specific issue/event id or slug.
 - **authorMemberId** (`string`) — restrict to a specific author (used by member profile pages to show "topics started").
@@ -154,5 +154,5 @@ The backend exposes this via a thin computed field on the `Event` read response 
 
 ## Recent changes
 
-- `2026-06-18` — added the `category` field + filter (`DESIGN`/`FRONTEND`/`BACKEND`/`PRODUCT`/`COMMUNITY`) backing the new left-rail taxonomy on the redesigned `/discussions` list. Noted a possible faceted `category-counts` endpoint.
+- `2026-06-18` — added the `category` field + filter backing the new left-rail taxonomy on the redesigned `/discussions` list: `DESIGN`/`FRONTEND`/`BACKEND` + an `OTHER` catch-all (default). (An earlier draft of this change had `PRODUCT` + `COMMUNITY` instead of `OTHER`; collapsed to a single residual bucket per product call.) Noted a possible faceted `category-counts` endpoint.
 - `2026-06-05` — initial draft, derived from Phase 7 UI mocks and the 2026-06-05 pivot ADR.

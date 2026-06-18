@@ -21,7 +21,7 @@ function isGraceful(err) {
   return GRACEFUL_STATUSES.has(status) || err?.message?.includes('fetch');
 }
 
-export async function apiPostTopic({ kind, category = 'COMMUNITY', title, body, anonymous = false, linkedEntity = null }, { isDemoId } = {}) {
+export async function apiPostTopic({ kind, category = 'OTHER', title, body, anonymous = false, linkedEntity = null }, { isDemoId } = {}) {
   if (isDemoId) {
     return demoPostTopic({ kind, category, title, body, anonymous, linkedEntity });
   }

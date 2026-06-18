@@ -16,10 +16,9 @@ import {
   ApiOutlined,
   AppstoreOutlined,
   BgColorsOutlined,
-  BulbOutlined,
+  EllipsisOutlined,
   LayoutOutlined,
-  RocketOutlined,
-  TeamOutlined
+  RocketOutlined
 } from "@ant-design/icons";
 import {
   DISCUSSION_CATEGORIES,
@@ -33,8 +32,7 @@ const ICONS = {
   design: <BgColorsOutlined />,
   frontend: <LayoutOutlined />,
   backend: <ApiOutlined />,
-  product: <BulbOutlined />,
-  community: <TeamOutlined />
+  other: <EllipsisOutlined />
 };
 
 export function DiscussionCategoryRail({

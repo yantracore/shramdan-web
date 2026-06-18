@@ -1190,8 +1190,7 @@ export const copy = {
         DESIGN: "डिजाइन",
         FRONTEND: "फ्रन्टएन्ड",
         BACKEND: "ब्याकएन्ड",
-        PRODUCT: "प्रोडक्ट",
-        COMMUNITY: "समुदाय"
+        OTHER: "अन्य"
       },
       categoryLabel: "विषय",
       categoryHint: "तपाईंको विषय कुन क्षेत्रसँग मिल्छ?",
@@ -2986,8 +2985,7 @@ export const copy = {
         DESIGN: "Design",
         FRONTEND: "Frontend",
         BACKEND: "Backend",
-        PRODUCT: "Product",
-        COMMUNITY: "Community"
+        OTHER: "Other"
       },
       categoryLabel: "Topic",
       categoryHint: "Which area does your topic belong to?",

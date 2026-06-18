@@ -60,9 +60,13 @@ export const DISCUSSION_CATEGORIES = [
   { key: "DESIGN", iconKey: "design", accent: "#a855f7" },
   { key: "FRONTEND", iconKey: "frontend", accent: "#2563eb" },
   { key: "BACKEND", iconKey: "backend", accent: "#0891b2" },
-  { key: "PRODUCT", iconKey: "product", accent: "#d97706" },
-  { key: "COMMUNITY", iconKey: "community", accent: "#16a34a" }
+  // "OTHER" is the catch-all: a residual bucket for anything outside the dev
+  // lanes. When one theme piles up here it can graduate to its own category.
+  { key: "OTHER", iconKey: "other", accent: "#64748b" }
 ];
+
+// Default catch-all bucket for topics with no (or a retired) category.
+export const DEFAULT_CATEGORY = "OTHER";
 
 // Lookup helper for chips/cards that have only a category key.
 export function categoryMeta(key) {
@@ -73,6 +77,6 @@ export function categoryMeta(key) {
 // topics with no category fall under COMMUNITY so nothing ever disappears.
 export function topicMatchesCategory(topic, categoryKey) {
   if (!categoryKey || categoryKey === ALL_CATEGORY) return true;
-  const tc = topic.category || "COMMUNITY";
+  const tc = topic.category || DEFAULT_CATEGORY;
   return tc === categoryKey;
 }

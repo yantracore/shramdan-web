@@ -126,7 +126,7 @@ const MOCK_TOPICS = [
     id: "disc-trail-marker-standards",
     slug: "trail-marker-standards",
     kind: "GENERAL",
-    category: "COMMUNITY",
+    category: "OTHER",
     title: "हाइकिङ ट्रेलमा एकरूप मार्कर मानक",
     body: "विभिन्न ट्रेल मर्मत अभियानहरूले फरक रंग र चिह्न प्रयोग गरिरहेका छन्। एकरूपता आवश्यक छ — सायद Department of Tourism का मानक follow गर्ने?",
     authorMemberId: "mem-muna-gurung",
@@ -185,7 +185,7 @@ const MOCK_TOPICS = [
     id: "disc-event-thanks-melamchi",
     slug: "event-thanks-melamchi",
     kind: "GENERAL",
-    category: "COMMUNITY",
+    category: "OTHER",
     title: "मेलम्ची नदी किनारको सरसफाइ — सहभागीहरूलाई धन्यवाद",
     body: "११० जना भाइबहिनी, ३ टन फोहोर — विकल्पको शक्ति। म साथमा रहेर सिक्न पाएको प्रत्येक हातलाई धन्यवाद।",
     authorMemberId: "mem-sita-tamang",
@@ -203,7 +203,7 @@ const MOCK_TOPICS = [
     id: "disc-promoted-app-darkmode-default",
     slug: "promoted-app-darkmode-default",
     kind: "FEATURE_PROPOSAL",
-    category: "PRODUCT",
+    category: "OTHER",
     title: "Dark mode लाई सिस्टम preference अनुसार default",
     body: "हालका सबै ब्राउजर ले OS-level dark/light preference signal पठाउँछन्। श्रमदान ले त्यो respect गर्नुपर्छ।",
     authorMemberId: "mem-ramesh-shrestha",
@@ -368,7 +368,7 @@ export function discussionPresenceForEvent(eventSlugOrId) {
 // feel live within the current session. The backend counterparts are
 // specified in docs/api-requirements/discussions.md.
 
-export function demoPostTopic({ kind = 'GENERAL', category = 'COMMUNITY', title, body, anonymous = false, linkedEntity = null } = {}) {
+export function demoPostTopic({ kind = 'GENERAL', category = 'OTHER', title, body, anonymous = false, linkedEntity = null } = {}) {
   const slug = title
     .toLowerCase()
     .replace(/[^a-z0-9\u0900-\u097F]+/g, '-')
