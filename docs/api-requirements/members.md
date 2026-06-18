@@ -171,6 +171,7 @@ Members can edit `publicProfilePreferences` from their own `/me/settings` page. 
 
 ## Recent changes
 
+- `2026-06-17` — **Account security + auth surfaces wired.** `/me` gained an `AccountSecurity` card (`GET /auth/sessions`, `DELETE /auth/sessions/{id}`, `POST /auth/logout-all`, `DELETE /auth/me { password }`) and an optional `PhoneVerify` card (`POST /auth/phone/send-otp`, `POST /auth/phone/verify`). Member signup moved to the email-OTP application flow (`/auth/register` + `/auth/verify-otp` retired) — see [`applications.md`](applications.md). New `/reset-password` page wraps the now email-based `POST /auth/forgot-password` + `POST /auth/reset-password`; `POST /auth/resend-otp` now requires auth + a `{ channel: email|phone }` body.
 - `2026-06-05` — Added Public profile section (Phase 7 pivot): `publicProfile` projection + `publicProfilePreferences` sub-object + `/members/[idOrSlug]` route. Linked from comments, rosters, and discussion threads.
 - `2026-06-05` — Applications sub-entity collapsed to a pointer; full spec now lives in [`applications.md`](applications.md).
 - `2026-06-03` — initial spec draft. Captures the member shape currently exercised through `/users`, `/applications`, and the member portal mocks. Includes the Applications sub-entity since it shares lifetime with the member.
