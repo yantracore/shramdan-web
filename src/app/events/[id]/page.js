@@ -235,12 +235,20 @@ export default function EventDetailPage() {
         requireAuth: true
       });
       const data = response?.data ?? response;
+      // The backend soft-deletes on leave (status -> LEFT, returned with 200)
+      // rather than 404ing, so a stale LEFT/NO_SHOW record must NOT count as
+      // membership — otherwise a refresh re-reads it and the UI flips back to
+      // "you're in". Only active states (joined / waitlisted / checked-in) hold.
+      const isActiveParticipation =
+        data?.role && ["CONFIRMED", "CHECKED_IN", "INVITED"].includes(data.status);
       setMyParticipation(
-        data?.role ? { id: data.id, role: data.role, status: data.status } : null
+        isActiveParticipation
+          ? { id: data.id, role: data.role, status: data.status }
+          : null
       );
     } catch {
-      // 404 = not joined yet; any other error soft-fails to the name-match
-      // path below so a transient hiccup never hides the join CTA.
+      // 404 = not joined (or hard-deleted); any other error soft-fails to the
+      // name-match path below so a transient hiccup never hides the join CTA.
       setMyParticipation(null);
     }
   }, [resolvedEventId, isDemoEvent, viewerId]);
