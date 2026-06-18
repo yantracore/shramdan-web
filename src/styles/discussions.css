@@ -21,8 +21,12 @@
 }
 
 /* ── App-style shell: sticky category rail + main column ─────────── */
+/* Clear the floating chrome (center pill nav + corner chips). Without a
+   hero band the content now starts at the very top, so it needs the same
+   --corner-clear-zone offset the home-search hero uses, or the pill nav
+   covers the toolbar on large screens. */
 .discussions-section {
-  padding-top: 8px;
+  padding-top: calc(var(--corner-clear-zone, 64px) + 20px);
 }
 
 .discussions-shell {
@@ -34,7 +38,7 @@
 
 .discussions-rail-wrap {
   position: sticky;
-  top: 88px;
+  top: calc(var(--corner-clear-zone, 64px) + 14px);
 }
 
 /* Left category rail (DiscussionCategoryRail) */
@@ -1662,6 +1666,10 @@
 }
 
 @media (max-width: 640px) {
+  .discussions-section {
+    padding-top: calc(var(--corner-clear-zone, 64px) + 12px);
+  }
+
   .discussions-toolbar {
     flex-direction: column;
     align-items: stretch;
