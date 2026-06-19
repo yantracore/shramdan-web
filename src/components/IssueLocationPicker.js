@@ -18,7 +18,13 @@ import {
   useMap,
   useMapEvents
 } from "react-leaflet";
-import { reverseGeocode, searchPlaces } from "@/lib/geocoding";
+import { ProvinceDistrictFilter } from "@/components/ProvinceDistrictFilter";
+import { geocodeAdminArea, reverseGeocode, searchPlaces } from "@/lib/geocoding";
+import {
+  getDistrictById,
+  getProvinceById,
+  resolveLocation
+} from "@/lib/geographyApi";
 
 const NEPAL_BOUNDS = [
   [26.3, 80.0],
@@ -30,6 +36,9 @@ const NEPAL_MAX_BOUNDS = [
 ];
 const SEARCH_DEBOUNCE_MS = 300;
 const REVERSE_DEBOUNCE_MS = 450;
+// Pin → province/district resolution. Slightly longer than the address reverse
+// so a quick series of pin nudges only fires one boundaries lookup.
+const REGION_DEBOUNCE_MS = 550;
 const LOCATE_ZOOM = 16;
 
 let cachedPinIcon = null;
@@ -52,6 +61,26 @@ function FlyTo({ target }) {
       ? target.zoom
       : Math.max(map.getZoom(), 14);
     map.flyTo([target.lat, target.lng], zoom, { duration: 0.6 });
+  }, [map, target]);
+  return null;
+}
+
+// Fits the map camera to a bounding box — used when the user picks a province
+// or district from the dropdowns (province → wide fit, district → tighter).
+function FitBounds({ target }) {
+  const map = useMap();
+  useEffect(() => {
+    if (!target?.bounds) return;
+    try {
+      map.fitBounds(target.bounds, {
+        padding: [24, 24],
+        maxZoom: target.maxZoom ?? 13,
+        animate: true,
+        duration: 0.6
+      });
+    } catch {
+      // Malformed bounds — ignore; the dropdown value still stands.
+    }
   }, [map, target]);
   return null;
 }
@@ -90,14 +119,21 @@ export default function IssueLocationPicker({
   const [showSearchDropdown, setShowSearchDropdown] = useState(false);
   const [detecting, setDetecting] = useState(false);
   const [reverseLoading, setReverseLoading] = useState(false);
+  const [regionResolving, setRegionResolving] = useState(false);
   const [flyTarget, setFlyTarget] = useState(null);
+  const [fitTarget, setFitTarget] = useState(null);
 
   const searchAbortRef = useRef(null);
   const reverseAbortRef = useRef(null);
   const searchDebounceRef = useRef(null);
   const reverseDebounceRef = useRef(null);
+  const regionDebounceRef = useRef(null);
+  const regionSeqRef = useRef(0);
   const addressCbRef = useRef(onAddressSuggestion);
   const errorCbRef = useRef(onLocationError);
+  // Latest value/onChange read inside async callbacks without re-subscribing.
+  const valueRef = useRef(value);
+  const onChangeRef = useRef(onChange);
 
   useEffect(() => {
     addressCbRef.current = onAddressSuggestion;
@@ -107,9 +143,25 @@ export default function IssueLocationPicker({
     errorCbRef.current = onLocationError;
   }, [onLocationError]);
 
+  useEffect(() => {
+    valueRef.current = value;
+  }, [value]);
+
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
+
   const lat = value && Number.isFinite(value.lat) ? Number(value.lat) : null;
   const lng = value && Number.isFinite(value.lng) ? Number(value.lng) : null;
   const hasPosition = lat !== null && lng !== null;
+  const provinceId = value?.provinceId || null;
+  const districtId = value?.districtId || null;
+
+  // Merge a patch into the location value, preserving the other keys
+  // (lat/lng vs provinceId/districtId live on the same object).
+  const emit = useCallback((patch) => {
+    onChangeRef.current?.({ ...(valueRef.current || {}), ...patch });
+  }, []);
 
   useEffect(() => {
     if (searchDebounceRef.current) {
@@ -144,6 +196,7 @@ export default function IssueLocationPicker({
     };
   }, [searchQuery, language]);
 
+  // Pin moved → suggest a human-readable address (reverse geocode).
   useEffect(() => {
     if (!hasPosition) return undefined;
     if (reverseDebounceRef.current) {
@@ -168,10 +221,46 @@ export default function IssueLocationPicker({
     };
   }, [hasPosition, lat, lng, language]);
 
+  // Pin moved → re-resolve province + district from the coordinates. This is
+  // authoritative: it overrides whatever the user may have picked from the
+  // dropdowns, because the dropdowns are only a navigation convenience.
+  useEffect(() => {
+    if (!hasPosition) return undefined;
+    if (regionDebounceRef.current) {
+      window.clearTimeout(regionDebounceRef.current);
+    }
+    const seq = (regionSeqRef.current += 1);
+    regionDebounceRef.current = window.setTimeout(() => {
+      setRegionResolving(true);
+      resolveLocation(lat, lng)
+        .then(({ province, district }) => {
+          if (seq !== regionSeqRef.current) return; // a newer pin won
+          const prev = valueRef.current || {};
+          const nextProvince = province?.id || null;
+          const nextDistrict = district?.id || null;
+          if (
+            nextProvince !== (prev.provinceId || null) ||
+            nextDistrict !== (prev.districtId || null)
+          ) {
+            emit({ provinceId: nextProvince, districtId: nextDistrict });
+          }
+          setRegionResolving(false);
+        })
+        .catch(() => {
+          // Outside Nepal / region not seeded — leave the region as-is.
+          if (seq === regionSeqRef.current) setRegionResolving(false);
+        });
+    }, REGION_DEBOUNCE_MS);
+    return () => {
+      if (regionDebounceRef.current) window.clearTimeout(regionDebounceRef.current);
+    };
+  }, [hasPosition, lat, lng, emit]);
+
   useEffect(
     () => () => {
       if (searchAbortRef.current) searchAbortRef.current.abort();
       if (reverseAbortRef.current) reverseAbortRef.current.abort();
+      if (regionDebounceRef.current) window.clearTimeout(regionDebounceRef.current);
     },
     []
   );
@@ -192,24 +281,24 @@ export default function IssueLocationPicker({
 
   const handleMapClick = useCallback(
     (point) => {
-      onChange?.({
+      emit({
         lat: Number(point.lat.toFixed(6)),
         lng: Number(point.lng.toFixed(6))
       });
       setShowSearchDropdown(false);
     },
-    [onChange]
+    [emit]
   );
 
   const handleMarkerDragEnd = useCallback(
     (event) => {
       const ll = event.target.getLatLng();
-      onChange?.({
+      emit({
         lat: Number(ll.lat.toFixed(6)),
         lng: Number(ll.lng.toFixed(6))
       });
     },
-    [onChange]
+    [emit]
   );
 
   const handleSearchSelect = (suggestion) => {
@@ -236,7 +325,7 @@ export default function IssueLocationPicker({
           lat: Number(position.coords.latitude.toFixed(6)),
           lng: Number(position.coords.longitude.toFixed(6))
         };
-        onChange?.(point);
+        emit(point);
         setFlyTarget({ ...point, zoom: LOCATE_ZOOM });
         setDetecting(false);
       },
@@ -246,6 +335,46 @@ export default function IssueLocationPicker({
       },
       { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 }
     );
+  };
+
+  // Fly/fit the map to a named province or district. Geometry is not in the
+  // API, so we resolve the name → centre + bbox through the geocoding service.
+  const flyToArea = useCallback(
+    (name, kind) => {
+      geocodeAdminArea(name, kind, { language })
+        .then((area) => {
+          if (!area) return;
+          if (area.bounds) {
+            setFitTarget({
+              // Fresh array each call so an identical reselect still re-fires.
+              bounds: area.bounds.map((corner) => [...corner]),
+              maxZoom: kind === "district" ? 12 : 9
+            });
+          } else {
+            setFlyTarget({ lat: area.lat, lng: area.lng, zoom: kind === "district" ? 11 : 8 });
+          }
+        })
+        .catch(() => {
+          // Geocoding miss — the dropdown value still stands, map just stays put.
+        });
+    },
+    [language]
+  );
+
+  // Dropdown change: store the ids and move the camera. The pin (and its
+  // authoritative resolve) is left untouched.
+  const handleRegionChange = ({ provinceId: nextProvince, districtId: nextDistrict }) => {
+    const prev = valueRef.current || {};
+    emit({ provinceId: nextProvince || null, districtId: nextDistrict || null });
+    if (nextDistrict && nextDistrict !== (prev.districtId || null)) {
+      getDistrictById(nextDistrict).then((d) => {
+        if (d?.name) flyToArea(d.name, "district");
+      });
+    } else if (nextProvince && nextProvince !== (prev.provinceId || null)) {
+      getProvinceById(nextProvince).then((p) => {
+        if (p?.name) flyToArea(p.name, "province");
+      });
+    }
   };
 
   const wrapClass = [
@@ -258,6 +387,22 @@ export default function IssueLocationPicker({
 
   return (
     <div className="location-picker-card">
+      <div className="location-picker-region">
+        <ProvinceDistrictFilter
+          provinceId={provinceId}
+          districtId={districtId}
+          language={language}
+          labels={labels?.region}
+          onChange={handleRegionChange}
+        />
+        {regionResolving ? (
+          <span className="location-picker-region-status" role="status">
+            <LoadingOutlined aria-hidden="true" />{" "}
+            <span>{labels?.region?.resolving || labels?.searchLoading}</span>
+          </span>
+        ) : null}
+      </div>
+
       <div className={wrapClass} style={wrapStyle}>
         <MapContainer
           bounds={NEPAL_BOUNDS}
@@ -278,6 +423,7 @@ export default function IssueLocationPicker({
           />
           <MapClickHandler onClick={handleMapClick} />
           <FlyTo target={flyTarget} />
+          <FitBounds target={fitTarget} />
           <InvalidateOnResize trigger={isFullscreen} />
           {hasPosition ? (
             <Marker

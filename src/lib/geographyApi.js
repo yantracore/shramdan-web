@@ -78,6 +78,26 @@ export function fetchDistricts(provinceId = null) {
 }
 
 /**
+ * Reverse-geocode a coordinate to its Nepal province + district via the
+ * backend boundaries lookup (GET /resolve-location — no external service).
+ * Returns the full province/district reference records (with ids) for the
+ * matched point, so the caller can both store the ids and show the names.
+ *
+ * NOT cached — every pin position is a fresh lookup. The backend rejects
+ * coordinates outside Nepal with ApiError errorCode "COORDINATES_OUTSIDE_NEPAL"
+ * (status 400); callers should treat that as "leave the region unset".
+ *
+ * @returns {Promise<{ province: object|null, district: object|null }>}
+ */
+export async function resolveLocation(latitude, longitude) {
+  const response = await getJson("/resolve-location", {
+    params: { latitude, longitude }
+  });
+  const data = response?.data ?? response ?? {};
+  return { province: data.province ?? null, district: data.district ?? null };
+}
+
+/**
  * Resolve a province object by id from the cached list.
  * @param {string} provinceId
  * @returns {Promise<{id: string, name: string, nameNp: string}|null>}

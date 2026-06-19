@@ -44,6 +44,34 @@
   gap: 8px;
 }
 
+/* Province + District selects sitting above the map (ProvinceDistrictFilter). */
+.location-picker-region {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.location-picker-region .public-issues-filter-field {
+  flex: 1 1 160px;
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.location-picker-region .public-issues-filter-field .ant-select {
+  width: 100%;
+}
+
+.location-picker-region-status {
+  flex-basis: 100%;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: var(--text-muted, #6b7280);
+}
+
 .location-picker-wrap {
   position: relative;
   width: 100%;

@@ -1613,7 +1613,14 @@ export const copy = {
           locationDenied: "ब्राउजरले अनुमति दिएन — नक्सामा ट्याप गरेर पिन राख्नुहोस्।",
           locationUnsupported: "तपाईंको ब्राउजरले स्थान सेवा समर्थन गर्दैन — नक्सामा ट्याप गरेर पिन राख्नुहोस्।",
           fullscreen: "पूर्ण स्क्रिन",
-          exitFullscreen: "पूर्ण स्क्रिनबाट बाहिर"
+          exitFullscreen: "पूर्ण स्क्रिनबाट बाहिर",
+          region: {
+            provinceLabel: "प्रदेश",
+            provincePlaceholder: "प्रदेश छान्नुहोस्",
+            districtLabel: "जिल्ला",
+            districtPlaceholder: "जिल्ला छान्नुहोस्",
+            resolving: "प्रदेश / जिल्ला पत्ता लगाउँदै..."
+          }
         }
       },
       categories: {
@@ -3408,7 +3415,14 @@ export const copy = {
           locationDenied: "Browser denied permission — tap on the map to drop a pin.",
           locationUnsupported: "Your browser does not support location services — tap on the map to drop a pin.",
           fullscreen: "Fullscreen",
-          exitFullscreen: "Exit fullscreen"
+          exitFullscreen: "Exit fullscreen",
+          region: {
+            provinceLabel: "Province",
+            provincePlaceholder: "Select province",
+            districtLabel: "District",
+            districtPlaceholder: "Select district",
+            resolving: "Detecting province / district..."
+          }
         }
       },
       categories: {
