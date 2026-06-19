@@ -276,6 +276,12 @@ export default function NewIssuePage() {
   const currentKey = STEP_KEYS[stepIndex];
   const isLast = currentKey === "review";
 
+  // On the cover step, the only way forward is a fully uploaded cover image.
+  // Keep "Continue" disabled until the upload finishes and yields an id, so the
+  // user can't advance into a flow that will only fail validation later.
+  const coverValue = Form.useWatch("cover", form);
+  const nextDisabled = currentKey === "cover" && !coverValue?.id;
+
   const goNext = async () => {
     const fieldsToCheck = STEP_FIELDS[currentKey];
     if (fieldsToCheck.length) {
@@ -415,6 +421,7 @@ export default function NewIssuePage() {
             onBack={goBack}
             onNext={goNext}
             onSubmit={handleSubmit}
+            nextDisabled={nextDisabled}
             nextLoading={submitting && isLast}
             isSubmitStep={isLast}
             submitLabel={labels.submit}
