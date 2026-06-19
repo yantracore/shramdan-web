@@ -85,12 +85,43 @@ The reporter can only edit content while the issue sits in `OPEN`.
 
 ## Gaps / requested capabilities
 
+### Unified Support / Join — per-viewer participation reads (requested 2026-06-19)
+
+> Backs the unified Support/Join control shared by every issue + event surface.
+> An issue is a not-yet-scheduled event; the frontend reconciles both into one UX
+> while the backend split stays (`POST /issues/{id}/vote` for issues,
+> `POST /events/{id}/participants` for events). These read fields are what the UI
+> needs to pick the right button + render the persisted "already done" state by
+> lifecycle, on refresh, without a click.
+
+**Per-viewer support echo — on `GET /issues/{id}` (detail) AND `GET /issues` (list), authenticated:**
+
+- **isVoted** (`boolean`) — already returned on the list; **must also be added to `GET /issues/{id}`.** Without it the detail page shows "Support" (un-voted) on every refresh and only flips after a click trips `ALREADY_VOTED (409)`.
+- **voterRole** (`enum`, nullable) — the caller's stored vote intent (`INTERESTED | GOING | WANT_TO_LEAD`). Needed to render "Supported" vs the specific role.
+- **eventRole** (`enum`, nullable) — the participation role chosen when `voterRole = GOING` (`WORKER | PHOTOGRAPHER | LIVESTREAMER | MEDIC | SAFETY_LEAD | COORDINATOR | LOGISTICS`). Just echo back what `POST /issues/{id}/vote { voterRole, eventRole }` stored.
+
+**Linked event — on the issue read once promoted (`status = EVENT_SCHEDULED`):**
+
+- **event** (`object`, nullable, public) — embed `{ id, slug, status, scheduledAt, leaderId }`. The **event `status`** (`DRAFT | SCHEDULED | ACTIVE | PAUSED | COMPLETED | CANCELLED`) is essential: the issue stays `EVENT_SCHEDULED` permanently after promotion, so the UI derives the correct action row from `event.status` — Join **+ Lead** while the event is `DRAFT`, Join-as-Role at `SCHEDULED`, Join-as-Worker at `ACTIVE`. (Supersedes the older "No link from an EVENT_SCHEDULED issue back to its event" gap below — same ask, now with the required sub-shape.)
+- **event.viewerParticipation** (`object`, nullable, authenticated) — `{ id, role, status }` for the caller on the linked event, or null. Lets the issue surface show "Joined as X" without a separate `/events/{id}/participants/me` round-trip. (Mirrors the events-side `viewerParticipation` ask in `events.md`.)
+
+> Surfaced 2026-06-19 while wiring inline backend-validation display on the issue edit forms.
+
+- **`PATCH /issues/{id}` rejects `uploadIds` as an unrecognized key.** Editing an issue and changing its attachment set sends `uploadIds: string[]` — the same key `POST /issues` accepts on create — but the update endpoint runs a strict schema and returns `400` with `body: Unrecognized key: "uploadIds"`. That fails the **entire** patch, so a member who also edits text/category in the same save loses all of it. The Fields/Validation sections document `uploads[]` + `coverImageId` but say nothing about **mutating** attachments on update. **Requested:** accept `uploadIds` (and ideally a `coverImageId` re-point) on `PATCH /issues/{id}` so an author can add/remove images while the issue is OPEN, matching the create contract. Until then the edit forms should not send `uploadIds` on patch — it only breaks the whole save, while cover/text/category edits work fine without it.
+  - **Live-spec verification (2026-06-19):** PATCH `/issues/{id}` request schema = `title, description, language, coverImageId, category, latitude, longitude, addressText, municipality, ward, provinceId, districtId` — **no `uploadIds`.** POST `/issues` has it (`...uploadIds, conversionThreshold`). Confirmed against the refreshed `07-api-reference.json`, not just the code comment.
+  - **Smallest unlock:** add `uploadIds: string[]` (optional) to the existing PATCH schema — mirror the POST validator (caller-owned, confirmed, not attached elsewhere; resolve removals by replacing the set). No new route needed; `coverImageId` re-point already works on PATCH.
+  - **Near-miss already on the API, do NOT reuse:** `POST /issues/{id}/after-uploads { uploadIds }` exists but is semantically *"after the cleanup"* photos (before/after documentation, post-resolution) — wrong bucket for editing an OPEN issue's general gallery, and it would mis-tag the images. Listing it here so it isn't mistaken for the fix.
+  - **Frontend state:** the additional-images field on both edit forms is locked (`extraImagesLocked` → read-only thumbnails of the existing set + "Photo editing isn't available yet — your other changes still save."). It upgrades to a live add/remove/reorder picker the moment PATCH accepts `uploadIds`. Owner: Pranish (backend).
+
 > Surfaced 2026-06-17 while building the member **My issues** (`/me/issues`) CRUD.
 
 - **Author withdraw / delete is missing.** `DELETE /issues/{id}` is Moderator/Admin-only (a moderation takedown). A member has no way to retract or soft-delete their own report. The member My-issues UI therefore ships **Create + Read + Update only** — no delete affordance. **Requested:** an author-scoped withdraw — e.g. `POST /issues/{id}/withdraw` or letting the reporter set a `WITHDRAWN`/closed status on their own OPEN issue — so the "D" of the CRUD can be completed client-side without a moderator.
+
+- **No link from an `EVENT_SCHEDULED` issue back to its event.** The link is one-directional today — an event carries `linkedIssueId`, but the issue payload exposes no `eventId` / embedded `event`, and `GET /events` has no `linkedIssueId` (or `issueId`) filter. So once an issue is promoted, the frontend cannot route a supporter from the issue to the joinable campaign. The issue lifecycle now flips its primary CTA from **Support** (vote) to **Join** at `EVENT_SCHEDULED`, but that Join button has nowhere to point. **Requested (smallest unlock):** expose the scheduled event on the issue read — either a bare **`eventId`** (`string`, public, present only when `status = EVENT_SCHEDULED`/`COMPLETED`) or, preferably, an embedded **`event`** summary `{ id, slug, status, scheduledAt }`. That alone makes the Join CTA live, because it reuses the **existing** event-participants join (`POST /events/{id}/participants` + roster) — **no separate "join on issue" endpoint is needed.** A `linkedIssueId` filter on `GET /events` would also work as a fallback. (Frontend reads `issue.eventId` / `issue.event` already via `getIssueEventId` — the CTA upgrades itself the moment the field ships.)
 
 ---
 
 ## Recent changes
 
+- `2026-06-19` — **Status-gated primary CTA: Support → Join.** Issue surfaces (detail page, grid card, preview pane) now switch their primary action by lifecycle: `OPEN` → Support (vote), `EVENT_SCHEDULED` → Join, `COMPLETED`/`REJECTED`/`DUPLICATE` → no action. Decision centralized in `lib/issueActions.js` (`issueActionMode`). The Join CTA (`IssueJoinButton`) is forward-compatible — it routes to `/events/{eventId}` via `getIssueEventId(issue)` once the backend exposes the link, and shows a graceful "joining opens shortly" cue until then. Logged the issue→event link gap above.
 - `2026-06-17` — Documented entity to back the member My-issues surface (`GET /issues/me` consumed; OPEN-only author edit wired). Logged the author withdraw/delete gap.

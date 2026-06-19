@@ -173,15 +173,16 @@ export function IssueImagesUpload({ value, onChange, disabled, onUploadingChange
                 unoptimized
                 width={104}
               />
-              <button
-                aria-label="Remove image"
-                className="admin-issue-images-remove"
-                disabled={disabled}
-                onClick={() => handleRemove(index)}
-                type="button"
-              >
-                <DeleteOutlined />
-              </button>
+              {disabled ? null : (
+                <button
+                  aria-label="Remove image"
+                  className="admin-issue-images-remove"
+                  onClick={() => handleRemove(index)}
+                  type="button"
+                >
+                  <DeleteOutlined />
+                </button>
+              )}
             </div>
           );
         })}
@@ -192,7 +193,7 @@ export function IssueImagesUpload({ value, onChange, disabled, onUploadingChange
           </div>
         ))}
 
-        {hasRoom ? (
+        {hasRoom && !disabled ? (
           <Upload
             accept={ACCEPTED_IMAGE_ACCEPT_ATTR}
             beforeUpload={handleBeforeUpload}
@@ -208,9 +209,11 @@ export function IssueImagesUpload({ value, onChange, disabled, onUploadingChange
           </Upload>
         ) : null}
       </div>
-      <p className="admin-issue-images-hint">
-        Up to {MAX_ITEMS} additional images ({totalCount}/{MAX_ITEMS} used). PNG, JPG, WebP, GIF, or AVIF, max 8 MB each. Drag a tile to reorder.
-      </p>
+      {disabled ? null : (
+        <p className="admin-issue-images-hint">
+          Up to {MAX_ITEMS} additional images ({totalCount}/{MAX_ITEMS} used). PNG, JPG, WebP, GIF, or AVIF, max 8 MB each. Drag a tile to reorder.
+        </p>
+      )}
     </div>
   );
 }
