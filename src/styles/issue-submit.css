@@ -87,6 +87,12 @@
   cursor: crosshair;
 }
 
+/* Outside Nepal's border the cursor signals you can't drop a pin there. */
+.location-picker-wrap--blocked .leaflet-container,
+.location-picker-wrap--blocked .leaflet-container.leaflet-grab {
+  cursor: not-allowed;
+}
+
 .location-picker-wrap .leaflet-marker-draggable {
   cursor: grab;
 }

@@ -25,6 +25,11 @@ import {
   getProvinceById,
   resolveLocation
 } from "@/lib/geographyApi";
+import { isInsideNepal } from "@/lib/nepalBorder";
+
+// Shown when a pin lands outside Nepal and no localized label was supplied
+// (e.g. the admin form's built-in EN defaults).
+const OUTSIDE_NEPAL_FALLBACK = "Pick a spot inside Nepal — tap within the border.";
 
 const NEPAL_BOUNDS = [
   [26.3, 80.0],
@@ -94,6 +99,20 @@ function MapClickHandler({ onClick }) {
   return null;
 }
 
+// Reports whether the cursor is currently over Nepal, so the picker can flip
+// the map cursor to "not-allowed" outside the border (you can only pin inside).
+function MapCursorGate({ onHover }) {
+  useMapEvents({
+    mousemove(event) {
+      onHover(isInsideNepal(event.latlng.lat, event.latlng.lng));
+    },
+    mouseout() {
+      onHover(true);
+    }
+  });
+  return null;
+}
+
 function InvalidateOnResize({ trigger }) {
   const map = useMap();
   useEffect(() => {
@@ -122,6 +141,8 @@ export default function IssueLocationPicker({
   const [regionResolving, setRegionResolving] = useState(false);
   const [flyTarget, setFlyTarget] = useState(null);
   const [fitTarget, setFitTarget] = useState(null);
+  const [cursorBlocked, setCursorBlocked] = useState(false);
+  const cursorBlockedRef = useRef(false);
 
   const searchAbortRef = useRef(null);
   const reverseAbortRef = useRef(null);
@@ -161,6 +182,18 @@ export default function IssueLocationPicker({
   // (lat/lng vs provinceId/districtId live on the same object).
   const emit = useCallback((patch) => {
     onChangeRef.current?.({ ...(valueRef.current || {}), ...patch });
+  }, []);
+
+  const outsideNepalMessage = labels?.outsideNepal || OUTSIDE_NEPAL_FALLBACK;
+
+  // Flip the not-allowed cursor only when the inside/outside state changes, so
+  // mousemove doesn't trigger a render on every pixel.
+  const handleHover = useCallback((inside) => {
+    const blocked = !inside;
+    if (cursorBlockedRef.current !== blocked) {
+      cursorBlockedRef.current = blocked;
+      setCursorBlocked(blocked);
+    }
   }, []);
 
   useEffect(() => {
@@ -281,24 +314,38 @@ export default function IssueLocationPicker({
 
   const handleMapClick = useCallback(
     (point) => {
+      // Pins must sit on Nepali soil — reject taps outside the border.
+      if (!isInsideNepal(point.lat, point.lng)) {
+        errorCbRef.current?.(outsideNepalMessage);
+        return;
+      }
+      errorCbRef.current?.(null);
       emit({
         lat: Number(point.lat.toFixed(6)),
         lng: Number(point.lng.toFixed(6))
       });
       setShowSearchDropdown(false);
     },
-    [emit]
+    [emit, outsideNepalMessage]
   );
 
   const handleMarkerDragEnd = useCallback(
     (event) => {
       const ll = event.target.getLatLng();
+      // Dragged past the border → drop the pin and warn, rather than save a
+      // coordinate the backend would reject anyway.
+      if (!isInsideNepal(ll.lat, ll.lng)) {
+        errorCbRef.current?.(outsideNepalMessage);
+        emit({ lat: undefined, lng: undefined });
+        return;
+      }
+      errorCbRef.current?.(null);
       emit({
         lat: Number(ll.lat.toFixed(6)),
         lng: Number(ll.lng.toFixed(6))
       });
     },
-    [emit]
+    [emit, outsideNepalMessage]
   );
 
   const handleSearchSelect = (suggestion) => {
@@ -325,6 +372,12 @@ export default function IssueLocationPicker({
           lat: Number(position.coords.latitude.toFixed(6)),
           lng: Number(position.coords.longitude.toFixed(6))
         };
+        if (!isInsideNepal(point.lat, point.lng)) {
+          errorCbRef.current?.(outsideNepalMessage);
+          setDetecting(false);
+          return;
+        }
+        errorCbRef.current?.(null);
         emit(point);
         setFlyTarget({ ...point, zoom: LOCATE_ZOOM });
         setDetecting(false);
@@ -361,11 +414,19 @@ export default function IssueLocationPicker({
     [language]
   );
 
-  // Dropdown change: store the ids and move the camera. The pin (and its
-  // authoritative resolve) is left untouched.
+  // Dropdown change = "take me to this region so I can place the pin here".
+  // It's navigation, not a location: store the ids, fly the camera, and clear
+  // the old pin so no stray red marker lingers in the new view. The next map
+  // tap drops a fresh pin and re-resolves the region authoritatively.
   const handleRegionChange = ({ provinceId: nextProvince, districtId: nextDistrict }) => {
     const prev = valueRef.current || {};
-    emit({ provinceId: nextProvince || null, districtId: nextDistrict || null });
+    errorCbRef.current?.(null);
+    emit({
+      provinceId: nextProvince || null,
+      districtId: nextDistrict || null,
+      lat: undefined,
+      lng: undefined
+    });
     if (nextDistrict && nextDistrict !== (prev.districtId || null)) {
       getDistrictById(nextDistrict).then((d) => {
         if (d?.name) flyToArea(d.name, "district");
@@ -379,7 +440,8 @@ export default function IssueLocationPicker({
 
   const wrapClass = [
     "location-picker-wrap",
-    isFullscreen ? "location-picker-wrap--fullscreen" : ""
+    isFullscreen ? "location-picker-wrap--fullscreen" : "",
+    cursorBlocked ? "location-picker-wrap--blocked" : ""
   ]
     .filter(Boolean)
     .join(" ");
@@ -422,6 +484,7 @@ export default function IssueLocationPicker({
             url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
           <MapClickHandler onClick={handleMapClick} />
+          <MapCursorGate onHover={handleHover} />
           <FlyTo target={flyTarget} />
           <FitBounds target={fitTarget} />
           <InvalidateOnResize trigger={isFullscreen} />

@@ -1614,6 +1614,7 @@ export const copy = {
           locationUnsupported: "तपाईंको ब्राउजरले स्थान सेवा समर्थन गर्दैन — नक्सामा ट्याप गरेर पिन राख्नुहोस्।",
           fullscreen: "पूर्ण स्क्रिन",
           exitFullscreen: "पूर्ण स्क्रिनबाट बाहिर",
+          outsideNepal: "नेपालभित्रको स्थान मात्र छान्न मिल्छ — सिमानाभित्र ट्याप गर्नुहोस्।",
           region: {
             provinceLabel: "प्रदेश",
             provincePlaceholder: "प्रदेश छान्नुहोस्",
@@ -3416,6 +3417,7 @@ export const copy = {
           locationUnsupported: "Your browser does not support location services — tap on the map to drop a pin.",
           fullscreen: "Fullscreen",
           exitFullscreen: "Exit fullscreen",
+          outsideNepal: "Pick a spot inside Nepal — tap within the border.",
           region: {
             provinceLabel: "Province",
             provincePlaceholder: "Select province",
