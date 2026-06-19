@@ -18,7 +18,7 @@ const MAX_ITEMS = 10;
 // is a strong fingerprint for "the same file picked again" within a session.
 const fileSignature = (file) => `${file.name}::${file.size}::${file.lastModified}`;
 
-export function IssueImagesUpload({ value, onChange, disabled }) {
+export function IssueImagesUpload({ value, onChange, disabled, onUploadingChange }) {
   const toast = useToast();
   const items = Array.isArray(value) ? value : [];
 
@@ -29,6 +29,12 @@ export function IssueImagesUpload({ value, onChange, disabled }) {
 
   const [uploadingCount, setUploadingCount] = useState(0);
   const uploadingCountRef = useRef(0);
+
+  // Let a parent form block its "next"/"submit" button while any tile is still
+  // uploading, so a pending image can't be dropped by advancing too early.
+  useEffect(() => {
+    onUploadingChange?.(uploadingCount > 0);
+  }, [uploadingCount, onUploadingChange]);
 
   // Signatures currently occupied: in-flight uploads + committed images.
   const seenSignaturesRef = useRef(new Set());

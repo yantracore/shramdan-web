@@ -3,7 +3,7 @@
 import { DeleteOutlined, InboxOutlined, LoadingOutlined } from "@ant-design/icons";
 import { Button, Upload } from "antd";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ACCEPTED_IMAGE_ACCEPT_ATTR,
   ACCEPTED_IMAGE_TYPES,
@@ -14,9 +14,16 @@ import { useToast } from "@/lib/toast";
 
 const { Dragger } = Upload;
 
-export function IssueCoverUpload({ value, onChange, disabled }) {
+export function IssueCoverUpload({ value, onChange, disabled, onUploadingChange }) {
   const toast = useToast();
   const [uploading, setUploading] = useState(false);
+
+  // Surface the in-flight state so a parent form can keep its "next"/"submit"
+  // button disabled until the upload settles — a replace keeps the old id, so
+  // the value alone can't tell the parent an upload is still pending.
+  useEffect(() => {
+    onUploadingChange?.(uploading);
+  }, [uploading, onUploadingChange]);
 
   const handleBeforeUpload = async (file) => {
     if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {

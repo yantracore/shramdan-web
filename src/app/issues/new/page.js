@@ -181,6 +181,8 @@ export default function NewIssuePage() {
   const [form] = Form.useForm();
   const [authChecked, setAuthChecked] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [coverUploading, setCoverUploading] = useState(false);
+  const [imagesUploading, setImagesUploading] = useState(false);
   const [locationError, setLocationError] = useState(null);
   const addressTouchedRef = useRef(false);
   const [stepIndex, setStepIndex] = useState(0);
@@ -278,9 +280,13 @@ export default function NewIssuePage() {
 
   // On the cover step, the only way forward is a fully uploaded cover image.
   // Keep "Continue" disabled until the upload finishes and yields an id, so the
-  // user can't advance into a flow that will only fail validation later.
+  // user can't advance into a flow that will only fail validation later. Also
+  // block any forward move (Continue or final Submit) while a cover or extra
+  // image is still uploading — advancing then would silently drop the pending
+  // upload from the payload.
   const coverValue = Form.useWatch("cover", form);
-  const nextDisabled = currentKey === "cover" && !coverValue?.id;
+  const anyUploading = coverUploading || imagesUploading;
+  const nextDisabled = (currentKey === "cover" && !coverValue?.id) || anyUploading;
 
   const goNext = async () => {
     const fieldsToCheck = STEP_FIELDS[currentKey];
@@ -434,7 +440,7 @@ export default function NewIssuePage() {
                 valuePropName="value"
                 rules={[{ validator: coverImageValidator(fields.coverRequired) }]}
               >
-                <IssueCoverUpload />
+                <IssueCoverUpload onUploadingChange={setCoverUploading} />
               </Form.Item>
             ) : null}
 
@@ -507,7 +513,7 @@ export default function NewIssuePage() {
                   label={fields.additionalImages}
                   valuePropName="value"
                 >
-                  <IssueImagesUpload />
+                  <IssueImagesUpload onUploadingChange={setImagesUploading} />
                 </Form.Item>
               </>
             ) : null}
