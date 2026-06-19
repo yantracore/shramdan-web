@@ -1,13 +1,21 @@
 "use client";
 
 import { SaveOutlined } from "@ant-design/icons";
-import { Button, Input, InputNumber, Select } from "antd";
+import { Button, Input, Select } from "antd";
 import Link from "next/link";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Form } from "@/components/AppForm";
 import { IssueCoverUpload } from "@/components/admin/IssueCoverUpload";
 import { IssueImagesUpload } from "@/components/admin/IssueImagesUpload";
-import { ISSUE_CATEGORIES, buildEnumOptions } from "@/lib/adminUtils";
+import IssueLocationPickerBlock from "@/components/IssueLocationPickerBlock";
+import {
+  ISSUE_CATEGORIES,
+  ISSUE_FORM_FIELDS,
+  ISSUE_FORM_FIELD_MAP,
+  buildEnumOptions
+} from "@/lib/adminUtils";
+import { applyApiErrorsToForm } from "@/lib/formErrors";
+import { useToast } from "@/lib/toast";
 
 // English defaults keep the admin control center (EN-only) behaving exactly
 // as before when no `labels` prop is passed. Member-facing surfaces pass a
@@ -29,12 +37,23 @@ const DEFAULT_LABELS = {
   address: "Address",
   addressRequired: "Address is required.",
   addressPlaceholder: "Lakeside, Pokhara",
-  latitude: "Latitude",
-  latitudeRequired: "Latitude is required.",
-  latitudeRange: "Latitude must be between -90 and 90.",
-  longitude: "Longitude",
-  longitudeRequired: "Longitude is required.",
-  longitudeRange: "Longitude must be between -180 and 180.",
+  addressFromMap: "Suggested from the map — refine with a tole or nearby landmark.",
+  location: "Location",
+  locationRequired: "Drop a pin on the map to set the location.",
+  picker: {
+    searchPlaceholder: "Search a place (e.g. Tarakeshwar, Kathmandu)",
+    searchClear: "Clear search",
+    searchLoading: "Searching...",
+    searchEmpty: "No matches found.",
+    hint: "Tap on the map to drop a pin, or use search to navigate.",
+    useMyLocation: "My location",
+    detecting: "Detecting...",
+    locationDenied: "Browser denied permission — tap on the map to drop a pin.",
+    locationUnsupported:
+      "Your browser does not support location services — tap on the map to drop a pin.",
+    fullscreen: "Fullscreen",
+    exitFullscreen: "Exit fullscreen"
+  },
   municipality: "Municipality (optional)",
   municipalityPlaceholder: "Pokhara Metropolitan City",
   ward: "Ward (optional)",
@@ -49,14 +68,35 @@ export function IssueForm({
   submitLabel = "Save",
   cancelHref = "/admin/issues",
   labels,
-  categoryOptions
+  categoryOptions,
+  language = "en",
+  submitErrorMessage
 }) {
   const [form] = Form.useForm();
+  const toast = useToast();
   const L = useMemo(() => ({ ...DEFAULT_LABELS, ...(labels || {}) }), [labels]);
   const categorySelectOptions = useMemo(
     () => categoryOptions || buildEnumOptions(ISSUE_CATEGORIES),
     [categoryOptions]
   );
+
+  const [locationError, setLocationError] = useState(null);
+  // The address is already authored on every edit surface, so treat it as
+  // user-owned from the start — dragging the pin must not silently overwrite
+  // a saved address. We only auto-fill when the field came in empty.
+  const addressTouchedRef = useRef(Boolean(initialValues?.addressText));
+
+  // The form speaks `location: { lat, lng }` to the map picker, but the API
+  // contract (and the parent pages) speak `latitude` / `longitude`. Seed the
+  // picker from the stored coordinates on the way in...
+  const formInitialValues = useMemo(() => {
+    const base = initialValues || { category: "ROADSIDE" };
+    const lat = Number(base.latitude);
+    const lng = Number(base.longitude);
+    return Number.isFinite(lat) && Number.isFinite(lng)
+      ? { ...base, location: { lat, lng } }
+      : base;
+  }, [initialValues]);
 
   const coverImageValidator = useMemo(
     () => (_, cover) =>
@@ -64,19 +104,60 @@ export function IssueForm({
     [L.coverRequired]
   );
 
+  const locationValidator = useMemo(
+    () => (_, location) =>
+      location && Number.isFinite(location.lat) && Number.isFinite(location.lng)
+        ? Promise.resolve()
+        : Promise.reject(new Error(L.locationRequired)),
+    [L.locationRequired]
+  );
+
   useEffect(() => {
-    if (initialValues) {
-      form.setFieldsValue(initialValues);
+    if (formInitialValues) {
+      form.setFieldsValue(formInitialValues);
+      addressTouchedRef.current = Boolean(formInitialValues.addressText);
     }
-  }, [form, initialValues]);
+  }, [form, formInitialValues]);
+
+  const handleAddressSuggestion = (suggested) => {
+    if (addressTouchedRef.current || !suggested) return;
+    form.setFieldsValue({ addressText: suggested });
+  };
+
+  const handleAddressFieldChange = () => {
+    addressTouchedRef.current = true;
+  };
+
+  // ...and translate `location` back into `latitude` / `longitude` on the way
+  // out, so neither the API payload nor the parent pages ever see `location`.
+  // The parent's onSubmit performs the API call and THROWS on failure; we catch
+  // here so backend validation errors land inline on the right field (the map
+  // pin counts as the `location` field) instead of only a toast.
+  const handleFinish = async (values) => {
+    const { location, ...rest } = values;
+    if (location && Number.isFinite(location.lat) && Number.isFinite(location.lng)) {
+      rest.latitude = location.lat;
+      rest.longitude = location.lng;
+    }
+    try {
+      await onSubmit(rest);
+    } catch (error) {
+      applyApiErrorsToForm(form, error, {
+        fieldMap: ISSUE_FORM_FIELD_MAP,
+        knownFields: ISSUE_FORM_FIELDS,
+        toast,
+        fallbackMessage: submitErrorMessage
+      });
+    }
+  };
 
   return (
     <Form
       form={form}
       layout="vertical"
       className="admin-form"
-      onFinish={onSubmit}
-      initialValues={initialValues || { category: "ROADSIDE" }}
+      onFinish={handleFinish}
+      initialValues={formInitialValues}
     >
       <div className="admin-form-grid">
         <Form.Item
@@ -132,33 +213,30 @@ export function IssueForm({
 
         <Form.Item
           className="admin-form-wide"
+          name="location"
+          label={L.location}
+          required
+          rules={[{ validator: locationValidator }]}
+        >
+          <FormLocationField
+            language={language}
+            labels={L.picker}
+            onAddressSuggestion={handleAddressSuggestion}
+            onLocationError={setLocationError}
+          />
+        </Form.Item>
+        {locationError ? (
+          <p className="admin-form-wide new-issue-location-error">{locationError}</p>
+        ) : null}
+
+        <Form.Item
+          className="admin-form-wide"
           name="addressText"
           label={L.address}
+          extra={L.addressFromMap}
           rules={[{ required: true, message: L.addressRequired }]}
         >
-          <Input placeholder={L.addressPlaceholder} />
-        </Form.Item>
-
-        <Form.Item
-          name="latitude"
-          label={L.latitude}
-          rules={[
-            { required: true, message: L.latitudeRequired },
-            { type: "number", min: -90, max: 90, message: L.latitudeRange }
-          ]}
-        >
-          <InputNumber style={{ width: "100%" }} step={0.0001} placeholder="28.2130" />
-        </Form.Item>
-
-        <Form.Item
-          name="longitude"
-          label={L.longitude}
-          rules={[
-            { required: true, message: L.longitudeRequired },
-            { type: "number", min: -180, max: 180, message: L.longitudeRange }
-          ]}
-        >
-          <InputNumber style={{ width: "100%" }} step={0.0001} placeholder="83.9570" />
+          <Input placeholder={L.addressPlaceholder} onChange={handleAddressFieldChange} />
         </Form.Item>
 
         <Form.Item name="municipality" label={L.municipality}>
@@ -185,4 +263,10 @@ export function IssueForm({
       </div>
     </Form>
   );
+}
+
+// Bridges the antd Form.Item value/onChange contract to the Leaflet picker,
+// which is loaded client-side only (see IssueLocationPickerBlock).
+function FormLocationField({ value, onChange, ...rest }) {
+  return <IssueLocationPickerBlock value={value} onChange={onChange} {...rest} />;
 }

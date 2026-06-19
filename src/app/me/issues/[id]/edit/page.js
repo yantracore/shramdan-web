@@ -111,12 +111,9 @@ const COPY = {
       address: "ठेगाना",
       addressRequired: "ठेगाना आवश्यक छ।",
       addressPlaceholder: "लेकसाइड, पोखरा",
-      latitude: "अक्षांश (latitude)",
-      latitudeRequired: "अक्षांश आवश्यक छ।",
-      latitudeRange: "अक्षांश -90 र 90 बीच हुनुपर्छ।",
-      longitude: "देशान्तर (longitude)",
-      longitudeRequired: "देशान्तर आवश्यक छ।",
-      longitudeRange: "देशान्तर -180 र 180 बीच हुनुपर्छ।",
+      addressFromMap: "नक्साको आधारमा सुझाव गरिएको — टोल वा निकटको चिनारीले मिल्ने गरी सच्याउन सकिन्छ।",
+      location: "स्थान",
+      locationRequired: "नक्सामा सही स्थान देखाउनुहोस्।",
       municipality: "नगरपालिका (वैकल्पिक)",
       municipalityPlaceholder: "पोखरा महानगरपालिका",
       ward: "वडा (वैकल्पिक)",
@@ -156,12 +153,9 @@ const COPY = {
       address: "Address",
       addressRequired: "Address is required.",
       addressPlaceholder: "Lakeside, Pokhara",
-      latitude: "Latitude",
-      latitudeRequired: "Latitude is required.",
-      latitudeRange: "Latitude must be between -90 and 90.",
-      longitude: "Longitude",
-      longitudeRequired: "Longitude is required.",
-      longitudeRange: "Longitude must be between -180 and 180.",
+      addressFromMap: "Suggested from the map — refine with a tole or nearby landmark.",
+      location: "Location",
+      locationRequired: "Drop a pin on the map to set the location.",
       municipality: "Municipality (optional)",
       municipalityPlaceholder: "Pokhara Metropolitan City",
       ward: "Ward (optional)",
@@ -243,6 +237,13 @@ export default function MeIssueEditPage() {
     [language]
   );
 
+  // The map picker's own chrome (search, "my location", fullscreen) is already
+  // localized in the public reporter copy — reuse it rather than re-translate.
+  const formLabels = useMemo(
+    () => ({ ...t.form, picker: copy[language]?.issueNew?.fields?.picker }),
+    [t.form, language]
+  );
+
   const reporterId = getReporterId(issue);
   const myId = session?.user?.id || null;
   const isOwner = !reporterId || !myId || reporterId === myId;
@@ -274,12 +275,13 @@ export default function MeIssueEditPage() {
       payload.uploadIds = nextIds;
     }
 
+    // No catch here: a failure (including backend validation) propagates into
+    // IssueForm, which pins each error onto its field. `finally` still clears
+    // the submitting state before the throw reaches the form.
     try {
       await patchJson(`/issues/${issueId}`, payload, { requireAuth: true });
       toast.success(t.saved);
       router.push("/me/issues");
-    } catch (error) {
-      toast.error(error.message || t.saveError);
     } finally {
       setSubmitting(false);
     }
@@ -325,8 +327,10 @@ export default function MeIssueEditPage() {
         submitLabel={t.submit}
         onSubmit={handleFinish}
         cancelHref="/me/issues"
-        labels={t.form}
+        labels={formLabels}
         categoryOptions={categoryOptions}
+        language={language}
+        submitErrorMessage={t.saveError}
       />
     );
   }
