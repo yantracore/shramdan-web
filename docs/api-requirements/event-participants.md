@@ -128,7 +128,8 @@ The event's `rolesNeeded` aggregation (described in `events.md`) is conceptually
 
 ## Recent changes
 
-- `2026-06-18` — **🔴 KNOWN BACKEND BUG — re-join after leaving is a no-op.** Live-verified against `backend.shramdan.org` (member on the ACTIVE event `boudha-ring-road-litter-sweep`):
+- `2026-06-19` — **✅ RESOLVED — re-join now reactivates.** Backend shipped the fix. Live-verified: a member at `status: LEFT` who POSTs `/events/{id}/participants` now gets `201` with `status: CONFIRMED` (record reactivated, same id), and `GET /participants/me` returns `CONFIRMED`. The frontend's `isActiveParticipationStatus` guard auto-passes for the now-active status, so the normal "you're in" flow runs with no further frontend change. The 2026-06-18 bug entry below is retained for history.
+- `2026-06-18` — **🔴 KNOWN BACKEND BUG (now fixed, see above) — re-join after leaving was a no-op.** Live-verified against `backend.shramdan.org` (member on the ACTIVE event `boudha-ring-road-litter-sweep`):
   1. `DELETE /events/{id}/participants/{participantId}` → `200 {deleted:true}`, but the record is **soft-deleted**: `status` flips to `LEFT` and the row is retained (correct, audit trail).
   2. `POST /events/{id}/participants {role:"WORKER"}` (re-join) → **`201`**, but the response body is the **same record still at `status:"LEFT"`** (same `id`, unchanged `confirmedAt`). It is NOT reactivated.
   3. `GET /events/{id}/participants/me` → `200` with `status:"LEFT"` (not 404).
