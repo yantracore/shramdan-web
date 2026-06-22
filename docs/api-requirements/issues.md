@@ -96,7 +96,7 @@ The reporter can only edit content while the issue sits in `OPEN`.
 
 **Per-viewer support echo — on `GET /issues/{id}` (detail) AND `GET /issues` (list), authenticated:**
 
-- **isVoted** (`boolean`) — already returned on the list; **must also be added to `GET /issues/{id}`.** Without it the detail page shows "Support" (un-voted) on every refresh and only flips after a click trips `ALREADY_VOTED (409)`.
+- **isVoted** (`boolean`) — already returned on the list; **must also be added to `GET /issues/{id}`.** Without it the detail page shows "Support" (un-voted) on every refresh and only flips after a click trips `ALREADY_VOTED (409)`. _Interim (2026-06-22): the FE derives this on the detail page from `GET /issues/me/votes`; that extra round-trip can be dropped once the field ships here._
 - **voterRole** (`enum`, nullable) — the caller's stored vote intent (`INTERESTED | GOING | WANT_TO_LEAD`). Needed to render "Supported" vs the specific role.
 - **eventRole** (`enum`, nullable) — the participation role chosen when `voterRole = GOING` (`WORKER | PHOTOGRAPHER | LIVESTREAMER | MEDIC | SAFETY_LEAD | COORDINATOR | LOGISTICS`). Just echo back what `POST /issues/{id}/vote { voterRole, eventRole }` stored.
 

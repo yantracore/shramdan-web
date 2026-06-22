@@ -54,9 +54,11 @@ shared `ReportDialog` on issue detail and the comment flag flow.
 When the caller sends a bearer token, `GET /issues` (list) returns a per-issue
 `isVoted` boolean — used by `IssueVoteButton` to render the "already supported"
 state without a separate round-trip. The detail endpoint `GET /issues/{id}` does
-not include this field even when authenticated, so the issue-detail page falls
-back to `voted=false` until the user clicks and the `POST /issues/{id}/vote` 409
-handler flips the state. Add `isVoted` to the detail response for parity.
+not include this field even when authenticated. **Interim FE workaround (2026-06-22):**
+`src/app/issues/[id]/page.js` now derives `isVoted` by fetching `GET /issues/me/votes`
+in parallel with the detail call and checking membership, so the button shows the
+"Supported" state on refresh. Add `isVoted` (plus `voterRole`/`eventRole`) to the
+detail response for parity so this extra round-trip can be dropped.
 
 ### Response shape change: `translations[]` instead of top-level `title`/`description`
 

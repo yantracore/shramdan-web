@@ -161,7 +161,7 @@ Pin remains a localStorage overlay (`src/lib/comments.js`) — admin-only, not y
 | Page | Method + path | apiClient fn | Notes |
 | --- | --- | --- | --- |
 | `src/app/issues/page.js` | `GET /issues` | `getJson` | Anonymous; params: `status`, `category`, `sort`, `limit=50`; client-side filters out non-public statuses. When the user is logged in, `apiClient` attaches the bearer token automatically and the response includes a per-issue `isVoted` boolean used to seed the "already supported" state |
-| `src/app/issues/[id]/page.js` | `GET /issues/{id}` | `getJson` | Anonymous; loads detail + a second `GET /issues` call (by category) for "Other issues in this category". `isVoted` is **not** returned on this endpoint today — see `09-backend-admin-gaps.md` |
+| `src/app/issues/[id]/page.js` | `GET /issues/{id}` (+ `GET /issues/me/votes` when authenticated) | `getJson` / `fetchMyIssueVotes` | Anonymous: loads detail + a second `GET /issues` call (by category) for "Other issues in this category". `isVoted` is **not** returned on the detail endpoint today, so when logged in the page fetches `GET /issues/me/votes` in parallel and derives `isVoted` from membership to seed the "Supported" button state on refresh — see `09-backend-admin-gaps.md` |
 | `src/components/IssueVoteButton.js` (via `useIssueVote`) | `POST /issues/{id}/vote` | `voteOnIssue` | Authenticated; verified users only; hard-coded `voterRole: "INTERESTED"`; flips local `voted` state on success/409 |
 | `src/app/issues/[id]/page.js` (via `ReportDialog`) | `POST /issues/{id}/report` | `reportIssue` | Authenticated; "रिपोर्ट" trigger under the share row opens the shared `ReportDialog` (reason enum + optional details). 409 = already reported |
 

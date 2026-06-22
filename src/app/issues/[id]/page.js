@@ -26,7 +26,8 @@ import { SiteShell } from "@/components/SiteShell";
 import { StickyActionBar } from "@/components/StickyActionBar";
 import { TertiaryButton } from "@/components/TertiaryButton";
 import { usePreferences } from "@/app/providers";
-import { getJson, reportIssue } from "@/lib/apiClient";
+import { fetchMyIssueVotes, getJson, reportIssue } from "@/lib/apiClient";
+import { getAuthSession } from "@/lib/authSession";
 import { copy } from "@/lib/siteContent";
 import { useTrackVisit } from "@/lib/useRecentlyViewed";
 import { issueActionMode } from "@/lib/issueActions";
@@ -81,12 +82,29 @@ export default function IssueDetailPage() {
     setNotFound(false);
 
     try {
-      const response = await getJson(`/issues/${issueId}`);
+      // GET /issues/{id} does not echo the caller's own vote yet (backend
+      // gap — see docs/engineering/09-backend-admin-gaps.md), so the support
+      // button would reset to "Support" on every refresh even after voting.
+      // Derive `isVoted` from the caller's votes (GET /issues/me/votes),
+      // fetched in parallel so it adds no latency, and seed the button's
+      // "Supported" state. Drop this once the detail endpoint returns isVoted.
+      const [response, myVotesResult] = await Promise.all([
+        getJson(`/issues/${issueId}`),
+        getAuthSession()?.user
+          ? fetchMyIssueVotes({ limit: 100 }).catch(() => null)
+          : Promise.resolve(null)
+      ]);
       const data = getResponseData(response, null);
       if (!data) {
         setNotFound(true);
         setIssue(null);
         return;
+      }
+      if (!data.isVoted && myVotesResult) {
+        const myVotes = getListItems(myVotesResult);
+        if (myVotes.some((vote) => vote.id === data.id)) {
+          data.isVoted = true;
+        }
       }
       setIssue(data);
 
