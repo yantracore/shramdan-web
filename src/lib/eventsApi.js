@@ -234,6 +234,41 @@ export async function getEventById(eventId, { language = "np" } = {}) {
   return data ? normalizeEvent(data, language) : null;
 }
 
+// Interim issue→event resolver. Once an issue is promoted to EVENT_SCHEDULED a
+// campaign event exists, but the issue read does NOT embed it and there is no
+// `GET /events?issueId=` filter (both confirmed live 2026-06-22 — see
+// docs/api-requirements/issues.md "Gaps"). The link only runs the other way:
+// every event payload carries `issueId`. So we narrow the event list by the
+// issue's own district (province as fallback) — which cuts the candidate set
+// hard — and match `issueId` client-side to recover the routing target.
+//
+// Returns `{ id, slug, status }` for the linked event, or null. Routing uses
+// slug-or-id; `status` lets callers pick the right join affordance (DRAFT →
+// Join+Lead, SCHEDULED → Join-as-Role, ACTIVE → Join-as-Worker). Drop this the
+// moment `GET /issues/{id}` embeds `event { id, slug, status, ... }`.
+export async function resolveEventForIssue(issue) {
+  if (!issue?.id) return null;
+  // Forward-compatible: if the backend ever lands the link on the issue, use it
+  // straight away and skip the lookup entirely.
+  const embedded = issue.event;
+  if (embedded?.id || embedded?.slug) {
+    return { id: embedded.id || null, slug: embedded.slug || null, status: embedded.status || null };
+  }
+  const districtId = issue.districtId || issue.district?.id || null;
+  const provinceId = issue.provinceId || issue.province?.id || null;
+  const params = { limit: 100 };
+  if (districtId) params.districtId = districtId;
+  else if (provinceId) params.provinceId = provinceId;
+  try {
+    const response = await getJson("/events", { params });
+    const match = getListItems(response).find((ev) => ev.issueId === issue.id);
+    if (!match) return null;
+    return { id: match.id || null, slug: match.slug || null, status: match.status || null };
+  } catch {
+    return null;
+  }
+}
+
 // Events the authenticated caller is involved in (GET /events/me). `as`
 // scopes to leader | voter | all (default all). Each normalized item keeps
 // the caller-relationship decorations the backend adds — `isLeader` and

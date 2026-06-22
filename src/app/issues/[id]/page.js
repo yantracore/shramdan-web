@@ -15,6 +15,7 @@ import { IssuePhotoGallery } from "@/components/IssuePhotoGallery";
 import { IssueShareRow } from "@/components/IssueShareRow";
 import { IssueStatusTimeline } from "@/components/IssueStatusTimeline";
 import { IssueJoinButton } from "@/components/IssueJoinButton";
+import { IssueParticipationPanel } from "@/components/IssueParticipationPanel";
 import { IssueVoteButton } from "@/components/IssueVoteButton";
 import { ShareButton } from "@/components/ShareButton";
 import { CommentSection } from "@/components/comments";
@@ -26,11 +27,17 @@ import { SiteShell } from "@/components/SiteShell";
 import { StickyActionBar } from "@/components/StickyActionBar";
 import { TertiaryButton } from "@/components/TertiaryButton";
 import { usePreferences } from "@/app/providers";
-import { fetchMyIssueVotes, getJson, reportIssue } from "@/lib/apiClient";
+import {
+  fetchIssueParticipants,
+  fetchMyIssueVotes,
+  getJson,
+  reportIssue
+} from "@/lib/apiClient";
 import { getAuthSession } from "@/lib/authSession";
 import { copy } from "@/lib/siteContent";
 import { useTrackVisit } from "@/lib/useRecentlyViewed";
 import { issueActionMode } from "@/lib/issueActions";
+import { resolveEventForIssue } from "@/lib/eventsApi";
 import {
   ISSUE_STATUS_COLORS,
   getIssueCoverImageUrl,
@@ -71,6 +78,14 @@ export default function IssueDetailPage() {
   // OPEN → Support (vote); EVENT_SCHEDULED → Join; otherwise no primary action.
   const actionMode = issue ? issueActionMode(issue.status) : "none";
   const [related, setRelated] = useState([]);
+  // GOING-voter roster (who'll show up once this converts) + the viewer's own
+  // vote intent, both feeding the IssueParticipationPanel below.
+  const [participants, setParticipants] = useState([]);
+  const [myVote, setMyVote] = useState(null);
+  // Routing target for the Join CTA on a promoted (EVENT_SCHEDULED) issue. The
+  // issue read omits its event, so we recover it client-side (interim — see
+  // resolveEventForIssue). Until it resolves the button shows the "soon" cue.
+  const [resolvedEventId, setResolvedEventId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [notFound, setNotFound] = useState(false);
@@ -88,11 +103,14 @@ export default function IssueDetailPage() {
       // Derive `isVoted` from the caller's votes (GET /issues/me/votes),
       // fetched in parallel so it adds no latency, and seed the button's
       // "Supported" state. Drop this once the detail endpoint returns isVoted.
-      const [response, myVotesResult] = await Promise.all([
+      const [response, myVotesResult, participantsResult] = await Promise.all([
         getJson(`/issues/${issueId}`),
         getAuthSession()?.user
           ? fetchMyIssueVotes({ limit: 100 }).catch(() => null)
-          : Promise.resolve(null)
+          : Promise.resolve(null),
+        // GOING-voter roster — public, so fetch it for everyone. The endpoint
+        // resolves slugs as well as ids, so the URL param is safe to pass.
+        fetchIssueParticipants(issueId, { limit: 100 }).catch(() => null)
       ]);
       const data = getResponseData(response, null);
       if (!data) {
@@ -100,13 +118,36 @@ export default function IssueDetailPage() {
         setIssue(null);
         return;
       }
-      if (!data.isVoted && myVotesResult) {
+      // Detail GET doesn't echo the caller's own vote (isVoted/voterRole/
+      // eventRole) yet, so derive it from GET /issues/me/votes, which decorates
+      // each issue with the caller's voterRole + eventRole. Seeds both the
+      // Support button's "Supported" state and the participation panel's
+      // "your role" line in one pass — no extra round-trip.
+      if (myVotesResult) {
         const myVotes = getListItems(myVotesResult);
-        if (myVotes.some((vote) => vote.id === data.id)) {
+        const mine = myVotes.find((vote) => vote.id === data.id);
+        if (mine) {
           data.isVoted = true;
+          setMyVote({ voterRole: mine.voterRole || "INTERESTED", eventRole: mine.eventRole || null });
+        } else {
+          setMyVote(null);
         }
+      } else {
+        setMyVote(null);
       }
+      setParticipants(getListItems(participantsResult));
       setIssue(data);
+
+      // Promoted issue → recover its scheduled event so the Join CTA can route
+      // to the real join flow on the event page (the issue read omits the link;
+      // interim client-side match — see resolveEventForIssue).
+      if (issueActionMode(data.status) === "join") {
+        resolveEventForIssue(data)
+          .then((linked) => setResolvedEventId(linked?.slug || linked?.id || null))
+          .catch(() => setResolvedEventId(null));
+      } else {
+        setResolvedEventId(null);
+      }
 
       if (data.category) {
         try {
@@ -139,6 +180,44 @@ export default function IssueDetailPage() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchIssue();
   }, [fetchIssue]);
+
+  // The Support button bubbles each vote/retract up here so the participation
+  // panel stays in sync without its own re-fetch of the detail. payload is the
+  // server's vote response (voterRole, eventRole, voteCount, attendingCount,
+  // conversionThreshold, status) on a vote, or null on a retract.
+  const handleVoteChange = useCallback(
+    (payload) => {
+      setMyVote(
+        payload
+          ? { voterRole: payload.voterRole || "INTERESTED", eventRole: payload.eventRole ?? null }
+          : null
+      );
+      // Move the conversion progress bar immediately off the server's echoed
+      // tallies (retract only echoes voteCount/attendingCount).
+      setIssue((prev) => {
+        if (!prev) return prev;
+        const next = { ...prev };
+        if (payload && typeof payload === "object") {
+          if (typeof payload.voteCount === "number") next.voteCount = payload.voteCount;
+          if (typeof payload.attendingCount === "number") next.attendingCount = payload.attendingCount;
+          if (typeof payload.conversionThreshold === "number")
+            next.conversionThreshold = payload.conversionThreshold;
+          if (payload.status) next.status = payload.status;
+        } else if (payload === null && typeof next.attendingCount === "number") {
+          // Retract with no server attendingCount → best-effort local decrement
+          // (a GOING vote was the only kind that counted toward attending).
+          next.attendingCount = Math.max(0, next.attendingCount - 1);
+        }
+        return next;
+      });
+      // The vote response doesn't carry the named roster, so re-pull it to give
+      // a fresh GOING signup a face (and drop a withdrawn one).
+      fetchIssueParticipants(issueId, { limit: 100 })
+        .then((res) => setParticipants(getListItems(res)))
+        .catch(() => {});
+    },
+    [issueId]
+  );
 
   const uploads = Array.isArray(issue?.uploads) ? issue.uploads : [];
   const coverImageUrl = getIssueCoverImageUrl(issue);
@@ -255,14 +334,21 @@ export default function IssueDetailPage() {
                       content={content}
                       initialVoteCount={issue.voteCount}
                       initialVoted={issue.isVoted}
+                      initialVoterRole={myVote?.voterRole}
                       issueId={issue.id}
                       language={language}
+                      onVoteChange={handleVoteChange}
                       showCount={false}
                       size="large"
                       type="primary"
                     />
                   ) : actionMode === "join" ? (
-                    <IssueJoinButton issue={issue} language={language} size="large" />
+                    <IssueJoinButton
+                      issue={issue}
+                      eventId={resolvedEventId}
+                      language={language}
+                      size="large"
+                    />
                   ) : null}
                 </div>
               </div>
@@ -320,6 +406,13 @@ export default function IssueDetailPage() {
                 </section>
               ) : null}
 
+              <IssueParticipationPanel
+                issue={issue}
+                participants={participants}
+                myVote={myVote}
+                language={language}
+              />
+
               <IssueLocationCard
                 issue={issue}
                 content={content}
@@ -350,7 +443,13 @@ export default function IssueDetailPage() {
 
         {!loading && !error && !notFound && issue && actionMode === "join" ? (
           <StickyActionBar>
-            <IssueJoinButton issue={issue} language={language} block size="large" />
+            <IssueJoinButton
+              issue={issue}
+              eventId={resolvedEventId}
+              language={language}
+              block
+              size="large"
+            />
           </StickyActionBar>
         ) : null}
 

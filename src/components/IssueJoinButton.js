@@ -4,11 +4,18 @@
 // campaign is scheduled, the action is no longer "support" but "join".
 //
 // The real join machinery already lives on the event (the role-picker modal in
-// EventJoinPanel → POST /events/{id}/participants). So when the backend links
-// the issue to its event (see getIssueEventId), this routes straight there and
-// reuses that working flow — no separate "join on issue" endpoint is needed.
-// Until that link ships, the button is present (the page reads correctly) but
-// explains it's almost ready. It upgrades itself the day the field lands.
+// EventJoinPanel → POST /events/{id}/participants). So once we know the issue's
+// event id, this routes straight there and reuses that working flow — no
+// separate "join on issue" endpoint is needed (voting the issue is impossible
+// past OPEN: POST /issues/{id}/vote returns 400 ISSUE_NOT_OPEN once promoted).
+//
+// The id can arrive three ways, in order of preference:
+//   1. `eventId` prop — the detail page resolves it via resolveEventForIssue
+//      (interim client-side `issueId` match, since the issue read omits it).
+//   2. an embedded link on the issue itself (getIssueEventId) — the day the
+//      backend lands `issue.event` / `issue.eventId`, this lights up for free.
+//   3. neither → keep the CTA honest with an "almost ready" cue instead of a
+//      dead button.
 
 import { UserAddOutlined } from "@ant-design/icons";
 import { Button } from "antd";
@@ -29,6 +36,7 @@ const COPY = {
 
 export function IssueJoinButton({
   issue,
+  eventId: eventIdProp = null,
   language = "np",
   size,
   type = "primary",
@@ -37,7 +45,8 @@ export function IssueJoinButton({
 }) {
   const t = COPY[language] || COPY.np;
   const messageApi = useToast();
-  const eventId = getIssueEventId(issue);
+  // Resolved id from the page wins; fall back to any link embedded on the issue.
+  const eventId = eventIdProp || getIssueEventId(issue);
 
   const button = (
     <Button

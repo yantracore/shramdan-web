@@ -26,7 +26,10 @@
 - **municipality / ward** (`string`, optional, public) — administrative location refinements.
 - **coverImageId** (`string`, optional, public) — upload id used as the cover; surfaced via `uploads[]`.
 - **uploads** (`array of object`, optional, public) — attached images/files; `coverImageId` points into this list.
-- **voteCount** (`number`, required, public) — number of supporters; drives the promotion threshold.
+- **voteCount** (`number`, required, public) — total supporters (every vote, any `voterRole`).
+- **attendingCount** (`number`, required, public) — supporters who committed to **show up** (`voterRole = GOING`). This — not `voteCount` — is what's measured against `conversionThreshold`, so the UI's conversion progress is GOING-driven ("when N people commit to join, the cleanup is scheduled").
+- **conversionThreshold** (`number`, required, public) — `attendingCount` needed to promote the issue to a scheduled event.
+- **eventRoleCounts** (`array of object`, public, present on the detail read) — per-role tally of GOING voters: `[{ eventRole, voterCount }]` across all seven roles (zeros included). Powers the issue-side roster breakdown without a participants round-trip.
 - **reportedById** (`string`, required, public) — the member who authored the issue. Used to scope `GET /issues/me` and to authorize edits.
 - **createdAt / updatedAt** (`datetime`, required, public) — ISO 8601.
 
@@ -48,6 +51,7 @@
 | List | REST GET | Public | Paginated, sorted by `voteCount` desc by default. |
 | List mine | REST GET `/issues/me` | Authenticated | Issues authored by the caller; default `sort=createdAt`. Powers the member **My issues** surface. |
 | Get by id | REST GET | Public | Single issue by id or slug. |
+| List participants | REST GET `/issues/{id}/participants` | Public | GOING voters who picked a participation role, with `{ voteId, eventRole, joinedAt, user }`. The issue-stage roster — paginated, `limit`/`cursor`, optional `role` filter, resolves slug or id. |
 | Create | REST POST | Authenticated (verified) | Reports a new issue. |
 | Update | REST PATCH | Reporter (author) | Author-only, OPEN-only partial update. |
 | Set status | REST PATCH `/issues/{id}/status` | Moderator or Admin | Lifecycle override. |
@@ -85,7 +89,7 @@ The reporter can only edit content while the issue sits in `OPEN`.
 
 ## Gaps / requested capabilities
 
-### Unified Support / Join — per-viewer participation reads (requested 2026-06-19)
+### Unified Support / Join — per-viewer participation reads (requested 2026-06-19) — ⚠️ PARTIALLY RESOLVED 2026-06-22
 
 > Backs the unified Support/Join control shared by every issue + event surface.
 > An issue is a not-yet-scheduled event; the frontend reconciles both into one UX
@@ -93,6 +97,18 @@ The reporter can only edit content while the issue sits in `OPEN`.
 > `POST /events/{id}/participants` for events). These read fields are what the UI
 > needs to pick the right button + render the persisted "already done" state by
 > lifecycle, on refresh, without a click.
+
+> **Status (2026-06-22):** The frontend now ships the full issue-side participation
+> surface (`IssueParticipationPanel` on `/issues/[id]`: conversion progress + "your
+> role" + GOING roster) using what the backend **has** shipped:
+> `GET /issues/{id}/participants` (named roster), `attendingCount` +
+> `conversionThreshold` + `eventRoleCounts` on the issue reads, and `voterRole` +
+> `eventRole` decorating each `GET /issues/me/votes` row (the FE derives the
+> viewer's own role from there). **Still open** — the per-viewer echo on the
+> detail read itself (`isVoted` / `voterRole` / `eventRole` on `GET /issues/{id}`)
+> and the issue→event link (`event` embed), both below. Until they land the FE
+> pays one `GET /issues/me/votes` round-trip per detail view to recover the
+> viewer's role.
 
 **Per-viewer support echo — on `GET /issues/{id}` (detail) AND `GET /issues` (list), authenticated:**
 
@@ -104,6 +120,23 @@ The reporter can only edit content while the issue sits in `OPEN`.
 
 - **event** (`object`, nullable, public) — embed `{ id, slug, status, scheduledAt, leaderId }`. The **event `status`** (`DRAFT | SCHEDULED | ACTIVE | PAUSED | COMPLETED | CANCELLED`) is essential: the issue stays `EVENT_SCHEDULED` permanently after promotion, so the UI derives the correct action row from `event.status` — Join **+ Lead** while the event is `DRAFT`, Join-as-Role at `SCHEDULED`, Join-as-Worker at `ACTIVE`. (Supersedes the older "No link from an EVENT_SCHEDULED issue back to its event" gap below — same ask, now with the required sub-shape.)
 - **event.viewerParticipation** (`object`, nullable, authenticated) — `{ id, role, status }` for the caller on the linked event, or null. Lets the issue surface show "Joined as X" without a separate `/events/{id}/participants/me` round-trip. (Mirrors the events-side `viewerParticipation` ask in `events.md`.)
+
+**Live verification (2026-06-22) — this is THE blocker for the unified Support/Join plan, confirmed against `backend.shramdan.org`:**
+
+The agreed action matrix and what the live API supports for each row:
+
+| Lifecycle | Btn | Actions | Join mechanism (live) | In sync? |
+| --- | --- | --- | --- | --- |
+| issue `OPEN` | Support | Interested · Join-as-Role · Lead | `POST /issues/{id}/vote { voterRole: INTERESTED\|GOING\|WANT_TO_LEAD, eventRole }` | ✅ yes |
+| issue `EVENT_SCHEDULED` (event `DRAFT`) | Join | Join-as-Role · Lead | event-side only: `POST /events/{eventId}/participants` + `…/leader-volunteer` | ⚠️ **blocked — no issue→event link** |
+| event `SCHEDULED` | Join | Join-as-Role | `POST /events/{id}/participants { role }` | ✅ yes (on event page) |
+| event `ACTIVE` | Join | Join-as-Worker | `POST /events/{id}/participants { role: WORKER }` | ✅ yes (on event page) |
+| event `COMPLETED` | "Contributed as" | — | read `viewerParticipation` | ⚠️ needs `viewerParticipation` echo |
+
+- **The API is NOT wrong** — `POST /issues/{id}/vote` correctly returns **`400 ISSUE_NOT_OPEN`** once the issue leaves `OPEN` (verified live), so joining a promoted issue MUST go through its event. That is the right contract. The single missing piece is the **read-side link** from the issue to that event.
+- **Confirmed live:** `GET /issues/{id}` for an `EVENT_SCHEDULED` issue returns **no** `event` / `eventId` field. And `GET /events?issueId=…` / `?linkedIssueId=…` both return **0** (no such filter). The link only runs event→issue: every **event** payload carries `issueId`.
+- **Interim FE workaround shipped (2026-06-22):** `resolveEventForIssue(issue)` in `lib/eventsApi.js` recovers the event by listing `/events` narrowed to the issue's `districtId` (≤100, then matching `issueId` client-side) and the Join CTA on `/issues/[id]` now routes to `/events/{slug}` — verified against staging (district narrowing → 8 candidates → clean match). This is a band-aid: it costs one extra `/events` fetch per promoted-issue detail view and is only reliable while a district holds ≤100 events. **It auto-drops the moment `issue.event` ships** (the resolver checks `issue.event` first).
+- **Smallest backend unlock:** embed `event { id, slug, status, scheduledAt, leaderId, viewerParticipation }` on `GET /issues/{id}` (and ideally `GET /issues` for the grid/preview Join buttons, which currently degrade to a "joining opens shortly" cue because a per-card `/events` fetch is too costly). A `GET /events?issueId=` filter would be an acceptable fallback. Owner: Pranish (backend).
 
 > Surfaced 2026-06-19 while wiring inline backend-validation display on the issue edit forms.
 
@@ -123,5 +156,7 @@ The reporter can only edit content while the issue sits in `OPEN`.
 
 ## Recent changes
 
+- `2026-06-22` — **Join CTA on `EVENT_SCHEDULED` issues now works (interim resolver).** The Join button was hitting a dead "joining opens shortly" cue because the issue read exposes no link to its scheduled event. Root-caused live: it is a **backend read-side gap, not a FE logic bug** — `POST /issues/{id}/vote` correctly returns `400 ISSUE_NOT_OPEN` past `OPEN`, so a promoted issue must join via its event, but neither `issue.event` nor a `GET /events?issueId=` filter exists. Shipped `resolveEventForIssue()` (`lib/eventsApi.js`) — recovers the event by district-narrowed `/events` list + client-side `issueId` match — and wired its result into `IssueJoinButton` (new `eventId` prop) on `/issues/[id]`, so the CTA routes to the real join flow on `/events/{slug}`. Auto-removes once `issue.event` ships. Full plan↔API sync matrix + the backend ask logged in Gaps above.
+- `2026-06-22` — **✅ Issue-side participation surface shipped (FE).** `/issues/[id]` now renders `IssueParticipationPanel` below the description — the issue-stage twin of the event page's join/roster surfaces, since an issue is a not-yet-scheduled event. Three blocks, all live-verified against `backend.shramdan.org`: **(1) conversion progress** — `attendingCount / conversionThreshold` (GOING-driven, not raw `voteCount`); **(2) your participation** — reflects the viewer's own vote back (Interested / Going-as-`<role>` / Want-to-lead), derived from `GET /issues/me/votes` (`voterRole` + `eventRole`), so it persists across refresh; **(3) roster** — GOING voters grouped by `eventRole` from the new `GET /issues/{id}/participants`, cross-checked with `eventRoleCounts`, viewer's own role highlighted. The Support button (`IssueVoteButton`) now bubbles each vote/retract up via `onVoteChange` so the panel + counts update without a refetch, and takes `initialVoterRole` (from the same `me/votes` read) to show role-tiered withdraw-confirmation copy. Backend endpoints consumed: `GET /issues/{id}/participants`, `GET /issues/me/votes` (now decorated with `voterRole`/`eventRole`/`votedAt`), and `attendingCount`/`conversionThreshold`/`eventRoleCounts` on the issue reads. Remaining backend asks (per-viewer echo on the detail read; issue→event link) logged in Gaps above.
 - `2026-06-19` — **Status-gated primary CTA: Support → Join.** Issue surfaces (detail page, grid card, preview pane) now switch their primary action by lifecycle: `OPEN` → Support (vote), `EVENT_SCHEDULED` → Join, `COMPLETED`/`REJECTED`/`DUPLICATE` → no action. Decision centralized in `lib/issueActions.js` (`issueActionMode`). The Join CTA (`IssueJoinButton`) is forward-compatible — it routes to `/events/{eventId}` via `getIssueEventId(issue)` once the backend exposes the link, and shows a graceful "joining opens shortly" cue until then. Logged the issue→event link gap above.
 - `2026-06-17` — Documented entity to back the member My-issues surface (`GET /issues/me` consumed; OPEN-only author edit wired). Logged the author withdraw/delete gap.
