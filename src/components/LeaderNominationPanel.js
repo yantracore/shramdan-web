@@ -12,12 +12,15 @@
 //   POST   /events/{id}/leader-vote { candidateId } — cast / change my vote
 //   DELETE /events/{id}/leader-vote            — retract my vote
 //
-// Candidates are seeded earlier — at the issue-voting stage — when
-// members express a "WANT_TO_LEAD" interest. There is no public
-// self-nominate endpoint at this stage; the self-nominate CTA on
-// the panel is therefore an inert hint linking back to the originating
-// issue. When the backend ships post-promotion self-nomination, the
-// hint can be promoted back to an active button.
+// Candidates are normally seeded at the issue-voting stage — members who
+// flagged "WANT_TO_LEAD". When an issue is promoted with NO such volunteers,
+// leader voting opens in the `SEEKING` state: a recruitment window where any
+// eligible member (a voter or the reporter of the linked issue) can step up:
+//   POST   /events/{id}/leader-volunteer   — offer to lead (no request body)
+//   DELETE /events/{id}/leader-volunteer   — withdraw the offer
+// So the self-nominate CTA is LIVE while status === "SEEKING", and falls back
+// to an inert "vote during the issue stage" hint in every other state (during
+// OPEN voting the candidate pool is already fixed).
 //
 // Demo events (`demo-` id prefix) stay on the local-state mock path
 // so the leader-nomination UX can still be exercised end-to-end
@@ -59,7 +62,16 @@ const COPY = {
     successWithdraw: "समर्थन फिर्ता भयो।",
     errorToast: "केही गडबड भयो। फेरि प्रयास गर्नुहोस्।",
     votesCount: "{n} समर्थन",
-    backToIssueLabel: "मूल समस्या हेर्नुहोस्"
+    backToIssueLabel: "मूल समस्या हेर्नुहोस्",
+    seekingIntro:
+      "यो अभियानलाई संयोजक चाहिएको छ। तपाईं आफै अघि सर्न सक्नुहुन्छ, वा अघि सरेका कसैलाई समर्थन गर्न सक्नुहुन्छ।",
+    withdrawVolunteerCta: "मेरो प्रस्ताव फिर्ता लिनुहोस्",
+    successVolunteer: "तपाईं संयोजक बन्न अघि सर्नुभयो।",
+    successVolunteerWithdraw: "तपाईंको प्रस्ताव फिर्ता भयो।",
+    notEligibleError:
+      "यो समस्यामा भोट दिनेहरू वा रिपोर्ट गर्नेले मात्र संयोजक बन्न अघि सर्न सक्छन्।",
+    notSeekingError: "यो अभियान अहिले संयोजक खोज्दै छैन।",
+    seekingEmptyState: "अहिलेसम्म कोही अघि सरेका छैनन् — पहिलो बन्नुहोस्!"
   },
   en: {
     eyebrow: "Leader nomination",
@@ -80,7 +92,16 @@ const COPY = {
     successWithdraw: "Support withdrawn.",
     errorToast: "Something went wrong. Try again.",
     votesCount: "{n} supporting",
-    backToIssueLabel: "Open original issue"
+    backToIssueLabel: "Open original issue",
+    seekingIntro:
+      "This campaign needs a leader. Step up yourself, or back someone who already has.",
+    withdrawVolunteerCta: "Withdraw my offer",
+    successVolunteer: "You've volunteered to lead.",
+    successVolunteerWithdraw: "Your offer has been withdrawn.",
+    notEligibleError:
+      "Only people who voted on this issue — or its reporter — can volunteer to lead it.",
+    notSeekingError: "This campaign isn't seeking a leader right now.",
+    seekingEmptyState: "No one has stepped up yet — be the first!"
   }
 };
 
@@ -116,6 +137,13 @@ function candidatesToNominations(candidates, viewerVotedCandidateId) {
         ? c.votedByMe
         : viewerVotedCandidateId === c.id
   }));
+}
+
+function volunteerErrorMessage(error, t) {
+  const code = error?.errorCode;
+  if (code === "LEADER_VOLUNTEER_NOT_ELIGIBLE") return t.notEligibleError;
+  if (code === "LEADER_NOT_SEEKING") return t.notSeekingError;
+  return error?.message || t.errorToast;
 }
 
 export function LeaderNominationPanel({ event, language = "np", onChanged }) {
@@ -163,6 +191,19 @@ export function LeaderNominationPanel({ event, language = "np", onChanged }) {
   const myNomination = nominations.find((n) => n.memberId === viewerId);
   const leaderElect = findLeaderElect(nominations);
   const isTie = detectTie(nominations);
+
+  // Leader-voting lifecycle. Real events read it off the live state; demo
+  // events fall back to "OPEN" so the existing mock voting UX is unchanged,
+  // unless a demo event explicitly opts into the SEEKING recruitment flow.
+  const votingStatus = isDemo
+    ? event?.leaderVotingStatus || "OPEN"
+    : votingState?.status || null;
+  const isSeeking = votingStatus === "SEEKING";
+  // Per-candidate voting is only live while the round is OPEN; during SEEKING
+  // the rows are volunteers, not yet vote targets (POST /leader-vote 409s).
+  const canVote = isDemo ? !isSeeking : votingStatus === "OPEN";
+  // During SEEKING, my presence in the candidate pool === I already volunteered.
+  const hasVolunteered = Boolean(myNomination);
 
   if (!viewerId) {
     return (
@@ -224,6 +265,53 @@ export function LeaderNominationPanel({ event, language = "np", onChanged }) {
     }
   };
 
+  const handleToggleVolunteer = async () => {
+    if (saving) return;
+    setSaving(true);
+    const wasVolunteer = hasVolunteered;
+    try {
+      if (isDemo) {
+        await new Promise((resolve) => setTimeout(resolve, 200));
+        const next = wasVolunteer
+          ? nominations.filter((n) => n.memberId !== viewerId)
+          : [
+              ...nominations,
+              {
+                id: viewerId,
+                memberId: viewerId,
+                memberName:
+                  session?.user?.name || session?.user?.username || "—",
+                voteCount: 0,
+                votedByMe: false
+              }
+            ];
+        onChanged?.({ ...event, nominations: next });
+        messageApi.success(
+          wasVolunteer ? t.successVolunteerWithdraw : t.successVolunteer
+        );
+        return;
+      }
+
+      if (wasVolunteer) {
+        await deleteJson(`/events/${eventId}/leader-volunteer`, {
+          requireAuth: true
+        });
+        messageApi.success(t.successVolunteerWithdraw);
+      } else {
+        await postJson(`/events/${eventId}/leader-volunteer`, undefined, {
+          requireAuth: true
+        });
+        messageApi.success(t.successVolunteer);
+      }
+      await refreshVoting();
+      onChanged?.();
+    } catch (error) {
+      messageApi.error(volunteerErrorMessage(error, t));
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const issueHref = event?.issueId ? `/issues/${event.issueId}` : null;
 
   return (
@@ -231,7 +319,7 @@ export function LeaderNominationPanel({ event, language = "np", onChanged }) {
       <header className="leader-nomination-header">
         <span className="eyebrow">{t.eyebrow}</span>
         <h2 id="leader-nomination-title">{t.title}</h2>
-        <p>{t.intro}</p>
+        <p>{isSeeking ? t.seekingIntro : t.intro}</p>
       </header>
 
       {isTie ? (
@@ -242,16 +330,28 @@ export function LeaderNominationPanel({ event, language = "np", onChanged }) {
       ) : null}
 
       <div className="leader-nomination-self">
-        <Tooltip title={t.selfNominateDisabledTooltip}>
+        {isSeeking ? (
           <Button
-            type="default"
+            type={hasVolunteered ? "default" : "primary"}
             icon={<UserAddOutlined />}
-            disabled
-            aria-disabled="true"
+            onClick={handleToggleVolunteer}
+            loading={saving}
+            disabled={saving}
           >
-            {t.selfNominateCta}
+            {hasVolunteered ? t.withdrawVolunteerCta : t.selfNominateCta}
           </Button>
-        </Tooltip>
+        ) : (
+          <Tooltip title={t.selfNominateDisabledTooltip}>
+            <Button
+              type="default"
+              icon={<UserAddOutlined />}
+              disabled
+              aria-disabled="true"
+            >
+              {t.selfNominateCta}
+            </Button>
+          </Tooltip>
+        )}
         {issueHref ? (
           <Link className="leader-nomination-issue-link" href={issueHref}>
             {t.backToIssueLabel}
@@ -260,14 +360,17 @@ export function LeaderNominationPanel({ event, language = "np", onChanged }) {
       </div>
 
       {nominations.length === 0 ? (
-        <p className="leader-nomination-empty">{t.emptyState}</p>
+        <p className="leader-nomination-empty">
+          {isSeeking ? t.seekingEmptyState : t.emptyState}
+        </p>
       ) : (
         <ul className="leader-nomination-list">
           {nominations
             .slice()
             .sort((a, b) => (b.voteCount || 0) - (a.voteCount || 0))
             .map((nomination) => {
-              const isElect = !isTie && leaderElect?.id === nomination.id;
+              const isElect =
+                canVote && !isTie && leaderElect?.id === nomination.id;
               return (
                 <li
                   key={nomination.id}
@@ -282,27 +385,27 @@ export function LeaderNominationPanel({ event, language = "np", onChanged }) {
                       </span>
                     ) : null}
                   </span>
-                  <span className="leader-nomination-votes">
-                    {t.votesCount.replace("{n}", nomination.voteCount || 0)}
-                  </span>
-                  <Button
-                    type={nomination.votedByMe ? "default" : "primary"}
-                    icon={<LikeOutlined />}
-                    onClick={() => handleToggleVote(nomination)}
-                    disabled={saving}
-                    size="small"
-                  >
-                    {nomination.votedByMe ? t.voteDoneCta : t.voteCta}
-                  </Button>
+                  {canVote ? (
+                    <span className="leader-nomination-votes">
+                      {t.votesCount.replace("{n}", nomination.voteCount || 0)}
+                    </span>
+                  ) : null}
+                  {canVote ? (
+                    <Button
+                      type={nomination.votedByMe ? "default" : "primary"}
+                      icon={<LikeOutlined />}
+                      onClick={() => handleToggleVote(nomination)}
+                      disabled={saving}
+                      size="small"
+                    >
+                      {nomination.votedByMe ? t.voteDoneCta : t.voteCta}
+                    </Button>
+                  ) : null}
                 </li>
               );
             })}
         </ul>
       )}
-      {/* myNomination intentionally unused after the self-nominate
-          flow was disabled — kept in the memo above so the
-          eligibility check is ready when backend ships the endpoint. */}
-      {myNomination ? null : null}
     </section>
   );
 }
