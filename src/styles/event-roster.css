@@ -698,6 +698,44 @@
   flex-shrink: 0;
 }
 
+/* Role cell is a two-line block: the title (+ count) over a small, muted
+   one-line description of what the role does — kept tight under the title so
+   the row only grows a little. The icon aligns to the title line. */
+.participants-role {
+  align-items: flex-start;
+}
+
+.participants-role .participants-role-icon {
+  margin-top: 2px;
+}
+
+.participants-role-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.participants-role-head {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.participants-role-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.participants-role-desc {
+  font-size: 11px;
+  line-height: 1.25;
+  font-weight: 400;
+  color: var(--muted);
+}
+
 /* The viewer's own avatar chip — ringed so they spot themselves at a glance. */
 .participants-chip-you {
   box-shadow: 0 0 0 2px var(--surface), 0 0 0 3.5px var(--role-color, var(--primary));

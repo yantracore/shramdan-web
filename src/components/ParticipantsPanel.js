@@ -123,6 +123,16 @@ const COPY = {
       SAFETY_LEAD: "सुरक्षा प्रमुख",
       COORDINATOR: "संयोजक",
       LOGISTICS: "लजिस्टिक्स"
+    },
+    // One-line "what this role does" shown under each role title.
+    roleDescriptions: {
+      WORKER: "फोहोर सङ्कलन र सफाइ",
+      PHOTOGRAPHER: "अघि–पछिको तस्बिर",
+      LIVESTREAMER: "लाइभ प्रसारण",
+      MEDIC: "प्राथमिक उपचार",
+      SAFETY_LEAD: "ट्राफिक र सुरक्षा",
+      COORDINATOR: "टोली समन्वय र समय",
+      LOGISTICS: "औजार, पानी र सामान"
     }
   },
   en: {
@@ -171,6 +181,16 @@ const COPY = {
       SAFETY_LEAD: "Safety Lead",
       COORDINATOR: "Coordinator",
       LOGISTICS: "Logistics"
+    },
+    // One-line "what this role does" shown under each role title.
+    roleDescriptions: {
+      WORKER: "Collect & clear waste",
+      PHOTOGRAPHER: "Capture before & after",
+      LIVESTREAMER: "Run the live stream",
+      MEDIC: "First aid & hydration",
+      SAFETY_LEAD: "Traffic & hazard safety",
+      COORDINATOR: "Team flow & timing",
+      LOGISTICS: "Tools, water & supplies"
     }
   }
 };
@@ -218,6 +238,15 @@ function CompactProgress({ t, language, progress }) {
       </span>
     </div>
   );
+}
+
+// Standalone export of the compact progress bar so other surfaces — e.g. the
+// issue detail topline above the description — can show the very same bar the
+// panel shows next to its heading. Builds its own copy from `language`; pass
+// the same `{ current, target, variant }` progress spec the panel takes.
+export function CompactConversionProgress({ language = "np", progress }) {
+  const t = COPY[language] || COPY.np;
+  return <CompactProgress t={t} language={language} progress={progress} />;
 }
 
 export function ParticipantsPanel({
@@ -328,6 +357,15 @@ export function ParticipantsPanel({
           // A row locks (dims) when the viewer is already committed elsewhere.
           const lockedByOther = Boolean(viewerRole) && !isOwnRole;
           const isPending = pendingRole === role;
+          const countText =
+            target !== null
+              ? t.filledOf
+                  .replace("{filled}", localizeDigits(count, language))
+                  .replace("{total}", localizeDigits(target, language))
+              : count > 0
+                ? t.roleCount.replace("{n}", localizeDigits(count, language))
+                : "";
+          const roleDesc = t.roleDescriptions?.[role] || "";
 
           return (
             <li
@@ -337,21 +375,21 @@ export function ParticipantsPanel({
               }`}
             >
               <span
-                className="event-roster-role has-icon"
+                className="event-roster-role has-icon participants-role"
                 style={{ "--role-color": roleColor }}
               >
                 <Icon className="participants-role-icon" aria-hidden="true" />
-                {roleLabel}
-              </span>
-
-              <span className="event-roster-count">
-                {target !== null
-                  ? t.filledOf
-                      .replace("{filled}", localizeDigits(count, language))
-                      .replace("{total}", localizeDigits(target, language))
-                  : count > 0
-                    ? t.roleCount.replace("{n}", localizeDigits(count, language))
-                    : ""}
+                <span className="participants-role-text">
+                  <span className="participants-role-head">
+                    <span className="participants-role-name">{roleLabel}</span>
+                    {countText ? (
+                      <span className="event-roster-count">{countText}</span>
+                    ) : null}
+                  </span>
+                  {roleDesc ? (
+                    <span className="participants-role-desc">{roleDesc}</span>
+                  ) : null}
+                </span>
               </span>
 
               <span className="event-roster-chips" aria-hidden={shownCount === 0}>
