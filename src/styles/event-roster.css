@@ -1080,6 +1080,20 @@
   border-top: none;
 }
 
+/* Withdraw-confirmation popover (support / role / lead) — keep it narrow so the
+   message wraps onto a few short lines instead of stretching into one very wide
+   row. Portaled to <body>, so these target the overlay's own class. */
+.vote-withdraw-popconfirm,
+.vote-withdraw-popconfirm .ant-popover-inner {
+  max-width: 264px;
+}
+
+.vote-withdraw-popconfirm .ant-popconfirm-message-title,
+.vote-withdraw-popconfirm .ant-popconfirm-description {
+  white-space: normal;
+  word-break: break-word;
+}
+
 .participants-panel--embedded .participants-header h2 {
   font-size: 18px;
 }
