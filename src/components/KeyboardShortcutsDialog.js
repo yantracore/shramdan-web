@@ -16,16 +16,16 @@ const COPY = {
       {
         heading: "नेभिगेसन",
         items: [
-          { keys: ["Ctrl/Cmd", "K"], label: "खोज खोल्नुहोस्" },
-          { keys: ["?"], label: "यो डायलग देखाउनुहोस्" },
-          { keys: ["Esc"], label: "खुलेका डायलग बन्द गर्नुहोस्" }
+          { keys: ["Ctrl/Cmd", "K"], label: "खोज खोल्ने" },
+          { keys: ["?"], label: "यो डायलग देखाउने" },
+          { keys: ["Esc"], label: "खुलेका डायलग बन्द गर्ने" }
         ]
       },
       {
         heading: "खोज भित्र",
         items: [
-          { keys: ["↑", "↓"], label: "नतिजा सर्नुहोस्" },
-          { keys: ["Enter"], label: "नतिजा खोल्नुहोस्" }
+          { keys: ["↑", "↓"], label: "नतिजा सर्ने" },
+          { keys: ["Enter"], label: "नतिजा खोल्ने" }
         ]
       },
       {

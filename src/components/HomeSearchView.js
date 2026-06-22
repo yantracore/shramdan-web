@@ -96,7 +96,7 @@ export default function HomeSearchView() {
             <p>{search.slogan}</p>
             <div className="home-search-intro-link">
               <Link href="/intro">
-                {language === "np" ? "श्रमदान के हो? हेर्नुहोस् →" : "What is Shramdan? Learn more →"}
+                {language === "np" ? "श्रमदान के हो? हेर्ने →" : "What is Shramdan? Learn more →"}
               </Link>
             </div>
           </header>

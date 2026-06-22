@@ -323,7 +323,7 @@ export default function DiscussionDetailPage({ params }) {
                   <strong>{np ? "यो अनुरोध रोडम्यापमा सारियो 🎉" : "This proposal made the roadmap 🎉"}</strong>
                   {topic.promotedRoadmapAnchor ? (
                     <a href={`/development${topic.promotedRoadmapAnchor}`}>
-                      {np ? "रोडम्यापमा हेर्नुहोस्" : "See it on the roadmap"}
+                      {np ? "रोडम्यापमा हेर्ने" : "See it on the roadmap"}
                     </a>
                   ) : null}
                 </div>
@@ -355,7 +355,7 @@ export default function DiscussionDetailPage({ params }) {
                       checked={replyAnonymous}
                       onChange={(e) => setReplyAnonymous(e.target.checked)}
                     />
-                    <span>{np ? "अज्ञात रूपमा पठाउनुहोस्" : "Reply anonymously"}</span>
+                    <span>{np ? "अज्ञात रूपमा पठाउने" : "Reply anonymously"}</span>
                   </label>
                   <Button
                     type="primary"
@@ -406,7 +406,7 @@ export default function DiscussionDetailPage({ params }) {
                 icon={hasVoted ? <CaretUpFilled /> : <CaretUpOutlined />}
                 onClick={handleVote}
               >
-                {hasVoted ? (t.upvoted || (np ? "समर्थन गरिएको" : "Supported")) : (t.upvote || (np ? "समर्थन गर्नुहोस्" : "Support"))}
+                {hasVoted ? (t.upvoted || (np ? "समर्थन गरिएको" : "Supported")) : (t.upvote || (np ? "समर्थन गर्ने" : "Support"))}
               </Button>
 
               {showMeter ? (
@@ -436,7 +436,7 @@ export default function DiscussionDetailPage({ params }) {
                   onClick={handleShare}
                   block
                 >
-                  {copied ? (np ? "लिङ्क कपी भयो" : "Link copied") : (np ? "साझा गर्नुहोस्" : "Share")}
+                  {copied ? (np ? "लिङ्क कपी भयो" : "Link copied") : (np ? "साझा गर्ने" : "Share")}
                 </Button>
               </div>
 

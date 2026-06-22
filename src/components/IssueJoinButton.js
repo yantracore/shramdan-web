@@ -25,7 +25,7 @@ import { getIssueEventId } from "@/lib/issueActions";
 
 const COPY = {
   np: {
-    label: "जोडिनुहोस्",
+    label: "जोडिने",
     soon: "अभियानको तालिका तय भइसक्यो — जोडिने सुविधा छिट्टै सक्रिय हुन्छ।"
   },
   en: {

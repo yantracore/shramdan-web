@@ -89,7 +89,7 @@ const COPY = {
     intro: "तपाईंलाई सुहाउने भूमिकामा जोडिनुहोस् — हरेक भूमिकाले श्रमदान चलाउँछ।",
     roleCount: "{n} जना",
     filledOf: "{filled} / {total}",
-    join: "जोडिनुहोस्",
+    join: "जोडिने",
     joining: "जोडिँदै…",
     openPill: "{n} खाली",
     fullPill: "पूरा",
@@ -102,7 +102,7 @@ const COPY = {
     leaving: "हट्दै…",
     leaveConfirmTitle: "सहभागिता फिर्ता गर्ने?",
     leaveConfirmDesc: "तपाईंको नाम सहभागी सूचीबाट हट्नेछ। मन लागे फेरि जोडिन सकिन्छ।",
-    leaveOk: "फिर्ता गर्नुहोस्",
+    leaveOk: "फिर्ता गर्ने",
     leaveCancel: "रहन्छु",
     moreFilled: "+{n}",
     progressFillLabel: "{filled} / {total} स्थान पूरा",
@@ -374,6 +374,235 @@ export function ParticipantsPanel({
   // count badge by the heading so the panel answers "how many are in?".
   const totalCount =
     roles.reduce((sum, r) => sum + (Number(r.count) || 0), 0) + (Number(leaderSlot?.count) || 0);
+
+  // Layout: the Cleaner (WORKER) leads as a FULL-WIDTH row — there can be many
+  // cleaners, so they need the room for chips. The Coordinator/leader slot is
+  // the next (half-column) item, then the rest of the roles follow as halves.
+  const workerRow = roles.find((r) => r.role === "WORKER") || null;
+  const otherRows = roles.filter((r) => r.role !== "WORKER");
+
+  const renderRoleRow = (row, full = false) => {
+    const role = row.role;
+    const roleColor = ROLE_COLORS[role] || "#176b5c";
+    const Icon = ROLE_ICONS[role] || TeamOutlined;
+    const roleLabel = t.roles[role] || role;
+    const count = Number(row.count) || 0;
+    const target = Number.isFinite(Number(row.target)) ? Number(row.target) : null;
+    const names = Array.isArray(row.names) ? row.names : [];
+    const isOwnRole = viewerRole === role;
+    const otherNames =
+      isOwnRole && viewer?.name ? names.filter((n) => n !== viewer.name) : names;
+    const visibleOthers = otherNames.slice(0, isOwnRole ? MAX_VISIBLE_CHIPS - 1 : MAX_VISIBLE_CHIPS);
+    const shownCount = visibleOthers.length + (isOwnRole ? 1 : 0);
+    const hiddenCount = Math.max(0, count - shownCount);
+    const openCount = target !== null ? Math.max(0, target - count) : null;
+    const canJoinThis = roleJoinable(role);
+    const isFullTargetRow = target !== null && openCount === 0;
+    const lockedByOther = viewerCommitted && !isOwnRole;
+    const isPending = pendingRole === role;
+    const countText =
+      target !== null
+        ? t.filledOf
+            .replace("{filled}", localizeDigits(count, language))
+            .replace("{total}", localizeDigits(target, language))
+        : count > 0
+          ? t.roleCount.replace("{n}", localizeDigits(count, language))
+          : "";
+    const roleDesc = t.roleDescriptions?.[role] || "";
+    return (
+      <li
+        key={role}
+        className={`event-roster-row${full ? " event-roster-row--full" : ""}${
+          isOwnRole ? " is-own-role" : ""
+        }${lockedByOther ? " is-locked" : ""}`}
+      >
+        <span
+          className="event-roster-role has-icon participants-role"
+          style={{ "--role-color": roleColor }}
+        >
+          <Icon className="participants-role-icon" aria-hidden="true" />
+          <span className="participants-role-text">
+            <span className="participants-role-head">
+              <span className="participants-role-name">{roleLabel}</span>
+              {countText ? <span className="event-roster-count">{countText}</span> : null}
+            </span>
+            {roleDesc ? <span className="participants-role-desc">{roleDesc}</span> : null}
+          </span>
+        </span>
+
+        <span className="event-roster-chips" aria-hidden={shownCount === 0}>
+          {isOwnRole ? (
+            <span
+              className="event-roster-chip event-roster-chip-filled participants-chip-you"
+              style={{ "--role-color": roleColor }}
+              title={viewer?.name || t.you}
+            >
+              {getInitial(viewer?.name)}
+            </span>
+          ) : null}
+          {visibleOthers.map((name, i) => (
+            <span
+              key={`${role}-${i}`}
+              className="event-roster-chip event-roster-chip-filled"
+              style={{ "--role-color": roleColor }}
+              title={name}
+            >
+              {getInitial(name)}
+            </span>
+          ))}
+          {hiddenCount > 0 ? (
+            <span className="event-roster-chip event-roster-chip-more">
+              {t.moreFilled.replace("{n}", localizeDigits(hiddenCount, language))}
+            </span>
+          ) : null}
+        </span>
+
+        {isOwnRole ? (
+          canLeave ? (
+            <Popconfirm
+              title={t.leaveConfirmTitle}
+              description={t.leaveConfirmDesc}
+              okText={t.leaveOk}
+              cancelText={t.leaveCancel}
+              okButtonProps={{ danger: true, loading: leaving }}
+              onConfirm={handleLeave}
+              overlayClassName="vote-withdraw-popconfirm"
+            >
+              <button
+                type="button"
+                className="participants-joined-toggle"
+                disabled={leaving}
+                aria-label={`${viewerStatusPill} — ${t.leave}`}
+              >
+                <span className="participants-joined-face participants-joined-face--default">
+                  <CheckCircleFilled aria-hidden="true" />
+                  {viewerStatusPill}
+                </span>
+                <span className="participants-joined-face participants-joined-face--leave">
+                  <CloseOutlined aria-hidden="true" />
+                  {leaving ? t.leaving : t.leave}
+                </span>
+              </button>
+            </Popconfirm>
+          ) : (
+            <span className="event-roster-joined-pill">
+              <CheckCircleFilled aria-hidden="true" />
+              {viewerStatusPill}
+            </span>
+          )
+        ) : canJoinThis && !isFullTargetRow ? (
+          <button
+            type="button"
+            className="event-roster-open-pill"
+            onClick={() => handleJoin(role)}
+            disabled={isPending || lockedByOther}
+            aria-label={`${t.join} — ${roleLabel}`}
+          >
+            {isPending
+              ? t.joining
+              : openCount !== null
+                ? t.openPill.replace("{n}", localizeDigits(openCount, language))
+                : t.join}
+          </button>
+        ) : isFullTargetRow ? (
+          <span className="event-roster-full-pill">{t.fullPill}</span>
+        ) : null}
+      </li>
+    );
+  };
+
+  const renderLeaderRow = () => {
+    if (!leaderSlot) return null;
+    return (
+      <li
+        key="__leader"
+        className={`event-roster-row participants-leader-row${
+          leaderSlot.viewerIsLeader ? " is-own-role" : ""
+        }`}
+        style={{ "--role-color": LEAD_COLOR }}
+      >
+        <span className="event-roster-role has-icon participants-role">
+          <CrownOutlined className="participants-role-icon" aria-hidden="true" />
+          <span className="participants-role-text">
+            <span className="participants-role-head">
+              <span className="participants-role-name">
+                {leaderSlot.title || t.roles.COORDINATOR}
+              </span>
+              {Number(leaderSlot.count) > 0 ? (
+                <span className="event-roster-count">
+                  {t.roleCount.replace("{n}", localizeDigits(leaderSlot.count, language))}
+                </span>
+              ) : null}
+            </span>
+            <span className="participants-role-desc">{t.leaderDesc}</span>
+          </span>
+        </span>
+
+        <span className="event-roster-chips" aria-hidden={!leaderSlot.name}>
+          {leaderSlot.name ? (
+            <span
+              className={`event-roster-chip event-roster-chip-filled${
+                leaderSlot.viewerIsLeader ? " participants-chip-you" : ""
+              }`}
+              style={{ "--role-color": LEAD_COLOR }}
+              title={leaderSlot.name}
+            >
+              {getInitial(leaderSlot.name)}
+            </span>
+          ) : null}
+        </span>
+
+        {leaderSlot.viewerIsLeader ? (
+          canLeaveLead ? (
+            <Popconfirm
+              title={t.leaveLeadConfirmTitle}
+              description={t.leaveLeadConfirmDesc}
+              okText={t.leaveOk}
+              cancelText={t.leaveCancel}
+              okButtonProps={{ danger: true, loading: leadLeaving }}
+              onConfirm={handleLeaveLead}
+              overlayClassName="vote-withdraw-popconfirm"
+            >
+              <button
+                type="button"
+                className="participants-joined-toggle participants-lead-toggle"
+                disabled={leadLeaving}
+                aria-label={`${t.leading} — ${t.leave}`}
+              >
+                <span className="participants-joined-face participants-joined-face--default">
+                  <CrownOutlined aria-hidden="true" />
+                  {t.leading}
+                </span>
+                <span className="participants-joined-face participants-joined-face--leave">
+                  <CloseOutlined aria-hidden="true" />
+                  {leadLeaving ? t.leaving : t.leave}
+                </span>
+              </button>
+            </Popconfirm>
+          ) : (
+            <span className="event-roster-joined-pill participants-lead-pill">
+              <CrownOutlined aria-hidden="true" />
+              {t.leading}
+            </span>
+          )
+        ) : leaderSlot.name ? (
+          <span className="participants-lead-by">{t.ledBy.replace("{name}", leaderSlot.name)}</span>
+        ) : leaderSlot.canLead ? (
+          <button
+            type="button"
+            className="event-roster-open-pill participants-lead-cta"
+            onClick={handleLead}
+            disabled={leadPending}
+            aria-label={t.wantToLead}
+          >
+            {leadPending ? t.joining : t.wantToLead}
+          </button>
+        ) : (
+          <span className="event-roster-full-pill">{t.leadOpen}</span>
+        )}
+      </li>
+    );
+  };
 
   return (
     <section

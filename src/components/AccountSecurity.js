@@ -29,7 +29,7 @@ const COPY = {
       intro: "तपाईंको खातामा हाल लग-इन भएका डिभाइसहरू। नचिनेको देखिए revoke गर्नुहोस्।",
       since: "देखि",
       empty: "कुनै सक्रिय session फेला परेन।",
-      revoke: "हटाउनुहोस्",
+      revoke: "हटाउने",
       revokeConfirm: "यो session हटाउने?",
       logoutAll: "सबै ठाउँबाट लग-आउट",
       logoutAllConfirm: "सबै डिभाइसबाट लग-आउट गर्ने?",
@@ -38,12 +38,12 @@ const COPY = {
     danger: {
       heading: "खाता मेटाउनुहोस्",
       intro: "यो स्थायी हो — तपाईंको खाता र डेटा हटाइनेछ। यो फिर्ता गर्न सकिँदैन।",
-      deleteCta: "खाता मेटाउनुहोस्",
+      deleteCta: "खाता मेटाउने",
       modalTitle: "खाता मेटाउने पुष्टि",
       warning: "यो कार्य फिर्ता गर्न सकिँदैन। पुष्टि गर्न पासवर्ड हाल्नुहोस्।",
       passwordLabel: "पासवर्ड",
       passwordPlaceholder: "तपाईंको पासवर्ड",
-      confirmCta: "स्थायी रूपमा मेटाउनुहोस्",
+      confirmCta: "स्थायी रूपमा मेटाउने",
       cancel: "रद्द"
     },
     revoked: "Session हटाइयो।",

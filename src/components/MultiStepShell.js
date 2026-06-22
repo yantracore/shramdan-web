@@ -13,7 +13,7 @@ function localizeDigits(value, language) {
 }
 
 const COPY = {
-  np: { stepFmt: "चरण {current} / {total}", back: "पछाडि", next: "अगाडि", submit: "पठाउनुहोस्" },
+  np: { stepFmt: "चरण {current} / {total}", back: "पछाडि", next: "अगाडि", submit: "पठाउने" },
   en: { stepFmt: "Step {current} of {total}", back: "Back", next: "Continue", submit: "Submit" }
 };
 

@@ -39,7 +39,7 @@ const PAGE_COPY = {
       ago: "अघि",
       participants: "सहभागी",
       durationMin: "{n} मिनेट",
-      view: "विवरण हेर्नुहोस्"
+      view: "विवरण हेर्ने"
     },
     filters: {
       ariaLabel: "अभियान फिल्टर",
@@ -68,7 +68,7 @@ const PAGE_COPY = {
       viewMap: "नक्सा",
       viewThumbnails: "थम्बनेल",
       searchingPrefix: "खोज्दै:",
-      clearSearch: "खोज खाली गर्नुहोस्"
+      clearSearch: "खोज खाली गर्ने"
     },
     categoryLabels: {
       ROADSIDE: "सडक र फुटपाथ",
@@ -81,15 +81,15 @@ const PAGE_COPY = {
     },
     preview: {
       empty: "बायाँबाट कुनै अभियान छान्नुहोस्।",
-      back: "सूचीमा फर्कनुहोस्",
-      openFull: "पूर्ण विवरण पृष्ठ खोल्नुहोस्",
+      back: "सूचीमा फर्कने",
+      openFull: "पूर्ण विवरण हेर्ने",
       meetup: "भेला हुने ठाउँ र निर्देशन",
       roles: "सहभागीहरू",
       photos: "तस्वीरहरू",
       voices: "दिनको आवाज",
       result: "नतिजा सारांश",
-      showMore: "थप पढ्नुहोस्",
-      showLess: "छोटो बनाउनुहोस्",
+      showMore: "थप पढ्ने",
+      showLess: "छोटो बनाउने",
       risk: {
         NORMAL: "सामान्य जोखिम",
         WATCH: "ध्यान आवश्यक",
@@ -107,8 +107,8 @@ const PAGE_COPY = {
         past: "सम्पन्न"
       },
       viewDetail: "विवरण",
-      fullscreenOpen: "पूर्ण-स्क्रिन नक्सा खोल्नुहोस्",
-      fullscreenClose: "पूर्ण-स्क्रिन नक्सा बन्द गर्नुहोस्"
+      fullscreenOpen: "पूर्ण-स्क्रिन नक्सा खोल्ने",
+      fullscreenClose: "पूर्ण-स्क्रिन नक्सा बन्द गर्ने"
     }
   },
   en: {

@@ -58,8 +58,8 @@ const DRAFT_COPY = {
   np: {
     foundTitle: "अधुरो मस्यौदा फेला पर्‍यो",
     foundIntroFmt: "तपाईंले {time} अघि लेख्न थालेको थियो। पुनः ल्याउने?",
-    restore: "पुनः ल्याउनुहोस्",
-    discard: "हटाउनुहोस्",
+    restore: "पुनः ल्याउने",
+    discard: "हटाउने",
     discardedToast: "मस्यौदा हटाइयो",
     restoredToast: "मस्यौदा फेरि ल्याइयो",
     savedNow: "मस्यौदा सुरक्षित · भर्खर",

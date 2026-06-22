@@ -43,7 +43,7 @@ const COPY = {
     heading: "सूचनाहरू",
     empty: "कुनै नयाँ सूचना छैन।",
     markAll: "सबै पढिएको",
-    viewAll: "सबै हेर्नुहोस्",
+    viewAll: "सबै हेर्ने",
     minutesAgo: "{n} मि. अघि",
     hoursAgo: "{n} घण्टा अघि",
     daysAgo: "{n} दिन अघि",

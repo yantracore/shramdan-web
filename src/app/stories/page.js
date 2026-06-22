@@ -33,11 +33,11 @@ const COPY = {
     intro:
       "हरेक श्रमदान अभियानको एउटा-एउटा कथा — स्थान, सहभागी, र समुदायको आवाजमार्फत।",
     participants: "सहभागी",
-    readMore: "पूरा कथा हेर्नुहोस्",
+    readMore: "पूरा कथा हेर्ने",
     empty: "अहिले कुनै कथा प्रकाशित भएको छैन।",
     featuredEyebrow: "फिचर्ड कथा",
     featuredHeading: "सम्पादकको छनोट",
-    featuredCta: "पढ्नुहोस्"
+    featuredCta: "पढ्ने"
   },
   en: {
     pageTitle: "Shramdan stories",

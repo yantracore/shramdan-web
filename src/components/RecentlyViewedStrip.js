@@ -10,7 +10,7 @@ import Link from "next/link";
 import { useRecentlyViewed } from "@/lib/useRecentlyViewed";
 
 const COPY = {
-  np: { title: "हालै हेरेका", clear: "खाली गर्नुहोस्" },
+  np: { title: "हालै हेरेका", clear: "खाली गर्ने" },
   en: { title: "Recently viewed", clear: "Clear" }
 };
 

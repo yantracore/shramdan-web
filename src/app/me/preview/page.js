@@ -76,7 +76,7 @@ const COPY = {
     pageTitle: "मेरो प्रोफाइल — झलक",
     devBanner:
       "👀 यो डेमो हो। सदस्य बनेपछि तपाईंको वास्तविक प्रोफाइल यहीँ देखिनेछ।",
-    devCta: "अहिले OTP बाट जोडिनुहोस्",
+    devCta: "अहिले OTP बाट जोडिने",
     name: "विवेक डेमो",
     handle: "@vivekdemo",
     phone: "+९७७ ९८XXXXXX९४",
@@ -90,7 +90,7 @@ const COPY = {
     inviteCodeLabel: "तपाईंको कोड",
     inviteCopy: "प्रतिलिपि",
     inviteCopied: "कोड प्रतिलिपि भयो",
-    inviteShare: "साझा गर्नुहोस्",
+    inviteShare: "साझा गर्ने",
     inviteShareTitle: "श्रमदान सामुदायिक काममा सहभागी हुनुहोस्",
     inviteShareText: "मेरो कोड {code} प्रयोग गरी श्रमदान मा सामेल हुनुहोस्।",
     inviteStat: "साथी सामेल",

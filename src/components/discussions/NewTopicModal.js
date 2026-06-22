@@ -155,13 +155,13 @@ export function NewTopicModal({
             checked={anonymous}
             onChange={(e) => setAnonymous(e.target.checked)}
           />
-          <span>{np ? "अज्ञात रूपमा पोस्ट गर्नुहोस्" : "Post anonymously"}</span>
+          <span>{np ? "अज्ञात रूपमा पोस्ट गर्ने" : "Post anonymously"}</span>
         </label>
 
         <div className="discussions-modal-actions">
-          <Button onClick={onClose}>{np ? "रद्द गर्नुहोस्" : "Cancel"}</Button>
+          <Button onClick={onClose}>{np ? "रद्द गर्ने" : "Cancel"}</Button>
           <Button type="primary" loading={submitting} disabled={!canSubmit} onClick={handleSubmit}>
-            {np ? "पठाउनुहोस्" : "Post"}
+            {np ? "पठाउने" : "Post"}
           </Button>
         </div>
       </div>

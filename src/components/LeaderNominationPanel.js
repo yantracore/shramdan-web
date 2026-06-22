@@ -57,15 +57,15 @@ const COPY = {
     tieLabel: "बराबर समर्थन — समुदायले निर्णय गर्न सक्छ",
     emptyState: "अहिले कुनै उम्मेदवार छैन।",
     loginPrompt: "समर्थनका लागि पहिले लग-इन गर्नुहोस्",
-    loginCta: "लग-इन गर्नुहोस्",
+    loginCta: "लग-इन गर्ने",
     successVote: "समर्थन दर्ता भयो।",
     successWithdraw: "समर्थन फिर्ता भयो।",
     errorToast: "केही गडबड भयो। फेरि प्रयास गर्नुहोस्।",
     votesCount: "{n} समर्थन",
-    backToIssueLabel: "मूल समस्या हेर्नुहोस्",
+    backToIssueLabel: "मूल समस्या हेर्ने",
     seekingIntro:
       "यो अभियानलाई संयोजक चाहिएको छ। तपाईं आफै अघि सर्न सक्नुहुन्छ, वा अघि सरेका कसैलाई समर्थन गर्न सक्नुहुन्छ।",
-    withdrawVolunteerCta: "मेरो प्रस्ताव फिर्ता लिनुहोस्",
+    withdrawVolunteerCta: "मेरो प्रस्ताव फिर्ता लिने",
     successVolunteer: "तपाईं संयोजक बन्न अघि सर्नुभयो।",
     successVolunteerWithdraw: "तपाईंको प्रस्ताव फिर्ता भयो।",
     notEligibleError:

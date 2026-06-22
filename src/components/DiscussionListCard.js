@@ -85,7 +85,7 @@ export function DiscussionListCard({ topic, language = "np", copy }) {
         className={`discussion-vote-rail${hasVoted ? " is-voted" : ""}`}
         onClick={handleVote}
         aria-pressed={hasVoted}
-        title={hasVoted ? (t.upvoted || (np ? "समर्थन गरिएको" : "Supported")) : (t.upvote || (np ? "समर्थन गर्नुहोस्" : "Support"))}
+        title={hasVoted ? (t.upvoted || (np ? "समर्थन गरिएको" : "Supported")) : (t.upvote || (np ? "समर्थन गर्ने" : "Support"))}
       >
         {hasVoted ? (
           <CaretUpFilled aria-hidden="true" className="discussion-vote-rail-arrow" />
@@ -183,7 +183,7 @@ export function DiscussionListCard({ topic, language = "np", copy }) {
           <div className="discussion-card-stats">
             <span><CommentOutlined aria-hidden="true" /> {localizeDigits(topic.messageCount ?? 0, language)}</span>
             <span className="discussion-card-cta">
-              {np ? "खोल्नुहोस्" : "Open"}
+              {np ? "खोल्ने" : "Open"}
               <ArrowRightOutlined aria-hidden="true" />
             </span>
           </div>

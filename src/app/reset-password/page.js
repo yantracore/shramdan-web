@@ -34,14 +34,14 @@ const COPY = {
     pwPlaceholder: "कम्तीमा ६ अक्षर",
     confirmLabel: "पासवर्ड पुष्टि गर्नुहोस्",
     confirmPlaceholder: "पासवर्ड फेरि लेख्नुहोस्",
-    sendCta: "कोड पठाउनुहोस्",
-    resetCta: "पासवर्ड रिसेट गर्नुहोस्",
-    resend: "कोड फेरि पठाउनुहोस्",
+    sendCta: "कोड पठाउने",
+    resetCta: "पासवर्ड रिसेट गर्ने",
+    resend: "कोड फेरि पठाउने",
     resendIn: "{n} सेकेन्डमा फेरि पठाउन सकिन्छ",
     requestHint: "खाता भएको इमेलमा मात्र कोड पठाइन्छ।",
     expiryHint: "ढुक्क हुनुहोस् — कोड १५ मिनेटसम्म मान्य हुन्छ।",
     remembered: "पासवर्ड सम्झनुभयो?",
-    loginCta: "लगइन गर्नुहोस्।",
+    loginCta: "लगइन गर्ने।",
     sent: "रिसेट कोड पठाइयो।",
     errEmail: "सही इमेल ठेगाना लेख्नुहोस्।",
     errOtp: "६ अंकको कोड हाल्नुहोस्।",
@@ -51,7 +51,7 @@ const COPY = {
     doneEyebrow: "सम्पन्न",
     doneTitle: "पासवर्ड रिसेट भयो।",
     doneBody: "अब नयाँ पासवर्डले लगइन गर्न सक्नुहुन्छ।",
-    toLogin: "लगइनमा जानुहोस्"
+    toLogin: "लगइनमा जाने"
   },
   en: {
     pageTitle: "Reset password",

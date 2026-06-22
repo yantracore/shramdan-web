@@ -25,7 +25,7 @@ const COPY = {
     countMany: "टिप्पणी",
     empty: "अहिलेसम्म कुनै टिप्पणी छैन — पहिलो तपाईं हुनुहोस्।",
     latestBy: "ताजा",
-    openAll: "सबै हेर्नुहोस्",
+    openAll: "सबै हेर्ने",
     minutesAgo: "{n} मि. अघि",
     hoursAgo: "{n} घण्टा अघि",
     daysAgo: "{n} दिन अघि",

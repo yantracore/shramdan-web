@@ -51,8 +51,8 @@ const ROLE_COPY = {
       COORDINATOR: "संयोजक",
       LOGISTICS: "लजिस्टिक्स"
     },
-    submit: "समर्थन गर्नुहोस्",
-    cancel: "रद्द गर्नुहोस्",
+    submit: "समर्थन गर्ने",
+    cancel: "रद्द गर्ने",
     // Voted-state button labels, by the role the viewer holds — the chip reads
     // as their actual commitment, not a flat "समर्थन गरियो".
     doneLabels: {
@@ -67,7 +67,7 @@ const ROLE_COPY = {
     // Confirm-before-withdraw copy, tiered by the role the viewer voted with.
     // INTERESTED is low-stakes; GOING/WANT_TO_LEAD carry a real commitment, so
     // the warning gets heavier the more the campaign is counting on them.
-    withdrawOk: "फिर्ता गर्नुहोस्",
+    withdrawOk: "फिर्ता गर्ने",
     withdrawCancel: "रहन्छु",
     withdraw: {
       INTERESTED: {

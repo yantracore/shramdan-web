@@ -19,7 +19,7 @@ const COPY = {
     inProgressEmpty: "अहिले कुनै फेजमा active काम छैन।",
     recentlyDoneEmpty: "विगत १४ दिनमा कुनै फेज सम्पन्न भएन।",
     upcomingEmpty: "सबै लीफ सकिएको छ।",
-    githubLink: "GitHub मा पूर्ण रोडम्याप हेर्नुहोस्",
+    githubLink: "GitHub मा पूर्ण रोडम्याप हेर्ने",
     phaseLabel: "फेज {n}",
     treeHeading: "पूर्ण रोडम्याप वृक्ष",
     treeIntro:

@@ -188,7 +188,7 @@ export default function DiscussionsPage() {
                       type="button"
                       className="discussions-search-clear"
                       onClick={() => setQuery("")}
-                      aria-label={np ? "खोज खाली गर्नुहोस्" : "Clear search"}
+                      aria-label={np ? "खोज खाली गर्ने" : "Clear search"}
                     >
                       <CloseOutlined />
                     </button>

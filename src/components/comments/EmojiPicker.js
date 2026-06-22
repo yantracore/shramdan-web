@@ -23,10 +23,10 @@ const CURATED_GRID = [
 
 const COPY = {
   np: {
-    aria: "इमोजी छान्नुहोस्",
+    aria: "इमोजी छान्ने",
     quick: "छनोट प्रतिक्रिया",
     grid: "थप इमोजी",
-    triggerAria: "इमोजी जोड्नुहोस्"
+    triggerAria: "इमोजी जोड्ने"
   },
   en: {
     aria: "Pick an emoji",

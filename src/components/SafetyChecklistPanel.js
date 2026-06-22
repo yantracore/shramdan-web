@@ -25,7 +25,7 @@ const COPY = {
     ],
     requiredHint: "सबै {n} बुँदा टिक लागेपछि सक्रिय गर्न सकिनेछ।",
     progress: "{checked} / {total} पुष्टि भयो",
-    activateCta: "अभियान सक्रिय गर्नुहोस्",
+    activateCta: "अभियान सक्रिय गर्ने",
     activateLockedHint: "बाँकी बुँदाहरू पनि पुष्टि गर्नुहोस्।",
     activatingState: "सक्रिय गर्दै...",
     successToast: "अभियान सक्रिय भयो।",

@@ -7,7 +7,7 @@ import { ArrowUpOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 
 const COPY = {
-  np: { aria: "माथि फर्कनुहोस्" },
+  np: { aria: "माथि फर्कने" },
   en: { aria: "Back to top" }
 };
 

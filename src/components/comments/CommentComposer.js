@@ -12,13 +12,13 @@ const COPY = {
     placeholderTop: "तपाईंको विचार राख्नुहोस्…",
     placeholderReply: "जवाफ लेख्नुहोस्…",
     placeholderEdit: "टिप्पणी सम्पादन गर्नुहोस्…",
-    submitTop: "पठाउनुहोस्",
-    submitReply: "जवाफ पठाउनुहोस्",
-    submitEdit: "बचत गर्नुहोस्",
+    submitTop: "पठाउने",
+    submitReply: "जवाफ पठाउने",
+    submitEdit: "बचत गर्ने",
     cancel: "रद्द",
     loginNeededTitle: "टिप्पणी लेख्न लग-इन आवश्यक",
     loginNeededBody: "तपाईंको आवाज दर्जको लागि लग-इन गर्नुहोस् — फेरि यहीं फर्किनुहुनेछ।",
-    loginAction: "लग-इन गर्नुहोस्",
+    loginAction: "लग-इन गर्ने",
     tooLong: "टिप्पणी अति लामो छ।"
   },
   en: {

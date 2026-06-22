@@ -28,7 +28,7 @@ const STATIC_ROUTES = [
   { id: "event-types", labels: ["कार्यक्षेत्र", "Event types"], href: "/event-types", icon: AppstoreOutlined },
   { id: "intro", labels: ["परिचय", "Intro"], href: "/intro", icon: FileTextOutlined },
   { id: "learn", labels: ["सिकौँ", "Learn", "Docs"], href: "/learn", icon: FileTextOutlined },
-  { id: "join", labels: ["जोडिनुहोस्", "Join"], href: "/join", icon: TeamOutlined },
+  { id: "join", labels: ["जोडिने", "Join"], href: "/join", icon: TeamOutlined },
   { id: "feedback", labels: ["प्रतिक्रिया", "Feedback"], href: "/feedback", icon: FileTextOutlined },
   { id: "settings", labels: ["सेटिङ्स", "Settings"], href: "/settings", icon: AppstoreOutlined },
   { id: "leaderboard", labels: ["लीडरबोर्ड", "Leaderboard"], href: "/leaderboard", icon: TrophyOutlined },

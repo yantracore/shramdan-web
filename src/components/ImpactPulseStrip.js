@@ -33,10 +33,10 @@ const COPY = {
     eyebrow: "समुदायको नब्ज",
     intro: "अहिले मञ्चमा के-के चलिरहेको छ — एक नजरमा।",
     tiles: {
-      live: { label: "अभियान लाइभ", hint: "हेर्नुहोस्" },
-      upcoming: { label: "आउँदै", hint: "जोडिनुहोस्" },
-      completed: { label: "सम्पन्न", hint: "प्रभाव हेर्नुहोस्" },
-      issues: { label: "खुला समस्या", hint: "समर्थन गर्नुहोस्" }
+      live: { label: "अभियान लाइभ", hint: "हेर्ने" },
+      upcoming: { label: "आउँदै", hint: "जोडिने" },
+      completed: { label: "सम्पन्न", hint: "प्रभाव हेर्ने" },
+      issues: { label: "खुला समस्या", hint: "समर्थन गर्ने" }
     }
   },
   en: {

@@ -18,10 +18,10 @@ import { ConfettiBurst } from "@/components/ConfettiBurst";
 const COPY = {
   np: {
     badge: "धन्यवाद",
-    submitAnother: "अर्को पठाउनुहोस्",
+    submitAnother: "अर्को पठाउने",
     shareHeading: "साथीलाई पनि निम्तो दिनुहोस्",
     shareSubtle: "श्रमदान सामूहिक मञ्च हो — जति बढी हात, उति ठूलो काम।",
-    copyLink: "लिङ्क प्रतिलिपि गर्नुहोस्",
+    copyLink: "लिङ्क प्रतिलिपि गर्ने",
     copied: "प्रतिलिपि भयो"
   },
   en: {

@@ -9,7 +9,7 @@ const COPY = {
     title: "टिप्पणी रिपोर्ट गर्नुहोस्",
     reasonLabel: "कारण",
     notePlaceholder: "थप जानकारी (वैकल्पिक)…",
-    submit: "रिपोर्ट पठाउनुहोस्",
+    submit: "रिपोर्ट पठाउने",
     cancel: "रद्द",
     reasons: {
       SPAM: "स्प्याम वा विज्ञापन",

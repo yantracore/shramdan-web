@@ -6,14 +6,14 @@ export const copy = {
       issues: "समस्या",
       events: "अभियान",
       eventTypes: "कार्यक्षेत्र",
-      join: "जोडिनुहोस्",
+      join: "जोडिने",
       feedback: "प्रतिक्रिया",
       login: "लगइन",
       intro: "परिचय",
       learn: "सिकौँ",
       settings: "सेटिङ्स",
       appDev: "एप निर्माण",
-      appDevTooltip: "सहभागी हुनुहोस्",
+      appDevTooltip: "सहभागी हुने",
       appDevBadge: "लाइभ",
       resources: "स्रोत भण्डार",
       contribute: "सहयोग"
@@ -35,12 +35,12 @@ export const copy = {
       home: "श्रमदान गृहपृष्ठ",
       nav: "मुख्य नेभिगेसन",
       preferences: "वेबसाइट प्राथमिकताहरू",
-      toggleTheme: "थिम बदल्नुहोस्",
-      openMenu: "नेभिगेसन खोल्नुहोस्",
+      toggleTheme: "थिम बदल्ने",
+      openMenu: "नेभिगेसन खोल्ने",
       heroPanel: "श्रमदान कार्य केन्द्र",
       userMenu: "प्रयोगकर्ता मेनु",
-      appGrid: "ऐप मेनु खोल्नुहोस्",
-      skipToMain: "मुख्य सामग्रीमा जानुहोस्"
+      appGrid: "ऐप मेनु खोल्ने",
+      skipToMain: "मुख्य सामग्रीमा जाने"
     },
     guestPopover: {
       title: "अतिथि",
@@ -48,22 +48,22 @@ export const copy = {
       body:
         "लगइन गरेर अभियान र समस्याहरूमा सहभागी हुनुहोस्, वा श्रमदान योगदानकर्ता बन्न जोडिनुहोस्।",
       login: "लगइन",
-      join: "जोडिनुहोस्"
+      join: "जोडिने"
     },
     controls: {
       language: "English",
       languageTooltip: "Change to English language",
-      themeTooltip: "थिम बदल्नुहोस्",
+      themeTooltip: "थिम बदल्ने",
       darkTheme: "गाढा थिम",
       lightTheme: "उज्यालो थिम",
-      viewAllSettings: "सबै सेटिङ्स हेर्नुहोस्"
+      viewAllSettings: "सबै सेटिङ्स हेर्ने"
     },
     hero: {
       eyebrow: "",
       title: "श्रमदान",
       subtitle: "हाम्रो श्रम, हाम्रो समाज, हाम्रो भविष्य।",
       support: "देशका हरेक समस्या समाधानका लागि सरकारको प्रतीक्षा गरेर हुँदैन। हामी नागरिकहरू आफैं मिलेर सरसफाइ, मर्मत, वृक्षारोपण, टोल सुधार जस्ता आधारभूत काम गर्न सक्छौँ। श्रमदान यही सामूहिक जिम्मेवारीको सुरुवात हो। स-साना हातहरू मिलेर ठूला परिवर्तन सम्भव हुन्छ। आज हाम्रो सामूहिक श्रमदान, भोलि सुन्दर समाजको निर्माण।",
-      join: "योगदान गर्नुहोस्"
+      join: "योगदान गर्ने"
     },
     eventTypes: {
       eyebrow: "श्रमदानको कार्यक्षेत्र",
@@ -74,7 +74,7 @@ export const copy = {
       badgeCurrent: "अहिले बन्दैछ",
       badgeNext: "अर्को",
       badgeFuture: "योजनामा",
-      seeAll: "सबै कार्यक्षेत्र हेर्नुहोस्",
+      seeAll: "सबै कार्यक्षेत्र हेर्ने",
       seeAllHref: "/event-types",
       detail: {
         eyebrow: "कार्यक्षेत्र विवरण",
@@ -85,8 +85,8 @@ export const copy = {
         impactHeading: "अपेक्षित प्रभाव",
         statusHeading: "अहिलेको स्थिति",
         relatedHeading: "सम्बन्धित कार्यक्षेत्र",
-        backToList: "सबै कार्यक्षेत्रमा फर्किनुहोस्",
-        backToHome: "गृहपृष्ठमा फर्किनुहोस्",
+        backToList: "सबै कार्यक्षेत्रमा फर्कने",
+        backToHome: "गृहपृष्ठमा फर्कने",
         notFoundTitle: "कार्यक्षेत्र भेटिएन",
         notFoundBody: "यो कार्यक्षेत्र हटाइएको वा लिङ्क गलत हुनसक्छ।"
       },
@@ -133,7 +133,7 @@ export const copy = {
           statusNote:
             "अहिले श्रमदान एपको पहिलो चरणमा सक्रिय कार्यक्षेत्र। तपाईंले समस्या रिपोर्ट गर्न, समर्थन जनाउन र अभियानमा सहभागी हुन सक्नुहुन्छ।",
           relatedIds: ["afforestation", "trail", "beautification"],
-          ctaLabel: "नयाँ समस्या रिपोर्ट गर्नुहोस्",
+          ctaLabel: "नयाँ समस्या रिपोर्ट गर्ने",
           ctaHref: "/issues/new"
         },
         {
@@ -177,7 +177,7 @@ export const copy = {
           statusNote:
             "अहिले रोडम्यापमा। पहिलो चरण (सरसफाइ) स्थिर भएपछि क्रमशः ल्याइनेछ। तपाईंले आफ्नो क्षेत्रमा सम्भावित स्थान सुझाउन सक्नुहुन्छ।",
           relatedIds: ["trail", "dam", "cleanup"],
-          ctaLabel: "अभियान सुरु भएपछि सूचित गराउनुहोस्",
+          ctaLabel: "अभियान सुरु भएपछि सूचित गराउने",
           ctaHref: "/feedback"
         },
         {
@@ -220,7 +220,7 @@ export const copy = {
           statusNote:
             "अहिले रोडम्यापमा। कलाकार रोस्टर र अनुमति प्रक्रिया तयार भएपछि पहिलो अभियान घोषणा हुनेछ।",
           relatedIds: ["cleanup", "infrastructure"],
-          ctaLabel: "कलाकार वा संयोजक हुन इच्छुक? सुझाव दिनुहोस्",
+          ctaLabel: "कलाकार वा संयोजक हुन इच्छुक? सुझाव दिने",
           ctaHref: "/feedback"
         },
         {
@@ -264,7 +264,7 @@ export const copy = {
           statusNote:
             "अहिले रोडम्यापमा। पहिलो पाइलट ट्रेल कुन हुने भन्ने तय हुन बाँकी — तपाईंले सम्भावित ठाउँ सुझाउन सक्नुहुन्छ।",
           relatedIds: ["dam", "afforestation", "disaster"],
-          ctaLabel: "तपाईंको स्थानीय ट्रेल सुझाउनुहोस्",
+          ctaLabel: "तपाईंको स्थानीय ट्रेल सुझाउने",
           ctaHref: "/feedback"
         },
         {
@@ -308,7 +308,7 @@ export const copy = {
           statusNote:
             "अहिले रोडम्यापमा। प्राविधिक भागीदार र पहिलो पाइलट साइट तय हुने काम बाँकी।",
           relatedIds: ["trail", "afforestation", "disaster"],
-          ctaLabel: "जोखिम क्षेत्र सुझाउनुहोस्",
+          ctaLabel: "जोखिम क्षेत्र सुझाउने",
           ctaHref: "/feedback"
         },
         {
@@ -352,7 +352,7 @@ export const copy = {
           statusNote:
             "अहिले रोडम्यापमा। पहिलो पाइलटका लागि कुन संस्था र क्षेत्र चयन गर्ने भन्ने तय हुन बाँकी।",
           relatedIds: ["cleanup", "beautification"],
-          ctaLabel: "तपाईंको क्षेत्रको संस्था सुझाउनुहोस्",
+          ctaLabel: "तपाईंको क्षेत्रको संस्था सुझाउने",
           ctaHref: "/feedback"
         },
         {
@@ -396,7 +396,7 @@ export const copy = {
           statusNote:
             "अहिले रोडम्यापमा। पहिलो अभियान हिउँदको शीतलहर मौसममा सुरु गर्ने योजना।",
           relatedIds: ["disaster", "infrastructure"],
-          ctaLabel: "स्थानीय जोखिम क्षेत्र सुझाउनुहोस्",
+          ctaLabel: "स्थानीय जोखिम क्षेत्र सुझाउने",
           ctaHref: "/feedback"
         },
         {
@@ -442,7 +442,7 @@ export const copy = {
           statusNote:
             "उच्च-प्राथमिकताको कार्यक्षेत्र तर बढी इन्जिनियरिङ चाहिने (तत्कालीन सूचना, भौगोलिक-दायरा सूचना)। सरल कार्यक्षेत्र स्थिर भएपछि सुरु हुनेछ।",
           relatedIds: ["seasonal", "trail", "dam"],
-          ctaLabel: "प्रथम-प्रतिक्रियाकर्ताका रूपमा सूचीकृत हुनुहोस्",
+          ctaLabel: "प्रथम-प्रतिक्रियाकर्ताका रूपमा सूचीकृत हुने",
           ctaHref: "/feedback"
         }
       ],
@@ -462,10 +462,10 @@ export const copy = {
           eyebrow: "अर्को विचार छ?",
           title: "तपाईंलाई लाग्ने थप कार्यक्षेत्र सुझाउनुहोस्",
           body: "नेपालमै काम लाग्ने अरू सामुदायिक कार्यक्षेत्र तपाईंलाई थाहा छ भने प्रतिक्रिया मार्फत हामीलाई बताउनुहोस्।",
-          buttonLabel: "सुझाव दिनुहोस्",
+          buttonLabel: "सुझाव दिने",
           href: "/feedback"
         },
-        backToHome: "गृहपृष्ठमा फर्किनुहोस्",
+        backToHome: "गृहपृष्ठमा फर्कने",
         additionalItems: [
           {
             id: "search-rescue",
@@ -586,63 +586,63 @@ export const copy = {
         description: "श्रमदानको विकास यात्रा, प्रत्यक्ष प्रसारण र परियोजनाको सन्दर्भ यहीँबाट सिधै हेर्न सकिन्छ।",
         embedUrl: "https://www.youtube-nocookie.com/embed/videoseries?list=PLWkh0s4xHPcTF4FOcYjkdR3i97YbkSDGo&rel=0&modestbranding=1",
         playlistUrl: "https://www.youtube.com/playlist?list=PLWkh0s4xHPcTF4FOcYjkdR3i97YbkSDGo",
-        button: "युट्युबमा पूरै प्लेलिस्ट हेर्नुहोस्"
+        button: "युट्युबमा पूरै प्लेलिस्ट हेर्ने"
       },
       items: [
         {
           id: "participate",
           title: "प्रत्यक्ष सहभागिता",
           description: "गुगल मीट मार्फत दैनिक श्रमदान कार्य सत्रमा सामेल हुनुहोस् — सोमबारदेखि शुक्रबार दिनको १२ बजे।",
-          button: "सहभागी हुनुहोस्",
+          button: "सहभागी हुने",
           href: "https://meet.google.com/kwi-kqyi-iyf"
         },
         {
           id: "watchLive",
           title: "प्रत्यक्ष प्रसारण हेर्नुहोस्",
           description: "युट्युबमा दैनिक विकास प्रत्यक्ष प्रसारण — सोमबारदेखि शुक्रबार दिनको १२ बजे।",
-          button: "प्रत्यक्ष हेर्नुहोस्",
+          button: "प्रत्यक्ष हेर्ने",
           href: "https://www.youtube.com/@yantracore/streams"
         },
         {
           id: "discord",
           title: "डिस्कोर्ड समुदाय",
           description: "डिस्कोर्डमा सबैसँग कुराकानी गर्नुहोस्, प्रश्न सोध्नुहोस् र समाचार पाउनुहोस्।",
-          button: "डिस्कोर्डमा सामेल हुनुहोस्",
+          button: "डिस्कोर्डमा सामेल हुने",
           href: "https://discord.gg/Cd57PXxf"
         },
         {
           id: "presentation",
           title: "प्रत्यक्ष प्रसारण प्रस्तुति सामग्री",
           description: "श्रमदानको उद्देश्य र पूरा विकास यात्रालाई समेटिएको प्रस्तुति सामग्री।",
-          button: "प्रस्तुति खोल्नुहोस्",
+          button: "प्रस्तुति खोल्ने",
           href: "https://drive.google.com/drive/folders/19Iuu_W7GRhD9F6qph0A8drKJQlN2UbUy"
         },
         {
           id: "roadmap",
           title: "विकास योजना (रोडम्याप)",
           description: "श्रमदान एप निर्माणका चरण, कार्यसूची र प्रगति समेटिएको पूरै मास्टर रोडम्याप।",
-          button: "रोडम्याप खोल्नुहोस्",
+          button: "रोडम्याप खोल्ने",
           href: "https://github.com/yantracore/shramdan-web/blob/main/docs/ops/00-master-roadmap.md"
         },
         {
           id: "documents",
           title: "गिटहब कागजातहरू",
           description: "योजना, रूपरेखा, कार्यान्वयन, एपीआई सन्दर्भ र सुरक्षा/कार्यक्रम मोडेलका कागजातहरू स्रोत भण्डारमै राखिएका छन्।",
-          button: "गिटहब कागजात खोल्नुहोस्",
+          button: "गिटहब कागजात खोल्ने",
           href: "https://github.com/yantracore/shramdan-web/tree/main/docs"
         },
         {
           id: "github",
           title: "गिटहब स्रोत भण्डार",
           description: "सार्वजनिक स्रोत कोड, समस्या सूची र योगदान इतिहास समेटिएको खुला स्रोत भण्डार।",
-          button: "स्रोत कोड हेर्नुहोस्",
+          button: "स्रोत कोड हेर्ने",
           href: "https://github.com/yantracore/shramdan-web"
         },
         {
           id: "apiDocs",
           title: "एपीआई कागजात",
           description: "सर्भर एपीआईका ठेगाना, अनुरोध ढाँचा र परीक्षण सन्दर्भहरू समेटिएको सार्वजनिक एपीआई कागजात।",
-          button: "एपीआई कागजात खोल्नुहोस्",
+          button: "एपीआई कागजात खोल्ने",
           href: "https://backend.shramdan.org/api-docs/"
         }
       ]
@@ -702,12 +702,12 @@ export const copy = {
         unassigned: "अगुवा छनोट हुन बाँकी"
       },
       actions: {
-        vote: "मत दिनुहोस्",
+        vote: "मत दिने",
         voted: "मत दिइयो",
         comment: "छलफलमा सामेल",
-        takeLead: "अगुवा बन्नुहोस्",
-        viewDetail: "विवरण हेर्नुहोस्",
-        propose: "नयाँ प्रस्ताव राख्नुहोस्"
+        takeLead: "अगुवा बन्ने",
+        viewDetail: "विवरण हेर्ने",
+        propose: "नयाँ प्रस्ताव राख्ने"
       },
       empty: {
         title: "अहिले सक्रिय प्रस्ताव छैन",
@@ -716,7 +716,7 @@ export const copy = {
       loginPrompt: {
         body: "मतदान र छलफलमा सामेल हुन लग-इन आवश्यक छ।",
         login: "लगइन",
-        join: "जोडिनुहोस्"
+        join: "जोडिने"
       }
     },
     join: {
@@ -733,8 +733,8 @@ export const copy = {
         dragText: "फाइल यहाँ तान्नुहोस् वा क्लिक गर्नुहोस्",
         uploadingText: "अपलोड हुँदैछ…",
         hint: "PDF, JPG, PNG, WebP वा GIF — अधिकतम ५ MB। एक फाइल मात्र।",
-        removeCta: "हटाउनुहोस्",
-        removeAria: "रेज्युमे हटाउनुहोस्",
+        removeCta: "हटाउने",
+        removeAria: "रेज्युमे हटाउने",
         attachedFallback: "रेज्युमे संलग्न",
         replaceHint: "अर्को फाइल राख्नुपरे पहिले हटाएर पुनः अपलोड गर्नुहोस्।",
         errors: {
@@ -747,7 +747,7 @@ export const copy = {
       experience: "तपाईंको अनुभव",
       motivation: "तपाईं श्रमदानमा किन योगदान गर्न चाहनुहुन्छ?",
       additionalInfo: "थप जानकारी",
-      submit: "आवेदन पठाउनुहोस्",
+      submit: "आवेदन पठाउने",
       consent: {
         intro: "म",
         terms: "उपयोग शर्तहरू",
@@ -759,7 +759,7 @@ export const copy = {
         required: "जारी राख्न शर्तहरूमा सहमत हुनुपर्छ।"
       },
       verify: {
-        sendCode: "कोड पठाउनुहोस्",
+        sendCode: "कोड पठाउने",
         sentTo: "पुष्टि कोड यहाँ पठाइयो:",
         password: "पासवर्ड बनाउनुहोस्",
         passwordPlaceholder: "कम्तीमा ६ अक्षर",
@@ -770,7 +770,7 @@ export const copy = {
         otp: "इमेलमा आएको OTP कोड",
         otpInvalid: "६ अंकको OTP कोड लेख्नुहोस्।",
         otpExpiry: "ढुक्क हुनुहोस् — कोड १५ मिनेटसम्म मान्य हुन्छ।",
-        resend: "कोड फेरि पठाउनुहोस्",
+        resend: "कोड फेरि पठाउने",
         resendIn: "{n} सेकेन्डमा फेरि पठाउन सकिन्छ"
       }
     },
@@ -788,8 +788,8 @@ export const copy = {
         dragText: "फाइल यहाँ तान्नुहोस् वा क्लिक गर्नुहोस्",
         uploadingText: "अपलोड हुँदैछ…",
         hint: "PNG, JPG, WebP, GIF वा PDF — अधिकतम ५ MB। एक फाइल मात्र।",
-        removeCta: "हटाउनुहोस्",
-        removeAria: "स्क्रिनशट हटाउनुहोस्",
+        removeCta: "हटाउने",
+        removeAria: "स्क्रिनशट हटाउने",
         attachedFallback: "स्क्रिनशट संलग्न",
         replaceHint: "अर्को फाइल राख्नुपरे पहिले हटाएर पुनः अपलोड गर्नुहोस्।",
         errors: {
@@ -799,7 +799,7 @@ export const copy = {
           generic: "स्क्रिनशट अपलोड गर्न सकिएन। फेरि प्रयास गर्नुहोस्।"
         }
       },
-      submit: "प्रतिक्रिया पठाउनुहोस्"
+      submit: "प्रतिक्रिया पठाउने"
     },
     placeholders: {
       joinName: "e.g. Muna Gurung",
@@ -875,7 +875,7 @@ export const copy = {
       avatar: {
         heading: "प्रोफाइल तस्वीर",
         intro: "JPG, PNG वा WEBP, अधिकतम ५ MB।",
-        change: "तस्वीर परिवर्तन गर्नुहोस्",
+        change: "तस्वीर परिवर्तन गर्ने",
         uploading: "अपलोड हुँदै..."
       },
       profile: {
@@ -883,7 +883,7 @@ export const copy = {
         intro: "नाम र युजरनेम अद्यावधिक गर्नुहोस्।",
         name: "पूरा नाम",
         username: "युजरनेम",
-        save: "सुरक्षित गर्नुहोस्"
+        save: "सुरक्षित गर्ने"
       },
       password: {
         heading: "पासवर्ड परिवर्तन",
@@ -891,7 +891,7 @@ export const copy = {
         current: "हालको पासवर्ड",
         next: "नयाँ पासवर्ड",
         confirm: "नयाँ पासवर्ड पुनः लेख्नुहोस्",
-        save: "पासवर्ड बदल्नुहोस्",
+        save: "पासवर्ड बदल्ने",
         oauthDisabled: "तपाईंले बाह्य लगइन (Google जस्तो) प्रयोग गरेर खाता खोल्नुभएको छ, त्यसैले यहाँ पासवर्ड परिवर्तन उपलब्ध छैन।"
       },
       validation: {
@@ -906,7 +906,7 @@ export const copy = {
         wrongCurrentPassword: "हालको पासवर्ड मिलेन।",
         samePassword: "नयाँ पासवर्ड हालकोभन्दा फरक हुनुपर्छ।",
         loadFailed: "प्रोफाइल लोड गर्न सकिएन।",
-        retry: "फेरि प्रयास गर्नुहोस्"
+        retry: "फेरि प्रयास गर्ने"
       },
       success: {
         profileSaved: "प्रोफाइल अद्यावधिक भयो।",
@@ -959,7 +959,7 @@ export const copy = {
         supportersOne: "१ समर्थक",
         supportersMany: "{n} समर्थक",
         viewDetail: "विस्तृत",
-        voteAction: "समर्थन गर्नुहोस्",
+        voteAction: "समर्थन गर्ने",
         voteDisabledTooltip: "समर्थन जनाउन साइन इन गर्नुहोस्"
       },
       states: {
@@ -968,10 +968,10 @@ export const copy = {
         emptyBody: "फिल्टर हटाएर पुनः हेर्नुहोस् वा पछि फेरि भेट्न आउनुहोस् — समुदायले निरन्तर नयाँ समस्या थप्दैछ।",
         errorTitle: "समस्याहरू लोड गर्न सकिएन",
         errorBody: "सर्भरसँग जोडिँदा केही गडबड भयो। केही क्षणपछि फेरि प्रयास गर्नुहोस्।",
-        retry: "फेरि प्रयास गर्नुहोस्"
+        retry: "फेरि प्रयास गर्ने"
       },
       detail: {
-        backToList: "सबै समस्यामा फर्किनुहोस्",
+        backToList: "सबै समस्यामा फर्कने",
         reportedOn: "रिपोर्ट मिति",
         locationLabel: "स्थान",
         categoryLabel: "क्षेत्र",
@@ -983,15 +983,15 @@ export const copy = {
         noRelated: "यस क्षेत्रमा अहिले अरू समस्या रिपोर्ट गरिएको छैन।",
         notFoundTitle: "समस्या भेटिएन",
         notFoundBody: "यो समस्या हटाइएको हुनसक्छ वा लिंक गलत छ।",
-        shareTitle: "साझेदारी गर्नुहोस्",
-        shareCopyLink: "लिङ्क प्रतिलिपि गर्नुहोस्",
+        shareTitle: "साझेदारी गर्ने",
+        shareCopyLink: "लिङ्क प्रतिलिपि गर्ने",
         shareCopied: "लिङ्क प्रतिलिपि भयो",
         locationTitle: "स्थान",
-        openInMaps: "नक्सामा खोल्नुहोस्",
-        fullscreenOpen: "पूरा स्क्रिनमा हेर्नुहोस्",
-        fullscreenClose: "पूरा स्क्रिन बन्द गर्नुहोस्",
+        openInMaps: "नक्सामा खोल्ने",
+        fullscreenOpen: "पूरा स्क्रिनमा हेर्ने",
+        fullscreenClose: "पूरा स्क्रिन बन्द गर्ने",
         galleryAria: "फोटो ग्यालरी",
-        viewPhoto: "फोटो ठूलो हेर्नुहोस्",
+        viewPhoto: "फोटो ठूलो हेर्ने",
         photoCount: "{n} तस्वीर",
         rejectedNote: "यो समस्या अस्वीकृत गरिएको छ।",
         duplicateNote: "यो समस्या डुप्लिकेट रिपोर्ट हो।"
@@ -1042,7 +1042,7 @@ export const copy = {
         supportersOne: "१ समर्थक",
         supportersMany: "{n} समर्थक",
         viewDetail: "विस्तृत",
-        voteAction: "समर्थन गर्नुहोस्",
+        voteAction: "समर्थन गर्ने",
         voteActionDone: "समर्थन गरियो",
         voteDisabledTooltip: "समर्थन गर्न साइन इन गर्नुहोस्",
         voteSuccess: "तपाईंको समर्थन रेकर्ड भयो।",
@@ -1062,7 +1062,7 @@ export const copy = {
         errorTitle: "समस्याहरू लोड गर्न सकिएन",
         errorBody:
           "सर्भरसँग जोडिँदा केही गडबड भयो। केही क्षणपछि फेरि प्रयास गर्नुहोस्।",
-        retry: "फेरि प्रयास गर्नुहोस्"
+        retry: "फेरि प्रयास गर्ने"
       },
       pagination: {
         previous: "अघिल्लो",
@@ -1070,7 +1070,7 @@ export const copy = {
         ariaLabel: "पृष्ठहरू"
       },
       detail: {
-        backToList: "सबै समस्यामा फर्किनुहोस्",
+        backToList: "सबै समस्यामा फर्कने",
         reportedOn: "रिपोर्ट मिति",
         locationLabel: "स्थान",
         categoryLabel: "क्षेत्र",
@@ -1082,15 +1082,15 @@ export const copy = {
         noRelated: "यस क्षेत्रमा अहिले अरू समस्या रिपोर्ट गरिएको छैन।",
         notFoundTitle: "समस्या भेटिएन",
         notFoundBody: "यो समस्या हटाइएको हुनसक्छ वा लिङ्क गलत छ।",
-        shareTitle: "साझेदारी गर्नुहोस्",
-        shareCopyLink: "लिङ्क प्रतिलिपि गर्नुहोस्",
+        shareTitle: "साझेदारी गर्ने",
+        shareCopyLink: "लिङ्क प्रतिलिपि गर्ने",
         shareCopied: "लिङ्क प्रतिलिपि भयो",
         locationTitle: "स्थान",
-        openInMaps: "नक्सामा खोल्नुहोस्",
-        fullscreenOpen: "पूरा स्क्रिनमा हेर्नुहोस्",
-        fullscreenClose: "पूरा स्क्रिन बन्द गर्नुहोस्",
+        openInMaps: "नक्सामा खोल्ने",
+        fullscreenOpen: "पूरा स्क्रिनमा हेर्ने",
+        fullscreenClose: "पूरा स्क्रिन बन्द गर्ने",
         galleryAria: "फोटो ग्यालरी",
-        viewPhoto: "फोटो ठूलो हेर्नुहोस्",
+        viewPhoto: "फोटो ठूलो हेर्ने",
         photoCount: "{n} तस्वीर",
         rejectedNote: "यो समस्या अस्वीकृत गरिएको छ।",
         duplicateNote: "यो समस्या डुप्लिकेट रिपोर्ट हो।"
@@ -1102,7 +1102,7 @@ export const copy = {
         regionLabel: "समस्याहरूको नक्सा",
         viewList: "सूची",
         viewMap: "नक्सा",
-        toggleLabel: "सूची वा नक्सा छनोट गर्नुहोस्",
+        toggleLabel: "सूची वा नक्सा छनोट गर्ने",
         markerCount: "नक्सामा {n} समस्या"
       },
       split: {
@@ -1115,11 +1115,11 @@ export const copy = {
       },
       preview: {
         empty: "बायाँबाट कुनै समस्या छान्नुहोस् — विवरण यहाँ देखिनेछ।",
-        back: "सूचीमा फर्कनुहोस्",
-        openFull: "पूर्ण विवरण पृष्ठ खोल्नुहोस्",
+        back: "सूचीमा फर्कने",
+        openFull: "पूर्ण विवरण हेर्ने",
         reportedOn: "रिपोर्ट मिति",
-        showMore: "थप पढ्नुहोस्",
-        showLess: "छोटो बनाउनुहोस्",
+        showMore: "थप पढ्ने",
+        showLess: "छोटो बनाउने",
         supporters: "समर्थनकर्ता",
         supportersMore: "थप {n}"
       }
@@ -1136,7 +1136,7 @@ export const copy = {
       searchPlaceholder: "अभियान, समस्या वा ठाउँ खोज्नुहोस्…",
       searchAria: "श्रमदानमा खोज्नुहोस्",
       filtersLabel: "फिल्टर",
-      submitAria: "खोज सुरु गर्नुहोस्",
+      submitAria: "खोज सुरु गर्ने",
       mapEyebrow: "नक्सामा",
       mapEmpty: "अहिले नक्सामा देखाउन कुनै अभियान छैन।",
       map: {
@@ -1146,8 +1146,8 @@ export const copy = {
           past: "सम्पन्न"
         },
         viewDetail: "विवरण",
-        fullscreenOpen: "पूर्ण-स्क्रिन नक्सा खोल्नुहोस्",
-        fullscreenClose: "पूर्ण-स्क्रिन नक्सा बन्द गर्नुहोस्"
+        fullscreenOpen: "पूर्ण-स्क्रिन नक्सा खोल्ने",
+        fullscreenClose: "पूर्ण-स्क्रिन नक्सा बन्द गर्ने"
       },
       forYou: {
         eyebrow: "तपाईंका लागि",
@@ -1165,7 +1165,7 @@ export const copy = {
         },
         distanceNearby: "नजिकै",
         distanceSuffix: "किमी दूर",
-        locationCta: "नजिकैका देखाउनुहोस्",
+        locationCta: "नजिकैका देखाउने",
         locationGranted: "तपाईंको ठाउँअनुसार क्रम मिलाइयो",
         modeEventLabel: "अभियानहरू",
         modeIssueLabel: "समस्याहरू",
@@ -1204,11 +1204,11 @@ export const copy = {
       newTopic: "नयाँ विषय",
       newProposal: "नयाँ फिचर अनुरोध",
       anonymousAuthor: "अज्ञात सदस्य",
-      anonymousToggleLabel: "मेरो नाम लुकाउनुहोस्",
+      anonymousToggleLabel: "मेरो नाम लुकाउने",
       anonymousToggleHint: "तपाईंको पोस्ट अज्ञात रूपमा देखिनेछ; मोडरेसन को लागि सर्भर मा रेकर्ड भने रहन्छ।",
       messageCount: "{n} सन्देश",
       lastActivity: "अन्तिम गतिविधि",
-      upvote: "समर्थन गर्नुहोस्",
+      upvote: "समर्थन गर्ने",
       upvoted: "समर्थन गरिएको",
       promotionEligible: "प्रवर्द्धनको दहलीजमा",
       promotionPromoted: "रोडम्यापमा सारियो",
@@ -1223,19 +1223,19 @@ export const copy = {
       sortUpvotes: "सबैभन्दा बढी समर्थन",
       sortNearThreshold: "दहलीजको नजिक",
       replyComposerPlaceholder: "जवाफ लेख्नुहोस्…",
-      composerCta: "पठाउनुहोस्",
+      composerCta: "पठाउने",
       backToList: "सबै छलफल",
       emptyMessage: "अहिले छलफल छैन। पहिलो विषय खोल्नुहोस्।",
       eventPresence: {
         labelOne: "{n} सक्रिय छलफल सन्देश",
         labelMany: "{n} सक्रिय छलफल सन्देश",
-        viewThread: "थ्रेड हेर्नुहोस्"
+        viewThread: "थ्रेड हेर्ने"
       }
     },
     memberProfile: {
       eyebrow: "श्रमदान सदस्य",
       memberSinceLabel: "देखि सदस्य",
-      backToList: "सूचीमा फर्कनुहोस्",
+      backToList: "सूचीमा फर्कने",
       sections: {
         recentActivity: "हालैको गतिविधि",
         supportedIssues: "समर्थन गरिएका समस्या",
@@ -1271,7 +1271,7 @@ export const copy = {
       liveBadge: "लाइभ",
       title: "श्रमदान अभियानहरू",
       subtitle: "अहिले लाइभ भइरहेका अभियानहरू हेर्नुहोस्।",
-      viewAll: "सबै अभियान हेर्नुहोस्",
+      viewAll: "सबै अभियान हेर्ने",
       emptyMessage:
         "अहिले कुनै अभियान छैन। जब कुनै सुरु हुन्छ, श्रमेशले यहीँ देखाउनेछ।",
       viewersPrefix: "",
@@ -1281,29 +1281,29 @@ export const copy = {
       durationLive: "देखि लाइभ",
       viewDetails: "विवरण",
       ariaCarousel: "लाइभ अभियानहरूको स्लाइडर",
-      prevAria: "अघिल्ला अभियानहरू देखाउनुहोस्",
-      nextAria: "अरू अभियानहरू देखाउनुहोस्"
+      prevAria: "अघिल्ला अभियानहरू देखाउने",
+      nextAria: "अरू अभियानहरू देखाउने"
     },
     liveIssues: {
       eyebrow: "सक्रिय समस्याहरू",
       title: "देशभरबाट उठेका समस्याहरू",
       intro:
         "सदस्यहरूले हालै रिपोर्ट गरेका, समर्थन बटुलिरहेका र अभियानको तयारीमा रहेका समस्याहरू। नक्सामा क्लिक गरेर वा सूचीमा गएर पूर्ण विवरण हेर्नुहोस्।",
-      viewAll: "सबै समस्या हेर्नुहोस्",
+      viewAll: "सबै समस्या हेर्ने",
       statIssues: "सक्रिय समस्या",
       statLocations: "ठाउँ",
       statVotes: "जम्मा समर्थन",
       statsAria: "सक्रिय समस्याहरूको सारांश",
-      mapAria: "समस्या नक्सा खोल्नुहोस्",
-      mapPill: "नक्सामा अन्वेषण गर्नुहोस्",
+      mapAria: "समस्या नक्सा खोल्ने",
+      mapPill: "नक्सामा अन्वेषण गर्ने",
       topTitle: "अहिले सबैभन्दा बढी समर्थन पाएका",
-      fullscreenOpen: "नक्सा पूरा स्क्रिनमा खोल्नुहोस्",
-      fullscreenClose: "पूरा स्क्रिन बन्द गर्नुहोस्"
+      fullscreenOpen: "नक्सा पूरा स्क्रिनमा खोल्ने",
+      fullscreenClose: "पूरा स्क्रिन बन्द गर्ने"
     },
     events: {
       detail: {
-        backToEvents: "सबै अभियानमा फर्किनुहोस्",
-        backToIssue: "मूल समस्या हेर्नुहोस्",
+        backToEvents: "सबै अभियानमा फर्कने",
+        backToIssue: "मूल समस्या हेर्ने",
         scheduledOn: "तय मिति",
         notScheduled: "अहिलेसम्म मिति तय भएको छैन",
         duration: "अवधि",
@@ -1316,9 +1316,9 @@ export const copy = {
         goalTitle: "अभियानको लक्ष्य",
         goalEmpty: "विवरण थप हुनै बाँकी।",
         locationTitle: "स्थान",
-        openInMaps: "नक्सामा खोल्नुहोस्",
-        fullscreenOpen: "पूरा स्क्रिनमा हेर्नुहोस्",
-        fullscreenClose: "पूरा स्क्रिन बन्द गर्नुहोस्",
+        openInMaps: "नक्सामा खोल्ने",
+        fullscreenOpen: "पूरा स्क्रिनमा हेर्ने",
+        fullscreenClose: "पूरा स्क्रिन बन्द गर्ने",
         completedAt: "सम्पन्न मिति",
         resultSummary: "नतिजा",
         photosTitle: "तस्वीर र प्रमाण",
@@ -1326,11 +1326,11 @@ export const copy = {
         notFoundBody: "यो अभियान हटाइएको वा लिङ्क गलत हुनसक्छ।",
         errorTitle: "अभियान लोड गर्न सकिएन",
         errorBody: "केही गडबड भयो। केही क्षणपछि फेरि प्रयास गर्नुहोस्।",
-        retry: "फेरि प्रयास गर्नुहोस्",
+        retry: "फेरि प्रयास गर्ने",
         loading: "अभियान लोड हुँदै...",
         defaultTitle: "श्रमदान अभियान",
         leaderSchedule: {
-          openCta: "अभियान तय गर्नुहोस्",
+          openCta: "अभियान तय गर्ने",
           eyebrow: "अभियान संयोजक मात्र",
           modalTitle: "अभियानको मिति र विवरण तय गर्नुहोस्",
           intro: "मस्यौदा अभियानलाई सञ्चालनमा लैजान मिति, अवधि र भेला हुने स्थान तय गर्नुहोस्। तय गरेपछि अभियानको स्थिति 'तय भएको' मा सर्नेछ।",
@@ -1349,19 +1349,19 @@ export const copy = {
           latitudeLabel: "अक्षांश (latitude)",
           longitudeLabel: "देशान्तर (longitude)",
           coordsInvalid: "अक्षांश/देशान्तर मान्य संख्या हुनुपर्छ।",
-          useIssueLocation: "मूल समस्याको स्थान प्रयोग गर्नुहोस्",
+          useIssueLocation: "मूल समस्याको स्थान प्रयोग गर्ने",
           planningNotesLabel: "योजना नोटहरू",
           planningNotesPlaceholder: "उपकरण, सुरक्षा, खाजा आदिको आन्तरिक योजना।",
           planningNotesHelp: "यो टिप्पणी संयोजक र व्यवस्थापकलाई मात्र देखिने हो।",
-          submit: "अभियान तय गर्नुहोस्",
-          cancel: "रद्द गर्नुहोस्",
+          submit: "अभियान तय गर्ने",
+          cancel: "रद्द गर्ने",
           successToast: "अभियान सफलतापूर्वक तय भयो।",
           errorToast: "अभियान तय गर्न सकिएन। फेरि प्रयास गर्नुहोस्।",
           forbiddenToast: "तपाईं यस अभियानको संयोजक होइन।",
           conflictToast: "यो अभियान पहिले नै तय भइसकेको छ।"
         },
         leaderComplete: {
-          openCta: "अभियान सम्पन्न गर्नुहोस्",
+          openCta: "अभियान सम्पन्न गर्ने",
           eyebrow: "अभियान संयोजक मात्र",
           intro: "अभियान सम्पन्न हुनासाथ छोटो परिणाम विवरण लेखेर सम्पन्नता दर्ता गर्नुहोस्। सहभागीहरूले यो विवरण अभियान पृष्ठमा देख्नेछन्।",
           modalTitle: "अभियान सम्पन्न दर्ता",
@@ -1375,8 +1375,8 @@ export const copy = {
           resultSummaryHelp: "के सम्पन्न भयो, कतिजना सहभागी, र मापन योग्य परिणाम भए के — संक्षेपमा।",
           resultSummaryRequired: "परिणाम विवरण आवश्यक छ।",
           resultSummaryTooShort: "कम्तीमा १२ अक्षर लेख्नुहोस्।",
-          submit: "सम्पन्न दर्ता गर्नुहोस्",
-          cancel: "रद्द गर्नुहोस्",
+          submit: "सम्पन्न दर्ता गर्ने",
+          cancel: "रद्द गर्ने",
           successToast: "अभियान सम्पन्न दर्ता भयो।",
           demoSuccessToast: "डेमो अभियान सम्पन्न दर्ता भयो (स्थानीय)।",
           errorToast: "सम्पन्न दर्ता गर्न सकिएन। फेरि प्रयास गर्नुहोस्।",
@@ -1572,7 +1572,7 @@ export const copy = {
       eyebrow: "समस्या रिपोर्ट",
       title: "नयाँ समस्या रिपोर्ट गर्नुहोस्",
       intro: "तपाईंको टोल वा आसपासको कुनै समस्या समुदायलाई बताउनुहोस् — समुदायले भोट दिएर अभियानमा परिणत गर्नेछ।",
-      submit: "समस्या पठाउनुहोस्",
+      submit: "समस्या पठाउने",
       successMessage: "तपाईंको रिपोर्ट सफलतापूर्वक पठाइयो।",
       authRequiredMessage: "रिपोर्ट गर्न पहिले लगइन गर्नुहोस्।",
       review: {
@@ -1604,7 +1604,7 @@ export const copy = {
         locationRequired: "नक्सामा सही स्थान देखाउनुहोस्।",
         picker: {
           searchPlaceholder: "स्थान खोज्नुहोस् (जस्तै: तारकेश्वर, काठमाडौँ)",
-          searchClear: "खोज खाली गर्नुहोस्",
+          searchClear: "खोज खाली गर्ने",
           searchLoading: "खोजी गर्दै...",
           searchEmpty: "कुनै नतिजा भेटिएन।",
           hint: "नक्सामा ट्याप गरेर सही ठाउँमा पिन राख्नुहोस्, वा खोज प्रयोग गर्नुहोस्।",
@@ -1639,7 +1639,7 @@ export const copy = {
         stepFmt: "चरण {current} / {total}",
         back: "पछाडि",
         next: "अगाडि",
-        submit: "पठाउनुहोस्"
+        submit: "पठाउने"
       },
       lanes: {
         legend: "योगदानको लेन छान्नुहोस्",
@@ -1752,7 +1752,7 @@ export const copy = {
             title: "स्वागत",
             heading: "श्रमदान सदस्य बन्नुहोस्",
             intro: "नाम, इमेल र पासवर्ड — अनि इमेलमा आउने OTP कोडले पुष्टि।",
-            cta: "सुरु गर्नुहोस्"
+            cta: "सुरु गर्ने"
           },
           details: {
             title: "विवरण",
@@ -1789,8 +1789,8 @@ export const copy = {
         social: "सामाजिक सञ्जाल"
       },
       links: {
-        contributor: "योगदान गर्नुहोस्",
-        feedback: "प्रतिक्रिया दिनुहोस्",
+        contributor: "योगदान गर्ने",
+        feedback: "प्रतिक्रिया दिने",
         documents: "दस्तावेजहरू",
         terms: "उपयोग शर्तहरू",
         privacy: "गोपनीयता नीति",
@@ -1855,7 +1855,7 @@ export const copy = {
     },
     controls: {
       language: "नेपाली",
-      languageTooltip: "नेपाली भाषामा बदल्नुहोस्",
+      languageTooltip: "नेपाली भाषामा बदल्ने",
       themeTooltip: "Switch theme",
       darkTheme: "Dark theme",
       lightTheme: "Light theme",

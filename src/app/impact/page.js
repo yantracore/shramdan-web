@@ -72,10 +72,10 @@ const COPY = {
     eventDateLabel: "मिति",
     eventParticipantsLabel: "सहभागी",
     eventDurationLabel: "अवधि (मिनेट)",
-    viewDetail: "विस्तृत हेर्नुहोस्",
+    viewDetail: "विस्तृत हेर्ने",
     ctaTitle: "तपाईं पनि जोडिनुहोस्",
     ctaBody: "अर्को अभियान सुरु हुनलागेको छ। तपाईं भूमिकामा छनोट गरेर अहिल्यै सहभागी हुनुहोस्।",
-    ctaBtn: "आउँदा अभियानहरू हेर्नुहोस्"
+    ctaBtn: "आउँदा अभियानहरू हेर्ने"
   },
   en: {
     pageTitle: "Shramdan impact",

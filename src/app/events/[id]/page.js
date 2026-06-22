@@ -1009,7 +1009,7 @@ export default function EventDetailPage() {
                     <div>
                       <Link href={`/discussions/${discussionPresence.topicSlug}`}>
                         <Button type="link" style={{ padding: 0 }}>
-                          {language === "np" ? "मुख्य छलफलमा सामेल हुनुहोस्" : "Join the main discussion"} &rarr;
+                          {language === "np" ? "मुख्य छलफलमा सामेल हुने" : "Join the main discussion"} &rarr;
                         </Button>
                       </Link>
                     </div>
@@ -1045,7 +1045,7 @@ export default function EventDetailPage() {
 
         {!loading && !error && !notFound && eventData ? (
           <StickyActionBar
-            label={language === "np" ? "जोडिनुहोस्" : "Join this event"}
+            label={language === "np" ? "जोडिने" : "Join this event"}
             href={`/join?event=${encodeURIComponent(eventData.id)}`}
           />
         ) : null}

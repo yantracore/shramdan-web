@@ -85,7 +85,7 @@ const COPY = {
     inKindLabel: "सामग्री",
     receiptLink: "रसिद",
     noReceipt: "—",
-    eventLink: "हेर्नुहोस्",
+    eventLink: "हेर्ने",
     emptyLedger: "अहिले कुनै दर्ता छैन।",
     notesIntroNp: "सार्वजनिक खाताबही",
     notesBody:

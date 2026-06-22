@@ -11,7 +11,7 @@ import { AppstoreOutlined, CloseOutlined } from "@ant-design/icons";
 import Link from "next/link";
 
 const COPY = {
-  np: { title: "अनुप्रयोगहरू", aria: "ऐप मेनु", close: "बन्द गर्नुहोस्" },
+  np: { title: "अनुप्रयोगहरू", aria: "ऐप मेनु", close: "बन्द गर्ने" },
   en: { title: "Apps", aria: "Apps menu", close: "Close menu" }
 };
 

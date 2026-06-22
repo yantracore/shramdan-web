@@ -51,7 +51,7 @@ const COPY = {
     notesLabel: "थप विवरण",
     notesPlaceholder:
       "तपाईं कहिले उपलब्ध हुनुहुन्छ, कुन विशेष सीप छ, अरू केही जानकारी।",
-    submit: "पठाउनुहोस्",
+    submit: "पठाउने",
     cancel: "रद्द",
     requiredField: "अनिवार्य",
     successToast: "तपाईंको प्रस्ताव संयोजकलाई पुग्यो।",

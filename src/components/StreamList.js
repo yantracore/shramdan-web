@@ -343,11 +343,11 @@ export function StreamList({
               onClick={() => request()}
             >
               <AimOutlined aria-hidden="true" />
-              {t.locationCta || (language === "np" ? "नजिकैका देखाउनुहोस्" : "Show nearby")}
+              {t.locationCta || (language === "np" ? "नजिकैका देखाउने" : "Show nearby")}
             </button>
           ) : null}
           <Link className="home-for-you-view-all" href={mode === "event" ? "/events" : "/issues"}>
-            {language === "np" ? "सबै हेर्नुहोस्" : "View all"}
+            {language === "np" ? "सबै हेर्ने" : "View all"}
             <ArrowRightOutlined aria-hidden="true" />
           </Link>
         </div>
@@ -384,7 +384,7 @@ export function StreamList({
           </p>
           <Link className="home-for-you-empty-cta" href={mode === "event" ? "/events" : "/issues"}>
             {language === "np"
-              ? mode === "event" ? "सबै अभियान हेर्नुहोस्" : "सबै समस्या हेर्नुहोस्"
+              ? mode === "event" ? "सबै अभियान हेर्ने" : "सबै समस्या हेर्ने"
               : mode === "event" ? "Browse all events" : "Browse all issues"}
             <ArrowRightOutlined aria-hidden="true" />
           </Link>

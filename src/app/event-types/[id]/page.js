@@ -260,7 +260,7 @@ export default function EventTypeDetailPage() {
       </article>
 
       <StickyActionBar
-        label={language === "np" ? "यस्तो समस्या रिपोर्ट गर्नुहोस्" : "Report this kind of problem"}
+        label={language === "np" ? "यस्तो समस्या रिपोर्ट गर्ने" : "Report this kind of problem"}
         href={`/issues/new?category=${encodeURIComponent(item.id)}`}
       />
     </SiteShell>

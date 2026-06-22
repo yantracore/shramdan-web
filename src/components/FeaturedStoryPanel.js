@@ -23,7 +23,7 @@ function localizeDigits(value, language) {
 const COPY = {
   np: {
     eyebrow: "तपाईंलाई थाहै नहोला",
-    cta: "पूरा कथा पढ्नुहोस्",
+    cta: "पूरा कथा पढ्ने",
     participants: "सहभागी"
   },
   en: {

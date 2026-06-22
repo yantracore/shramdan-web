@@ -39,7 +39,7 @@ function formatDate(iso, language) {
 const COPY = {
   np: {
     backToStories: "सबै कथाहरू",
-    eventLink: "सम्बन्धित अभियान हेर्नुहोस्",
+    eventLink: "सम्बन्धित अभियान हेर्ने",
     notFoundTitle: "कथा भेटिएन",
     notFoundBody: "तपाईंले खोज्नुभएको कथा अहिले उपलब्ध छैन।"
   },

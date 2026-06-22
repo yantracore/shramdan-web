@@ -17,11 +17,11 @@ import { useState } from "react";
 
 const COPY = {
   np: {
-    share: "साझा गर्नुहोस्",
+    share: "साझा गर्ने",
     copied: "लिङ्क प्रतिलिपि भयो",
     copiedToast: "लिङ्क क्लिपबोर्डमा सारियो",
     copyFailed: "साझा गर्न सकिएन",
-    aria: "यो पृष्ठ साझा गर्नुहोस्"
+    aria: "यो पृष्ठ साझा गर्ने"
   },
   en: {
     share: "Share",
