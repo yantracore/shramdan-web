@@ -30,6 +30,7 @@ import {
   CameraOutlined,
   CheckCircleFilled,
   CloseOutlined,
+  CrownOutlined,
   InboxOutlined,
   MedicineBoxOutlined,
   SafetyOutlined,
@@ -38,6 +39,10 @@ import {
   VideoCameraOutlined
 } from "@ant-design/icons";
 import { Popconfirm } from "antd";
+
+// The leadership ("Coordinator") slot reads in gold — set apart from the
+// participation roles, which it sits below.
+const LEAD_COLOR = "#b7791f";
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 
@@ -115,6 +120,14 @@ const COPY = {
     compactSpotsEyebrow: "स्थान भरियो",
     compactOpen: "{n} खाली",
     compactFull: "सबै भरियो",
+    leaderEyebrow: "नेतृत्व",
+    leaderDesc: "टोली जुटाउने र अभियानको दिन नेतृत्व",
+    wantToLead: "नेतृत्व गर्छु",
+    leading: "तपाईं नेतृत्वमा",
+    ledBy: "{name} नेतृत्वमा",
+    leadOpen: "नेतृत्व खुला",
+    leaveLeadConfirmTitle: "नेतृत्व फिर्ता गर्ने?",
+    leaveLeadConfirmDesc: "तपाईं यो अभियानको नेतृत्वबाट हट्नुहुनेछ। मन लागे फेरि प्रस्ताव गर्न सकिन्छ।",
     roles: {
       WORKER: "कामदार",
       PHOTOGRAPHER: "फोटोग्राफर",
@@ -173,6 +186,14 @@ const COPY = {
     compactSpotsEyebrow: "Roles filled",
     compactOpen: "{n} open",
     compactFull: "All filled",
+    leaderEyebrow: "Leadership",
+    leaderDesc: "Rallies the team & leads on the day",
+    wantToLead: "Want to Lead",
+    leading: "You're leading",
+    ledBy: "Led by {name}",
+    leadOpen: "Lead open",
+    leaveLeadConfirmTitle: "Step down as lead?",
+    leaveLeadConfirmDesc: "You'll no longer be leading this campaign. You can offer again anytime.",
     roles: {
       WORKER: "Worker",
       PHOTOGRAPHER: "Photographer",
@@ -257,21 +278,34 @@ export function ParticipantsPanel({
   canLeave = false,
   onJoin,
   onLeave,
+  // The leadership ("Coordinator") slot, rendered separately at the bottom.
+  //   { viewerIsLeader, name, count, canLead }
+  // Leadership is its own commitment — on issues a WANT_TO_LEAD vote, on events
+  // the resolved event leader — so it's NOT one of the `roles` above.
+  leaderSlot = null,
+  onLead,
+  onLeaveLead,
+  canLeaveLead = false,
   language = "np"
 }) {
   const t = COPY[language] || COPY.np;
   const [pendingRole, setPendingRole] = useState(null);
   const [leaving, setLeaving] = useState(false);
+  const [leadPending, setLeadPending] = useState(false);
+  const [leadLeaving, setLeadLeaving] = useState(false);
 
   const viewerRole = viewer?.role || null;
+  // The viewer is "committed" if they hold a role OR they're leading — either
+  // locks the other join actions (one commitment per issue).
+  const viewerCommitted = Boolean(viewerRole) || Boolean(leaderSlot?.viewerIsLeader);
   const roleJoinable = (role) =>
-    !viewerRole && (joinableRoles === null || (Array.isArray(joinableRoles) && joinableRoles.includes(role)));
+    !viewerCommitted && (joinableRoles === null || (Array.isArray(joinableRoles) && joinableRoles.includes(role)));
 
   // Nothing to show → render nothing (a brand-new issue with no roster and a
   // viewer who hasn't joined, and no progress to nudge).
   const anyFilled = roles.some((r) => (r.count || 0) > 0 || (r.names || []).length > 0);
   const anyJoinable = roles.some((r) => roleJoinable(r.role));
-  if (!viewerRole && !anyFilled && !anyJoinable && !progress) return null;
+  if (!viewerCommitted && !anyFilled && !anyJoinable && !progress && !leaderSlot) return null;
 
   const handleJoin = async (role) => {
     if (!onJoin || pendingRole) return;
@@ -297,6 +331,30 @@ export function ParticipantsPanel({
     }
   };
 
+  const handleLead = async () => {
+    if (!onLead || leadPending) return;
+    setLeadPending(true);
+    try {
+      await onLead();
+    } catch {
+      /* page handles messaging */
+    } finally {
+      setLeadPending(false);
+    }
+  };
+
+  const handleLeaveLead = async () => {
+    if (!onLeaveLead || leadLeaving) return;
+    setLeadLeaving(true);
+    try {
+      await onLeaveLead();
+    } catch {
+      /* page handles messaging */
+    } finally {
+      setLeadLeaving(false);
+    }
+  };
+
   const viewerStatusPill =
     viewer?.status === "INVITED"
       ? t.waitlisted
@@ -304,9 +362,10 @@ export function ParticipantsPanel({
         ? t.checkedIn
         : t.youreIn;
 
-  // Total people committed across all roles — surfaced as a count badge by the
-  // heading so the panel answers "how many are in?" at a glance.
-  const totalCount = roles.reduce((sum, r) => sum + (Number(r.count) || 0), 0);
+  // Total people committed across all roles (+ the leader) — surfaced as a
+  // count badge by the heading so the panel answers "how many are in?".
+  const totalCount =
+    roles.reduce((sum, r) => sum + (Number(r.count) || 0), 0) + (Number(leaderSlot?.count) || 0);
 
   return (
     <section className="participants-panel event-roster-panel" aria-labelledby="participants-title">
@@ -354,8 +413,9 @@ export function ParticipantsPanel({
           const openCount = target !== null ? Math.max(0, target - count) : null;
           const canJoinThis = roleJoinable(role);
           const isFullTargetRow = target !== null && openCount === 0;
-          // A row locks (dims) when the viewer is already committed elsewhere.
-          const lockedByOther = Boolean(viewerRole) && !isOwnRole;
+          // A row locks when the viewer is already committed elsewhere (another
+          // role, or leading).
+          const lockedByOther = viewerCommitted && !isOwnRole;
           const isPending = pendingRole === role;
           const countText =
             target !== null
@@ -476,6 +536,100 @@ export function ParticipantsPanel({
           );
         })}
       </ul>
+
+      {leaderSlot ? (
+        <div className="participants-leader">
+          <span className="participants-leader-eyebrow">{t.leaderEyebrow}</span>
+          <div
+            className={`event-roster-row participants-leader-row${
+              leaderSlot.viewerIsLeader ? " is-own-role" : ""
+            }`}
+            style={{ "--role-color": LEAD_COLOR }}
+          >
+            <span className="event-roster-role has-icon participants-role">
+              <CrownOutlined className="participants-role-icon" aria-hidden="true" />
+              <span className="participants-role-text">
+                <span className="participants-role-head">
+                  <span className="participants-role-name">
+                    {leaderSlot.title || t.roles.COORDINATOR}
+                  </span>
+                  {Number(leaderSlot.count) > 0 ? (
+                    <span className="event-roster-count">
+                      {t.roleCount.replace("{n}", localizeDigits(leaderSlot.count, language))}
+                    </span>
+                  ) : null}
+                </span>
+                <span className="participants-role-desc">{t.leaderDesc}</span>
+              </span>
+            </span>
+
+            <span className="event-roster-chips" aria-hidden={!leaderSlot.name}>
+              {leaderSlot.name ? (
+                <span
+                  className={`event-roster-chip event-roster-chip-filled${
+                    leaderSlot.viewerIsLeader ? " participants-chip-you" : ""
+                  }`}
+                  style={{ "--role-color": LEAD_COLOR }}
+                  title={leaderSlot.name}
+                >
+                  {getInitial(leaderSlot.name)}
+                </span>
+              ) : null}
+            </span>
+
+            {leaderSlot.viewerIsLeader ? (
+              canLeaveLead ? (
+                <Popconfirm
+                  title={t.leaveLeadConfirmTitle}
+                  description={t.leaveLeadConfirmDesc}
+                  okText={t.leaveOk}
+                  cancelText={t.leaveCancel}
+                  okButtonProps={{ danger: true, loading: leadLeaving }}
+                  onConfirm={handleLeaveLead}
+                  overlayClassName="vote-withdraw-popconfirm"
+                >
+                  <button
+                    type="button"
+                    className="participants-joined-toggle participants-lead-toggle"
+                    disabled={leadLeaving}
+                    aria-label={`${t.leading} — ${t.leave}`}
+                  >
+                    <span className="participants-joined-face participants-joined-face--default">
+                      <CrownOutlined aria-hidden="true" />
+                      {t.leading}
+                    </span>
+                    <span className="participants-joined-face participants-joined-face--leave">
+                      <CloseOutlined aria-hidden="true" />
+                      {leadLeaving ? t.leaving : t.leave}
+                    </span>
+                  </button>
+                </Popconfirm>
+              ) : (
+                <span className="event-roster-joined-pill participants-lead-pill">
+                  <CrownOutlined aria-hidden="true" />
+                  {t.leading}
+                </span>
+              )
+            ) : leaderSlot.name ? (
+              <span className="participants-lead-by">
+                {t.ledBy.replace("{name}", leaderSlot.name)}
+              </span>
+            ) : leaderSlot.canLead ? (
+              <button
+                type="button"
+                className="event-roster-open-pill participants-lead-cta"
+                onClick={handleLead}
+                disabled={leadPending}
+                aria-label={t.wantToLead}
+              >
+                {leadPending ? t.joining : t.wantToLead}
+              </button>
+            ) : (
+              <span className="event-roster-full-pill">{t.leadOpen}</span>
+            )}
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }

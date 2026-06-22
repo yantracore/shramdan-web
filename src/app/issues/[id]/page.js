@@ -15,12 +15,11 @@ import { IssuePhotoGallery } from "@/components/IssuePhotoGallery";
 import { IssueShareRow } from "@/components/IssueShareRow";
 import { IssueStatusTimeline } from "@/components/IssueStatusTimeline";
 import { IssueJoinButton } from "@/components/IssueJoinButton";
-import { ParticipantsPanel } from "@/components/ParticipantsPanel";
+import { CompactConversionProgress, ParticipantsPanel } from "@/components/ParticipantsPanel";
 import { IssueVoteButton } from "@/components/IssueVoteButton";
-import { ShareButton } from "@/components/ShareButton";
 import { CommentSection } from "@/components/comments";
 import { IssueReactions } from "@/components/IssueReactions";
-import { PublicIssueCard, formatSupporters } from "@/components/PublicIssueCard";
+import { PublicIssueCard } from "@/components/PublicIssueCard";
 import { ReportDialog } from "@/components/ReportDialog";
 import { ScrollProgressBar } from "@/components/ScrollProgressBar";
 import { SiteShell } from "@/components/SiteShell";
@@ -312,6 +311,36 @@ export default function IssueDetailPage() {
     }
   }, [content.card, handleVoteChange, messageApi, rawIssue]);
 
+  // Offer to lead → a WANT_TO_LEAD vote (no eventRole). This is the issue-stage
+  // leadership signal that maps to the Coordinator/leader slot. Withdrawing
+  // leadership reuses handleLeaveRole (retract). One vote per issue applies.
+  const handleLeadVote = useCallback(async () => {
+    if (!getAuthSession()?.user) {
+      router.push(buildLoginHref(pathname, "vote"));
+      return;
+    }
+    if (myVote) {
+      messageApi.info(content.card.voteAlreadyVoted);
+      return;
+    }
+    if (!rawIssue?.id) return;
+    try {
+      const res = await voteOnIssue(rawIssue.id, "WANT_TO_LEAD");
+      handleVoteChange({ voterRole: "WANT_TO_LEAD", eventRole: null, ...(res?.data || {}) });
+      messageApi.success(content.card.voteSuccess);
+    } catch (err) {
+      if (err?.errorCode === "ALREADY_VOTED" || err?.status === 409) {
+        messageApi.info(content.card.voteAlreadyVoted);
+        handleVoteChange({ voterRole: "WANT_TO_LEAD", eventRole: null });
+      } else if (err?.status === 403) {
+        messageApi.error(content.card.voteForbidden);
+      } else {
+        messageApi.error(err?.message || content.card.voteError);
+        throw err;
+      }
+    }
+  }, [content.card, handleVoteChange, messageApi, myVote, pathname, rawIssue, router]);
+
   const uploads = Array.isArray(issue?.uploads) ? issue.uploads : [];
   const coverImageUrl = getIssueCoverImageUrl(issue);
   const imageUploads = uploads
@@ -365,19 +394,35 @@ export default function IssueDetailPage() {
       arr.push(p.user.name);
       namesByRole.set(p.eventRole, arr);
     }
-    return PARTICIPANT_ROLE_ORDER.map((role) => {
+    // COORDINATOR is pulled out of the grid — it's the leadership slot (a
+    // WANT_TO_LEAD vote), rendered separately at the bottom by the panel.
+    return PARTICIPANT_ROLE_ORDER.filter((role) => role !== "COORDINATOR").map((role) => {
       const names = namesByRole.get(role) || [];
       const count = countByRole.has(role) ? countByRole.get(role) : names.length;
       return { role, count, names };
     });
   })();
   // The viewer occupies a role row only when they committed to GOING with a
-  // chosen role. INTERESTED / WANT_TO_LEAD are reflected by the topline Support
-  // button, not a roster row.
+  // chosen role. INTERESTED is reflected by the topline Support button;
+  // WANT_TO_LEAD goes to the leader slot below.
   const participantViewer =
     myVote?.voterRole === "GOING" && myVote?.eventRole
       ? { role: myVote.eventRole, status: "GOING", name: viewerName }
       : null;
+  // Leadership ("Coordinator") slot — driven by the WANT_TO_LEAD vote. The
+  // backend doesn't expose a count of would-be leaders yet, so we can only
+  // reflect the viewer's own offer (see docs/api-requirements/issues.md gap).
+  const viewerIsLeader = myVote?.voterRole === "WANT_TO_LEAD";
+  const participantLeaderSlot =
+    isOpenIssue || viewerIsLeader
+      ? {
+          viewerIsLeader,
+          name: viewerIsLeader ? viewerName : null,
+          count: viewerIsLeader ? 1 : 0,
+          canLead: isOpenIssue && !myVote
+        }
+      : null;
+  const participantCanLeaveLead = isOpenIssue && viewerIsLeader;
   const participantProgress =
     isOpenIssue && Number(issue?.conversionThreshold) > 0
       ? {
@@ -459,17 +504,15 @@ export default function IssueDetailPage() {
                   <Tag>{content.categoryLabels[issue.category] || issue.category}</Tag>
                 </div>
                 <div className="public-issue-detail-support" id="issue-vote">
-                  <span className="public-issue-detail-supporters">
-                    {formatSupporters(issue.voteCount, content, language)}
-                  </span>
-                  <ShareButton
-                    language={language}
-                    title={issue.title}
-                    text={issue.title}
-                    size="large"
-                  />
+                  {participantProgress ? (
+                    <CompactConversionProgress
+                      language={language}
+                      progress={participantProgress}
+                    />
+                  ) : null}
                   {actionMode === "support" ? (
                     <IssueVoteButton
+                      className="issue-topline-support-btn"
                       content={content}
                       initialVoteCount={issue.voteCount}
                       initialVoted={issue.isVoted}
@@ -554,11 +597,17 @@ export default function IssueDetailPage() {
               <ParticipantsPanel
                 roles={participantRoles}
                 viewer={participantViewer}
-                progress={participantProgress}
+                /* conversion progress shows in the topline (CompactConversionProgress
+                   beside the Support button), so the panel doesn't repeat it here */
+                progress={null}
                 joinableRoles={participantJoinable}
                 canLeave={participantCanLeave}
                 onJoin={handleJoinRole}
                 onLeave={handleLeaveRole}
+                leaderSlot={participantLeaderSlot}
+                onLead={handleLeadVote}
+                onLeaveLead={handleLeaveRole}
+                canLeaveLead={participantCanLeaveLead}
                 language={language}
               />
 

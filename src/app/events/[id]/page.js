@@ -526,6 +526,19 @@ export default function EventDetailPage() {
     EVENT_JOINABLE_STATUSES.has(eventData?.status) &&
     viewerStatus !== "CHECKED_IN" &&
     (isDemoEvent || Boolean(myParticipation?.id));
+  // Leadership slot — the resolved event leader, shown read-only here (offering
+  // to lead / nominations live in LeaderNominationPanel). Labelled "Leader",
+  // distinct from the Coordinator participation role that stays in the grid.
+  const participantLeaderSlot =
+    eventData?.eventLeaderId || isLeader
+      ? {
+          title: language === "np" ? "अगुवा" : "Leader",
+          viewerIsLeader: isLeader,
+          name: leader?.name || (isLeader ? viewerName : null),
+          count: eventData?.eventLeaderId ? 1 : 0,
+          canLead: false
+        }
+      : null;
 
   const uploads = Array.isArray(eventData?.uploads) ? eventData.uploads : [];
   const imageUploads = uploads.filter(isImageUpload);
@@ -821,7 +834,8 @@ export default function EventDetailPage() {
               {/* ZONES 2-5 — action / leader / after-the-campaign / discussion */}
               <div className="event-detail-main event-detail-main--rest">
                 {/* ZONE 2 — ACTION: how a visitor takes part */}
-                {Array.isArray(eventData.rolesNeeded) && eventData.rolesNeeded.length > 0 ? (
+                {(Array.isArray(eventData.rolesNeeded) && eventData.rolesNeeded.length > 0) ||
+                participantLeaderSlot ? (
                   <ParticipantsPanel
                     roles={participantRoles}
                     viewer={participantViewer}
@@ -830,6 +844,7 @@ export default function EventDetailPage() {
                     canLeave={participantCanLeave}
                     onJoin={handleJoinRole}
                     onLeave={handleLeaveRole}
+                    leaderSlot={participantLeaderSlot}
                     language={language}
                   />
                 ) : null}
