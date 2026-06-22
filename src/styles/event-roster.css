@@ -447,15 +447,9 @@
   background: color-mix(in srgb, #4ade80 9%, var(--surface));
 }
 
-/* Other rows lock once the viewer has committed to a role — dim the row,
-   but keep the disabled pill itself legible (no compounded fade). */
-.event-roster-row.is-locked {
-  opacity: 0.6;
-}
-
-.event-roster-row.is-locked .event-roster-open-pill:disabled {
-  opacity: 1;
-}
+/* Once the viewer has committed to a role, the other rows simply stop
+   offering a join action (no pill renders) — they stay fully legible, NOT
+   dimmed. Clicks are prevented by the absence of the control, not by fading. */
 
 @media (max-width: 620px) {
   .event-roster-list {

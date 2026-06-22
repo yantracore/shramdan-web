@@ -24,7 +24,6 @@ import { PublicIssueCard, formatSupporters } from "@/components/PublicIssueCard"
 import { ReportDialog } from "@/components/ReportDialog";
 import { ScrollProgressBar } from "@/components/ScrollProgressBar";
 import { SiteShell } from "@/components/SiteShell";
-import { StickyActionBar } from "@/components/StickyActionBar";
 import { TertiaryButton } from "@/components/TertiaryButton";
 import { usePreferences } from "@/app/providers";
 import {
@@ -107,6 +106,10 @@ export default function IssueDetailPage() {
   // issue read omits its event, so we recover it client-side (interim — see
   // resolveEventForIssue). Until it resolves the button shows the "soon" cue.
   const [resolvedEventId, setResolvedEventId] = useState(null);
+  // The linked event's own status (DRAFT | SCHEDULED | ACTIVE | PAUSED |
+  // COMPLETED | CANCELLED) — the fine-grained lifecycle the issue's coarse
+  // EVENT_SCHEDULED hides. Feeds the status timeline below.
+  const [resolvedEventStatus, setResolvedEventStatus] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [notFound, setNotFound] = useState(false);
@@ -164,10 +167,17 @@ export default function IssueDetailPage() {
       // interim client-side match — see resolveEventForIssue).
       if (issueActionMode(data.status) === "join") {
         resolveEventForIssue(data)
-          .then((linked) => setResolvedEventId(linked?.slug || linked?.id || null))
-          .catch(() => setResolvedEventId(null));
+          .then((linked) => {
+            setResolvedEventId(linked?.slug || linked?.id || null);
+            setResolvedEventStatus(linked?.status || null);
+          })
+          .catch(() => {
+            setResolvedEventId(null);
+            setResolvedEventStatus(null);
+          });
       } else {
         setResolvedEventId(null);
+        setResolvedEventStatus(null);
       }
 
       if (data.category) {
@@ -526,7 +536,12 @@ export default function IssueDetailPage() {
               ) : null}
 
               <section className="public-issue-detail-section-block public-issue-timeline-block">
-                <IssueStatusTimeline status={issue.status} content={content} />
+                <IssueStatusTimeline
+                  status={issue.status}
+                  eventStatus={resolvedEventStatus}
+                  content={content}
+                  language={language}
+                />
               </section>
 
               {issue.description ? (
@@ -566,25 +581,6 @@ export default function IssueDetailPage() {
               />
             </div>
           </article>
-        ) : null}
-
-        {!loading && !error && !notFound && issue && actionMode === "support" ? (
-          <StickyActionBar
-            label={language === "np" ? "हाल समर्थन गर्नुहोस्" : "Support this issue"}
-            href="#issue-vote"
-          />
-        ) : null}
-
-        {!loading && !error && !notFound && issue && actionMode === "join" ? (
-          <StickyActionBar>
-            <IssueJoinButton
-              issue={issue}
-              eventId={resolvedEventId}
-              language={language}
-              block
-              size="large"
-            />
-          </StickyActionBar>
         ) : null}
 
         {!loading && !error && !notFound && issue ? (
