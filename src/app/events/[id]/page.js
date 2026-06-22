@@ -39,7 +39,7 @@ import { CommentSection } from "@/components/comments";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
 import { getJson } from "@/lib/apiClient";
-import { injectMockLiveStream } from "@/lib/devMockData";
+import { getDemoEventById, injectMockLiveStream } from "@/lib/devMockData";
 import {
   buildRolesNeeded,
   countActiveParticipants,
@@ -149,6 +149,17 @@ export default function EventDetailPage() {
     setLoading(true);
     setError("");
     setNotFound(false);
+
+    // Demo events (demo-* ids) have no backend row — resolve them from the
+    // local mock so draft/nomination surfaces stay exercisable end-to-end
+    // without round-tripping (and 404-ing) the real API.
+    if (typeof eventId === "string" && eventId.startsWith("demo-")) {
+      const demo = getDemoEventById(eventId);
+      setNotFound(!demo);
+      setEventData(demo || null);
+      setLoading(false);
+      return;
+    }
 
     try {
       const response = await getJson(`/events/${eventId}`);

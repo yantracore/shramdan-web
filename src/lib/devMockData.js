@@ -2610,6 +2610,46 @@ const DEMO_DRAFT_EVENTS = [
         createdAt: daysAgo(2)
       }
     ]
+  },
+  {
+    id: "demo-draft-2",
+    title: "टेकु घाट सरसफाइ",
+    addressText: "टेकु, काठमाडौँ",
+    category: "cleanup",
+    status: "DRAFT",
+    // Promoted with no WANT_TO_LEAD volunteers, so leader voting opened in the
+    // recruitment (SEEKING) window — exercises the live self-nominate flow.
+    leaderVotingStatus: "SEEKING",
+    meetupAddress: "टेकु घाट, काठमाडौँ",
+    meetupLatitude: 27.6939,
+    meetupLongitude: 85.3009,
+    meetupNotes:
+      "मस्यौदा अभियान — कसैले संयोजन गर्न अघि सरेपछि मिति र विवरण तय हुनेछ।",
+    eventLeader: { name: null },
+    eventLeaderId: null,
+    rolesNeeded: DEMO_ROSTER,
+    linkedIssue: {
+      id: "demo-issue-teku-1",
+      title: "टेकु घाट वरपर फोहोरको चाङ; नदी किनार बिग्रँदै",
+      description:
+        "टेकु घाटको नदी किनारमा वर्षौंदेखि फोहोर थुप्रिएको। स्थानीयले सरसफाइ अभियान चाहेका; नगरले सोहोर्ने सामग्री र फोहोर उठाउने प्रबन्धमा सहयोगको प्रतिबद्धता।",
+      category: "cleanup",
+      addressText: "टेकु, काठमाडौँ",
+      latitude: 27.6939,
+      longitude: 85.3009,
+      voteCount: 38,
+      status: "PROMOTED"
+    },
+    nominations: [
+      {
+        id: "nom-teku-anil",
+        memberId: "demo-member-anil",
+        memberName: "अनिल मगर",
+        voteCount: 0,
+        votedByMe: false,
+        createdAt: daysAgo(1)
+      }
+    ]
   }
 ];
 
