@@ -43,6 +43,8 @@ const EDITABLE_FIELDS = [
   "addressText",
   "latitude",
   "longitude",
+  "provinceId",
+  "districtId",
   "municipality",
   "ward"
 ];
@@ -70,14 +72,6 @@ function pickEditableFields(issue) {
   return data;
 }
 
-function sameIdSet(a, b) {
-  if (a.length !== b.length) return false;
-  for (let i = 0; i < a.length; i += 1) {
-    if (a[i] !== b[i]) return false;
-  }
-  return true;
-}
-
 const COPY = {
   np: {
     pageTitle: "समस्या सम्पादन",
@@ -99,6 +93,8 @@ const COPY = {
       cover: "मुख्य तस्वीर",
       coverRequired: "मुख्य तस्वीर आवश्यक छ।",
       additionalImages: "थप तस्वीरहरू (वैकल्पिक)",
+      additionalImagesLocked:
+        "तस्वीर सम्पादन अहिले उपलब्ध छैन — तपाईंका अन्य परिवर्तनहरू भने सुरक्षित हुन्छन्।",
       title: "शीर्षक",
       titleRequired: "शीर्षक आवश्यक छ।",
       titlePlaceholder: "समस्याको छोटो, स्पष्ट सारांश",
@@ -141,6 +137,8 @@ const COPY = {
       cover: "Cover image",
       coverRequired: "Cover image is required.",
       additionalImages: "Additional images (optional)",
+      additionalImagesLocked:
+        "Photo editing isn't available yet — your other changes still save.",
       title: "Title",
       titleRequired: "Title is required.",
       titlePlaceholder: "Short, specific summary of the issue",
@@ -252,7 +250,11 @@ export default function MeIssueEditPage() {
   const handleFinish = async (values) => {
     setSubmitting(true);
 
-    const { cover, additionalImages, ...rest } = values;
+    // `additionalImages` is pulled out and intentionally NOT sent: PATCH
+    // /issues rejects `uploadIds` (see docs/api-requirements/issues.md gap), so
+    // photo edits are deferred — the form locks that field. cover/text/category/
+    // location all patch fine.
+    const { cover, additionalImages: _additionalImages, ...rest } = values;
     const originalCoverId = initialValues?.cover?.id || null;
     const nextCoverId = cover?.id || null;
 
@@ -265,14 +267,6 @@ export default function MeIssueEditPage() {
     }
     if (nextCoverId !== originalCoverId) {
       payload.coverImageId = nextCoverId;
-    }
-
-    const originalIds = (initialValues?.additionalImages || []).map((image) => image.id);
-    const nextIds = Array.isArray(additionalImages)
-      ? additionalImages.map((image) => image.id)
-      : [];
-    if (!sameIdSet(originalIds, nextIds)) {
-      payload.uploadIds = nextIds;
     }
 
     // No catch here: a failure (including backend validation) propagates into
@@ -331,6 +325,7 @@ export default function MeIssueEditPage() {
         categoryOptions={categoryOptions}
         language={language}
         submitErrorMessage={t.saveError}
+        extraImagesLocked
       />
     );
   }

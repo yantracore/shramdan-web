@@ -12,7 +12,8 @@ import { getJson, patchJson } from "@/lib/apiClient";
 import {
   getIssueCoverImageUrl,
   getResponseData,
-  isImageUpload
+  isImageUpload,
+  localizeIssue
 } from "@/lib/adminUtils";
 import { useToast } from "@/lib/toast";
 
@@ -23,6 +24,8 @@ const EDITABLE_FIELDS = [
   "addressText",
   "latitude",
   "longitude",
+  "provinceId",
+  "districtId",
   "municipality",
   "ward"
 ];
@@ -49,14 +52,6 @@ function pickEditableFields(issue) {
   data.additionalImages = additionalImages;
 
   return data;
-}
-
-function sameIdSet(a, b) {
-  if (a.length !== b.length) return false;
-  for (let i = 0; i < a.length; i += 1) {
-    if (a[i] !== b[i]) return false;
-  }
-  return true;
 }
 
 export default function AdminIssueEditPage() {
@@ -97,12 +92,26 @@ export default function AdminIssueEditPage() {
     loadIssue();
   }, [loadIssue]);
 
-  const initialValues = useMemo(() => (issue ? pickEditableFields(issue) : null), [issue]);
+  // The API returns title/description as a translations[] array, not as
+  // top-level fields, so seed the form from the localized view. Admin is
+  // EN-only, hence the "en" locale (mirrors the member edit page).
+  const localizedIssue = useMemo(
+    () => (issue ? localizeIssue(issue, "en") : null),
+    [issue]
+  );
+  const initialValues = useMemo(
+    () => (localizedIssue ? pickEditableFields(localizedIssue) : null),
+    [localizedIssue]
+  );
 
   const handleFinish = async (values) => {
     setSubmitting(true);
 
-    const { cover, additionalImages, ...rest } = values;
+    // `additionalImages` is pulled out and intentionally NOT sent: PATCH
+    // /issues rejects `uploadIds` (see docs/api-requirements/issues.md gap), so
+    // photo edits are deferred — the form locks that field. cover/text/category/
+    // location all patch fine.
+    const { cover, additionalImages: _additionalImages, ...rest } = values;
     const originalCoverId = initialValues?.cover?.id || null;
     const nextCoverId = cover?.id || null;
 
@@ -117,20 +126,13 @@ export default function AdminIssueEditPage() {
       payload.coverImageId = nextCoverId;
     }
 
-    const originalIds = (initialValues?.additionalImages || []).map((image) => image.id);
-    const nextIds = Array.isArray(additionalImages)
-      ? additionalImages.map((image) => image.id)
-      : [];
-    if (!sameIdSet(originalIds, nextIds)) {
-      payload.uploadIds = nextIds;
-    }
-
+    // No catch here: a failure (including backend validation) propagates into
+    // IssueForm, which pins each error onto its field. `finally` still clears
+    // the submitting state before the throw reaches the form.
     try {
       await patchJson(`/issues/${issueId}`, payload, { requireAuth: true });
       toast.success("Issue updated.");
       router.push("/admin/issues");
-    } catch (error) {
-      toast.error(error.message || "Could not update issue.");
     } finally {
       setSubmitting(false);
     }
@@ -141,7 +143,7 @@ export default function AdminIssueEditPage() {
       <section className="admin-panel">
         <AdminPanelHeading
           eyebrow="Community issues"
-          title={issue?.title ? `Edit: ${issue.title}` : "Edit issue"}
+          title={localizedIssue?.title ? `Edit: ${localizedIssue.title}` : "Edit issue"}
           description="Update issue details. Status changes go through the per-row status control on the issues list."
           actions={
             <Link href="/admin/issues">
@@ -170,6 +172,8 @@ export default function AdminIssueEditPage() {
             submitting={submitting}
             submitLabel="Save changes"
             onSubmit={handleFinish}
+            submitErrorMessage="Could not update issue."
+            extraImagesLocked
           />
         ) : null}
       </section>
