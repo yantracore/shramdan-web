@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
+import { IssueMarker } from "./IssueMap";
 
 const NEPAL_BOUNDS = [
   [26.3, 80.0],
@@ -193,6 +194,8 @@ function EventMarker({ entry, interactive, showPopup, t, language }) {
 
 export default function EventMap({
   entries,
+  issues,
+  issuesContent,
   height = 480,
   interactive = true,
   showPopup = true,
@@ -229,28 +232,54 @@ export default function EventMap({
     [entries]
   );
 
+  // The home map mixes scheduled events with raw issues so the overview shows
+  // the full picture, not just the small promoted subset. Issues reuse the
+  // shared IssueMarker (same pin/cluster CSS) and link to /issues.
+  const validIssues = useMemo(
+    () =>
+      (issues || []).filter((issue) => {
+        const lat = Number(issue?.latitude);
+        const lng = Number(issue?.longitude);
+        return Number.isFinite(lat) && Number.isFinite(lng);
+      }),
+    [issues]
+  );
+
   const focus = useMemo(() => {
-    if (validEntries.length !== 1) return null;
-    const only = validEntries[0].event;
+    if (validEntries.length + validIssues.length !== 1) return null;
+    const only = validEntries[0]?.event ?? validIssues[0];
+    if (!only) return null;
     return {
       lat: Number(only.latitude),
       lng: Number(only.longitude),
       zoom: 15
     };
-  }, [validEntries]);
+  }, [validEntries, validIssues]);
 
-  const useCluster = cluster && validEntries.length > 1;
+  const useCluster = cluster && validEntries.length + validIssues.length > 1;
 
-  const markers = validEntries.map((entry) => (
-    <EventMarker
-      key={entry.event.id ?? `${entry.event.latitude},${entry.event.longitude}`}
-      entry={entry}
-      interactive={interactive}
-      showPopup={showPopup}
-      t={t}
-      language={language}
-    />
-  ));
+  const markers = [
+    ...validEntries.map((entry) => (
+      <EventMarker
+        key={`event-${entry.event.id ?? `${entry.event.latitude},${entry.event.longitude}`}`}
+        entry={entry}
+        interactive={interactive}
+        showPopup={showPopup}
+        t={t}
+        language={language}
+      />
+    )),
+    ...validIssues.map((issue) => (
+      <IssueMarker
+        key={`issue-${issue.id ?? `${issue.latitude},${issue.longitude}`}`}
+        issue={issue}
+        interactive={interactive}
+        showPopup={showPopup}
+        content={issuesContent}
+        language={language}
+      />
+    ))
+  ];
 
   const wrapClass = [
     "issue-map-wrap",

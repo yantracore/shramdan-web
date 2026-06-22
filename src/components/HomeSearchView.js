@@ -23,7 +23,14 @@ import { StreamList } from "@/components/StreamList";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
 import { listAllEvents } from "@/lib/eventsApi";
+import { getJson } from "@/lib/apiClient";
+import { getListItems } from "@/lib/adminUtils";
 import { copy } from "@/lib/siteContent";
+
+// Issue statuses surfaced publicly (mirrors /issues page) — the home map mixes
+// these raw issues in with scheduled events so the overview shows everything.
+const PUBLIC_ISSUE_STATUSES = ["OPEN", "EVENT_SCHEDULED", "COMPLETED"];
+const MAP_ISSUE_LIMIT = 100;
 
 export default function HomeSearchView() {
   const { language } = usePreferences();
@@ -35,6 +42,7 @@ export default function HomeSearchView() {
   const [liveEvents, setLiveEvents] = useState([]);
   const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [pastEvents, setPastEvents] = useState([]);
+  const [mapIssues, setMapIssues] = useState([]);
   const [query, setQuery] = useState("");
 
   useEffect(() => {
@@ -59,6 +67,34 @@ export default function HomeSearchView() {
       cancelled = true;
     };
   }, [language]);
+
+  // Raw issues for the map — independent of the event buckets above. Language
+  // doesn't change the geo filter, so this fires once; markers re-localize via
+  // the `language` prop on render.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const response = await getJson("/issues", {
+          params: { limit: MAP_ISSUE_LIMIT }
+        });
+        if (cancelled) return;
+        const items = getListItems(response)
+          .filter((issue) => PUBLIC_ISSUE_STATUSES.includes(issue?.status))
+          .filter((issue) => {
+            const lat = Number(issue?.latitude);
+            const lng = Number(issue?.longitude);
+            return Number.isFinite(lat) && Number.isFinite(lng);
+          });
+        setMapIssues(items);
+      } catch {
+        if (!cancelled) setMapIssues([]);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const mapEntries = useMemo(() => {
     const tag = (events, status) =>
@@ -147,7 +183,7 @@ export default function HomeSearchView() {
             <ActivityStatsRow language={language} variant="events" />
           </div>
 
-          {mapEntries.length > 0 ? (
+          {mapEntries.length > 0 || mapIssues.length > 0 ? (
             <section
               className="home-search-map"
               aria-labelledby="home-search-map-title"
@@ -163,6 +199,8 @@ export default function HomeSearchView() {
               <div className="home-search-map-frame">
                 <EventMapBlock
                   entries={mapEntries}
+                  issues={mapIssues}
+                  issuesContent={t.issues}
                   t={search.map}
                   language={language}
                   height={544}

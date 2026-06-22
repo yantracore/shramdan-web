@@ -103,7 +103,7 @@ function toLocalDigits(value, language) {
   return str.replace(/\d/g, (d) => NP_DIGITS[Number(d)]);
 }
 
-function IssueMarker({ issue: rawIssue, interactive, showPopup, content, language }) {
+export function IssueMarker({ issue: rawIssue, interactive, showPopup, content, language }) {
   const issue = localizeIssue(rawIssue, language);
   const lat = Number(issue.latitude);
   const lng = Number(issue.longitude);
