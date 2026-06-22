@@ -1,9 +1,10 @@
 "use client";
 
 // /me/notifications — full inbox page that mirrors NotificationsBell's
-// dropdown but with tabs, larger cards, and a Mark-all-read button. Wired to
-// the real `/notifications` backend; read-state mutations are optimistic and
-// hit markNotificationRead / markAllNotificationsRead.
+// dropdown but with tabs, larger cards, and a Mark-all-read button. Reads from
+// the app-wide notifications store (NotificationsProvider), so it shares the
+// same live feed, unread count, and optimistic read-state with the topbar bell
+// and updates in real time as SSE events arrive.
 
 import {
   BellOutlined,
@@ -15,17 +16,11 @@ import {
 } from "@ant-design/icons";
 import { Empty } from "antd";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { NotificationChannelPrefs } from "@/components/NotificationChannelPrefs";
+import { useNotifications } from "@/components/NotificationsProvider";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
-import {
-  fetchNotificationFeed,
-  markAllNotificationsRead,
-  markNotificationRead
-} from "@/lib/notificationsApi";
-
-const INBOX_FEED_LIMIT = 50;
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 
@@ -104,38 +99,14 @@ function relativeTime(iso, t, language) {
 export default function NotificationsInboxPage() {
   const { language } = usePreferences();
   const t = COPY[language] || COPY.np;
-  const [items, setItems] = useState([]);
+  const { items, unreadCount, markRead, markAllRead } = useNotifications();
   const [tab, setTab] = useState("all");
-
-  useEffect(() => {
-    let alive = true;
-    fetchNotificationFeed({ limit: INBOX_FEED_LIMIT }).then((feed) => {
-      if (alive) setItems(feed.items);
-    });
-    return () => {
-      alive = false;
-    };
-  }, []);
-
-  const unreadCount = items.filter((n) => !n.isRead).length;
 
   const visible = items.filter((n) => {
     if (tab === "unread") return !n.isRead;
     if (tab === "read") return n.isRead;
     return true;
   });
-
-  const markAllRead = () => {
-    setItems((prev) => prev.map((n) => ({ ...n, isRead: true })));
-    markAllNotificationsRead().catch(() => {});
-  };
-
-  const markRead = (id) => {
-    setItems((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
-    );
-    markNotificationRead(id).catch(() => {});
-  };
 
   const emptyMessage =
     tab === "unread"

@@ -3,6 +3,7 @@
 import { App as AntdApp, ConfigProvider, theme as antdTheme } from "antd";
 import { createContext, useCallback, useContext, useEffect, useMemo, useSyncExternalStore } from "react";
 import { GlobalFileDragWatcher } from "@/components/GlobalFileDragWatcher";
+import { NotificationsProvider } from "@/components/NotificationsProvider";
 import { SessionExpirationWatcher } from "@/components/SessionExpirationWatcher";
 
 const PreferenceContext = createContext(null);
@@ -271,7 +272,7 @@ export function Providers({ children }) {
         <AntdApp>
           <SessionExpirationWatcher />
           <GlobalFileDragWatcher />
-          {children}
+          <NotificationsProvider>{children}</NotificationsProvider>
         </AntdApp>
       </ConfigProvider>
     </PreferenceContext.Provider>

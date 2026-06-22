@@ -1,13 +1,10 @@
 "use client";
 
-// Topbar notifications bell — wired to the real `/notifications` backend.
-//
-// Mounted only for authenticated users (see SiteShell). On mount it pulls a
-// short page via fetchNotificationFeed(); read-state mutations hit the API
-// optimistically (markNotificationRead / markAllNotificationsRead) so the
-// badge updates instantly and reverts only on a hard reload if the server
-// rejected. The unread badge prefers the server's unreadCount, which can
-// exceed the few items shown in the dropdown.
+// Topbar notifications bell — a thin view over the app-wide notifications
+// store (NotificationsProvider). The store owns the REST page, the live SSE
+// updates, and the read-state mutations; the bell just renders the most recent
+// few and reflects the authoritative unread count, which can exceed the items
+// shown here. New notifications and reads arriving over SSE update it live.
 
 import {
   BellOutlined,
@@ -19,12 +16,8 @@ import {
 } from "@ant-design/icons";
 import { Badge, Dropdown } from "antd";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import {
-  fetchNotificationFeed,
-  markAllNotificationsRead,
-  markNotificationRead
-} from "@/lib/notificationsApi";
+import { useState } from "react";
+import { useNotifications } from "@/components/NotificationsProvider";
 
 const BELL_FEED_LIMIT = 8;
 
@@ -84,36 +77,14 @@ function relativeTime(iso, t, language) {
 
 export function NotificationsBell({ language = "np" }) {
   const t = COPY[language] || COPY.np;
-  const [items, setItems] = useState([]);
-  const [unread, setUnread] = useState(0);
+  const {
+    items: allItems,
+    unreadCount: unread,
+    markRead,
+    markAllRead
+  } = useNotifications();
+  const items = allItems.slice(0, BELL_FEED_LIMIT);
   const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    let alive = true;
-    fetchNotificationFeed({ limit: BELL_FEED_LIMIT }).then((feed) => {
-      if (!alive) return;
-      setItems(feed.items);
-      setUnread(feed.unreadCount);
-    });
-    return () => {
-      alive = false;
-    };
-  }, []);
-
-  const markAllRead = () => {
-    setItems((prev) => prev.map((n) => ({ ...n, isRead: true })));
-    setUnread(0);
-    markAllNotificationsRead().catch(() => {});
-  };
-
-  const markRead = (id) => {
-    setItems((prev) => {
-      const target = prev.find((n) => n.id === id);
-      if (target && !target.isRead) setUnread((c) => Math.max(0, c - 1));
-      return prev.map((n) => (n.id === id ? { ...n, isRead: true } : n));
-    });
-    markNotificationRead(id).catch(() => {});
-  };
 
   const panel = (
     <div className="notifications-panel" role="region" aria-label={t.heading}>
