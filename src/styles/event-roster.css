@@ -692,70 +692,109 @@
   box-shadow: 0 0 0 2px var(--surface), 0 0 0 3.5px var(--role-color, var(--primary));
 }
 
-/* Own-row trailing cluster: "you're in · name" pill + the withdraw control.
-   .event-roster-chips already carries margin-left:auto, which right-aligns
-   this whole group. */
-.participants-own-actions {
+/* Count badge beside the heading — "how many are in?" at a glance. */
+.participants-header h2 {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
-/* Withdraw — quiet by default; fades in on row hover (desktop) and is always
-   present on touch (no hover). Keyboard users get it via :focus-within. */
-.participants-leave-btn {
+.participants-count-badge {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 3px 10px;
+  justify-content: center;
+  min-width: 26px;
+  height: 24px;
+  padding: 0 9px;
   border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--primary) 14%, var(--surface-soft));
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+/* The viewer's own row keeps a SINGLE in-place pill — no extra row, no height
+   bump. "You Joined" by default; on hover/focus it swaps to a danger "Leave"
+   in the very same slot. Both faces are stacked in one grid cell so the pill
+   width never jumps as they swap. On touch (no hover) it stays "You Joined"
+   and a tap opens the confirm directly. .event-roster-chips' margin-left:auto
+   right-aligns the whole trailing group. */
+.participants-joined-toggle {
+  display: inline-grid;
+  grid-template-areas: "face";
+  align-items: center;
+  justify-items: center;
+  padding: 3px 11px;
+  border-radius: var(--radius-pill);
+  font: inherit;
   font-size: 12px;
   font-weight: 600;
-  font-family: inherit;
   line-height: 1.4;
   white-space: nowrap;
   cursor: pointer;
-  color: #b42318;
-  border: 1px solid color-mix(in srgb, #b42318 35%, var(--line));
-  background: color-mix(in srgb, #b42318 6%, transparent);
-  opacity: 0;
+  color: #2e7d32;
+  background: color-mix(in srgb, #2e7d32 12%, transparent);
+  border: 1px solid color-mix(in srgb, #2e7d32 40%, var(--line));
   transition:
-    opacity var(--duration-fast) var(--ease-out-soft),
-    background var(--duration-fast) var(--ease-out-soft);
+    color var(--duration-fast) var(--ease-out-soft),
+    background var(--duration-fast) var(--ease-out-soft),
+    border-color var(--duration-fast) var(--ease-out-soft);
 }
 
-.participants-leave-btn:hover:not(:disabled),
-.participants-leave-btn:focus-visible {
-  background: color-mix(in srgb, #b42318 14%, transparent);
+.participants-joined-face {
+  grid-area: face;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: opacity var(--duration-fast) var(--ease-out-soft);
 }
 
-.participants-leave-btn:disabled {
+.participants-joined-face > .anticon {
+  font-size: 13px;
+}
+
+.participants-joined-face--leave {
+  opacity: 0;
+}
+
+.participants-joined-toggle:disabled {
   cursor: not-allowed;
-  opacity: 0.55;
-}
-
-.participants-leave-btn > .anticon {
-  font-size: 11px;
+  opacity: 0.7;
 }
 
 @media (hover: hover) {
-  .event-roster-row.is-own-role:hover .participants-leave-btn,
-  .event-roster-row.is-own-role:focus-within .participants-leave-btn {
+  .participants-joined-toggle:hover,
+  .participants-joined-toggle:focus-visible {
+    color: #b42318;
+    background: color-mix(in srgb, #b42318 12%, transparent);
+    border-color: color-mix(in srgb, #b42318 42%, var(--line));
+  }
+  .participants-joined-toggle:hover .participants-joined-face--default,
+  .participants-joined-toggle:focus-visible .participants-joined-face--default {
+    opacity: 0;
+  }
+  .participants-joined-toggle:hover .participants-joined-face--leave,
+  .participants-joined-toggle:focus-visible .participants-joined-face--leave {
     opacity: 1;
   }
 }
 
-/* Touch devices have no hover — keep the control always visible. */
-@media (hover: none) {
-  .participants-leave-btn {
-    opacity: 1;
-  }
+:root[data-theme="dark"] .participants-joined-toggle {
+  color: #4ade80;
+  background: color-mix(in srgb, #4ade80 14%, transparent);
+  border-color: color-mix(in srgb, #4ade80 36%, var(--line));
 }
 
-:root[data-theme="dark"] .participants-leave-btn {
-  color: #fca5a5;
-  border-color: color-mix(in srgb, #fca5a5 30%, var(--line));
-  background: color-mix(in srgb, #fca5a5 10%, transparent);
+@media (hover: hover) {
+  :root[data-theme="dark"] .participants-joined-toggle:hover,
+  :root[data-theme="dark"] .participants-joined-toggle:focus-visible {
+    color: #fca5a5;
+    background: color-mix(in srgb, #fca5a5 14%, transparent);
+    border-color: color-mix(in srgb, #fca5a5 34%, var(--line));
+  }
 }
 
 /* Progress now sits BELOW the roster on both surfaces. */
@@ -788,13 +827,6 @@
   line-height: 1.3;
   font-weight: 600;
   color: var(--text);
-}
-
-@media (max-width: 620px) {
-  /* On the typically-touch small layout, keep withdraw always visible. */
-  .participants-leave-btn {
-    opacity: 1;
-  }
 }
 
 /* --- StickyActionBar -----------------------------------------------

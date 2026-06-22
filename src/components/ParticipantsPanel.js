@@ -86,9 +86,10 @@ const COPY = {
     joining: "जोडिँदै…",
     openPill: "{n} खाली",
     fullPill: "पूरा",
-    youreIn: "तपाईं",
+    youreIn: "जोडिनुभयो",
     waitlisted: "प्रतीक्षामा",
     checkedIn: "चेक-इन",
+    countLabel: "{n} सहभागी",
     you: "तपाईं",
     leave: "हट्ने",
     leaving: "हट्दै…",
@@ -126,9 +127,10 @@ const COPY = {
     joining: "Joining…",
     openPill: "{n} open",
     fullPill: "Full",
-    youreIn: "You're in",
+    youreIn: "You Joined",
     waitlisted: "Waitlisted",
     checkedIn: "Checked in",
+    countLabel: "{n} participants",
     you: "you",
     leave: "Leave",
     leaving: "Leaving…",
@@ -288,10 +290,24 @@ export function ParticipantsPanel({
         ? t.checkedIn
         : t.youreIn;
 
+  // Total people committed across all roles — surfaced as a count badge by the
+  // heading so the panel answers "how many are in?" at a glance.
+  const totalCount = roles.reduce((sum, r) => sum + (Number(r.count) || 0), 0);
+
   return (
     <section className="participants-panel event-roster-panel" aria-labelledby="participants-title">
       <header className="event-roster-header participants-header">
-        <h2 id="participants-title">{t.heading}</h2>
+        <h2 id="participants-title">
+          {t.heading}
+          {totalCount > 0 ? (
+            <span
+              className="participants-count-badge"
+              aria-label={t.countLabel.replace("{n}", localizeDigits(totalCount, language))}
+            >
+              {localizeDigits(totalCount, language)}
+            </span>
+          ) : null}
+        </h2>
         <p>{t.intro}</p>
       </header>
 
@@ -376,35 +392,41 @@ export function ParticipantsPanel({
               </span>
 
               {isOwnRole ? (
-                <span className="participants-own-actions">
+                canLeave ? (
+                  // Single in-place pill: "You Joined" by default, swapping to
+                  // "Leave" on hover/focus (desktop) — same slot, no second row,
+                  // no height bump. On touch the tap opens the confirm directly.
+                  <Popconfirm
+                    title={t.leaveConfirmTitle}
+                    description={t.leaveConfirmDesc}
+                    okText={t.leaveOk}
+                    cancelText={t.leaveCancel}
+                    okButtonProps={{ danger: true, loading: leaving }}
+                    onConfirm={handleLeave}
+                    overlayClassName="vote-withdraw-popconfirm"
+                  >
+                    <button
+                      type="button"
+                      className="participants-joined-toggle"
+                      disabled={leaving}
+                      aria-label={`${viewerStatusPill} — ${t.leave}`}
+                    >
+                      <span className="participants-joined-face participants-joined-face--default">
+                        <CheckCircleFilled aria-hidden="true" />
+                        {viewerStatusPill}
+                      </span>
+                      <span className="participants-joined-face participants-joined-face--leave">
+                        <CloseOutlined aria-hidden="true" />
+                        {leaving ? t.leaving : t.leave}
+                      </span>
+                    </button>
+                  </Popconfirm>
+                ) : (
                   <span className="event-roster-joined-pill">
                     <CheckCircleFilled aria-hidden="true" />
-                    {viewer?.name ? `${viewerStatusPill} · ${viewer.name}` : viewerStatusPill}
+                    {viewerStatusPill}
                   </span>
-                  {canLeave ? (
-                    <Popconfirm
-                      title={t.leaveConfirmTitle}
-                      description={t.leaveConfirmDesc}
-                      okText={t.leaveOk}
-                      cancelText={t.leaveCancel}
-                      okButtonProps={{ danger: true, loading: leaving }}
-                      onConfirm={handleLeave}
-                      overlayClassName="vote-withdraw-popconfirm"
-                    >
-                      <button
-                        type="button"
-                        className="participants-leave-btn"
-                        disabled={leaving}
-                        aria-label={t.leave}
-                      >
-                        <CloseOutlined aria-hidden="true" />
-                        <span className="participants-leave-btn-label">
-                          {leaving ? t.leaving : t.leave}
-                        </span>
-                      </button>
-                    </Popconfirm>
-                  ) : null}
-                </span>
+                )
               ) : canJoinThis && !isFullTargetRow ? (
                 <button
                   type="button"
