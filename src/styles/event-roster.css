@@ -661,6 +661,23 @@
   border-top: 1px solid var(--line);
 }
 
+/* Title row holds the heading (+ count badge) on the left and the compact
+   progress on the right — there's room beside the title, so the progress no
+   longer needs a full-width row of its own below the roster. */
+.participants-header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.participants-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 28px;
+  flex-wrap: wrap;
+}
+
 /* Full-width intro — one concise line, not a clamped column that eats
    vertical space. */
 .participants-header p {
@@ -791,36 +808,55 @@
   }
 }
 
-/* Progress now sits BELOW the roster on both surfaces. */
-.participants-progress {
-  margin: 18px 0 0;
-}
-
-.participants-progress--conversion {
-  padding: 16px 18px;
-  border: 1px solid color-mix(in srgb, var(--primary) 18%, var(--line));
-  border-radius: var(--radius-md);
-  background: linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--primary) 7%, var(--surface)) 0%,
-    var(--surface) 100%
-  );
-  box-shadow: var(--shadow-1);
-}
-
-.participants-progress-head {
+/* Compact progress beside the title (right side of the header row). A short
+   bar + a one-line caption whose <strong> denominator is the TOTAL needed. */
+.participants-progress-compact {
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  margin-bottom: 12px;
+  gap: 4px;
+  min-width: 190px;
+  max-width: 340px;
+  flex: 0 1 auto;
 }
 
-.participants-progress-title {
-  margin: 0;
-  font-size: clamp(15px, 1.6vw, 18px);
-  line-height: 1.3;
-  font-weight: 600;
+.participants-progress-compact-eyebrow {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.participants-progress-compact .event-roster-progress-bar {
+  height: 6px;
+}
+
+.participants-progress-compact-meta {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.participants-progress-compact-meta strong {
   color: var(--text);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.participants-progress-compact.is-full .participants-progress-compact-meta strong {
+  color: #2e7d32;
+}
+
+:root[data-theme="dark"] .participants-progress-compact.is-full .participants-progress-compact-meta strong {
+  color: #4ade80;
+}
+
+/* On narrow screens the compact progress drops below the title (full row). */
+@media (max-width: 560px) {
+  .participants-progress-compact {
+    max-width: none;
+    width: 100%;
+  }
 }
 
 /* --- StickyActionBar -----------------------------------------------

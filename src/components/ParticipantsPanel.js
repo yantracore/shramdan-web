@@ -108,6 +108,13 @@ const COPY = {
     conversionGoingNone: "अहिलेसम्म कोही सामेल भएका छैनन् — पहिलो बन्नुहोस्!",
     conversionRemaining: "अभियान तय हुन अझै {n} जना चाहिन्छ",
     conversionReady: "पर्याप्त समर्थन जुट्यो — अभियान तय हुँदैछ!",
+    compactCommitted: "सामेल",
+    compactRemaining: "अझै {n} चाहिन्छ",
+    compactReady: "पुग्यो — तय हुँदै!",
+    compactSpots: "स्थान",
+    compactSpotsEyebrow: "स्थान भरियो",
+    compactOpen: "{n} खाली",
+    compactFull: "सबै भरियो",
     roles: {
       WORKER: "कामदार",
       PHOTOGRAPHER: "फोटोग्राफर",
@@ -149,6 +156,13 @@ const COPY = {
     conversionGoingNone: "No one's committed yet — be the first!",
     conversionRemaining: "{n} more needed to schedule the campaign",
     conversionReady: "Enough support — the campaign is being scheduled!",
+    compactCommitted: "joined",
+    compactRemaining: "{n} more to schedule",
+    compactReady: "Ready to schedule!",
+    compactSpots: "spots",
+    compactSpotsEyebrow: "Roles filled",
+    compactOpen: "{n} open",
+    compactFull: "All filled",
     roles: {
       WORKER: "Worker",
       PHOTOGRAPHER: "Photographer",
@@ -161,76 +175,47 @@ const COPY = {
   }
 };
 
-function ConversionProgress({ t, language, current, target }) {
-  const hasTarget = Number.isFinite(target) && target > 0;
-  const fillPercent = hasTarget ? Math.min(100, Math.round((current / target) * 100)) : 0;
-  const remaining = hasTarget ? Math.max(0, target - current) : 0;
-  const isReady = hasTarget && current >= target;
-  const goingLine =
-    current === 0
-      ? t.conversionGoingNone
-      : (current === 1 ? t.conversionGoingOne : t.conversionGoingMany).replace(
-          "{n}",
-          localizeDigits(current, language)
-        );
-  return (
-    <div
-      className={`event-roster-progress participants-progress participants-progress--conversion ${
-        isReady ? "is-full" : ""
-      }`}
-      role="group"
-      aria-label={goingLine}
-    >
-      <header className="participants-progress-head">
-        <span className="event-detail-zone-eyebrow">{t.conversionEyebrow}</span>
-        <h3 className="participants-progress-title">{t.conversionTitle}</h3>
-      </header>
-      <div className="event-roster-progress-bar" aria-hidden="true">
-        <span className="event-roster-progress-fill" style={{ width: `${fillPercent}%` }} />
-      </div>
-      <div className="event-roster-progress-meta">
-        <span className="event-roster-progress-count">{goingLine}</span>
-        {isReady ? (
-          <span className="event-roster-progress-open">{t.conversionReady}</span>
-        ) : remaining > 0 ? (
-          <span className="event-roster-progress-open">
-            {t.conversionRemaining.replace("{n}", localizeDigits(remaining, language))}
-          </span>
-        ) : null}
-      </div>
-    </div>
-  );
-}
+// Compact progress that lives to the RIGHT of the heading (there's room), not
+// as a full-width row below the roster. The denominator is the TOTAL needed —
+// conversion: attendingCount / conversionThreshold ("how many votes to become a
+// campaign"); fill: filled / planned spots. One small bar + a one-line caption.
+function CompactProgress({ t, language, progress }) {
+  const current = Number(progress?.current) || 0;
+  const target = Number(progress?.target);
+  if (!Number.isFinite(target) || target <= 0) return null;
 
-function FillProgress({ t, language, current, target }) {
-  const hasTarget = Number.isFinite(target) && target > 0;
-  if (!hasTarget) return null;
-  const filled = Math.min(current, target);
-  const open = Math.max(0, target - filled);
-  const fillPercent = Math.round((filled / target) * 100);
-  const isFull = open === 0;
-  const label = isFull
-    ? t.progressFillFull.replace("{total}", localizeDigits(target, language))
-    : t.progressFillLabel
-        .replace("{filled}", localizeDigits(filled, language))
-        .replace("{total}", localizeDigits(target, language));
+  const isConversion = progress.variant === "conversion";
+  const remaining = Math.max(0, target - current);
+  const isComplete = current >= target;
+  const fillPercent = Math.min(100, Math.round((current / target) * 100));
+
+  const eyebrow = isConversion ? t.conversionEyebrow : t.compactSpotsEyebrow;
+  const unit = isConversion ? t.compactCommitted : t.compactSpots;
+  const tail = isComplete
+    ? isConversion
+      ? t.compactReady
+      : t.compactFull
+    : (isConversion ? t.compactRemaining : t.compactOpen).replace(
+        "{n}",
+        localizeDigits(remaining, language)
+      );
+
   return (
     <div
-      className={`event-roster-progress participants-progress ${isFull ? "is-full" : ""}`}
+      className={`participants-progress-compact ${isComplete ? "is-full" : ""}`}
       role="group"
-      aria-label={label}
+      aria-label={`${eyebrow}: ${localizeDigits(current, language)}/${localizeDigits(target, language)}`}
     >
+      <span className="participants-progress-compact-eyebrow">{eyebrow}</span>
       <div className="event-roster-progress-bar" aria-hidden="true">
         <span className="event-roster-progress-fill" style={{ width: `${fillPercent}%` }} />
       </div>
-      <div className="event-roster-progress-meta">
-        <span className="event-roster-progress-count">{label}</span>
-        {open > 0 ? (
-          <span className="event-roster-progress-open">
-            {t.progressOpen.replace("{n}", localizeDigits(open, language))}
-          </span>
-        ) : null}
-      </div>
+      <span className="participants-progress-compact-meta">
+        <strong>
+          {localizeDigits(current, language)}/{localizeDigits(target, language)}
+        </strong>{" "}
+        {unit} · {tail}
+      </span>
     </div>
   );
 }
@@ -297,17 +282,22 @@ export function ParticipantsPanel({
   return (
     <section className="participants-panel event-roster-panel" aria-labelledby="participants-title">
       <header className="event-roster-header participants-header">
-        <h2 id="participants-title">
-          {t.heading}
-          {totalCount > 0 ? (
-            <span
-              className="participants-count-badge"
-              aria-label={t.countLabel.replace("{n}", localizeDigits(totalCount, language))}
-            >
-              {localizeDigits(totalCount, language)}
-            </span>
+        <div className="participants-header-top">
+          <h2 id="participants-title">
+            {t.heading}
+            {totalCount > 0 ? (
+              <span
+                className="participants-count-badge"
+                aria-label={t.countLabel.replace("{n}", localizeDigits(totalCount, language))}
+              >
+                {localizeDigits(totalCount, language)}
+              </span>
+            ) : null}
+          </h2>
+          {progress ? (
+            <CompactProgress t={t} language={language} progress={progress} />
           ) : null}
-        </h2>
+        </div>
         <p>{t.intro}</p>
       </header>
 
@@ -448,22 +438,6 @@ export function ParticipantsPanel({
           );
         })}
       </ul>
-
-      {progress?.variant === "conversion" ? (
-        <ConversionProgress
-          t={t}
-          language={language}
-          current={Number(progress.current) || 0}
-          target={Number(progress.target)}
-        />
-      ) : progress?.variant === "fill" ? (
-        <FillProgress
-          t={t}
-          language={language}
-          current={Number(progress.current) || 0}
-          target={Number(progress.target)}
-        />
-      ) : null}
     </section>
   );
 }
