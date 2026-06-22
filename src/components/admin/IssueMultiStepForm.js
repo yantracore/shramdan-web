@@ -6,7 +6,14 @@ import { Form } from "@/components/AppForm";
 import { IssueCoverUpload } from "@/components/admin/IssueCoverUpload";
 import { IssueImagesUpload } from "@/components/admin/IssueImagesUpload";
 import { MultiStepShell } from "@/components/MultiStepShell";
-import { ISSUE_CATEGORIES, buildEnumOptions } from "@/lib/adminUtils";
+import {
+  ISSUE_CATEGORIES,
+  ISSUE_STEP_FIELDS,
+  ISSUE_STEP_FIELD_MAP,
+  buildEnumOptions
+} from "@/lib/adminUtils";
+import { useStepFormErrors } from "@/hooks/useStepFormErrors";
+import { useToast } from "@/lib/toast";
 
 /* Admin create-issue form — multi-step counterpart to the legacy IssueForm.
  *
@@ -23,6 +30,22 @@ const STEP_FIELDS = {
   review: []
 };
 
+// Which step renders each field — so a backend validation error can jump back
+// to the step holding the offending field (incl. the optional inputs that
+// aren't part of the per-step gate above).
+const FIELD_STEP = {
+  cover: 0,
+  title: 1,
+  description: 1,
+  addressText: 2,
+  latitude: 2,
+  longitude: 2,
+  category: 3,
+  municipality: 3,
+  ward: 3,
+  additionalImages: 3
+};
+
 const coverImageValidator = (_, cover) =>
   cover?.id || cover?.url
     ? Promise.resolve()
@@ -35,7 +58,14 @@ export function IssueMultiStepForm({
   submitLabel = "Create issue"
 }) {
   const [form] = Form.useForm();
+  const toast = useToast();
   const [stepIndex, setStepIndex] = useState(0);
+  const { applyApiErrors, clearFieldErrors } = useStepFormErrors({
+    form,
+    stepIndex,
+    setStepIndex,
+    fieldStep: FIELD_STEP
+  });
   const stepCopy = copy.multiStep.issueAdmin.steps;
   const categoryOptions = useMemo(() => buildEnumOptions(ISSUE_CATEGORIES), []);
 
@@ -75,7 +105,19 @@ export function IssueMultiStepForm({
       return;
     }
     const values = form.getFieldsValue(true);
-    await onSubmit(values);
+    // The parent's onSubmit performs the API call and THROWS on failure; catch
+    // here so backend validation lands inline on the right field — jumping back
+    // to the step that field lives on — instead of only a toast.
+    try {
+      await onSubmit(values);
+    } catch (error) {
+      applyApiErrors(error, {
+        fieldMap: ISSUE_STEP_FIELD_MAP,
+        knownFields: ISSUE_STEP_FIELDS,
+        toast,
+        fallbackMessage: "Could not save issue."
+      });
+    }
   };
 
   return (
@@ -84,6 +126,7 @@ export function IssueMultiStepForm({
       layout="vertical"
       component="div"
       initialValues={{ category: "ROADSIDE" }}
+      onValuesChange={clearFieldErrors}
       preserve
     >
       <MultiStepShell

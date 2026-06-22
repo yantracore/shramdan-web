@@ -52,13 +52,24 @@ const DEFAULT_LABELS = {
     locationUnsupported:
       "Your browser does not support location services — tap on the map to drop a pin.",
     fullscreen: "Fullscreen",
-    exitFullscreen: "Exit fullscreen"
+    exitFullscreen: "Exit fullscreen",
+    region: {
+      provinceLabel: "Province",
+      provincePlaceholder: "Select province",
+      districtLabel: "District",
+      districtPlaceholder: "Select district",
+      resolving: "Detecting province / district..."
+    }
   },
   municipality: "Municipality (optional)",
   municipalityPlaceholder: "Pokhara Metropolitan City",
   ward: "Ward (optional)",
   wardPlaceholder: "6",
-  cancel: "Cancel"
+  cancel: "Cancel",
+  // Shown on the additional-images field while photo editing is deferred —
+  // PATCH /issues rejects uploadIds (see docs/api-requirements/issues.md).
+  additionalImagesLocked:
+    "Photo editing isn't available yet — your other changes still save."
 };
 
 export function IssueForm({
@@ -70,7 +81,8 @@ export function IssueForm({
   labels,
   categoryOptions,
   language = "en",
-  submitErrorMessage
+  submitErrorMessage,
+  extraImagesLocked = false
 }) {
   const [form] = Form.useForm();
   const toast = useToast();
@@ -94,7 +106,15 @@ export function IssueForm({
     const lat = Number(base.latitude);
     const lng = Number(base.longitude);
     return Number.isFinite(lat) && Number.isFinite(lng)
-      ? { ...base, location: { lat, lng } }
+      ? {
+          ...base,
+          location: {
+            lat,
+            lng,
+            provinceId: base.provinceId ?? null,
+            districtId: base.districtId ?? null
+          }
+        }
       : base;
   }, [initialValues]);
 
@@ -138,6 +158,11 @@ export function IssueForm({
     if (location && Number.isFinite(location.lat) && Number.isFinite(location.lng)) {
       rest.latitude = location.lat;
       rest.longitude = location.lng;
+      // Province + district ride along inside `location` (resolved from the
+      // pin); hand them to the API as top-level ids. Null → compactPayload
+      // drops them and the backend re-resolves from the coordinates.
+      rest.provinceId = location.provinceId ?? null;
+      rest.districtId = location.districtId ?? null;
     }
     try {
       await onSubmit(rest);
@@ -175,9 +200,10 @@ export function IssueForm({
           className="admin-form-wide"
           name="additionalImages"
           label={L.additionalImages}
+          extra={extraImagesLocked ? L.additionalImagesLocked : undefined}
           valuePropName="value"
         >
-          <IssueImagesUpload />
+          <IssueImagesUpload disabled={extraImagesLocked} />
         </Form.Item>
 
         <Form.Item

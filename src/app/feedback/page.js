@@ -9,7 +9,6 @@ import { SubmissionSuccessCard } from "@/components/SubmissionSuccessCard";
 import { usePreferences } from "@/app/providers";
 import { postJson } from "@/lib/apiClient";
 import { copy } from "@/lib/siteContent";
-import { useToast } from "@/lib/toast";
 
 const feedbackVisualCopy = {
   np: {
@@ -50,7 +49,6 @@ export default function FeedbackPage() {
   const { language } = usePreferences();
   const t = copy[language];
   const visual = feedbackVisualCopy[language] ?? feedbackVisualCopy.np;
-  const messageApi = useToast();
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
@@ -69,13 +67,12 @@ export default function FeedbackPage() {
 
     setSubmitting(true);
 
+    // No catch: a failure (including backend validation) propagates into
+    // FeedbackForm, which pins each error onto its field.
     try {
       await postJson("/feedback", payload);
       setSubmitted(true);
       return true;
-    } catch (error) {
-      messageApi.error(error.message || t.messages.submitError);
-      return false;
     } finally {
       setSubmitting(false);
     }

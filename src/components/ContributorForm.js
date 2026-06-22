@@ -8,6 +8,8 @@ import { Form } from "@/components/AppForm";
 import { Honeypot } from "@/components/Honeypot";
 import { MultiStepShell } from "@/components/MultiStepShell";
 import { PublicAttachmentField } from "@/components/PublicAttachmentField";
+import { useStepFormErrors } from "@/hooks/useStepFormErrors";
+import { useToast } from "@/lib/toast";
 
 /* Multi-step contributor application — five steps:
  *
@@ -42,6 +44,53 @@ const STEP_FIELDS = {
   work: ["portfolio", "experience"],
   motivation: ["motivation", "consent"],
   verify: ["password", "confirmPassword", "otp"]
+};
+
+// Maps a backend validation path root (POST /applications) onto the matching
+// form field. `resumeId` is the resume upload; `role`/`additionalInfo` are sent
+// without a visible field, so their errors fall to the form level.
+const APPLICATION_FIELD_MAP = {
+  name: "name",
+  email: "email",
+  phone: "phone",
+  portfolio: "portfolio",
+  experience: "experience",
+  motivation: "motivation",
+  password: "password",
+  otp: "otp",
+  resumeId: "resume",
+  role: null,
+  additionalInfo: null
+};
+
+const APPLICATION_FIELDS = [
+  "name",
+  "email",
+  "phone",
+  "portfolio",
+  "resume",
+  "experience",
+  "motivation",
+  "consent",
+  "password",
+  "confirmPassword",
+  "otp"
+];
+
+// Which step renders each field — so a backend validation error can jump back
+// to the step holding the offending field.
+const FIELD_STEP = {
+  name: 1,
+  email: 1,
+  phone: 1,
+  portfolio: 2,
+  resume: 2,
+  experience: 2,
+  motivation: 3,
+  consent: 3,
+  password: 4,
+  confirmPassword: 4,
+  otp: 4
 };
 
 const RESEND_COOLDOWN_SECONDS = 30;
@@ -108,6 +157,7 @@ export function ContributorForm({
   submitting = false
 }) {
   const [form] = Form.useForm();
+  const toast = useToast();
   const ms = content.multiStep;
   const joinSteps = ms.join.steps;
   const labels = content.join;
@@ -115,6 +165,12 @@ export function ContributorForm({
   const requiredRule = { required: true, message: content.messages.required };
 
   const [stepIndex, setStepIndex] = useState(0);
+  const { applyApiErrors, clearFieldErrors } = useStepFormErrors({
+    form,
+    stepIndex,
+    setStepIndex,
+    fieldStep: FIELD_STEP
+  });
   const [requestingOtp, setRequestingOtp] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
   const draftLoadedRef = useRef(false);
@@ -232,7 +288,21 @@ export function ContributorForm({
       ...(resume?.id ? { resumeId: resume.id } : {})
     };
 
-    const shouldReset = await onSubmit(payload);
+    // The parent's onSubmit performs the API call and THROWS on failure; catch
+    // here so backend validation lands inline on the right field — jumping back
+    // to the step that field lives on — instead of only a toast.
+    let shouldReset;
+    try {
+      shouldReset = await onSubmit(payload);
+    } catch (error) {
+      applyApiErrors(error, {
+        fieldMap: APPLICATION_FIELD_MAP,
+        knownFields: APPLICATION_FIELDS,
+        toast,
+        fallbackMessage: content.messages.submitError
+      });
+      return;
+    }
 
     if (shouldReset !== false) {
       form.resetFields();
@@ -251,7 +321,10 @@ export function ContributorForm({
       layout="vertical"
       component="div"
       preserve
-      onValuesChange={scheduleDraftSave}
+      onValuesChange={(changed) => {
+        clearFieldErrors(changed);
+        scheduleDraftSave();
+      }}
     >
       <Honeypot />
 

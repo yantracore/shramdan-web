@@ -18,7 +18,12 @@ import IssueLocationPickerBlock from "@/components/IssueLocationPickerBlock";
 import { MultiStepShell } from "@/components/MultiStepShell";
 import { SiteShell } from "@/components/SiteShell";
 import { postJson } from "@/lib/apiClient";
-import { ISSUE_CATEGORIES } from "@/lib/adminUtils";
+import {
+  ISSUE_CATEGORIES,
+  ISSUE_PICKER_FIELDS,
+  ISSUE_PICKER_FIELD_MAP
+} from "@/lib/adminUtils";
+import { useStepFormErrors } from "@/hooks/useStepFormErrors";
 import { getAuthSession } from "@/lib/authSession";
 import { buildLoginHref } from "@/lib/loginRedirect";
 import { copy } from "@/lib/siteContent";
@@ -167,6 +172,19 @@ const STEP_FIELDS = {
   review: []
 };
 
+// Which step renders each field — so a backend validation error can jump the
+// user back to the step holding the offending field. Includes the optional
+// `additionalImages` picker (rendered on `extras`, but not gated by it).
+const FIELD_STEP = {
+  cover: 0,
+  title: 1,
+  description: 1,
+  location: 2,
+  addressText: 2,
+  category: 3,
+  additionalImages: 3
+};
+
 export default function NewIssuePage() {
   const router = useRouter();
   const { language } = usePreferences();
@@ -186,6 +204,12 @@ export default function NewIssuePage() {
   const [locationError, setLocationError] = useState(null);
   const addressTouchedRef = useRef(false);
   const [stepIndex, setStepIndex] = useState(0);
+  const { applyApiErrors, clearFieldErrors } = useStepFormErrors({
+    form,
+    stepIndex,
+    setStepIndex,
+    fieldStep: FIELD_STEP
+  });
 
   const [draftPrompt, setDraftPrompt] = useState(null);
   const [savedAt, setSavedAt] = useState(null);
@@ -331,6 +355,11 @@ export default function NewIssuePage() {
       addressText: values.addressText,
       latitude: location.lat,
       longitude: location.lng,
+      // Province + district resolved from the pin (GET /resolve-location).
+      // Null when the lookup failed (e.g. just outside a seeded boundary) —
+      // compactPayload drops them and the backend re-resolves server-side.
+      provinceId: location.provinceId ?? null,
+      districtId: location.districtId ?? null,
       coverImageId: cover.id
     };
     if (additionalImages.length) {
@@ -352,7 +381,15 @@ export default function NewIssuePage() {
         router.push("/issues");
       }
     } catch (error) {
-      messageApi.error(error.message || t.messages.submitError);
+      // Jump to the earliest step holding an error, pin each error to its field
+      // (preserved across step navigation), and scroll to the first. Form-level
+      // / non-validation messages fall through to a toast.
+      applyApiErrors(error, {
+        fieldMap: ISSUE_PICKER_FIELD_MAP,
+        knownFields: ISSUE_PICKER_FIELDS,
+        toast: messageApi,
+        fallbackMessage: t.messages.submitError
+      });
     } finally {
       setSubmitting(false);
     }
@@ -417,7 +454,10 @@ export default function NewIssuePage() {
           layout="vertical"
           component="div"
           initialValues={{ category: "ROADSIDE" }}
-          onValuesChange={scheduleDraftSave}
+          onValuesChange={(changed) => {
+            clearFieldErrors(changed);
+            scheduleDraftSave();
+          }}
           preserve
         >
           <MultiStepShell

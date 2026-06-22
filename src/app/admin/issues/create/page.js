@@ -34,12 +34,13 @@ export default function AdminIssueCreatePage() {
       payload.uploadIds = additionalImages.map((image) => image.id);
     }
 
+    // No catch here: a failure (including backend validation) propagates into
+    // IssueMultiStepForm, which pins each error onto its field and step.
+    // `finally` still clears the submitting state before the throw lands.
     try {
       await postJson("/issues", payload, { requireAuth: true });
       toast.success("Issue created.");
       router.push("/admin/issues");
-    } catch (error) {
-      toast.error(error.message || "Could not create issue.");
     } finally {
       setSubmitting(false);
     }

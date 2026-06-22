@@ -40,6 +40,8 @@ function JoinPageContent() {
 
     setSubmitting(true);
 
+    // No catch: a failure (including backend validation) propagates into
+    // ContributorForm, which pins each error onto its field and step.
     try {
       const response = await submitApplication(payload);
       const data = response?.data ?? {};
@@ -54,9 +56,6 @@ function JoinPageContent() {
       }
       setSubmitted(true);
       return true;
-    } catch (error) {
-      messageApi.error(error.message || t.messages.submitError);
-      return false;
     } finally {
       setSubmitting(false);
     }

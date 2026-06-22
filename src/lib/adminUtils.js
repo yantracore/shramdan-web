@@ -45,6 +45,82 @@ export const ISSUE_STATUS_COLORS = {
   DUPLICATE: "default"
 };
 
+// Maps a backend validation path root (POST/PATCH /issues) onto the matching
+// form field, so a server-side error lands inline on the right input. Used with
+// applyApiErrorsToForm. Payload-only aliases: `coverImageId` is the cover
+// upload, `uploadIds` the extra-images picker; `language` is sent alongside the
+// edited text but has no visible field, so its errors fall to the form level.
+//
+// IssueForm (admin + member edit) drops the map pin into a single composite
+// `location` field, so latitude/longitude errors both land there.
+export const ISSUE_FORM_FIELD_MAP = {
+  title: "title",
+  description: "description",
+  category: "category",
+  addressText: "addressText",
+  latitude: "location",
+  longitude: "location",
+  municipality: "municipality",
+  ward: "ward",
+  coverImageId: "cover",
+  uploadIds: "additionalImages",
+  language: null
+};
+
+// Real, rendered field names on the single-screen IssueForm. Any backend key
+// outside this set surfaces at the form level instead of being pinned to a
+// field that never renders.
+export const ISSUE_FORM_FIELDS = [
+  "cover",
+  "additionalImages",
+  "title",
+  "description",
+  "category",
+  "location",
+  "addressText",
+  "municipality",
+  "ward"
+];
+
+// Public reporter (/issues/new): same `location` picker, but with no
+// municipality/ward inputs — those errors fall to the form level.
+export const ISSUE_PICKER_FIELD_MAP = {
+  ...ISSUE_FORM_FIELD_MAP,
+  municipality: null,
+  ward: null
+};
+
+export const ISSUE_PICKER_FIELDS = [
+  "cover",
+  "additionalImages",
+  "title",
+  "description",
+  "category",
+  "location",
+  "addressText"
+];
+
+// Admin create (IssueMultiStepForm): separate latitude/longitude number inputs
+// rather than a map picker, so those errors land on their own fields.
+export const ISSUE_STEP_FIELD_MAP = {
+  ...ISSUE_FORM_FIELD_MAP,
+  latitude: "latitude",
+  longitude: "longitude"
+};
+
+export const ISSUE_STEP_FIELDS = [
+  "cover",
+  "additionalImages",
+  "title",
+  "description",
+  "category",
+  "addressText",
+  "latitude",
+  "longitude",
+  "municipality",
+  "ward"
+];
+
 export const EVENT_STATUSES = [
   "DRAFT",
   "SCHEDULED",

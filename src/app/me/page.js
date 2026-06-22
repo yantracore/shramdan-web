@@ -16,7 +16,7 @@ import { Form } from "@/components/AppForm";
 import { PhoneVerify } from "@/components/PhoneVerify";
 import { SiteShell } from "@/components/SiteShell";
 import { changePassword, fetchMe, updateMe } from "@/lib/apiClient";
-import { setFieldErrorsAndScroll } from "@/lib/formErrors";
+import { applyApiErrorsToForm, setFieldErrorsAndScroll } from "@/lib/formErrors";
 import {
   getAuthSession,
   setAuthSession,
@@ -160,7 +160,13 @@ export default function MePage() {
           { name: "username", errors: [t.errors.usernameTaken] }
         ]);
       } else {
-        messageApi.error(error?.message || globalCopy.messages.submitError);
+        // Any other backend validation (e.g. username format) lands inline on
+        // its field; non-validation failures fall through to a toast.
+        applyApiErrorsToForm(profileForm, error, {
+          knownFields: ["name", "username"],
+          toast: messageApi,
+          fallbackMessage: globalCopy.messages.submitError
+        });
       }
     } finally {
       setSavingProfile(false);
@@ -229,7 +235,13 @@ export default function MePage() {
           { name: "newPassword", errors: [t.errors.samePassword] }
         ]);
       } else {
-        messageApi.error(error?.message || globalCopy.messages.submitError);
+        // Any other backend validation (e.g. password too short) lands inline
+        // on its field; non-validation failures fall through to a toast.
+        applyApiErrorsToForm(passwordForm, error, {
+          knownFields: ["currentPassword", "newPassword", "confirmNewPassword"],
+          toast: messageApi,
+          fallbackMessage: globalCopy.messages.submitError
+        });
       }
     } finally {
       setSavingPassword(false);
