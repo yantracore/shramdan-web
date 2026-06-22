@@ -124,12 +124,12 @@ const COPY = {
     compactFull: "सबै भरियो",
     leaderEyebrow: "नेतृत्व",
     leaderDesc: "टोली जुटाउने र अभियानको दिन नेतृत्व",
-    wantToLead: "नेतृत्व गर्छु",
-    leading: "तपाईं नेतृत्वमा",
-    ledBy: "{name} नेतृत्वमा",
-    leadOpen: "नेतृत्व खुला",
-    leaveLeadConfirmTitle: "नेतृत्व फिर्ता गर्ने?",
-    leaveLeadConfirmDesc: "तपाईं यो अभियानको नेतृत्वबाट हट्नुहुनेछ। मन लागे फेरि प्रस्ताव गर्न सकिन्छ।",
+    wantToLead: "संयोजक बन्छु",
+    leading: "तपाईं संयोजक",
+    ledBy: "{name} संयोजक",
+    leadOpen: "संयोजक खुला",
+    leaveLeadConfirmTitle: "संयोजक पद छोड्ने?",
+    leaveLeadConfirmDesc: "तपाईं यो अभियानको संयोजक पदबाट हट्नुहुनेछ। मन लागे फेरि प्रस्ताव गर्न सकिन्छ।",
     roles: {
       // Role labels are event-type-specific. Every event is a "cleanup" today,
       // so WORKER reads "सफाइकर्मी" (cleaner); a future event type would remap it.
@@ -192,12 +192,12 @@ const COPY = {
     compactFull: "All filled",
     leaderEyebrow: "Leadership",
     leaderDesc: "Rallies the team & leads on the day",
-    wantToLead: "Want to Lead",
-    leading: "You're leading",
-    ledBy: "Led by {name}",
-    leadOpen: "Lead open",
-    leaveLeadConfirmTitle: "Step down as lead?",
-    leaveLeadConfirmDesc: "You'll no longer be leading this campaign. You can offer again anytime.",
+    wantToLead: "Be the coordinator",
+    leading: "You're coordinating",
+    ledBy: "Coordinated by {name}",
+    leadOpen: "Coordinator open",
+    leaveLeadConfirmTitle: "Step down as coordinator?",
+    leaveLeadConfirmDesc: "You'll no longer be the coordinator for this campaign. You can offer again anytime.",
     roles: {
       // Event-type-specific (see np note): cleanup → "Cleaner".
       WORKER: "Cleaner",
@@ -632,246 +632,10 @@ export function ParticipantsPanel({
       </header>
 
       <ul className="event-roster-list">
-        {roles.map((row) => {
-          const role = row.role;
-          const roleColor = ROLE_COLORS[role] || "#176b5c";
-          const Icon = ROLE_ICONS[role] || TeamOutlined;
-          const roleLabel = t.roles[role] || role;
-          const count = Number(row.count) || 0;
-          const target = Number.isFinite(Number(row.target)) ? Number(row.target) : null;
-          const names = Array.isArray(row.names) ? row.names : [];
-          const isOwnRole = viewerRole === role;
-
-          // The viewer's own chip leads the row (highlighted); other names
-          // follow. Their name is also spelled out in the status pill so a
-          // shared first name is never ambiguous.
-          const otherNames = isOwnRole && viewer?.name
-            ? names.filter((n) => n !== viewer.name)
-            : names;
-          const visibleOthers = otherNames.slice(0, isOwnRole ? MAX_VISIBLE_CHIPS - 1 : MAX_VISIBLE_CHIPS);
-          const shownCount = visibleOthers.length + (isOwnRole ? 1 : 0);
-          const hiddenCount = Math.max(0, count - shownCount);
-
-          const openCount = target !== null ? Math.max(0, target - count) : null;
-          const canJoinThis = roleJoinable(role);
-          const isFullTargetRow = target !== null && openCount === 0;
-          // A row locks when the viewer is already committed elsewhere (another
-          // role, or leading).
-          const lockedByOther = viewerCommitted && !isOwnRole;
-          const isPending = pendingRole === role;
-          const countText =
-            target !== null
-              ? t.filledOf
-                  .replace("{filled}", localizeDigits(count, language))
-                  .replace("{total}", localizeDigits(target, language))
-              : count > 0
-                ? t.roleCount.replace("{n}", localizeDigits(count, language))
-                : "";
-          const roleDesc = t.roleDescriptions?.[role] || "";
-
-          return (
-            <li
-              key={role}
-              className={`event-roster-row${isOwnRole ? " is-own-role" : ""}${
-                lockedByOther ? " is-locked" : ""
-              }`}
-            >
-              <span
-                className="event-roster-role has-icon participants-role"
-                style={{ "--role-color": roleColor }}
-              >
-                <Icon className="participants-role-icon" aria-hidden="true" />
-                <span className="participants-role-text">
-                  <span className="participants-role-head">
-                    <span className="participants-role-name">{roleLabel}</span>
-                    {countText ? (
-                      <span className="event-roster-count">{countText}</span>
-                    ) : null}
-                  </span>
-                  {roleDesc ? (
-                    <span className="participants-role-desc">{roleDesc}</span>
-                  ) : null}
-                </span>
-              </span>
-
-              <span className="event-roster-chips" aria-hidden={shownCount === 0}>
-                {isOwnRole ? (
-                  <span
-                    className="event-roster-chip event-roster-chip-filled participants-chip-you"
-                    style={{ "--role-color": roleColor }}
-                    title={viewer?.name || t.you}
-                  >
-                    {getInitial(viewer?.name)}
-                  </span>
-                ) : null}
-                {visibleOthers.map((name, i) => (
-                  <span
-                    key={`${role}-${i}`}
-                    className="event-roster-chip event-roster-chip-filled"
-                    style={{ "--role-color": roleColor }}
-                    title={name}
-                  >
-                    {getInitial(name)}
-                  </span>
-                ))}
-                {hiddenCount > 0 ? (
-                  <span className="event-roster-chip event-roster-chip-more">
-                    {t.moreFilled.replace("{n}", localizeDigits(hiddenCount, language))}
-                  </span>
-                ) : null}
-              </span>
-
-              {isOwnRole ? (
-                canLeave ? (
-                  // Single in-place pill: "You Joined" by default, swapping to
-                  // "Leave" on hover/focus (desktop) — same slot, no second row,
-                  // no height bump. On touch the tap opens the confirm directly.
-                  <Popconfirm
-                    title={t.leaveConfirmTitle}
-                    description={t.leaveConfirmDesc}
-                    okText={t.leaveOk}
-                    cancelText={t.leaveCancel}
-                    okButtonProps={{ danger: true, loading: leaving }}
-                    onConfirm={handleLeave}
-                    overlayClassName="vote-withdraw-popconfirm"
-                  >
-                    <button
-                      type="button"
-                      className="participants-joined-toggle"
-                      disabled={leaving}
-                      aria-label={`${viewerStatusPill} — ${t.leave}`}
-                    >
-                      <span className="participants-joined-face participants-joined-face--default">
-                        <CheckCircleFilled aria-hidden="true" />
-                        {viewerStatusPill}
-                      </span>
-                      <span className="participants-joined-face participants-joined-face--leave">
-                        <CloseOutlined aria-hidden="true" />
-                        {leaving ? t.leaving : t.leave}
-                      </span>
-                    </button>
-                  </Popconfirm>
-                ) : (
-                  <span className="event-roster-joined-pill">
-                    <CheckCircleFilled aria-hidden="true" />
-                    {viewerStatusPill}
-                  </span>
-                )
-              ) : canJoinThis && !isFullTargetRow ? (
-                <button
-                  type="button"
-                  className="event-roster-open-pill"
-                  onClick={() => handleJoin(role)}
-                  disabled={isPending || lockedByOther}
-                  aria-label={`${t.join} — ${roleLabel}`}
-                >
-                  {isPending
-                    ? t.joining
-                    : openCount !== null
-                      ? t.openPill.replace("{n}", localizeDigits(openCount, language))
-                      : t.join}
-                </button>
-              ) : isFullTargetRow ? (
-                <span className="event-roster-full-pill">{t.fullPill}</span>
-              ) : null}
-            </li>
-          );
-        })}
+        {workerRow ? renderRoleRow(workerRow, true) : null}
+        {renderLeaderRow()}
+        {otherRows.map((row) => renderRoleRow(row))}
       </ul>
-
-      {leaderSlot ? (
-        <div className="participants-leader">
-          <span className="participants-leader-eyebrow">{t.leaderEyebrow}</span>
-          <div
-            className={`event-roster-row participants-leader-row${
-              leaderSlot.viewerIsLeader ? " is-own-role" : ""
-            }`}
-            style={{ "--role-color": LEAD_COLOR }}
-          >
-            <span className="event-roster-role has-icon participants-role">
-              <CrownOutlined className="participants-role-icon" aria-hidden="true" />
-              <span className="participants-role-text">
-                <span className="participants-role-head">
-                  <span className="participants-role-name">
-                    {leaderSlot.title || t.roles.COORDINATOR}
-                  </span>
-                  {Number(leaderSlot.count) > 0 ? (
-                    <span className="event-roster-count">
-                      {t.roleCount.replace("{n}", localizeDigits(leaderSlot.count, language))}
-                    </span>
-                  ) : null}
-                </span>
-                <span className="participants-role-desc">{t.leaderDesc}</span>
-              </span>
-            </span>
-
-            <span className="event-roster-chips" aria-hidden={!leaderSlot.name}>
-              {leaderSlot.name ? (
-                <span
-                  className={`event-roster-chip event-roster-chip-filled${
-                    leaderSlot.viewerIsLeader ? " participants-chip-you" : ""
-                  }`}
-                  style={{ "--role-color": LEAD_COLOR }}
-                  title={leaderSlot.name}
-                >
-                  {getInitial(leaderSlot.name)}
-                </span>
-              ) : null}
-            </span>
-
-            {leaderSlot.viewerIsLeader ? (
-              canLeaveLead ? (
-                <Popconfirm
-                  title={t.leaveLeadConfirmTitle}
-                  description={t.leaveLeadConfirmDesc}
-                  okText={t.leaveOk}
-                  cancelText={t.leaveCancel}
-                  okButtonProps={{ danger: true, loading: leadLeaving }}
-                  onConfirm={handleLeaveLead}
-                  overlayClassName="vote-withdraw-popconfirm"
-                >
-                  <button
-                    type="button"
-                    className="participants-joined-toggle participants-lead-toggle"
-                    disabled={leadLeaving}
-                    aria-label={`${t.leading} — ${t.leave}`}
-                  >
-                    <span className="participants-joined-face participants-joined-face--default">
-                      <CrownOutlined aria-hidden="true" />
-                      {t.leading}
-                    </span>
-                    <span className="participants-joined-face participants-joined-face--leave">
-                      <CloseOutlined aria-hidden="true" />
-                      {leadLeaving ? t.leaving : t.leave}
-                    </span>
-                  </button>
-                </Popconfirm>
-              ) : (
-                <span className="event-roster-joined-pill participants-lead-pill">
-                  <CrownOutlined aria-hidden="true" />
-                  {t.leading}
-                </span>
-              )
-            ) : leaderSlot.name ? (
-              <span className="participants-lead-by">
-                {t.ledBy.replace("{name}", leaderSlot.name)}
-              </span>
-            ) : leaderSlot.canLead ? (
-              <button
-                type="button"
-                className="event-roster-open-pill participants-lead-cta"
-                onClick={handleLead}
-                disabled={leadPending}
-                aria-label={t.wantToLead}
-              >
-                {leadPending ? t.joining : t.wantToLead}
-              </button>
-            ) : (
-              <span className="event-roster-full-pill">{t.leadOpen}</span>
-            )}
-          </div>
-        </div>
-      ) : null}
     </section>
   );
 }

@@ -484,14 +484,16 @@ export default function EventDetailPage() {
 
   // Adapt the event's rolePlan-derived rolesNeeded into the shared
   // ParticipantsPanel shape (count = filled, target = planned, names = roster).
-  const participantRoles = (Array.isArray(eventData?.rolesNeeded) ? eventData.rolesNeeded : []).map(
-    (row) => ({
+  // COORDINATOR is dropped from the grid — coordinator ≡ leader, shown only in
+  // the dedicated leadership slot (see backend note in event-participants.md).
+  const participantRoles = (Array.isArray(eventData?.rolesNeeded) ? eventData.rolesNeeded : [])
+    .filter((row) => row.role !== "COORDINATOR")
+    .map((row) => ({
       role: row.role,
       count: row.filled || 0,
       target: row.count,
       names: Array.isArray(row.filledNames) ? row.filledNames : []
-    })
-  );
+    }));
   const participantViewer = viewerRole
     ? { role: viewerRole, status: viewerStatus, name: viewerName }
     : null;
@@ -517,13 +519,12 @@ export default function EventDetailPage() {
     EVENT_JOINABLE_STATUSES.has(eventData?.status) &&
     viewerStatus !== "CHECKED_IN" &&
     (isDemoEvent || Boolean(myParticipation?.id));
-  // Leadership slot — the resolved event leader, shown read-only here (offering
-  // to lead / nominations live in LeaderNominationPanel). Labelled "Leader",
-  // distinct from the Coordinator participation role that stays in the grid.
+  // Leadership ("Coordinator") slot — the resolved event leader, shown read-only
+  // here (offering to lead / nominations live in LeaderNominationPanel). Titled
+  // "Coordinator" by the panel default; coordinator ≡ leader (only one shown).
   const participantLeaderSlot =
     eventData?.eventLeaderId || isLeader
       ? {
-          title: language === "np" ? "अगुवा" : "Leader",
           viewerIsLeader: isLeader,
           name: leader?.name || (isLeader ? viewerName : null),
           count: eventData?.eventLeaderId ? 1 : 0,

@@ -299,6 +299,12 @@
   min-width: 0;
 }
 
+/* The Cleaner leads as a full-width row (there can be many cleaners); the
+   Coordinator/leader slot + the other roles follow as half columns. */
+.event-roster-row--full {
+  grid-column: 1 / -1;
+}
+
 .event-roster-role {
   font-weight: 600;
   font-size: 14px;
