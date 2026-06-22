@@ -24,8 +24,6 @@ import { StickyActionBar } from "@/components/StickyActionBar";
 import { TertiaryButton } from "@/components/TertiaryButton";
 import { IssuePhotoGallery } from "@/components/IssuePhotoGallery";
 import { AttendanceVerifyPanel } from "@/components/AttendanceVerifyPanel";
-import { ContributionIntentPanel } from "@/components/ContributionIntentPanel";
-import { IncidentPanel } from "@/components/IncidentPanel";
 import { ShareAsContribution } from "@/components/ShareAsContribution";
 import { VideoUploadPanel } from "@/components/VideoUploadPanel";
 import { LeaderScheduleEditor } from "@/components/LeaderScheduleEditor";
@@ -321,12 +319,6 @@ export default function EventDetailPage() {
     (eventData?.status === "SCHEDULED" || eventData?.status === "ACTIVE");
   const canShowNominations =
     eventData?.status === "DRAFT" && !eventData?.eventLeaderId;
-  const canShowIncidents =
-    eventData?.status === "ACTIVE" ||
-    eventData?.status === "PAUSED" ||
-    eventData?.status === "COMPLETED" ||
-    isLeader;
-  const canSeeFullIncidents = isLeader || session?.user?.role === "ADMIN";
   const canUploadVideo =
     eventData?.status === "COMPLETED" &&
     (isLeader || session?.user?.role === "ADMIN");
@@ -803,12 +795,6 @@ export default function EventDetailPage() {
                   />
                 ) : null}
 
-                <ContributionIntentPanel
-                  event={eventData}
-                  language={language}
-                  onChanged={handleEventCompleted}
-                />
-
                 {eventData.status !== "COMPLETED" && eventData.status !== "CANCELLED" ? (
                   <ShareAsContribution event={eventData} language={language} />
                 ) : null}
@@ -817,15 +803,6 @@ export default function EventDetailPage() {
                   <LeaderNominationPanel
                     event={eventData}
                     language={language}
-                    onChanged={handleEventCompleted}
-                  />
-                ) : null}
-
-                {canShowIncidents ? (
-                  <IncidentPanel
-                    event={eventData}
-                    language={language}
-                    canSeeFull={canSeeFullIncidents}
                     onChanged={handleEventCompleted}
                   />
                 ) : null}
