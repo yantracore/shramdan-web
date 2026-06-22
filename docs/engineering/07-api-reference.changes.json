@@ -1,30 +1,26 @@
 {
-  "previousFetchedAt": "2026-06-18T12:08:58+05:45",
-  "currentFetchedAt": "2026-06-19T12:44:16+05:45",
-  "comparedAt": "2026-06-19T06:59:16.660Z",
+  "previousFetchedAt": "2026-06-19T13:22:36+05:45",
+  "currentFetchedAt": "2026-06-22T12:31:27+05:45",
+  "comparedAt": "2026-06-22T06:46:27.283Z",
   "diffDepth": "field-level",
   "totals": {
-    "added": 6,
+    "added": 3,
     "removed": 0,
     "modified": 1
   },
   "added": [
-    "GET /api/v1/badges/catalog",
-    "GET /api/v1/certificates/{code}",
-    "GET /api/v1/leaderboard",
-    "GET /api/v1/me/badges",
-    "GET /api/v1/me/certificates",
-    "GET /api/v1/users/{id}/badges"
+    "DELETE /api/v1/events/{id}/leader-volunteer",
+    "GET /api/v1/issues/{id}/participants",
+    "POST /api/v1/events/{id}/leader-volunteer"
   ],
   "removed": [],
   "modified": [
     {
-      "endpoint": "POST /api/v1/auth/login",
+      "endpoint": "POST /api/v1/events/{id}/participants",
       "changes": [
-        "req.required -email",
-        "req.field +phone(string)"
+        "resp +400"
       ]
     }
   ],
-  "acknowledgedAt": "2026-06-19T06:59:16.660Z"
+  "acknowledgedAt": null
 }
