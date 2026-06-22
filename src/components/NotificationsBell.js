@@ -166,7 +166,8 @@ export function NotificationsBell({ language = "np" }) {
         title={t.aria}
       >
         <Badge
-          count={localizeDigits(unread, language)}
+          className="notifications-badge"
+          count={unread > 0 ? localizeDigits(unread, language) : 0}
           offset={[-2, 2]}
           showZero={false}
           color="#d2360b"
