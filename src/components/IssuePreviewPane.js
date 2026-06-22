@@ -88,6 +88,19 @@ export function IssuePreviewPane({
   const sentinelRef = useRef(null);
   const didResolveFirstRef = useRef(false);
 
+  // Live supporter count for the previewed issue. The same preview instance is
+  // reused as the user clicks through the list, so a count seeded only once
+  // would stay frozen on the first issue (the bug this fixes). Re-seed it
+  // whenever the previewed issue changes — React's "adjust state during render
+  // on a changing key" pattern — and bump it on vote/retract via onVoteChange
+  // so the "{n} supporters" line and the Support button never disagree.
+  const [voteCount, setVoteCount] = useState(issue?.voteCount ?? 0);
+  const [syncedIssueId, setSyncedIssueId] = useState(issue?.id);
+  if (issue?.id !== syncedIssueId) {
+    setSyncedIssueId(issue?.id);
+    setVoteCount(issue?.voteCount ?? 0);
+  }
+
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setDescExpanded(false);
@@ -281,7 +294,7 @@ export function IssuePreviewPane({
             {Number.isFinite(Number(issue.voteCount)) ? (
               <span>
                 <RiseOutlined aria-hidden="true" />{" "}
-                {formatSupportersLabel(issue.voteCount, content, language)}
+                {formatSupportersLabel(voteCount, content, language)}
               </span>
             ) : null}
           </p>
@@ -315,13 +328,27 @@ export function IssuePreviewPane({
           <div className="event-preview-actions">
             {actionMode === "support" ? (
               <IssueVoteButton
+                // Remount per issue so the hook's voted/voteCount/role state
+                // reseeds from the new issue instead of carrying the previous
+                // one's over (same reason the count is synced above).
+                key={issue.id}
                 content={content}
                 initialVoteCount={issue.voteCount}
                 initialVoted={issue.isVoted}
                 issueId={issue.id}
                 language={language}
+                showCount={false}
                 size="large"
                 type="primary"
+                onVoteChange={(payload) => {
+                  if (payload && typeof payload.voteCount === "number") {
+                    setVoteCount(payload.voteCount);
+                  } else if (payload) {
+                    setVoteCount((c) => c + 1);
+                  } else {
+                    setVoteCount((c) => Math.max(0, c - 1));
+                  }
+                }}
               />
             ) : actionMode === "join" ? (
               <IssueJoinButton issue={issue} language={language} size="large" />
