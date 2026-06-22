@@ -14,6 +14,7 @@ import { IssueLocationCard } from "@/components/IssueLocationCard";
 import { IssuePhotoGallery } from "@/components/IssuePhotoGallery";
 import { IssueShareRow } from "@/components/IssueShareRow";
 import { IssueStatusTimeline } from "@/components/IssueStatusTimeline";
+import { IssueJoinButton } from "@/components/IssueJoinButton";
 import { IssueVoteButton } from "@/components/IssueVoteButton";
 import { ShareButton } from "@/components/ShareButton";
 import { CommentSection } from "@/components/comments";
@@ -28,6 +29,7 @@ import { usePreferences } from "@/app/providers";
 import { getJson, reportIssue } from "@/lib/apiClient";
 import { copy } from "@/lib/siteContent";
 import { useTrackVisit } from "@/lib/useRecentlyViewed";
+import { issueActionMode } from "@/lib/issueActions";
 import {
   ISSUE_STATUS_COLORS,
   getIssueCoverImageUrl,
@@ -65,6 +67,8 @@ export default function IssueDetailPage() {
 
   const [rawIssue, setIssue] = useState(null);
   const issue = rawIssue ? localizeIssue(rawIssue, language) : null;
+  // OPEN → Support (vote); EVENT_SCHEDULED → Join; otherwise no primary action.
+  const actionMode = issue ? issueActionMode(issue.status) : "none";
   const [related, setRelated] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -228,16 +232,20 @@ export default function IssueDetailPage() {
                     text={issue.title}
                     size="large"
                   />
-                  <IssueVoteButton
-                    content={content}
-                    initialVoteCount={issue.voteCount}
-                    initialVoted={issue.isVoted}
-                    issueId={issue.id}
-                    language={language}
-                    showCount={false}
-                    size="large"
-                    type="primary"
-                  />
+                  {actionMode === "support" ? (
+                    <IssueVoteButton
+                      content={content}
+                      initialVoteCount={issue.voteCount}
+                      initialVoted={issue.isVoted}
+                      issueId={issue.id}
+                      language={language}
+                      showCount={false}
+                      size="large"
+                      type="primary"
+                    />
+                  ) : actionMode === "join" ? (
+                    <IssueJoinButton issue={issue} language={language} size="large" />
+                  ) : null}
                 </div>
               </div>
 
@@ -315,11 +323,17 @@ export default function IssueDetailPage() {
           </article>
         ) : null}
 
-        {!loading && !error && !notFound && issue ? (
+        {!loading && !error && !notFound && issue && actionMode === "support" ? (
           <StickyActionBar
             label={language === "np" ? "हाल समर्थन गर्नुहोस्" : "Support this issue"}
             href="#issue-vote"
           />
+        ) : null}
+
+        {!loading && !error && !notFound && issue && actionMode === "join" ? (
+          <StickyActionBar>
+            <IssueJoinButton issue={issue} language={language} block size="large" />
+          </StickyActionBar>
         ) : null}
 
         {!loading && !error && !notFound && issue ? (

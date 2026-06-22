@@ -10,12 +10,14 @@ import { Tag, Tooltip } from "antd";
 import Image from "next/image";
 import Link from "next/link";
 import { IssueMapThumb } from "@/components/IssueMapThumb";
+import { IssueJoinButton } from "@/components/IssueJoinButton";
 import { IssueVoteButton } from "@/components/IssueVoteButton";
 import {
   ISSUE_STATUS_COLORS,
   getIssueCoverImageUrl,
   localizeIssue
 } from "@/lib/adminUtils";
+import { issueActionMode } from "@/lib/issueActions";
 import { useSavedIssues } from "@/lib/useSavedIssues";
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
@@ -35,6 +37,7 @@ export function formatSupporters(count, content, language) {
 
 export function PublicIssueCard({ issue: rawIssue, content, language }) {
   const issue = localizeIssue(rawIssue, language);
+  const actionMode = issueActionMode(issue.status);
   const statusLabel = content.statusLabels[issue.status] || issue.status;
   const categoryLabel = content.categoryLabels[issue.category] || issue.category;
   const coverImageUrl = getIssueCoverImageUrl(issue);
@@ -123,14 +126,22 @@ export function PublicIssueCard({ issue: rawIssue, content, language }) {
         {issue.addressText ? <span>{issue.addressText}</span> : null}
       </div>
       <div className="public-issue-card-actions">
-        <IssueVoteButton
-          className="public-issue-card-support"
-          content={content}
-          initialVoteCount={issue.voteCount}
-          initialVoted={issue.isVoted}
-          issueId={issue.id}
-          language={language}
-        />
+        {actionMode === "support" ? (
+          <IssueVoteButton
+            className="public-issue-card-support"
+            content={content}
+            initialVoteCount={issue.voteCount}
+            initialVoted={issue.isVoted}
+            issueId={issue.id}
+            language={language}
+          />
+        ) : actionMode === "join" ? (
+          <IssueJoinButton
+            className="public-issue-card-support"
+            issue={issue}
+            language={language}
+          />
+        ) : null}
         <Link className="card-link" href={`/issues/${issue.slug ?? issue.id}`}>
           {content.card.viewDetail} <ArrowRightOutlined />
         </Link>

@@ -13,12 +13,14 @@ import {
 import { Tag } from "antd";
 import { CommentsSummary } from "@/components/EventCommentsSummary";
 import { IssueMapThumb } from "@/components/IssueMapThumb";
+import { IssueJoinButton } from "@/components/IssueJoinButton";
 import { IssueVoteButton } from "@/components/IssueVoteButton";
 import {
   ISSUE_STATUS_COLORS,
   getIssueCoverImageUrl,
   localizeIssue
 } from "@/lib/adminUtils";
+import { issueActionMode } from "@/lib/issueActions";
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 
@@ -78,6 +80,7 @@ export function IssuePreviewPane({
   isMobileDrillActive
 }) {
   const issue = localizeIssue(rawIssue, language);
+  const actionMode = issueActionMode(issue?.status);
   const [descExpanded, setDescExpanded] = useState(false);
   const [isPinned, setIsPinned] = useState(false);
   const [isChanging, setIsChanging] = useState(false);
@@ -310,15 +313,19 @@ export function IssuePreviewPane({
           />
 
           <div className="event-preview-actions">
-            <IssueVoteButton
-              content={content}
-              initialVoteCount={issue.voteCount}
-              initialVoted={issue.isVoted}
-              issueId={issue.id}
-              language={language}
-              size="large"
-              type="primary"
-            />
+            {actionMode === "support" ? (
+              <IssueVoteButton
+                content={content}
+                initialVoteCount={issue.voteCount}
+                initialVoted={issue.isVoted}
+                issueId={issue.id}
+                language={language}
+                size="large"
+                type="primary"
+              />
+            ) : actionMode === "join" ? (
+              <IssueJoinButton issue={issue} language={language} size="large" />
+            ) : null}
             <Link
               className="event-preview-open"
               href={`/issues/${issue.slug ?? issue.id}`}
