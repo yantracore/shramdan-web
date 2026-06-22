@@ -1,7 +1,7 @@
 "use client";
 
 import { CheckOutlined, LikeOutlined } from "@ant-design/icons";
-import { Button, Modal, Radio, Space, Tooltip } from "antd";
+import { Button, Modal, Popconfirm, Radio, Space, Tooltip } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { useIssueVote } from "@/lib/useIssueVote";
 
@@ -51,7 +51,36 @@ const ROLE_COPY = {
       LOGISTICS: "लजिस्टिक्स"
     },
     submit: "समर्थन गर्नुहोस्",
-    cancel: "रद्द गर्नुहोस्"
+    cancel: "रद्द गर्नुहोस्",
+    // Voted-state button labels, by the role the viewer holds — the chip reads
+    // as their actual commitment, not a flat "समर्थन गरियो".
+    doneLabels: {
+      INTERESTED: "समर्थन गरियो",
+      GOING: "सामेल हुने",
+      WANT_TO_LEAD: "नेतृत्व गर्ने"
+    },
+    // Confirm-before-withdraw copy, tiered by the role the viewer voted with.
+    // INTERESTED is low-stakes; GOING/WANT_TO_LEAD carry a real commitment, so
+    // the warning gets heavier the more the campaign is counting on them.
+    withdrawOk: "फिर्ता गर्नुहोस्",
+    withdrawCancel: "रहन्छु",
+    withdraw: {
+      INTERESTED: {
+        title: "समर्थन फिर्ता गर्ने?",
+        description:
+          "तपाईंको समर्थन यो समस्याको गन्तीबाट हट्नेछ। मन लागे फेरि जहिले पनि समर्थन गर्न सकिन्छ।"
+      },
+      GOING: {
+        title: "सामेल हुने प्रतिबद्धता फिर्ता गर्ने?",
+        description:
+          "अभियान भएमा आफैँ आएर श्रममा सामेल हुने भनेर तपाईंले नाम लेखाउनुभएको थियो। समर्थन फिर्ता गर्दा अभियानले भरोसा गरेको एउटा हात घट्छ — साँच्चै हट्ने?"
+      },
+      WANT_TO_LEAD: {
+        title: "नेतृत्वको प्रतिबद्धता फिर्ता गर्ने?",
+        description:
+          "तपाईं यो अभियान नेतृत्व गर्न तयार हुनुभएको थियो। तपाईं हट्नुभयो भने आयोजना नै अड्किन सक्छ। यो निर्णय सोचविचार गरेर मात्र गर्नुहोस् — साँच्चै हट्ने?"
+      }
+    }
   },
   en: {
     modalTitle: "How are you supporting?",
@@ -86,7 +115,31 @@ const ROLE_COPY = {
       LOGISTICS: "Logistics"
     },
     submit: "Support",
-    cancel: "Cancel"
+    cancel: "Cancel",
+    doneLabels: {
+      INTERESTED: "Supported",
+      GOING: "Joining",
+      WANT_TO_LEAD: "Leading"
+    },
+    withdrawOk: "Withdraw",
+    withdrawCancel: "Stay",
+    withdraw: {
+      INTERESTED: {
+        title: "Withdraw your support?",
+        description:
+          "Your support will be removed from this issue's count. You can support it again anytime."
+      },
+      GOING: {
+        title: "Withdraw your commitment to join?",
+        description:
+          "You signed up to show up and pitch in if a campaign happens. Withdrawing means the campaign loses a hand it was counting on — are you sure?"
+      },
+      WANT_TO_LEAD: {
+        title: "Withdraw your offer to lead?",
+        description:
+          "You stepped up to help lead this campaign. If you withdraw, organizing it could stall. Please be sure before you go — withdraw anyway?"
+      }
+    }
   }
 };
 
@@ -106,20 +159,38 @@ export function IssueVoteButton({
   issueId,
   initialVoteCount,
   initialVoted,
+  // The role the viewer voted with (INTERESTED | GOING | WANT_TO_LEAD), when
+  // known — sourced from GET /issues/me/votes on the detail page. Drives which
+  // withdraw-confirmation copy we show. Falls back to the INTERESTED (lightest)
+  // wording when a surface only knows the boolean isVoted (e.g. list cards).
+  initialVoterRole,
+  // The event-day role a GOING voter signed up for (WORKER | PHOTOGRAPHER | …),
+  // when known. Lets the voted chip name the actual role (e.g. "फोटोग्राफर")
+  // instead of the generic "सामेल हुने". Also from GET /issues/me/votes.
+  initialEventRole,
   content,
   language,
   size,
   type,
   showCount = true,
   showLabel = true,
-  className
+  className,
+  // Optional. Bubbles the viewer's role + fresh tallies up to a parent (e.g.
+  // the issue detail page's participation panel) on each vote/retract.
+  onVoteChange,
+  // Optional. When set, an unvoted authenticated click delegates to the parent
+  // (the detail page opens the rich SupportRolesModal) instead of this
+  // component's own role-picker modal. Cards/preview leave it unset and keep
+  // the built-in picker.
+  onRequestSupport
 }) {
   const { isAuthenticated, voteCount, voted, voting, handleVoteClick, handleRetract } =
     useIssueVote({
       issueId,
       initialVoteCount,
       initialVoted,
-      content: content.card
+      content: content.card,
+      onVoteChange
     });
 
   const roleCopy = ROLE_COPY[language] || ROLE_COPY.np;
@@ -128,6 +199,31 @@ export function IssueVoteButton({
   // Required only when pickerRole === "GOING" — the participant role the voter
   // would take once the issue becomes a campaign.
   const [pickerEventRole, setPickerEventRole] = useState(null);
+
+  // The role the viewer's live vote is held under — drives which tier of
+  // withdraw-confirmation copy we show. Seeded from initialVoterRole and
+  // refreshed when the viewer casts a fresh vote through the picker.
+  const [activeVoterRole, setActiveVoterRole] = useState(
+    initialVoterRole || "INTERESTED"
+  );
+  // Resync when the known role arrives/changes from the parent (the detail
+  // page resolves it from GET /issues/me/votes after mount). Adjusting state
+  // during render — not in an effect — is React's recommended way to follow a
+  // changing prop and avoids the cascading re-render lint flags.
+  const [syncedVoterRole, setSyncedVoterRole] = useState(initialVoterRole);
+  if (initialVoterRole && initialVoterRole !== syncedVoterRole) {
+    setSyncedVoterRole(initialVoterRole);
+    setActiveVoterRole(initialVoterRole);
+  }
+
+  // The event-day role behind a GOING vote — names the voted chip. Seeded and
+  // resynced from initialEventRole the same render-time way as activeVoterRole.
+  const [activeEventRole, setActiveEventRole] = useState(initialEventRole || null);
+  const [syncedEventRole, setSyncedEventRole] = useState(initialEventRole);
+  if (initialEventRole !== syncedEventRole) {
+    setSyncedEventRole(initialEventRole);
+    setActiveEventRole(initialEventRole || null);
+  }
 
   const previousCountRef = useRef(voteCount);
   const [pulseKey, setPulseKey] = useState(0);
@@ -138,7 +234,11 @@ export function IssueVoteButton({
     }
   }, [voteCount]);
 
-  const label = voted ? content.card.voteActionDone : content.card.voteAction;
+  const label = voted
+    ? activeVoterRole === "GOING" && activeEventRole
+      ? roleCopy.eventRoles[activeEventRole] || roleCopy.doneLabels.GOING
+      : roleCopy.doneLabels[activeVoterRole] || content.card.voteActionDone
+    : content.card.voteAction;
   const tooltipTitle = !isAuthenticated
     ? content.card.voteDisabledTooltip
     : voted
@@ -154,10 +254,13 @@ export function IssueVoteButton({
       return;
     }
     if (voting || !issueId) return;
-    // Voted already → tapping withdraws support (issue must still be OPEN;
-    // the hook surfaces a graceful message when the backend rejects with 409).
-    if (voted) {
-      handleRetract(event);
+    // Voted already → withdrawal runs through the confirm popover that wraps
+    // this button (see Popconfirm below), so the bare click is a no-op here.
+    if (voted) return;
+    // Detail page → defer to the rich SupportRolesModal (roles + counts + lead
+    // visible by default). Elsewhere fall back to the built-in role picker.
+    if (onRequestSupport) {
+      onRequestSupport();
       return;
     }
     setPickerRole("INTERESTED");
@@ -170,37 +273,57 @@ export function IssueVoteButton({
   const handleConfirmRole = () => {
     if (goingNeedsRole) return;
     setPickerOpen(false);
+    // Remember the role so the chip + a later withdrawal match this commitment.
+    setActiveVoterRole(pickerRole);
+    setActiveEventRole(pickerRole === "GOING" ? pickerEventRole : null);
     handleVoteClick({
       voterRole: pickerRole,
       eventRole: pickerRole === "GOING" ? pickerEventRole : undefined
     });
   };
 
+  // Withdraw-confirmation copy for the role the viewer's vote is held under.
+  const withdrawCopy = roleCopy.withdraw[activeVoterRole] || roleCopy.withdraw.INTERESTED;
+
   return (
     <>
-      <Tooltip title={tooltipTitle}>
-        <Button
-          aria-pressed={voted}
-          className={className}
-          icon={voted ? <CheckOutlined /> : <LikeOutlined />}
-          loading={voting}
-          onClick={handleClick}
-          size={size}
-          type={voted ? "default" : type}
-        >
-          {showCount ? (
-            <span
-              key={pulseKey}
-              className="public-issue-card-support-count vote-tickup"
-            >
-              {toLocalDigits(voteCount, language)}
-            </span>
-          ) : null}
-          {showLabel ? (
-            <span className="public-issue-card-support-label">{label}</span>
-          ) : null}
-        </Button>
-      </Tooltip>
+      <Popconfirm
+        // Only intercept the click when there's a live vote to withdraw —
+        // otherwise the button's own onClick handles the login redirect (anon)
+        // or opens the role picker (not yet voted).
+        disabled={!isAuthenticated || !voted}
+        title={withdrawCopy.title}
+        description={withdrawCopy.description}
+        okText={roleCopy.withdrawOk}
+        cancelText={roleCopy.withdrawCancel}
+        okButtonProps={{ danger: true, loading: voting }}
+        onConfirm={() => handleRetract()}
+        overlayClassName="vote-withdraw-popconfirm"
+      >
+        <Tooltip title={tooltipTitle}>
+          <Button
+            aria-pressed={voted}
+            className={className}
+            icon={voted ? <CheckOutlined /> : <LikeOutlined />}
+            loading={voting}
+            onClick={handleClick}
+            size={size}
+            type={voted ? "default" : type}
+          >
+            {showCount ? (
+              <span
+                key={pulseKey}
+                className="public-issue-card-support-count vote-tickup"
+              >
+                {toLocalDigits(voteCount, language)}
+              </span>
+            ) : null}
+            {showLabel ? (
+              <span className="public-issue-card-support-label">{label}</span>
+            ) : null}
+          </Button>
+        </Tooltip>
+      </Popconfirm>
 
       <Modal
         open={pickerOpen}

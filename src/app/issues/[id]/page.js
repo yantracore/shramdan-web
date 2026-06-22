@@ -16,6 +16,7 @@ import { IssueShareRow } from "@/components/IssueShareRow";
 import { IssueStatusTimeline } from "@/components/IssueStatusTimeline";
 import { IssueJoinButton } from "@/components/IssueJoinButton";
 import { CompactConversionProgress, ParticipantsPanel } from "@/components/ParticipantsPanel";
+import { SupportRolesModal } from "@/components/SupportRolesModal";
 import { IssueVoteButton } from "@/components/IssueVoteButton";
 import { CommentSection } from "@/components/comments";
 import { IssueReactions } from "@/components/IssueReactions";
@@ -101,6 +102,9 @@ export default function IssueDetailPage() {
   const [myVote, setMyVote] = useState(null);
   // Which role the viewer is mid-join on, from a roster row tap (null = idle).
   const [joiningRole, setJoiningRole] = useState(null);
+  // The rich Support modal (roles + counts + lead, shown by default) — opened
+  // from the topline Support button while the issue is unvoted.
+  const [supportModalOpen, setSupportModalOpen] = useState(false);
   // Routing target for the Join CTA on a promoted (EVENT_SCHEDULED) issue. The
   // issue read omits its event, so we recover it client-side (interim — see
   // resolveEventForIssue). Until it resolves the button shows the "soon" cue.
@@ -341,6 +345,35 @@ export default function IssueDetailPage() {
     }
   }, [content.card, handleVoteChange, messageApi, myVote, pathname, rawIssue, router]);
 
+  // "I'm interested" from the Support modal → a plain INTERESTED vote (no role,
+  // no lead). Registers support and counts toward voteCount but NOT attending.
+  const handleInterestedVote = useCallback(async () => {
+    if (!getAuthSession()?.user) {
+      router.push(buildLoginHref(pathname, "vote"));
+      return;
+    }
+    if (myVote) {
+      messageApi.info(content.card.voteAlreadyVoted);
+      return;
+    }
+    if (!rawIssue?.id) return;
+    try {
+      const res = await voteOnIssue(rawIssue.id, "INTERESTED");
+      handleVoteChange({ voterRole: "INTERESTED", eventRole: null, ...(res?.data || {}) });
+      messageApi.success(content.card.voteSuccess);
+    } catch (err) {
+      if (err?.errorCode === "ALREADY_VOTED" || err?.status === 409) {
+        messageApi.info(content.card.voteAlreadyVoted);
+        handleVoteChange({ voterRole: "INTERESTED", eventRole: null });
+      } else if (err?.status === 403) {
+        messageApi.error(content.card.voteForbidden);
+      } else {
+        messageApi.error(err?.message || content.card.voteError);
+        throw err;
+      }
+    }
+  }, [content.card, handleVoteChange, messageApi, myVote, pathname, rawIssue, router]);
+
   const uploads = Array.isArray(issue?.uploads) ? issue.uploads : [];
   const coverImageUrl = getIssueCoverImageUrl(issue);
   const imageUploads = uploads
@@ -512,6 +545,10 @@ export default function IssueDetailPage() {
                   ) : null}
                   {actionMode === "support" ? (
                     <IssueVoteButton
+                      // Remount when the vote state changes so the button label
+                      // (Support → Supported/Joining/Leading) reseeds — votes can
+                      // land from the rich modal, not just this button.
+                      key={myVote ? myVote.voterRole : "unvoted"}
                       className="issue-topline-support-btn"
                       content={content}
                       initialVoteCount={issue.voteCount}
@@ -521,6 +558,7 @@ export default function IssueDetailPage() {
                       issueId={issue.id}
                       language={language}
                       onVoteChange={handleVoteChange}
+                      onRequestSupport={() => setSupportModalOpen(true)}
                       showCount={false}
                       size="large"
                       type="primary"
@@ -609,6 +647,26 @@ export default function IssueDetailPage() {
                 onLeaveLead={handleLeaveRole}
                 canLeaveLead={participantCanLeaveLead}
                 language={language}
+              />
+
+              <SupportRolesModal
+                open={supportModalOpen}
+                onClose={() => setSupportModalOpen(false)}
+                language={language}
+                onInterested={handleInterestedVote}
+                panelProps={{
+                  roles: participantRoles,
+                  viewer: participantViewer,
+                  progress: participantProgress,
+                  joinableRoles: participantJoinable,
+                  canLeave: participantCanLeave,
+                  onJoin: handleJoinRole,
+                  onLeave: handleLeaveRole,
+                  leaderSlot: participantLeaderSlot,
+                  onLead: handleLeadVote,
+                  onLeaveLead: handleLeaveRole,
+                  canLeaveLead: participantCanLeaveLead
+                }}
               />
 
               <IssueLocationCard

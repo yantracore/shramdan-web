@@ -986,6 +986,104 @@
   color: #e9b949;
 }
 
+/* --- SupportRolesModal -----------------------------------------------
+ * The "how do you want to support?" modal: an "I'm interested" action on top,
+ * then the embedded ParticipantsPanel (roles + counts + lead, by default). */
+.support-modal-intro {
+  margin: 0 0 16px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.support-modal-interested {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  text-align: left;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid color-mix(in srgb, var(--primary) 32%, var(--line));
+  background: color-mix(in srgb, var(--primary) 6%, var(--surface));
+  cursor: pointer;
+  font: inherit;
+  transition:
+    background var(--duration-fast) var(--ease-out-soft),
+    border-color var(--duration-fast) var(--ease-out-soft);
+}
+
+.support-modal-interested:hover:not(:disabled),
+.support-modal-interested:focus-visible {
+  background: color-mix(in srgb, var(--primary) 12%, var(--surface));
+  border-color: var(--primary);
+}
+
+.support-modal-interested:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.support-modal-interested-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  font-size: 18px;
+  color: #fff;
+  background: var(--primary);
+}
+
+.support-modal-interested-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.support-modal-interested-text strong {
+  font-size: 15px;
+  color: var(--text);
+}
+
+.support-modal-interested-text span {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.support-modal-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 18px 0 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.support-modal-divider::before,
+.support-modal-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+/* The panel, embedded in the modal, drops its section chrome. */
+.participants-panel--embedded {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
+.participants-panel--embedded .participants-header h2 {
+  font-size: 18px;
+}
+
 /* --- StickyActionBar -----------------------------------------------
  * Mobile-first sticky bottom action. Slides up when the user has
  * scrolled past the in-flow primary CTA (~480px). Glass-tinted chrome.

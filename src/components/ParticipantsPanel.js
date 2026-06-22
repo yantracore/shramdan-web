@@ -286,6 +286,9 @@ export function ParticipantsPanel({
   onLead,
   onLeaveLead,
   canLeaveLead = false,
+  // When the panel is rendered INSIDE another surface (the Support modal), drop
+  // its own section chrome (top divider/margin) and the intro line.
+  embedded = false,
   language = "np"
 }) {
   const t = COPY[language] || COPY.np;
@@ -368,7 +371,12 @@ export function ParticipantsPanel({
     roles.reduce((sum, r) => sum + (Number(r.count) || 0), 0) + (Number(leaderSlot?.count) || 0);
 
   return (
-    <section className="participants-panel event-roster-panel" aria-labelledby="participants-title">
+    <section
+      className={`participants-panel event-roster-panel${
+        embedded ? " participants-panel--embedded" : ""
+      }`}
+      aria-labelledby="participants-title"
+    >
       <header className="event-roster-header participants-header">
         <div className="participants-header-top">
           <h2 id="participants-title">
@@ -386,7 +394,7 @@ export function ParticipantsPanel({
             <CompactProgress t={t} language={language} progress={progress} />
           ) : null}
         </div>
-        <p>{t.intro}</p>
+        {embedded ? null : <p>{t.intro}</p>}
       </header>
 
       <ul className="event-roster-list">
