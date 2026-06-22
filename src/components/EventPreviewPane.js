@@ -58,7 +58,7 @@ function formatDateLong(iso, language) {
 const FALLBACK_HERO = "/images/event-types/cleanup.jpg";
 
 const ROLE_LABELS = {
-  WORKER: { np: "श्रमिक", en: "Worker" },
+  WORKER: { np: "सफाइकर्मी", en: "Cleaner" },
   PHOTOGRAPHER: { np: "फोटो", en: "Photo" },
   LIVESTREAMER: { np: "लाइभ", en: "Livestreamer" },
   MEDIC: { np: "स्वास्थ्य", en: "Medic" },

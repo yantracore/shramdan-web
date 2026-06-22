@@ -31,7 +31,7 @@ const COPY = {
     successToast: "उपस्थिति पुष्टिकरण सुरक्षित भयो (स्थानीय)।",
     emptyState: "रोस्टरमा भरिएको सहभागी छैन।",
     rolesLabel: {
-      WORKER: "कामदार",
+      WORKER: "सफाइकर्मी",
       PHOTOGRAPHER: "फोटोग्राफर",
       LIVESTREAMER: "लाइभस्ट्रिमर",
       MEDIC: "स्वास्थ्यकर्मी",
@@ -53,7 +53,7 @@ const COPY = {
     successToast: "Attendance verifications saved (local).",
     emptyState: "No roster members filled.",
     rolesLabel: {
-      WORKER: "Worker",
+      WORKER: "Cleaner",
       PHOTOGRAPHER: "Photographer",
       LIVESTREAMER: "Livestreamer",
       MEDIC: "Medic",

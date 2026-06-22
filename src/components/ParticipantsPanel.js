@@ -29,13 +29,13 @@ import { useState } from "react";
 import {
   CameraOutlined,
   CheckCircleFilled,
+  ClearOutlined,
   CloseOutlined,
   CrownOutlined,
   InboxOutlined,
   MedicineBoxOutlined,
   SafetyOutlined,
   TeamOutlined,
-  ToolOutlined,
   VideoCameraOutlined
 } from "@ant-design/icons";
 import { Popconfirm } from "antd";
@@ -69,8 +69,10 @@ const ROLE_COLORS = {
 
 // Each role gets a glanceable icon so the menu reads at a scan, not a wall of
 // text. Kept in one place so issue + event always show the same mark per role.
+// WORKER's icon is event-type-specific like its label — cleanup → a broom
+// (ClearOutlined); a future event type would remap it alongside the label.
 const ROLE_ICONS = {
-  WORKER: ToolOutlined,
+  WORKER: ClearOutlined,
   PHOTOGRAPHER: CameraOutlined,
   LIVESTREAMER: VideoCameraOutlined,
   MEDIC: MedicineBoxOutlined,
@@ -129,7 +131,9 @@ const COPY = {
     leaveLeadConfirmTitle: "नेतृत्व फिर्ता गर्ने?",
     leaveLeadConfirmDesc: "तपाईं यो अभियानको नेतृत्वबाट हट्नुहुनेछ। मन लागे फेरि प्रस्ताव गर्न सकिन्छ।",
     roles: {
-      WORKER: "कामदार",
+      // Role labels are event-type-specific. Every event is a "cleanup" today,
+      // so WORKER reads "सफाइकर्मी" (cleaner); a future event type would remap it.
+      WORKER: "सफाइकर्मी",
       PHOTOGRAPHER: "फोटोग्राफर",
       LIVESTREAMER: "लाइभस्ट्रिमर",
       MEDIC: "स्वास्थ्यकर्मी",
@@ -195,7 +199,8 @@ const COPY = {
     leaveLeadConfirmTitle: "Step down as lead?",
     leaveLeadConfirmDesc: "You'll no longer be leading this campaign. You can offer again anytime.",
     roles: {
-      WORKER: "Worker",
+      // Event-type-specific (see np note): cleanup → "Cleaner".
+      WORKER: "Cleaner",
       PHOTOGRAPHER: "Photographer",
       LIVESTREAMER: "Livestreamer",
       MEDIC: "Medic",

@@ -42,7 +42,8 @@ const ROLE_COPY = {
     eventRolePrompt: "कुन भूमिकामा आएर श्रम गर्नुहुन्छ?",
     eventRoleHint: "अभियानमा परिणत भएपछि तपाईं यही भूमिकामा सहभागी हुनुहुन्छ।",
     eventRoles: {
-      WORKER: "कामदार",
+      // cleanup event type → "सफाइकर्मी" (see ParticipantsPanel note).
+      WORKER: "सफाइकर्मी",
       PHOTOGRAPHER: "फोटोग्राफर",
       LIVESTREAMER: "लाइभस्ट्रिमर",
       MEDIC: "स्वास्थ्यकर्मी",
@@ -59,6 +60,10 @@ const ROLE_COPY = {
       GOING: "सामेल हुने",
       WANT_TO_LEAD: "नेतृत्व गर्ने"
     },
+    // Tooltip on the "already supported" button — names the commitment held.
+    joinedTooltipGoing: "तपाईं {role}को रूपमा जोडिनुभयो — समर्थन फिर्ता गर्न क्लिक गर्नुहोस्।",
+    joinedTooltipInterested: "तपाईंले समर्थन गर्नुभयो — फिर्ता गर्न क्लिक गर्नुहोस्।",
+    joinedTooltipLead: "तपाईं नेतृत्वका लागि इच्छुक हुनुहुन्छ — फिर्ता गर्न क्लिक गर्नुहोस्।",
     // Confirm-before-withdraw copy, tiered by the role the viewer voted with.
     // INTERESTED is low-stakes; GOING/WANT_TO_LEAD carry a real commitment, so
     // the warning gets heavier the more the campaign is counting on them.
@@ -106,7 +111,7 @@ const ROLE_COPY = {
     eventRolePrompt: "Which role would you take on the day?",
     eventRoleHint: "When this becomes a campaign, you'll join in this role.",
     eventRoles: {
-      WORKER: "Worker",
+      WORKER: "Cleaner",
       PHOTOGRAPHER: "Photographer",
       LIVESTREAMER: "Livestreamer",
       MEDIC: "Medic",
@@ -121,6 +126,9 @@ const ROLE_COPY = {
       GOING: "Joining",
       WANT_TO_LEAD: "Leading"
     },
+    joinedTooltipGoing: "You have joined as {role}. Click to withdraw support.",
+    joinedTooltipInterested: "You're supporting this. Click to withdraw.",
+    joinedTooltipLead: "You've offered to lead. Click to withdraw.",
     withdrawOk: "Withdraw",
     withdrawCancel: "Stay",
     withdraw: {
@@ -239,10 +247,21 @@ export function IssueVoteButton({
       ? roleCopy.eventRoles[activeEventRole] || roleCopy.doneLabels.GOING
       : roleCopy.doneLabels[activeVoterRole] || content.card.voteActionDone
     : content.card.voteAction;
+  // When already supported, the tooltip names the actual commitment instead of
+  // a flat "withdraw support".
+  const withdrawTooltip =
+    activeVoterRole === "GOING" && activeEventRole
+      ? roleCopy.joinedTooltipGoing.replace(
+          "{role}",
+          roleCopy.eventRoles[activeEventRole] || roleCopy.doneLabels.GOING
+        )
+      : activeVoterRole === "WANT_TO_LEAD"
+        ? roleCopy.joinedTooltipLead
+        : roleCopy.joinedTooltipInterested;
   const tooltipTitle = !isAuthenticated
     ? content.card.voteDisabledTooltip
     : voted
-      ? content.card.voteWithdraw
+      ? withdrawTooltip
       : "";
 
   const handleClick = (event) => {
