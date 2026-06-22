@@ -38,7 +38,7 @@ import { copy, footerQuotes, getDailyQuoteIndex } from "@/lib/siteContent";
 import { getAuthSession, isAdminUser, subscribeAuthSession } from "@/lib/authSession";
 import { logoutAndClearSession } from "@/lib/apiClient";
 import { buildLoginHref } from "@/lib/loginRedirect";
-import { getCachedPublicCounts, getFallbackPublicCounts } from "@/lib/publicStats";
+import { getCachedPublicCounts } from "@/lib/publicStats";
 
 const PILL_INTRO_SESSION_KEY = "shramdan.pill.intro.v1";
 const PILL_MIN_WIDTH_PX = 1180;
@@ -113,14 +113,6 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
 
   useEffect(() => {
     let cancelled = false;
-    getFallbackPublicCounts()
-      .then((counts) => {
-        if (!cancelled && counts) {
-          setPublicCounts((current) => current ?? counts);
-        }
-      })
-      .catch(() => {});
-
     getCachedPublicCounts()
       .then((counts) => {
         if (!cancelled) {

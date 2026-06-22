@@ -2,9 +2,9 @@
 
 // /me/saved — every issue the user has bookmarked via the heart icon
 // on PublicIssueCard, fetched from the local-storage-backed
-// useSavedIssues hook. Uses dummy issues from /issues fetch in dev;
-// since we have no per-id mock, we render simple link rows with the
-// issue id and a "remove" affordance.
+// useSavedIssues hook. Bookmarks are stored as issue ids; each id is
+// resolved to its real public issue (GET /issues/:id) so the row can
+// show the issue's title and location, with a "remove" affordance.
 
 import {
   ArrowRightOutlined,
@@ -12,10 +12,12 @@ import {
   HeartFilled
 } from "@ant-design/icons";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { EmptyState } from "@/components/EmptyState";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
-import { getDemoIssueById } from "@/lib/devMockData";
+import { getJson } from "@/lib/apiClient";
+import { localizeIssue } from "@/lib/adminUtils";
 import { useSavedIssues } from "@/lib/useSavedIssues";
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
@@ -63,6 +65,34 @@ export default function MeSavedPage() {
   const { saved, toggle, count } = useSavedIssues();
   const ids = Array.from(saved);
 
+  // Resolve each bookmarked id to its real public issue record. Failed
+  // lookups (deleted issue, transient error) fall back to the raw id.
+  const [issueMap, setIssueMap] = useState({});
+  useEffect(() => {
+    let cancelled = false;
+    const currentIds = Array.from(saved);
+    // Nothing to resolve when there are no bookmarks — the empty state
+    // renders from `ids` directly, so stale map entries never show.
+    if (currentIds.length === 0) return undefined;
+    (async () => {
+      const entries = await Promise.all(
+        currentIds.map(async (id) => {
+          try {
+            const res = await getJson(`/issues/${id}`);
+            const data = res?.data ?? res;
+            return [id, data ? localizeIssue(data, language) : null];
+          } catch {
+            return [id, null];
+          }
+        })
+      );
+      if (!cancelled) setIssueMap(Object.fromEntries(entries));
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [saved, language]);
+
   return (
     <SiteShell pageTitle={t.pageTitle}>
       <section className="page-section saved-section">
@@ -85,7 +115,7 @@ export default function MeSavedPage() {
         ) : (
           <ul className="saved-list">
             {ids.map((id) => {
-              const meta = getDemoIssueById(id);
+              const meta = issueMap[id];
               return (
                 <li key={id} className="saved-row">
                   <Link href={`/issues/${meta?.slug ?? id}`} className="saved-row-link">

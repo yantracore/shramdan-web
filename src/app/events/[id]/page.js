@@ -39,7 +39,7 @@ import { CommentSection } from "@/components/comments";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
 import { getJson } from "@/lib/apiClient";
-import { getDemoEventById, injectMockLiveStream } from "@/lib/devMockData";
+import { getDemoEventById } from "@/lib/devMockData";
 import {
   buildRolesNeeded,
   countActiveParticipants,
@@ -208,9 +208,7 @@ export default function EventDetailPage() {
         }
       }
 
-      // Dev mock: pin a liveStream onto fetched real events so the
-      // player block visually appears. No-op in production builds.
-      setEventData(injectMockLiveStream(eventId, merged));
+      setEventData(merged);
     } catch (fetchError) {
       if (fetchError?.status === 404) {
         setNotFound(true);

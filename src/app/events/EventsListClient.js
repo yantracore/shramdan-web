@@ -16,7 +16,6 @@ import { ViewSwitch } from "@/components/ViewSwitch";
 import { StreamCard, eventToEntry } from "@/components/StreamList";
 import { usePreferences } from "@/app/providers";
 import { copy } from "@/lib/siteContent";
-import { injectMockLiveStream } from "@/lib/devMockData";
 import { listAllEvents } from "@/lib/eventsApi";
 import { haversineKm } from "@/lib/haversine";
 import { useGeolocation } from "@/lib/useGeolocation";
@@ -296,7 +295,7 @@ export default function EventsListPageContent() {
           districtId: filters.districtId
         });
         if (cancelled) return;
-        setLive(liveEv.map((ev) => injectMockLiveStream(ev.id, ev)));
+        setLive(liveEv);
         setUpcoming(upEv);
         setPast(pastEv);
       } catch {

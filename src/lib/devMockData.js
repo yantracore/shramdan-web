@@ -6,20 +6,6 @@
 // real (eventually-populated) backend data takes over without code
 // changes at the call site.
 
-const YT_DEMO_ID = "qviiNFXX_WQ"; // fallback for injectMockLiveStream() on arbitrary backend events
-
-function buildPreviewEmbed(videoId) {
-  return `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${videoId}&modestbranding=1&rel=0`;
-}
-
-function buildLivePlayerEmbed(videoId) {
-  return `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&mute=1&modestbranding=1&rel=0`;
-}
-
-function ytThumb(videoId) {
-  return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
-}
-
 // Local MP4 footage paired with each live demo event. The
 // EventLiveStreamPlayer auto-switches to a native <video> when the URL
 // ends in .mp4, so these slugs control what plays on the event detail
@@ -2840,31 +2826,6 @@ export function getDemoEventTypeStats(eventTypeId) {
   return DEMO_EVENT_TYPE_STATS[eventTypeId] || [];
 }
 
-// Helper for the event-detail page: when in dev mode AND the fetched
-// event has no liveStream, optionally pin one on for visual demo. Use
-// sparingly — only when explicitly asking for the autoplay demo.
-export function injectMockLiveStream(eventId, realEvent) {
-  if (!isDev()) return realEvent;
-  if (!realEvent) return realEvent;
-  if (realEvent.liveStream?.isActive) return realEvent; // real data wins
-  // Pin a deterministic mock stream based on the event id so refresh
-  // doesn't flap.
-  return {
-    ...realEvent,
-    liveStream: {
-      isActive: true,
-      startedAt: new Date(Date.now() - 15 * 60_000).toISOString(),
-      streamUrl: buildLivePlayerEmbed(YT_DEMO_ID),
-      previewEmbedUrl: buildPreviewEmbed(YT_DEMO_ID),
-      thumbnailUrl: ytThumb(YT_DEMO_ID),
-      viewerCount: 42 + (eventId?.length ?? 0) * 3,
-      videoId: YT_DEMO_ID,
-      isMock: true
-    },
-    rolesNeeded: realEvent.rolesNeeded?.length ? realEvent.rolesNeeded : DEMO_ROSTER
-  };
-}
-
 // --- Notifications mock ----------------------------------------------
 // Five sample notifications shown in the topbar bell dropdown when the
 // real notifications API isn't wired yet. Each carries a stable ISO
@@ -3182,44 +3143,6 @@ function minutesAgoIso(min) {
   return new Date(Date.now() - min * 60_000).toISOString();
 }
 
-// --- Public demo issues registry ------------------------------------
-// A tiny set of "real-looking" issues whose IDs can be saved/bookmarked
-// from the homepage cards or referenced in deep links. getDemoIssueById
-// also reaches into the linkedIssue blobs on each demo past/upcoming/live
-// event so /me/saved can resolve any id the user has interacted with.
-const DEMO_PUBLIC_ISSUES = [
-  {
-    id: "demo-issue-bagmati-1",
-    title: "बागमती नदी किनार अव्यवस्थित फोहोर",
-    addressText: "तीनकुने पुल, ललितपुर",
-    category: "cleanup",
-    status: "EVENT_SCHEDULED",
-    voteCount: 73,
-    latitude: 27.6749,
-    longitude: 85.3491
-  },
-  {
-    id: "demo-issue-lakeside-1",
-    title: "लेकसाइड किनारको प्लास्टिक",
-    addressText: "Lakeside, Pokhara",
-    category: "cleanup",
-    status: "OPEN",
-    voteCount: 41,
-    latitude: 28.213,
-    longitude: 83.957
-  },
-  {
-    id: "demo-issue-shivapuri-1",
-    title: "शिवपुरी ट्रेल मर्मत आवश्यक",
-    addressText: "शिवपुरी निकुञ्ज, बुढानीलकण्ठ",
-    category: "trail",
-    status: "OPEN",
-    voteCount: 58,
-    latitude: 27.7717,
-    longitude: 85.3654
-  }
-];
-
 // English translations for demo issues, keyed by issue id. Used by
 // attachIssueTranslations() to build the bilingual translations[] array
 // that mirrors the real API shape. Items absent from this map fall back
@@ -3385,7 +3308,7 @@ const DEMO_ISSUE_EN_TRANSLATIONS = {
       "The 4 km highway stretch from Galchhi toward Malekhu is bare — bus passengers and locals suffer through summer. Plan: plant 350 saplings."
   },
 
-  // --- DEMO_PUBLIC_ISSUES + draft event ----------------------------
+  // --- Standalone + draft event linkedIssues -----------------------
   "demo-issue-lakeside-1": {
     title: "Plastic litter along the Lakeside shoreline",
     description: "Long stretches of the Lakeside walking promenade have collected plastic carried in by the wind off Phewa Lake."
@@ -3428,92 +3351,9 @@ export function attachIssueTranslations(issue) {
   };
 }
 
-export function getDemoPublicIssues() {
-  if (!isDev()) return [];
-  return DEMO_PUBLIC_ISSUES.map(attachIssueTranslations);
-}
-
-export function getDemoIssueById(id) {
-  if (!isDev() || !id) return null;
-  const direct = DEMO_PUBLIC_ISSUES.find((i) => i.id === id);
-  if (direct) return attachIssueTranslations(direct);
-  const pools = [DEMO_LIVE_EVENTS, DEMO_UPCOMING_EVENTS, DEMO_PAST_EVENTS];
-  for (const pool of pools) {
-    for (const event of pool) {
-      if (event.linkedIssue?.id === id) {
-        return attachIssueTranslations(event.linkedIssue);
-      }
-    }
-  }
-  return null;
-}
-
-// Flat, deduped list of demo issues used to augment the API issues
-// list. Pulls from every demo event pool plus the standalone public
-// issue registry so the homepage cards, live rail, and /issues list
-// all reference a consistent set of bilingual issues.
-export function getDemoIssues() {
-  if (!isDev()) return [];
-  const seen = new Map();
-  const pools = [DEMO_LIVE_EVENTS, DEMO_UPCOMING_EVENTS, DEMO_PAST_EVENTS];
-  for (const pool of pools) {
-    for (const event of pool) {
-      const linked = event?.linkedIssue;
-      if (linked?.id && !seen.has(linked.id)) {
-        seen.set(linked.id, attachIssueTranslations(linked));
-      }
-    }
-  }
-  for (const issue of DEMO_PUBLIC_ISSUES) {
-    if (issue?.id && !seen.has(issue.id)) {
-      seen.set(issue.id, attachIssueTranslations(issue));
-    }
-  }
-  return Array.from(seen.values());
-}
-
 // Vote-count history mini-trend (8 data points). Used by the sparkline
 // on /issues/[id]. Deterministic from issue id so the curve doesn't
 // twitch between renders.
-// --- Demo applications mock ------------------------------------------
-// Shown on /me/applications as if the user has previously submitted
-// contribution applications through /join. Mix of statuses so the UI
-// shows the full set of badges.
-const DEMO_APPLICATIONS = [
-  {
-    id: "app-1",
-    role: "FRONTEND_DEVELOPER",
-    roleLabel: { np: "फ्रन्टएन्ड डेभलपर", en: "Frontend developer" },
-    status: "ACCEPTED",
-    submittedAt: minutesAgo(60 * 24 * 18),
-    decidedAt: minutesAgo(60 * 24 * 14),
-    note: { np: "स्वागत। पहिलो assignment इमेलमा पठाइनेछ।", en: "Welcome. First assignment will be emailed." }
-  },
-  {
-    id: "app-2",
-    role: "PHOTOGRAPHER",
-    roleLabel: { np: "फोटोग्राफर", en: "Photographer" },
-    status: "REVIEWING",
-    submittedAt: minutesAgo(60 * 24 * 4),
-    decidedAt: null,
-    note: null
-  },
-  {
-    id: "app-3",
-    role: "COMMUNITY_MANAGER",
-    roleLabel: { np: "सामुदायिक नेतृत्व", en: "Community manager" },
-    status: "SUBMITTED",
-    submittedAt: minutesAgo(60 * 6),
-    decidedAt: null,
-    note: null
-  }
-];
-
-export function getDemoApplications() {
-  if (!isDev()) return [];
-  return DEMO_APPLICATIONS;
-}
-
 export function getDemoVoteHistory(issueId) {
   if (!isDev()) return [];
   let h = 0;

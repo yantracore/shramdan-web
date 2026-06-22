@@ -11,20 +11,6 @@ const LIVE_SCHEDULED_WINDOW_MS = 6 * 60 * 60 * 1000;
 let publicCountsCache = null;
 let publicCountsPromise = null;
 
-export async function getFallbackPublicCounts() {
-  if (process.env.NODE_ENV === "production") return null;
-
-  const { getDemoAllEvents, getDemoIssues } = await import("@/lib/devMockData");
-  const eventGroups = getDemoAllEvents();
-
-  return {
-    events:
-      eventGroups.live.length +
-      eventGroups.upcoming.length,
-    issues: getDemoIssues().length
-  };
-}
-
 function getItems(response) {
   const data = getResponseData(response, []);
   if (Array.isArray(data)) return data;
@@ -92,21 +78,14 @@ async function countOngoingEvents() {
 }
 
 async function loadPublicCounts() {
-  const fallback = await getFallbackPublicCounts();
   const [eventsResult, issuesResult] = await Promise.allSettled([
     countOngoingEvents(),
     countPublicList("/issues")
   ]);
 
   return {
-    events:
-      eventsResult.status === "fulfilled"
-        ? eventsResult.value
-        : fallback?.events ?? null,
-    issues:
-      issuesResult.status === "fulfilled"
-        ? issuesResult.value
-        : fallback?.issues ?? null
+    events: eventsResult.status === "fulfilled" ? eventsResult.value : null,
+    issues: issuesResult.status === "fulfilled" ? issuesResult.value : null
   };
 }
 

@@ -2,16 +2,15 @@
 
 // /me/applications — list of contribution applications the user has
 // submitted via /join. Status-tagged with submitted / reviewing /
-// accepted / rejected variants. Reads from getDemoApplications until
-// a real /users/me/applications endpoint lands.
+// accepted / rejected variants. The member-scoped read endpoint
+// (GET /users/me/applications) is not built yet, so this renders the
+// empty state until that backend lands — see docs/api-requirements/applications.md.
 
 import { CalendarOutlined, CheckCircleOutlined, ClockCircleOutlined, FileSearchOutlined } from "@ant-design/icons";
 import Link from "next/link";
-import { useMemo } from "react";
 import { EmptyState } from "@/components/EmptyState";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
-import { getDemoApplications } from "@/lib/devMockData";
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 function localizeDigits(v, lang) {
@@ -81,7 +80,8 @@ function formatDate(iso, language) {
 export default function MeApplicationsPage() {
   const { language } = usePreferences();
   const t = COPY[language] || COPY.np;
-  const apps = useMemo(() => getDemoApplications(), []);
+  // No member-scoped applications read endpoint yet — render empty until it ships.
+  const apps = [];
 
   return (
     <SiteShell pageTitle={t.pageTitle}>

@@ -27,7 +27,6 @@ import { StreamCard, issueToEntry } from "@/components/StreamList";
 import { usePreferences } from "@/app/providers";
 import { getJson } from "@/lib/apiClient";
 import { copy } from "@/lib/siteContent";
-import { getDemoIssues } from "@/lib/devMockData";
 import { ISSUE_CATEGORIES, getListItems } from "@/lib/adminUtils";
 
 const PUBLIC_ISSUE_STATUSES = ["OPEN", "EVENT_SCHEDULED", "COMPLETED"];
@@ -50,23 +49,6 @@ const MAP_FETCH_LIMIT = 100;
 
 function isPublicIssue(issue) {
   return PUBLIC_ISSUE_STATUSES.includes(issue?.status);
-}
-
-// Demo issues exist alongside API issues — the staging API has thin
-// real data, so we surface a bilingual demo set to make the list feel
-// populated. Filter the demo set by the same status/category constraints
-// that get applied to the API query, and skip items whose id already
-// appears in the API response so we never double-render.
-function filterDemoIssues(filters, alreadyHaveIds) {
-  return getDemoIssues()
-    .filter(isPublicIssue)
-    .filter((issue) => !alreadyHaveIds.has(issue.id))
-    .filter((issue) => !filters.status || issue.status === filters.status)
-    .filter(
-      (issue) => !filters.category || issue.category === filters.category
-    );
-  // Province/district filtering of demo issues is skipped — demo issues
-  // do not carry UUIDs and real API results dominate when the backend is live.
 }
 
 export default function IssuesListPageContent() {
@@ -163,9 +145,7 @@ export default function IssuesListPageContent() {
       try {
         const page = await fetchPage();
         if (cancelled) return;
-        const apiIds = new Set(page.items.map((i) => i.id));
-        const demoExtras = filterDemoIssues(filters, apiIds);
-        setItems([...page.items, ...demoExtras]);
+        setItems(page.items);
         setNextCursor(page.nextCursor);
         setVisibleCount(INITIAL_VISIBLE);
       } catch (fetchError) {
@@ -203,15 +183,7 @@ export default function IssuesListPageContent() {
             const lng = Number(issue?.longitude);
             return Number.isFinite(lat) && Number.isFinite(lng);
           });
-        const apiIds = new Set(pageItems.map((i) => i.id));
-        const demoMapItems = filterDemoIssues(filters, apiIds).filter(
-          (issue) => {
-            const lat = Number(issue?.latitude);
-            const lng = Number(issue?.longitude);
-            return Number.isFinite(lat) && Number.isFinite(lng);
-          }
-        );
-        if (!cancelled) setMapIssues([...pageItems, ...demoMapItems]);
+        if (!cancelled) setMapIssues(pageItems);
       } catch {
         if (!cancelled) setMapIssues([]);
       }
@@ -507,9 +479,7 @@ export default function IssuesListPageContent() {
     (async () => {
       try {
         const page = await fetchPage();
-        const apiIds = new Set(page.items.map((i) => i.id));
-        const demoExtras = filterDemoIssues(filters, apiIds);
-        setItems([...page.items, ...demoExtras]);
+        setItems(page.items);
         setNextCursor(page.nextCursor);
         setVisibleCount(INITIAL_VISIBLE);
       } catch (fetchError) {

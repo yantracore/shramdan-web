@@ -11,9 +11,9 @@
 //   - participantCount (filled in by /events/[id]/page.js via /participants merge — left undefined here)
 //   - rolesNeeded (also filled in client-side from rolePlan + participants)
 //
-// `liveStream` (mp4 URL / viewer count) is NOT present in backend events;
-// `injectMockLiveStream()` continues to enrich the 5 known LIVE events
-// with a deterministic YouTube fallback for now.
+// `liveStream` (mp4 URL / viewer count) is NOT present in backend events
+// and is no longer mocked here — the live-stream player only renders once
+// the live-streams backend ships (see docs/api-requirements/live-streams.md).
 
 import { getJson } from "@/lib/apiClient";
 import { getListItems, getIssueCoverImageUrl, localizeIssue } from "@/lib/adminUtils";

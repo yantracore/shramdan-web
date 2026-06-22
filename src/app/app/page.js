@@ -26,10 +26,7 @@ import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { PushOptInPanel } from "@/components/PushOptInPanel";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
-import {
-  getDemoApplications,
-  getDemoNotifications
-} from "@/lib/devMockData";
+import { getDemoNotifications } from "@/lib/devMockData";
 import { fetchMyIssueVotes } from "@/lib/apiClient";
 import { getListItems, localizeIssue } from "@/lib/adminUtils";
 import { listMyEvents } from "@/lib/eventsApi";
@@ -135,8 +132,9 @@ export default function AppDashboardPage() {
 
   // Personalized from the backend: events the caller is involved in
   // (GET /events/me) and issues the caller actually voted on
-  // (GET /issues/me/votes). Applications + notifications stay on demo
-  // mocks — no member-scoped endpoint exists for those yet.
+  // (GET /issues/me/votes). Applications now have no member-scoped read
+  // endpoint, so the pending-applications stat reads 0; notifications
+  // stay on a demo mock until that backend ships.
   const [myEvents, setMyEvents] = useState([]);
   const [supportedIssues, setSupportedIssues] = useState([]);
 
@@ -170,7 +168,7 @@ export default function AppDashboardPage() {
     .slice(0, 3);
   const pastEvents = myEvents.filter((e) => e.status === "COMPLETED");
 
-  const applications = useMemo(() => getDemoApplications(), []);
+  const applications = [];
   const notifications = useMemo(() => getDemoNotifications(), []);
   const unreadNotifications = useMemo(
     () => notifications.filter((n) => !n.isRead).length,
