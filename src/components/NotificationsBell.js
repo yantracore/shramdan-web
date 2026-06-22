@@ -83,8 +83,28 @@ export function NotificationsBell({ language = "np" }) {
     markRead,
     markAllRead
   } = useNotifications();
-  const items = allItems.slice(0, BELL_FEED_LIMIT);
   const [open, setOpen] = useState(false);
+  // Snapshot of the feed as it stood when the panel opened. Opening the panel
+  // auto-marks everything read (clearing the badge), so without this freeze the
+  // list would lose its "new" highlight the instant it appears. We render from
+  // the frozen copy while open, so the user can still see what just arrived.
+  const [frozenItems, setFrozenItems] = useState(null);
+  const items = (open && frozenItems ? frozenItems : allItems).slice(
+    0,
+    BELL_FEED_LIMIT
+  );
+
+  const handleOpenChange = (next) => {
+    setOpen(next);
+    if (next) {
+      setFrozenItems(allItems);
+      if (unread > 0) markAllRead();
+    } else {
+      setFrozenItems(null);
+    }
+  };
+
+  const closePanel = () => handleOpenChange(false);
 
   const panel = (
     <div className="notifications-panel" role="region" aria-label={t.heading}>
@@ -113,7 +133,7 @@ export function NotificationsBell({ language = "np" }) {
                 href={n.href || "#"}
                 onClick={() => {
                   markRead(n.id);
-                  setOpen(false);
+                  closePanel();
                 }}
                 className="notifications-item-link"
               >
@@ -143,7 +163,7 @@ export function NotificationsBell({ language = "np" }) {
         <Link
           href="/me/notifications"
           className="notifications-panel-view-all"
-          onClick={() => setOpen(false)}
+          onClick={closePanel}
         >
           {t.viewAll} →
         </Link>
@@ -155,7 +175,7 @@ export function NotificationsBell({ language = "np" }) {
     <Dropdown
       dropdownRender={() => panel}
       open={open}
-      onOpenChange={setOpen}
+      onOpenChange={handleOpenChange}
       placement="bottomRight"
       trigger={["click"]}
     >
