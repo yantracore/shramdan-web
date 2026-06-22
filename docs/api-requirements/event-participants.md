@@ -126,6 +126,19 @@ The event's `rolesNeeded` aggregation (described in `events.md`) is conceptually
 
 ---
 
+## Requested capabilities — unified Support/Join lifecycle (requested 2026-06-19)
+
+The unified control narrows the available actions as the lifecycle advances:
+`OPEN` issue → Interested / Join-as-Role / Lead · event `DRAFT` (issue
+`EVENT_SCHEDULED`) → Join-as-Role / Lead · event `SCHEDULED` → Join-as-Role ·
+event `ACTIVE` → Join-as-Worker only · `COMPLETED`/`CANCELLED` → none. Two backend
+needs fall out of this:
+
+- **Join while `ACTIVE` (ongoing).** `POST /events/{id}/participants` must be accepted while the event is `ACTIVE`, not only `SCHEDULED` — viewers of a live event may want to jump in. Product rule: while `ACTIVE`, only the `WORKER` role is offered (late hands pitch in as workers; specialised roles + leadership are closed). The frontend restricts the modal to `WORKER`; the backend must at minimum allow a `WORKER` join on an `ACTIVE` event.
+- **Self-nominate as leader post-promotion ("Lead" action).** While the event is `DRAFT` (issue `EVENT_SCHEDULED`), an authenticated member needs to express leadership intent directly. Today there is no endpoint — leader candidates are seeded only from issue `WANT_TO_LEAD` votes and the self-nominate CTA is inert (see `events.md` 2026-06-04). Requested: a self-nominate operation (e.g. `POST /events/{id}/leader-vote` with the auth context as candidate, or `POST /events/{id}/nominations`) so "Lead" works at the EVENT_SCHEDULED stage, not just during OPEN issue voting.
+
+---
+
 ## Recent changes
 
 - `2026-06-19` — **✅ RESOLVED — re-join now reactivates.** Backend shipped the fix. Live-verified: a member at `status: LEFT` who POSTs `/events/{id}/participants` now gets `201` with `status: CONFIRMED` (record reactivated, same id), and `GET /participants/me` returns `CONFIRMED`. The frontend's `isActiveParticipationStatus` guard auto-passes for the now-active status, so the normal "you're in" flow runs with no further frontend change. The 2026-06-18 bug entry below is retained for history.

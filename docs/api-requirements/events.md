@@ -136,6 +136,18 @@ A leader may not skip states. The system may auto-transition `SCHEDULED → ACTI
 
 ---
 
+## Requested capabilities
+
+### Per-viewer participation echo on event reads (requested 2026-06-19)
+
+Backs the unified Support/Join control's persisted "Joined as X" state on event
+cards, the events index preview, and the home rails — without fanning out one
+`GET /events/{id}/participants/me` call per card.
+
+- **viewerParticipation** (`object`, nullable, authenticated reads) — on `GET /events` (list) AND `GET /events/{id}` (detail): `{ id, role, status }` for the calling member on this event, or `null` if not joined. Inlines what `GET /events/{id}/participants/me` returns. Terminal statuses (`LEFT` / `NO_SHOW`) must report as `null` (treated as not-joined), consistent with `isActiveParticipationStatus` on the frontend.
+
+---
+
 ## Recent changes
 
 - `2026-06-17` — **Admin edit-logistics + cancel wired.** `PATCH /events/{id}` (scheduledAt, durationMinutes, meetup coords/address/notes, coordinationLink, whatToBring, planningNotes, riskLevel) and `POST /events/{id}/cancel { reason? }` are live; `/admin/events` exposes both from the detail modal via `updateEvent` / `cancelEvent`. Reconciled `adminUtils.EVENT_RISK_LEVELS` to the backend enum (`NORMAL`/`WATCH`/`URGENT`/`CRITICAL`) — the prior `NORMAL`/`ELEVATED`/`HIGH` was drift that left admin risk tags colourless. Note `compactPayload` drops blanks, so the edit form sets/edits but cannot clear a field to empty.
