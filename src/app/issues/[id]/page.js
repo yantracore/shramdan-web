@@ -8,14 +8,14 @@ import {
 import { Button, Empty, Skeleton, Tag } from "antd";
 import Image from "next/image";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { IssueLocationCard } from "@/components/IssueLocationCard";
 import { IssuePhotoGallery } from "@/components/IssuePhotoGallery";
 import { IssueShareRow } from "@/components/IssueShareRow";
 import { IssueStatusTimeline } from "@/components/IssueStatusTimeline";
 import { IssueJoinButton } from "@/components/IssueJoinButton";
-import { IssueParticipationPanel } from "@/components/IssueParticipationPanel";
+import { ParticipantsPanel } from "@/components/ParticipantsPanel";
 import { IssueVoteButton } from "@/components/IssueVoteButton";
 import { ShareButton } from "@/components/ShareButton";
 import { CommentSection } from "@/components/comments";
@@ -31,10 +31,14 @@ import {
   fetchIssueParticipants,
   fetchMyIssueVotes,
   getJson,
-  reportIssue
+  reportIssue,
+  retractVoteOnIssue,
+  voteOnIssue
 } from "@/lib/apiClient";
 import { getAuthSession } from "@/lib/authSession";
+import { buildLoginHref } from "@/lib/loginRedirect";
 import { copy } from "@/lib/siteContent";
+import { useToast } from "@/lib/toast";
 import { useTrackVisit } from "@/lib/useRecentlyViewed";
 import { issueActionMode } from "@/lib/issueActions";
 import { resolveEventForIssue } from "@/lib/eventsApi";
@@ -50,6 +54,18 @@ import {
 const PUBLIC_ISSUE_STATUSES = ["OPEN", "EVENT_SCHEDULED", "COMPLETED"];
 const RELATED_LIMIT = 6;
 const RELATED_DISPLAY = 3;
+
+// Role menu order shared with the event page, so a role sits in the same place
+// whether you meet it on an issue or its converted event.
+const PARTICIPANT_ROLE_ORDER = [
+  "WORKER",
+  "PHOTOGRAPHER",
+  "LIVESTREAMER",
+  "MEDIC",
+  "SAFETY_LEAD",
+  "COORDINATOR",
+  "LOGISTICS"
+];
 
 function formatIssueDate(value, language) {
   if (!value) return "";
@@ -72,6 +88,9 @@ export default function IssueDetailPage() {
   const { language } = usePreferences();
   const t = copy[language];
   const content = t.issues;
+  const messageApi = useToast();
+  const router = useRouter();
+  const pathname = usePathname();
 
   const [rawIssue, setIssue] = useState(null);
   const issue = rawIssue ? localizeIssue(rawIssue, language) : null;
@@ -79,9 +98,11 @@ export default function IssueDetailPage() {
   const actionMode = issue ? issueActionMode(issue.status) : "none";
   const [related, setRelated] = useState([]);
   // GOING-voter roster (who'll show up once this converts) + the viewer's own
-  // vote intent, both feeding the IssueParticipationPanel below.
+  // vote intent, both feeding the shared ParticipantsPanel below.
   const [participants, setParticipants] = useState([]);
   const [myVote, setMyVote] = useState(null);
+  // Which role the viewer is mid-join on, from a roster row tap (null = idle).
+  const [joiningRole, setJoiningRole] = useState(null);
   // Routing target for the Join CTA on a promoted (EVENT_SCHEDULED) issue. The
   // issue read omits its event, so we recover it client-side (interim — see
   // resolveEventForIssue). Until it resolves the button shows the "soon" cue.
@@ -197,6 +218,9 @@ export default function IssueDetailPage() {
       setIssue((prev) => {
         if (!prev) return prev;
         const next = { ...prev };
+        // Keep isVoted in step so the topline Support button (which mirrors
+        // initialVoted) flips even when the vote came from the roster, not it.
+        next.isVoted = Boolean(payload);
         if (payload && typeof payload === "object") {
           if (typeof payload.voteCount === "number") next.voteCount = payload.voteCount;
           if (typeof payload.attendingCount === "number") next.attendingCount = payload.attendingCount;
@@ -218,6 +242,65 @@ export default function IssueDetailPage() {
     },
     [issueId]
   );
+
+  // Roster role-row tap → join directly as that role (a GOING vote with the
+  // chosen eventRole), mirroring the event roster's "+N open" join pills. This
+  // is the single writer for roster-driven votes; it reconciles through
+  // handleVoteChange so the panel, progress bar, AND the topline Support button
+  // (which mirrors isVoted) all stay in step.
+  const handleJoinRole = useCallback(
+    async (eventRole) => {
+      if (!getAuthSession()?.user) {
+        router.push(buildLoginHref(pathname, "vote"));
+        return;
+      }
+      // One vote per issue — to change roles the viewer withdraws first via the
+      // Support button. Surface why a tap on an already-committed issue no-ops.
+      if (myVote) {
+        messageApi.info(content.card.voteAlreadyVoted);
+        return;
+      }
+      if (!rawIssue?.id || joiningRole) return;
+      setJoiningRole(eventRole);
+      try {
+        const res = await voteOnIssue(rawIssue.id, "GOING", eventRole);
+        handleVoteChange({ voterRole: "GOING", eventRole, ...(res?.data || {}) });
+        messageApi.success(content.card.voteSuccess);
+      } catch (err) {
+        if (err?.errorCode === "ALREADY_VOTED" || err?.status === 409) {
+          messageApi.info(content.card.voteAlreadyVoted);
+          handleVoteChange({ voterRole: "GOING", eventRole });
+        } else if (err?.status === 403) {
+          messageApi.error(content.card.voteForbidden);
+        } else {
+          messageApi.error(err?.message || content.card.voteError);
+        }
+      } finally {
+        setJoiningRole(null);
+      }
+    },
+    [content.card, handleVoteChange, joiningRole, messageApi, myVote, pathname, rawIssue, router]
+  );
+
+  // Withdraw from a role straight off the roster (retract the GOING vote). The
+  // backend only allows this while the issue is OPEN; reconciles through
+  // handleVoteChange(null) so the panel, progress bar, AND the topline Support
+  // button all clear together. Mirrors the event roster's leave path.
+  const handleLeaveRole = useCallback(async () => {
+    if (!rawIssue?.id) return;
+    try {
+      await retractVoteOnIssue(rawIssue.id);
+      handleVoteChange(null);
+      messageApi.success(content.card.voteWithdrawn);
+    } catch (err) {
+      if (err?.errorCode === "ISSUE_NOT_OPEN" || err?.status === 409) {
+        messageApi.info(content.card.voteWithdrawNotOpen);
+      } else {
+        messageApi.error(err?.message || content.card.voteWithdrawError);
+      }
+      throw err;
+    }
+  }, [content.card, handleVoteChange, messageApi, rawIssue]);
 
   const uploads = Array.isArray(issue?.uploads) ? issue.uploads : [];
   const coverImageUrl = getIssueCoverImageUrl(issue);
@@ -251,6 +334,52 @@ export default function IssueDetailPage() {
         }
       : null
   );
+
+  // Adapt the issue's vote signal into the shared ParticipantsPanel shape.
+  // Per-role counts come from eventRoleCounts (covers roles with no named voter
+  // yet); names come from the GOING-voter roster. Issues have no per-role plan,
+  // so there's no `target` — each row just shows the committed count.
+  const isOpenIssue = issue?.status === "OPEN";
+  const viewerName = getAuthSession()?.user?.name || null;
+  const participantRoles = (() => {
+    const countByRole = new Map();
+    if (Array.isArray(issue?.eventRoleCounts)) {
+      for (const entry of issue.eventRoleCounts) {
+        countByRole.set(entry?.eventRole, Number(entry?.voterCount) || 0);
+      }
+    }
+    const namesByRole = new Map();
+    for (const p of participants) {
+      if (!p?.eventRole || !p?.user?.name) continue;
+      const arr = namesByRole.get(p.eventRole) || [];
+      arr.push(p.user.name);
+      namesByRole.set(p.eventRole, arr);
+    }
+    return PARTICIPANT_ROLE_ORDER.map((role) => {
+      const names = namesByRole.get(role) || [];
+      const count = countByRole.has(role) ? countByRole.get(role) : names.length;
+      return { role, count, names };
+    });
+  })();
+  // The viewer occupies a role row only when they committed to GOING with a
+  // chosen role. INTERESTED / WANT_TO_LEAD are reflected by the topline Support
+  // button, not a roster row.
+  const participantViewer =
+    myVote?.voterRole === "GOING" && myVote?.eventRole
+      ? { role: myVote.eventRole, status: "GOING", name: viewerName }
+      : null;
+  const participantProgress =
+    isOpenIssue && Number(issue?.conversionThreshold) > 0
+      ? {
+          current: Number(issue?.attendingCount) || 0,
+          target: Number(issue?.conversionThreshold),
+          variant: "conversion"
+        }
+      : null;
+  // One vote per issue: roles are joinable only while OPEN and the viewer hasn't
+  // committed to anything yet. Withdraw (retract) is likewise OPEN-only.
+  const participantJoinable = isOpenIssue && !myVote ? null : [];
+  const participantCanLeave = isOpenIssue && Boolean(participantViewer);
 
   return (
     <SiteShell pageTitle={issue?.title || content.detail.notFoundTitle}>
@@ -335,6 +464,7 @@ export default function IssueDetailPage() {
                       initialVoteCount={issue.voteCount}
                       initialVoted={issue.isVoted}
                       initialVoterRole={myVote?.voterRole}
+                      initialEventRole={myVote?.eventRole}
                       issueId={issue.id}
                       language={language}
                       onVoteChange={handleVoteChange}
@@ -406,10 +536,14 @@ export default function IssueDetailPage() {
                 </section>
               ) : null}
 
-              <IssueParticipationPanel
-                issue={issue}
-                participants={participants}
-                myVote={myVote}
+              <ParticipantsPanel
+                roles={participantRoles}
+                viewer={participantViewer}
+                progress={participantProgress}
+                joinableRoles={participantJoinable}
+                canLeave={participantCanLeave}
+                onJoin={handleJoinRole}
+                onLeave={handleLeaveRole}
                 language={language}
               />
 

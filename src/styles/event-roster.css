@@ -509,6 +509,294 @@
   box-shadow: none;
 }
 
+/* --- IssueParticipationPanel ----------------------------------------
+ * The issue-stage twin of EventJoinPanel + EventRosterPanel, rendered on
+ * /issues/[id]. Reuses the .event-roster-progress / .event-roster-list
+ * vocabulary so a role + progress bar read identically across the issue→
+ * event lifecycle. Adds a "your participation" banner that reflects the
+ * viewer's own vote (interested / going-as-role / want-to-lead) back to them. */
+
+.issue-participation-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  margin-top: 8px;
+}
+
+.issue-participation-progress {
+  margin: 0;
+  padding: 18px 20px;
+  border: 1px solid color-mix(in srgb, var(--primary) 18%, var(--line));
+  border-radius: var(--radius-md);
+  background:
+    linear-gradient(135deg,
+      color-mix(in srgb, var(--primary) 7%, var(--surface)) 0%,
+      var(--surface) 100%);
+  box-shadow: var(--shadow-1);
+}
+
+.issue-participation-progress-head {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-bottom: 14px;
+}
+
+.issue-participation-progress-title {
+  margin: 0;
+  font-size: clamp(16px, 1.8vw, 20px);
+  line-height: 1.3;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* "Your participation" banner — soft card whose accent tracks the commitment
+   level. Green for going (mirrors the event "you're in" pill), primary for
+   interested, gold for want-to-lead. */
+.issue-participation-you {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--accent-line, var(--line));
+  background: var(--accent-bg, var(--surface));
+  box-shadow: var(--shadow-1);
+}
+
+.issue-participation-you.is-going {
+  --accent: #2e7d32;
+  --accent-line: color-mix(in srgb, #2e7d32 40%, var(--line));
+  --accent-bg: color-mix(in srgb, #2e7d32 8%, var(--surface));
+}
+
+.issue-participation-you.is-interested {
+  --accent: var(--primary);
+  --accent-line: color-mix(in srgb, var(--primary) 36%, var(--line));
+  --accent-bg: color-mix(in srgb, var(--primary) 7%, var(--surface));
+}
+
+.issue-participation-you.is-lead {
+  --accent: #b7791f;
+  --accent-line: color-mix(in srgb, #b7791f 40%, var(--line));
+  --accent-bg: color-mix(in srgb, #b7791f 9%, var(--surface));
+}
+
+.issue-participation-you-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  font-size: 17px;
+  color: #fff;
+  background: var(--accent, var(--primary));
+  box-shadow: var(--shadow-1);
+}
+
+.issue-participation-you-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.issue-participation-you-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--accent, var(--primary)) 75%, var(--muted));
+}
+
+.issue-participation-you-text {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--text);
+}
+
+:root[data-theme="dark"] .issue-participation-you.is-going {
+  --accent: #4ade80;
+  --accent-line: color-mix(in srgb, #4ade80 34%, var(--line));
+  --accent-bg: color-mix(in srgb, #4ade80 10%, var(--surface));
+}
+
+:root[data-theme="dark"] .issue-participation-you-icon {
+  color: #07271a;
+}
+
+.issue-participation-roster .event-roster-header {
+  margin-bottom: 14px;
+}
+
+/* An as-yet-unclaimed role still shows (event-roster style), with a dashed
+   "open" pill inviting someone to be the first — the issue has no role-plan
+   target, so there's no "+N open" count, just the invitation. */
+.issue-roster-open-pill {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  line-height: 1.4;
+  color: var(--primary);
+  border: 1px dashed color-mix(in srgb, var(--primary) 45%, var(--line));
+  background: color-mix(in srgb, var(--primary) 5%, transparent);
+}
+
+.issue-participation-roster .event-roster-row.is-empty {
+  opacity: 0.72;
+}
+
+/* --- ParticipantsPanel (shared by /issues/[id] AND /events/[id]) ------
+ * The single participation surface. Reuses the .event-roster-* vocabulary
+ * for the shared visual elements (list, rows, chips, progress bar, pills);
+ * the rules below are only the additions it layers on: role icons, the
+ * viewer's own row (name + withdraw on hover/tap), and the progress bar
+ * sitting BELOW the roster on both surfaces. */
+
+.participants-panel {
+  margin-top: 28px;
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
+}
+
+/* Full-width intro — one concise line, not a clamped column that eats
+   vertical space. */
+.participants-header p {
+  max-width: none;
+}
+
+/* A role icon replaces the little colour dot. */
+.event-roster-role.has-icon::before {
+  display: none;
+}
+
+.participants-role-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  color: var(--role-color, var(--primary));
+  flex-shrink: 0;
+}
+
+/* The viewer's own avatar chip — ringed so they spot themselves at a glance. */
+.participants-chip-you {
+  box-shadow: 0 0 0 2px var(--surface), 0 0 0 3.5px var(--role-color, var(--primary));
+}
+
+/* Own-row trailing cluster: "you're in · name" pill + the withdraw control.
+   .event-roster-chips already carries margin-left:auto, which right-aligns
+   this whole group. */
+.participants-own-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Withdraw — quiet by default; fades in on row hover (desktop) and is always
+   present on touch (no hover). Keyboard users get it via :focus-within. */
+.participants-leave-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  line-height: 1.4;
+  white-space: nowrap;
+  cursor: pointer;
+  color: #b42318;
+  border: 1px solid color-mix(in srgb, #b42318 35%, var(--line));
+  background: color-mix(in srgb, #b42318 6%, transparent);
+  opacity: 0;
+  transition:
+    opacity var(--duration-fast) var(--ease-out-soft),
+    background var(--duration-fast) var(--ease-out-soft);
+}
+
+.participants-leave-btn:hover:not(:disabled),
+.participants-leave-btn:focus-visible {
+  background: color-mix(in srgb, #b42318 14%, transparent);
+}
+
+.participants-leave-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.participants-leave-btn > .anticon {
+  font-size: 11px;
+}
+
+@media (hover: hover) {
+  .event-roster-row.is-own-role:hover .participants-leave-btn,
+  .event-roster-row.is-own-role:focus-within .participants-leave-btn {
+    opacity: 1;
+  }
+}
+
+/* Touch devices have no hover — keep the control always visible. */
+@media (hover: none) {
+  .participants-leave-btn {
+    opacity: 1;
+  }
+}
+
+:root[data-theme="dark"] .participants-leave-btn {
+  color: #fca5a5;
+  border-color: color-mix(in srgb, #fca5a5 30%, var(--line));
+  background: color-mix(in srgb, #fca5a5 10%, transparent);
+}
+
+/* Progress now sits BELOW the roster on both surfaces. */
+.participants-progress {
+  margin: 18px 0 0;
+}
+
+.participants-progress--conversion {
+  padding: 16px 18px;
+  border: 1px solid color-mix(in srgb, var(--primary) 18%, var(--line));
+  border-radius: var(--radius-md);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--primary) 7%, var(--surface)) 0%,
+    var(--surface) 100%
+  );
+  box-shadow: var(--shadow-1);
+}
+
+.participants-progress-head {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-bottom: 12px;
+}
+
+.participants-progress-title {
+  margin: 0;
+  font-size: clamp(15px, 1.6vw, 18px);
+  line-height: 1.3;
+  font-weight: 600;
+  color: var(--text);
+}
+
+@media (max-width: 620px) {
+  /* On the typically-touch small layout, keep withdraw always visible. */
+  .participants-leave-btn {
+    opacity: 1;
+  }
+}
+
 /* --- StickyActionBar -----------------------------------------------
  * Mobile-first sticky bottom action. Slides up when the user has
  * scrolled past the in-flow primary CTA (~480px). Glass-tinted chrome.

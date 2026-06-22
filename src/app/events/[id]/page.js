@@ -12,12 +12,11 @@ import {
 import { Button, Empty, Skeleton, Tag } from "antd";
 import Image from "next/image";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import { BeforeAfterSlider } from "@/components/BeforeAfterSlider";
-import { EventJoinPanel } from "@/components/EventJoinPanel";
 import { EventLiveStreamPlayer } from "@/components/EventLiveStreamPlayer";
-import { EventRosterPanel } from "@/components/EventRosterPanel";
+import { ParticipantsPanel } from "@/components/ParticipantsPanel";
 import IssueMapBlock from "@/components/IssueMapBlock";
 import { PeopleChipRow } from "@/components/PeopleChipRow";
 import { PrintButton } from "@/components/PrintButton";
@@ -38,7 +37,9 @@ import { SafetyChecklistPanel } from "@/components/SafetyChecklistPanel";
 import { CommentSection } from "@/components/comments";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
-import { getJson } from "@/lib/apiClient";
+import { deleteJson, getJson, postJson } from "@/lib/apiClient";
+import { buildLoginHref } from "@/lib/loginRedirect";
+import { useToast } from "@/lib/toast";
 import { getDemoEventById } from "@/lib/devMockData";
 import {
   buildRolesNeeded,
@@ -65,6 +66,36 @@ function localizeDigits(value, language) {
   if (language !== "np") return str;
   return str.replace(/\d/g, (d) => NP_DIGITS[Number(d)]);
 }
+
+// Event lifecycle stages that still accept a join (mirrors the issue side's
+// OPEN-only rule, one stage later). ACTIVE narrows to Worker-only per the
+// agreed action matrix; DRAFT/SCHEDULED accept any planned role.
+const EVENT_JOINABLE_STATUSES = new Set(["DRAFT", "SCHEDULED", "ACTIVE"]);
+
+// Toasts for the page-owned join/leave handlers (the shared ParticipantsPanel
+// stays presentational and raises no toasts of its own).
+const JOIN_COPY = {
+  np: {
+    joined: "तपाईं जोडिनुभयो।",
+    waitlisted: "भूमिका भरिएको छ — तपाईं प्रतीक्षा सूचीमा हुनुहुन्छ।",
+    already: "तपाईं पहिले अर्को भूमिकामा जोडिनुभएको छ।",
+    medic: "स्वास्थ्यकर्मी भूमिकाका लागि प्रमाणित मेडिकल क्रेडेन्सियल चाहिन्छ।",
+    rejoinBlocked: "अहिले फेरि जोडिन सकिएन — पहिले छाड्नुभएको रेकर्ड सर्भरले पुनः सक्रिय गरेन।",
+    joinError: "जोडिन सकिएन। फेरि प्रयास गर्नुहोस्।",
+    left: "तपाईं यो श्रमदानबाट हट्नुभयो।",
+    leaveError: "हट्न सकिएन। फेरि प्रयास गर्नुहोस्।"
+  },
+  en: {
+    joined: "You're in.",
+    waitlisted: "Role full — you're on the waitlist.",
+    already: "You've already joined in another role.",
+    medic: "The Medic role requires verified medical credentials.",
+    rejoinBlocked: "Couldn't re-join right now — a signup you previously left wasn't reactivated by the server.",
+    joinError: "Could not join. Please try again.",
+    left: "You've left this shramdan.",
+    leaveError: "Could not leave. Please try again."
+  }
+};
 
 function formatScheduledAt(value, language) {
   if (!value) return "";
@@ -173,9 +204,9 @@ export default function EventDetailPage() {
       // Real-backend events: GET /events/{id} returns `rolePlan` (raw
       // targets only). The roster of joined members lives on the
       // separate /participants resource. We fetch it and compose the
-      // `rolesNeeded` aggregation client-side so existing UI
-      // (EventJoinPanel, EventRosterPanel, participant chip row)
-      // keeps consuming the same shape. Demo events ship rolesNeeded
+      // `rolesNeeded` aggregation client-side so the shared
+      // ParticipantsPanel (and the participant chip row) keeps
+      // consuming the same shape. Demo events ship rolesNeeded
       // baked-in so they skip this branch.
       let merged = data;
       if (Array.isArray(data?.rolePlan) && !Array.isArray(data?.rolesNeeded)) {
@@ -227,6 +258,8 @@ export default function EventDetailPage() {
   }, [fetchEvent]);
 
   const session = useSyncExternalStore(subscribeAuthSession, getAuthSession, () => null);
+  const messageApi = useToast();
+  const router = useRouter();
 
   const isDemoEvent = typeof eventId === "string" && eventId.startsWith("demo-");
   const viewerId = session?.user?.id || null;
@@ -375,6 +408,125 @@ export default function EventDetailPage() {
     },
     [viewerName]
   );
+
+  // Join as a role directly off the roster (the shared ParticipantsPanel calls
+  // these; it owns no API logic). Mirrors the old EventRosterPanel join path —
+  // waitlist / medic-credential / rejoin-blocked / already-joined all handled —
+  // then reconciles through handleJoinChanged.
+  const jc = JOIN_COPY[language] || JOIN_COPY.np;
+  const handleJoinRole = useCallback(
+    async (role) => {
+      if (!session?.user?.id) {
+        router.push(buildLoginHref(`/events/${eventData?.slug ?? eventData?.id ?? eventId}`, "join"));
+        return;
+      }
+      if (isDemoEvent) {
+        // Demo events have no backend — mutate the local roster + flip state.
+        setEventData((prev) => {
+          if (!prev || !Array.isArray(prev.rolesNeeded)) return prev;
+          const rolesNeeded = prev.rolesNeeded.map((row) => {
+            if (row.role !== role) return row;
+            const filledNames = Array.isArray(row.filledNames) ? row.filledNames : [];
+            if (filledNames.includes(viewerName)) return row;
+            return {
+              ...row,
+              filled: Math.min((row.filled || 0) + 1, row.count),
+              filledNames: [...filledNames, viewerName || "तपाईं"]
+            };
+          });
+          return { ...prev, rolesNeeded };
+        });
+        setMyParticipation({ id: null, role, status: "CONFIRMED" });
+        messageApi.success(jc.joined);
+        return;
+      }
+      try {
+        const response = await postJson(
+          `/events/${eventData.id}/participants`,
+          { role },
+          { requireAuth: true }
+        );
+        const data = response?.data ?? response;
+        if (data?.status && !isActiveParticipationStatus(data.status)) {
+          // Backend bug: re-join after leaving returns 201 with the stale
+          // terminal record instead of reactivating it.
+          messageApi.error(jc.rejoinBlocked);
+          handleJoinChanged({ refetch: true });
+        } else {
+          messageApi[data?.status === "INVITED" ? "info" : "success"](
+            data?.status === "INVITED" ? jc.waitlisted : jc.joined
+          );
+          handleJoinChanged({ id: data?.id, role, status: data?.status });
+        }
+      } catch (err) {
+        if (err?.status === 403 && /MEDIC/i.test(err?.errorCode || err?.message || "")) {
+          messageApi.error(jc.medic);
+        } else if (err?.status === 409) {
+          messageApi.warning(jc.already);
+          handleJoinChanged({ refetch: true });
+        } else {
+          messageApi.error(err?.message || jc.joinError);
+        }
+        throw err;
+      }
+    },
+    [eventData, eventId, handleJoinChanged, isDemoEvent, jc, messageApi, router, session, viewerName]
+  );
+
+  // Withdraw from the event (DELETE the participant record), then reconcile
+  // through handleLeaveChanged. Demo events skip the network call.
+  const handleLeaveRole = useCallback(async () => {
+    if (!isDemoEvent) {
+      if (!myParticipation?.id) return;
+      try {
+        await deleteJson(`/events/${eventData.id}/participants/${myParticipation.id}`, {
+          requireAuth: true
+        });
+      } catch (err) {
+        messageApi.error(err?.message || jc.leaveError);
+        throw err;
+      }
+    }
+    messageApi.success(jc.left);
+    handleLeaveChanged({ left: true });
+  }, [eventData, handleLeaveChanged, isDemoEvent, jc, messageApi, myParticipation]);
+
+  // Adapt the event's rolePlan-derived rolesNeeded into the shared
+  // ParticipantsPanel shape (count = filled, target = planned, names = roster).
+  const participantRoles = (Array.isArray(eventData?.rolesNeeded) ? eventData.rolesNeeded : []).map(
+    (row) => ({
+      role: row.role,
+      count: row.filled || 0,
+      target: row.count,
+      names: Array.isArray(row.filledNames) ? row.filledNames : []
+    })
+  );
+  const participantViewer = viewerRole
+    ? { role: viewerRole, status: viewerStatus, name: viewerName }
+    : null;
+  const participantTotalTarget = participantRoles.reduce((s, r) => s + (Number(r.target) || 0), 0);
+  const participantTotalFilled = participantRoles.reduce(
+    (s, r) => s + Math.min(Number(r.count) || 0, Number(r.target) || 0),
+    0
+  );
+  const participantProgress =
+    participantTotalTarget > 0
+      ? { current: participantTotalFilled, target: participantTotalTarget, variant: "fill" }
+      : null;
+  // Joinable roles by stage: DRAFT/SCHEDULED → any planned role; ACTIVE →
+  // Worker only; PAUSED/COMPLETED/CANCELLED → read-only.
+  const participantJoinableRoles =
+    eventData?.status === "ACTIVE"
+      ? ["WORKER"]
+      : eventData?.status === "DRAFT" || eventData?.status === "SCHEDULED"
+        ? null
+        : [];
+  const participantCanLeave =
+    Boolean(viewerRole) &&
+    EVENT_JOINABLE_STATUSES.has(eventData?.status) &&
+    viewerStatus !== "CHECKED_IN" &&
+    (isDemoEvent || Boolean(myParticipation?.id));
+
   const uploads = Array.isArray(eventData?.uploads) ? eventData.uploads : [];
   const imageUploads = uploads.filter(isImageUpload);
 
@@ -670,25 +822,16 @@ export default function EventDetailPage() {
               <div className="event-detail-main event-detail-main--rest">
                 {/* ZONE 2 — ACTION: how a visitor takes part */}
                 {Array.isArray(eventData.rolesNeeded) && eventData.rolesNeeded.length > 0 ? (
-                  <>
-                    <EventJoinPanel
-                      event={eventData}
-                      language={language}
-                      viewerRole={viewerRole}
-                      viewerStatus={viewerStatus}
-                      viewerParticipantId={myParticipation?.id || null}
-                      onJoined={handleJoinChanged}
-                      onLeft={handleLeaveChanged}
-                    />
-                    <EventRosterPanel
-                      rolesNeeded={eventData.rolesNeeded}
-                      language={language}
-                      eventId={eventData.id}
-                      viewerRole={viewerRole}
-                      viewerStatus={viewerStatus}
-                      onJoined={handleJoinChanged}
-                    />
-                  </>
+                  <ParticipantsPanel
+                    roles={participantRoles}
+                    viewer={participantViewer}
+                    progress={participantProgress}
+                    joinableRoles={participantJoinableRoles}
+                    canLeave={participantCanLeave}
+                    onJoin={handleJoinRole}
+                    onLeave={handleLeaveRole}
+                    language={language}
+                  />
                 ) : null}
 
                 <ContributionIntentPanel
