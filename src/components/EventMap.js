@@ -8,7 +8,8 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
-import { IssueMarker } from "./IssueMap";
+import { IssueMarker, MapArrowGlyph, MapPinGlyph } from "./IssueMap";
+import { IssueMapThumb } from "@/components/IssueMapThumb";
 
 const NEPAL_BOUNDS = [
   [26.3, 80.0],
@@ -102,29 +103,30 @@ function toLocalDigits(value, language) {
   return str.replace(/\d/g, (d) => NP_DIGITS[Number(d)]);
 }
 
-function formatScheduleLine(event, status, statusLabel, language) {
+// Just the date piece ("Jun 24" / "२४ जुन") — the status word lives in the
+// badge over the image, so the eyebrow stays the "when" without repeating it.
+function formatEventDate(event, status, language) {
   const iso =
     status === "past"
       ? event.completedAt || event.scheduledAt
       : event.scheduledAt;
-  if (!iso) return statusLabel;
+  if (!iso) return null;
   const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) return statusLabel;
+  if (Number.isNaN(date.getTime())) return null;
   try {
     if (language === "np") {
       const formatter = new Intl.DateTimeFormat("en-GB", {
         day: "2-digit",
         month: "short"
       });
-      return `${statusLabel} · ${toLocalDigits(formatter.format(date), "np")}`;
+      return toLocalDigits(formatter.format(date), "np");
     }
-    const formatter = new Intl.DateTimeFormat("en-US", {
+    return new Intl.DateTimeFormat("en-US", {
       month: "short",
       day: "numeric"
-    });
-    return `${statusLabel} · ${formatter.format(date)}`;
+    }).format(date);
   } catch {
-    return statusLabel;
+    return null;
   }
 }
 
@@ -135,7 +137,7 @@ function EventMarker({ entry, interactive, showPopup, t, language }) {
   const lat = Number(event.latitude);
   const lng = Number(event.longitude);
   const statusLabel = t?.statusLabels?.[status] || status || "";
-  const meta = formatScheduleLine(event, status, statusLabel, language);
+  const dateLabel = formatEventDate(event, status, language);
   const markerLabel = event.title || event.addressText || statusLabel || "Map marker";
   const coverUrl = getIssueCoverImageUrl(event);
 
@@ -149,40 +151,49 @@ function EventMarker({ entry, interactive, showPopup, t, language }) {
     >
       {interactive && showPopup ? (
         <Popup>
-          <div className="issue-map-popup">
-            {coverUrl ? (
-              <div className="issue-map-popup-thumb">
-                <img src={coverUrl} alt="" />
-              </div>
-            ) : null}
-            <div className="issue-map-popup-body">
-              <div className="issue-map-popup-meta">
-                <span
-                  className={`issue-map-popup-status event-map-popup-status--${status || "upcoming"}`}
-                >
-                  {meta}
-                </span>
-              </div>
+          <div className="map-pop">
+            <div className="map-pop-media">
+              {coverUrl ? (
+                <img className="map-pop-img" src={coverUrl} alt="" />
+              ) : Number.isFinite(lat) && Number.isFinite(lng) ? (
+                <IssueMapThumb latitude={lat} longitude={lng} alt="" />
+              ) : (
+                <span className="map-pop-img map-pop-img--empty" aria-hidden="true" />
+              )}
+              <span className="map-pop-scrim" aria-hidden="true" />
+              <span
+                className={`map-pop-badge map-pop-badge--${status || "upcoming"}`}
+              >
+                <span className="map-pop-badge-dot" aria-hidden="true" />
+                {statusLabel}
+              </span>
+              {dateLabel ? (
+                <span className="map-pop-eyebrow">{dateLabel}</span>
+              ) : null}
+            </div>
+            <div className="map-pop-body">
               {event.title ? (
                 <Link
                   href={`/events/${event.slug ?? event.id}`}
-                  className="issue-map-popup-title"
+                  className="map-pop-title"
                 >
                   {event.title}
                 </Link>
               ) : null}
               {event.addressText ? (
-                <p className="issue-map-popup-address">{event.addressText}</p>
+                <p className="map-pop-loc">
+                  <MapPinGlyph />
+                  <span>{event.addressText}</span>
+                </p>
               ) : null}
               {event.id ? (
-                <div className="issue-map-popup-footer">
-                  <Link
-                    href={`/events/${event.slug ?? event.id}`}
-                    className="issue-map-popup-link"
-                  >
-                    {t?.viewDetail || "View"} →
-                  </Link>
-                </div>
+                <Link
+                  href={`/events/${event.slug ?? event.id}`}
+                  className="map-pop-cta"
+                >
+                  <span>{t?.viewDetail || "View"}</span>
+                  <MapArrowGlyph />
+                </Link>
               ) : null}
             </div>
           </div>

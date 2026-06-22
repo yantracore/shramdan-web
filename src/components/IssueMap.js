@@ -9,6 +9,7 @@ import { useEffect, useMemo, useState } from "react";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import { getIssueCoverImageUrl, localizeIssue } from "@/lib/adminUtils";
+import { IssueMapThumb } from "@/components/IssueMapThumb";
 
 const NEPAL_BOUNDS = [
   [26.3, 80.0],
@@ -103,6 +104,87 @@ function toLocalDigits(value, language) {
   return str.replace(/\d/g, (d) => NP_DIGITS[Number(d)]);
 }
 
+// ── Shared glyphs + supporter stack for the floating map card ─────────────────
+// Exported so EventMarker reuses the exact same pin/arrow/avatar treatment and
+// the two map popups stay visually identical.
+
+export function MapPinGlyph() {
+  return (
+    <svg
+      className="map-pop-pin-ico"
+      viewBox="0 0 24 24"
+      width="13"
+      height="13"
+      aria-hidden="true"
+    >
+      <path
+        fill="currentColor"
+        d="M12 2a7 7 0 0 0-7 7c0 4.6 6.1 12.2 6.4 12.5a.8.8 0 0 0 1.2 0C12.9 21.2 19 13.6 19 9a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"
+      />
+    </svg>
+  );
+}
+
+export function MapArrowGlyph() {
+  return (
+    <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+      <path
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M5 12h13M12.5 6l6 6-6 6"
+      />
+    </svg>
+  );
+}
+
+const AVATAR_GRADIENTS = [
+  "linear-gradient(135deg, #21a08a, #0e5f4c)",
+  "linear-gradient(135deg, #f5a524, #d97706)",
+  "linear-gradient(135deg, #2f7ed8, #1d4ed8)",
+  "linear-gradient(135deg, #e5679a, #b4318f)",
+  "linear-gradient(135deg, #34b27b, #0f766e)"
+];
+
+function avatarSeed(value) {
+  const str = String(value ?? "");
+  let hash = 0;
+  for (let i = 0; i < str.length; i += 1) {
+    hash = (hash * 31 + str.charCodeAt(i)) | 0;
+  }
+  return Math.abs(hash);
+}
+
+// An issue carries only a vote *count*, never real supporter avatars — so these
+// are deterministic gradient discs (stable per issue, never random) that read as
+// "a group of people behind this" without inventing identities. The count text
+// beside them carries the real number.
+export function SupporterStack({ seed, count }) {
+  const shown = Math.min(3, Number(count) || 0);
+  if (shown <= 0) return null;
+  const base = avatarSeed(seed);
+  return (
+    <span className="map-pop-avatars" aria-hidden="true">
+      {Array.from({ length: shown }).map((_, i) => (
+        <span
+          key={i}
+          className="map-pop-avatar"
+          style={{ backgroundImage: AVATAR_GRADIENTS[(base + i) % AVATAR_GRADIENTS.length] }}
+        >
+          <svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true">
+            <path
+              fill="rgba(255,255,255,0.92)"
+              d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4zm0 2c-3.3 0-8 1.66-8 5v1h16v-1c0-3.34-4.7-5-8-5z"
+            />
+          </svg>
+        </span>
+      ))}
+    </span>
+  );
+}
+
 export function IssueMarker({ issue: rawIssue, interactive, showPopup, content, language }) {
   const issue = localizeIssue(rawIssue, language);
   const lat = Number(issue.latitude);
@@ -133,46 +215,58 @@ export function IssueMarker({ issue: rawIssue, interactive, showPopup, content, 
     >
       {interactive && showPopup ? (
         <Popup>
-          <div className="issue-map-popup">
-            {coverUrl ? (
-              <div className="issue-map-popup-thumb">
-                <img src={coverUrl} alt="" />
-              </div>
-            ) : null}
-            <div className="issue-map-popup-body">
-              <div className="issue-map-popup-meta">
-                <span
-                  className={`issue-map-popup-status issue-map-popup-status--${issue.status || "OPEN"}`}
-                >
-                  {statusLabel}
-                </span>
-                {categoryLabel ? (
-                  <span className="issue-map-popup-category">
-                    {categoryLabel}
-                  </span>
-                ) : null}
-              </div>
+          <div className="map-pop">
+            <div className="map-pop-media">
+              {coverUrl ? (
+                <img className="map-pop-img" src={coverUrl} alt="" />
+              ) : Number.isFinite(lat) && Number.isFinite(lng) ? (
+                <IssueMapThumb latitude={lat} longitude={lng} alt="" />
+              ) : (
+                <span className="map-pop-img map-pop-img--empty" aria-hidden="true" />
+              )}
+              <span className="map-pop-scrim" aria-hidden="true" />
+              <span
+                className={`map-pop-badge map-pop-badge--${issue.status || "OPEN"}`}
+              >
+                <span className="map-pop-badge-dot" aria-hidden="true" />
+                {statusLabel}
+              </span>
+              {categoryLabel ? (
+                <span className="map-pop-eyebrow">{categoryLabel}</span>
+              ) : null}
+            </div>
+            <div className="map-pop-body">
               {issue.title ? (
                 <Link
                   href={`/issues/${issue.slug ?? issue.id}`}
-                  className="issue-map-popup-title"
+                  className="map-pop-title"
                 >
                   {issue.title}
                 </Link>
               ) : null}
               {issue.addressText ? (
-                <p className="issue-map-popup-address">{issue.addressText}</p>
+                <p className="map-pop-loc">
+                  <MapPinGlyph />
+                  <span>{issue.addressText}</span>
+                </p>
               ) : null}
-              {issue.id && (issue.title || issue.voteCount != null) ? (
-                <div className="issue-map-popup-footer">
-                  <span className="issue-map-popup-votes">{voteText}</span>
-                  <Link
-                    href={`/issues/${issue.slug ?? issue.id}`}
-                    className="issue-map-popup-link"
-                  >
-                    {content?.card?.viewDetail || "View"} →
-                  </Link>
+              {votes > 0 ? (
+                <div className="map-pop-people">
+                  <SupporterStack
+                    seed={issue.id ?? issue.slug ?? markerLabel}
+                    count={votes}
+                  />
+                  <span className="map-pop-count">{voteText}</span>
                 </div>
+              ) : null}
+              {issue.id ? (
+                <Link
+                  href={`/issues/${issue.slug ?? issue.id}`}
+                  className="map-pop-cta"
+                >
+                  <span>{content?.card?.viewDetail || "View"}</span>
+                  <MapArrowGlyph />
+                </Link>
               ) : null}
             </div>
           </div>

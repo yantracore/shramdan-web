@@ -8076,144 +8076,291 @@
   background: linear-gradient(135deg, #0e4337 0%, #1a6e5d 100%);
 }
 
-/* Override leaflet default padding to make the popup more compact */
-.issue-map-wrap .leaflet-popup-content {
-  margin: 10px 12px;
+/* ── Floating map card (issue + event popups) ──────────────────────────────
+ * Leaflet's default bubble is reshaped into a full-bleed card: a hero image up
+ * top with a glass status pill + scrim, then title, location, a supporter stack
+ * and a CTA below. Shared by IssueMarker and EventMarker so both map surfaces
+ * read identically. Every colour derives from the theme tokens so dark mode and
+ * the glass treatment carry through untouched.
+ */
+.issue-map-wrap .leaflet-popup-content-wrapper {
+  padding: 0;
+  overflow: hidden;
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow:
+    0 22px 48px -16px rgba(13, 38, 30, 0.55),
+    0 2px 8px -2px rgba(13, 38, 30, 0.18);
 }
 
-.issue-map-popup {
+.issue-map-wrap .leaflet-popup-content {
+  margin: 0;
+  line-height: inherit;
+}
+
+.issue-map-wrap .leaflet-popup-tip {
+  background: var(--surface);
+  box-shadow: 0 14px 26px -12px rgba(13, 38, 30, 0.4);
+}
+
+.issue-map-wrap .leaflet-popup-close-button {
+  top: 9px;
+  right: 9px;
+  width: 26px;
+  height: 26px;
   display: flex;
   align-items: center;
-  gap: 10px;
-  min-width: 240px;
-  max-width: 320px;
-  font-family: inherit;
+  justify-content: center;
   padding: 0;
+  border-radius: 50%;
+  color: #fff;
+  font: 600 17px/1 inherit;
+  background: rgba(17, 24, 21, 0.42);
+  -webkit-backdrop-filter: blur(7px);
+  backdrop-filter: blur(7px);
+  transition: background 0.15s ease;
+  z-index: 2;
 }
 
-.issue-map-popup-thumb {
-  flex: 0 0 60px;
-  width: 60px;
-  height: 60px;
-  border-radius: 8px;
+.issue-map-wrap .leaflet-popup-close-button:hover {
+  color: #fff;
+  background: rgba(17, 24, 21, 0.66);
+}
+
+.map-pop {
+  width: 268px;
+  font-family: inherit;
+  text-align: left;
+  color: var(--text);
+}
+
+.map-pop-media {
+  position: relative;
+  width: 100%;
+  height: 134px;
   overflow: hidden;
-  background: color-mix(in srgb, var(--accent) 10%, var(--surface));
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface));
 }
 
-.issue-map-popup-thumb img {
+.map-pop-img {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  display: block;
 }
 
-.issue-map-popup-body {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  justify-content: center;
+.map-pop-media .issue-map-thumb {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
 }
 
-.issue-map-popup-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+.map-pop-media .issue-map-thumb-tile {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.map-pop-img--empty {
+  background:
+    radial-gradient(120% 90% at 0% 0%, color-mix(in srgb, var(--accent) 30%, transparent), transparent 60%),
+    color-mix(in srgb, var(--accent) 14%, var(--surface));
+}
+
+.map-pop-scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    rgba(8, 20, 16, 0.62) 0%,
+    rgba(8, 20, 16, 0.12) 38%,
+    rgba(8, 20, 16, 0) 60%
+  );
+}
+
+.map-pop-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: inline-flex;
   align-items: center;
+  gap: 6px;
+  max-width: calc(100% - 52px);
+  padding: 4px 10px 4px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: #15241d;
+  background: rgba(255, 255, 255, 0.86);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 8px rgba(8, 20, 16, 0.18);
+  white-space: nowrap;
 }
 
-.issue-map-popup-status {
+.map-pop-badge-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #888;
+  flex: none;
+}
+
+.map-pop-badge--OPEN .map-pop-badge-dot { background: #f5a524; }
+.map-pop-badge--EVENT_SCHEDULED .map-pop-badge-dot { background: #2f7ed8; }
+.map-pop-badge--COMPLETED .map-pop-badge-dot { background: #2f9e6b; }
+.map-pop-badge--upcoming .map-pop-badge-dot { background: #2f7ed8; }
+.map-pop-badge--past .map-pop-badge-dot { background: #6b7280; }
+.map-pop-badge--live .map-pop-badge-dot {
+  background: #e5484d;
+  box-shadow: 0 0 0 0 rgba(229, 72, 77, 0.55);
+  animation: map-pop-pulse 1.8s ease-out infinite;
+}
+
+@keyframes map-pop-pulse {
+  to { box-shadow: 0 0 0 6px rgba(229, 72, 77, 0); }
+}
+
+.map-pop-eyebrow {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 9px;
   font-size: 11px;
   font-weight: 600;
-  text-transform: uppercase;
   letter-spacing: 0.04em;
-  padding: 2px 8px;
-  border-radius: 999px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.94);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.55);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.issue-map-popup-status--OPEN {
-  background: rgba(245, 165, 36, 0.18);
-  color: #b46c00;
+.map-pop-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 13px 13px;
 }
 
-.issue-map-popup-status--EVENT_SCHEDULED {
-  background: rgba(47, 126, 216, 0.18);
-  color: #1d5fa8;
-}
-
-.issue-map-popup-status--COMPLETED {
-  background: rgba(47, 158, 107, 0.2);
-  color: #1d7a52;
-}
-
-.event-map-popup-status--live {
-  background: rgba(229, 72, 77, 0.16);
-  color: #b3261e;
-}
-
-.event-map-popup-status--upcoming {
-  background: rgba(47, 126, 216, 0.18);
-  color: #1d5fa8;
-}
-
-.event-map-popup-status--past {
-  background: rgba(107, 114, 128, 0.18);
-  color: #4b5563;
-}
-
-.issue-map-popup-category {
-  font-size: 12px;
-  color: var(--muted);
-}
-
-.issue-map-popup-title {
-  font-size: 14px;
-  font-weight: 600;
+/* Scoped under .issue-map-wrap so the title/CTA colours beat Leaflet's default
+ * `.leaflet-container a { color:#0078A8 }`, which otherwise paints these links
+ * its built-in blue. */
+.issue-map-wrap .map-pop-title {
+  font-size: 14.5px;
+  font-weight: 700;
+  line-height: 1.3;
   color: var(--text);
   text-decoration: none;
-  line-height: 1.25;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-.issue-map-popup-title:hover {
-  text-decoration: underline;
+.issue-map-wrap .map-pop-title:hover {
+  color: var(--accent);
 }
 
-.issue-map-popup-address {
+.map-pop-loc {
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
   margin: 0;
-  font-size: 11px;
+  font-size: 12px;
+  line-height: 1.35;
   color: var(--muted);
-  line-height: 1.3;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
-.issue-map-popup-footer {
+.map-pop-loc .map-pop-pin-ico {
+  flex: none;
+  margin-top: 1px;
+  color: var(--accent);
+}
+
+.map-pop-loc span {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.map-pop-people {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 8px;
-  margin-top: 4px;
+}
+
+.map-pop-avatars {
+  display: inline-flex;
+}
+
+.map-pop-avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--surface);
+  background-size: cover;
+  box-shadow: 0 1px 2px rgba(8, 20, 16, 0.25);
+}
+
+.map-pop-avatar + .map-pop-avatar {
+  margin-left: -8px;
+}
+
+.map-pop-count {
   font-size: 12px;
-}
-
-.issue-map-popup-votes {
-  color: var(--muted);
-}
-
-.issue-map-popup-link {
-  color: var(--accent);
   font-weight: 600;
-  text-decoration: none;
+  color: var(--text);
 }
 
-.issue-map-popup-link:hover {
-  text-decoration: underline;
+.issue-map-wrap .map-pop-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin-top: 2px;
+  padding: 9px 14px;
+  border-radius: 11px;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  color: #fff;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--accent) 88%, #000) 0%,
+    var(--accent) 100%
+  );
+  box-shadow: 0 6px 16px -6px color-mix(in srgb, var(--accent) 70%, transparent);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.issue-map-wrap .map-pop-cta:hover {
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 9px 20px -7px color-mix(in srgb, var(--accent) 75%, transparent);
+}
+
+.map-pop-cta svg {
+  transition: transform 0.15s ease;
+}
+
+.map-pop-cta:hover svg {
+  transform: translateX(2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .map-pop-badge--live .map-pop-badge-dot { animation: none; }
+  .map-pop-cta,
+  .map-pop-cta svg { transition: none; }
+  .map-pop-cta:hover { transform: none; }
 }
 
 /* Issues page — toolbar + split layout */
