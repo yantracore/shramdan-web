@@ -12,15 +12,14 @@
 - **id** (`string`, required, public) — unique identifier, server-generated.
 - **eventId** (`string`, required, public) — the event the participant has joined.
 - **memberId** (`string`, required, public) — the member who is participating.
-- **role** (`enum`, required, public) — the role this participant has signed up for. One of:
+- **role** (`enum`, required, public) — the role this participant has signed up for. One of (six participation roles, as of the 2026-06-23 enum change — see Recent changes):
   - `WORKER` — Worker Shramdan, the hands-on labor role.
   - `PHOTOGRAPHER` — Photographer Shramdan.
   - `LIVESTREAMER` — Livestreamer Shramdan.
   - `MEDIC` — Medic Shramdan (requires credential verification on the member record).
   - `SAFETY_LEAD` — Safety Lead Shramdan.
-  - `COORDINATOR` — Coordinator Shramdan, the on-site flow controller.
   - `LOGISTICS` — Logistics Shramdan.
-  - `LEADER` — Event leader. Only one participant per event may hold this role; the event's `leaderId` field mirrors this participant's `memberId`.
+  - `LEADER` — Event leader. Only one participant per event may hold this role; the event's `leaderId` field mirrors this participant's `memberId`. **Coordination is now folded into leadership** — the former `COORDINATOR` participation role was removed from the API enum on 2026-06-23 (the on-site flow controller _is_ the leader). On-site coordination rights ride on `LEADER` rather than a separate seat.
 - **status** (`enum`, required, public) — lifecycle status of this participation:
   - `INVITED` — the leader or coordinator has invited this member but they have not yet accepted.
   - `CONFIRMED` — the member has accepted and is expected at the event.
@@ -141,6 +140,7 @@ needs fall out of this:
 
 ## Recent changes
 
+- `2026-06-23` — **🔁 BACKEND ENUM CHANGE — `COORDINATOR` removed from the participation-role enum.** The live spec (`backend.shramdan.org/api-docs.json`, refreshed 2026-06-23 12:31 NPT) dropped `COORDINATOR` from the role/`eventRole` enum across **six** endpoints: it is now `LIVESTREAMER | LOGISTICS | MEDIC | PHOTOGRAPHER | SAFETY_LEAD | WORKER` (six values, was seven) on `POST /events/{id}/participants`, `POST /events/{id}/participants/invite`, `PATCH /events/{id}/participants/{participantId}`, `PUT /events/{id}/role-plan` (`rolePlan[].role`), `POST /issues/{id}/vote` (`eventRole`), and the `GET /issues/{id}/participants` response (`data.items[].eventRole`). **This lands exactly the divergence the FE flagged on 2026-06-22 (see `issues.md` → "Coordinator ≡ Leader").** Coordination ≡ leadership now holds end-to-end: leadership is expressed via the `WANT_TO_LEAD` vote → `leaderId` / `leader-volunteer`, not a participation seat. **FE impact:** the participation grids on `/issues/[id]` and `/events/[id]` already filtered `COORDINATOR` out, so the primary surfaces were safe; the one live break was `IssueVoteButton`'s built-in role picker (used on issue **cards / preview**), whose `EVENT_ROLE_ORDER` still offered COORDINATOR — a GOING voter there could submit `eventRole: COORDINATOR`, which the API now rejects. Fixed same session (COORDINATOR dropped from `EVENT_ROLE_ORDER`). The COORDINATOR **display label** is retained where it titles the leadership slot (`ParticipantsPanel`) and for rendering any legacy COORDINATOR records — labels are decoupled from the submit enum. RBAC note: the API diff covers only the participation enum; if a backend "coordinator" check-in capability still exists it is now decoupled from a participation role (unconfirmed — owner: Pranish).
 - `2026-06-22` — **✅ PARTIALLY RESOLVED — self-nominate as leader (SEEKING phase).** Backend shipped `POST /events/{id}/leader-volunteer` + `DELETE /events/{id}/leader-volunteer`, allowed while leader voting is `SEEKING` (issue promoted with no `WANT_TO_LEAD` volunteers; recruitment window open). Eligible callers: any voter or the reporter of the linked issue. Frontend wired in `LeaderNominationPanel` — the "Lead" CTA is now live during `SEEKING` (POST to volunteer / DELETE to withdraw; per-candidate vote buttons hidden since voting isn't OPEN yet), and falls back to the inert hint in every other state. The remaining gap from the ask below is by design: during `OPEN` leader voting the candidate pool is fixed (seeded from issue `WANT_TO_LEAD`), so post-promotion self-nomination applies only to the `SEEKING` recruitment window, not the `OPEN` voting round.
 - `2026-06-19` — **✅ RESOLVED — re-join now reactivates.** Backend shipped the fix. Live-verified: a member at `status: LEFT` who POSTs `/events/{id}/participants` now gets `201` with `status: CONFIRMED` (record reactivated, same id), and `GET /participants/me` returns `CONFIRMED`. The frontend's `isActiveParticipationStatus` guard auto-passes for the now-active status, so the normal "you're in" flow runs with no further frontend change. The 2026-06-18 bug entry below is retained for history.
 - `2026-06-18` — **🔴 KNOWN BACKEND BUG (now fixed, see above) — re-join after leaving was a no-op.** Live-verified against `backend.shramdan.org` (member on the ACTIVE event `boudha-ring-road-litter-sweep`):
