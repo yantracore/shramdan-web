@@ -7,14 +7,14 @@
 // the existing useIssueVote hook so message toasts + optimistic counts stay
 // consistent with the rest of the app.
 
-import { useCallback, useState } from "react";
+import { useCallback, useState, useSyncExternalStore } from "react";
 import { useIssueVote } from "@/lib/useIssueVote";
 import {
   fetchIssueParticipants,
   fetchMyIssueVotes,
   getJson
 } from "@/lib/apiClient";
-import { getAuthSession } from "@/lib/authSession";
+import { getAuthSession, subscribeAuthSession } from "@/lib/authSession";
 import { getListItems } from "@/lib/adminUtils";
 
 // Role menu order shared with the issue page and event page.
@@ -33,6 +33,12 @@ export function useRoleSupport(
   issueId,
   { seed = null, content, language = "np", onVoteChange } = {}
 ) {
+  const session = useSyncExternalStore(
+    subscribeAuthSession,
+    getAuthSession,
+    () => null
+  );
+
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loaded, setLoaded] = useState(false);
@@ -119,7 +125,7 @@ export function useRoleSupport(
       setIssue((prev) => ({ ...(prev || {}), ...data }));
     }
     const myVotes = myVotesRes ? getListItems(myVotesRes) : [];
-    const mine = myVotes.find((v) => v.id === (data?.id ?? issueId));
+    const mine = myVotes.find((v) => String(v.id) === String(data?.id ?? issueId));
     setMyVote(
       mine
         ? { voterRole: mine.voterRole || "INTERESTED", eventRole: mine.eventRole || null }
@@ -144,7 +150,7 @@ export function useRoleSupport(
 
   // ── panelProps derivation ──────────────────────────────────────────────────
   // Mirrors issues/[id]/page.js lines ~458-517 verbatim, adapted to local state.
-  const viewerName = getAuthSession()?.user?.name || null;
+  const viewerName = session?.user?.name || null;
   const isOpenIssue = issue?.status === "OPEN";
 
   const roles = (() => {
