@@ -89,8 +89,8 @@ const COPY = {
     intro: "तपाईंलाई सुहाउने भूमिकामा जोडिनुहोस् — हरेक भूमिकाले श्रमदान चलाउँछ।",
     coreGroupLabel: "मुख्य भूमिका",
     additionalGroupLabel: "थप भूमिका",
-    additionalOptionalTag: "वैकल्पिक",
-    additionalHelper: "यी नभए पनि हुन्छ — सुरुमा संयोजकले नै सम्हाल्छन्।",
+    coreGroupNote: "यी दुई भूमिका नै अभियानको आधार — पहिले यिनै भरौं।",
+    additionalGroupNote: "थप सहयोगी भूमिका — कोही नभए संयोजकले नै सम्हाल्छन्, खासगरी सुरुमा।",
     roleCount: "{n} जना",
     filledOf: "{filled} / {total}",
     join: "जोडिने",
@@ -161,8 +161,8 @@ const COPY = {
     intro: "Join in the role that fits you — every role keeps the cleanup running.",
     coreGroupLabel: "Core roles",
     additionalGroupLabel: "Additional roles",
-    additionalOptionalTag: "Optional",
-    additionalHelper: "Optional — early on, the coordinator covers these.",
+    coreGroupNote: "The backbone of every cleanup — fill these first.",
+    additionalGroupNote: "Helpful extras — if unfilled, the coordinator covers them, especially early on.",
     roleCount: "{n}",
     filledOf: "{filled} / {total}",
     join: "Join",
@@ -663,20 +663,18 @@ export function ParticipantsPanel({
             {workerRow ? renderRoleRow(workerRow, true) : null}
             {renderLeaderRow()}
           </ul>
+          <p className="participants-group-note">{t.coreGroupNote}</p>
         </div>
 
         {/* Additional — optional specialist roles. If unfilled, the coordinator
             covers them (especially early), so they read as secondary. */}
         {otherRows.length ? (
           <div className="participants-group participants-group--additional">
-            <p className="participants-group-label">
-              {t.additionalGroupLabel}
-              <span className="participants-group-tag">{t.additionalOptionalTag}</span>
-            </p>
-            <p className="participants-group-helper">{t.additionalHelper}</p>
+            <p className="participants-group-label">{t.additionalGroupLabel}</p>
             <ul className="event-roster-list">
               {otherRows.map((row) => renderRoleRow(row))}
             </ul>
+            <p className="participants-group-note">{t.additionalGroupNote}</p>
           </div>
         ) : null}
       </div>

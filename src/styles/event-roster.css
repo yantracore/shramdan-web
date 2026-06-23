@@ -940,23 +940,11 @@
   color: var(--muted);
 }
 
-/* "Optional" chip beside the Additional label — sentence-case, quiet. */
-.participants-group-tag {
-  text-transform: none;
-  letter-spacing: 0;
-  font-size: 11px;
-  font-weight: 600;
-  padding: 1px 8px;
-  border-radius: var(--radius-pill);
-  color: var(--muted);
-  background: var(--surface-soft);
-  border: 1px solid var(--line);
-}
-
-.participants-group-helper {
-  margin: -4px 0 2px;
+/* Short note under each group's rows — explains the section at a glance. */
+.participants-group-note {
+  margin: 2px 0 0;
   font-size: 12.5px;
-  line-height: 1.4;
+  line-height: 1.45;
   color: var(--muted);
 }
 
