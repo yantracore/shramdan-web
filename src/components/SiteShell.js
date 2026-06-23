@@ -203,19 +203,11 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
       countTone: "issues"
     },
     { href: "/feedback", label: t.nav.feedback },
-    { href: "/contribute", label: t.nav.contribute },
-    {
-      // The "एप निर्माण / App Development LIVE" entry leads into the live,
-      // participatory build-Shramdan surface — which is /discussions (feature
-      // proposals → roadmap), NOT the standalone /app-development task board
-      // (being retired; see docs/ops/00-polish-backlog.md, 2026-06-18).
-      href: "/discussions",
-      label: t.nav.appDev,
-      highlight: true,
-      badge: "LIVE",
-      separatorBefore: true,
-      tooltip: t.nav.appDevTooltip
-    }
+    { href: "/contribute", label: t.nav.contribute }
+    // The "एप निर्माण / App Development · LIVE" pill (→ /discussions) is pulled
+    // from the main nav for now. The feature stays live for a v2 relaunch —
+    // /discussions and /app-development pages plus the t.nav.appDev copy remain
+    // in place; only the nav entry is removed here.
   ];
 
   // Bottom-left "apps grid" dropdown — secondary nav for places that don't
