@@ -90,7 +90,7 @@ wrapper that reuses the panel.
 | `PublicIssueCard`, `IssuePreviewPane` | old radio modal | new model (auto, via `IssueVoteButton` fix) |
 | Issue map popup (`IssueMap`) | "View" link only | + role-based support button |
 | Event map popup (`EventMap`) | "View" link only | + role-based join button |
-| Event preview pane / event cards | no action | + join button |
+| Event preview pane (`EventPreviewPane`) | no action | + join button |
 | Issue detail page, event detail page | inline wiring | consume the shared hooks |
 
 ## Divergence prevention
