@@ -452,7 +452,7 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
                 onClick={handleBrandClick}
               >
                 <span className="brand-mark">
-                  <Image alt="" height={96} priority src="/images/logo.png" width={96} />
+                  <Image alt="" height={96} priority src="/branding/logo-mark.png" width={96} />
                 </span>
                 <span className="brand-name">{t.brand}</span>
               </Link>
@@ -730,7 +730,7 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
             onClick={handleBrandClick}
           >
             <span className="brand-mark footer-brand-mark">
-              <Image alt="" height={96} src="/images/logo.png" width={96} />
+              <Image alt="" height={96} src="/branding/logo-mark.png" width={96} />
             </span>
             <span>{t.footer.brand}</span>
           </Link>

@@ -108,7 +108,7 @@ export default function EventTypesPage() {
 
         <p className="event-types-phase-note phase-note">
           <span aria-hidden="true">
-            <Image alt="" height={96} src="/images/logo.png" width={96} />
+            <Image alt="" height={96} src="/branding/logo-mark.png" width={96} />
           </span>
           {eventTypes.phaseNote}
         </p>

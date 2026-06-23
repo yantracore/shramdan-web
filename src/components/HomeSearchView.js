@@ -111,7 +111,7 @@ export default function HomeSearchView() {
           <header className="home-search-brand">
             <Image
               className="home-search-brand-logo"
-              src="/branding/logo.png"
+              src="/branding/logo-mark.png"
               alt=""
               width={112}
               height={112}

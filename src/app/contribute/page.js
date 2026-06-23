@@ -222,7 +222,7 @@ export default function ContributePage() {
                 <div className="qr-corner qr-top-right"></div>
                 <div className="qr-corner qr-bottom-left"></div>
                 <div className="qr-center-logo">
-                  <Image alt="" height={40} src="/images/logo.png" width={40} />
+                  <Image alt="" height={40} src="/branding/logo-mark.png" width={40} />
                 </div>
                 {/* Simulated QR pattern lines */}
                 <div className="qr-pattern-grid"></div>
