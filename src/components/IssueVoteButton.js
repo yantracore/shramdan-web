@@ -176,9 +176,17 @@ export function IssueVoteButton({
   onVoteChange,
   // seed: optional issue snapshot (id, voteCount, isVoted, status …) passed by
   // list-card or preview surfaces so the hook can seed counts without a fetch.
-  seed
+  seed,
+  // Optional controlled support instance — when passed, the button uses THIS
+  // hook return value instead of creating its own. Allows a page to share one
+  // useRoleSupport instance between the body roster and the topline button.
+  // We always call useRoleSupport internally (hooks must not be conditional),
+  // but ignore ownSupport when a controlled instance is provided.
+  support: controlledSupport
 }) {
-  const support = useRoleSupport(issueId, {
+  // Always call the hook (rules of hooks: no conditional calls). The own
+  // instance is used only when the caller hasn't passed a controlled one.
+  const ownSupport = useRoleSupport(issueId, {
     seed: seed ?? {
       voteCount: initialVoteCount,
       isVoted: initialVoted
@@ -187,6 +195,8 @@ export function IssueVoteButton({
     language,
     onVoteChange
   });
+  // If a controlled support is passed, use it; otherwise fall back to own.
+  const support = controlledSupport ?? ownSupport;
 
   const roleCopy = ROLE_COPY[language] || ROLE_COPY.np;
 

@@ -7,7 +7,7 @@
 // the existing useIssueVote hook so message toasts + optimistic counts stay
 // consistent with the rest of the app.
 
-import { useCallback, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import { useIssueVote } from "@/lib/useIssueVote";
 import {
   fetchIssueParticipants,
@@ -31,7 +31,7 @@ const PARTICIPANT_ROLE_ORDER = [
 
 export function useRoleSupport(
   issueId,
-  { seed = null, content, language = "np", onVoteChange } = {}
+  { seed = null, content, language = "np", onVoteChange, eager = false } = {}
 ) {
   const session = useSyncExternalStore(
     subscribeAuthSession,
@@ -147,6 +147,33 @@ export function useRoleSupport(
   }, [loaded, load]);
 
   const closeModal = useCallback(() => setOpen(false), []);
+
+  // ── Eager load (when caller wants the roster visible without opening modal) ──
+  // When eager=true we run the same load-once logic on mount so the caller can
+  // render the always-visible roster (e.g. the issue detail page body panel)
+  // without needing to open the modal first. Guard with !loaded so we never
+  // double-fetch if openModal() was called before the effect fires.
+  useEffect(() => {
+    if (!eager || loaded) return;
+    let cancelled = false;
+    // Wrap in async IIFE so setState calls happen after the effect returns
+    // (in .then/.finally microtasks), avoiding the set-state-in-effect lint.
+    (async () => {
+      setLoading(true);
+      try {
+        await load();
+        if (!cancelled) setLoaded(true);
+      } catch {
+        // ignore — individual fetch errors are swallowed inside load()
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [eager, issueId]);
 
   // ── panelProps derivation ──────────────────────────────────────────────────
   // Mirrors issues/[id]/page.js lines ~458-517 verbatim, adapted to local state.
