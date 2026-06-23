@@ -4,8 +4,8 @@
 
 > This entity is introduced by the [2026-06-03 pivot ADR](../decisions/2026-06-03-ui-first-and-two-meeting-pivot.md). No frontend currently consumes it; this spec is the design that the UI will be built against. Backend implementation is gated on UI surface design landing.
 
-**Spec status:** `draft`
-**Last updated:** 2026-06-03
+**Spec status:** `draft` — **deferred to v2 (2026-06-23).** Not part of the active backend handoff; kept as a record. No UI consumes this entity and the 2026-06-05 TV-app pivot reshaped the planning model.
+**Last updated:** 2026-06-23
 
 ---
 

@@ -16,8 +16,8 @@
 > entities share UX patterns (vote, comment, leader-pick) but never mix
 > data.
 
-**Spec status:** `draft`
-**Last updated:** 2026-06-05
+**Spec status:** `draft` — **deferred to v2 (2026-06-23).** Not part of the active backend handoff; kept as a record. The standalone task board is folded into `/discussions` for now — the "App Development · LIVE" nav points there.
+**Last updated:** 2026-06-23
 
 ---
 

@@ -6,6 +6,8 @@
 
 The methodology that produced this folder is recorded in [`../decisions/2026-06-03-ui-first-and-two-meeting-pivot.md`](../decisions/2026-06-03-ui-first-and-two-meeting-pivot.md). Read that ADR first if you are new to this folder.
 
+> **📌 Start here:** [`00-OUTSTANDING.md`](00-OUTSTANDING.md) is the consolidated punch list of what the backend still needs to build — everything not on that list is already live. The per-domain files below carry the full prose; the punch list is the short handoff. Last reconciled against the live spec on **2026-06-23**.
+
 ---
 
 ## How to read this folder
@@ -50,20 +52,29 @@ If a new entity emerges (a genuinely new noun in the product, not just a new fie
 **Backend implementation status values:**
 
 - `not-started` — no endpoints yet.
-- `partial` — some endpoints are live; gaps documented inline in the domain file.
-- `complete` — all operations in the file are live in production.
+- `partial` — some endpoints are live; gaps documented inline in the domain file (and in [`00-OUTSTANDING.md`](00-OUTSTANDING.md)).
+- `complete` — all operations in the file are live; only optional / nice-to-have items remain.
+- `deferred` — pulled out of the active build (v2); the file stays as a record, not a current request.
+
+Table reconciled against the live spec on **2026-06-23**. The single punch list of what's left is [`00-OUTSTANDING.md`](00-OUTSTANDING.md).
 
 | Domain | Spec | Backend impl | Notes |
 | --- | --- | --- | --- |
-| [events](events.md) | draft | partial | Existing endpoints live; gaps tracked in [`../engineering/09-backend-admin-gaps.md`](../engineering/09-backend-admin-gaps.md). |
-| [event-participants](event-participants.md) | draft | partial | Self-join, my-participation, and roster reads are wired (2026-06-04). Invite / role-change / check-in / role-plan PUT and SSE remain not-yet-wired. |
-| [meetings](meetings.md) | draft | not-started | New entity introduced by the two-meeting flow pivot. No UI surface yet; spec leads. |
-| [members](members.md) | draft | partial | Maps roughly to the existing `/users` endpoints. Applications sub-entity now spec'd in [applications.md](applications.md). |
-| [applications](applications.md) | draft | partial | Public submission live; multi-attachment `resumeIds` / `portfolioIds` and the anonymous-upload mechanism are pending backend work (2026-06-05). |
-| [feedback](feedback.md) | draft | partial | Public submission live; multi-attachment `screenshotIds` and the anonymous-upload mechanism are pending backend work (2026-06-05). |
-| [comments](comments.md) | draft | partial | CRUD + reactions wired through `CommentSection` (2026-06-04). SSE stream + admin-side flag/pin endpoints remain not-yet-wired. |
-| [live-streams](live-streams.md) | draft | not-started | Event broadcast metadata plus viewer-count SSE; player URL is multi-format. |
-| notifications | _pending_ | not-started | Reminder cadence (kickoff → signup → pre-execution → event day) and incident alerts. Deferred from Phase C. |
+| [issues](issues.md) | stable | complete | All ten operations live (incl. participants roster). Read-side gaps only: `isVoted`/event embed on the detail read, `uploadIds` on PATCH, author withdraw — see [00-OUTSTANDING](00-OUTSTANDING.md) P1/P2. |
+| [events](events.md) | draft | partial | List/get/schedule/complete/cancel/leader-\*/role-plan live; **server-side filters now resolved** (category/municipality/ward/sort/order/bbox). Pending: activate, reminder cadence, pause/resume, `viewerParticipation` echo, embedded issue `translations` — P1/P2. |
+| [event-participants](event-participants.md) | draft | complete | Join/leave/role/invite/check-in/role-plan PUT + my-participation all live; re-join reactivation fixed (2026-06-19); self-nominate (SEEKING) shipped (2026-06-22). Only the optional SSE roster stream remains. |
+| [comments](comments.md) | draft | complete | CRUD + reactions + report + replies + the SSE `/comments/stream` endpoint all live. Minor: per-viewer `myReactions`, admin pin/flag-management. |
+| [members](members.md) | draft | partial | Profile/role/medical-credential/leader-eligibility/delete live. Pending: admin `PATCH /users/{id}` profile edit, public-profile-preferences endpoint — P2. |
+| [applications](applications.md) | draft | partial | Public submission + account-creating signup live. Pending: multi-attachment arrays, optional token-withdraw — P4. |
+| [feedback](feedback.md) | draft | partial | Public submission + admin triage live. Pending: multi-attachment `screenshotIds` array — P4. |
+| [notifications](notifications.md) | stable | partial | REST (list/unread-count/read/read-all/preferences PUT) + live SSE on staging. Pending: `GET /notifications/preferences`, OpenAPI doc for the SSE endpoint — P2. |
+| [discussions](discussions.md) | draft | not-started | `/discussions` is a live nav surface running on a stub; full spec ready. P3. |
+| [feature-votes](feature-votes.md) | draft | not-started | Projection of discussion topics (`kind: FEATURE_PROPOSAL`); pending alongside discussions. P3. |
+| [live-streams](live-streams.md) | draft | not-started | Home live rail uses mock data; broadcast metadata + viewer-count SSE. P3. |
+| [incidents](incidents.md) | draft | not-started | FE panels exist (roadmap 4.2); also unblocks events pause/resume + `riskLevel`. P3. |
+| [donations](donations.md) | draft | not-started | Phase 6 transparency ledger (`/ledger`). Future. P3. |
+| [meetings](meetings.md) | draft | deferred | Two-meeting kickoff/pre-execution flow; no UI consumes it after the 2026-06-05 TV-app pivot reshaped the planning model. |
+| [app-development](app-development.md) | draft | deferred | Standalone task board folded into `/discussions` for now; nav points there. |
 
 ---
 
