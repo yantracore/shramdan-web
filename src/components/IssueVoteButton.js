@@ -152,14 +152,16 @@ const ROLE_COPY = {
 };
 
 // Order the event-role options are offered in. Mirrors the backend enum on
-// POST /issues/{id}/vote and EventJoinPanel's role list.
+// POST /issues/{id}/vote and EventJoinPanel's role list. COORDINATOR was
+// removed from the enum 2026-06-23 (coordination ≡ leadership — offered via the
+// WANT_TO_LEAD voterRole option, not as a GOING participation role), so it is
+// not listed here; submitting it now 400s server-side.
 const EVENT_ROLE_ORDER = [
   "WORKER",
   "PHOTOGRAPHER",
   "LIVESTREAMER",
   "MEDIC",
   "SAFETY_LEAD",
-  "COORDINATOR",
   "LOGISTICS"
 ];
 

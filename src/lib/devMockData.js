@@ -35,8 +35,9 @@ const DEMO_ROSTER = [
   { role: "LIVESTREAMER", count: 1, filled: 1, filledNames: ["अमित"] },
   { role: "MEDIC", count: 1, filled: 0, filledNames: [] },
   { role: "SAFETY_LEAD", count: 1, filled: 1, filledNames: ["कमला"] },
-  { role: "COORDINATOR", count: 2, filled: 2, filledNames: ["रोहित", "स्मिता"] },
-  { role: "LOGISTICS", count: 2, filled: 1, filledNames: ["दिनेश"] }
+  // COORDINATOR removed from the participation enum 2026-06-23 (coordination ≡
+  // leadership); names folded into LOGISTICS so the demo plan stays populated.
+  { role: "LOGISTICS", count: 3, filled: 2, filledNames: ["दिनेश", "स्मिता"] }
 ];
 
 // Demo live events for the homepage live-events rail.
