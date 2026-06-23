@@ -541,7 +541,7 @@ const EVENTS = [
     minutesAgo: 37,
     durationMinutes: 180,
     meetupNotes: "तीनकुने पुलको दक्षिणी छेउमा भेला हुने। पन्जा र मास्क लिएर आउनुहोस् — टीमले अरू सामग्री ल्याउँछ।",
-    rolePlan: { WORKER: 8, PHOTOGRAPHER: 1, LIVESTREAMER: 1, MEDIC: 1, COORDINATOR: 1, SAFETY_LEAD: 1, LOGISTICS: 1 },
+    rolePlan: { WORKER: 8, PHOTOGRAPHER: 1, LIVESTREAMER: 1, MEDIC: 1, SAFETY_LEAD: 1, LOGISTICS: 1 },
     leaderVoting: "settled", // arjun wins
     leaderCandidates: ["arjun", "suman"],
     leaderWinner: "arjun"
@@ -552,7 +552,7 @@ const EVENTS = [
     minutesAgo: 22,
     durationMinutes: 240,
     meetupNotes: "कमलपोखरी मन्दिर छेउ भेला। पैदलमार्गको दुई किनारका ८ ठाउँमा भित्ता चित्र।",
-    rolePlan: { WORKER: 6, PHOTOGRAPHER: 1, LIVESTREAMER: 1, COORDINATOR: 1, SAFETY_LEAD: 1, LOGISTICS: 1 },
+    rolePlan: { WORKER: 6, PHOTOGRAPHER: 1, LIVESTREAMER: 1, SAFETY_LEAD: 1, LOGISTICS: 1 },
     leaderVoting: "open", // unsettled, votes still coming
     leaderCandidates: ["bishnu", "suman"]
   },
@@ -562,7 +562,7 @@ const EVENTS = [
     minutesAgo: 102,
     durationMinutes: 200,
     meetupNotes: "सूर्यविनायक मन्दिर परिसरको पश्चिम गेटमा भेला। बिरुवा, चित्रकोलो, पानी, हलुका खाजा सब टीमले ल्याउँछ।",
-    rolePlan: { WORKER: 10, PHOTOGRAPHER: 1, MEDIC: 1, COORDINATOR: 1, SAFETY_LEAD: 1, LOGISTICS: 2 }
+    rolePlan: { WORKER: 10, PHOTOGRAPHER: 1, MEDIC: 1, SAFETY_LEAD: 1, LOGISTICS: 2 }
   },
   {
     issueSlug: "hanumante-lokanthali-cleanup",
@@ -570,7 +570,7 @@ const EVENTS = [
     minutesAgo: 18,
     durationMinutes: 180,
     meetupNotes: "लोकन्थली पुलको पूर्वी किनारमा भेला हुने। तीन टोलीमा बाँडिने।",
-    rolePlan: { WORKER: 7, PHOTOGRAPHER: 1, LIVESTREAMER: 1, MEDIC: 1, COORDINATOR: 1, SAFETY_LEAD: 1 }
+    rolePlan: { WORKER: 7, PHOTOGRAPHER: 1, LIVESTREAMER: 1, MEDIC: 1, SAFETY_LEAD: 1 }
   },
   {
     issueSlug: "fewa-shoreline-cleanup",
@@ -578,7 +578,7 @@ const EVENTS = [
     minutesAgo: 64,
     durationMinutes: 240,
     meetupNotes: "बारही टोलको ताल किनार पैदलमार्गमा भेला हुने। डुङ्गा प्रयोग गरेर पानीमा तैरिने प्लास्टिक पनि सङ्कलन।",
-    rolePlan: { WORKER: 8, PHOTOGRAPHER: 1, LIVESTREAMER: 1, MEDIC: 1, COORDINATOR: 1, SAFETY_LEAD: 1, LOGISTICS: 2 }
+    rolePlan: { WORKER: 8, PHOTOGRAPHER: 1, LIVESTREAMER: 1, MEDIC: 1, SAFETY_LEAD: 1, LOGISTICS: 2 }
   },
 
   // ─── 3 upcoming (scheduledAt in future) ────────────────────────────────
@@ -639,8 +639,10 @@ const EVENTS = [
 // ──────────────────────────────────────────────────────────────────────────
 
 const PARTICIPANTS = {
+  // arjun is seeded as this event's leader via the leader-voting flow (phase
+  // 5f), and coordination ≡ leadership since the 2026-06-23 enum change — so he
+  // is NOT also a participation-grid row.
   "bagmati-tinkune-cleanup": [
-    { memberSlug: "arjun",  role: "COORDINATOR" },
     { memberSlug: "maya",   role: "PHOTOGRAPHER" },
     { memberSlug: "bishnu", role: "MEDIC" },
     { memberSlug: "ramesh", role: "LIVESTREAMER" },
@@ -648,15 +650,18 @@ const PARTICIPANTS = {
     { memberSlug: "sita",   role: "WORKER" },
     { memberSlug: "hari",   role: "WORKER" }
   ],
+  // bishnu is a leader candidate for this event (open leader voting, phase 5f);
+  // coordination ≡ leadership, so no separate participation-grid row.
   "kamalpokhari-beautification": [
-    { memberSlug: "bishnu", role: "COORDINATOR" },
     { memberSlug: "maya",   role: "PHOTOGRAPHER" },
     { memberSlug: "ramesh", role: "LIVESTREAMER" },
     { memberSlug: "priya",  role: "SAFETY_LEAD" },
     { memberSlug: "sita",   role: "WORKER" }
   ],
+  // Past event, no leader-voting seeded — the former coordinator joins as a
+  // worker (COORDINATOR was dropped from the participation enum 2026-06-23).
   "suryabinayak-afforestation": [
-    { memberSlug: "arjun",  role: "COORDINATOR" },
+    { memberSlug: "arjun",  role: "WORKER" },
     { memberSlug: "bishnu", role: "MEDIC" },
     { memberSlug: "maya",   role: "PHOTOGRAPHER" },
     { memberSlug: "hari",   role: "WORKER" },
@@ -664,14 +669,14 @@ const PARTICIPANTS = {
     { memberSlug: "bikash", role: "WORKER" }
   ],
   "hanumante-lokanthali-cleanup": [
-    { memberSlug: "suman",  role: "COORDINATOR" },
+    { memberSlug: "suman",  role: "WORKER" },
     { memberSlug: "ramesh", role: "LIVESTREAMER" },
     { memberSlug: "bishnu", role: "MEDIC" },
     { memberSlug: "priya",  role: "SAFETY_LEAD" },
     { memberSlug: "hari",   role: "WORKER" }
   ],
   "fewa-shoreline-cleanup": [
-    { memberSlug: "arjun",  role: "COORDINATOR" },
+    { memberSlug: "arjun",  role: "WORKER" },
     { memberSlug: "maya",   role: "PHOTOGRAPHER" },
     { memberSlug: "ramesh", role: "LIVESTREAMER" },
     { memberSlug: "bishnu", role: "MEDIC" },
