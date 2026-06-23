@@ -7,7 +7,7 @@
 // the existing useIssueVote hook so message toasts + optimistic counts stay
 // consistent with the rest of the app.
 
-import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useIssueVote } from "@/lib/useIssueVote";
 import {
   fetchIssueParticipants,
@@ -41,32 +41,17 @@ export function useRoleSupport(
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [loaded, setLoaded] = useState(false);
+
+  // Ref-keyed guard: tracks which issueId has already been loaded.
+  // Using a ref (not state) means changing issueId never triggers a re-render
+  // by itself — ensureLoaded handles the transition transparently.
+  const loadedIdRef = useRef(null);
 
   // Local issue snapshot — patched optimistically after each vote then
   // reconciled from the server via fetchIssueParticipants.
   const [issue, setIssue] = useState(seed);
   const [myVote, setMyVote] = useState(null);
   const [participants, setParticipants] = useState([]);
-
-  // FIX 1 — stale `loaded` flag on issueId change.
-  // When the component stays mounted but issueId changes (SPA navigation),
-  // reset all per-issue state so the eager effect and openModal() re-fetch
-  // for the new issue instead of showing stale data from the previous one.
-  // The setState calls here are intentional — they fire only when issueId
-  // actually changes and React batches them with any concurrent render, so
-  // no cascading extra render is scheduled. seed is intentionally excluded
-  // from deps (it is the initial value; re-reading it on every seed reference
-  // change would fight optimistic patches made after mount).
-  /* eslint-disable react-hooks/set-state-in-effect -- intentional: state resets are tied to issueId change only, not an ongoing external subscription */
-  useEffect(() => {
-    setLoaded(false);
-    setIssue(seed);
-    setMyVote(null);
-    setParticipants([]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [issueId]);
-  /* eslint-enable react-hooks/set-state-in-effect */
 
   // Called by useIssueVote's onVoteChange callback after every confirmed
   // mutation. Payload is { voterRole, eventRole, ...serverData } on a vote,
@@ -153,46 +138,40 @@ export function useRoleSupport(
     setParticipants(getListItems(partsRes));
   }, [issueId, seed]);
 
-  const openModal = useCallback(async () => {
-    setOpen(true);
-    if (loaded) return;
+  // ── ensureLoaded — loads at most once per issueId ─────────────────────────
+  // Keyed by ref so any issueId change (same-component SPA navigation) triggers
+  // a fresh load without relying on boolean state that can be stale across
+  // renders. Clears stale per-issue data before fetching so the old roster
+  // never flashes on the new issue.
+  const ensureLoaded = useCallback(async () => {
+    if (loadedIdRef.current === issueId) return;
+    loadedIdRef.current = issueId;
+    // Clear stale per-issue data so the new issue never briefly shows the old roster.
+    setIssue(seed);
+    setMyVote(null);
+    setParticipants([]);
     setLoading(true);
     try {
       await load();
-      setLoaded(true);
     } finally {
       setLoading(false);
     }
-  }, [loaded, load]);
+  }, [issueId, seed, load]);
+
+  const openModal = useCallback(() => {
+    setOpen(true);
+    ensureLoaded();
+  }, [ensureLoaded]);
 
   const closeModal = useCallback(() => setOpen(false), []);
 
   // ── Eager load (when caller wants the roster visible without opening modal) ──
-  // When eager=true we run the same load-once logic on mount so the caller can
-  // render the always-visible roster (e.g. the issue detail page body panel)
-  // without needing to open the modal first. Guard with !loaded so we never
-  // double-fetch if openModal() was called before the effect fires.
+  // When eager=true we run ensureLoaded on mount (and whenever ensureLoaded's
+  // identity changes, i.e. whenever issueId/seed/load change). ensureLoaded is
+  // internally ref-guarded so it never double-fetches for the same issueId.
   useEffect(() => {
-    if (!eager || loaded) return;
-    let cancelled = false;
-    // Wrap in async IIFE so setState calls happen after the effect returns
-    // (in .then/.finally microtasks), avoiding the set-state-in-effect lint.
-    (async () => {
-      setLoading(true);
-      try {
-        await load();
-        if (!cancelled) setLoaded(true);
-      } catch {
-        // ignore — individual fetch errors are swallowed inside load()
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [eager, issueId]);
+    if (eager) ensureLoaded();
+  }, [eager, ensureLoaded]);
 
   // ── panelProps derivation ──────────────────────────────────────────────────
   // Mirrors issues/[id]/page.js lines ~458-517 verbatim, adapted to local state.
