@@ -940,9 +940,10 @@
   color: var(--muted);
 }
 
-/* Short note under each group's rows — explains the section at a glance. */
+/* Short subtitle under each group's title (above its rows) — explains the
+   section at a glance. Pulled up tight so it reads as the label's subtitle. */
 .participants-group-note {
-  margin: 2px 0 0;
+  margin: -4px 0 0;
   font-size: 12.5px;
   line-height: 1.45;
   color: var(--muted);

@@ -89,8 +89,8 @@ const COPY = {
     intro: "तपाईंलाई सुहाउने भूमिकामा जोडिनुहोस् — हरेक भूमिकाले श्रमदान चलाउँछ।",
     coreGroupLabel: "मुख्य भूमिका",
     additionalGroupLabel: "थप भूमिका",
-    coreGroupNote: "यी दुई भूमिका नै अभियानको आधार — पहिले यिनै भरौं।",
-    additionalGroupNote: "थप सहयोगी भूमिका — कोही नभए संयोजकले नै सम्हाल्छन्, खासगरी सुरुमा।",
+    coreGroupNote: "यी दुई बिना सफाइ नै हुँदैन — श्रम गर्ने हातहरू, र नेतृत्व गर्ने संयोजक।",
+    additionalGroupNote: "ठूला सफाइका लागि थप सहयोग — हुँदा राम्रो, तर सुरु गर्न अनिवार्य होइन।",
     roleCount: "{n} जना",
     filledOf: "{filled} / {total}",
     join: "जोडिने",
@@ -161,8 +161,8 @@ const COPY = {
     intro: "Join in the role that fits you — every role keeps the cleanup running.",
     coreGroupLabel: "Core roles",
     additionalGroupLabel: "Additional roles",
-    coreGroupNote: "The backbone of every cleanup — fill these first.",
-    additionalGroupNote: "Helpful extras — if unfilled, the coordinator covers them, especially early on.",
+    coreGroupNote: "No cleanup happens without these: the hands doing the work and the coordinator leading it.",
+    additionalGroupNote: "Nice-to-have support for bigger cleanups — helpful, but not needed to get started.",
     roleCount: "{n}",
     filledOf: "{filled} / {total}",
     join: "Join",
@@ -659,11 +659,11 @@ export function ParticipantsPanel({
             the Coordinator/leader (who runs it). These anchor every event. */}
         <div className="participants-group participants-group--core">
           <p className="participants-group-label">{t.coreGroupLabel}</p>
+          <p className="participants-group-note">{t.coreGroupNote}</p>
           <ul className="event-roster-list">
             {workerRow ? renderRoleRow(workerRow, true) : null}
             {renderLeaderRow()}
           </ul>
-          <p className="participants-group-note">{t.coreGroupNote}</p>
         </div>
 
         {/* Additional — optional specialist roles. If unfilled, the coordinator
@@ -671,10 +671,10 @@ export function ParticipantsPanel({
         {otherRows.length ? (
           <div className="participants-group participants-group--additional">
             <p className="participants-group-label">{t.additionalGroupLabel}</p>
+            <p className="participants-group-note">{t.additionalGroupNote}</p>
             <ul className="event-roster-list">
               {otherRows.map((row) => renderRoleRow(row))}
             </ul>
-            <p className="participants-group-note">{t.additionalGroupNote}</p>
           </div>
         ) : null}
       </div>
