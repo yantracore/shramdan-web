@@ -49,6 +49,25 @@ export function useRoleSupport(
   const [myVote, setMyVote] = useState(null);
   const [participants, setParticipants] = useState([]);
 
+  // FIX 1 — stale `loaded` flag on issueId change.
+  // When the component stays mounted but issueId changes (SPA navigation),
+  // reset all per-issue state so the eager effect and openModal() re-fetch
+  // for the new issue instead of showing stale data from the previous one.
+  // The setState calls here are intentional — they fire only when issueId
+  // actually changes and React batches them with any concurrent render, so
+  // no cascading extra render is scheduled. seed is intentionally excluded
+  // from deps (it is the initial value; re-reading it on every seed reference
+  // change would fight optimistic patches made after mount).
+  /* eslint-disable react-hooks/set-state-in-effect -- intentional: state resets are tied to issueId change only, not an ongoing external subscription */
+  useEffect(() => {
+    setLoaded(false);
+    setIssue(seed);
+    setMyVote(null);
+    setParticipants([]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [issueId]);
+  /* eslint-enable react-hooks/set-state-in-effect */
+
   // Called by useIssueVote's onVoteChange callback after every confirmed
   // mutation. Payload is { voterRole, eventRole, ...serverData } on a vote,
   // or null on a retract.
@@ -259,6 +278,11 @@ export function useRoleSupport(
     canLeave,
     leaderSlot,
     canLeaveLead,
+    // FIX 2 — authoritative "committed" total for the panel heading badge.
+    // Pass attendingCount (GOING tally) because COORDINATOR + role-less GOING
+    // voters never appear in per-role rows, so row-sum would undercount.
+    // null falls back to the panel's own row-sum.
+    totalOverride: Number.isFinite(Number(issue?.attendingCount)) ? Number(issue?.attendingCount) : null,
     onJoin: join,
     onLead: lead,
     onLeave: leave,
