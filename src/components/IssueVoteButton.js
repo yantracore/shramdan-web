@@ -1,9 +1,10 @@
 "use client";
 
 import { CheckOutlined, LikeOutlined } from "@ant-design/icons";
-import { Button, Modal, Popconfirm, Radio, Space, Tooltip } from "antd";
+import { Button, Popconfirm, Tooltip } from "antd";
 import { useEffect, useRef, useState } from "react";
-import { useIssueVote } from "@/lib/useIssueVote";
+import { SupportRolesModal } from "@/components/SupportRolesModal";
+import { useRoleSupport } from "@/lib/useRoleSupport";
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 
@@ -42,7 +43,6 @@ const ROLE_COPY = {
     eventRolePrompt: "कुन भूमिकामा आएर श्रम गर्नुहुन्छ?",
     eventRoleHint: "अभियानमा परिणत भएपछि तपाईं यही भूमिकामा सहभागी हुनुहुन्छ।",
     eventRoles: {
-      // cleanup event type → "सफाइकर्मी" (see ParticipantsPanel note).
       WORKER: "सफाइकर्मी",
       PHOTOGRAPHER: "फोटोग्राफर",
       LIVESTREAMER: "लाइभस्ट्रिमर",
@@ -151,20 +151,6 @@ const ROLE_COPY = {
   }
 };
 
-// Order the event-role options are offered in. Mirrors the backend enum on
-// POST /issues/{id}/vote and EventJoinPanel's role list. COORDINATOR was
-// removed from the enum 2026-06-23 (coordination ≡ leadership — offered via the
-// WANT_TO_LEAD voterRole option, not as a GOING participation role), so it is
-// not listed here; submitting it now 400s server-side.
-const EVENT_ROLE_ORDER = [
-  "WORKER",
-  "PHOTOGRAPHER",
-  "LIVESTREAMER",
-  "MEDIC",
-  "SAFETY_LEAD",
-  "LOGISTICS"
-];
-
 export function IssueVoteButton({
   issueId,
   initialVoteCount,
@@ -188,31 +174,25 @@ export function IssueVoteButton({
   // Optional. Bubbles the viewer's role + fresh tallies up to a parent (e.g.
   // the issue detail page's participation panel) on each vote/retract.
   onVoteChange,
-  // Optional. When set, an unvoted authenticated click delegates to the parent
-  // (the detail page opens the rich SupportRolesModal) instead of this
-  // component's own role-picker modal. Cards/preview leave it unset and keep
-  // the built-in picker.
-  onRequestSupport
+  // seed: optional issue snapshot (id, voteCount, isVoted, status …) passed by
+  // list-card or preview surfaces so the hook can seed counts without a fetch.
+  seed
 }) {
-  const { isAuthenticated, voteCount, voted, voting, handleVoteClick, handleRetract } =
-    useIssueVote({
-      issueId,
-      initialVoteCount,
-      initialVoted,
-      content: content.card,
-      onVoteChange
-    });
+  const support = useRoleSupport(issueId, {
+    seed: seed ?? {
+      voteCount: initialVoteCount,
+      isVoted: initialVoted
+    },
+    content,
+    language,
+    onVoteChange
+  });
 
   const roleCopy = ROLE_COPY[language] || ROLE_COPY.np;
-  const [pickerOpen, setPickerOpen] = useState(false);
-  const [pickerRole, setPickerRole] = useState("INTERESTED");
-  // Required only when pickerRole === "GOING" — the participant role the voter
-  // would take once the issue becomes a campaign.
-  const [pickerEventRole, setPickerEventRole] = useState(null);
 
   // The role the viewer's live vote is held under — drives which tier of
   // withdraw-confirmation copy we show. Seeded from initialVoterRole and
-  // refreshed when the viewer casts a fresh vote through the picker.
+  // refreshed when the viewer casts a fresh vote through the modal.
   const [activeVoterRole, setActiveVoterRole] = useState(
     initialVoterRole || "INTERESTED"
   );
@@ -235,20 +215,36 @@ export function IssueVoteButton({
     setActiveEventRole(initialEventRole || null);
   }
 
-  const previousCountRef = useRef(voteCount);
+  // When the hook delivers a live vote (after the modal resolves), sync the
+  // active role state so the chip label and withdraw copy stay truthful.
+  const liveVoterRole = support.voterRole;
+  const liveEventRole = support.eventRole;
+  const [syncedLiveVoterRole, setSyncedLiveVoterRole] = useState(liveVoterRole);
+  if (liveVoterRole && liveVoterRole !== syncedLiveVoterRole) {
+    setSyncedLiveVoterRole(liveVoterRole);
+    setActiveVoterRole(liveVoterRole);
+  }
+  const [syncedLiveEventRole, setSyncedLiveEventRole] = useState(liveEventRole);
+  if (liveEventRole !== syncedLiveEventRole) {
+    setSyncedLiveEventRole(liveEventRole);
+    setActiveEventRole(liveEventRole || null);
+  }
+
+  const previousCountRef = useRef(support.voteCount);
   const [pulseKey, setPulseKey] = useState(0);
   useEffect(() => {
-    if (previousCountRef.current !== voteCount) {
-      previousCountRef.current = voteCount;
+    if (previousCountRef.current !== support.voteCount) {
+      previousCountRef.current = support.voteCount;
       setPulseKey((k) => k + 1);
     }
-  }, [voteCount]);
+  }, [support.voteCount]);
 
-  const label = voted
+  const label = support.voted
     ? activeVoterRole === "GOING" && activeEventRole
       ? roleCopy.eventRoles[activeEventRole] || roleCopy.doneLabels.GOING
       : roleCopy.doneLabels[activeVoterRole] || content.card.voteActionDone
     : content.card.voteAction;
+
   // When already supported, the tooltip names the actual commitment instead of
   // a flat "withdraw support".
   const withdrawTooltip =
@@ -260,47 +256,27 @@ export function IssueVoteButton({
       : activeVoterRole === "WANT_TO_LEAD"
         ? roleCopy.joinedTooltipLead
         : roleCopy.joinedTooltipInterested;
-  const tooltipTitle = !isAuthenticated
+  const tooltipTitle = !support.isAuthenticated
     ? content.card.voteDisabledTooltip
-    : voted
+    : support.voted
       ? withdrawTooltip
       : "";
 
   const handleClick = (event) => {
     if (event?.preventDefault) event.preventDefault();
     if (event?.stopPropagation) event.stopPropagation();
-    if (!isAuthenticated) {
-      // Reuse the hook's auth-redirect path.
-      handleVoteClick(event);
+    if (!support.isAuthenticated) {
+      // Delegate to the hook's "interested" path — useIssueVote's handleVoteClick
+      // will detect the missing session and push to the login page.
+      support.onInterested();
       return;
     }
-    if (voting || !issueId) return;
+    if (support.voting || !issueId) return;
     // Voted already → withdrawal runs through the confirm popover that wraps
     // this button (see Popconfirm below), so the bare click is a no-op here.
-    if (voted) return;
-    // Detail page → defer to the rich SupportRolesModal (roles + counts + lead
-    // visible by default). Elsewhere fall back to the built-in role picker.
-    if (onRequestSupport) {
-      onRequestSupport();
-      return;
-    }
-    setPickerRole("INTERESTED");
-    setPickerEventRole(null);
-    setPickerOpen(true);
-  };
-
-  const goingNeedsRole = pickerRole === "GOING" && !pickerEventRole;
-
-  const handleConfirmRole = () => {
-    if (goingNeedsRole) return;
-    setPickerOpen(false);
-    // Remember the role so the chip + a later withdrawal match this commitment.
-    setActiveVoterRole(pickerRole);
-    setActiveEventRole(pickerRole === "GOING" ? pickerEventRole : null);
-    handleVoteClick({
-      voterRole: pickerRole,
-      eventRole: pickerRole === "GOING" ? pickerEventRole : undefined
-    });
+    if (support.voted) return;
+    // Open the rich SupportRolesModal (all roles + counts + lead visible).
+    support.openModal();
   };
 
   // Withdraw-confirmation copy for the role the viewer's vote is held under.
@@ -312,31 +288,31 @@ export function IssueVoteButton({
         // Only intercept the click when there's a live vote to withdraw —
         // otherwise the button's own onClick handles the login redirect (anon)
         // or opens the role picker (not yet voted).
-        disabled={!isAuthenticated || !voted}
+        disabled={!support.isAuthenticated || !support.voted}
         title={withdrawCopy.title}
         description={withdrawCopy.description}
         okText={roleCopy.withdrawOk}
         cancelText={roleCopy.withdrawCancel}
-        okButtonProps={{ danger: true, loading: voting }}
-        onConfirm={() => handleRetract()}
+        okButtonProps={{ danger: true, loading: support.voting }}
+        onConfirm={() => support.retract()}
         overlayClassName="vote-withdraw-popconfirm"
       >
         <Tooltip title={tooltipTitle}>
           <Button
-            aria-pressed={voted}
+            aria-pressed={support.voted}
             className={className}
-            icon={voted ? <CheckOutlined /> : <LikeOutlined />}
-            loading={voting}
+            icon={support.voted ? <CheckOutlined /> : <LikeOutlined />}
+            loading={support.voting}
             onClick={handleClick}
             size={size}
-            type={voted ? "default" : type}
+            type={support.voted ? "default" : type}
           >
             {showCount ? (
               <span
                 key={pulseKey}
                 className="public-issue-card-support-count vote-tickup"
               >
-                {toLocalDigits(voteCount, language)}
+                {toLocalDigits(support.voteCount, language)}
               </span>
             ) : null}
             {showLabel ? (
@@ -346,59 +322,13 @@ export function IssueVoteButton({
         </Tooltip>
       </Popconfirm>
 
-      <Modal
-        open={pickerOpen}
-        title={roleCopy.modalTitle}
-        onOk={handleConfirmRole}
-        onCancel={() => (voting ? null : setPickerOpen(false))}
-        okText={roleCopy.submit}
-        cancelText={roleCopy.cancel}
-        confirmLoading={voting}
-        okButtonProps={{ disabled: goingNeedsRole }}
-        width={520}
-      >
-        <p className="voter-role-modal-intro">{roleCopy.modalIntro}</p>
-        <Radio.Group
-          value={pickerRole}
-          onChange={(e) => {
-            setPickerRole(e.target.value);
-            // eventRole only applies to GOING; clear it when switching away so
-            // we never send a stray role the backend would reject.
-            if (e.target.value !== "GOING") setPickerEventRole(null);
-          }}
-          disabled={voting}
-          className="voter-role-modal-options"
-        >
-          <Space direction="vertical" style={{ width: "100%" }}>
-            {roleCopy.options.map((opt) => (
-              <Radio key={opt.value} value={opt.value} className="voter-role-modal-option">
-                <span className="voter-role-modal-option-label">{opt.label}</span>
-                <span className="voter-role-modal-option-hint">{opt.hint}</span>
-              </Radio>
-            ))}
-          </Space>
-        </Radio.Group>
-
-        {pickerRole === "GOING" ? (
-          <div className="voter-role-modal-event-role">
-            <p className="voter-role-modal-event-role-prompt">{roleCopy.eventRolePrompt}</p>
-            <p className="voter-role-modal-event-role-hint">{roleCopy.eventRoleHint}</p>
-            <Radio.Group
-              value={pickerEventRole}
-              onChange={(e) => setPickerEventRole(e.target.value)}
-              disabled={voting}
-            >
-              <Space direction="vertical" style={{ width: "100%" }}>
-                {EVENT_ROLE_ORDER.map((role) => (
-                  <Radio key={role} value={role} className="voter-role-modal-option">
-                    {roleCopy.eventRoles[role] || role}
-                  </Radio>
-                ))}
-              </Space>
-            </Radio.Group>
-          </div>
-        ) : null}
-      </Modal>
+      <SupportRolesModal
+        open={support.open}
+        onClose={support.closeModal}
+        language={language}
+        onInterested={support.onInterested}
+        panelProps={support.panelProps}
+      />
     </>
   );
 }
