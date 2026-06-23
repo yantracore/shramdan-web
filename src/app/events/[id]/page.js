@@ -12,7 +12,7 @@ import {
 import { Button, Empty, Skeleton, Tag } from "antd";
 import Image from "next/image";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import { BeforeAfterSlider } from "@/components/BeforeAfterSlider";
 import { EventLiveStreamPlayer } from "@/components/EventLiveStreamPlayer";
@@ -34,16 +34,13 @@ import { SafetyChecklistPanel } from "@/components/SafetyChecklistPanel";
 import { CommentSection } from "@/components/comments";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
-import { deleteJson, getJson, postJson } from "@/lib/apiClient";
-import { buildLoginHref } from "@/lib/loginRedirect";
-import { useToast } from "@/lib/toast";
+import { getJson } from "@/lib/apiClient";
 import { getDemoEventById } from "@/lib/devMockData";
 import {
   buildRolesNeeded,
-  countActiveParticipants,
-  findViewerRoleByName,
-  isActiveParticipationStatus
+  countActiveParticipants
 } from "@/lib/eventParticipants";
+import { useEventJoin } from "@/lib/useEventJoin";
 import { getAuthSession, subscribeAuthSession } from "@/lib/authSession";
 import { copy } from "@/lib/siteContent";
 import { discussionPresenceForEvent } from "@/lib/discussionsStub";
@@ -63,36 +60,6 @@ function localizeDigits(value, language) {
   if (language !== "np") return str;
   return str.replace(/\d/g, (d) => NP_DIGITS[Number(d)]);
 }
-
-// Event lifecycle stages that still accept a join (mirrors the issue side's
-// OPEN-only rule, one stage later). ACTIVE narrows to Worker-only per the
-// agreed action matrix; DRAFT/SCHEDULED accept any planned role.
-const EVENT_JOINABLE_STATUSES = new Set(["DRAFT", "SCHEDULED", "ACTIVE"]);
-
-// Toasts for the page-owned join/leave handlers (the shared ParticipantsPanel
-// stays presentational and raises no toasts of its own).
-const JOIN_COPY = {
-  np: {
-    joined: "तपाईं जोडिनुभयो।",
-    waitlisted: "भूमिका भरिएको छ — तपाईं प्रतीक्षा सूचीमा हुनुहुन्छ।",
-    already: "तपाईं पहिले अर्को भूमिकामा जोडिनुभएको छ।",
-    medic: "स्वास्थ्यकर्मी भूमिकाका लागि प्रमाणित मेडिकल क्रेडेन्सियल चाहिन्छ।",
-    rejoinBlocked: "अहिले फेरि जोडिन सकिएन — पहिले छाड्नुभएको रेकर्ड सर्भरले पुनः सक्रिय गरेन।",
-    joinError: "जोडिन सकिएन। फेरि प्रयास गर्नुहोस्।",
-    left: "तपाईं यो श्रमदानबाट हट्नुभयो।",
-    leaveError: "हट्न सकिएन। फेरि प्रयास गर्नुहोस्।"
-  },
-  en: {
-    joined: "You're in.",
-    waitlisted: "Role full — you're on the waitlist.",
-    already: "You've already joined in another role.",
-    medic: "The Medic role requires verified medical credentials.",
-    rejoinBlocked: "Couldn't re-join right now — a signup you previously left wasn't reactivated by the server.",
-    joinError: "Could not join. Please try again.",
-    left: "You've left this shramdan.",
-    leaveError: "Could not leave. Please try again."
-  }
-};
 
 function formatScheduledAt(value, language) {
   if (!value) return "";
@@ -151,9 +118,6 @@ export default function EventDetailPage() {
   const [error, setError] = useState("");
   const [notFound, setNotFound] = useState(false);
   const [discussionPresence, setDiscussionPresence] = useState(null);
-  // Viewer's own participation record — single source of truth shared by the
-  // join CTA and the roster panel so both agree on "you're already in as X".
-  const [myParticipation, setMyParticipation] = useState(null);
 
   useEffect(() => {
     if (!eventId) return;
@@ -255,52 +219,11 @@ export default function EventDetailPage() {
   }, [fetchEvent]);
 
   const session = useSyncExternalStore(subscribeAuthSession, getAuthSession, () => null);
-  const messageApi = useToast();
-  const router = useRouter();
 
-  const isDemoEvent = typeof eventId === "string" && eventId.startsWith("demo-");
-  const viewerId = session?.user?.id || null;
-  const viewerName = session?.user?.name || null;
-  // Participant sub-resources are keyed by the event UUID, but the URL param
-  // can be a slug — use the resolved id from the fetched event.
-  const resolvedEventId = eventData?.id || null;
-
-  const fetchMyParticipation = useCallback(async () => {
-    if (!resolvedEventId || isDemoEvent || !viewerId) {
-      setMyParticipation(null);
-      return;
-    }
-    try {
-      const response = await getJson(`/events/${resolvedEventId}/participants/me`, {
-        requireAuth: true
-      });
-      const data = response?.data ?? response;
-      // The backend soft-deletes on leave (status -> LEFT, returned with 200)
-      // rather than 404ing, so a stale LEFT/NO_SHOW record must NOT count as
-      // membership — otherwise a refresh re-reads it and the UI flips back to
-      // "you're in". Only active states (joined / waitlisted / checked-in) hold.
-      setMyParticipation(
-        data?.role && isActiveParticipationStatus(data.status)
-          ? { id: data.id, role: data.role, status: data.status }
-          : null
-      );
-    } catch {
-      // 404 = not joined (or hard-deleted); any other error soft-fails to the
-      // name-match path below so a transient hiccup never hides the join CTA.
-      setMyParticipation(null);
-    }
-  }, [resolvedEventId, isDemoEvent, viewerId]);
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchMyParticipation();
-  }, [fetchMyParticipation]);
-
-  // Backend record wins; demo events (and soft-failed fetches) fall back to
-  // matching the viewer's name against the roster's filledNames.
-  const viewerRole =
-    myParticipation?.role || findViewerRoleByName(eventData?.rolesNeeded, viewerName);
-  const viewerStatus = myParticipation?.status || null;
+  // Single source of truth for participation state: seed with the page's
+  // already-resolved eventData so the hook can derive panelProps on first
+  // render, then eager-load its own fresh copy (roster + myParticipation).
+  const join = useEventJoin(eventId, { seed: eventData, language, eager: true });
 
   const linkedIssue = eventData?.issue ? localizeIssue(eventData.issue, language) : null;
   const leader = eventData?.eventLeader ?? null;
@@ -337,200 +260,6 @@ export default function EventDetailPage() {
     },
     [fetchEvent]
   );
-
-  // The join CTA and roster panel report participation changes here. We flip
-  // local state optimistically for instant feedback, then reconcile with the
-  // server (real events only — demo events have no backend to reconcile with).
-  const handleJoinChanged = useCallback(
-    (payload) => {
-      // Demo join: the panel hands back the locally-mutated event (its
-      // rolesNeeded now lists the viewer's name) — merge it; the name-match
-      // in `viewerRole` then flips both panels to the joined state.
-      if (payload && typeof payload === "object" && Array.isArray(payload.rolesNeeded)) {
-        setEventData((prev) => ({ ...(prev || {}), ...payload }));
-        return;
-      }
-      // Real join: optimistically record the role for an instant flip.
-      if (payload && typeof payload === "object" && payload.role) {
-        setMyParticipation({
-          id: payload.id || null,
-          role: payload.role,
-          status: payload.status || "CONFIRMED"
-        });
-      }
-      if (!isDemoEvent) {
-        fetchEvent();
-        fetchMyParticipation();
-      }
-    },
-    [fetchEvent, fetchMyParticipation, isDemoEvent]
-  );
-
-  // Withdraw path. The DELETE returning 200 is authoritative, so we update
-  // optimistically and deliberately do NOT refetch /participants here: an
-  // immediate read can race the delete's propagation and hand back the just-
-  // removed record, flipping the UI straight back to "you're in" (the bug
-  // विवेक hit on first test). Clearing myParticipation AND stripping the viewer
-  // from the local roster makes `viewerRole` (which falls back to a name match
-  // against rolesNeeded) resolve to null deterministically; a later navigation
-  // or manual refresh reconciles exact counts with the server.
-  const handleLeaveChanged = useCallback(
-    (payload) => {
-      setMyParticipation(null);
-      setEventData((prev) => {
-        if (!prev) return prev;
-        // Demo events hand back a fully-rebuilt event payload.
-        if (payload && typeof payload === "object" && Array.isArray(payload.rolesNeeded)) {
-          return { ...(prev || {}), ...payload };
-        }
-        // Real events: drop the viewer's chip from the roster locally.
-        if (!Array.isArray(prev.rolesNeeded) || !viewerName) return prev;
-        const rolesNeeded = prev.rolesNeeded.map((row) => {
-          const filledNames = Array.isArray(row.filledNames) ? row.filledNames : [];
-          if (!filledNames.includes(viewerName)) return row;
-          return {
-            ...row,
-            filled: Math.max(0, (row.filled || 0) - 1),
-            filledNames: filledNames.filter((name) => name !== viewerName)
-          };
-        });
-        return { ...prev, rolesNeeded };
-      });
-    },
-    [viewerName]
-  );
-
-  // Join as a role directly off the roster (the shared ParticipantsPanel calls
-  // these; it owns no API logic). Mirrors the old EventRosterPanel join path —
-  // waitlist / medic-credential / rejoin-blocked / already-joined all handled —
-  // then reconciles through handleJoinChanged.
-  const jc = JOIN_COPY[language] || JOIN_COPY.np;
-  const handleJoinRole = useCallback(
-    async (role) => {
-      if (!session?.user?.id) {
-        router.push(buildLoginHref(`/events/${eventData?.slug ?? eventData?.id ?? eventId}`, "join"));
-        return;
-      }
-      if (isDemoEvent) {
-        // Demo events have no backend — mutate the local roster + flip state.
-        setEventData((prev) => {
-          if (!prev || !Array.isArray(prev.rolesNeeded)) return prev;
-          const rolesNeeded = prev.rolesNeeded.map((row) => {
-            if (row.role !== role) return row;
-            const filledNames = Array.isArray(row.filledNames) ? row.filledNames : [];
-            if (filledNames.includes(viewerName)) return row;
-            return {
-              ...row,
-              filled: Math.min((row.filled || 0) + 1, row.count),
-              filledNames: [...filledNames, viewerName || "तपाईं"]
-            };
-          });
-          return { ...prev, rolesNeeded };
-        });
-        setMyParticipation({ id: null, role, status: "CONFIRMED" });
-        messageApi.success(jc.joined);
-        return;
-      }
-      try {
-        const response = await postJson(
-          `/events/${eventData.id}/participants`,
-          { role },
-          { requireAuth: true }
-        );
-        const data = response?.data ?? response;
-        if (data?.status && !isActiveParticipationStatus(data.status)) {
-          // Backend bug: re-join after leaving returns 201 with the stale
-          // terminal record instead of reactivating it.
-          messageApi.error(jc.rejoinBlocked);
-          handleJoinChanged({ refetch: true });
-        } else {
-          messageApi[data?.status === "INVITED" ? "info" : "success"](
-            data?.status === "INVITED" ? jc.waitlisted : jc.joined
-          );
-          handleJoinChanged({ id: data?.id, role, status: data?.status });
-        }
-      } catch (err) {
-        if (err?.status === 403 && /MEDIC/i.test(err?.errorCode || err?.message || "")) {
-          messageApi.error(jc.medic);
-        } else if (err?.status === 409) {
-          messageApi.warning(jc.already);
-          handleJoinChanged({ refetch: true });
-        } else {
-          messageApi.error(err?.message || jc.joinError);
-        }
-        throw err;
-      }
-    },
-    [eventData, eventId, handleJoinChanged, isDemoEvent, jc, messageApi, router, session, viewerName]
-  );
-
-  // Withdraw from the event (DELETE the participant record), then reconcile
-  // through handleLeaveChanged. Demo events skip the network call.
-  const handleLeaveRole = useCallback(async () => {
-    if (!isDemoEvent) {
-      if (!myParticipation?.id) return;
-      try {
-        await deleteJson(`/events/${eventData.id}/participants/${myParticipation.id}`, {
-          requireAuth: true
-        });
-      } catch (err) {
-        messageApi.error(err?.message || jc.leaveError);
-        throw err;
-      }
-    }
-    messageApi.success(jc.left);
-    handleLeaveChanged({ left: true });
-  }, [eventData, handleLeaveChanged, isDemoEvent, jc, messageApi, myParticipation]);
-
-  // Adapt the event's rolePlan-derived rolesNeeded into the shared
-  // ParticipantsPanel shape (count = filled, target = planned, names = roster).
-  // COORDINATOR is dropped from the grid — coordinator ≡ leader, shown only in
-  // the dedicated leadership slot (see backend note in event-participants.md).
-  const participantRoles = (Array.isArray(eventData?.rolesNeeded) ? eventData.rolesNeeded : [])
-    .filter((row) => row.role !== "COORDINATOR")
-    .map((row) => ({
-      role: row.role,
-      count: row.filled || 0,
-      target: row.count,
-      names: Array.isArray(row.filledNames) ? row.filledNames : []
-    }));
-  const participantViewer = viewerRole
-    ? { role: viewerRole, status: viewerStatus, name: viewerName }
-    : null;
-  const participantTotalTarget = participantRoles.reduce((s, r) => s + (Number(r.target) || 0), 0);
-  const participantTotalFilled = participantRoles.reduce(
-    (s, r) => s + Math.min(Number(r.count) || 0, Number(r.target) || 0),
-    0
-  );
-  const participantProgress =
-    participantTotalTarget > 0
-      ? { current: participantTotalFilled, target: participantTotalTarget, variant: "fill" }
-      : null;
-  // Joinable roles by stage: DRAFT/SCHEDULED → any planned role; ACTIVE →
-  // Worker only; PAUSED/COMPLETED/CANCELLED → read-only.
-  const participantJoinableRoles =
-    eventData?.status === "ACTIVE"
-      ? ["WORKER"]
-      : eventData?.status === "DRAFT" || eventData?.status === "SCHEDULED"
-        ? null
-        : [];
-  const participantCanLeave =
-    Boolean(viewerRole) &&
-    EVENT_JOINABLE_STATUSES.has(eventData?.status) &&
-    viewerStatus !== "CHECKED_IN" &&
-    (isDemoEvent || Boolean(myParticipation?.id));
-  // Leadership ("Coordinator") slot — the resolved event leader, shown read-only
-  // here (offering to lead / nominations live in LeaderNominationPanel). Titled
-  // "Coordinator" by the panel default; coordinator ≡ leader (only one shown).
-  const participantLeaderSlot =
-    eventData?.eventLeaderId || isLeader
-      ? {
-          viewerIsLeader: isLeader,
-          name: leader?.name || (isLeader ? viewerName : null),
-          count: eventData?.eventLeaderId ? 1 : 0,
-          canLead: false
-        }
-      : null;
 
   const uploads = Array.isArray(eventData?.uploads) ? eventData.uploads : [];
   const imageUploads = uploads.filter(isImageUpload);
@@ -782,16 +511,9 @@ export default function EventDetailPage() {
               <div className="event-detail-main event-detail-main--rest">
                 {/* ZONE 2 — ACTION: how a visitor takes part */}
                 {(Array.isArray(eventData.rolesNeeded) && eventData.rolesNeeded.length > 0) ||
-                participantLeaderSlot ? (
+                join.panelProps.leaderSlot ? (
                   <ParticipantsPanel
-                    roles={participantRoles}
-                    viewer={participantViewer}
-                    progress={participantProgress}
-                    joinableRoles={participantJoinableRoles}
-                    canLeave={participantCanLeave}
-                    onJoin={handleJoinRole}
-                    onLeave={handleLeaveRole}
-                    leaderSlot={participantLeaderSlot}
+                    {...join.panelProps}
                     language={language}
                   />
                 ) : null}
