@@ -903,6 +903,69 @@
   }
 }
 
+/* --- Core vs Additional role grouping -------------------------------------
+ * The roster splits into two labelled groups: the must-fill CORE roles (the
+ * Cleaner + the Coordinator/leader, which anchor every event) and the optional
+ * ADDITIONAL specialist roles. The coordinator covers any optional role that
+ * goes unfilled — especially early — so those read a notch quieter and the eye
+ * lands on core first. Purely presentational; join/lead behaviour is unchanged. */
+.participants-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.participants-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.participants-group-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.participants-group--core .participants-group-label {
+  color: var(--text);
+}
+
+.participants-group--additional .participants-group-label {
+  color: var(--muted);
+}
+
+/* "Optional" chip beside the Additional label — sentence-case, quiet. */
+.participants-group-tag {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 1px 8px;
+  border-radius: var(--radius-pill);
+  color: var(--muted);
+  background: var(--surface-soft);
+  border: 1px solid var(--line);
+}
+
+.participants-group-helper {
+  margin: -4px 0 2px;
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: var(--muted);
+}
+
+/* Optional roles read a touch quieter (soft wash, no text fade — stays
+   legible) so the must-fill core pair draws the eye first. */
+.participants-group--additional .event-roster-row {
+  background: color-mix(in srgb, var(--surface-soft) 65%, var(--surface));
+}
+
 /* --- Leadership ("Coordinator") slot --------------------------------------
  * Set apart below the participation roster — the lead is its own commitment,
  * not one of the role cards. Gold accent + a dashed divider make it read as a

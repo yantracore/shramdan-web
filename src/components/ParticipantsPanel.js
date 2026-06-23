@@ -87,6 +87,10 @@ const COPY = {
   np: {
     heading: "सहभागीहरू",
     intro: "तपाईंलाई सुहाउने भूमिकामा जोडिनुहोस् — हरेक भूमिकाले श्रमदान चलाउँछ।",
+    coreGroupLabel: "मुख्य भूमिका",
+    additionalGroupLabel: "थप भूमिका",
+    additionalOptionalTag: "वैकल्पिक",
+    additionalHelper: "यी नभए पनि हुन्छ — सुरुमा संयोजकले नै सम्हाल्छन्।",
     roleCount: "{n} जना",
     filledOf: "{filled} / {total}",
     join: "जोडिने",
@@ -155,6 +159,10 @@ const COPY = {
   en: {
     heading: "Participants",
     intro: "Join in the role that fits you — every role keeps the cleanup running.",
+    coreGroupLabel: "Core roles",
+    additionalGroupLabel: "Additional roles",
+    additionalOptionalTag: "Optional",
+    additionalHelper: "Optional — early on, the coordinator covers these.",
     roleCount: "{n}",
     filledOf: "{filled} / {total}",
     join: "Join",
@@ -531,7 +539,7 @@ export function ParticipantsPanel({
     return (
       <li
         key="__leader"
-        className={`event-roster-row participants-leader-row${
+        className={`event-roster-row event-roster-row--full participants-leader-row${
           leaderSlot.viewerIsLeader ? " is-own-role" : ""
         }`}
         style={{ "--role-color": LEAD_COLOR }}
@@ -646,11 +654,32 @@ export function ParticipantsPanel({
         {embedded ? null : <p>{t.intro}</p>}
       </header>
 
-      <ul className="event-roster-list">
-        {workerRow ? renderRoleRow(workerRow, true) : null}
-        {renderLeaderRow()}
-        {otherRows.map((row) => renderRoleRow(row))}
-      </ul>
+      <div className="participants-groups">
+        {/* Core — the two must-fill roles: the Cleaner (the work itself) and
+            the Coordinator/leader (who runs it). These anchor every event. */}
+        <div className="participants-group participants-group--core">
+          <p className="participants-group-label">{t.coreGroupLabel}</p>
+          <ul className="event-roster-list">
+            {workerRow ? renderRoleRow(workerRow, true) : null}
+            {renderLeaderRow()}
+          </ul>
+        </div>
+
+        {/* Additional — optional specialist roles. If unfilled, the coordinator
+            covers them (especially early), so they read as secondary. */}
+        {otherRows.length ? (
+          <div className="participants-group participants-group--additional">
+            <p className="participants-group-label">
+              {t.additionalGroupLabel}
+              <span className="participants-group-tag">{t.additionalOptionalTag}</span>
+            </p>
+            <p className="participants-group-helper">{t.additionalHelper}</p>
+            <ul className="event-roster-list">
+              {otherRows.map((row) => renderRoleRow(row))}
+            </ul>
+          </div>
+        ) : null}
+      </div>
     </section>
   );
 }
