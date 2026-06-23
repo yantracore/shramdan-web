@@ -6,14 +6,11 @@ import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "rea
 import { CloseOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import { Button, Select } from "antd";
 import { SiteShell } from "@/components/SiteShell";
-import { ActivityTypeTabs } from "@/components/ActivityTypeTabs";
 import { EventListCard } from "@/components/EventListCard";
 import { EventPreviewPane } from "@/components/EventPreviewPane";
 import { ActivityStatsRow } from "@/components/ActivityStatsRow";
-import EventMapBlock from "@/components/EventMapBlock";
 import { ProvinceDistrictFilter } from "@/components/ProvinceDistrictFilter";
-import { ViewSwitch } from "@/components/ViewSwitch";
-import { StreamCard, eventToEntry } from "@/components/StreamList";
+import { PublicSearchBar } from "@/components/PublicSearchBar";
 import { usePreferences } from "@/app/providers";
 import { copy } from "@/lib/siteContent";
 import { listAllEvents } from "@/lib/eventsApi";
@@ -63,10 +60,6 @@ const PAGE_COPY = {
       sortLocating: "स्थान खोज्दै…",
       sortLocationDenied: "स्थान अनुमति अस्वीकृत भयो",
       sortLocationUnsupported: "ब्राउजरले स्थान समर्थन गर्दैन",
-      viewSwitchAriaLabel: "दृश्य मोड",
-      viewListPreview: "सूची",
-      viewMap: "नक्सा",
-      viewThumbnails: "थम्बनेल",
       searchingPrefix: "खोज्दै:",
       clearSearch: "खोज खाली गर्ने"
     },
@@ -152,10 +145,6 @@ const PAGE_COPY = {
       sortLocating: "Locating…",
       sortLocationDenied: "Location permission denied",
       sortLocationUnsupported: "Browser does not support location",
-      viewSwitchAriaLabel: "View mode",
-      viewListPreview: "List",
-      viewMap: "Map",
-      viewThumbnails: "Thumbnails",
       searchingPrefix: "Searching:",
       clearSearch: "Clear search"
     },
@@ -233,6 +222,7 @@ function byCompletedDesc(a, b) {
 export default function EventsListPageContent() {
   const { language } = usePreferences();
   const t = PAGE_COPY[language] || PAGE_COPY.np;
+  const homeSearch = copy[language]?.homeSearch || copy.np.homeSearch;
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -275,10 +265,17 @@ export default function EventsListPageContent() {
     );
   }, [readFiltersFromUrl]);
 
-  // View switch is UI-only for this iteration: the chrome ships now so both
-  // /issues and /events expose identical toolbars, and the actual layout
-  // swaps (full-bleed map, thumbnail grid) land in a follow-up.
-  const [view, setView] = useState("list-preview");
+  // Detailed filter panel is collapsed by default; the filter button in the
+  // search bar toggles it open. Search text is kept in a local input buffer
+  // and committed to the URL filters on submit (handler defined below, once
+  // applyFilters exists).
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [searchInput, setSearchInput] = useState(filters.q);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setSearchInput(filters.q);
+  }, [filters.q]);
 
   // ----- raw data + ordered/flattened list ------------------------------
   const [live, setLive] = useState([]);
@@ -328,6 +325,14 @@ export default function EventsListPageContent() {
       router.replace(query ? `/events?${query}` : "/events", { scroll: false });
     },
     [router, searchParams]
+  );
+
+  const handleSearchSubmit = useCallback(
+    (event) => {
+      event.preventDefault();
+      applyFilters({ ...filters, q: searchInput.trim() });
+    },
+    [applyFilters, filters, searchInput]
   );
 
   // ----- geolocation (for sort=nearest) ----------------------------------
@@ -453,20 +458,6 @@ export default function EventsListPageContent() {
     }
     return filtered;
   }, [live, upcoming, past, filters, nearMe]);
-
-  // Map entries respect the same filters as the list so users see the exact
-  // subset they're browsing. Coordinate validity is enforced inside EventMap,
-  // but we pre-filter here to avoid rendering an empty section when nothing
-  // in the current slice has coords.
-  const mapEntries = useMemo(
-    () =>
-      orderedEvents.filter((entry) => {
-        const lat = Number(entry?.event?.latitude);
-        const lng = Number(entry?.event?.longitude);
-        return Number.isFinite(lat) && Number.isFinite(lng);
-      }),
-    [orderedEvents]
-  );
 
   // ----- selection state --------------------------------------------------
   const [selectedId, setSelectedId] = useState(null);
@@ -742,20 +733,23 @@ export default function EventsListPageContent() {
         ) : null}
 
         <div className="public-issues-toolbar">
-          <ActivityStatsRow language={language} variant="events" />
-          <div className="public-issues-context-row">
-            <ActivityTypeTabs active="event" labels={localizedCopy.activityTabs} />
-            <ViewSwitch
-              value={view}
-              onChange={setView}
-              labels={{
-                ariaLabel: t.filters.viewSwitchAriaLabel,
-                listPreview: t.filters.viewListPreview,
-                map: t.filters.viewMap,
-                thumbnails: t.filters.viewThumbnails
-              }}
+          <ActivityStatsRow language={language} interactive currentPage="events" />
+          <div className="public-issues-search-row">
+            <PublicSearchBar
+              value={searchInput}
+              onChange={setSearchInput}
+              onSubmit={handleSearchSubmit}
+              onToggleFilters={() => setFiltersOpen((open) => !open)}
+              filtersOpen={filtersOpen}
+              labels={homeSearch}
             />
+            <Link className="public-issues-filters-cta" href="/issues/new">
+              <Button type="primary" icon={<PlusOutlined />} size="large">
+                {reportIssueCtaLabel}
+              </Button>
+            </Link>
           </div>
+          {filtersOpen ? (
           <div className="public-issues-filters">
             <div className="public-issues-filter-field">
               <label
@@ -818,20 +812,15 @@ export default function EventsListPageContent() {
                 </span>
               ) : null}
             </div>
-            <Link className="public-issues-filters-cta" href="/issues/new">
-              <Button type="primary" icon={<PlusOutlined />} size="large">
-                {reportIssueCtaLabel}
-              </Button>
-            </Link>
           </div>
+          ) : null}
         </div>
 
-        {view === "list-preview" ? (
-          <section
-            className="events-split"
-            data-mobile-view={mobileView}
-            aria-label={t.filters.ariaLabel}
-          >
+        <section
+          className="events-split"
+          data-mobile-view={mobileView}
+          aria-label={t.filters.ariaLabel}
+        >
             <div className="events-split-list">
               <ul
                 ref={listRef}
@@ -865,39 +854,7 @@ export default function EventsListPageContent() {
               onBack={handleBack}
               isMobileDrillActive={isMobileDrillActive}
             />
-          </section>
-        ) : null}
-
-        {view === "thumbnails" ? (
-          <div className="home-for-you-grid">
-            {visibleEvents.map((entry) => (
-              <StreamCard
-                key={entry.event.id}
-                entry={eventToEntry(entry.event, entry.status)}
-                language={language}
-                copy={{
-                  statusLabels: t.map.statusLabels,
-                  viewLink: t.preview?.openFull
-                }}
-              />
-            ))}
-          </div>
-        ) : null}
-
-        {view === "map" ? (
-          <div className="stream-map-primary">
-            <EventMapBlock
-              entries={mapEntries}
-              t={t.map}
-              language={language}
-              height={560}
-              interactive
-              enableFullscreen
-              fullscreenLabel={t.map.fullscreenOpen}
-              exitFullscreenLabel={t.map.fullscreenClose}
-            />
-          </div>
-        ) : null}
+        </section>
       </section>
     </SiteShell>
   );

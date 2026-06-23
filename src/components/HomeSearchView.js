@@ -1,21 +1,21 @@
 "use client";
 
 // Phase 2 v0 of the TV-app pivot homepage. Replaces the old brochure-style
-// HomeClient at /. Three stacked blocks above the fold:
+// HomeClient at /. Stacked blocks above the fold:
 //
-//   1. Brand title + slogan (compact — share the band with the search box)
-//   2. Search box + filters button
-//   3. EventsHomeRail — the main highlight; viewport-scales 1 → 7 cards
+//   1. Brand title + slogan
+//   2. EventsHomeRail — the main highlight; viewport-scales 1 → 7 cards
+//   3. Stats pills + overview map
+//   4. Curated for-you stream
 //
-// Stats pills, map, and curated for-you stream come in Phase 2 follow-ups.
-// HomeClient.js stays in the repo as reference for /intro content. The
-// IntroCinematic at /intro is a separate, already-polished page.
+// The search box + filters button now live on /issues and /events (the
+// listing surfaces that actually have a dataset to narrow). HomeClient.js
+// stays in the repo as reference for /intro content. The IntroCinematic at
+// /intro is a separate, already-polished page.
 
-import { FilterOutlined, SearchOutlined } from "@ant-design/icons";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import { ActivityStatsRow } from "@/components/ActivityStatsRow";
 import EventMapBlock from "@/components/EventMapBlock";
 import { EventsHomeRail } from "@/components/EventsHomeRail";
@@ -34,7 +34,6 @@ const MAP_ISSUE_LIMIT = 100;
 
 export default function HomeSearchView() {
   const { language } = usePreferences();
-  const router = useRouter();
   const t = copy[language] ?? copy.np;
   const search = t.homeSearch ?? copy.np.homeSearch;
   const rail = t.liveEventsRail ?? copy.np.liveEventsRail;
@@ -43,7 +42,6 @@ export default function HomeSearchView() {
   const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [pastEvents, setPastEvents] = useState([]);
   const [mapIssues, setMapIssues] = useState([]);
-  const [query, setQuery] = useState("");
 
   useEffect(() => {
     let cancelled = false;
@@ -106,15 +104,6 @@ export default function HomeSearchView() {
     ];
   }, [liveEvents, upcomingEvents, pastEvents]);
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const trimmed = query.trim();
-    const params = new URLSearchParams();
-    if (trimmed) params.set("q", trimmed);
-    const qs = params.toString();
-    router.push(qs ? `/events?${qs}` : "/events");
-  };
-
   return (
     <SiteShell>
       <section className="home-search-hero" aria-labelledby="home-search-title">
@@ -147,40 +136,10 @@ export default function HomeSearchView() {
         language={language}
       />
 
-      <section className="home-search-panel" aria-label={search.searchAria}>
+      <section className="home-search-panel" aria-label={search.mapEyebrow}>
         <div className="home-search-panel-inner">
-          <form className="home-search-bar" onSubmit={handleSubmit} role="search">
-            <label className="home-search-input">
-              <SearchOutlined aria-hidden="true" />
-              <input
-                type="search"
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder={search.searchPlaceholder}
-                aria-label={search.searchAria}
-                autoComplete="off"
-              />
-            </label>
-            <button
-              type="button"
-              className="home-search-filters"
-              aria-label={search.filtersLabel}
-              title={search.filtersLabel}
-            >
-              <FilterOutlined aria-hidden="true" />
-              <span>{search.filtersLabel}</span>
-            </button>
-            <button
-              type="submit"
-              className="home-search-submit"
-              aria-label={search.submitAria}
-            >
-              <SearchOutlined aria-hidden="true" />
-            </button>
-          </form>
-
           <div className="home-search-stats">
-            <ActivityStatsRow language={language} variant="events" />
+            <ActivityStatsRow language={language} />
           </div>
 
           {mapEntries.length > 0 || mapIssues.length > 0 ? (

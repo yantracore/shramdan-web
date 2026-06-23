@@ -1137,6 +1137,8 @@ export const copy = {
       searchAria: "श्रमदानमा खोज्नुहोस्",
       filtersLabel: "फिल्टर",
       submitAria: "खोज सुरु गर्ने",
+      searchingPrefix: "खोज्दै:",
+      clearSearch: "खोज खाली गर्ने",
       mapEyebrow: "नक्सामा",
       mapEmpty: "अहिले नक्सामा देखाउन कुनै अभियान छैन।",
       map: {
@@ -2940,6 +2942,8 @@ export const copy = {
       searchAria: "Search Shramdan",
       filtersLabel: "Filters",
       submitAria: "Submit search",
+      searchingPrefix: "Searching:",
+      clearSearch: "Clear search",
       mapEyebrow: "On the map",
       mapEmpty: "No campaigns to map right now.",
       map: {

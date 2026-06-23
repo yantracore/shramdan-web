@@ -1,8 +1,10 @@
 "use client";
 
 import {
+  CloseOutlined,
   PlusOutlined,
-  ReloadOutlined
+  ReloadOutlined,
+  SearchOutlined
 } from "@ant-design/icons";
 import { Button, Empty, Select, Skeleton } from "antd";
 import Link from "next/link";
@@ -16,18 +18,16 @@ import {
   useState
 } from "react";
 import IssueMapBlock from "@/components/IssueMapBlock";
-import { ActivityTypeTabs } from "@/components/ActivityTypeTabs";
 import { ActivityStatsRow } from "@/components/ActivityStatsRow";
 import { IssueListCard } from "@/components/IssueListCard";
 import { IssuePreviewPane } from "@/components/IssuePreviewPane";
 import { ProvinceDistrictFilter } from "@/components/ProvinceDistrictFilter";
+import { PublicSearchBar } from "@/components/PublicSearchBar";
 import { SiteShell } from "@/components/SiteShell";
-import { ViewSwitch } from "@/components/ViewSwitch";
-import { StreamCard, issueToEntry } from "@/components/StreamList";
 import { usePreferences } from "@/app/providers";
 import { getJson } from "@/lib/apiClient";
 import { copy } from "@/lib/siteContent";
-import { ISSUE_CATEGORIES, getListItems } from "@/lib/adminUtils";
+import { ISSUE_CATEGORIES, getListItems, localizeIssue } from "@/lib/adminUtils";
 
 const PUBLIC_ISSUE_STATUSES = ["OPEN", "EVENT_SCHEDULED", "COMPLETED"];
 // Server-supported sorts: voteCount, createdAt (no direction param).
@@ -55,6 +55,7 @@ export default function IssuesListPageContent() {
   const { language } = usePreferences();
   const t = copy[language];
   const content = t.issues;
+  const homeSearch = t.homeSearch || {};
   const liveIssuesCopy = t.liveIssues || {};
   const preview = content.preview || {};
   const splitCopy = content.split || {};
@@ -69,13 +70,15 @@ export default function IssuesListPageContent() {
     const provinceParam = searchParams?.get("province");
     const districtParam = searchParams?.get("district");
     const sortParam = searchParams?.get("sort");
+    const qParam = searchParams?.get("q");
     return {
       status: statusParam && STATUS_VALUES.has(statusParam) ? statusParam : undefined,
       category:
         categoryParam && categorySet.has(categoryParam) ? categoryParam : undefined,
       provinceId: provinceParam || undefined,
       districtId: districtParam || undefined,
-      sort: sortParam && SORT_VALUES.has(sortParam) ? sortParam : "voteCount"
+      sort: sortParam && SORT_VALUES.has(sortParam) ? sortParam : "voteCount",
+      q: qParam ? qParam.trim() : ""
     };
   }, [searchParams, categorySet]);
 
@@ -90,10 +93,11 @@ export default function IssuesListPageContent() {
   const [geoBusy, setGeoBusy] = useState(false);
   const [geoError, setGeoError] = useState("");
   const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE);
-  // View switch is UI-only for this iteration: the chrome ships now so both
-  // /issues and /events expose identical toolbars, and the actual layout
-  // swaps (full-bleed map, thumbnail grid) land in a follow-up.
-  const [view, setView] = useState("list-preview");
+  // Detailed filter panel is collapsed by default; the filter button in the
+  // search bar toggles it open. Search text is kept in a local input buffer
+  // and committed to the URL filters on submit.
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [searchInput, setSearchInput] = useState(() => readFiltersFromUrl().q);
 
   // Re-sync state from URL on back/forward navigation.
   useEffect(() => {
@@ -104,13 +108,21 @@ export default function IssuesListPageContent() {
         prev.category === next.category &&
         prev.provinceId === next.provinceId &&
         prev.districtId === next.districtId &&
-        prev.sort === next.sort
+        prev.sort === next.sort &&
+        prev.q === next.q
       ) {
         return prev;
       }
       return next;
     });
   }, [readFiltersFromUrl]);
+
+  // Keep the search input in sync when the query changes from the URL
+  // (back/forward nav, or clearing the search chip).
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setSearchInput(filters.q);
+  }, [filters.q]);
 
   const fetchPage = useCallback(
     async (cursor) => {
@@ -207,6 +219,8 @@ export default function IssuesListPageContent() {
       else params.delete("district");
       if (next.sort && next.sort !== "voteCount") params.set("sort", next.sort);
       else params.delete("sort");
+      if (next.q) params.set("q", next.q);
+      else params.delete("q");
       const query = params.toString();
       router.replace(query ? `/issues?${query}` : "/issues", { scroll: false });
     },
@@ -259,7 +273,26 @@ export default function IssuesListPageContent() {
   };
 
   const sortedItems = useMemo(() => {
-    if (filters.sort !== "nearest" || !nearMe) return items;
+    // Text search is client-side over the loaded buffer — substring match on
+    // title + address (Devanagari-safe; compares the original strings). We match
+    // against the *localized* title/description (localizeIssue resolves the
+    // active locale from issue.translations) so the search hits the same text
+    // the cards render, not the raw base-locale fields.
+    const needle = filters.q?.trim().toLowerCase();
+    const base = needle
+      ? items.filter((issue) => {
+          const localized = localizeIssue(issue, language);
+          const title = (localized.title || "").toLowerCase();
+          const addr = (issue.addressText || "").toLowerCase();
+          const desc = (localized.description || "").toLowerCase();
+          return (
+            title.includes(needle) ||
+            addr.includes(needle) ||
+            desc.includes(needle)
+          );
+        })
+      : items;
+    if (filters.sort !== "nearest" || !nearMe) return base;
     const haversine = (lat1, lon1, lat2, lon2) => {
       const toRad = (d) => (d * Math.PI) / 180;
       const R = 6371;
@@ -270,7 +303,7 @@ export default function IssuesListPageContent() {
         Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
       return 2 * R * Math.asin(Math.sqrt(a));
     };
-    return [...items].sort((a, b) => {
+    return [...base].sort((a, b) => {
       const aLat = Number(a.latitude);
       const aLng = Number(a.longitude);
       const bLat = Number(b.latitude);
@@ -284,7 +317,7 @@ export default function IssuesListPageContent() {
       const db = haversine(nearMe.lat, nearMe.lng, bLat, bLng);
       return da - db;
     });
-  }, [items, nearMe, filters.sort]);
+  }, [items, nearMe, filters.sort, filters.q, language]);
 
   const visibleItems = useMemo(
     () => sortedItems.slice(0, visibleCount),
@@ -512,11 +545,21 @@ export default function IssuesListPageContent() {
     [filters, applyFilters]
   );
 
+  const handleSearchSubmit = useCallback(
+    (event) => {
+      event.preventDefault();
+      applyFilters({ ...filters, q: searchInput.trim() });
+    },
+    [applyFilters, filters, searchInput]
+  );
+
   const selectedIssue = sortedItems.find((i) => i.id === selectedId) || null;
   const isMobileDrillActive = mobileView === "detail";
   const showResults = !error && !loading && visibleItems.length > 0;
+  // Empty when the *filtered* list is empty — covers both "no issues at all"
+  // and "search matched nothing" so a zero-result query never shows a blank gap.
   const showEmpty =
-    !loading && !error && items.length === 0;
+    !loading && !error && sortedItems.length === 0;
   const showError = !loading && Boolean(error);
   const isInitialLoad = loading && items.length === 0;
 
@@ -529,21 +572,43 @@ export default function IssuesListPageContent() {
           <p>{content.list.intro}</p>
         </div>
 
-        <div className="public-issues-toolbar">
-          <ActivityStatsRow language={language} variant="issues" />
-          <div className="public-issues-context-row">
-            <ActivityTypeTabs active="issue" labels={t.activityTabs} />
-            <ViewSwitch
-              value={view}
-              onChange={setView}
-              labels={{
-                ariaLabel: content.filters.viewSwitchAriaLabel,
-                listPreview: content.filters.viewListPreview,
-                map: content.filters.viewMap,
-                thumbnails: content.filters.viewThumbnails
-              }}
-            />
+        {filters.q ? (
+          <div className="public-issues-search-chip" role="status">
+            <SearchOutlined aria-hidden="true" />
+            <span className="public-issues-search-chip-label">
+              {homeSearch.searchingPrefix}
+            </span>
+            <strong>{filters.q}</strong>
+            <button
+              type="button"
+              className="public-issues-search-chip-clear"
+              aria-label={homeSearch.clearSearch}
+              title={homeSearch.clearSearch}
+              onClick={() => applyFilters({ ...filters, q: "" })}
+            >
+              <CloseOutlined aria-hidden="true" />
+            </button>
           </div>
+        ) : null}
+
+        <div className="public-issues-toolbar">
+          <ActivityStatsRow language={language} interactive currentPage="issues" />
+          <div className="public-issues-search-row">
+            <PublicSearchBar
+              value={searchInput}
+              onChange={setSearchInput}
+              onSubmit={handleSearchSubmit}
+              onToggleFilters={() => setFiltersOpen((open) => !open)}
+              filtersOpen={filtersOpen}
+              labels={homeSearch}
+            />
+            <Link className="public-issues-filters-cta" href="/issues/new">
+              <Button type="primary" icon={<PlusOutlined />} size="large">
+                {t.issueNew.cta.list}
+              </Button>
+            </Link>
+          </div>
+          {filtersOpen ? (
           <div className="public-issues-filters">
             <div className="public-issues-filter-field">
               <label
@@ -606,12 +671,8 @@ export default function IssuesListPageContent() {
                 </span>
               ) : null}
             </div>
-            <Link className="public-issues-filters-cta" href="/issues/new">
-              <Button type="primary" icon={<PlusOutlined />} size="large">
-                {t.issueNew.cta.list}
-              </Button>
-            </Link>
           </div>
+          ) : null}
         </div>
 
         {showError ? (
@@ -669,7 +730,7 @@ export default function IssuesListPageContent() {
           </section>
         ) : null}
 
-        {!isInitialLoad && !showEmpty && !showError && view === "list-preview" ? (
+        {!isInitialLoad && !showEmpty && !showError ? (
           <section
             className="events-split"
             data-mobile-view={mobileView}
@@ -735,42 +796,7 @@ export default function IssuesListPageContent() {
           </section>
         ) : null}
 
-        {!isInitialLoad && !showEmpty && !showError && view === "thumbnails" ? (
-          <div className="home-for-you-grid">
-            {visibleItems.map((issue) => (
-              <StreamCard
-                key={issue.id}
-                entry={issueToEntry(issue, language)}
-                language={language}
-                copy={{
-                  statusLabels: content.statusLabels,
-                  viewLink: content.preview?.viewLink
-                }}
-              />
-            ))}
-          </div>
-        ) : null}
-
-        {!isInitialLoad && !showEmpty && !showError && view === "map" ? (
-          <div className="stream-map-primary">
-            <IssueMapBlock
-              issues={mapIssues}
-              content={content}
-              language={language}
-              height={560}
-              interactive
-              enableFullscreen
-              fullscreenLabel={
-                liveIssuesCopy.fullscreenOpen || "Open fullscreen map"
-              }
-              exitFullscreenLabel={
-                liveIssuesCopy.fullscreenClose || "Close fullscreen map"
-              }
-            />
-          </div>
-        ) : null}
-
-        {view === "list-preview" && showResults ? (
+        {showResults ? (
           <div className="public-issues-map-section">
             <div className="live-issues-map-frame">
               <IssueMapBlock
