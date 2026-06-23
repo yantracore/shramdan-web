@@ -108,6 +108,7 @@ export function issueToEntry(rawIssue, language) {
     id: issue.id ?? issue.slug,
     slug: issue.slug ?? issue.id,
     title: issue.title || issue.addressText || "—",
+    description: issue.description || "",
     addressText: issue.addressText,
     poster: getIssueCoverImageUrl(issue) || FALLBACK_POSTER,
     status: issue.status, // OPEN | EVENT_SCHEDULED | COMPLETED
@@ -159,6 +160,9 @@ export function StreamCard({ entry, distanceKm, language, copy }) {
         </div>
         <div className="home-for-you-card-body">
           <h3>{entry.title}</h3>
+          {entry.description ? (
+            <p className="home-for-you-card-desc">{entry.description}</p>
+          ) : null}
           <div className="home-for-you-card-meta">
             {entry.addressText ? (
               <span className="home-for-you-card-address">
@@ -187,7 +191,8 @@ export function StreamList({
   language = "np",
   copy,
   defaultMode = "event",
-  maxItems = 12
+  maxItems = 12,
+  showModeTabs = true
 }) {
   const t = copy ?? {};
   const [mode, setMode] = useState(defaultMode);
@@ -353,25 +358,27 @@ export function StreamList({
         </div>
       </header>
 
-      <div className="stream-list-mode-tabs" role="tablist" aria-label={t.modeTabsAria || (language === "np" ? "धारा प्रकार" : "Stream type")}>
-        {modeTabs.map((tab) => {
-          const Icon = tab.icon;
-          const isActive = mode === tab.key;
-          return (
-            <button
-              key={tab.key}
-              type="button"
-              role="tab"
-              aria-selected={isActive}
-              className={`stream-list-mode-tab${isActive ? " is-active" : ""}`}
-              onClick={() => setMode(tab.key)}
-            >
-              <Icon aria-hidden="true" />
-              <span>{tab.label}</span>
-            </button>
-          );
-        })}
-      </div>
+      {showModeTabs ? (
+        <div className="stream-list-mode-tabs" role="tablist" aria-label={t.modeTabsAria || (language === "np" ? "धारा प्रकार" : "Stream type")}>
+          {modeTabs.map((tab) => {
+            const Icon = tab.icon;
+            const isActive = mode === tab.key;
+            return (
+              <button
+                key={tab.key}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                className={`stream-list-mode-tab${isActive ? " is-active" : ""}`}
+                onClick={() => setMode(tab.key)}
+              >
+                <Icon aria-hidden="true" />
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      ) : null}
 
       {isEmpty ? (
         <div className="home-for-you-empty" role="status">

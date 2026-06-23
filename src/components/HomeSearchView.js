@@ -215,7 +215,13 @@ export default function HomeSearchView() {
         </div>
       </section>
 
-      <StreamList language={language} copy={search.forYou} defaultMode="event" />
+      {/* Events live in the coverflow rail above; this stream lists issues only. */}
+      <StreamList
+        language={language}
+        copy={search.forYou}
+        defaultMode="issue"
+        showModeTabs={false}
+      />
     </SiteShell>
   );
 }

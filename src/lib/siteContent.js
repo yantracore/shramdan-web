@@ -1151,8 +1151,8 @@ export const copy = {
       },
       forYou: {
         eyebrow: "तपाईंका लागि",
-        title: "नजिकैका अभियान र समस्या",
-        intro: "तपाईंको ठाउँ नजिकैका लाइभ अभियान, आउँदै गरेका योजना र खुला समस्याहरू।",
+        title: "नजिकैका समस्याहरू",
+        intro: "तपाईंको ठाउँ नजिकैका खुला समस्या, तालिकामा परेका र समाधान भइसकेका।",
         viewLink: "विवरण",
         emptyMessage: "अहिले देखाउन कुनै कुरा छैन।",
         statusLabels: {
@@ -2954,8 +2954,8 @@ export const copy = {
       },
       forYou: {
         eyebrow: "For you",
-        title: "Nearby campaigns + issues",
-        intro: "Live campaigns, upcoming events, and open issues near you.",
+        title: "Nearby issues",
+        intro: "Open issues near you — open, scheduled, and resolved.",
         viewLink: "View detail",
         emptyMessage: "Nothing to show right now.",
         statusLabels: {

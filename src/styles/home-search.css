@@ -497,14 +497,10 @@
 
 .home-for-you-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
-}
-
-@media (max-width: 1024px) {
-  .home-for-you-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+  /* Compact, auto-filling thumbs — narrower cards mean more per row on
+   * wider screens (4–5), so the issue list reads as a dense overview. */
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 14px;
 }
 
 @media (max-width: 640px) {
@@ -513,14 +509,14 @@
     margin-top: 24px;
   }
   .home-for-you-grid {
-    grid-template-columns: 1fr;
-    gap: 14px;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
   }
 }
 
 .home-for-you-card {
   position: relative;
-  border-radius: 16px;
+  border-radius: 14px;
   overflow: hidden;
   background: color-mix(in srgb, var(--surface) 70%, transparent);
   -webkit-backdrop-filter: blur(18px) saturate(1.2);
@@ -548,7 +544,8 @@
 
 .home-for-you-card-poster {
   position: relative;
-  aspect-ratio: 16 / 10;
+  /* Shorter than the old 16/10 — smaller, more compact thumbnails. */
+  aspect-ratio: 16 / 9;
   overflow: hidden;
 }
 
@@ -566,13 +563,13 @@
 
 .home-for-you-card-badge {
   position: absolute;
-  top: 10px;
-  left: 10px;
+  top: 8px;
+  left: 8px;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
-  font-size: 11px;
+  gap: 5px;
+  padding: 3px 8px;
+  font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -627,13 +624,13 @@
  * the status badge (top-left) so users can scan both at a glance. */
 .home-for-you-card-distance {
   position: absolute;
-  bottom: 10px;
-  right: 10px;
+  bottom: 8px;
+  right: 8px;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
-  font-size: 11px;
+  gap: 5px;
+  padding: 3px 8px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.02em;
   border-radius: 999px;
@@ -661,14 +658,14 @@
 
 .home-for-you-card-body {
   display: grid;
-  gap: 10px;
-  padding: 16px 16px 18px;
+  gap: 7px;
+  padding: 11px 12px 13px;
   align-content: start;
 }
 
 .home-for-you-card-body h3 {
   margin: 0;
-  font-size: 17px;
+  font-size: 15px;
   line-height: 1.3;
   color: var(--text);
   /* Cap at two lines so the grid stays even-height. */
@@ -679,11 +676,25 @@
   overflow: hidden;
 }
 
+/* Issue summary under the title — capped at two lines so compact cards
+ * stay even-height. Only renders when the issue carries a description. */
+.home-for-you-card-desc {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: var(--muted);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
 .home-for-you-card-meta {
   display: grid;
-  gap: 6px;
+  gap: 5px;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .home-for-you-card-address,
@@ -702,13 +713,13 @@
 }
 
 .home-for-you-card-cta {
-  margin-top: 2px;
+  margin-top: 1px;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   color: var(--primary-dark);
   font-weight: 700;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 @media (prefers-reduced-motion: reduce) {
