@@ -296,7 +296,13 @@ export function useRoleSupport(
     // Vote state (mirrors useIssueVote surface)
     isAuthenticated,
     voteCount,
-    voted,
+    // Reflect the resolved myVote (from fetchMyIssueVotes) in the voted face.
+    // useIssueVote only knows seed.isVoted, so on the detail page (controlled +
+    // eager) a pre-existing vote — e.g. the viewer is already the coordinator —
+    // must surface through myVote, else the topline button wrongly reads
+    // "समर्थन गर्ने". Cards stay correct: lazy (non-eager) myVote is null until
+    // the modal opens, so they keep relying on seed.isVoted.
+    voted: voted || Boolean(myVote),
     voting,
     voterRole: myVote?.voterRole ?? null,
     eventRole: myVote?.eventRole ?? null,
