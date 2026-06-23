@@ -32,7 +32,6 @@ import {
 import { copy } from "@/lib/siteContent";
 import { useTrackVisit } from "@/lib/useRecentlyViewed";
 import { issueActionMode } from "@/lib/issueActions";
-import { resolveEventForIssue } from "@/lib/eventsApi";
 import {
   ISSUE_STATUS_COLORS,
   getIssueCoverImageUrl,
@@ -73,14 +72,10 @@ export default function IssueDetailPage() {
   // OPEN → Support (vote); EVENT_SCHEDULED → Join; otherwise no primary action.
   const actionMode = issue ? issueActionMode(issue.status) : "none";
   const [related, setRelated] = useState([]);
-  // Routing target for the Join CTA on a promoted (EVENT_SCHEDULED) issue. The
-  // issue read omits its event, so we recover it client-side (interim — see
-  // resolveEventForIssue). Until it resolves the button shows the "soon" cue.
-  const [resolvedEventId, setResolvedEventId] = useState(null);
-  // The linked event's own status (DRAFT | SCHEDULED | ACTIVE | PAUSED |
-  // COMPLETED | CANCELLED) — the fine-grained lifecycle the issue's coarse
-  // EVENT_SCHEDULED hides. Feeds the status timeline below.
-  const [resolvedEventStatus, setResolvedEventStatus] = useState(null);
+  // The promoted issue's linked event (routing target for the Join CTA + the
+  // fine-grained event lifecycle the issue's coarse EVENT_SCHEDULED hides) is
+  // resolved once inside useRoleSupport — read off `support` below — so the
+  // Coordinator slot, Join CTA, and status timeline all share one lookup.
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [notFound, setNotFound] = useState(false);
@@ -112,24 +107,6 @@ export default function IssueDetailPage() {
         return;
       }
       setIssue(data);
-
-      // Promoted issue → recover its scheduled event so the Join CTA can route
-      // to the real join flow on the event page (the issue read omits the link;
-      // interim client-side match — see resolveEventForIssue).
-      if (issueActionMode(data.status) === "join") {
-        resolveEventForIssue(data)
-          .then((linked) => {
-            setResolvedEventId(linked?.slug || linked?.id || null);
-            setResolvedEventStatus(linked?.status || null);
-          })
-          .catch(() => {
-            setResolvedEventId(null);
-            setResolvedEventStatus(null);
-          });
-      } else {
-        setResolvedEventId(null);
-        setResolvedEventStatus(null);
-      }
 
       if (data.category) {
         try {
@@ -285,7 +262,7 @@ export default function IssueDetailPage() {
                   ) : actionMode === "join" ? (
                     <IssueJoinButton
                       issue={issue}
-                      eventId={resolvedEventId}
+                      eventId={support.resolvedEventId}
                       language={language}
                       size="large"
                     />
@@ -338,7 +315,7 @@ export default function IssueDetailPage() {
               <section className="public-issue-detail-section-block public-issue-timeline-block">
                 <IssueStatusTimeline
                   status={issue.status}
-                  eventStatus={resolvedEventStatus}
+                  eventStatus={support.resolvedEventStatus}
                   content={content}
                   language={language}
                 />

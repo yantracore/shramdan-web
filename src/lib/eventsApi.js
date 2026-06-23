@@ -242,17 +242,25 @@ export async function getEventById(eventId, { language = "np" } = {}) {
 // issue's own district (province as fallback) — which cuts the candidate set
 // hard — and match `issueId` client-side to recover the routing target.
 //
-// Returns `{ id, slug, status }` for the linked event, or null. Routing uses
-// slug-or-id; `status` lets callers pick the right join affordance (DRAFT →
-// Join+Lead, SCHEDULED → Join-as-Role, ACTIVE → Join-as-Worker). Drop this the
-// moment `GET /issues/{id}` embeds `event { id, slug, status, ... }`.
+// Returns `{ id, slug, status, eventLeaderId, eventLeader }` for the linked
+// event, or null. Routing uses slug-or-id; `status` lets callers pick the right
+// join affordance (DRAFT → Join+Lead, SCHEDULED → Join-as-Role, ACTIVE →
+// Join-as-Worker); `eventLeader` (+ id) lets the issue surface show its
+// resolved Coordinator filled (the event list carries the leader inline). Drop
+// this the moment `GET /issues/{id}` embeds `event { id, slug, status, ... }`.
 export async function resolveEventForIssue(issue) {
   if (!issue?.id) return null;
   // Forward-compatible: if the backend ever lands the link on the issue, use it
   // straight away and skip the lookup entirely.
   const embedded = issue.event;
   if (embedded?.id || embedded?.slug) {
-    return { id: embedded.id || null, slug: embedded.slug || null, status: embedded.status || null };
+    return {
+      id: embedded.id || null,
+      slug: embedded.slug || null,
+      status: embedded.status || null,
+      eventLeaderId: embedded.eventLeaderId ?? null,
+      eventLeader: embedded.eventLeader ?? null
+    };
   }
   const districtId = issue.districtId || issue.district?.id || null;
   const provinceId = issue.provinceId || issue.province?.id || null;
@@ -263,7 +271,13 @@ export async function resolveEventForIssue(issue) {
     const response = await getJson("/events", { params });
     const match = getListItems(response).find((ev) => ev.issueId === issue.id);
     if (!match) return null;
-    return { id: match.id || null, slug: match.slug || null, status: match.status || null };
+    return {
+      id: match.id || null,
+      slug: match.slug || null,
+      status: match.status || null,
+      eventLeaderId: match.eventLeaderId ?? null,
+      eventLeader: match.eventLeader ?? null
+    };
   } catch {
     return null;
   }

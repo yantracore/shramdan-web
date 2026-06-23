@@ -16,6 +16,7 @@ import {
 } from "@/lib/apiClient";
 import { getAuthSession, subscribeAuthSession } from "@/lib/authSession";
 import { getListItems } from "@/lib/adminUtils";
+import { resolveEventForIssue } from "@/lib/eventsApi";
 
 // Role menu order shared with the issue page and event page.
 // COORDINATOR is intentionally excluded — coordination is now exclusively the
@@ -52,6 +53,10 @@ export function useRoleSupport(
   const [issue, setIssue] = useState(seed);
   const [myVote, setMyVote] = useState(null);
   const [participants, setParticipants] = useState([]);
+  // The linked campaign event, recovered for a promoted/closed issue so the
+  // Coordinator (core) slot can show its resolved leader and the page can route
+  // the Join CTA. null while OPEN (no event yet) or before it resolves.
+  const [linkedEvent, setLinkedEvent] = useState(null);
 
   // Called by useIssueVote's onVoteChange callback after every confirmed
   // mutation. Payload is { voterRole, eventRole, ...serverData } on a vote,
@@ -136,6 +141,15 @@ export function useRoleSupport(
         : null
     );
     setParticipants(getListItems(partsRes));
+    // Promoted/closed issue → recover its campaign event so the Coordinator slot
+    // can show the resolved leader (the issue read carries no leader/event link)
+    // and the page can route the Join CTA without resolving a second time.
+    if (data?.status && data.status !== "OPEN") {
+      const linked = await resolveEventForIssue(data).catch(() => null);
+      setLinkedEvent(linked || null);
+    } else {
+      setLinkedEvent(null);
+    }
   }, [issueId, seed]);
 
   // ── ensureLoaded — loads at most once per issueId ─────────────────────────
@@ -150,6 +164,7 @@ export function useRoleSupport(
     setIssue(seed);
     setMyVote(null);
     setParticipants([]);
+    setLinkedEvent(null);
     setLoading(true);
     try {
       await load();
@@ -206,15 +221,19 @@ export function useRoleSupport(
 
   const viewerIsLeader = myVote?.voterRole === "WANT_TO_LEAD";
 
-  const leaderSlot =
-    isOpenIssue || viewerIsLeader
-      ? {
-          viewerIsLeader,
-          name: viewerIsLeader ? viewerName : null,
-          count: viewerIsLeader ? 1 : 0,
-          canLead: isOpenIssue && !myVote
-        }
-      : null;
+  // Coordinator is a CORE role, so the slot ALWAYS shows (never null). It's
+  // filled by the viewer's own WANT_TO_LEAD offer, or — once the issue is
+  // promoted — by the linked event's resolved leader (the issue read itself
+  // carries no leader). An unled OPEN issue shows the "offer to lead" CTA; a
+  // promoted/closed issue is read-only (leadership moves to the event by then).
+  const eventLeaderName = linkedEvent?.eventLeader?.name || null;
+  const eventHasLeader = Boolean(linkedEvent?.eventLeaderId || eventLeaderName);
+  const leaderSlot = {
+    viewerIsLeader,
+    name: viewerIsLeader ? viewerName : eventLeaderName,
+    count: viewerIsLeader || eventHasLeader ? 1 : 0,
+    canLead: isOpenIssue && !myVote
+  };
 
   const progress =
     isOpenIssue && Number(issue?.conversionThreshold) > 0
@@ -281,6 +300,11 @@ export function useRoleSupport(
     voting,
     voterRole: myVote?.voterRole ?? null,
     eventRole: myVote?.eventRole ?? null,
+    // Resolved linked event for a promoted/closed issue (slug-or-id + status) —
+    // exposed so the page routes its Join CTA + status timeline off the same
+    // lookup the Coordinator slot uses, instead of resolving the event twice.
+    resolvedEventId: linkedEvent?.slug || linkedEvent?.id || null,
+    resolvedEventStatus: linkedEvent?.status || null,
     // Retract — exposed so IssueVoteButton's withdraw Popconfirm can call it.
     retract,
     // Panel contract for SupportRolesModal / ParticipantsPanel
