@@ -24,6 +24,11 @@ import {
   ISSUE_PICKER_FIELD_MAP
 } from "@/lib/adminUtils";
 import { useStepFormErrors } from "@/hooks/useStepFormErrors";
+import {
+  ISSUE_TEXT_LIMITS,
+  minCharsValidator,
+  minWordsValidator
+} from "@/lib/issueFormValidation";
 import { getAuthSession } from "@/lib/authSession";
 import { buildLoginHref } from "@/lib/loginRedirect";
 import { copy } from "@/lib/siteContent";
@@ -278,6 +283,53 @@ export default function NewIssuePage() {
     [labels.categories]
   );
 
+  // Title + description validation: required → min characters → min words, with
+  // messages carrying locale-aware digits. Built here (not module-level) so the
+  // numbers render as Devanagari in NP. See lib/issueFormValidation.js.
+  const { titleRules, descriptionRules, titleHint, descriptionHint } = useMemo(() => {
+    const nd = (n) => localizeDigits(n, language);
+    const tl = ISSUE_TEXT_LIMITS.title;
+    const dl = ISSUE_TEXT_LIMITS.description;
+    return {
+      titleRules: [
+        { required: true, whitespace: true, message: fields.titleRequired },
+        {
+          validator: minCharsValidator(
+            tl.minChars,
+            fields.titleMinChars.replace("{n}", nd(tl.minChars))
+          )
+        },
+        {
+          validator: minWordsValidator(
+            tl.minWords,
+            fields.titleMinWords.replace("{n}", nd(tl.minWords))
+          )
+        }
+      ],
+      descriptionRules: [
+        { required: true, whitespace: true, message: fields.descriptionRequired },
+        {
+          validator: minCharsValidator(
+            dl.minChars,
+            fields.descriptionMinChars.replace("{n}", nd(dl.minChars))
+          )
+        },
+        {
+          validator: minWordsValidator(
+            dl.minWords,
+            fields.descriptionMinWords.replace("{n}", nd(dl.minWords))
+          )
+        }
+      ],
+      titleHint: fields.titleHint
+        .replace("{c}", nd(tl.minChars))
+        .replace("{w}", nd(tl.minWords)),
+      descriptionHint: fields.descriptionHint
+        .replace("{c}", nd(dl.minChars))
+        .replace("{w}", nd(dl.minWords))
+    };
+  }, [fields, language]);
+
   const handleAddressSuggestion = (suggested) => {
     if (addressTouchedRef.current) return;
     if (!suggested) return;
@@ -489,18 +541,26 @@ export default function NewIssuePage() {
                 <Form.Item
                   name="title"
                   label={fields.title}
-                  rules={[{ required: true, message: fields.titleRequired }]}
+                  extra={titleHint}
+                  validateFirst
+                  rules={titleRules}
                 >
-                  <Input autoFocus maxLength={140} placeholder={fields.titlePlaceholder} />
+                  <Input
+                    autoFocus
+                    maxLength={ISSUE_TEXT_LIMITS.title.maxChars}
+                    placeholder={fields.titlePlaceholder}
+                  />
                 </Form.Item>
                 <Form.Item
                   name="description"
                   label={fields.description}
-                  rules={[{ required: true, message: fields.descriptionRequired }]}
+                  extra={descriptionHint}
+                  validateFirst
+                  rules={descriptionRules}
                 >
                   <Input.TextArea
                     rows={6}
-                    maxLength={2000}
+                    maxLength={ISSUE_TEXT_LIMITS.description.maxChars}
                     showCount
                     placeholder={fields.descriptionPlaceholder}
                   />
@@ -529,7 +589,7 @@ export default function NewIssuePage() {
                   name="addressText"
                   label={fields.address}
                   extra={fields.addressFromMap}
-                  rules={[{ required: true, message: fields.addressRequired }]}
+                  rules={[{ required: true, whitespace: true, message: fields.addressRequired }]}
                 >
                   <Input
                     placeholder={fields.addressPlaceholder}
