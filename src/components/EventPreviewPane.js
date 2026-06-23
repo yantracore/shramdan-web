@@ -13,6 +13,7 @@ import {
 } from "@ant-design/icons";
 import { EventCommentsSummary } from "@/components/EventCommentsSummary";
 import { EventLiveStreamPlayer } from "@/components/EventLiveStreamPlayer";
+import { EventJoinButton } from "@/components/EventJoinButton";
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 
@@ -406,6 +407,11 @@ export function EventPreviewPane({
         <EventCommentsSummary eventId={event.id} language={language} />
 
         <div className="event-preview-actions">
+          <EventJoinButton
+            eventId={event.id}
+            seed={event}
+            language={language}
+          />
           <Link
             className="event-preview-open"
             href={`/events/${event.slug ?? event.id}`}
