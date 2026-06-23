@@ -8442,114 +8442,158 @@
   width: 100%;
 }
 
-/* Compact 4-stat strip shared by /events and /issues. Sits inside
-   .public-issues-toolbar above the filter row, so the page chrome
-   stays visually identical when toggling between the two tabs. */
-.activity-stats-row {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 8px;
+/* Five-step lifecycle funnel shared by home, /events and /issues:
+   OPEN → FORMING → SCHEDULED → LIVE → COMPLETED, each showing how many
+   activities currently sit in that state. One glassy rail with a connector
+   line threading the markers left to right, so the whole journey reads at a
+   glance and the counts show work flowing through it. */
+.activity-funnel {
+  display: flex;
+  align-items: flex-start;
   list-style: none;
   margin: 0;
-  padding: 0;
+  padding: 14px 10px;
+  border: 1px solid color-mix(in srgb, var(--line) 55%, transparent);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--surface) 72%, transparent);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  backdrop-filter: blur(18px) saturate(1.2);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.3) inset,
+    0 12px 32px rgba(23, 33, 28, 0.1);
 }
 
-.activity-stat-chip {
+.activity-funnel-step {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
   margin: 0;
 }
 
-.activity-stat-chip-link {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: var(--surface);
-  color: var(--text);
-  text-decoration: none;
-  line-height: 1.1;
-  transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
-}
-
-.activity-stat-chip-link:hover {
-  border-color: color-mix(in srgb, var(--primary) 45%, var(--line));
-  background: color-mix(in srgb, var(--primary) 6%, var(--surface));
+/* Connector line into each step from the one before, pinned to the marker's
+   vertical centre. Marker rings paint over its ends so it reads as one rail. */
+.activity-funnel-step:not(:first-child)::before {
+  content: "";
+  position: absolute;
+  top: 19px;
+  right: 50%;
+  width: 100%;
+  height: 2px;
+  background: color-mix(in srgb, var(--line) 80%, transparent);
   transform: translateY(-1px);
+  z-index: 0;
 }
 
-.activity-stat-chip-link:focus-visible {
+.activity-funnel-link,
+.activity-funnel-static {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 0 4px;
+  text-decoration: none;
+  color: var(--text);
+  border-radius: 12px;
+  transition: transform 160ms ease;
+}
+
+.activity-funnel-link:hover {
+  transform: translateY(-2px);
+}
+
+.activity-funnel-link:hover .activity-funnel-marker {
+  box-shadow:
+    0 0 0 4px color-mix(in srgb, var(--surface) 80%, transparent),
+    0 6px 16px rgba(23, 33, 28, 0.18);
+}
+
+.activity-funnel-link:focus-visible {
   outline: 2px solid var(--primary);
-  outline-offset: 2px;
+  outline-offset: 3px;
 }
 
-.activity-stat-chip-icon {
+.activity-funnel-marker {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 26px;
-  height: 26px;
-  border-radius: 8px;
-  background: color-mix(in srgb, var(--primary) 12%, transparent);
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--surface);
   color: var(--primary);
-  font-size: 14px;
+  font-size: 16px;
   flex: 0 0 auto;
+  /* Solid ring masks the connector line right at the marker. */
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--surface) 80%, transparent);
+  transition: box-shadow 160ms ease;
 }
 
-.activity-stats-row .stat-live .activity-stat-chip-icon {
-  background: color-mix(in srgb, #e02b20 14%, transparent);
-  color: #c41a10;
-}
-.activity-stats-row .stat-upcoming .activity-stat-chip-icon,
-.activity-stats-row .stat-scheduled .activity-stat-chip-icon {
-  background: color-mix(in srgb, #2563eb 14%, transparent);
-  color: #1d4ed8;
-}
-.activity-stats-row .stat-completed .activity-stat-chip-icon {
-  background: color-mix(in srgb, #16a34a 14%, transparent);
-  color: #15803d;
-}
-.activity-stats-row .stat-open .activity-stat-chip-icon,
-.activity-stats-row .stat-issues .activity-stat-chip-icon {
-  background: color-mix(in srgb, #d97706 14%, transparent);
+/* Phase tints flow warm → cool → hot → green, mirroring the journey. */
+.activity-funnel .step-open .activity-funnel-marker {
+  background: color-mix(in srgb, #d97706 16%, var(--surface));
   color: #b45309;
 }
-.activity-stats-row .stat-participants .activity-stat-chip-icon,
-.activity-stats-row .stat-votes .activity-stat-chip-icon {
-  background: color-mix(in srgb, #7c3aed 14%, transparent);
+.activity-funnel .step-forming .activity-funnel-marker {
+  background: color-mix(in srgb, #7c3aed 16%, var(--surface));
   color: #6d28d9;
 }
+.activity-funnel .step-scheduled .activity-funnel-marker {
+  background: color-mix(in srgb, #2563eb 16%, var(--surface));
+  color: #1d4ed8;
+}
+.activity-funnel .step-live .activity-funnel-marker {
+  background: color-mix(in srgb, #e02b20 16%, var(--surface));
+  color: #c41a10;
+}
+.activity-funnel .step-completed .activity-funnel-marker {
+  background: color-mix(in srgb, #16a34a 16%, var(--surface));
+  color: #15803d;
+}
 
-.activity-stat-chip-value {
-  font-size: 18px;
+.activity-funnel-count {
+  font-size: 19px;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.01em;
-  flex: 0 0 auto;
+  line-height: 1.1;
 }
 
-.activity-stat-chip-label {
-  font-size: 12px;
+.activity-funnel-label {
+  font-size: 11.5px;
   font-weight: 600;
   color: var(--muted);
-  letter-spacing: 0.02em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  min-width: 0;
-  flex: 1 1 auto;
+  text-align: center;
+  line-height: 1.2;
+  word-break: break-word;
 }
 
-:root[data-theme="dark"] .activity-stat-chip-link {
-  background: color-mix(in srgb, var(--surface) 92%, transparent);
+:root[data-theme="dark"] .activity-funnel {
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+}
+:root[data-theme="dark"] .activity-funnel-marker {
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--surface) 90%, transparent);
 }
 
-@media (max-width: 720px) {
-  .activity-stats-row {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+@media (prefers-reduced-transparency: reduce) {
+  .activity-funnel {
+    background: var(--surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
   }
-  .activity-stat-chip-link {
-    padding: 9px 12px;
+}
+
+/* Below ~560px the funnel scrolls horizontally rather than wrapping — a
+   wrapped funnel loses its left-to-right meaning. */
+@media (max-width: 560px) {
+  .activity-funnel {
+    overflow-x: auto;
+    padding: 12px 8px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .activity-funnel-step {
+    flex: 0 0 84px;
   }
 }
 

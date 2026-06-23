@@ -2,14 +2,13 @@
 
 import {
   CalendarOutlined,
-  CheckCircleOutlined,
+  CheckCircleFilled,
+  FireFilled,
   FlagOutlined,
-  LikeOutlined,
-  RiseOutlined,
-  TeamOutlined,
-  ThunderboltOutlined
+  TeamOutlined
 } from "@ant-design/icons";
 import Link from "next/link";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { listAllEvents } from "@/lib/eventsApi";
 import { getJson } from "@/lib/apiClient";
@@ -33,7 +32,6 @@ function useCountUp(target, duration = 1000) {
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     return reduced ? target : 0;
   });
-  const startedRef = useRef(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return undefined;
@@ -48,7 +46,6 @@ function useCountUp(target, duration = 1000) {
       setValue(0);
       return undefined;
     }
-    startedRef.current = true;
     const startTime = performance.now();
     let raf;
     const tick = (now) => {
@@ -67,182 +64,176 @@ function useCountUp(target, duration = 1000) {
   return value;
 }
 
-function StatChipValue({ target, language }) {
+function FunnelCount({ target, language }) {
   const value = useCountUp(target);
   return (
-    <span className="activity-stat-chip-value">
+    <span className="activity-funnel-count">
       {localizeDigits(value, language)}
     </span>
   );
 }
 
+// The same five-step lifecycle the IssueStatusTimeline draws, reused here as a
+// left-to-right funnel: how many activities currently sit in each state. A
+// citizen's issue is born OPEN, gets promoted (FORMING), the event is dated
+// (SCHEDULED), runs (LIVE), and finishes (COMPLETED). The line tells the whole
+// story; the counts show the work flowing through it.
+//
+// Each step also owns a destination. OPEN/FORMING belong to the issue (it's not
+// an event yet), so they route to /issues; once dated the campaign is an event,
+// so SCHEDULED/LIVE/COMPLETED route to /events. When the step's page IS the page
+// you're on, we only swap the status param (preserving the rest of the URL);
+// otherwise it's a cross-page jump. Home renders the rail read-only.
+const STEPS = [
+  { key: "OPEN", icon: FlagOutlined, page: "issues", param: ["status", "OPEN"] },
+  {
+    key: "FORMING",
+    icon: TeamOutlined,
+    page: "issues",
+    param: ["status", "EVENT_SCHEDULED"]
+  },
+  {
+    key: "SCHEDULED",
+    icon: CalendarOutlined,
+    page: "events",
+    param: ["show", "upcoming"]
+  },
+  { key: "LIVE", icon: FireFilled, page: "events", param: ["show", "live"] },
+  {
+    key: "COMPLETED",
+    icon: CheckCircleFilled,
+    page: "events",
+    param: ["show", "past"]
+  }
+];
+
 const COPY = {
   np: {
-    events: {
-      ariaLabel: "अभियानको झलक",
-      live: "लाइभ",
-      upcoming: "आउँदै",
-      completed: "सम्पन्न",
-      participants: "सहभागी"
-    },
-    issues: {
-      ariaLabel: "समस्याको झलक",
-      open: "खुला",
-      scheduled: "तालिका मिल्यो",
-      completed: "समाधान",
-      votes: "मत"
+    ariaLabel: "गतिविधिको चरण",
+    steps: {
+      OPEN: "खुला",
+      FORMING: "छानिएको",
+      SCHEDULED: "मिति तय",
+      LIVE: "चलिरहेको",
+      COMPLETED: "सम्पन्न"
     }
   },
   en: {
-    events: {
-      ariaLabel: "Event glance",
-      live: "Live",
-      upcoming: "Upcoming",
-      completed: "Completed",
-      participants: "Participants"
-    },
-    issues: {
-      ariaLabel: "Issue glance",
-      open: "Open",
-      scheduled: "Scheduled",
-      completed: "Resolved",
-      votes: "Votes"
+    ariaLabel: "Activity funnel",
+    steps: {
+      OPEN: "Open",
+      FORMING: "Selected",
+      SCHEDULED: "Scheduled",
+      LIVE: "Ongoing",
+      COMPLETED: "Complete"
     }
   }
 };
 
-function eventsTiles(t, buckets) {
-  const { live, upcoming, past } = buckets;
-  const participants = [...live, ...upcoming, ...past].reduce(
-    (sum, e) => sum + (Number(e?.participantCount) || 0),
-    0
-  );
-  return [
-    {
-      key: "live",
-      icon: ThunderboltOutlined,
-      label: t.live,
-      value: live.length,
-      href: "/events?show=live"
-    },
-    {
-      key: "upcoming",
-      icon: RiseOutlined,
-      label: t.upcoming,
-      value: upcoming.length,
-      href: "/events?show=upcoming"
-    },
-    {
-      key: "completed",
-      icon: CheckCircleOutlined,
-      label: t.completed,
-      value: past.length,
-      href: "/events?show=past"
-    },
-    {
-      key: "participants",
-      icon: TeamOutlined,
-      label: t.participants,
-      value: participants,
-      href: "/impact"
-    }
-  ];
+// One global funnel, identical on every page: pull both datasets and fold each
+// campaign into exactly one step. OPEN/FORMING come off the issue side,
+// SCHEDULED/LIVE/COMPLETED off the event side, so nothing is counted twice.
+// FORMING = promoted issues that haven't surfaced as a public (upcoming/live)
+// event yet — the genuine "selected, awaiting a date" middle.
+function foldCounts(issues, buckets) {
+  const open = issues.filter((i) => i?.status === "OPEN").length;
+  const scheduledIssues = issues.filter(
+    (i) => i?.status === "EVENT_SCHEDULED"
+  ).length;
+  const upcoming = buckets.upcoming.length;
+  const live = buckets.live.length;
+  const past = buckets.past.length;
+  const forming = Math.max(0, scheduledIssues - (upcoming + live));
+  return {
+    OPEN: open,
+    FORMING: forming,
+    SCHEDULED: upcoming,
+    LIVE: live,
+    COMPLETED: past
+  };
 }
 
-function issuesTiles(t, issues) {
-  const byStatus = (status) => issues.filter((i) => i?.status === status).length;
-  const votes = issues.reduce(
-    (sum, i) => sum + (Number(i?.voteCount) || 0),
-    0
-  );
-  return [
-    {
-      key: "open",
-      icon: FlagOutlined,
-      label: t.open,
-      value: byStatus("OPEN"),
-      href: "/issues?status=OPEN"
-    },
-    {
-      key: "scheduled",
-      icon: CalendarOutlined,
-      label: t.scheduled,
-      value: byStatus("EVENT_SCHEDULED"),
-      href: "/issues?status=EVENT_SCHEDULED"
-    },
-    {
-      key: "completed",
-      icon: CheckCircleOutlined,
-      label: t.completed,
-      value: byStatus("COMPLETED"),
-      href: "/issues?status=COMPLETED"
-    },
-    {
-      key: "votes",
-      icon: LikeOutlined,
-      label: t.votes,
-      value: votes,
-      href: "/issues"
-    }
-  ];
-}
+export function ActivityStatsRow({
+  language = "np",
+  interactive = false,
+  currentPage
+}) {
+  const t = COPY[language] || COPY.np;
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
-export function ActivityStatsRow({ language = "np", variant = "events" }) {
-  const t =
-    (COPY[language] && COPY[language][variant]) ||
-    COPY.np[variant] ||
-    COPY.np.events;
-
-  const [buckets, setBuckets] = useState({ live: [], upcoming: [], past: [] });
   const [issues, setIssues] = useState([]);
+  const [buckets, setBuckets] = useState({ live: [], upcoming: [], past: [] });
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
-        if (variant === "issues") {
-          const res = await getJson("/issues", { params: { limit: 100 } });
-          if (!cancelled) setIssues(getListItems(res));
-        } else {
-          const data = await listAllEvents({ language });
-          if (!cancelled) setBuckets(data);
-        }
+        const [issuesRes, eventData] = await Promise.all([
+          getJson("/issues", { params: { limit: 100 } }),
+          listAllEvents({ language })
+        ]);
+        if (cancelled) return;
+        setIssues(getListItems(issuesRes));
+        setBuckets(eventData);
       } catch {
-        if (!cancelled) {
-          setBuckets({ live: [], upcoming: [], past: [] });
-          setIssues([]);
-        }
+        if (cancelled) return;
+        setIssues([]);
+        setBuckets({ live: [], upcoming: [], past: [] });
       }
     })();
-    return () => { cancelled = true; };
-  }, [language, variant]);
+    return () => {
+      cancelled = true;
+    };
+  }, [language]);
 
-  const tiles = useMemo(
-    () => (variant === "issues" ? issuesTiles(t, issues) : eventsTiles(t, buckets)),
-    [variant, t, issues, buckets]
-  );
+  const counts = useMemo(() => foldCounts(issues, buckets), [issues, buckets]);
+
+  const hrefFor = (step) => {
+    const [pkey, pval] = step.param;
+    if (currentPage && step.page === currentPage) {
+      const params = new URLSearchParams(searchParams?.toString() || "");
+      params.set(pkey, pval);
+      const query = params.toString();
+      return query ? `${pathname}?${query}` : pathname;
+    }
+    return `/${step.page}?${pkey}=${pval}`;
+  };
 
   return (
-    <ul
-      className={`activity-stats-row variant-${variant}`}
-      role="list"
+    <ol
+      className={`activity-funnel${interactive ? " is-interactive" : ""}`}
       aria-label={t.ariaLabel}
     >
-      {tiles.map(({ key, icon: Icon, label, value, href }) => (
-        <li key={key} className={`activity-stat-chip stat-${key}`}>
-          <Link
-            href={href}
-            className="activity-stat-chip-link"
-            aria-label={`${label}: ${value}`}
-          >
-            <span className="activity-stat-chip-icon" aria-hidden="true">
+      {STEPS.map((step) => {
+        const { key, icon: Icon } = step;
+        const label = t.steps[key] || key;
+        const value = counts[key] || 0;
+        const body = (
+          <>
+            <span className="activity-funnel-marker" aria-hidden="true">
               <Icon />
             </span>
-            <StatChipValue target={value} language={language} />
-            <span className="activity-stat-chip-label">{label}</span>
-          </Link>
-        </li>
-      ))}
-    </ul>
+            <FunnelCount target={value} language={language} />
+            <span className="activity-funnel-label">{label}</span>
+          </>
+        );
+        return (
+          <li key={key} className={`activity-funnel-step step-${key.toLowerCase()}`}>
+            {interactive ? (
+              <Link
+                href={hrefFor(step)}
+                className="activity-funnel-link"
+                aria-label={`${label}: ${value}`}
+              >
+                {body}
+              </Link>
+            ) : (
+              <div className="activity-funnel-static">{body}</div>
+            )}
+          </li>
+        );
+      })}
+    </ol>
   );
 }
