@@ -130,7 +130,7 @@ export function VideoUploadPanel({ event, language = "np", canUpload, onChanged 
           <Form.Item
             label={t.titleLabel}
             name="title"
-            rules={[{ required: true, message: t.requiredField }]}
+            rules={[{ required: true, whitespace: true, message: t.requiredField }]}
           >
             <Input placeholder={t.titlePlaceholder} maxLength={140} />
           </Form.Item>

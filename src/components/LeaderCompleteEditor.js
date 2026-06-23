@@ -128,7 +128,7 @@ export function LeaderCompleteEditor({ event, content, onSaved }) {
             name="resultSummary"
             help={content.resultSummaryHelp}
             rules={[
-              { required: true, message: content.resultSummaryRequired },
+              { required: true, whitespace: true, message: content.resultSummaryRequired },
               { min: 12, message: content.resultSummaryTooShort }
             ]}
           >

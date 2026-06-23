@@ -269,7 +269,7 @@ export function ContributionIntentPanel({ event, language = "np", onChanged }) {
           <Form.Item
             label={t.notesLabel}
             name="notes"
-            rules={[{ required: true, message: t.requiredField }]}
+            rules={[{ required: true, whitespace: true, message: t.requiredField }]}
           >
             <Input.TextArea rows={4} placeholder={t.notesPlaceholder} maxLength={500} showCount />
           </Form.Item>

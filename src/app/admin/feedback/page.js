@@ -284,7 +284,7 @@ export default function AdminFeedbackPage() {
           <Form.Item
             label="Admin reply"
             name="adminReply"
-            rules={[{ required: true, message: "Admin reply cannot be empty." }]}
+            rules={[{ required: true, whitespace: true, message: "Admin reply cannot be empty." }]}
           >
             <Input.TextArea rows={5} />
           </Form.Item>

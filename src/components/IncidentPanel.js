@@ -410,7 +410,7 @@ export function IncidentPanel({ event, language = "np", canSeeFull, onChanged })
           <Form.Item
             label={t.descriptionLabel}
             name="description"
-            rules={[{ required: true, message: t.requiredField }]}
+            rules={[{ required: true, whitespace: true, message: t.requiredField }]}
           >
             <Input.TextArea
               rows={4}
