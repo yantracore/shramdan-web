@@ -291,6 +291,14 @@ export function ParticipantsPanel({
   onLead,
   onLeaveLead,
   canLeaveLead = false,
+  // Optional authoritative "how many are in" total for the heading badge. When
+  // the page already holds a server-computed total (issues: `attendingCount`,
+  // the GOING tally the conversion bar also reads), pass it here so the badge
+  // and that bar agree by construction — the per-role rows are only a breakdown,
+  // and some committed voters (role-less GOING, COORDINATOR) never land in a
+  // visible row, so summing the rows would undercount. Omit to fall back to the
+  // derived row sum (events, where the roster IS the full picture).
+  totalOverride = null,
   // When the panel is rendered INSIDE another surface (the Support modal), drop
   // its own section chrome (top divider/margin) and the intro line.
   embedded = false,
@@ -371,9 +379,16 @@ export function ParticipantsPanel({
         : t.youreIn;
 
   // Total people committed across all roles (+ the leader) — surfaced as a
-  // count badge by the heading so the panel answers "how many are in?".
-  const totalCount =
+  // count badge by the heading so the panel answers "how many are in?". An
+  // authoritative `totalOverride` (e.g. the issue's GOING `attendingCount`, the
+  // same number the conversion bar shows) wins over the derived row sum so the
+  // badge can never drift from the headline progress.
+  const derivedTotal =
     roles.reduce((sum, r) => sum + (Number(r.count) || 0), 0) + (Number(leaderSlot?.count) || 0);
+  const totalCount =
+    totalOverride === null || totalOverride === undefined
+      ? derivedTotal
+      : Number(totalOverride) || 0;
 
   // Layout: the Cleaner (WORKER) leads as a FULL-WIDTH row — there can be many
   // cleaners, so they need the room for chips. The Coordinator/leader slot is

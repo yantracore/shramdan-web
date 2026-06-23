@@ -215,45 +215,89 @@ export default function IssueDetailPage() {
     fetchIssue();
   }, [fetchIssue]);
 
-  // The Support button bubbles each vote/retract up here so the participation
-  // panel stays in sync without its own re-fetch of the detail. payload is the
-  // server's vote response (voterRole, eventRole, voteCount, attendingCount,
-  // conversionThreshold, status) on a vote, or null on a retract.
+  // Re-pull the issue's server tallies (voteCount / attendingCount /
+  // conversionThreshold / eventRoleCounts / status) AND the named roster after a
+  // vote changes, so the topline conversion bar, the participation panel's count
+  // badge, and every per-role tally all read from ONE fresh server snapshot. The
+  // vote/retract endpoints return no body (201/200, no echo — confirmed against
+  // the OpenAPI), so the server read is the only source of truth for the new
+  // counts; the optimistic nudge in handleVoteChange just keeps the UI snappy
+  // until this lands. eventRoleCounts in particular was never refreshed before,
+  // which is what let the per-role tallies (and the badge built from them) drift.
+  const reconcileParticipation = useCallback(() => {
+    if (!issueId) return;
+    fetchIssueParticipants(issueId, { limit: 100 })
+      .then((res) => setParticipants(getListItems(res)))
+      .catch(() => {});
+    getJson(`/issues/${issueId}`)
+      .then((response) => {
+        const fresh = getResponseData(response, null);
+        if (!fresh) return;
+        setIssue((prev) => {
+          if (!prev) return prev;
+          const next = { ...prev };
+          if (typeof fresh.voteCount === "number") next.voteCount = fresh.voteCount;
+          if (typeof fresh.attendingCount === "number") next.attendingCount = fresh.attendingCount;
+          if (typeof fresh.conversionThreshold === "number")
+            next.conversionThreshold = fresh.conversionThreshold;
+          if (Array.isArray(fresh.eventRoleCounts)) next.eventRoleCounts = fresh.eventRoleCounts;
+          if (fresh.status) next.status = fresh.status;
+          return next;
+        });
+        // A vote can tip the issue past its conversion threshold → it promotes to
+        // EVENT_SCHEDULED. Recover the freshly-linked event so the CTA can flip
+        // from Support to a live Join (mirrors fetchIssue's promotion branch).
+        if (issueActionMode(fresh.status) === "join") {
+          resolveEventForIssue(fresh)
+            .then((linked) => {
+              setResolvedEventId(linked?.slug || linked?.id || null);
+              setResolvedEventStatus(linked?.status || null);
+            })
+            .catch(() => {});
+        }
+      })
+      .catch(() => {});
+  }, [issueId]);
+
+  // The Support button / roster bubble each vote/retract up here so the whole
+  // participation surface stays in sync. payload is { voterRole, eventRole, … }
+  // on a vote, or null on a retract. We apply a correct-signed optimistic nudge
+  // for instant feedback, then reconcile every tally from the server snapshot.
   const handleVoteChange = useCallback(
     (payload) => {
+      // The vote we're replacing — handleVoteChange is recreated when `myVote`
+      // changes (same as the sibling join/lead/interested handlers), so this
+      // closure always reads the live prior vote.
+      const prior = myVote;
+      // attendingCount is the GOING-only conversion tally, so it moves only when
+      // a GOING vote is gained or lost; voteCount moves for any vote gained/lost.
+      // Computing both deltas off the PRIOR vote keeps a role swap honest too.
+      const attendingDelta =
+        (payload?.voterRole === "GOING" ? 1 : 0) - (prior?.voterRole === "GOING" ? 1 : 0);
+      const voteDelta = (payload ? 1 : 0) - (prior ? 1 : 0);
+
       setMyVote(
         payload
           ? { voterRole: payload.voterRole || "INTERESTED", eventRole: payload.eventRole ?? null }
           : null
       );
-      // Move the conversion progress bar immediately off the server's echoed
-      // tallies (retract only echoes voteCount/attendingCount).
       setIssue((prev) => {
         if (!prev) return prev;
         const next = { ...prev };
         // Keep isVoted in step so the topline Support button (which mirrors
         // initialVoted) flips even when the vote came from the roster, not it.
         next.isVoted = Boolean(payload);
-        if (payload && typeof payload === "object") {
-          if (typeof payload.voteCount === "number") next.voteCount = payload.voteCount;
-          if (typeof payload.attendingCount === "number") next.attendingCount = payload.attendingCount;
-          if (typeof payload.conversionThreshold === "number")
-            next.conversionThreshold = payload.conversionThreshold;
-          if (payload.status) next.status = payload.status;
-        } else if (payload === null && typeof next.attendingCount === "number") {
-          // Retract with no server attendingCount → best-effort local decrement
-          // (a GOING vote was the only kind that counted toward attending).
-          next.attendingCount = Math.max(0, next.attendingCount - 1);
+        if (attendingDelta !== 0 && typeof next.attendingCount === "number") {
+          next.attendingCount = Math.max(0, next.attendingCount + attendingDelta);
+        }
+        if (voteDelta !== 0 && typeof next.voteCount === "number") {
+          next.voteCount = Math.max(0, next.voteCount + voteDelta);
         }
         return next;
       });
-      // The vote response doesn't carry the named roster, so re-pull it to give
-      // a fresh GOING signup a face (and drop a withdrawn one).
-      fetchIssueParticipants(issueId, { limit: 100 })
-        .then((res) => setParticipants(getListItems(res)))
-        .catch(() => {});
+      reconcileParticipation();
     },
-    [issueId]
+    [myVote, reconcileParticipation]
   );
 
   // Roster role-row tap → join directly as that role (a GOING vote with the
@@ -431,7 +475,10 @@ export default function IssueDetailPage() {
     // WANT_TO_LEAD vote), rendered separately at the bottom by the panel.
     return PARTICIPANT_ROLE_ORDER.filter((role) => role !== "COORDINATOR").map((role) => {
       const names = namesByRole.get(role) || [];
-      const count = countByRole.has(role) ? countByRole.get(role) : names.length;
+      // eventRoleCounts is authoritative for the tally and the roster for names;
+      // take the max so a just-joined voter still shows a count even in the brief
+      // window before the refreshed eventRoleCounts lands (and vice-versa).
+      const count = Math.max(Number(countByRole.get(role)) || 0, names.length);
       return { role, count, names };
     });
   })();
@@ -635,6 +682,10 @@ export default function IssueDetailPage() {
               <ParticipantsPanel
                 roles={participantRoles}
                 viewer={participantViewer}
+                /* The heading badge reads the GOING `attendingCount` — the exact
+                   number the conversion bar shows — so "Participants N" can never
+                   disagree with "N/threshold joined" in the topline. */
+                totalOverride={Number(issue?.attendingCount) || 0}
                 /* conversion progress shows in the topline (CompactConversionProgress
                    beside the Support button), so the panel doesn't repeat it here */
                 progress={null}
@@ -657,6 +708,7 @@ export default function IssueDetailPage() {
                 panelProps={{
                   roles: participantRoles,
                   viewer: participantViewer,
+                  totalOverride: Number(issue?.attendingCount) || 0,
                   progress: participantProgress,
                   joinableRoles: participantJoinable,
                   canLeave: participantCanLeave,
