@@ -171,11 +171,19 @@ export function useEventJoin(eventId, { seed = null, language = "np", eager = fa
   }, [eager, ensureLoaded]);
 
   // ── Refetch helpers (mirror page's handleJoinChanged / handleLeaveChanged) ───
-  const refetchAll = useCallback(() => {
+  const refetchAll = useCallback(async () => {
     if (isDemoEvent) return;
-    // Force a fresh load by clearing the ref-guard, then re-running load.
-    loadedIdRef.current = null;
-    load();
+    // Reconcile from the server after a mutation. Keep the ref-guard intact
+    // (load() always fetches regardless), and wrap in setLoading so the button
+    // stays disabled during the round-trip — no double-submit, no race window,
+    // and no spurious clear-to-seed flash (which nulling the ref would trigger
+    // on the next ensureLoaded).
+    setLoading(true);
+    try {
+      await load();
+    } finally {
+      setLoading(false);
+    }
   }, [isDemoEvent, load]);
 
   // ── panelProps derivation ─────────────────────────────────────────────────────
