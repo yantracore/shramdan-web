@@ -389,14 +389,14 @@ export default function MePage() {
             <Form.Item
               label={t.profile.name}
               name="name"
-              rules={[{ required: true, message: t.validation.required }]}
+              rules={[{ required: true, whitespace: true, message: t.validation.required }]}
             >
               <Input prefix={<UserOutlined />} />
             </Form.Item>
             <Form.Item
               label={t.profile.username}
               name="username"
-              rules={[{ required: true, message: t.validation.required }]}
+              rules={[{ required: true, whitespace: true, message: t.validation.required }]}
             >
               <Input prefix={<UserOutlined />} />
             </Form.Item>

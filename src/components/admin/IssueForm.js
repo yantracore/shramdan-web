@@ -15,6 +15,7 @@ import {
   buildEnumOptions
 } from "@/lib/adminUtils";
 import { applyApiErrorsToForm } from "@/lib/formErrors";
+import { buildIssueTextRules } from "@/lib/issueFormValidation";
 import { useToast } from "@/lib/toast";
 
 // English defaults keep the admin control center (EN-only) behaving exactly
@@ -28,9 +29,15 @@ const DEFAULT_LABELS = {
   title: "Title",
   titleRequired: "Title is required.",
   titlePlaceholder: "Short, specific summary of the issue",
+  titleMinChars: "Make the title a bit longer — at least {n} characters.",
+  titleMinWords: "Use at least {n} words in the title.",
+  titleHint: "At least {c} characters and {w} words.",
   description: "Description",
   descriptionRequired: "Description is required.",
   descriptionPlaceholder: "What is happening, who is affected, and what needs to change?",
+  descriptionMinChars: "Add a bit more detail — at least {n} characters.",
+  descriptionMinWords: "Use at least {n} words in the description.",
+  descriptionHint: "At least {c} characters and {w} words.",
   category: "Category",
   categoryRequired: "Category is required.",
   categoryPlaceholder: "Select category",
@@ -91,6 +98,9 @@ export function IssueForm({
     () => categoryOptions || buildEnumOptions(ISSUE_CATEGORIES),
     [categoryOptions]
   );
+  // Same min char/word floors + hints the public reporter enforces, localized
+  // via the merged labels. See lib/issueFormValidation.js.
+  const issueTextRules = useMemo(() => buildIssueTextRules(L, language), [L, language]);
 
   const [locationError, setLocationError] = useState(null);
   // The address is already authored on every edit surface, so treat it as
@@ -210,7 +220,9 @@ export function IssueForm({
           className="admin-form-wide"
           name="title"
           label={L.title}
-          rules={[{ required: true, message: L.titleRequired }]}
+          extra={issueTextRules.titleHint}
+          validateFirst
+          rules={issueTextRules.titleRules}
         >
           <Input maxLength={140} placeholder={L.titlePlaceholder} />
         </Form.Item>
@@ -219,7 +231,9 @@ export function IssueForm({
           className="admin-form-wide"
           name="description"
           label={L.description}
-          rules={[{ required: true, message: L.descriptionRequired }]}
+          extra={issueTextRules.descriptionHint}
+          validateFirst
+          rules={issueTextRules.descriptionRules}
         >
           <Input.TextArea
             rows={6}
@@ -260,7 +274,7 @@ export function IssueForm({
           name="addressText"
           label={L.address}
           extra={L.addressFromMap}
-          rules={[{ required: true, message: L.addressRequired }]}
+          rules={[{ required: true, whitespace: true, message: L.addressRequired }]}
         >
           <Input placeholder={L.addressPlaceholder} onChange={handleAddressFieldChange} />
         </Form.Item>

@@ -162,7 +162,7 @@ export function ContributorForm({
   const joinSteps = ms.join.steps;
   const labels = content.join;
   const verifyCopy = labels.verify;
-  const requiredRule = { required: true, message: content.messages.required };
+  const requiredRule = { required: true, whitespace: true, message: content.messages.required };
 
   const [stepIndex, setStepIndex] = useState(0);
   const { applyApiErrors, clearFieldErrors } = useStepFormErrors({

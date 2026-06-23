@@ -13,6 +13,7 @@ import {
   buildEnumOptions
 } from "@/lib/adminUtils";
 import { useStepFormErrors } from "@/hooks/useStepFormErrors";
+import { buildIssueTextRules } from "@/lib/issueFormValidation";
 import { useToast } from "@/lib/toast";
 
 /* Admin create-issue form — multi-step counterpart to the legacy IssueForm.
@@ -50,6 +51,22 @@ const coverImageValidator = (_, cover) =>
   cover?.id || cover?.url
     ? Promise.resolve()
     : Promise.reject(new Error("Cover image is required."));
+
+// Admin control center is EN-only, so the title/description floors are static.
+// Same min char/word limits as the public reporter (lib/issueFormValidation.js).
+const TEXT_RULES = buildIssueTextRules(
+  {
+    titleRequired: "Title is required.",
+    titleMinChars: "Make the title a bit longer — at least {n} characters.",
+    titleMinWords: "Use at least {n} words in the title.",
+    titleHint: "At least {c} characters and {w} words.",
+    descriptionRequired: "Description is required.",
+    descriptionMinChars: "Add a bit more detail — at least {n} characters.",
+    descriptionMinWords: "Use at least {n} words in the description.",
+    descriptionHint: "At least {c} characters and {w} words."
+  },
+  "en"
+);
 
 export function IssueMultiStepForm({
   copy,
@@ -159,14 +176,18 @@ export function IssueMultiStepForm({
             <Form.Item
               name="title"
               label="Title"
-              rules={[{ required: true, message: "Title is required." }]}
+              extra={TEXT_RULES.titleHint}
+              validateFirst
+              rules={TEXT_RULES.titleRules}
             >
               <Input autoFocus maxLength={140} placeholder="Short, specific summary of the issue" />
             </Form.Item>
             <Form.Item
               name="description"
               label="Description"
-              rules={[{ required: true, message: "Description is required." }]}
+              extra={TEXT_RULES.descriptionHint}
+              validateFirst
+              rules={TEXT_RULES.descriptionRules}
             >
               <Input.TextArea
                 rows={6}
@@ -183,7 +204,7 @@ export function IssueMultiStepForm({
             <Form.Item
               name="addressText"
               label="Address"
-              rules={[{ required: true, message: "Address is required." }]}
+              rules={[{ required: true, whitespace: true, message: "Address is required." }]}
             >
               <Input placeholder="Lakeside, Pokhara" />
             </Form.Item>

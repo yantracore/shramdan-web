@@ -49,3 +49,74 @@ export function minWordsValidator(min, message) {
     return Promise.reject(new Error(message));
   };
 }
+
+const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
+
+// App language state uses "np" for Nepali; "ne" accepted defensively (the
+// `<html lang>` / API locale form). Either renders the count in Devanagari.
+function localizeDigits(value, language) {
+  const str = String(value ?? "");
+  if (language !== "np" && language !== "ne") return str;
+  return str.replace(/\d/g, (d) => NP_DIGITS[Number(d)]);
+}
+
+function fill(template, values) {
+  return Object.entries(values).reduce(
+    (out, [key, val]) => out.split(`{${key}}`).join(val),
+    String(template ?? "")
+  );
+}
+
+/* Builds the antd `rules` arrays + inline hints for the issue title and
+ * description from a locale's message templates, so every issue form (public
+ * reporter, member edit, admin create/edit) enforces the SAME floors from one
+ * place. `messages` supplies the templates ({n} = the limit, {c}/{w} = the
+ * char/word minimums in the hint); counts are localised to `language`.
+ *
+ * Required + whitespace fire first (validateFirst on the Form.Item keeps only
+ * the first failure visible), then the min-char and min-word floors. */
+export function buildIssueTextRules(messages, language) {
+  const tl = ISSUE_TEXT_LIMITS.title;
+  const dl = ISSUE_TEXT_LIMITS.description;
+  const nd = (n) => localizeDigits(n, language);
+  const m = messages || {};
+
+  return {
+    titleRules: [
+      { required: true, whitespace: true, message: m.titleRequired },
+      {
+        validator: minCharsValidator(
+          tl.minChars,
+          fill(m.titleMinChars, { n: nd(tl.minChars) })
+        )
+      },
+      {
+        validator: minWordsValidator(
+          tl.minWords,
+          fill(m.titleMinWords, { n: nd(tl.minWords) })
+        )
+      }
+    ],
+    descriptionRules: [
+      { required: true, whitespace: true, message: m.descriptionRequired },
+      {
+        validator: minCharsValidator(
+          dl.minChars,
+          fill(m.descriptionMinChars, { n: nd(dl.minChars) })
+        )
+      },
+      {
+        validator: minWordsValidator(
+          dl.minWords,
+          fill(m.descriptionMinWords, { n: nd(dl.minWords) })
+        )
+      }
+    ],
+    titleHint: m.titleHint
+      ? fill(m.titleHint, { c: nd(tl.minChars), w: nd(tl.minWords) })
+      : undefined,
+    descriptionHint: m.descriptionHint
+      ? fill(m.descriptionHint, { c: nd(dl.minChars), w: nd(dl.minWords) })
+      : undefined
+  };
+}

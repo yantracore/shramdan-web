@@ -17,7 +17,7 @@ export function FeedbackForm({ content, eyebrow, title, intro, onSubmit, submitt
   const [form] = Form.useForm();
   const toast = useToast();
   const labels = content.feedback;
-  const requiredRule = { required: true, message: content.messages.required };
+  const requiredRule = { required: true, whitespace: true, message: content.messages.required };
 
   // The parent's onSubmit performs the API call and THROWS on failure; catch
   // here so backend validation lands inline on the matching field.

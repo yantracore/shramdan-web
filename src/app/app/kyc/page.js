@@ -167,14 +167,14 @@ export default function AppKycPage() {
           <Form.Item
             label={t.idNumberLabel}
             name="idNumber"
-            rules={[{ required: true, message: t.requiredField }]}
+            rules={[{ required: true, whitespace: true, message: t.requiredField }]}
           >
             <Input placeholder={t.idNumberPlaceholder} maxLength={50} prefix={<IdcardOutlined />} />
           </Form.Item>
           <Form.Item
             label={t.fullNameLabel}
             name="fullName"
-            rules={[{ required: true, message: t.requiredField }]}
+            rules={[{ required: true, whitespace: true, message: t.requiredField }]}
           >
             <Input placeholder={t.fullNamePlaceholder} maxLength={120} />
           </Form.Item>
@@ -188,7 +188,7 @@ export default function AppKycPage() {
           <Form.Item
             label={t.addressLabel}
             name="address"
-            rules={[{ required: true, message: t.requiredField }]}
+            rules={[{ required: true, whitespace: true, message: t.requiredField }]}
           >
             <Input.TextArea
               rows={2}
