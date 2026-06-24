@@ -29,21 +29,37 @@ is on, triggering the **same role-picker component**, with the available actions
 limited by lifecycle phase. The participant sees one continuous lifecycle even
 though the underlying entity transitions from issue → event.
 
-| Lifecycle phase | Signal | Button label | Actions in picker |
-|---|---|---|---|
-| Issue open | `issue.status === OPEN` | **Support** | Interested · Join as Role · Lead |
-| Promoted, not yet scheduled | promoted + `event.status === DRAFT` | **Join** | Join as Role · Lead |
-| Scheduled | `event.status === SCHEDULED` | **Join** | Join as Cleaner (WORKER) |
-| Active | `event.status === ACTIVE` | **Join** | Join as Cleaner (WORKER) |
-| Completed | `event.status === COMPLETED` or `issue.status === COMPLETED` | **"Contributed as {role}"** | — (read-only) |
-| Cancelled | `event.status === CANCELLED` | **"Cancelled"** | — (read-only) |
+These are the **only five phases** the CTA worries about. `OPEN` is sourced from
+the issue; the other four are sourced from the **event's status** directly.
 
-**Status taxonomy note.** The lead's clean taxonomy names the promoted-but-draft
-phase `EVENT_DRAFT`; the backend currently reports `issue.status = EVENT_SCHEDULED`
-for it. The frontend does NOT depend on the issue carrying a fine-grained status:
-once an issue is promoted it resolves the linked event (`resolveEventForIssue` →
-`resolvedEventStatus`) and gates on **`event.status`**. Issue status is used only
-to tell `OPEN` (vote) apart from "promoted" (join).
+| Phase | Authoritative source | Button label | Actions in picker |
+|---|---|---|---|
+| `OPEN` | `/issues?status=OPEN` → `issue.status` | **Support** | Interested · Join as Role · Lead |
+| `DRAFT` | `/events?status=DRAFT` → `event.status` | **Join** | Join as Role · Lead |
+| `SCHEDULED` | `/events?status=SCHEDULED` → `event.status` | **Join** | Join as Cleaner (WORKER) |
+| `ACTIVE` | `/events?status=ACTIVE` → `event.status` | **Join** | Join as Cleaner (WORKER) |
+| `COMPLETED` | `/events?status=COMPLETED` → `event.status` | **"Contributed as {role}"** | — (read-only) |
+
+`CANCELLED` (event) is not one of the five; it falls through to a read-only "no
+action" state.
+
+**Status taxonomy note (confirmed live 2026-06-24 via devtunnel).** The backend
+now reports `issue.status = EVENT_DRAFT` on promotion (the old `EVENT_SCHEDULED`
+is retired — that filter now 400s). Valid issue statuses: **`OPEN`,
+`EVENT_DRAFT`, `COMPLETED`**. **Crucially, `issue.status` is still coarse:**
+`EVENT_DRAFT` covers the linked event being `DRAFT`, `SCHEDULED`, `ACTIVE`, *and*
+`CANCELLED` — only `COMPLETED` flips the issue to `COMPLETED`. So the rename did
+NOT make the issue track the fine phase. The frontend therefore gates the
+button/roles on **`event.status`**, resolved via `resolveEventForIssue` →
+`resolvedEventStatus`; `issue.status` only distinguishes `OPEN` (vote) from
+"promoted" (join) and the terminal `COMPLETED`.
+
+`GET /issues/{id}` still does **not** embed an event link (`event` / `eventId`
+absent), so `resolveEventForIssue` (district-list + `issueId` match) is retained.
+A new `eventRoleCounts` field now appears on the issue read — worth exploring as a
+rolePlan-independent source for the DRAFT role menu. A clean backend ask (embed
+`event { id, slug, status }` on the issue read) would let us drop the lookup
+entirely — route handoff to Pranish, out of scope here.
 
 ## Key decisions (confirm in review)
 
