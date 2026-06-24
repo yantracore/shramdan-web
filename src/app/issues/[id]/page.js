@@ -259,10 +259,11 @@ export default function IssueDetailPage() {
                       size="large"
                       type="primary"
                     />
-                  ) : actionMode === "join" ? (
+                  ) : actionMode === "join" || actionMode === "contributed" ? (
                     <IssueJoinButton
                       issue={issue}
                       eventId={support.resolvedEventId}
+                      eventStatus={support.resolvedEventStatus}
                       language={language}
                       size="large"
                     />
