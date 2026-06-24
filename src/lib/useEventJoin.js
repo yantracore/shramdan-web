@@ -22,6 +22,7 @@ import {
   findViewerRoleByName,
   isActiveParticipationStatus
 } from "@/lib/eventParticipants";
+import { eventJoinPhase, PARTICIPANT_ROLE_ORDER } from "@/lib/issueActions";
 import { getResponseData } from "@/lib/adminUtils";
 import { getDemoEventById } from "@/lib/devMockData";
 
@@ -200,10 +201,8 @@ export function useEventJoin(eventId, { seed = null, language = "np", eager = fa
       session?.user?.id === eventData?.eventLeaderId
   );
 
-  // roles: rolesNeeded → ParticipantsPanel shape; COORDINATOR excluded from grid.
-  const participantRoles = (
-    Array.isArray(eventData?.rolesNeeded) ? eventData.rolesNeeded : []
-  )
+  // Real plan rows (rolePlan → rolesNeeded), COORDINATOR excluded from the grid.
+  const planRows = (Array.isArray(eventData?.rolesNeeded) ? eventData.rolesNeeded : [])
     .filter((row) => row.role !== "COORDINATOR")
     .map((row) => ({
       role: row.role,
@@ -211,6 +210,26 @@ export function useEventJoin(eventId, { seed = null, language = "np", eager = fa
       target: row.count,
       names: Array.isArray(row.filledNames) ? row.filledNames : []
     }));
+
+  // Which roles this phase must be able to OFFER, even with no rolePlan:
+  //   all roles (DRAFT) → the full menu;  ["WORKER"] (SCHEDULED/ACTIVE) → cleaner.
+  const scopeRoles =
+    participantJoinableRoles === null
+      ? PARTICIPANT_ROLE_ORDER
+      : participantJoinableRoles;
+
+  // Merge: start from real plan rows, then add any scoped role missing from the
+  // plan as an empty (count 0, no target) row so it renders a Join action.
+  const participantRoles = (() => {
+    const byRole = new Map(planRows.map((r) => [r.role, r]));
+    for (const role of scopeRoles) {
+      if (!byRole.has(role)) byRole.set(role, { role, count: 0, target: null, names: [] });
+    }
+    // Preserve a stable order: known order first, then any plan-only extras.
+    const ordered = PARTICIPANT_ROLE_ORDER.filter((r) => byRole.has(r)).map((r) => byRole.get(r));
+    const extras = planRows.filter((r) => !PARTICIPANT_ROLE_ORDER.includes(r.role));
+    return [...ordered, ...extras];
+  })();
 
   const participantViewer = viewerRole
     ? { role: viewerRole, status: viewerStatus, name: viewerName }
@@ -229,14 +248,11 @@ export function useEventJoin(eventId, { seed = null, language = "np", eager = fa
       ? { current: participantTotalFilled, target: participantTotalTarget, variant: "fill" }
       : null;
 
-  // joinableRoles: ACTIVE → Worker only; DRAFT|SCHEDULED → all (null);
-  // PAUSED|COMPLETED|CANCELLED → nothing ([]).
-  const participantJoinableRoles =
-    eventData?.status === "ACTIVE"
-      ? ["WORKER"]
-      : eventData?.status === "DRAFT" || eventData?.status === "SCHEDULED"
-        ? null
-        : [];
+  // Fine-grained join behaviour from the EVENT's status (issue.status is coarse).
+  const phase = eventJoinPhase(eventData?.status);
+
+  // joinableRoles: null = all roles open; ["WORKER"] = cleaner only; [] = none.
+  const participantJoinableRoles = phase.roleScope;
 
   const participantCanLeave =
     Boolean(viewerRole) &&
@@ -367,10 +383,7 @@ export function useEventJoin(eventId, { seed = null, language = "np", eager = fa
     });
   }, [eventData, eventId, isDemoEvent, jc, messageApi, myParticipation, viewerName]);
 
-  // joinable: whether any role currently accepts a join (drives button label/state).
-  const joinable =
-    participantJoinableRoles === null ||
-    (Array.isArray(participantJoinableRoles) && participantJoinableRoles.length > 0);
+  const joinable = phase.joinable;
 
   const panelProps = {
     roles: participantRoles,
@@ -392,6 +405,7 @@ export function useEventJoin(eventId, { seed = null, language = "np", eager = fa
     loading,
     panelProps,
     joinable,
+    phase,
     viewerRole,
     viewerStatus
   };
