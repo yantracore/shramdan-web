@@ -201,6 +201,12 @@ export function useEventJoin(eventId, { seed = null, language = "np", eager = fa
       session?.user?.id === eventData?.eventLeaderId
   );
 
+  // Fine-grained join behaviour from the EVENT's status (issue.status is coarse).
+  // joinableRoles: null = all roles open; ["WORKER"] = cleaner only; [] = none.
+  // Declared before the role-row build below, which reads participantJoinableRoles.
+  const phase = eventJoinPhase(eventData?.status);
+  const participantJoinableRoles = phase.roleScope;
+
   // Real plan rows (rolePlan → rolesNeeded), COORDINATOR excluded from the grid.
   const planRows = (Array.isArray(eventData?.rolesNeeded) ? eventData.rolesNeeded : [])
     .filter((row) => row.role !== "COORDINATOR")
@@ -247,12 +253,6 @@ export function useEventJoin(eventId, { seed = null, language = "np", eager = fa
     participantTotalTarget > 0
       ? { current: participantTotalFilled, target: participantTotalTarget, variant: "fill" }
       : null;
-
-  // Fine-grained join behaviour from the EVENT's status (issue.status is coarse).
-  const phase = eventJoinPhase(eventData?.status);
-
-  // joinableRoles: null = all roles open; ["WORKER"] = cleaner only; [] = none.
-  const participantJoinableRoles = phase.roleScope;
 
   const participantCanLeave =
     Boolean(viewerRole) &&
