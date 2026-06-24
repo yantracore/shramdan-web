@@ -1,19 +1,24 @@
 // Which primary action an issue surfaces, decided by its lifecycle status.
 //
-//   OPEN        → "support"      voting is open; supporters can still pile on.
-//   EVENT_DRAFT → "join"         promoted into a campaign event; the call to
-//                                action is to take part. (Issue status stays
-//                                EVENT_DRAFT across event DRAFT/SCHEDULED/ACTIVE/
-//                                CANCELLED — the fine phase comes from the event,
-//                                see eventJoinPhase.)
-//   COMPLETED   → "contributed"  campaign done; show the viewer's contribution.
+//   OPEN                          → "support"      voting is open.
+//   EVENT_SCHEDULED / EVENT_DRAFT → "join"         promoted into a campaign
+//                                event; the call to action is to take part.
+//                                Both are accepted while the backend renames
+//                                the promoted status; the issue status stays
+//                                coarse across event DRAFT/SCHEDULED/ACTIVE/
+//                                CANCELLED — the fine phase comes from the
+//                                linked event, see eventJoinPhase.
+//   COMPLETED                     → "contributed"  campaign done; show the
+//                                viewer's contribution.
 //   anything else → "none"
 //
 // Single source of truth shared by every issue surface (detail page, grid card,
 // preview pane) so they all agree on Support-vs-Join-vs-Contributed.
 export function issueActionMode(status) {
   if (status === "OPEN") return "support";
-  if (status === "EVENT_DRAFT") return "join";
+  // Accept both the legacy (EVENT_SCHEDULED) and new (EVENT_DRAFT) promoted
+  // status so the Join CTA works against either backend during the rename.
+  if (status === "EVENT_SCHEDULED" || status === "EVENT_DRAFT") return "join";
   if (status === "COMPLETED") return "contributed";
   return "none";
 }
