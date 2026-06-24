@@ -72,7 +72,7 @@ function timeFromNow(iso, language) {
 const FALLBACK_THUMB = "/images/event-types/cleanup.jpg";
 
 export const EventListCard = forwardRef(function EventListCard(
-  { event, status, selected, language, t, onSelect, optionId },
+  { event, status, selected, language, t, onSelect, optionId, statusLabel: statusLabelOverride },
   ref
 ) {
   const thumb =
@@ -82,12 +82,16 @@ export const EventListCard = forwardRef(function EventListCard(
     if (typeof onSelect === "function") onSelect(event.id);
   };
 
+  // Callers on the unified /campaigns surface pass an explicit label (e.g.
+  // "तयारीमा" for a DRAFT event rendered with the "upcoming" visual). Fall back
+  // to the live/upcoming/past wording when no override is given.
   const statusLabel =
-    status === "live"
+    statusLabelOverride ??
+    (status === "live"
       ? t.filters.live
       : status === "upcoming"
         ? t.filters.upcoming
-        : t.filters.past;
+        : t.filters.past);
 
   const participantCount = computeParticipantCount(event);
 

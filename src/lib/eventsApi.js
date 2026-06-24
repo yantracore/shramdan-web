@@ -218,6 +218,14 @@ export async function listPastEvents({ language = "np", limit = DEFAULT_LIMIT, p
   return fetchEvents({ status: "COMPLETED", limit, language, provinceId, districtId });
 }
 
+// DRAFT events — promoted from an issue, leader/schedule still being settled
+// (leaderVotingStatus + leaderCandidateIds are present; scheduledAt is usually
+// null). Surfaced on the unified /campaigns "तयारीमा / Planning" stage. Cards
+// must render gracefully without a date — see EventListCard's draft handling.
+export async function listDraftEvents({ language = "np", limit = DEFAULT_LIMIT, provinceId, districtId } = {}) {
+  return fetchEvents({ status: "DRAFT", limit, language, provinceId, districtId });
+}
+
 // All buckets in parallel — handy for /events page + /calendar.
 export async function listAllEvents({ language = "np", provinceId, districtId } = {}) {
   const [live, upcoming, past] = await Promise.all([

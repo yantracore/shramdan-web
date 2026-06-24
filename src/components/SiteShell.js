@@ -188,19 +188,20 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
   // Pill nav (>= 1180px): pure navigation, no auth. Login + Join live in the
   // TR user-icon popover. Events and issues carry public count badges across
   // desktop and mobile nav.
+  // Issues + Events merged into one "अभियान / Campaigns" entry → /campaigns,
+  // the unified surface where the status filter spans the whole lifecycle. The
+  // badge sums both public counts since the page now holds both.
+  const campaignsCount =
+    publicCounts
+      ? (publicCounts.issues || 0) + (publicCounts.events || 0)
+      : undefined;
   const pillNavItems = [
     { href: "/", label: t.nav.home },
     {
-      href: "/events",
-      label: t.nav.events,
-      count: formatNavCount(publicCounts?.events, language),
+      href: "/campaigns",
+      label: t.nav.campaigns,
+      count: formatNavCount(campaignsCount, language),
       countTone: "events"
-    },
-    {
-      href: "/issues",
-      label: t.nav.issues,
-      count: formatNavCount(publicCounts?.issues, language),
-      countTone: "issues"
     },
     { href: "/feedback", label: t.nav.feedback },
     { href: "/contribute", label: t.nav.contribute }
@@ -369,7 +370,7 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
 
   const pagesLinks = [
     { href: "/", label: t.nav.home },
-    { href: "/events", label: t.nav.events },
+    { href: "/campaigns", label: t.nav.campaigns },
     { href: "/event-types", label: t.nav.eventTypes }
   ];
   const learnLinks = [

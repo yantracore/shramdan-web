@@ -18,7 +18,10 @@ import { haversineKm } from "@/lib/haversine";
 import { useGeolocation } from "@/lib/useGeolocation";
 import { ISSUE_CATEGORIES } from "@/lib/adminUtils";
 
-const PAGE_COPY = {
+// Exported so the unified /campaigns surface can reuse the exact event-card and
+// event-preview wording without duplicating it. (/events itself redirects to
+// /campaigns; this module stays as the source of that copy + the event list UX.)
+export const PAGE_COPY = {
   np: {
     pageTitle: "अभियानहरू",
     eyebrow: "अभियानहरू",
