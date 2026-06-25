@@ -10,7 +10,6 @@ import {
   AppstoreOutlined,
   CalendarOutlined,
   FileTextOutlined,
-  FlagOutlined,
   HomeOutlined,
   SearchOutlined,
   TeamOutlined,
@@ -23,8 +22,7 @@ import { listAllEvents } from "@/lib/eventsApi";
 
 const STATIC_ROUTES = [
   { id: "home", labels: ["गृहपृष्ठ", "Home"], href: "/", icon: HomeOutlined },
-  { id: "events", labels: ["अभियानहरू", "Events", "Campaigns"], href: "/events", icon: AppstoreOutlined },
-  { id: "issues", labels: ["समस्याहरू", "Issues"], href: "/issues", icon: FlagOutlined },
+  { id: "campaign", labels: ["अभियानहरू", "अभियान", "समस्याहरू", "Campaign", "Campaigns", "Events", "Issues"], href: "/campaign", icon: AppstoreOutlined },
   { id: "event-types", labels: ["कार्यक्षेत्र", "Event types"], href: "/event-types", icon: AppstoreOutlined },
   { id: "intro", labels: ["परिचय", "Intro"], href: "/intro", icon: FileTextOutlined },
   { id: "learn", labels: ["सिकौँ", "Learn", "Docs"], href: "/learn", icon: FileTextOutlined },

@@ -351,7 +351,7 @@ export function StreamList({
               {t.locationCta || (language === "np" ? "नजिकैका देखाउने" : "Show nearby")}
             </button>
           ) : null}
-          <Link className="home-for-you-view-all" href={mode === "event" ? "/events" : "/issues"}>
+          <Link className="home-for-you-view-all" href="/campaign">
             {language === "np" ? "सबै हेर्ने" : "View all"}
             <ArrowRightOutlined aria-hidden="true" />
           </Link>
@@ -389,7 +389,7 @@ export function StreamList({
                 ? "अहिले देखाउन कुनै कुरा छैन।"
                 : "Nothing to show right now.")}
           </p>
-          <Link className="home-for-you-empty-cta" href={mode === "event" ? "/events" : "/issues"}>
+          <Link className="home-for-you-empty-cta" href="/campaign">
             {language === "np"
               ? mode === "event" ? "सबै अभियान हेर्ने" : "सबै समस्या हेर्ने"
               : mode === "event" ? "Browse all events" : "Browse all issues"}

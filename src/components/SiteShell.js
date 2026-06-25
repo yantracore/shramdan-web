@@ -188,7 +188,7 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
   // Pill nav (>= 1180px): pure navigation, no auth. Login + Join live in the
   // TR user-icon popover. Events and issues carry public count badges across
   // desktop and mobile nav.
-  // Issues + Events merged into one "अभियान / Campaigns" entry → /campaigns,
+  // Issues + Events merged into one "अभियान / Campaign" entry → /campaign,
   // the unified surface where the status filter spans the whole lifecycle. The
   // badge sums both public counts since the page now holds both.
   const campaignsCount =
@@ -198,7 +198,7 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
   const pillNavItems = [
     { href: "/", label: t.nav.home },
     {
-      href: "/campaigns",
+      href: "/campaign",
       label: t.nav.campaigns,
       count: formatNavCount(campaignsCount, language),
       countTone: "events"
@@ -370,7 +370,7 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
 
   const pagesLinks = [
     { href: "/", label: t.nav.home },
-    { href: "/campaigns", label: t.nav.campaigns },
+    { href: "/campaign", label: t.nav.campaigns },
     { href: "/event-types", label: t.nav.eventTypes }
   ];
   const learnLinks = [
@@ -696,8 +696,7 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
       <MobileBottomNav
         language={language}
         counts={{
-          events: formatNavCount(publicCounts?.events, language),
-          issues: formatNavCount(publicCounts?.issues, language)
+          campaign: formatNavCount(campaignsCount, language)
         }}
         onMore={() => {
           if (mobileMenuRef.current) {

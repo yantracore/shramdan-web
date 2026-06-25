@@ -134,14 +134,14 @@ export function OnboardingSpotlight({ language = "np" }) {
         </ol>
         <div className="onboarding-actions">
           <Link
-            href="/issues"
+            href="/campaign"
             className="onboarding-cta-primary"
             onClick={dismiss}
           >
             {t.primaryCta}
           </Link>
           <Link
-            href="/events"
+            href="/campaign"
             className="onboarding-cta-secondary"
             onClick={dismiss}
           >

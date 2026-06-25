@@ -211,7 +211,7 @@ export function EventsHomeRail({
             {copy?.subtitle ? <p>{copy.subtitle}</p> : null}
           </div>
           <TertiaryButton
-            href="/events"
+            href="/campaign"
             icon={<ArrowRightOutlined />}
             iconPosition="trailing"
             className="events-home-rail-view-all"

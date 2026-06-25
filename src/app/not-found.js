@@ -44,11 +44,7 @@ export default function NotFoundPage() {
             <HomeOutlined aria-hidden="true" />
             <span>{t.home}</span>
           </Link>
-          <Link className="not-found-action" href="/issues">
-            <span>{t.issues}</span>
-            <ArrowRightOutlined aria-hidden="true" />
-          </Link>
-          <Link className="not-found-action" href="/events">
+          <Link className="not-found-action" href="/campaign">
             <span>{t.events}</span>
             <ArrowRightOutlined aria-hidden="true" />
           </Link>

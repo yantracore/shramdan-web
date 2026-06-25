@@ -313,7 +313,7 @@ export default function ImpactPage() {
                 return (
                   <li key={row.key} className="impact-category-mix-row">
                     <Link
-                      href={`/events?show=past&category=${encodeURIComponent(row.key)}`}
+                      href={`/campaign?category=${encodeURIComponent(row.key)}`}
                       className="impact-category-mix-link"
                     >
                       <span className="impact-category-mix-label">{label}</span>
@@ -438,7 +438,7 @@ export default function ImpactPage() {
         <aside className="impact-cta" role="complementary">
           <h2>{t.ctaTitle}</h2>
           <p>{t.ctaBody}</p>
-          <Link href="/events?show=upcoming" className="impact-cta-btn">
+          <Link href="/campaign" className="impact-cta-btn">
             {t.ctaBtn} <ArrowRightOutlined />
           </Link>
         </aside>

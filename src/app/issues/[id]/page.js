@@ -177,7 +177,7 @@ export default function IssueDetailPage() {
     <SiteShell pageTitle={issue?.title || content.detail.notFoundTitle}>
       <ScrollProgressBar />
       <section className="page-section public-issue-detail-section">
-        <TertiaryButton href="/issues" icon={<ArrowLeftOutlined />}>
+        <TertiaryButton href="/campaign" icon={<ArrowLeftOutlined />}>
           {content.detail.backToList}
         </TertiaryButton>
 
@@ -210,7 +210,7 @@ export default function IssueDetailPage() {
               </>
             }
           >
-            <Link href="/issues">
+            <Link href="/campaign">
               <Button type="primary">{content.detail.backToList}</Button>
             </Link>
           </Empty>

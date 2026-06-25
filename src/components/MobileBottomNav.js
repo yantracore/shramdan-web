@@ -1,10 +1,10 @@
 "use client";
 
-// 5-slot bottom nav that appears only at <=720px viewports. Replaces
+// 4-slot bottom nav that appears only at <=720px viewports. Replaces
 // the hamburger menu as the primary mobile navigation surface — apps
 // generally feel more native with a thumb-reachable tab bar than a
 // top-right hamburger. The tabs map to the highest-frequency citizen
-// actions: home, issues, events, my profile preview, more.
+// actions: home, campaign (unified issues+events), my profile preview, more.
 //
 // The "more" tab opens the existing <details> hamburger menu by
 // dispatching a custom event that SiteShell listens for.
@@ -12,7 +12,6 @@
 import {
   AppstoreOutlined,
   EllipsisOutlined,
-  FlagOutlined,
   HomeOutlined,
   UserOutlined
 } from "@ant-design/icons";
@@ -22,24 +21,30 @@ import { usePathname } from "next/navigation";
 const COPY = {
   np: {
     home: "घर",
-    issues: "समस्या",
-    events: "अभियान",
+    campaign: "अभियान",
     me: "मेरो",
     more: "थप"
   },
   en: {
     home: "Home",
-    issues: "Issues",
-    events: "Events",
+    campaign: "Campaign",
     me: "Me",
     more: "More"
   }
 };
 
+// Issues + events are one entity now ("campaign"), so the two old tabs collapse
+// into one. The match also catches the legacy /issues and /events paths so the
+// tab still highlights during a redirect-in-flight.
 const TABS = [
   { id: "home", href: "/", icon: HomeOutlined, match: (p) => p === "/" },
-  { id: "events", href: "/events", icon: AppstoreOutlined, match: (p) => p?.startsWith("/events") },
-  { id: "issues", href: "/issues", icon: FlagOutlined, match: (p) => p?.startsWith("/issues") },
+  {
+    id: "campaign",
+    href: "/campaign",
+    icon: AppstoreOutlined,
+    match: (p) =>
+      p?.startsWith("/campaign") || p?.startsWith("/events") || p?.startsWith("/issues")
+  },
   { id: "me", href: "/me/preview", icon: UserOutlined, match: (p) => p?.startsWith("/me") }
 ];
 

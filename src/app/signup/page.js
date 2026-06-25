@@ -322,7 +322,7 @@ export default function SignupPage() {
               <Link className="signup-done-primary" href="/app">
                 {t.goDashboard} <ArrowRightOutlined />
               </Link>
-              <Link className="signup-done-secondary" href="/events">
+              <Link className="signup-done-secondary" href="/campaign">
                 {t.goEvents}
               </Link>
             </div>

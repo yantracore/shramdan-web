@@ -232,7 +232,7 @@ export default function AppDashboardPage() {
         >
           <header className="app-dashboard-block-header">
             <h2 id="app-dashboard-upcoming-title">{t.upcomingHeading}</h2>
-            <Link href="/events?show=upcoming" className="app-dashboard-block-more">
+            <Link href="/campaign" className="app-dashboard-block-more">
               {t.browseEvents} <ArrowRightOutlined aria-hidden="true" />
             </Link>
           </header>
@@ -267,7 +267,7 @@ export default function AppDashboardPage() {
         >
           <header className="app-dashboard-block-header">
             <h2 id="app-dashboard-issues-title">{t.issuesHeading}</h2>
-            <Link href="/issues" className="app-dashboard-block-more">
+            <Link href="/campaign" className="app-dashboard-block-more">
               {t.browseIssues} <ArrowRightOutlined aria-hidden="true" />
             </Link>
           </header>
@@ -335,7 +335,7 @@ export default function AppDashboardPage() {
               <HeartOutlined aria-hidden="true" />
               <span>{t.quickIssue}</span>
             </Link>
-            <Link href="/events?show=upcoming" className="app-dashboard-quick-tile">
+            <Link href="/campaign" className="app-dashboard-quick-tile">
               <TeamOutlined aria-hidden="true" />
               <span>{t.quickJoin}</span>
             </Link>

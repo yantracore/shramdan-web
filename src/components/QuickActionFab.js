@@ -76,7 +76,7 @@ export function QuickActionFab({ language = "np", variant }) {
 
   const actions = [
     { href: "/issues/new", label: t.report, Icon: FlagOutlined, accent: "accent" },
-    { href: "/events", label: t.join, Icon: TeamOutlined, accent: "primary" },
+    { href: "/campaign", label: t.join, Icon: TeamOutlined, accent: "primary" },
     { href: "/feedback", label: t.feedback, Icon: MessageOutlined, accent: "muted" }
   ];
 
