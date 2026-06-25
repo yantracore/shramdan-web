@@ -1691,8 +1691,8 @@
   gap: 18px;
 }
 
-.event-detail-main--top > .public-issue-detail-topline {
-  margin-bottom: -6px;
+.event-detail-main--top > .campaign-detail-status {
+  margin-bottom: -8px;
 }
 
 .event-detail-main--top > h1 {

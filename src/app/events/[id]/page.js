@@ -6,10 +6,9 @@ import {
   ClockCircleOutlined,
   EnvironmentOutlined,
   ExportOutlined,
-  TeamOutlined,
-  WarningOutlined
+  TeamOutlined
 } from "@ant-design/icons";
-import { Button, Empty, Skeleton, Tag } from "antd";
+import { Button, Empty, Skeleton } from "antd";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -19,7 +18,6 @@ import { EventLiveStreamPlayer } from "@/components/EventLiveStreamPlayer";
 import { ParticipantsPanel } from "@/components/ParticipantsPanel";
 import IssueMapBlock from "@/components/IssueMapBlock";
 import { PrintButton } from "@/components/PrintButton";
-import { ShareButton } from "@/components/ShareButton";
 import { StickyActionBar } from "@/components/StickyActionBar";
 import { TertiaryButton } from "@/components/TertiaryButton";
 import { IssuePhotoGallery } from "@/components/IssuePhotoGallery";
@@ -46,13 +44,12 @@ import { copy } from "@/lib/siteContent";
 import { discussionPresenceForEvent } from "@/lib/discussionsStub";
 import { useTrackVisit } from "@/lib/useRecentlyViewed";
 import {
-  EVENT_RISK_COLORS,
-  EVENT_STATUS_COLORS,
   formatEnum,
   getResponseData,
   isImageUpload,
   localizeIssue
 } from "@/lib/adminUtils";
+import { CAMPAIGN_STATUS_LABELS, campaignVisualStatus } from "@/lib/campaignStatus";
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 function localizeDigits(value, language) {
@@ -394,23 +391,15 @@ export default function EventDetailPage() {
             <div className="public-issue-detail-body event-detail-body">
               {/* ZONE 1 — ESSENTIALS: what this campaign is, when, where, who's in */}
               <div className="event-detail-main event-detail-main--top">
-                <div className="public-issue-detail-topline">
-                  <div className="public-issue-detail-topline-tags">
-                    <Tag color={EVENT_STATUS_COLORS[eventData.status] || "default"}>
-                      {content.statusLabels[eventData.status] || formatEnum(eventData.status)}
-                    </Tag>
-                    {eventData.riskLevel ? (
-                      <Tag color={EVENT_RISK_COLORS[eventData.riskLevel] || "default"}>
-                        <WarningOutlined aria-hidden="true" />{" "}
-                        {content.riskLabels[eventData.riskLevel] || formatEnum(eventData.riskLevel)}
-                      </Tag>
-                    ) : null}
-                  </div>
-                  <ShareButton
-                    language={language}
-                    title={linkedIssue?.title || eventData.meetupAddress || content.detail.defaultTitle}
-                  />
-                </div>
+                <span
+                  className="campaign-detail-status"
+                  data-status={campaignVisualStatus(eventData.status)}
+                >
+                  <span className="campaign-detail-status-dot" aria-hidden="true" />
+                  {CAMPAIGN_STATUS_LABELS[language]?.[eventData.status] ||
+                    content.statusLabels[eventData.status] ||
+                    formatEnum(eventData.status)}
+                </span>
 
                 <h1>{linkedIssue?.title || eventData.meetupAddress || content.detail.defaultTitle}</h1>
 
