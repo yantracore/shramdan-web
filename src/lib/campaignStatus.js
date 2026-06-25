@@ -9,7 +9,7 @@
 // Confirmed live (devtunnel probe, 2026-06-24): all five statuses return items.
 //
 // "all" shows every stage, grouped in lifecycle order:
-//   खुला (OPEN) -> तयारीमा (DRAFT) -> आउँदै (SCHEDULED) -> लाइभ (ACTIVE) -> सम्पन्न (COMPLETED)
+//   खुला (OPEN) -> तयारीमा (DRAFT) -> मिति तय (SCHEDULED) -> चलिरहेको (ACTIVE) -> सम्पन्न (COMPLETED)
 
 // Lifecycle order — also the render order of the "all" view's grouped sections.
 export const CAMPAIGN_STATUS_SEQUENCE = [
@@ -21,15 +21,20 @@ export const CAMPAIGN_STATUS_SEQUENCE = [
 ];
 
 // kind  = which API the stage is read from (issue | event).
-// visual = the data-status hook the list/preview components already style.
-//          DRAFT borrows the "upcoming" visual (it is being organized but has
-//          no firm date yet) so no new CSS is required for v1.
+// visual = the data-status hook the list/preview components style. Each stage
+//          owns a distinct lifecycle colour (see docs/design/06-state-color-
+//          system.md). COMPLETED keeps the historical `past` value — a lot of
+//          JS branches on it — but renders the `completed` (slate) colour.
 export const CAMPAIGN_STATUSES = {
   OPEN: { key: "OPEN", kind: "issue", visual: "open" },
-  DRAFT: { key: "DRAFT", kind: "event", visual: "upcoming" },
+  DRAFT: { key: "DRAFT", kind: "event", visual: "planning" },
   SCHEDULED: { key: "SCHEDULED", kind: "event", visual: "upcoming" },
   ACTIVE: { key: "ACTIVE", kind: "event", visual: "live" },
-  COMPLETED: { key: "COMPLETED", kind: "event", visual: "past" }
+  COMPLETED: { key: "COMPLETED", kind: "event", visual: "past" },
+  // PAUSED is circumstantial — shown only on a campaign's detail page when it is
+  // paused. Deliberately ABSENT from CAMPAIGN_STATUS_SEQUENCE so it never appears
+  // as a filter chip / pill, while its label + visual still resolve for detail.
+  PAUSED: { key: "PAUSED", kind: "event", visual: "paused" }
 };
 
 // User-friendly labels. These drive the chip row, the dropdown, and the
@@ -41,17 +46,19 @@ export const CAMPAIGN_STATUS_LABELS = {
     all: "सबै",
     OPEN: "खुला",
     DRAFT: "तयारीमा",
-    SCHEDULED: "आउँदै",
-    ACTIVE: "लाइभ",
-    COMPLETED: "सम्पन्न"
+    SCHEDULED: "मिति तय",
+    ACTIVE: "चलिरहेको",
+    COMPLETED: "सम्पन्न",
+    PAUSED: "रोकिएको"
   },
   en: {
     all: "All",
     OPEN: "Open",
     DRAFT: "Planning",
-    SCHEDULED: "Upcoming",
-    ACTIVE: "Live",
-    COMPLETED: "Completed"
+    SCHEDULED: "Scheduled",
+    ACTIVE: "Ongoing",
+    COMPLETED: "Complete",
+    PAUSED: "Paused"
   }
 };
 
