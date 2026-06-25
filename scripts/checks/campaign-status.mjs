@@ -29,5 +29,9 @@ ok(/PAUSED:\s*"रोकिएको"/.test(cs) && /PAUSED:\s*"Paused"/.test(cs)
 const seqMatch = cs.match(/CAMPAIGN_STATUS_SEQUENCE\s*=\s*\[([\s\S]*?)\]/);
 ok(seqMatch && !/PAUSED/.test(seqMatch[1]), "CAMPAIGN_STATUS_SEQUENCE does NOT contain PAUSED");
 
+const ia = await read("src/lib/issueActions.js");
+ok(/case\s+"PAUSED":\s*\n\s*return\s*\{\s*label:\s*"paused",\s*roleScope:\s*\[\],\s*joinable:\s*false\s*\};/.test(ia),
+  "eventJoinPhase has explicit PAUSED no-join case");
+
 if (failures) { console.error(`\n${failures} assertion(s) failed.`); process.exit(1); }
 console.log("campaign-status checks passed.");

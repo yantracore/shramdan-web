@@ -50,6 +50,8 @@ export function eventJoinPhase(eventStatus) {
       return { label: "contributed", roleScope: [], joinable: false };
     case "CANCELLED":
       return { label: "cancelled", roleScope: [], joinable: false };
+    case "PAUSED":
+      return { label: "paused", roleScope: [], joinable: false };
     case "DRAFT":
     default:
       return { label: "join", roleScope: null, joinable: true };
