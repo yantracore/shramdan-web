@@ -1,8 +1,8 @@
 "use client";
 
 // Unified campaign surface. One list, one status filter spanning the whole
-// lifecycle: खुला (OPEN issue) → तयारीमा (DRAFT) → आउँदै (SCHEDULED) →
-// लाइभ (ACTIVE) → सम्पन्न (COMPLETED). The status the user picks decides which
+// lifecycle: खुला (OPEN issue) → तयारीमा (DRAFT) → मिति तय (SCHEDULED) →
+// चलिरहेको (ACTIVE) → सम्पन्न (COMPLETED). The status the user picks decides which
 // backend source is read (see useCampaignFeed); the list/preview dispatch by
 // item `kind` to the existing issue/event cards so nothing is re-implemented.
 //
@@ -47,7 +47,7 @@ const PAGE_COPY = {
     eyebrow: "अभियानहरू",
     title: "श्रमदान अभियानहरू",
     intro:
-      "समस्या उठेदेखि सम्पन्न अभियानसम्म — सबै एकै ठाउँमा। तलको स्थिति फिल्टरले खुला, तयारीमा, आउँदै, लाइभ र सम्पन्न — जुनसुकै चरण छान्न मिल्छ।",
+      "समस्या उठेदेखि सम्पन्न अभियानसम्म — सबै एकै ठाउँमा। तलको स्थिति फिल्टरले खुला, तयारीमा, मिति तय, चलिरहेको र सम्पन्न — जुनसुकै चरण छान्न मिल्छ।",
     statusFilterAria: "स्थिति फिल्टर",
     viewToggleAria: "दृश्य रोज्नुहोस्",
     viewList: "सूची",
@@ -61,7 +61,7 @@ const PAGE_COPY = {
     eyebrow: "Campaigns",
     title: "Shramdan Campaigns",
     intro:
-      "From a reported problem to a finished cleanup — all in one place. The status filter below switches between Open, Planning, Upcoming, Live and Completed.",
+      "From a reported problem to a finished cleanup — all in one place. The status filter below switches between Open, Planning, Scheduled, Ongoing and Complete.",
     statusFilterAria: "Status filter",
     viewToggleAria: "Choose view",
     viewList: "List",
