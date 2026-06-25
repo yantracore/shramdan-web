@@ -3451,23 +3451,23 @@
 }
 
 .impact-pulse-strip-tile.pulse-live .impact-pulse-strip-tile-icon {
-  background: color-mix(in srgb, #d2360b 12%, transparent);
-  color: #d2360b;
+  background: color-mix(in srgb, var(--state-live) 12%, transparent);
+  color: var(--state-live);
 }
 
 .impact-pulse-strip-tile.pulse-upcoming .impact-pulse-strip-tile-icon {
-  background: color-mix(in srgb, #176b5c 12%, transparent);
-  color: #176b5c;
+  background: color-mix(in srgb, var(--state-upcoming) 12%, transparent);
+  color: var(--state-upcoming-ink);
 }
 
 .impact-pulse-strip-tile.pulse-completed .impact-pulse-strip-tile-icon {
-  background: color-mix(in srgb, #2e7d32 14%, transparent);
-  color: #2e7d32;
+  background: color-mix(in srgb, var(--state-completed) 14%, transparent);
+  color: var(--state-completed-ink);
 }
 
 .impact-pulse-strip-tile.pulse-issues .impact-pulse-strip-tile-icon {
-  background: color-mix(in srgb, #1d4ed8 12%, transparent);
-  color: #1d4ed8;
+  background: color-mix(in srgb, var(--state-open) 12%, transparent);
+  color: var(--state-open);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -3750,7 +3750,7 @@
 .notifications-item-icon--vote { background: var(--primary); }
 .notifications-item-icon--schedule { background: #1d4ed8; }
 .notifications-item-icon--result { background: #2e7d32; }
-.notifications-item-icon--live { background: #d2360b; }
+.notifications-item-icon--live { background: var(--state-live); }
 .notifications-item-icon--welcome { background: #7b3fa0; }
 
 .notifications-item-text {
@@ -6652,6 +6652,14 @@
   background: var(--state-completed);
 }
 
+.campaign-detail-status[data-status="paused"] {
+  color: var(--state-paused-ink);
+  background: color-mix(in srgb, var(--state-paused) 16%, var(--surface));
+}
+.campaign-detail-status[data-status="paused"] .campaign-detail-status-dot {
+  background: var(--state-paused);
+}
+
 /* Generic share button used in issue/event detail toplines. */
 .ant-btn.share-button.is-copied {
   background: color-mix(in srgb, #16a34a 14%, var(--surface));
@@ -6742,6 +6750,43 @@
   font-size: 15px;
   font-weight: 600;
   color: var(--text);
+}
+
+/* Topline support block: a compact conversion bar on the left, the Support /
+   Join CTA on the right. Let the progress grow but never crowd the button. */
+.public-issue-detail-support .participants-progress-compact {
+  flex: 1 1 200px;
+}
+
+/* Voted state of the topline Support button — drop the flat "default" look for
+   the same highlighted green "joined" pill the roster uses, so the role the
+   viewer committed to (e.g. "Safety Lead") reads as a real, owned commitment. */
+.public-issue-detail-support .issue-topline-support-btn.ant-btn[aria-pressed="true"] {
+  background: color-mix(in srgb, #2e7d32 12%, var(--surface));
+  border-color: color-mix(in srgb, #2e7d32 42%, var(--line));
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+.public-issue-detail-support .issue-topline-support-btn.ant-btn[aria-pressed="true"] .anticon {
+  color: #2e7d32;
+}
+
+.public-issue-detail-support .issue-topline-support-btn.ant-btn[aria-pressed="true"]:hover,
+.public-issue-detail-support .issue-topline-support-btn.ant-btn[aria-pressed="true"]:focus-visible {
+  background: color-mix(in srgb, #2e7d32 18%, var(--surface));
+  border-color: #2e7d32;
+  color: #2e7d32;
+}
+
+:root[data-theme="dark"] .public-issue-detail-support .issue-topline-support-btn.ant-btn[aria-pressed="true"] {
+  color: #4ade80;
+  background: color-mix(in srgb, #4ade80 14%, var(--surface));
+  border-color: color-mix(in srgb, #4ade80 36%, var(--line));
+}
+
+:root[data-theme="dark"] .public-issue-detail-support .issue-topline-support-btn.ant-btn[aria-pressed="true"] .anticon {
+  color: #4ade80;
 }
 
 .public-issue-detail-section-block {
@@ -8162,23 +8207,29 @@
   line-height: inherit;
 }
 
+/* Kill Leaflet's default `.leaflet-popup-content p { margin: 18px 0 }`, which
+ * outranks our own margin:0 and was padding huge gaps around the address row. */
+.issue-map-wrap .leaflet-popup-content p {
+  margin: 0;
+}
+
 .issue-map-wrap .leaflet-popup-tip {
   background: var(--surface);
   box-shadow: 0 14px 26px -12px rgba(13, 38, 30, 0.4);
 }
 
 .issue-map-wrap .leaflet-popup-close-button {
-  top: 9px;
-  right: 9px;
-  width: 26px;
-  height: 26px;
+  top: 6px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
   border-radius: 50%;
   color: #fff;
-  font: 600 17px/1 inherit;
+  font: 600 14px/1 inherit;
   background: rgba(17, 24, 21, 0.42);
   -webkit-backdrop-filter: blur(7px);
   backdrop-filter: blur(7px);
@@ -8192,7 +8243,7 @@
 }
 
 .map-pop {
-  width: 268px;
+  width: 236px;
   font-family: inherit;
   text-align: left;
   color: var(--text);
@@ -8201,7 +8252,7 @@
 .map-pop-media {
   position: relative;
   width: 100%;
-  height: 134px;
+  height: 72px;
   overflow: hidden;
   background: color-mix(in srgb, var(--accent) 12%, var(--surface));
 }
@@ -8246,15 +8297,15 @@
 
 .map-pop-badge {
   position: absolute;
-  top: 10px;
-  left: 10px;
+  top: 7px;
+  left: 7px;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  max-width: calc(100% - 52px);
-  padding: 4px 10px 4px 8px;
+  gap: 5px;
+  max-width: calc(100% - 46px);
+  padding: 2px 8px 2px 6px;
   border-radius: 999px;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.01em;
   color: #15241d;
@@ -8266,8 +8317,8 @@
 }
 
 .map-pop-badge-dot {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: #888;
   flex: none;
@@ -8290,10 +8341,10 @@
 
 .map-pop-eyebrow {
   position: absolute;
-  left: 12px;
-  right: 12px;
-  bottom: 9px;
-  font-size: 11px;
+  left: 10px;
+  right: 10px;
+  bottom: 6px;
+  font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -8307,17 +8358,17 @@
 .map-pop-body {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 12px 13px 13px;
+  gap: 3px;
+  padding: 7px 11px 8px;
 }
 
 /* Scoped under .issue-map-wrap so the title/CTA colours beat Leaflet's default
  * `.leaflet-container a { color:#0078A8 }`, which otherwise paints these links
  * its built-in blue. */
 .issue-map-wrap .map-pop-title {
-  font-size: 14.5px;
+  font-size: 13px;
   font-weight: 700;
-  line-height: 1.3;
+  line-height: 1.2;
   color: var(--text);
   text-decoration: none;
   display: -webkit-box;
@@ -8333,16 +8384,16 @@
 .map-pop-loc {
   display: flex;
   align-items: flex-start;
-  gap: 5px;
+  gap: 4px;
   margin: 0;
-  font-size: 12px;
-  line-height: 1.35;
+  font-size: 11.5px;
+  line-height: 1.25;
   color: var(--muted);
 }
 
 .map-pop-loc .map-pop-pin-ico {
   flex: none;
-  margin-top: 1px;
+  margin-top: 0.5px;
   color: var(--accent);
 }
 
@@ -8356,7 +8407,7 @@
 .map-pop-people {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .map-pop-avatars {
@@ -8364,36 +8415,50 @@
 }
 
 .map-pop-avatar {
-  width: 22px;
-  height: 22px;
+  width: 17px;
+  height: 17px;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid var(--surface);
+  border: 1.5px solid var(--surface);
   background-size: cover;
   box-shadow: 0 1px 2px rgba(8, 20, 16, 0.25);
 }
 
 .map-pop-avatar + .map-pop-avatar {
-  margin-left: -8px;
+  margin-left: -6px;
 }
 
 .map-pop-count {
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 600;
   color: var(--text);
+}
+
+/* Supporters and the CTA share one row to keep the card short — people on the
+ * left, action on the right. When there are no supporters (events, or a
+ * zero-vote issue) the CTA fills the row on its own. */
+.map-pop-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.issue-map-wrap .map-pop-foot--solo .map-pop-cta {
+  width: 100%;
 }
 
 .issue-map-wrap .map-pop-cta {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
-  margin-top: 2px;
-  padding: 9px 14px;
-  border-radius: 11px;
-  font-size: 13px;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-size: 12px;
   font-weight: 700;
   text-decoration: none;
   color: #fff;
@@ -8504,6 +8569,235 @@
   justify-content: flex-start;
   margin-left: 0;
   width: 100%;
+}
+
+/* ── /campaigns: status chips + list/map view toggle on one row ───────────── */
+/* nowrap keeps the view toggle pinned top-right on the SAME row as the status
+   chips at every width; if the chip row gets too wide it scrolls horizontally
+   (hidden scrollbar) rather than pushing the toggle onto a second line. */
+.campaigns-toolbar-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: nowrap;
+}
+
+.campaigns-toolbar-top .campaigns-status-chips {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.campaigns-toolbar-top .campaigns-status-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.campaigns-view-toggle {
+  flex: 0 0 auto;
+}
+
+/* Combined-map view — issues + events on one Leaflet map. Glassy frame that
+   mirrors .live-issues-map-frame, including the :has() fullscreen escape so the
+   map can break out of the rounded/clipped frame when expanded. */
+.campaigns-map-frame {
+  position: relative;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--line) 45%, transparent);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.32) inset,
+    0 14px 36px rgba(23, 33, 28, 0.12);
+}
+
+.campaigns-map-frame:has(.issue-map-wrap--fullscreen) {
+  overflow: visible;
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  transform: none;
+  z-index: 9999;
+}
+
+.campaigns-map-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 320px;
+  padding: 32px 20px;
+  text-align: center;
+  color: var(--muted);
+  border-radius: 18px;
+  border: 1px dashed color-mix(in srgb, var(--line) 60%, transparent);
+  background: color-mix(in srgb, var(--surface) 50%, transparent);
+}
+
+/* Search row — search box (lifted from the homepage hero) on the left and
+   the always-visible "report" CTA on the right. The filter button inside the
+   search box toggles the detailed filter panel below; ViewSwitch and the
+   activity-type tabs that used to live here were removed. */
+.public-issues-search-row {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  width: 100%;
+}
+
+.public-issues-search-row .public-search-bar {
+  flex: 1 1 auto;
+}
+
+.public-issues-search-row .public-issues-filters-cta {
+  align-self: stretch;
+  display: inline-flex;
+}
+
+.public-issues-search-row .public-issues-filters-cta .ant-btn {
+  height: 100%;
+}
+
+/* Glass search box — mirrors .home-search-bar but stretches full width
+   inside the toolbar instead of centering at a fixed 720px. */
+.public-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px;
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  backdrop-filter: blur(18px) saturate(1.2);
+  border: 1px solid color-mix(in srgb, var(--line) 45%, transparent);
+  border-radius: 16px;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.32) inset,
+    0 14px 36px rgba(23, 33, 28, 0.12);
+}
+
+.public-search-input {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  min-width: 0;
+  color: var(--text);
+  font-size: 16px;
+}
+
+.public-search-input > :first-child {
+  color: var(--muted);
+  font-size: 18px;
+}
+
+.public-search-input input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  outline: none;
+}
+
+.public-search-input input::placeholder {
+  color: color-mix(in srgb, var(--muted) 80%, transparent);
+}
+
+.public-search-filters,
+.public-search-submit {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  min-height: 40px;
+  border: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: background 160ms ease, color 160ms ease, transform 160ms ease,
+    border-color 160ms ease;
+}
+
+.public-search-filters:hover,
+.public-search-submit:hover {
+  background: color-mix(in srgb, var(--primary) 12%, var(--surface));
+  color: var(--primary-dark);
+  border-color: color-mix(in srgb, var(--primary) 24%, var(--line));
+  transform: translateY(-1px);
+}
+
+/* Active = the detailed filter panel below is open. */
+.public-search-filters.is-active {
+  background: color-mix(in srgb, var(--primary) 14%, var(--surface));
+  color: var(--primary-dark);
+  border-color: color-mix(in srgb, var(--primary) 32%, var(--line));
+}
+
+.public-search-submit {
+  background: var(--primary);
+  color: #fff;
+  border-color: transparent;
+  padding: 10px 16px;
+  font-size: 16px;
+}
+
+.public-search-submit:hover {
+  background: var(--primary-dark);
+  color: #fff;
+  border-color: transparent;
+}
+
+@media (max-width: 720px) {
+  .public-search-filters span {
+    /* Hide the "Filter" label below 720px; icon stays for the tap target. */
+    display: none;
+  }
+  .public-search-filters {
+    padding: 10px 12px;
+  }
+}
+
+@media (max-width: 540px) {
+  .public-issues-search-row {
+    flex-wrap: wrap;
+  }
+  .public-issues-search-row .public-issues-filters-cta,
+  .public-issues-search-row .public-issues-filters-cta .ant-btn {
+    width: 100%;
+  }
+  .public-search-bar {
+    padding: 6px;
+    gap: 6px;
+  }
+  .public-search-input {
+    padding: 10px 10px;
+    font-size: 15px;
+  }
+  .public-search-submit {
+    padding: 8px 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .public-search-filters,
+  .public-search-submit {
+    transition: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .public-search-bar {
+    background: var(--surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
 }
 
 /* Five-step lifecycle funnel shared by home, /events and /issues:
@@ -12619,9 +12913,9 @@
   margin-right: 4px;
 }
 
-.calendar-legend-dot.is-live { background: #d2360b; }
-.calendar-legend-dot.is-upcoming { background: var(--primary); }
-.calendar-legend-dot.is-past { background: var(--muted); }
+.calendar-legend-dot.is-live { background: var(--state-live); }
+.calendar-legend-dot.is-upcoming { background: var(--state-upcoming); }
+.calendar-legend-dot.is-past { background: var(--state-completed); }
 
 .calendar-grid-wrap {
   display: grid;
@@ -12699,9 +12993,9 @@
   border-radius: 50%;
 }
 
-.calendar-cell-dot.is-live { background: #d2360b; }
-.calendar-cell-dot.is-upcoming { background: var(--primary); }
-.calendar-cell-dot.is-past { background: var(--muted); }
+.calendar-cell-dot.is-live { background: var(--state-live); }
+.calendar-cell-dot.is-upcoming { background: var(--state-upcoming); }
+.calendar-cell-dot.is-past { background: var(--state-completed); }
 
 .calendar-cell.is-today {
   background: color-mix(in srgb, var(--accent) 10%, transparent);
@@ -12798,8 +13092,8 @@
   color: #fff;
 }
 
-.calendar-day-event.is-live .calendar-day-event-kind { background: #d2360b; }
-.calendar-day-event.is-past .calendar-day-event-kind { background: var(--muted); }
+.calendar-day-event.is-live .calendar-day-event-kind { background: var(--state-live); }
+.calendar-day-event.is-past .calendar-day-event-kind { background: var(--state-completed); }
 
 .calendar-day-event strong {
   font-size: 14px;

@@ -28,6 +28,25 @@
   --accent: #e75f1b;
   --line: #dce5df;
   --section-divider: rgba(0, 0, 0, 0.04);
+
+  /* --- Campaign lifecycle state colours --------------------------------
+     One hue per lifecycle stage; see docs/design/06-state-color-system.md.
+     `core`  = solid use (left spine, dot, thumbnail tag, live badge).
+     `-ink`  = readable text on a tinted pill (bg = color-mix(core 14%, surface)).
+     upcoming intentionally === brand primary so SCHEDULED reads as "on brand". */
+  --state-open: #4f5bd5;
+  --state-open-ink: #3730a3;
+  --state-planning: #d98309;
+  --state-planning-ink: #8a5206;
+  --state-upcoming: var(--primary);
+  --state-upcoming-ink: var(--primary-dark);
+  --state-live: #e23b2e;
+  --state-live-ink: #b3261e;
+  --state-completed: #5f7a72;
+  --state-completed-ink: #3f5650;
+  /* PAUSED — circumstantial; detail surface only (never a filter/pill). */
+  --state-paused: #9a8f86;
+  --state-paused-ink: #5f574e;
   --ambient-backdrop:
     radial-gradient(circle at 16% -8%, rgba(92, 191, 159, 0.18), transparent 34rem),
     radial-gradient(circle at 92% 18%, rgba(231, 95, 27, 0.08), transparent 28rem),
@@ -48,6 +67,20 @@
   --accent: #ff8b3d;
   --line: #2b3b36;
   --section-divider: rgba(255, 255, 255, 0.04);
+
+  /* Lifecycle state colours — dark variants (cores lighter, ink near-white). */
+  --state-open: #8b95f0;
+  --state-open-ink: #c2c8ff;
+  --state-planning: #f0a843;
+  --state-planning-ink: #ffd699;
+  --state-upcoming: var(--primary);
+  --state-upcoming-ink: var(--primary-dark);
+  --state-live: #ff6a5c;
+  --state-live-ink: #ffc7c0;
+  --state-completed: #93a8a0;
+  --state-completed-ink: #d4e0db;
+  --state-paused: #b3aaa0;
+  --state-paused-ink: #e2dcd5;
   --ambient-backdrop:
     radial-gradient(circle at 18% -10%, rgba(92, 191, 159, 0.14), transparent 34rem),
     radial-gradient(circle at 88% 14%, rgba(255, 139, 61, 0.08), transparent 30rem),
