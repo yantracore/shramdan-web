@@ -7,6 +7,23 @@
 
 ---
 
+## Implementation status (updated 2026-06-25)
+
+Plan: `docs/superpowers/plans/2026-06-25-campaign-unification-frontend.md`.
+
+- ✅ **Phase 1 — status model** (§4, §6): labels relabelled (Scheduled/Ongoing/Complete; मिति तय/चलिरहेको), PAUSED added as a detail-only state, PAUSED no-join fix, `--state-paused` colour. Verified: node assertions (`scripts/checks/campaign-status.mjs`) + production compile + browser (labels render at `/campaign`).
+- ✅ **Phase 2 — colour propagation** (§5): filter chips + dropdown now carry per-status colour. **Browser-verified** via computed-style read — every chip badge ink + every dropdown dot matches its canonical `--state-*` hex (the "orange for everything" complaint is resolved).
+- ✅ **Phase 3 — routing** (§8.1, §8.4): `/campaigns`→`/campaign` (singular) + 307 redirects from `/campaigns`,`/issues`,`/events`; mobile nav merged to one अभियान tab; desktop nav, command palette, 404, onboarding, FAB, sitemap, dashboard, impact, and detail back-to-list links all target `/campaign`. Browser-verified (route 200, redirects 307, single nav tab).
+- ✅ **Phase 0 (docs half)**: backend asks A (issue→event link, already P1 #2) + B (SCHEDULED=WORKER-only enforce, new) recorded in `docs/api-requirements/{00-OUTSTANDING,event-participants}.md`.
+- ⏸️ **Phase 4 — unified `/campaign/[id]` detail merge** — DEFERRED, hard-blocked on backend item A.
+- ⏸️ **Backend A/B verification** — DEFERRED, backend unreachable (staging down + last devtunnel rotated). Needs the current devtunnel URL.
+- ⏭️ **Open decisions:** map-pin label wording (keep "LIVE"/"अहिले लाइभ" punchy vs unify to चलिरहेको) — user's call. Cards/pane unification left (entangled with pre-existing working-tree WIP).
+- 🐞 **Out-of-scope blocker found:** `next build` fails prerendering `/` (`useSearchParams` needs a Suspense boundary, Next 16) — pre-existing, unrelated to this work, but blocks production deploy.
+
+All commits are local on branch `stage` (not pushed), per the project's local-only commit rule.
+
+---
+
 ## 1. Goal & principles
 
 Issues and events are **one entity: a "campaign"** — a single continuum from a reported problem
