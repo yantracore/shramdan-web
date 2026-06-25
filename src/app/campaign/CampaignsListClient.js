@@ -186,7 +186,7 @@ export default function CampaignsListPageContent() {
       if (nextView === "map") params.set("view", "map");
       else params.delete("view");
       const query = params.toString();
-      router.replace(query ? `/campaigns?${query}` : "/campaigns", {
+      router.replace(query ? `/campaign?${query}` : "/campaign", {
         scroll: false
       });
     },
@@ -208,7 +208,7 @@ export default function CampaignsListPageContent() {
       if (next.q) params.set("q", next.q);
       else params.delete("q");
       const query = params.toString();
-      router.replace(query ? `/campaigns?${query}` : "/campaigns", {
+      router.replace(query ? `/campaign?${query}` : "/campaign", {
         scroll: false
       });
     },
@@ -373,7 +373,7 @@ export default function CampaignsListPageContent() {
       if (id) params.set("sel", id);
       else params.delete("sel");
       const query = params.toString();
-      const url = query ? `/campaigns?${query}` : "/campaigns";
+      const url = query ? `/campaign?${query}` : "/campaign";
       if (opts?.push) router.push(url, { scroll: false });
       else router.replace(url, { scroll: false });
     },

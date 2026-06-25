@@ -14,12 +14,15 @@ const nextConfig = {
       { source: "/app-development/:path*", destination: "/discussions", permanent: false },
 
       // 2026-06-24 — Issues + Events list pages merged into the unified
-      // /campaigns surface (one status filter spanning OPEN → COMPLETED). Only
-      // the LIST routes redirect; /issues/new, /issues/:id and /events/:id
+      // campaign surface (one status filter spanning OPEN → COMPLETED). Only the
+      // LIST routes redirect; /issues/new, /issues/:id and /events/:id
       // detail/create pages stay where they are. Temporary (307) keeps the move
       // reversible while the unified surface beds in.
-      { source: "/issues", destination: "/campaigns", permanent: false },
-      { source: "/events", destination: "/campaigns", permanent: false }
+      // 2026-06-25 — the route was renamed to the singular /campaign; the old
+      // plural /campaigns now redirects too.
+      { source: "/issues", destination: "/campaign", permanent: false },
+      { source: "/events", destination: "/campaign", permanent: false },
+      { source: "/campaigns", destination: "/campaign", permanent: false }
     ];
   }
 };
