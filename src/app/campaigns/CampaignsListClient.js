@@ -23,6 +23,7 @@ import { EventListCard } from "@/components/EventListCard";
 import { EventPreviewPane } from "@/components/EventPreviewPane";
 import { IssueListCard } from "@/components/IssueListCard";
 import { IssuePreviewPane } from "@/components/IssuePreviewPane";
+import { CampaignsMap } from "@/components/CampaignsMap";
 import { PAGE_COPY as EVENTS_COPY } from "@/app/events/EventsListClient";
 import { usePreferences } from "@/app/providers";
 import { copy } from "@/lib/siteContent";
@@ -48,6 +49,9 @@ const PAGE_COPY = {
     intro:
       "समस्या उठेदेखि सम्पन्न अभियानसम्म — सबै एकै ठाउँमा। तलको स्थिति फिल्टरले खुला, तयारीमा, आउँदै, लाइभ र सम्पन्न — जुनसुकै चरण छान्न मिल्छ।",
     statusFilterAria: "स्थिति फिल्टर",
+    viewToggleAria: "दृश्य रोज्नुहोस्",
+    viewList: "सूची",
+    viewMap: "नक्सा",
     listAriaLabel: "अभियानहरूको सूची",
     loadingMore: "थप ल्याउँदै…",
     noMore: "सबै देखाइए।"
@@ -59,6 +63,9 @@ const PAGE_COPY = {
     intro:
       "From a reported problem to a finished cleanup — all in one place. The status filter below switches between Open, Planning, Upcoming, Live and Completed.",
     statusFilterAria: "Status filter",
+    viewToggleAria: "Choose view",
+    viewList: "List",
+    viewMap: "Map",
     listAriaLabel: "List of campaigns",
     loadingMore: "Loading more…",
     noMore: "All shown."
@@ -160,6 +167,31 @@ export default function CampaignsListPageContent() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setSearchInput(filters.q);
   }, [filters.q]);
+
+  // ----- list / map view toggle (URL-synced via ?view=map) ---------------
+  // `view` is not a filter — it rides on its own ?view= param so a filtered
+  // map is shareable, and filter/selection URL writes preserve it untouched.
+  const [view, setView] = useState(() =>
+    searchParams?.get("view") === "map" ? "map" : "list"
+  );
+  useEffect(() => {
+    const next = searchParams?.get("view") === "map" ? "map" : "list";
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setView((prev) => (prev === next ? prev : next));
+  }, [searchParams]);
+  const handleViewChange = useCallback(
+    (nextView) => {
+      setView(nextView);
+      const params = new URLSearchParams(searchParams?.toString() || "");
+      if (nextView === "map") params.set("view", "map");
+      else params.delete("view");
+      const query = params.toString();
+      router.replace(query ? `/campaigns?${query}` : "/campaigns", {
+        scroll: false
+      });
+    },
+    [router, searchParams]
+  );
 
   const applyFilters = useCallback(
     (next) => {
@@ -528,13 +560,33 @@ export default function CampaignsListPageContent() {
         ) : null}
 
         <div className="public-issues-toolbar">
-          {/* Primary status filter — the chip row (always visible). */}
-          <div className="campaigns-status-chips" role="group" aria-label={t.statusFilterAria}>
-            <Segmented
-              options={chipOptions}
-              value={filters.status}
-              onChange={(value) => setFilter("status", value)}
-            />
+          {/* Status filter (chip row, always visible) + list/map view toggle. */}
+          <div className="campaigns-toolbar-top">
+            <div
+              className="campaigns-status-chips"
+              role="group"
+              aria-label={t.statusFilterAria}
+            >
+              <Segmented
+                options={chipOptions}
+                value={filters.status}
+                onChange={(value) => setFilter("status", value)}
+              />
+            </div>
+            <div
+              className="campaigns-view-toggle"
+              role="group"
+              aria-label={t.viewToggleAria}
+            >
+              <Segmented
+                options={[
+                  { value: "list", label: t.viewList },
+                  { value: "map", label: t.viewMap }
+                ]}
+                value={view}
+                onChange={handleViewChange}
+              />
+            </div>
           </div>
 
           <div className="public-issues-search-row">
@@ -652,6 +704,15 @@ export default function CampaignsListPageContent() {
         ) : null}
 
         {!isInitialLoad && !showEmpty && !showError ? (
+          view === "map" ? (
+            <CampaignsMap
+              items={filteredItems}
+              language={language}
+              content={issuesCopy}
+              mapCopy={homeSearch.map}
+              emptyLabel={homeSearch.mapEmpty}
+            />
+          ) : (
           <section
             className="events-split"
             data-mobile-view={mobileView}
@@ -704,6 +765,7 @@ export default function CampaignsListPageContent() {
               />
             )}
           </section>
+          )
         ) : null}
       </section>
     </SiteShell>
