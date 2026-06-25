@@ -225,11 +225,15 @@ export function useEventJoin(eventId, { seed = null, language = "np", eager = fa
       : participantJoinableRoles;
 
   // Merge: start from real plan rows, then add any scoped role missing from the
-  // plan as an empty (count 0, no target) row so it renders a Join action.
+  // plan as an empty, OPEN row so it renders a Join action. `target` is omitted
+  // on purpose: ParticipantsPanel coerces it with Number(), and Number(null) is
+  // 0 — which would read as a full 0/0 slot ("पूरा") and hide the Join button.
+  // Leaving it undefined makes Number(undefined) → NaN → "no target", so the row
+  // is open and joinable.
   const participantRoles = (() => {
     const byRole = new Map(planRows.map((r) => [r.role, r]));
     for (const role of scopeRoles) {
-      if (!byRole.has(role)) byRole.set(role, { role, count: 0, target: null, names: [] });
+      if (!byRole.has(role)) byRole.set(role, { role, count: 0, names: [] });
     }
     // Preserve a stable order: known order first, then any plan-only extras.
     const ordered = PARTICIPANT_ROLE_ORDER.filter((r) => byRole.has(r)).map((r) => byRole.get(r));
