@@ -226,6 +226,15 @@ export async function listDraftEvents({ language = "np", limit = DEFAULT_LIMIT, 
   return fetchEvents({ status: "DRAFT", limit, language, provinceId, districtId });
 }
 
+// Raw single-status event list (enriched with issue covers), used by the
+// unified /campaigns feed where each lifecycle stage maps 1:1 to a backend
+// event status. Unlike listLive/Upcoming/PastEvents it does NO client-side date
+// re-bucketing — the status the user filters by IS the status fetched. This
+// keeps the feed and the chip-row counts in lock-step.
+export async function listEventsByStatus(status, { language = "np", limit = DEFAULT_LIMIT, provinceId, districtId } = {}) {
+  return fetchEvents({ status, limit, language, provinceId, districtId });
+}
+
 // All buckets in parallel — handy for /events page + /calendar.
 export async function listAllEvents({ language = "np", provinceId, districtId } = {}) {
   const [live, upcoming, past] = await Promise.all([

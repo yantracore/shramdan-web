@@ -1,0 +1,104 @@
+/* Unified /campaigns status filter — the always-visible lifecycle chip row.
+   Bigger, glanceable segments; each carries a live count badge that flips to a
+   spinner while its stage is (re)fetching, so a click reads as "loading below"
+   even when the surrounding page chrome doesn't move. The same five stages +
+   "all" are mirrored in the detailed filter panel's dropdown. */
+
+.campaigns-status-chips {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.campaigns-status-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.campaigns-status-chips .ant-segmented {
+  display: inline-flex;
+  padding: 6px;
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  backdrop-filter: blur(16px) saturate(1.2);
+  border: 1px solid color-mix(in srgb, var(--line) 45%, transparent);
+  box-shadow: 0 10px 28px rgba(23, 33, 28, 0.1);
+}
+
+.campaigns-status-chips .ant-segmented-item {
+  border-radius: 11px;
+  transition: color 160ms ease;
+}
+
+.campaigns-status-chips .ant-segmented-item-label {
+  min-height: 46px;
+  display: flex;
+  align-items: center;
+  padding: 0 18px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.campaigns-status-chips .ant-segmented-item-selected,
+.campaigns-status-chips .ant-segmented-thumb {
+  border-radius: 11px;
+  box-shadow: 0 6px 16px -6px rgba(13, 38, 30, 0.34);
+}
+
+/* chip = label text + count badge */
+.campaign-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.campaign-chip-text {
+  white-space: nowrap;
+}
+
+.campaign-chip-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 25px;
+  height: 22px;
+  padding: 0 7px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--muted);
+  background: color-mix(in srgb, var(--muted) 14%, var(--surface));
+}
+
+/* Selected segment: the count pill picks up the brand colour so the active
+   stage's tally pops against the others. */
+.campaigns-status-chips .ant-segmented-item-selected .campaign-chip-count,
+.campaigns-status-chips .ant-segmented-item:hover .campaign-chip-count {
+  color: #fff;
+  background: var(--primary);
+}
+
+.campaign-chip-spin {
+  display: inline-flex;
+  font-size: 12px;
+}
+
+@media (max-width: 640px) {
+  .campaigns-status-chips .ant-segmented-item-label {
+    min-height: 42px;
+    padding: 0 13px;
+    font-size: 14px;
+  }
+  .campaign-chip {
+    gap: 7px;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .campaigns-status-chips .ant-segmented {
+    background: var(--surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}

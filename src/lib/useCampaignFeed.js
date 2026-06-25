@@ -19,12 +19,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { getJson } from "@/lib/apiClient";
 import { getListItems } from "@/lib/adminUtils";
-import {
-  listDraftEvents,
-  listLiveEvents,
-  listPastEvents,
-  listUpcomingEvents
-} from "@/lib/eventsApi";
+import { listEventsByStatus } from "@/lib/eventsApi";
 import { CAMPAIGN_STATUS_SEQUENCE } from "@/lib/campaignStatus";
 
 const ISSUE_LIMIT = 50;
@@ -57,24 +52,13 @@ function byCompletedDesc(a, b) {
 }
 
 async function fetchStatus(status, opts) {
-  switch (status) {
-    case "OPEN":
-      return fetchOpenIssues(opts);
-    case "DRAFT":
-      return toEventEntries("DRAFT", await listDraftEvents(opts));
-    case "SCHEDULED":
-      return toEventEntries("SCHEDULED", await listUpcomingEvents(opts)).sort(
-        byScheduledAsc
-      );
-    case "ACTIVE":
-      return toEventEntries("ACTIVE", await listLiveEvents(opts));
-    case "COMPLETED":
-      return toEventEntries("COMPLETED", await listPastEvents(opts)).sort(
-        byCompletedDesc
-      );
-    default:
-      return [];
-  }
+  if (status === "OPEN") return fetchOpenIssues(opts);
+  // Every later stage maps 1:1 to a backend event status — fetch it raw so the
+  // displayed list and the chip-row count agree exactly.
+  const entries = toEventEntries(status, await listEventsByStatus(status, opts));
+  if (status === "SCHEDULED") return entries.sort(byScheduledAsc);
+  if (status === "COMPLETED") return entries.sort(byCompletedDesc);
+  return entries;
 }
 
 export function useCampaignFeed({ status, language, provinceId, districtId }) {

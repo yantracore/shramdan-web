@@ -11,7 +11,7 @@
 // collapsible filter panel. "all" is the default and groups every stage under
 // inline dividers in lifecycle order.
 
-import { CloseOutlined, PlusOutlined, ReloadOutlined, SearchOutlined } from "@ant-design/icons";
+import { CloseOutlined, LoadingOutlined, PlusOutlined, ReloadOutlined, SearchOutlined } from "@ant-design/icons";
 import { Button, Empty, Segmented, Select, Skeleton } from "antd";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -28,6 +28,7 @@ import { usePreferences } from "@/app/providers";
 import { copy } from "@/lib/siteContent";
 import { ISSUE_CATEGORIES, localizeIssue } from "@/lib/adminUtils";
 import { useCampaignFeed } from "@/lib/useCampaignFeed";
+import { useCampaignCounts } from "@/lib/useCampaignCounts";
 import {
   CAMPAIGN_FILTER_VALUES,
   CAMPAIGN_STATUS_SEQUENCE,
@@ -79,6 +80,31 @@ function itemSearchText(entry, language) {
     addr: (entry.data.addressText || "").toLowerCase(),
     desc: ""
   };
+}
+
+const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
+function localizeDigits(value, language) {
+  const str = String(value ?? "");
+  if (language !== "np") return str;
+  return str.replace(/\d/g, (d) => NP_DIGITS[Number(d)]);
+}
+
+// A status chip's content: the stage label + a count badge. While the stage is
+// (re)fetching, the number is swapped for a spinner — so a click reads as
+// "loading below" even when the page chrome around it doesn't move.
+function StatusChip({ text, count, loading, language }) {
+  return (
+    <span className="campaign-chip">
+      <span className="campaign-chip-text">{text}</span>
+      <span className="campaign-chip-count">
+        {loading ? (
+          <LoadingOutlined className="campaign-chip-spin" aria-label="loading" />
+        ) : (
+          localizeDigits(Number.isFinite(count) ? count : 0, language)
+        )}
+      </span>
+    </span>
+  );
 }
 
 export default function CampaignsListPageContent() {
@@ -185,6 +211,13 @@ export default function CampaignsListPageContent() {
   const { items, loading, error } = useCampaignFeed({
     status: filters.status,
     language,
+    provinceId: filters.provinceId,
+    districtId: filters.districtId
+  });
+
+  // Per-stage counts for the chip badges — always all five, independent of the
+  // active filter (so every badge can show a number, not just the selected one).
+  const { counts, total, loading: countsLoading } = useCampaignCounts({
     provinceId: filters.provinceId,
     districtId: filters.districtId
   });
@@ -372,7 +405,29 @@ export default function CampaignsListPageContent() {
   }, [selectedId]);
 
   // ----- filter options --------------------------------------------------
-  const statusOptions = useMemo(
+  // Chip row: rich labels with a count badge / loader. The badge for a stage
+  // spins while counts are still loading, or while THAT stage is the active
+  // selection and its feed is fetching (the click-feedback case).
+  const chipOptions = useMemo(() => {
+    const make = (value, count) => ({
+      value,
+      label: (
+        <StatusChip
+          text={campaignStatusLabel(value, language)}
+          count={count}
+          loading={countsLoading || (filters.status === value && loading)}
+          language={language}
+        />
+      )
+    });
+    return [
+      make("all", total),
+      ...CAMPAIGN_STATUS_SEQUENCE.map((value) => make(value, counts[value]))
+    ];
+  }, [language, counts, total, countsLoading, loading, filters.status]);
+
+  // Dropdown mirror: plain text labels (the badge/loader belong on the chips).
+  const dropdownOptions = useMemo(
     () => [
       { value: "all", label: campaignStatusLabel("all", language) },
       ...CAMPAIGN_STATUS_SEQUENCE.map((value) => ({
@@ -476,7 +531,7 @@ export default function CampaignsListPageContent() {
           {/* Primary status filter — the chip row (always visible). */}
           <div className="campaigns-status-chips" role="group" aria-label={t.statusFilterAria}>
             <Segmented
-              options={statusOptions}
+              options={chipOptions}
               value={filters.status}
               onChange={(value) => setFilter("status", value)}
             />
@@ -511,7 +566,7 @@ export default function CampaignsListPageContent() {
                 <Select
                   id="campaigns-filter-status"
                   onChange={(value) => setFilter("status", value || "all")}
-                  options={statusOptions}
+                  options={dropdownOptions}
                   value={filters.status}
                 />
               </div>
