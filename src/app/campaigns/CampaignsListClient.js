@@ -99,9 +99,9 @@ function localizeDigits(value, language) {
 // A status chip's content: the stage label + a count badge. While the stage is
 // (re)fetching, the number is swapped for a spinner — so a click reads as
 // "loading below" even when the page chrome around it doesn't move.
-function StatusChip({ text, count, loading, language }) {
+function StatusChip({ text, count, loading, language, status }) {
   return (
-    <span className="campaign-chip">
+    <span className="campaign-chip" data-status={status || undefined}>
       <span className="campaign-chip-text">{text}</span>
       <span className="campaign-chip-count">
         {loading ? (
@@ -449,6 +449,7 @@ export default function CampaignsListPageContent() {
           count={count}
           loading={countsLoading || (filters.status === value && loading)}
           language={language}
+          status={value === "all" ? null : campaignVisualStatus(value)}
         />
       )
     });
@@ -464,7 +465,12 @@ export default function CampaignsListPageContent() {
       { value: "all", label: campaignStatusLabel("all", language) },
       ...CAMPAIGN_STATUS_SEQUENCE.map((value) => ({
         value,
-        label: campaignStatusLabel(value, language)
+        label: (
+          <span className="campaign-filter-opt" data-status={campaignVisualStatus(value)}>
+            <span className="campaign-filter-dot" aria-hidden="true" />
+            {campaignStatusLabel(value, language)}
+          </span>
+        )
       }))
     ],
     [language]

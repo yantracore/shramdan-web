@@ -70,13 +70,28 @@
   background: color-mix(in srgb, var(--muted) 14%, var(--surface));
 }
 
-/* Selected segment: the count pill picks up the brand colour so the active
-   stage's tally pops against the others. */
-.campaigns-status-chips .ant-segmented-item-selected .campaign-chip-count,
-.campaigns-status-chips .ant-segmented-item:hover .campaign-chip-count {
-  color: #fff;
-  background: var(--primary);
-}
+/* Per-stage badge tint — every stage's tally carries its lifecycle colour so the
+   status is glanceable on the chip row even before selection. ("all" has no
+   data-status, so it keeps the neutral base badge above.) */
+.campaign-chip[data-status="open"] .campaign-chip-count { color: var(--state-open-ink); background: color-mix(in srgb, var(--state-open) 16%, var(--surface)); }
+.campaign-chip[data-status="planning"] .campaign-chip-count { color: var(--state-planning-ink); background: color-mix(in srgb, var(--state-planning) 16%, var(--surface)); }
+.campaign-chip[data-status="upcoming"] .campaign-chip-count { color: var(--state-upcoming-ink); background: color-mix(in srgb, var(--state-upcoming) 16%, var(--surface)); }
+.campaign-chip[data-status="live"] .campaign-chip-count { color: var(--state-live-ink); background: color-mix(in srgb, var(--state-live) 16%, var(--surface)); }
+.campaign-chip[data-status="past"] .campaign-chip-count { color: var(--state-completed-ink); background: color-mix(in srgb, var(--state-completed) 16%, var(--surface)); }
+
+/* Selected segment: a faint status wash on the segment + a solid status badge so
+   the active stage pops. The "all" segment keeps the brand badge. */
+.campaigns-status-chips .ant-segmented-item-selected:has(.campaign-chip[data-status="open"]) { background: color-mix(in srgb, var(--state-open) 14%, var(--surface)); }
+.campaigns-status-chips .ant-segmented-item-selected:has(.campaign-chip[data-status="planning"]) { background: color-mix(in srgb, var(--state-planning) 14%, var(--surface)); }
+.campaigns-status-chips .ant-segmented-item-selected:has(.campaign-chip[data-status="upcoming"]) { background: color-mix(in srgb, var(--state-upcoming) 14%, var(--surface)); }
+.campaigns-status-chips .ant-segmented-item-selected:has(.campaign-chip[data-status="live"]) { background: color-mix(in srgb, var(--state-live) 14%, var(--surface)); }
+.campaigns-status-chips .ant-segmented-item-selected:has(.campaign-chip[data-status="past"]) { background: color-mix(in srgb, var(--state-completed) 14%, var(--surface)); }
+.campaigns-status-chips .ant-segmented-item-selected:has(.campaign-chip[data-status="open"]) .campaign-chip-count { color: #fff; background: var(--state-open); }
+.campaigns-status-chips .ant-segmented-item-selected:has(.campaign-chip[data-status="planning"]) .campaign-chip-count { color: #fff; background: var(--state-planning); }
+.campaigns-status-chips .ant-segmented-item-selected:has(.campaign-chip[data-status="upcoming"]) .campaign-chip-count { color: #fff; background: var(--state-upcoming); }
+.campaigns-status-chips .ant-segmented-item-selected:has(.campaign-chip[data-status="live"]) .campaign-chip-count { color: #fff; background: var(--state-live); }
+.campaigns-status-chips .ant-segmented-item-selected:has(.campaign-chip[data-status="past"]) .campaign-chip-count { color: #fff; background: var(--state-completed); }
+.campaigns-status-chips .ant-segmented-item-selected:has(.campaign-chip:not([data-status])) .campaign-chip-count { color: #fff; background: var(--primary); }
 
 .campaign-chip-spin {
   display: inline-flex;

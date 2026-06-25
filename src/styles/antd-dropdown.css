@@ -334,3 +334,26 @@
 .ant-picker-header-view button:hover {
   color: var(--primary) !important;
 }
+
+/* ============================================================
+ * Campaign status filter — a leading lifecycle-colour dot per option, so the
+ * dropdown mirror of the chip row carries the same status colour. "all" has no
+ * data-status and shows the neutral dot.
+ * ============================================================ */
+.campaign-filter-opt {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.campaign-filter-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: var(--muted);
+  flex: 0 0 auto;
+}
+.campaign-filter-opt[data-status="open"] .campaign-filter-dot { background: var(--state-open); }
+.campaign-filter-opt[data-status="planning"] .campaign-filter-dot { background: var(--state-planning); }
+.campaign-filter-opt[data-status="upcoming"] .campaign-filter-dot { background: var(--state-upcoming); }
+.campaign-filter-opt[data-status="live"] .campaign-filter-dot { background: var(--state-live); }
+.campaign-filter-opt[data-status="past"] .campaign-filter-dot { background: var(--state-completed); }
