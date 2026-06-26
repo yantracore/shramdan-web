@@ -22,7 +22,7 @@ import { listAllEvents } from "@/lib/eventsApi";
 
 const STATIC_ROUTES = [
   { id: "home", labels: ["गृहपृष्ठ", "Home"], href: "/", icon: HomeOutlined },
-  { id: "campaign", labels: ["अभियानहरू", "अभियान", "समस्याहरू", "Campaign", "Campaigns", "Events", "Issues"], href: "/campaign", icon: AppstoreOutlined },
+  { id: "campaign", labels: ["अभियानहरू", "अभियान", "समस्याहरू", "Campaign", "Campaigns", "Events", "Issues"], href: "/campaigns", icon: AppstoreOutlined },
   { id: "event-types", labels: ["कार्यक्षेत्र", "Event types"], href: "/event-types", icon: AppstoreOutlined },
   { id: "intro", labels: ["परिचय", "Intro"], href: "/intro", icon: FileTextOutlined },
   { id: "learn", labels: ["सिकौँ", "Learn", "Docs"], href: "/learn", icon: FileTextOutlined },
@@ -77,7 +77,7 @@ export function CommandPalette({ language = "np" }) {
         const data = await listAllEvents({ language });
         if (!cancelled) setEventBuckets(data);
       } catch {
-        if (!cancelled) setEventBuckets({ live: [], upcoming: [], past: [] });
+        if (!cancelled) setEventBuckets({ active: [], scheduled: [], completed: [] });
       }
     })();
     return () => { cancelled = true; };

@@ -110,7 +110,7 @@ export default function MeSavedPage() {
           <EmptyState
             kind="no-saved"
             title={t.empty}
-            cta={{ label: t.browseLink, href: "/campaign" }}
+            cta={{ label: t.browseLink, href: "/campaigns" }}
           />
         ) : (
           <ul className="saved-list">

@@ -2532,11 +2532,11 @@ export function getDemoPastEvents() {
 }
 
 export function getDemoAllEvents() {
-  if (!isDev()) return { live: [], upcoming: [], past: [] };
+  if (!isDev()) return { active: [], scheduled: [], completed: [] };
   return {
-    live: DEMO_LIVE_EVENTS.map(hydrateEventLinkedIssue),
-    upcoming: DEMO_UPCOMING_EVENTS.map(hydrateEventLinkedIssue),
-    past: DEMO_PAST_EVENTS.map(hydrateEventLinkedIssue)
+    active: DEMO_LIVE_EVENTS.map(hydrateEventLinkedIssue),
+    scheduled: DEMO_UPCOMING_EVENTS.map(hydrateEventLinkedIssue),
+    completed: DEMO_PAST_EVENTS.map(hydrateEventLinkedIssue)
   };
 }
 

@@ -13,16 +13,17 @@ const nextConfig = {
       { source: "/app-development", destination: "/discussions", permanent: false },
       { source: "/app-development/:path*", destination: "/discussions", permanent: false },
 
-      // 2026-06-24 — Issues + Events list pages merged into the unified
-      // campaign surface (one status filter spanning OPEN → COMPLETED). Only the
-      // LIST routes redirect; /issues/new, /issues/:id and /events/:id
-      // detail/create pages stay where they are. Temporary (307) keeps the move
-      // reversible while the unified surface beds in.
-      // 2026-06-25 — the route was renamed to the singular /campaign; the old
-      // plural /campaigns now redirects too.
-      { source: "/issues", destination: "/campaign", permanent: false },
-      { source: "/events", destination: "/campaign", permanent: false },
-      { source: "/campaigns", destination: "/campaign", permanent: false }
+      // 2026-06-24 — Issues + Events LIST pages merged into the unified list at
+      // /campaigns (plural). Only the list routes redirect; /issues/new,
+      // /issues/:id and /events/:id stay where they are (the single-campaign
+      // detail page /campaign/:slug ships in Phase 4, at which point the
+      // /issues/:slug and /events/:slug detail redirects get added here).
+      // 2026-06-26 — list is plural /campaigns; the singular bare /campaign is
+      // reserved for the detail route, so /campaign with no slug redirects to
+      // the list. Temporary (307) keeps the move reversible.
+      { source: "/issues", destination: "/campaigns", permanent: false },
+      { source: "/events", destination: "/campaigns", permanent: false },
+      { source: "/campaign", destination: "/campaigns", permanent: false }
     ];
   }
 };

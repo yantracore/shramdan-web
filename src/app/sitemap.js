@@ -6,7 +6,7 @@ import { SITE_URL } from "@/lib/seo";
 const STATIC_ROUTES = [
   { path: "/", priority: 1.0, changeFrequency: "weekly" },
   { path: "/event-types", priority: 0.9, changeFrequency: "monthly" },
-  { path: "/campaign", priority: 0.9, changeFrequency: "daily" },
+  { path: "/campaigns", priority: 0.9, changeFrequency: "daily" },
   { path: "/issues/new", priority: 0.6, changeFrequency: "yearly" },
   { path: "/join", priority: 0.7, changeFrequency: "monthly" },
   { path: "/feedback", priority: 0.5, changeFrequency: "monthly" },

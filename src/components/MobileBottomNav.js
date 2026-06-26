@@ -40,7 +40,7 @@ const TABS = [
   { id: "home", href: "/", icon: HomeOutlined, match: (p) => p === "/" },
   {
     id: "campaign",
-    href: "/campaign",
+    href: "/campaigns",
     icon: AppstoreOutlined,
     match: (p) =>
       p?.startsWith("/campaign") || p?.startsWith("/events") || p?.startsWith("/issues")

@@ -198,7 +198,7 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
   const pillNavItems = [
     { href: "/", label: t.nav.home },
     {
-      href: "/campaign",
+      href: "/campaigns",
       label: t.nav.campaigns,
       count: formatNavCount(campaignsCount, language),
       countTone: "events"
@@ -370,7 +370,7 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
 
   const pagesLinks = [
     { href: "/", label: t.nav.home },
-    { href: "/campaign", label: t.nav.campaigns },
+    { href: "/campaigns", label: t.nav.campaigns },
     { href: "/event-types", label: t.nav.eventTypes }
   ];
   const learnLinks = [

@@ -198,7 +198,7 @@ export function StreamList({
   const [mode, setMode] = useState(defaultMode);
 
   // Per-mode data buckets so switching tabs doesn't re-fetch each time.
-  const [eventBuckets, setEventBuckets] = useState({ live: [], upcoming: [], past: [] });
+  const [eventBuckets, setEventBuckets] = useState({ active: [], scheduled: [], completed: [] });
   const [eventsLoaded, setEventsLoaded] = useState(false);
   const [issues, setIssues] = useState([]);
   const [issuesLoaded, setIssuesLoaded] = useState(false);
@@ -220,7 +220,7 @@ export function StreamList({
           });
         } catch {
           if (cancelled) return;
-          setEventBuckets({ live: [], upcoming: [], past: [] });
+          setEventBuckets({ active: [], scheduled: [], completed: [] });
         } finally {
           if (!cancelled) setEventsLoaded(true);
         }
@@ -351,7 +351,7 @@ export function StreamList({
               {t.locationCta || (language === "np" ? "नजिकैका देखाउने" : "Show nearby")}
             </button>
           ) : null}
-          <Link className="home-for-you-view-all" href="/campaign">
+          <Link className="home-for-you-view-all" href="/campaigns">
             {language === "np" ? "सबै हेर्ने" : "View all"}
             <ArrowRightOutlined aria-hidden="true" />
           </Link>
@@ -389,7 +389,7 @@ export function StreamList({
                 ? "अहिले देखाउन कुनै कुरा छैन।"
                 : "Nothing to show right now.")}
           </p>
-          <Link className="home-for-you-empty-cta" href="/campaign">
+          <Link className="home-for-you-empty-cta" href="/campaigns">
             {language === "np"
               ? mode === "event" ? "सबै अभियान हेर्ने" : "सबै समस्या हेर्ने"
               : mode === "event" ? "Browse all events" : "Browse all issues"}

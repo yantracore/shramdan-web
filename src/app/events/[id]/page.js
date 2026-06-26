@@ -316,7 +316,7 @@ export default function EventDetailPage() {
     <SiteShell pageTitle={pageTitle || content.detail.defaultTitle}>
       <section className="page-section public-issue-detail-section">
         <div className="public-issue-back-row">
-          <TertiaryButton href="/campaign" icon={<ArrowLeftOutlined />}>
+          <TertiaryButton href="/campaigns" icon={<ArrowLeftOutlined />}>
             {content.detail.backToEvents}
           </TertiaryButton>
           <PrintButton language={language} />
@@ -354,7 +354,7 @@ export default function EventDetailPage() {
               </>
             }
           >
-            <Link href="/campaign">
+            <Link href="/campaigns">
               <Button type="primary">{content.detail.backToEvents}</Button>
             </Link>
           </Empty>
