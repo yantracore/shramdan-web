@@ -5,6 +5,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useSyncExte
 import { GlobalFileDragWatcher } from "@/components/GlobalFileDragWatcher";
 import { NotificationsProvider } from "@/components/NotificationsProvider";
 import { SessionExpirationWatcher } from "@/components/SessionExpirationWatcher";
+import { ApiHealthWatcher } from "@/components/ApiHealthWatcher";
 
 const PreferenceContext = createContext(null);
 const THEME_STORAGE_KEY = "shramdan-theme";
@@ -271,6 +272,7 @@ export function Providers({ children }) {
       <ConfigProvider theme={theme}>
         <AntdApp>
           <SessionExpirationWatcher />
+          <ApiHealthWatcher />
           <GlobalFileDragWatcher />
           <NotificationsProvider>{children}</NotificationsProvider>
         </AntdApp>

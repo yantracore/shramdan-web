@@ -15,6 +15,7 @@
 @import "../styles/home-search.css";
 @import "../styles/discussions.css";
 @import "../styles/contribute.css";
+@import "../styles/api-health-banner.css";
 
 :root {
   color-scheme: light;

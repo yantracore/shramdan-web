@@ -5,6 +5,7 @@ import {
   getStoredRefreshToken,
   setAuthSession
 } from "@/lib/authSession";
+import { reportApiDown, reportApiUp } from "@/lib/apiHealth";
 
 // Staging (active). Temporary devtunnel z0n76c1j-3000 is retired.
 const FALLBACK_API_BASE_URL = "https://backend.shramdan.org/api/v1";
@@ -87,7 +88,7 @@ let inFlightRefresh = null;
 
 async function performRefresh(refreshToken) {
   const url = createApiUrl(REFRESH_PATH);
-  const response = await fetch(url, {
+  const response = await trackedFetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ refreshToken })
@@ -139,6 +140,35 @@ function refreshAccessToken() {
   return inFlightRefresh;
 }
 
+const UNAVAILABLE_STATUSES = new Set([502, 503, 504]);
+
+// One choke point for every network call. A dead/unreachable backend (fetch
+// reject) or a gateway 5xx becomes an ApiError + a health "down" report; any
+// real answer from the server (even a 4xx) reports "up".
+async function trackedFetch(url, init) {
+  let response;
+  try {
+    response = await fetch(url, init);
+  } catch {
+    reportApiDown("unreachable");
+    throw new ApiError("Can't reach the server right now.", {
+      errorCode: "SERVER_UNREACHABLE",
+      status: 0
+    });
+  }
+
+  if (UNAVAILABLE_STATUSES.has(response.status)) {
+    reportApiDown("service_unavailable");
+    throw new ApiError("The server is temporarily unavailable.", {
+      errorCode: "SERVICE_UNAVAILABLE",
+      status: response.status
+    });
+  }
+
+  reportApiUp();
+  return response;
+}
+
 async function parseResponse(response) {
   const responseText = await response.text();
 
@@ -183,7 +213,7 @@ export async function apiRequest(path, options = {}) {
     });
   }
 
-  const response = await fetch(createApiUrl(path, params), {
+  const response = await trackedFetch(createApiUrl(path, params), {
     method,
     headers: requestHeaders,
     body: body === undefined ? undefined : JSON.stringify(compactPayload(body))
