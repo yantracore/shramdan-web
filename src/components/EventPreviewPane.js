@@ -6,6 +6,7 @@ import {
   ArrowLeftOutlined,
   ArrowRightOutlined,
   CalendarOutlined,
+  CheckCircleFilled,
   ClockCircleOutlined,
   EnvironmentOutlined,
   TeamOutlined,
@@ -198,9 +199,21 @@ export function EventPreviewPane({
     FALLBACK_HERO;
 
   const dateText =
-    status === "past"
+    status === "completed"
       ? formatDateLong(event.completedAt, language)
       : formatDateLong(event.scheduledAt || event.liveStream?.startedAt, language);
+
+  // Toward-campaign tally for the DRAFT (planning) banner: sum the people each
+  // needed role still wants vs how many have joined. Once an issue is promoted a
+  // campaign row exists, so we surface "campaign created" + this X/Y rather than
+  // hiding the stage — see docs/design/06-state-color-system.md.
+  const roleTotals = (Array.isArray(event.rolesNeeded) ? event.rolesNeeded : []).reduce(
+    (acc, r) => ({
+      filled: acc.filled + (Number(r.filled) || 0),
+      needed: acc.needed + (Number(r.count) || 0)
+    }),
+    { filled: 0, needed: 0 }
+  );
 
   return (
     <>
@@ -239,13 +252,13 @@ export function EventPreviewPane({
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img className="event-preview-media-hero" src={hero} alt="" />
             <div className="event-preview-media-overlay">
-              {status === "upcoming" && event.scheduledAt ? (
+              {status === "scheduled" && event.scheduledAt ? (
                 <span>
                   <CalendarOutlined aria-hidden="true" />{" "}
                   {formatDateLong(event.scheduledAt, language)}
                 </span>
               ) : null}
-              {status === "past" && event.completedAt ? (
+              {status === "completed" && event.completedAt ? (
                 <span>
                   <ClockCircleOutlined aria-hidden="true" />{" "}
                   {formatDateLong(event.completedAt, language)}
@@ -263,25 +276,48 @@ export function EventPreviewPane({
           </Link>
         </h2>
 
-        {(status !== "live" || event.riskLevel) ? (
+        {(status !== "active" || event.riskLevel) ? (
           <div className="event-preview-tags">
-            {status !== "live" ? (
+            {status !== "active" ? (
               <span
                 className="event-list-card-status-pill"
                 data-status={status}
               >
-                {status === "upcoming" ? t.filters.upcoming : t.filters.past}
+                {status === "scheduled"
+                  ? t.filters.upcoming
+                  : status === "draft"
+                    ? t.filters.planning
+                    : t.filters.past}
               </span>
             ) : null}
             {event.riskLevel ? (
               <span
                 className="event-list-card-status-pill"
-                data-status="upcoming"
+                data-status="scheduled"
               >
                 <WarningOutlined aria-hidden="true" />{" "}
                 {t.preview.risk?.[event.riskLevel] || event.riskLevel}
               </span>
             ) : null}
+          </div>
+        ) : null}
+
+        {status === "draft" ? (
+          <div className="event-preview-campaign-created" data-status="draft">
+            <span className="event-preview-campaign-created-head">
+              <CheckCircleFilled aria-hidden="true" />
+              <strong>{t.preview.campaignCreated}</strong>
+              {roleTotals.needed > 0 ? (
+                <span className="event-preview-toward-campaign">
+                  {t.preview.towardCampaign
+                    .replace("{x}", localizeDigits(roleTotals.filled, language))
+                    .replace("{y}", localizeDigits(roleTotals.needed, language))}
+                </span>
+              ) : null}
+            </span>
+            <span className="event-preview-campaign-created-hint">
+              {t.preview.campaignCreatedHint}
+            </span>
           </div>
         ) : null}
 
@@ -310,7 +346,7 @@ export function EventPreviewPane({
               <TeamOutlined aria-hidden="true" /> {event.leaderName}
             </span>
           ) : null}
-          {status === "past" && Number.isFinite(event.participantCount) ? (
+          {status === "completed" && Number.isFinite(event.participantCount) ? (
             <span>
               <TeamOutlined aria-hidden="true" />{" "}
               {localizeDigits(event.participantCount, language)} {t.meta.participants}
@@ -338,7 +374,7 @@ export function EventPreviewPane({
           </>
         ) : null}
 
-        {status === "past" && event.resultSummary ? (
+        {status === "completed" && event.resultSummary ? (
           <section className="event-preview-section">
             <h3>{t.preview.result}</h3>
             <p>{event.resultSummary}</p>
@@ -373,7 +409,7 @@ export function EventPreviewPane({
           </section>
         ) : null}
 
-        {status === "past" && Array.isArray(event.photos) && event.photos.length > 0 ? (
+        {status === "completed" && Array.isArray(event.photos) && event.photos.length > 0 ? (
           <section className="event-preview-section">
             <h3>{t.preview.photos}</h3>
             <div className="event-preview-photos">
@@ -387,7 +423,7 @@ export function EventPreviewPane({
           </section>
         ) : null}
 
-        {status === "past" && Array.isArray(event.testimonials) && event.testimonials.length > 0 ? (
+        {status === "completed" && Array.isArray(event.testimonials) && event.testimonials.length > 0 ? (
           <section className="event-preview-section">
             <h3>{t.preview.voices}</h3>
             <div className="event-preview-voices">
@@ -411,6 +447,7 @@ export function EventPreviewPane({
             eventId={event.id}
             seed={event}
             language={language}
+            status={status}
           />
           <Link
             className="event-preview-open"

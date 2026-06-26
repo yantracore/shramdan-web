@@ -87,7 +87,7 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: #d2360b;
+  color: var(--state-active);
   font-weight: 600;
 }
 
@@ -96,8 +96,8 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #d2360b;
-  box-shadow: 0 0 0 0 rgba(210, 54, 11, 0.55);
+  background: var(--state-active);
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--state-active) 55%, transparent);
   animation: live-dot-pulse 1.6s ease-out infinite;
 }
 
@@ -402,7 +402,7 @@
 }
 
 .events-home-rail-poster-badge--live {
-  background: rgba(210, 54, 11, 0.92);
+  background: color-mix(in srgb, var(--state-active) 92%, transparent);
   animation: live-badge-blink 2.4s ease-in-out infinite;
 }
 
@@ -630,7 +630,7 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: #d2360b;
+  color: var(--state-active);
   font-weight: 600;
 }
 
@@ -639,20 +639,20 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #d2360b;
-  box-shadow: 0 0 0 0 rgba(210, 54, 11, 0.55);
+  background: var(--state-active);
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--state-active) 55%, transparent);
   animation: live-dot-pulse 1.6s ease-out infinite;
 }
 
 @keyframes live-dot-pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(210, 54, 11, 0.55);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--state-active) 55%, transparent);
   }
   70% {
-    box-shadow: 0 0 0 10px rgba(210, 54, 11, 0);
+    box-shadow: 0 0 0 10px transparent;
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(210, 54, 11, 0);
+    box-shadow: 0 0 0 0 transparent;
   }
 }
 
@@ -744,7 +744,7 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  background: rgba(210, 54, 11, 0.92);
+  background: color-mix(in srgb, var(--state-active) 92%, transparent);
   color: #fff;
   padding: 2px 7px;
   border-radius: var(--radius-pill);
@@ -859,7 +859,7 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  background: rgba(210, 54, 11, 0.92);
+  background: color-mix(in srgb, var(--state-active) 92%, transparent);
   color: #fff;
   padding: 2px 8px;
   border-radius: var(--radius-pill);
@@ -892,7 +892,7 @@
   align-items: baseline;
   gap: 8px;
   margin-left: auto;
-  color: var(--accent);
+  color: var(--state-active);
   font-weight: 700;
   animation: live-viewers-breathe 3.2s ease-in-out infinite;
 }

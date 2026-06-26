@@ -87,9 +87,9 @@ export const EventListCard = forwardRef(function EventListCard(
   // to the live/upcoming/past wording when no override is given.
   const statusLabel =
     statusLabelOverride ??
-    (status === "live"
+    (status === "active"
       ? t.filters.live
-      : status === "upcoming"
+      : status === "scheduled"
         ? t.filters.upcoming
         : t.filters.past);
 
@@ -116,13 +116,13 @@ export const EventListCard = forwardRef(function EventListCard(
       <div className="event-list-card-thumb">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={thumb} alt="" loading="lazy" />
-        {status === "live" ? (
+        {status === "active" ? (
           <span className="event-list-card-live-pill">
             <span className="live-dot" aria-hidden="true" />
             {t.meta.live}
           </span>
         ) : null}
-        {status === "live" && Number.isFinite(participantCount) ? (
+        {status === "active" && Number.isFinite(participantCount) ? (
           <span className="event-list-card-viewers" aria-hidden="true">
             {localizeDigits(participantCount, language)}
           </span>
@@ -130,7 +130,7 @@ export const EventListCard = forwardRef(function EventListCard(
       </div>
       <div className="event-list-card-body">
         <h3>{event.title}</h3>
-        {status !== "live" ? (
+        {status !== "active" ? (
           <div className="event-list-card-pill-row">
             <span className="event-list-card-status-pill" data-status={status}>
               {statusLabel}
@@ -143,19 +143,19 @@ export const EventListCard = forwardRef(function EventListCard(
           </p>
         ) : null}
         <p className="event-list-card-meta-secondary">
-          {status === "live" && Number.isFinite(participantCount) ? (
+          {status === "active" && Number.isFinite(participantCount) ? (
             <span>
               <TeamOutlined aria-hidden="true" />
               {localizeDigits(participantCount, language)} {t.meta.participants}
             </span>
           ) : null}
-          {status === "upcoming" && event.scheduledAt ? (
+          {status === "scheduled" && event.scheduledAt ? (
             <span>
               <CalendarOutlined aria-hidden="true" />
               {formatSchedulePill(event.scheduledAt, language)}
             </span>
           ) : null}
-          {status === "upcoming" && event.durationMinutes ? (
+          {status === "scheduled" && event.durationMinutes ? (
             <span>
               <ClockCircleOutlined aria-hidden="true" />
               {t.meta.durationMin.replace(
@@ -164,13 +164,13 @@ export const EventListCard = forwardRef(function EventListCard(
               )}
             </span>
           ) : null}
-          {status === "past" && event.completedAt ? (
+          {status === "completed" && event.completedAt ? (
             <span>
               <ClockCircleOutlined aria-hidden="true" />
               {timeFromNow(event.completedAt, language)} {t.meta.ago}
             </span>
           ) : null}
-          {status === "past" && Number.isFinite(event.participantCount) ? (
+          {status === "completed" && Number.isFinite(event.participantCount) ? (
             <span>
               <TeamOutlined aria-hidden="true" />
               {localizeDigits(event.participantCount, language)} {t.meta.participants}

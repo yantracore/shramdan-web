@@ -353,7 +353,7 @@
   flex: 0 0 auto;
 }
 .campaign-filter-opt[data-status="open"] .campaign-filter-dot { background: var(--state-open); }
-.campaign-filter-opt[data-status="planning"] .campaign-filter-dot { background: var(--state-planning); }
-.campaign-filter-opt[data-status="upcoming"] .campaign-filter-dot { background: var(--state-upcoming); }
-.campaign-filter-opt[data-status="live"] .campaign-filter-dot { background: var(--state-live); }
-.campaign-filter-opt[data-status="past"] .campaign-filter-dot { background: var(--state-completed); }
+.campaign-filter-opt[data-status="draft"] .campaign-filter-dot { background: var(--state-draft); }
+.campaign-filter-opt[data-status="scheduled"] .campaign-filter-dot { background: var(--state-scheduled); }
+.campaign-filter-opt[data-status="active"] .campaign-filter-dot { background: var(--state-active); }
+.campaign-filter-opt[data-status="completed"] .campaign-filter-dot { background: var(--state-completed); }

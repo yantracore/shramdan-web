@@ -11,16 +11,15 @@ import { forwardRef } from "react";
 import { getIssueCoverImageUrl, localizeIssue } from "@/lib/adminUtils";
 import { IssueMapThumb } from "@/components/IssueMapThumb";
 
-// Maps the API issue status onto the same data-status hooks the event card
-// already styles (live | upcoming | past). EVENT_SCHEDULED is the most active
-// state — the issue is being actively organized into a campaign — so it gets
-// the accent treatment that `live` uses. OPEN is the "gathering support"
-// state, mapped to the primary-toned `upcoming` style. COMPLETED maps to the
-// muted `past` style.
+// Maps the API issue status onto the lifecycle data-status hooks the cards
+// style — ALWAYS the technical status (open | draft | scheduled | active |
+// completed). One vocabulary; see docs/design/06-state-color-system.md.
 function visualStatus(apiStatus) {
-  if (apiStatus === "EVENT_SCHEDULED") return "live";
-  if (apiStatus === "COMPLETED") return "past";
-  return "upcoming";
+  if (apiStatus === "EVENT_DRAFT") return "draft";
+  if (apiStatus === "EVENT_SCHEDULED") return "scheduled";
+  if (apiStatus === "EVENT_ACTIVE" || apiStatus === "ACTIVE") return "active";
+  if (apiStatus === "COMPLETED") return "completed";
+  return "open";
 }
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];

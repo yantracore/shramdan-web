@@ -102,19 +102,19 @@
   background: var(--state-open);
 }
 
-.event-list-card[data-status="planning"]::before {
-  background: var(--state-planning);
+.event-list-card[data-status="draft"]::before {
+  background: var(--state-draft);
 }
 
-.event-list-card[data-status="upcoming"]::before {
-  background: var(--state-upcoming);
+.event-list-card[data-status="scheduled"]::before {
+  background: var(--state-scheduled);
 }
 
-.event-list-card[data-status="live"]::before {
-  background: var(--state-live);
+.event-list-card[data-status="active"]::before {
+  background: var(--state-active);
 }
 
-.event-list-card[data-status="past"]::before {
+.event-list-card[data-status="completed"]::before {
   background: var(--state-completed);
 }
 
@@ -188,7 +188,7 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #fff;
-  background: var(--state-live);
+  background: var(--state-active);
   border-radius: 999px;
   line-height: 1;
 }
@@ -250,22 +250,22 @@
   background: color-mix(in srgb, var(--state-open) 14%, var(--surface));
 }
 
-.event-list-card-status-pill[data-status="planning"] {
-  color: var(--state-planning-ink);
-  background: color-mix(in srgb, var(--state-planning) 16%, var(--surface));
+.event-list-card-status-pill[data-status="draft"] {
+  color: var(--state-draft-ink);
+  background: color-mix(in srgb, var(--state-draft) 16%, var(--surface));
 }
 
-.event-list-card-status-pill[data-status="upcoming"] {
-  color: var(--state-upcoming-ink);
-  background: color-mix(in srgb, var(--state-upcoming) 14%, var(--surface));
+.event-list-card-status-pill[data-status="scheduled"] {
+  color: var(--state-scheduled-ink);
+  background: color-mix(in srgb, var(--state-scheduled) 14%, var(--surface));
 }
 
-.event-list-card-status-pill[data-status="live"] {
-  color: var(--state-live-ink);
-  background: color-mix(in srgb, var(--state-live) 16%, var(--surface));
+.event-list-card-status-pill[data-status="active"] {
+  color: var(--state-active-ink);
+  background: color-mix(in srgb, var(--state-active) 16%, var(--surface));
 }
 
-.event-list-card-status-pill[data-status="past"] {
+.event-list-card-status-pill[data-status="completed"] {
   color: var(--state-completed-ink);
   background: color-mix(in srgb, var(--state-completed) 16%, var(--surface));
 }
@@ -540,8 +540,8 @@
   gap: 3px;
   padding: 10px 12px;
   border-radius: var(--radius-md);
-  border: 1px solid color-mix(in srgb, var(--state-planning) 28%, var(--line));
-  background: color-mix(in srgb, var(--state-planning) 10%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--state-draft) 28%, var(--line));
+  background: color-mix(in srgb, var(--state-draft) 10%, var(--surface));
 }
 
 .event-preview-campaign-created-head {
@@ -550,11 +550,11 @@
   flex-wrap: wrap;
   gap: 8px;
   font-size: 14px;
-  color: var(--state-planning-ink);
+  color: var(--state-draft-ink);
 }
 
 .event-preview-campaign-created-head .anticon {
-  color: var(--state-planning);
+  color: var(--state-draft);
 }
 
 .event-preview-toward-campaign {
@@ -564,7 +564,7 @@
   font-size: 12.5px;
   font-weight: 700;
   color: #fff;
-  background: var(--state-planning);
+  background: var(--state-draft);
 }
 
 .event-preview-campaign-created-hint {
@@ -821,9 +821,9 @@
   box-shadow: 0 4px 14px -10px color-mix(in srgb, var(--primary) 60%, transparent);
 }
 
-.activity-type-tab[data-status="live"].is-active {
-  border-color: color-mix(in srgb, var(--state-live) 36%, var(--line));
-  box-shadow: 0 4px 14px -10px color-mix(in srgb, var(--state-live) 60%, transparent);
+.activity-type-tab[data-status="active"].is-active {
+  border-color: color-mix(in srgb, var(--state-active) 36%, var(--line));
+  box-shadow: 0 4px 14px -10px color-mix(in srgb, var(--state-active) 60%, transparent);
 }
 
 .activity-type-tab-icon {
@@ -838,9 +838,9 @@
   color: var(--primary-dark);
 }
 
-.activity-type-tab[data-status="live"] .activity-type-tab-icon {
-  background: color-mix(in srgb, var(--state-live) 14%, var(--surface));
-  color: var(--state-live-ink);
+.activity-type-tab[data-status="active"] .activity-type-tab-icon {
+  background: color-mix(in srgb, var(--state-active) 14%, var(--surface));
+  color: var(--state-active-ink);
 }
 
 .activity-type-tab-body {

@@ -10,6 +10,7 @@ import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import { getIssueCoverImageUrl, localizeIssue } from "@/lib/adminUtils";
 import { IssueMapThumb } from "@/components/IssueMapThumb";
+import { campaignStatusLabel } from "@/lib/campaignStatus";
 
 const NEPAL_BOUNDS = [
   [26.3, 80.0],
@@ -21,19 +22,31 @@ const NEPAL_MAX_BOUNDS = [
   [32.0, 90.0]
 ];
 
+// API issue status -> the technical lifecycle status used everywhere (one vocab).
+function visualStatus(apiStatus) {
+  if (apiStatus === "EVENT_DRAFT") return "draft";
+  if (apiStatus === "EVENT_SCHEDULED") return "scheduled";
+  if (apiStatus === "EVENT_ACTIVE" || apiStatus === "ACTIVE") return "active";
+  if (apiStatus === "COMPLETED") return "completed";
+  return "open";
+}
+
 const STATUS_PIN_CLASS = {
-  OPEN: "issue-pin--open",
-  EVENT_SCHEDULED: "issue-pin--scheduled",
-  COMPLETED: "issue-pin--completed"
+  open: "issue-pin--open",
+  draft: "issue-pin--draft",
+  scheduled: "issue-pin--scheduled",
+  active: "issue-pin--active",
+  completed: "issue-pin--completed",
+  paused: "issue-pin--paused"
 };
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 const pinIconCache = new Map();
 
 function getPinIcon(status) {
-  const key = status || "OPEN";
+  const key = status || "open";
   if (pinIconCache.has(key)) return pinIconCache.get(key);
-  const cls = STATUS_PIN_CLASS[key] || STATUS_PIN_CLASS.OPEN;
+  const cls = STATUS_PIN_CLASS[key] || STATUS_PIN_CLASS.open;
   const icon = L.divIcon({
     className: `issue-pin ${cls}`,
     html: '<span class="issue-pin-dot" aria-hidden="true"></span>',
@@ -113,8 +126,8 @@ export function MapPinGlyph() {
     <svg
       className="map-pop-pin-ico"
       viewBox="0 0 24 24"
-      width="13"
-      height="13"
+      width="12"
+      height="12"
       aria-hidden="true"
     >
       <path
@@ -127,7 +140,7 @@ export function MapPinGlyph() {
 
 export function MapArrowGlyph() {
   return (
-    <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+    <svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true">
       <path
         fill="none"
         stroke="currentColor"
@@ -173,7 +186,7 @@ export function SupporterStack({ seed, count }) {
           className="map-pop-avatar"
           style={{ backgroundImage: AVATAR_GRADIENTS[(base + i) % AVATAR_GRADIENTS.length] }}
         >
-          <svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="10" height="10" aria-hidden="true">
             <path
               fill="rgba(255,255,255,0.92)"
               d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4zm0 2c-3.3 0-8 1.66-8 5v1h16v-1c0-3.34-4.7-5-8-5z"
@@ -189,8 +202,10 @@ export function IssueMarker({ issue: rawIssue, interactive, showPopup, content, 
   const issue = localizeIssue(rawIssue, language);
   const lat = Number(issue.latitude);
   const lng = Number(issue.longitude);
-  const statusLabel =
-    content?.statusLabels?.[issue.status] || issue.status || "";
+  const statusLabel = campaignStatusLabel(
+    visualStatus(issue.status).toUpperCase(),
+    language
+  );
   const categoryLabel =
     content?.categoryLabels?.[issue.category] || issue.category || "";
   const votes = Number(issue.voteCount) || 0;
@@ -208,7 +223,7 @@ export function IssueMarker({ issue: rawIssue, interactive, showPopup, content, 
   return (
     <Marker
       position={[lat, lng]}
-      icon={getPinIcon(issue.status)}
+      icon={getPinIcon(visualStatus(issue.status))}
       title={markerLabel}
       alt={markerLabel}
       keyboard
@@ -226,7 +241,7 @@ export function IssueMarker({ issue: rawIssue, interactive, showPopup, content, 
               )}
               <span className="map-pop-scrim" aria-hidden="true" />
               <span
-                className={`map-pop-badge map-pop-badge--${issue.status || "OPEN"}`}
+                className={`map-pop-badge map-pop-badge--${visualStatus(issue.status)}`}
               >
                 <span className="map-pop-badge-dot" aria-hidden="true" />
                 {statusLabel}
@@ -250,23 +265,27 @@ export function IssueMarker({ issue: rawIssue, interactive, showPopup, content, 
                   <span>{issue.addressText}</span>
                 </p>
               ) : null}
-              {votes > 0 ? (
-                <div className="map-pop-people">
-                  <SupporterStack
-                    seed={issue.id ?? issue.slug ?? markerLabel}
-                    count={votes}
-                  />
-                  <span className="map-pop-count">{voteText}</span>
-                </div>
-              ) : null}
               {issue.id ? (
-                <Link
-                  href={`/issues/${issue.slug ?? issue.id}`}
-                  className="map-pop-cta"
+                <div
+                  className={`map-pop-foot${votes > 0 ? "" : " map-pop-foot--solo"}`}
                 >
-                  <span>{content?.card?.viewDetail || "View"}</span>
-                  <MapArrowGlyph />
-                </Link>
+                  {votes > 0 ? (
+                    <div className="map-pop-people">
+                      <SupporterStack
+                        seed={issue.id ?? issue.slug ?? markerLabel}
+                        count={votes}
+                      />
+                      <span className="map-pop-count">{voteText}</span>
+                    </div>
+                  ) : null}
+                  <Link
+                    href={`/issues/${issue.slug ?? issue.id}`}
+                    className="map-pop-cta"
+                  >
+                    <span>{content?.card?.viewDetail || "View"}</span>
+                    <MapArrowGlyph />
+                  </Link>
+                </div>
               ) : null}
             </div>
           </div>

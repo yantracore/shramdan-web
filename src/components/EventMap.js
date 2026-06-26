@@ -10,6 +10,7 @@ import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import { IssueMarker, MapArrowGlyph, MapPinGlyph } from "./IssueMap";
 import { IssueMapThumb } from "@/components/IssueMapThumb";
+import { campaignStatusLabel } from "@/lib/campaignStatus";
 
 const NEPAL_BOUNDS = [
   [26.3, 80.0],
@@ -22,18 +23,21 @@ const NEPAL_MAX_BOUNDS = [
 ];
 
 const STATUS_PIN_CLASS = {
-  live: "event-pin--live",
-  upcoming: "event-pin--upcoming",
-  past: "event-pin--past"
+  open: "issue-pin--open",
+  draft: "issue-pin--draft",
+  scheduled: "issue-pin--scheduled",
+  active: "issue-pin--active",
+  completed: "issue-pin--completed",
+  paused: "issue-pin--paused"
 };
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 const pinIconCache = new Map();
 
 function getPinIcon(status) {
-  const key = status || "upcoming";
+  const key = status || "scheduled";
   if (pinIconCache.has(key)) return pinIconCache.get(key);
-  const cls = STATUS_PIN_CLASS[key] || STATUS_PIN_CLASS.upcoming;
+  const cls = STATUS_PIN_CLASS[key] || STATUS_PIN_CLASS.scheduled;
   const icon = L.divIcon({
     className: `issue-pin ${cls}`,
     html: '<span class="issue-pin-dot" aria-hidden="true"></span>',
@@ -107,7 +111,7 @@ function toLocalDigits(value, language) {
 // badge over the image, so the eyebrow stays the "when" without repeating it.
 function formatEventDate(event, status, language) {
   const iso =
-    status === "past"
+    status === "completed"
       ? event.completedAt || event.scheduledAt
       : event.scheduledAt;
   if (!iso) return null;
@@ -136,7 +140,7 @@ function EventMarker({ entry, interactive, showPopup, t, language }) {
   const { event, status } = entry;
   const lat = Number(event.latitude);
   const lng = Number(event.longitude);
-  const statusLabel = t?.statusLabels?.[status] || status || "";
+  const statusLabel = campaignStatusLabel(String(status).toUpperCase(), language);
   const dateLabel = formatEventDate(event, status, language);
   const markerLabel = event.title || event.addressText || statusLabel || "Map marker";
   const coverUrl = getIssueCoverImageUrl(event);
@@ -162,7 +166,7 @@ function EventMarker({ entry, interactive, showPopup, t, language }) {
               )}
               <span className="map-pop-scrim" aria-hidden="true" />
               <span
-                className={`map-pop-badge map-pop-badge--${status || "upcoming"}`}
+                className={`map-pop-badge map-pop-badge--${status || "scheduled"}`}
               >
                 <span className="map-pop-badge-dot" aria-hidden="true" />
                 {statusLabel}
@@ -187,13 +191,15 @@ function EventMarker({ entry, interactive, showPopup, t, language }) {
                 </p>
               ) : null}
               {event.id ? (
-                <Link
-                  href={`/events/${event.slug ?? event.id}`}
-                  className="map-pop-cta"
-                >
-                  <span>{t?.viewDetail || "View"}</span>
-                  <MapArrowGlyph />
-                </Link>
+                <div className="map-pop-foot map-pop-foot--solo">
+                  <Link
+                    href={`/events/${event.slug ?? event.id}`}
+                    className="map-pop-cta"
+                  >
+                    <span>{t?.viewDetail || "View"}</span>
+                    <MapArrowGlyph />
+                  </Link>
+                </div>
               ) : null}
             </div>
           </div>

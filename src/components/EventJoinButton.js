@@ -44,7 +44,7 @@ const ROLE_LABELS_EN = {
   LOGISTICS: "Logistics"
 };
 
-export function EventJoinButton({ eventId, seed, language = "np", size }) {
+export function EventJoinButton({ eventId, seed, language = "np", size, status }) {
   const lang = language === "en" ? "en" : "np";
   const bc = BUTTON_COPY[lang];
 
@@ -54,7 +54,18 @@ export function EventJoinButton({ eventId, seed, language = "np", size }) {
   // (joinable = false means COMPLETED/CANCELLED/PAUSED with no active viewer role.)
   if (!join.joinable && !join.viewerRole) return null;
 
-  const label = join.viewerRole ? bc.joinedAs(join.viewerRole) : bc.join;
+  // Hybrid CTA colour (see docs/design/06-state-color-system.md): one constant
+  // teal action colour, with LIVE as the single exception — a red "join now".
+  // The status colour is identity; this is the action colour, deliberately kept
+  // separate, so we read the lifecycle tokens rather than the card's data-status.
+  const accent = status === "active" ? "var(--state-active)" : "var(--primary)";
+  const liveLabel = lang === "np" ? "अहिले जोडिने" : "Join now";
+
+  const label = join.viewerRole
+    ? bc.joinedAs(join.viewerRole)
+    : status === "active"
+      ? liveLabel
+      : bc.join;
 
   // Button style: primary when unjoined, default when already in.
   const btnType = join.viewerRole ? "default" : "primary";
@@ -68,9 +79,9 @@ export function EventJoinButton({ eventId, seed, language = "np", size }) {
           cursor: "pointer",
           padding: size === "small" ? "4px 12px" : "6px 16px",
           borderRadius: 8,
-          border: join.viewerRole ? "1.5px solid #4caf50" : "none",
-          background: join.viewerRole ? "transparent" : "#4caf50",
-          color: join.viewerRole ? "#4caf50" : "#fff",
+          border: join.viewerRole ? `1.5px solid ${accent}` : "none",
+          background: join.viewerRole ? "transparent" : accent,
+          color: join.viewerRole ? accent : "#fff",
           fontWeight: 600,
           fontSize: size === "small" ? 13 : 14,
           lineHeight: "1.5",
@@ -88,15 +99,16 @@ export function EventJoinButton({ eventId, seed, language = "np", size }) {
         {join.loading ? (lang === "np" ? "लोड…" : "Loading…") : label}
       </button>
 
+      {/* Same shell + width as SupportRolesModal so the role picker is identical
+          in size across every lifecycle stage (OPEN support vs DRAFT/LIVE join). */}
       <Modal
         open={join.open}
         onCancel={join.closeModal}
         footer={null}
         title={bc.modalTitle}
         destroyOnHidden
-        centered
-        width={480}
-        styles={{ body: { padding: "8px 0 4px" } }}
+        width={680}
+        className="support-roles-modal"
       >
         <ParticipantsPanel
           {...join.panelProps}

@@ -3451,13 +3451,13 @@
 }
 
 .impact-pulse-strip-tile.pulse-live .impact-pulse-strip-tile-icon {
-  background: color-mix(in srgb, var(--state-live) 12%, transparent);
-  color: var(--state-live);
+  background: color-mix(in srgb, var(--state-active) 12%, transparent);
+  color: var(--state-active);
 }
 
 .impact-pulse-strip-tile.pulse-upcoming .impact-pulse-strip-tile-icon {
-  background: color-mix(in srgb, var(--state-upcoming) 12%, transparent);
-  color: var(--state-upcoming-ink);
+  background: color-mix(in srgb, var(--state-scheduled) 12%, transparent);
+  color: var(--state-scheduled-ink);
 }
 
 .impact-pulse-strip-tile.pulse-completed .impact-pulse-strip-tile-icon {
@@ -3750,7 +3750,7 @@
 .notifications-item-icon--vote { background: var(--primary); }
 .notifications-item-icon--schedule { background: #1d4ed8; }
 .notifications-item-icon--result { background: #2e7d32; }
-.notifications-item-icon--live { background: var(--state-live); }
+.notifications-item-icon--live { background: var(--state-active); }
 .notifications-item-icon--welcome { background: #7b3fa0; }
 
 .notifications-item-text {
@@ -6620,35 +6620,35 @@
   background: var(--state-open);
 }
 
-.campaign-detail-status[data-status="planning"] {
-  color: var(--state-planning-ink);
-  background: color-mix(in srgb, var(--state-planning) 16%, var(--surface));
+.campaign-detail-status[data-status="draft"] {
+  color: var(--state-draft-ink);
+  background: color-mix(in srgb, var(--state-draft) 16%, var(--surface));
 }
-.campaign-detail-status[data-status="planning"] .campaign-detail-status-dot {
-  background: var(--state-planning);
-}
-
-.campaign-detail-status[data-status="upcoming"] {
-  color: var(--state-upcoming-ink);
-  background: color-mix(in srgb, var(--state-upcoming) 14%, var(--surface));
-}
-.campaign-detail-status[data-status="upcoming"] .campaign-detail-status-dot {
-  background: var(--state-upcoming);
+.campaign-detail-status[data-status="draft"] .campaign-detail-status-dot {
+  background: var(--state-draft);
 }
 
-.campaign-detail-status[data-status="live"] {
-  color: var(--state-live-ink);
-  background: color-mix(in srgb, var(--state-live) 16%, var(--surface));
+.campaign-detail-status[data-status="scheduled"] {
+  color: var(--state-scheduled-ink);
+  background: color-mix(in srgb, var(--state-scheduled) 14%, var(--surface));
 }
-.campaign-detail-status[data-status="live"] .campaign-detail-status-dot {
-  background: var(--state-live);
+.campaign-detail-status[data-status="scheduled"] .campaign-detail-status-dot {
+  background: var(--state-scheduled);
 }
 
-.campaign-detail-status[data-status="past"] {
+.campaign-detail-status[data-status="active"] {
+  color: var(--state-active-ink);
+  background: color-mix(in srgb, var(--state-active) 16%, var(--surface));
+}
+.campaign-detail-status[data-status="active"] .campaign-detail-status-dot {
+  background: var(--state-active);
+}
+
+.campaign-detail-status[data-status="completed"] {
   color: var(--state-completed-ink);
   background: color-mix(in srgb, var(--state-completed) 16%, var(--surface));
 }
-.campaign-detail-status[data-status="past"] .campaign-detail-status-dot {
+.campaign-detail-status[data-status="completed"] .campaign-detail-status-dot {
   background: var(--state-completed);
 }
 
@@ -8131,28 +8131,28 @@
 }
 
 .issue-pin--open .issue-pin-dot {
-  background: #f5a524;
+  background: var(--state-open);
+}
+
+.issue-pin--draft .issue-pin-dot {
+  background: var(--state-draft);
 }
 
 .issue-pin--scheduled .issue-pin-dot {
-  background: #2f7ed8;
+  background: var(--state-scheduled);
+}
+
+.issue-pin--active .issue-pin-dot {
+  background: var(--state-active);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--state-active) 22%, transparent);
 }
 
 .issue-pin--completed .issue-pin-dot {
-  background: #2f9e6b;
+  background: var(--state-completed);
 }
 
-.event-pin--live .issue-pin-dot {
-  background: #e5484d;
-  box-shadow: 0 0 0 4px rgba(229, 72, 77, 0.22);
-}
-
-.event-pin--upcoming .issue-pin-dot {
-  background: #2f7ed8;
-}
-
-.event-pin--past .issue-pin-dot {
-  background: #6b7280;
+.issue-pin--paused .issue-pin-dot {
+  background: var(--state-paused);
 }
 
 .issue-cluster {
@@ -8324,19 +8324,19 @@
   flex: none;
 }
 
-.map-pop-badge--OPEN .map-pop-badge-dot { background: #f5a524; }
-.map-pop-badge--EVENT_SCHEDULED .map-pop-badge-dot { background: #2f7ed8; }
-.map-pop-badge--COMPLETED .map-pop-badge-dot { background: #2f9e6b; }
-.map-pop-badge--upcoming .map-pop-badge-dot { background: #2f7ed8; }
-.map-pop-badge--past .map-pop-badge-dot { background: #6b7280; }
-.map-pop-badge--live .map-pop-badge-dot {
-  background: #e5484d;
-  box-shadow: 0 0 0 0 rgba(229, 72, 77, 0.55);
+.map-pop-badge--open .map-pop-badge-dot { background: var(--state-open); }
+.map-pop-badge--draft .map-pop-badge-dot { background: var(--state-draft); }
+.map-pop-badge--scheduled .map-pop-badge-dot { background: var(--state-scheduled); }
+.map-pop-badge--completed .map-pop-badge-dot { background: var(--state-completed); }
+.map-pop-badge--paused .map-pop-badge-dot { background: var(--state-paused); }
+.map-pop-badge--active .map-pop-badge-dot {
+  background: var(--state-active);
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--state-active) 55%, transparent);
   animation: map-pop-pulse 1.8s ease-out infinite;
 }
 
 @keyframes map-pop-pulse {
-  to { box-shadow: 0 0 0 6px rgba(229, 72, 77, 0); }
+  to { box-shadow: 0 0 0 6px transparent; }
 }
 
 .map-pop-eyebrow {
@@ -8486,7 +8486,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .map-pop-badge--live .map-pop-badge-dot { animation: none; }
+  .map-pop-badge--active .map-pop-badge-dot { animation: none; }
   .map-pop-cta,
   .map-pop-cta svg { transition: none; }
   .map-pop-cta:hover { transform: none; }
@@ -12913,8 +12913,8 @@
   margin-right: 4px;
 }
 
-.calendar-legend-dot.is-live { background: var(--state-live); }
-.calendar-legend-dot.is-upcoming { background: var(--state-upcoming); }
+.calendar-legend-dot.is-live { background: var(--state-active); }
+.calendar-legend-dot.is-upcoming { background: var(--state-scheduled); }
 .calendar-legend-dot.is-past { background: var(--state-completed); }
 
 .calendar-grid-wrap {
@@ -12993,8 +12993,8 @@
   border-radius: 50%;
 }
 
-.calendar-cell-dot.is-live { background: var(--state-live); }
-.calendar-cell-dot.is-upcoming { background: var(--state-upcoming); }
+.calendar-cell-dot.is-live { background: var(--state-active); }
+.calendar-cell-dot.is-upcoming { background: var(--state-scheduled); }
 .calendar-cell-dot.is-past { background: var(--state-completed); }
 
 .calendar-cell.is-today {
@@ -13092,7 +13092,7 @@
   color: #fff;
 }
 
-.calendar-day-event.is-live .calendar-day-event-kind { background: var(--state-live); }
+.calendar-day-event.is-live .calendar-day-event-kind { background: var(--state-active); }
 .calendar-day-event.is-past .calendar-day-event-kind { background: var(--state-completed); }
 
 .calendar-day-event strong {
