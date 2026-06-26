@@ -29,6 +29,13 @@ ok(/PAUSED:\s*"रोकिएको"/.test(cs) && /PAUSED:\s*"Paused"/.test(cs)
 const seqMatch = cs.match(/CAMPAIGN_STATUS_SEQUENCE\s*=\s*\[([\s\S]*?)\]/);
 ok(seqMatch && !/PAUSED/.test(seqMatch[1]), "CAMPAIGN_STATUS_SEQUENCE does NOT contain PAUSED");
 
+// R1.1: visual key === technical status (no planning/upcoming/live/past visual keys)
+ok(/DRAFT:\s*\{[^}]*visual:\s*"draft"/.test(cs), 'DRAFT visual is "draft"');
+ok(/SCHEDULED:\s*\{[^}]*visual:\s*"scheduled"/.test(cs), 'SCHEDULED visual is "scheduled"');
+ok(/ACTIVE:\s*\{[^}]*visual:\s*"active"/.test(cs), 'ACTIVE visual is "active"');
+ok(/COMPLETED:\s*\{[^}]*visual:\s*"completed"/.test(cs), 'COMPLETED visual is "completed"');
+ok(!/visual:\s*"(planning|upcoming|live|past)"/.test(cs), "no off-vocabulary visual keys remain");
+
 const ia = await read("src/lib/issueActions.js");
 ok(/case\s+"PAUSED":\s*\n\s*return\s*\{\s*label:\s*"paused",\s*roleScope:\s*\[\],\s*joinable:\s*false\s*\};/.test(ia),
   "eventJoinPhase has explicit PAUSED no-join case");

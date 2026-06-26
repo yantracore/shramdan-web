@@ -21,16 +21,17 @@ export const CAMPAIGN_STATUS_SEQUENCE = [
 ];
 
 // kind  = which API the stage is read from (issue | event).
-// visual = the data-status hook the list/preview components style. Each stage
-//          owns a distinct lifecycle colour (see docs/design/06-state-color-
-//          system.md). COMPLETED keeps the historical `past` value — a lot of
-//          JS branches on it — but renders the `completed` (slate) colour.
+// visual = the data-status hook the list/preview components style. It is ALWAYS
+//          the lower-cased technical status — ONE vocabulary across code, CSS
+//          (`--state-<status>`), and `data-status`. No third set of words
+//          (no planning/upcoming/live/past). UI words come from the labels
+//          below; see docs/design/06-state-color-system.md.
 export const CAMPAIGN_STATUSES = {
   OPEN: { key: "OPEN", kind: "issue", visual: "open" },
-  DRAFT: { key: "DRAFT", kind: "event", visual: "planning" },
-  SCHEDULED: { key: "SCHEDULED", kind: "event", visual: "upcoming" },
-  ACTIVE: { key: "ACTIVE", kind: "event", visual: "live" },
-  COMPLETED: { key: "COMPLETED", kind: "event", visual: "past" },
+  DRAFT: { key: "DRAFT", kind: "event", visual: "draft" },
+  SCHEDULED: { key: "SCHEDULED", kind: "event", visual: "scheduled" },
+  ACTIVE: { key: "ACTIVE", kind: "event", visual: "active" },
+  COMPLETED: { key: "COMPLETED", kind: "event", visual: "completed" },
   // PAUSED is circumstantial — shown only on a campaign's detail page when it is
   // paused. Deliberately ABSENT from CAMPAIGN_STATUS_SEQUENCE so it never appears
   // as a filter chip / pill, while its label + visual still resolve for detail.
@@ -73,9 +74,11 @@ export function campaignStatusLabel(status, language) {
   return dict[status] || status;
 }
 
-// The card/preview visual hook for a campaign status (live | upcoming | past).
+// The card/preview visual hook for a campaign status — the lower-cased technical
+// status (open | draft | scheduled | active | completed | paused), used as the
+// `data-status` attribute that the `--state-<status>` colours key off.
 export function campaignVisualStatus(status) {
-  return CAMPAIGN_STATUSES[status]?.visual || "upcoming";
+  return CAMPAIGN_STATUSES[status]?.visual || String(status || "").toLowerCase();
 }
 
 export function campaignStatusKind(status) {
