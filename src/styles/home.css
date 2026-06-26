@@ -12913,9 +12913,9 @@
   margin-right: 4px;
 }
 
-.calendar-legend-dot.is-live { background: var(--state-active); }
-.calendar-legend-dot.is-upcoming { background: var(--state-scheduled); }
-.calendar-legend-dot.is-past { background: var(--state-completed); }
+.calendar-legend-dot.is-active { background: var(--state-active); }
+.calendar-legend-dot.is-scheduled { background: var(--state-scheduled); }
+.calendar-legend-dot.is-completed { background: var(--state-completed); }
 
 .calendar-grid-wrap {
   display: grid;
@@ -12993,9 +12993,9 @@
   border-radius: 50%;
 }
 
-.calendar-cell-dot.is-live { background: var(--state-active); }
-.calendar-cell-dot.is-upcoming { background: var(--state-scheduled); }
-.calendar-cell-dot.is-past { background: var(--state-completed); }
+.calendar-cell-dot.is-active { background: var(--state-active); }
+.calendar-cell-dot.is-scheduled { background: var(--state-scheduled); }
+.calendar-cell-dot.is-completed { background: var(--state-completed); }
 
 .calendar-cell.is-today {
   background: color-mix(in srgb, var(--accent) 10%, transparent);
@@ -13092,8 +13092,8 @@
   color: #fff;
 }
 
-.calendar-day-event.is-live .calendar-day-event-kind { background: var(--state-active); }
-.calendar-day-event.is-past .calendar-day-event-kind { background: var(--state-completed); }
+.calendar-day-event.is-active .calendar-day-event-kind { background: var(--state-active); }
+.calendar-day-event.is-completed .calendar-day-event-kind { background: var(--state-completed); }
 
 .calendar-day-event strong {
   font-size: 14px;

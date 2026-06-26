@@ -80,7 +80,7 @@ export default function CalendarPage() {
   const months = language === "np" ? NP_MONTHS : EN_MONTHS;
   const weekdays = language === "np" ? NP_WEEKDAYS : EN_WEEKDAYS;
 
-  const [buckets, setBuckets] = useState({ live: [], upcoming: [], past: [] });
+  const [buckets, setBuckets] = useState({ active: [], scheduled: [], completed: [] });
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -88,7 +88,7 @@ export default function CalendarPage() {
         const data = await listAllEvents({ language });
         if (!cancelled) setBuckets(data);
       } catch {
-        if (!cancelled) setBuckets({ live: [], upcoming: [], past: [] });
+        if (!cancelled) setBuckets({ active: [], scheduled: [], completed: [] });
       }
     })();
     return () => {
@@ -107,9 +107,9 @@ export default function CalendarPage() {
       if (!map.has(key)) map.set(key, []);
       map.get(key).push({ ...event, kind, date: d });
     };
-    buckets.active.forEach((e) => push(e, e.scheduledAt, "live"));
-    buckets.scheduled.forEach((e) => push(e, e.scheduledAt, "upcoming"));
-    buckets.completed.forEach((e) => push(e, e.completedAt, "past"));
+    buckets.active.forEach((e) => push(e, e.scheduledAt, "active"));
+    buckets.scheduled.forEach((e) => push(e, e.scheduledAt, "scheduled"));
+    buckets.completed.forEach((e) => push(e, e.completedAt, "completed"));
     return map;
   }, [buckets]);
 

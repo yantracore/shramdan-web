@@ -401,12 +401,12 @@
   white-space: nowrap;
 }
 
-.events-home-rail-poster-badge--live {
+.events-home-rail-poster-badge--active {
   background: color-mix(in srgb, var(--state-active) 92%, transparent);
   animation: live-badge-blink 2.4s ease-in-out infinite;
 }
 
-.events-home-rail-poster-badge--live .live-dot {
+.events-home-rail-poster-badge--active .live-dot {
   width: 5px;
   height: 5px;
   background: #fff;
@@ -423,7 +423,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .events-home-rail-poster-badge--live {
+  .events-home-rail-poster-badge--active {
     animation: none;
   }
 }

@@ -98,9 +98,9 @@ export default function HomeSearchView() {
     const tag = (events, status) =>
       (events ?? []).map((event) => ({ event, status }));
     return [
-      ...tag(liveEvents, "live"),
-      ...tag(upcomingEvents, "upcoming"),
-      ...tag(pastEvents, "past")
+      ...tag(liveEvents, "active"),
+      ...tag(upcomingEvents, "scheduled"),
+      ...tag(pastEvents, "completed")
     ];
   }, [liveEvents, upcomingEvents, pastEvents]);
 

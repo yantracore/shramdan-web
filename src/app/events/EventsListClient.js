@@ -202,7 +202,7 @@ export const PAGE_COPY = {
   }
 };
 
-const FILTER_KEYS = new Set(["all", "live", "upcoming", "past"]);
+const FILTER_KEYS = new Set(["all", "active", "scheduled", "completed"]);
 const INITIAL_VISIBLE = 8;
 const LOAD_MORE_STEP = 6;
 
@@ -440,9 +440,9 @@ export default function EventsListPageContent() {
         : [...past].sort(byCompletedDesc);
 
     const items = [
-      ...liveSorted.map((event) => ({ event, status: "live" })),
-      ...upcomingSorted.map((event) => ({ event, status: "upcoming" })),
-      ...pastSorted.map((event) => ({ event, status: "past" }))
+      ...liveSorted.map((event) => ({ event, status: "active" })),
+      ...upcomingSorted.map((event) => ({ event, status: "scheduled" })),
+      ...pastSorted.map((event) => ({ event, status: "completed" }))
     ];
     let filtered =
       filters.status === "all"
@@ -859,7 +859,7 @@ export default function EventsListPageContent() {
 
             <EventPreviewPane
               event={selectedEntry?.event || null}
-              status={selectedEntry?.status || "live"}
+              status={selectedEntry?.status || "active"}
               language={language}
               t={t}
               onBack={handleBack}

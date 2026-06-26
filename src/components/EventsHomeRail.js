@@ -187,8 +187,8 @@ export function EventsHomeRail({
   const reduceMotion = useReducedMotion();
 
   const items = [
-    ...liveEvents.map((event) => ({ kind: "live", event })),
-    ...upcomingEvents.map((event) => ({ kind: "upcoming", event }))
+    ...liveEvents.map((event) => ({ kind: "active", event })),
+    ...upcomingEvents.map((event) => ({ kind: "scheduled", event }))
   ].slice(0, MAX_RAIL_ITEMS);
   const isEmpty = items.length === 0;
 
@@ -255,7 +255,7 @@ export function EventsHomeRail({
             const isActive = index === activeIndex;
             return (
               <SwiperSlide key={item.event.id} className="events-home-rail-slide">
-                {item.kind === "live" ? (
+                {item.kind === "active" ? (
                   <LivePosterCard
                     event={item.event}
                     copy={copy}
@@ -314,7 +314,7 @@ function LivePosterCard({ event, copy, language, isActive }) {
 
           <div className="events-home-rail-poster-overlay">
             <div className="events-home-rail-poster-top">
-              <span className="events-home-rail-poster-badge events-home-rail-poster-badge--live">
+              <span className="events-home-rail-poster-badge events-home-rail-poster-badge--active">
                 <span className="live-dot" aria-hidden="true" />
                 {copy?.liveBadge || "LIVE"}
               </span>

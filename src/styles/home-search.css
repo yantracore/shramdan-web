@@ -547,19 +547,19 @@
   color: var(--text);
 }
 
-.home-for-you-card-badge--live {
+.home-for-you-card-badge--active {
   background: color-mix(in srgb, #ef4444 32%, rgba(0, 0, 0, 0.34));
   border-color: rgba(255, 255, 255, 0.34);
   color: #fff;
 }
 
-.home-for-you-card-badge--upcoming {
+.home-for-you-card-badge--scheduled {
   background: color-mix(in srgb, #2563eb 26%, rgba(0, 0, 0, 0.34));
   border-color: rgba(255, 255, 255, 0.34);
   color: #fff;
 }
 
-.home-for-you-card-badge--past {
+.home-for-you-card-badge--completed {
   background: color-mix(in srgb, #16a34a 26%, rgba(0, 0, 0, 0.34));
   border-color: rgba(255, 255, 255, 0.34);
   color: #fff;
