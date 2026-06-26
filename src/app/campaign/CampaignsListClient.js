@@ -762,7 +762,7 @@ export default function CampaignsListPageContent() {
               <EventPreviewPane
                 event={selectedEntry?.data || null}
                 status={
-                  selectedEntry ? campaignVisualStatus(selectedEntry.status) : "live"
+                  selectedEntry ? campaignVisualStatus(selectedEntry.status) : "active"
                 }
                 language={language}
                 t={eventsCopy}
