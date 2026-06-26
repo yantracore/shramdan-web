@@ -15,8 +15,8 @@ Plan: `docs/superpowers/plans/2026-06-25-campaign-unification-frontend.md`.
 - ✅ **Phase 2 — colour propagation** (§5): filter chips + dropdown now carry per-status colour. **Browser-verified** via computed-style read — every chip badge ink + every dropdown dot matches its canonical `--state-*` hex (the "orange for everything" complaint is resolved).
 - ✅ **Phase 3 — routing** (§8.1, §8.4): `/campaigns`→`/campaign` (singular) + 307 redirects from `/campaigns`,`/issues`,`/events`; mobile nav merged to one अभियान tab; desktop nav, command palette, 404, onboarding, FAB, sitemap, dashboard, impact, and detail back-to-list links all target `/campaign`. Browser-verified (route 200, redirects 307, single nav tab).
 - ✅ **Phase 0 (docs half)**: backend asks A (issue→event link, already P1 #2) + B (SCHEDULED=WORKER-only enforce, new) recorded in `docs/api-requirements/{00-OUTSTANDING,event-participants}.md`.
-- ⏸️ **Phase 4 — unified `/campaign/[id]` detail merge** — DEFERRED, hard-blocked on backend item A.
-- ⏸️ **Backend A/B verification** — DEFERRED, backend unreachable (staging down + last devtunnel rotated). Needs the current devtunnel URL.
+- ✅ **Backend A/B verification (2026-06-26, against `api.shramdan.org`)** — **B done**: `POST /events/{id}/participants` spec documents `SCHEDULED → WORKER only` (+ PAUSED/COMPLETED/CANCELLED closed). **A done**: `GET /issues/{id}` live-embeds `event { id, slug, status, scheduledAt, leaderId }` on promoted issues (observed on multiple `EVENT_DRAFT` + `COMPLETED` issues). Both unblock Phase 4.
+- ▶️ **Phase 4 — unified `/campaign/[id]` detail merge** — READY TO START (backend A confirmed; FE already reads the embed via `getIssueEventId`). Next step: writing-plans for Phase 4.
 - ⏭️ **Open decisions:** map-pin label wording (keep "LIVE"/"अहिले लाइभ" punchy vs unify to चलिरहेको) — user's call. Cards/pane unification left (entangled with pre-existing working-tree WIP).
 - 🐞 **Out-of-scope blocker found:** `next build` fails prerendering `/` (`useSearchParams` needs a Suspense boundary, Next 16) — pre-existing, unrelated to this work, but blocks production deploy.
 
