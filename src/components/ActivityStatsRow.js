@@ -13,6 +13,7 @@ import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { listAllEvents } from "@/lib/eventsApi";
 import { getJson } from "@/lib/apiClient";
 import { getListItems } from "@/lib/adminUtils";
+import { campaignStatusLabel } from "@/lib/campaignStatus";
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 
@@ -84,72 +85,41 @@ function FunnelCount({ target, language }) {
 // so SCHEDULED/LIVE/COMPLETED route to /events. When the step's page IS the page
 // you're on, we only swap the status param (preserving the rest of the URL);
 // otherwise it's a cross-page jump. Home renders the rail read-only.
+// The five filterable campaign stages, in lifecycle order. Each links to the
+// unified list filtered by that technical status.
 const STEPS = [
-  { key: "OPEN", icon: FlagOutlined, page: "issues", param: ["status", "OPEN"] },
-  {
-    key: "FORMING",
-    icon: TeamOutlined,
-    page: "issues",
-    param: ["status", "EVENT_SCHEDULED"]
-  },
-  {
-    key: "SCHEDULED",
-    icon: CalendarOutlined,
-    page: "events",
-    param: ["show", "upcoming"]
-  },
-  { key: "LIVE", icon: FireFilled, page: "events", param: ["show", "live"] },
-  {
-    key: "COMPLETED",
-    icon: CheckCircleFilled,
-    page: "events",
-    param: ["show", "past"]
-  }
+  { key: "OPEN", icon: FlagOutlined },
+  { key: "DRAFT", icon: TeamOutlined },
+  { key: "SCHEDULED", icon: CalendarOutlined },
+  { key: "ACTIVE", icon: FireFilled },
+  { key: "COMPLETED", icon: CheckCircleFilled }
 ];
 
 const COPY = {
-  np: {
-    ariaLabel: "गतिविधिको चरण",
-    steps: {
-      OPEN: "खुला",
-      FORMING: "छानिएको",
-      SCHEDULED: "मिति तय",
-      LIVE: "चलिरहेको",
-      COMPLETED: "सम्पन्न"
-    }
-  },
-  en: {
-    ariaLabel: "Activity funnel",
-    steps: {
-      OPEN: "Open",
-      FORMING: "Selected",
-      SCHEDULED: "Scheduled",
-      LIVE: "Ongoing",
-      COMPLETED: "Complete"
-    }
-  }
+  np: { ariaLabel: "गतिविधिको चरण" },
+  en: { ariaLabel: "Activity funnel" }
 };
 
 // One global funnel, identical on every page: pull both datasets and fold each
-// campaign into exactly one step. OPEN/FORMING come off the issue side,
-// SCHEDULED/LIVE/COMPLETED off the event side, so nothing is counted twice.
-// FORMING = promoted issues that haven't surfaced as a public (upcoming/live)
-// event yet — the genuine "selected, awaiting a date" middle.
+// campaign into exactly one step. OPEN/DRAFT come off the issue side, SCHEDULED/
+// ACTIVE/COMPLETED off the event side, so nothing is counted twice. DRAFT =
+// promoted issues whose event isn't yet a public (scheduled/active) event — the
+// "planning, awaiting a date" middle.
 function foldCounts(issues, buckets) {
   const open = issues.filter((i) => i?.status === "OPEN").length;
   const scheduledIssues = issues.filter(
     (i) => i?.status === "EVENT_SCHEDULED"
   ).length;
-  const upcoming = buckets.upcoming.length;
-  const live = buckets.live.length;
-  const past = buckets.past.length;
-  const forming = Math.max(0, scheduledIssues - (upcoming + live));
+  const scheduled = buckets.scheduled.length;
+  const active = buckets.active.length;
+  const completed = buckets.completed.length;
+  const draft = Math.max(0, scheduledIssues - (scheduled + active));
   return {
     OPEN: open,
-    FORMING: forming,
-    SCHEDULED: upcoming,
-    LIVE: live,
-    COMPLETED: past
+    DRAFT: draft,
+    SCHEDULED: scheduled,
+    ACTIVE: active,
+    COMPLETED: completed
   };
 }
 
@@ -163,7 +133,7 @@ function ActivityStatsRowInner({
   const searchParams = useSearchParams();
 
   const [issues, setIssues] = useState([]);
-  const [buckets, setBuckets] = useState({ live: [], upcoming: [], past: [] });
+  const [buckets, setBuckets] = useState({ active: [], scheduled: [], completed: [] });
 
   useEffect(() => {
     let cancelled = false;
@@ -179,7 +149,7 @@ function ActivityStatsRowInner({
       } catch {
         if (cancelled) return;
         setIssues([]);
-        setBuckets({ live: [], upcoming: [], past: [] });
+        setBuckets({ active: [], scheduled: [], completed: [] });
       }
     })();
     return () => {
@@ -190,14 +160,15 @@ function ActivityStatsRowInner({
   const counts = useMemo(() => foldCounts(issues, buckets), [issues, buckets]);
 
   const hrefFor = (step) => {
-    const [pkey, pval] = step.param;
-    if (currentPage && step.page === currentPage) {
+    // On the /campaigns list itself, swap only the status param (preserve the
+    // rest of the URL); otherwise jump to the filtered unified list.
+    if (currentPage === "campaigns") {
       const params = new URLSearchParams(searchParams?.toString() || "");
-      params.set(pkey, pval);
+      params.set("status", step.key);
       const query = params.toString();
       return query ? `${pathname}?${query}` : pathname;
     }
-    return `/${step.page}?${pkey}=${pval}`;
+    return `/campaigns?status=${step.key}`;
   };
 
   return (
@@ -207,7 +178,7 @@ function ActivityStatsRowInner({
     >
       {STEPS.map((step) => {
         const { key, icon: Icon } = step;
-        const label = t.steps[key] || key;
+        const label = campaignStatusLabel(key, language);
         const value = counts[key] || 0;
         const body = (
           <>

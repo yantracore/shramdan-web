@@ -33,20 +33,20 @@ const COPY = {
     eyebrow: "समुदायको नब्ज",
     intro: "अहिले मञ्चमा के-के चलिरहेको छ — एक नजरमा।",
     tiles: {
-      live: { label: "अभियान लाइभ", hint: "हेर्ने" },
-      upcoming: { label: "आउँदै", hint: "जोडिने" },
+      live: { label: "चलिरहेको", hint: "हेर्ने" },
+      upcoming: { label: "मिति तय", hint: "जोडिने" },
       completed: { label: "सम्पन्न", hint: "प्रभाव हेर्ने" },
-      issues: { label: "खुला समस्या", hint: "समर्थन गर्ने" }
+      issues: { label: "खुला", hint: "समर्थन गर्ने" }
     }
   },
   en: {
     eyebrow: "Community pulse",
     intro: "What's moving on the platform right now — at a glance.",
     tiles: {
-      live: { label: "Live now", hint: "Watch" },
-      upcoming: { label: "Upcoming", hint: "Join" },
-      completed: { label: "Completed", hint: "See impact" },
-      issues: { label: "Open issues", hint: "Support" }
+      live: { label: "Ongoing", hint: "Watch" },
+      upcoming: { label: "Scheduled", hint: "Join" },
+      completed: { label: "Complete", hint: "See impact" },
+      issues: { label: "Open", hint: "Support" }
     }
   }
 };

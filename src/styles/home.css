@@ -8890,24 +8890,24 @@
 
 /* Phase tints flow warm → cool → hot → green, mirroring the journey. */
 .activity-funnel .step-open .activity-funnel-marker {
-  background: color-mix(in srgb, #d97706 16%, var(--surface));
-  color: #b45309;
+  background: color-mix(in srgb, var(--state-open) 16%, var(--surface));
+  color: var(--state-open-ink);
 }
-.activity-funnel .step-forming .activity-funnel-marker {
-  background: color-mix(in srgb, #7c3aed 16%, var(--surface));
-  color: #6d28d9;
+.activity-funnel .step-draft .activity-funnel-marker {
+  background: color-mix(in srgb, var(--state-draft) 16%, var(--surface));
+  color: var(--state-draft-ink);
 }
 .activity-funnel .step-scheduled .activity-funnel-marker {
-  background: color-mix(in srgb, #2563eb 16%, var(--surface));
-  color: #1d4ed8;
+  background: color-mix(in srgb, var(--state-scheduled) 16%, var(--surface));
+  color: var(--state-scheduled-ink);
 }
-.activity-funnel .step-live .activity-funnel-marker {
-  background: color-mix(in srgb, #e02b20 16%, var(--surface));
-  color: #c41a10;
+.activity-funnel .step-active .activity-funnel-marker {
+  background: color-mix(in srgb, var(--state-active) 16%, var(--surface));
+  color: var(--state-active-ink);
 }
 .activity-funnel .step-completed .activity-funnel-marker {
-  background: color-mix(in srgb, #16a34a 16%, var(--surface));
-  color: #15803d;
+  background: color-mix(in srgb, var(--state-completed) 16%, var(--surface));
+  color: var(--state-completed-ink);
 }
 
 .activity-funnel-count {
