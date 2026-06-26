@@ -3664,7 +3664,7 @@ const DEMO_STORIES = [
     title: "किन गर्छौँ श्रमदान",
     excerpt:
       "हरेक अभियान पछाडि एउटा कारण छ — सरकार पर्खिएर बस्न मिल्दैन भन्ने अनुभव।",
-    author: "श्रमेश",
+    author: "श्रमदान टोली",
     publishedAt: "2026-03-15T09:00:00.000Z",
     coverEvent: null,
     body: [

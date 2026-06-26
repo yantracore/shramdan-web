@@ -1276,7 +1276,7 @@ export const copy = {
       subtitle: "अहिले लाइभ भइरहेका अभियानहरू हेर्नुहोस्।",
       viewAll: "सबै अभियान हेर्ने",
       emptyMessage:
-        "अहिले कुनै अभियान छैन। जब कुनै सुरु हुन्छ, श्रमेशले यहीँ देखाउनेछ।",
+        "अहिले कुनै अभियान छैन। जब कुनै सुरु हुन्छ, यहीँ देखिनेछ।",
       viewersPrefix: "",
       viewersSuffix: " जना हेर्दैछन्",
       participantsLabel: "सहभागी",
@@ -3088,7 +3088,7 @@ export const copy = {
       subtitle: "Watch what's live right now.",
       viewAll: "View All Events",
       emptyMessage:
-        "No campaigns right now. श्रमेश will surface them here as they start.",
+        "No campaigns right now. They'll surface here as they start.",
       viewersPrefix: "",
       viewersSuffix: " watching",
       participantsLabel: "Participants",
