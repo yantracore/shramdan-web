@@ -69,7 +69,7 @@ export function CommandPalette({ language = "np" }) {
   const inputRef = useRef(null);
 
   // Compile dataset. Events come from the API; routes are static.
-  const [eventBuckets, setEventBuckets] = useState({ live: [], upcoming: [], past: [] });
+  const [eventBuckets, setEventBuckets] = useState({ active: [], scheduled: [], completed: [] });
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -84,7 +84,7 @@ export function CommandPalette({ language = "np" }) {
   }, [language]);
 
   const dataset = useMemo(() => {
-    const events = [...eventBuckets.live, ...eventBuckets.upcoming, ...eventBuckets.past];
+    const events = [...eventBuckets.active, ...eventBuckets.scheduled, ...eventBuckets.completed];
     const eventRows = events.map((e) => ({
       id: `event-${e.id}`,
       label: e.title,

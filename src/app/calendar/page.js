@@ -107,9 +107,9 @@ export default function CalendarPage() {
       if (!map.has(key)) map.set(key, []);
       map.get(key).push({ ...event, kind, date: d });
     };
-    buckets.live.forEach((e) => push(e, e.scheduledAt, "live"));
-    buckets.upcoming.forEach((e) => push(e, e.scheduledAt, "upcoming"));
-    buckets.past.forEach((e) => push(e, e.completedAt, "past"));
+    buckets.active.forEach((e) => push(e, e.scheduledAt, "live"));
+    buckets.scheduled.forEach((e) => push(e, e.scheduledAt, "upcoming"));
+    buckets.completed.forEach((e) => push(e, e.completedAt, "past"));
     return map;
   }, [buckets]);
 

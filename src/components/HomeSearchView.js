@@ -51,9 +51,9 @@ export default function HomeSearchView() {
         // rail and the map stay in sync without firing 3 parallel calls.
         const buckets = await listAllEvents({ language });
         if (cancelled) return;
-        setLiveEvents(buckets.live ?? []);
-        setUpcomingEvents(buckets.upcoming ?? []);
-        setPastEvents(buckets.past ?? []);
+        setLiveEvents(buckets.active ?? []);
+        setUpcomingEvents(buckets.scheduled ?? []);
+        setPastEvents(buckets.completed ?? []);
       } catch {
         if (cancelled) return;
         setLiveEvents([]);

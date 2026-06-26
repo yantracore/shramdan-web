@@ -45,6 +45,7 @@ export const PAGE_COPY = {
       ariaLabel: "अभियान फिल्टर",
       all: "सबै",
       allStatuses: "सबै स्थिति",
+      planning: "तयारीमा",
       live: "लाइभ",
       upcoming: "आउँदै",
       past: "सम्पन्न",
@@ -86,6 +87,9 @@ export const PAGE_COPY = {
       result: "नतिजा सारांश",
       showMore: "थप पढ्ने",
       showLess: "छोटो बनाउने",
+      campaignCreated: "अभियान सिर्जना भयो",
+      campaignCreatedHint: "भेला हुने मिति तय हुँदै — तयारी सुरु भइसक्यो।",
+      towardCampaign: "{x}/{y} जना जोडिनुभयो",
       risk: {
         NORMAL: "सामान्य जोखिम",
         WATCH: "ध्यान आवश्यक",
@@ -130,6 +134,7 @@ export const PAGE_COPY = {
       ariaLabel: "Filter campaigns",
       all: "All",
       allStatuses: "All Statuses",
+      planning: "Planning",
       live: "Live",
       upcoming: "Upcoming",
       past: "Past",
@@ -171,6 +176,9 @@ export const PAGE_COPY = {
       result: "Result summary",
       showMore: "Show more",
       showLess: "Show less",
+      campaignCreated: "Campaign created",
+      campaignCreatedHint: "A meetup date is being set — planning has begun.",
+      towardCampaign: "{x}/{y} joined",
       risk: {
         NORMAL: "Normal risk",
         WATCH: "Heads-up",
@@ -481,7 +489,7 @@ export default function EventsListPageContent() {
       if (resolvedIndex >= 0) resolvedId = fromUrl;
     }
     if (!resolvedId) {
-      resolvedIndex = orderedEvents.findIndex((e) => e.status === "live");
+      resolvedIndex = orderedEvents.findIndex((e) => e.status === "active");
       if (resolvedIndex < 0) resolvedIndex = 0;
       resolvedId = orderedEvents[resolvedIndex]?.event.id ?? null;
     }
@@ -512,7 +520,7 @@ export default function EventsListPageContent() {
       return;
     }
     if (!orderedEvents.some((e) => e.event.id === selectedId)) {
-      const firstLive = orderedEvents.find((e) => e.status === "live");
+      const firstLive = orderedEvents.find((e) => e.status === "active");
       setSelectedId((firstLive || orderedEvents[0])?.event.id ?? null);
     }
   }, [orderedEvents, selectedId]);
@@ -672,9 +680,9 @@ export default function EventsListPageContent() {
   visibleEvents.forEach((entry, idx) => {
     if (entry.status !== lastStatus) {
       const dividerLabel =
-        entry.status === "live"
+        entry.status === "active"
           ? t.sections.live.eyebrow
-          : entry.status === "upcoming"
+          : entry.status === "scheduled"
             ? t.sections.upcoming.eyebrow
             : t.sections.past.eyebrow;
       renderedItems.push(

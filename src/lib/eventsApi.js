@@ -235,14 +235,17 @@ export async function listEventsByStatus(status, { language = "np", limit = DEFA
   return fetchEvents({ status, limit, language, provinceId, districtId });
 }
 
-// All buckets in parallel — handy for /events page + /calendar.
+// All lifecycle buckets in parallel — handy for /campaigns + /calendar. Keys use
+// the technical status vocabulary (active = ongoing now, scheduled = upcoming,
+// completed = past). The backend status strings passed to fetchEvents above are
+// unchanged — this is only our frontend grouping name.
 export async function listAllEvents({ language = "np", provinceId, districtId } = {}) {
-  const [live, upcoming, past] = await Promise.all([
+  const [active, scheduled, completed] = await Promise.all([
     listLiveEvents({ language, provinceId, districtId }),
     listUpcomingEvents({ language, provinceId, districtId }),
     listPastEvents({ language, provinceId, districtId })
   ]);
-  return { live, upcoming, past };
+  return { active, scheduled, completed };
 }
 
 export async function getEventById(eventId, { language = "np" } = {}) {

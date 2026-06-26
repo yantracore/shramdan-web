@@ -65,9 +65,9 @@ export function ImpactPulseStrip({ language = "np" }) {
         ]);
         if (cancelled) return;
         setCounts({
-          live: buckets.live.length,
-          upcoming: buckets.upcoming.length,
-          completed: buckets.past.length,
+          live: buckets.active.length,
+          upcoming: buckets.scheduled.length,
+          completed: buckets.completed.length,
           issues: getListItems(issuesRes).length
         });
       } catch {

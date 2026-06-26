@@ -146,7 +146,7 @@ export function StreamCard({ entry, distanceKm, language, copy }) {
             onError={fallBackPoster}
           />
           <span className={`home-for-you-card-badge ${badgeClass}`}>
-            {entry.kind === "event" && entry.status === "live" ? (
+            {entry.kind === "event" && entry.status === "active" ? (
               <span className="live-dot" aria-hidden="true" />
             ) : null}
             {statusLabel}
@@ -266,18 +266,18 @@ export function StreamList({
     let baseEntries = [];
     if (mode === "event") {
       const tagged = [
-        ...(eventBuckets.live ?? []).map((event) => eventToEntry(event, "live")),
-        ...(eventBuckets.upcoming ?? []).map((event) => eventToEntry(event, "upcoming")),
-        ...(eventBuckets.past ?? []).map((event) => eventToEntry(event, "past"))
+        ...(eventBuckets.active ?? []).map((event) => eventToEntry(event, "active")),
+        ...(eventBuckets.scheduled ?? []).map((event) => eventToEntry(event, "scheduled")),
+        ...(eventBuckets.completed ?? []).map((event) => eventToEntry(event, "completed"))
       ];
       // v0 base ranking: live → upcoming-soonest → past-newest.
-      const live = tagged.filter((e) => e.status === "live");
-      const upcoming = tagged.filter((e) => e.status === "upcoming").sort((a, b) => {
+      const live = tagged.filter((e) => e.status === "active");
+      const upcoming = tagged.filter((e) => e.status === "scheduled").sort((a, b) => {
         const aAt = a.scheduledAt ? new Date(a.scheduledAt).getTime() : Infinity;
         const bAt = b.scheduledAt ? new Date(b.scheduledAt).getTime() : Infinity;
         return aAt - bAt;
       });
-      const past = tagged.filter((e) => e.status === "past").sort((a, b) => {
+      const past = tagged.filter((e) => e.status === "completed").sort((a, b) => {
         const aAt = a.scheduledAt ? new Date(a.scheduledAt).getTime() : 0;
         const bAt = b.scheduledAt ? new Date(b.scheduledAt).getTime() : 0;
         return bAt - aAt;
