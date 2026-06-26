@@ -9,7 +9,7 @@ import {
 } from "@ant-design/icons";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { listAllEvents } from "@/lib/eventsApi";
 import { getJson } from "@/lib/apiClient";
 import { getListItems } from "@/lib/adminUtils";
@@ -153,7 +153,7 @@ function foldCounts(issues, buckets) {
   };
 }
 
-export function ActivityStatsRow({
+function ActivityStatsRowInner({
   language = "np",
   interactive = false,
   currentPage
@@ -235,5 +235,18 @@ export function ActivityStatsRow({
         );
       })}
     </ol>
+  );
+}
+
+// useSearchParams() (called inside the inner component) forces any statically
+// prerendered page that renders this row to bail out of static generation
+// unless the hook sits below a Suspense boundary — without this, `next build`
+// fails on "/" with the missing-suspense-with-csr-bailout error. Wrapping once
+// here gives every call site (home, /issues, /events) the boundary for free.
+export function ActivityStatsRow(props) {
+  return (
+    <Suspense fallback={null}>
+      <ActivityStatsRowInner {...props} />
+    </Suspense>
   );
 }
