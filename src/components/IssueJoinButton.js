@@ -57,7 +57,11 @@ export function IssueJoinButton({
   size,
   type = "primary",
   className,
-  block = false
+  block = false,
+  // Optional controlled useEventJoin instance. When a page already drives one
+  // (so its body roster and this button's modal stay one live-synced source),
+  // it's passed in; otherwise the button creates its own.
+  join: controlledJoin
 }) {
   const t = COPY[language] || COPY.np;
   const messageApi = useToast();
@@ -65,11 +69,13 @@ export function IssueJoinButton({
   const phase = eventJoinPhase(eventStatus);
 
   // Eager-load only when we need the viewer's role for the COMPLETED chip; join
-  // phases load lazily when the modal opens.
-  const join = useEventJoin(eventId, {
+  // phases load lazily when the modal opens. A controlled instance, when given,
+  // wins (the page already loaded it).
+  const ownJoin = useEventJoin(eventId, {
     language,
     eager: phase.label === "contributed" && Boolean(eventId)
   });
+  const join = controlledJoin ?? ownJoin;
 
   const sizeKey = size === "large" ? "lg" : "sm";
 

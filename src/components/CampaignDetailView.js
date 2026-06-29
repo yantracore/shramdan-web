@@ -35,7 +35,7 @@ import { IssueShareRow } from "@/components/IssueShareRow";
 import { IssueStatusTimeline } from "@/components/IssueStatusTimeline";
 import { IssueJoinButton } from "@/components/IssueJoinButton";
 import { IssueMapThumb } from "@/components/IssueMapThumb";
-import { CompactConversionProgress, ParticipantsPanel } from "@/components/ParticipantsPanel";
+import { ParticipantsPanel } from "@/components/ParticipantsPanel";
 import { IssueVoteButton } from "@/components/IssueVoteButton";
 import { CommentSection } from "@/components/comments";
 import { IssueReactions } from "@/components/IssueReactions";
@@ -59,6 +59,7 @@ import {
   localizeIssue
 } from "@/lib/adminUtils";
 import { useRoleSupport } from "@/lib/useRoleSupport";
+import { useEventJoin } from "@/lib/useEventJoin";
 
 const PUBLIC_ISSUE_STATUSES = ["OPEN", "EVENT_SCHEDULED", "EVENT_DRAFT", "COMPLETED"];
 const RELATED_LIMIT = 6;
@@ -192,6 +193,16 @@ export function CampaignDetailView({ slug }) {
     eager: true
   });
 
+  // The promoted campaign's event roster — the SAME source the join modal uses,
+  // so the body roster matches the modal exactly. eventId resolves from the
+  // issue's linked event (null while OPEN → the hook stays idle).
+  const rosterEventId = support.resolvedEventId || getIssueEventId(rawIssue);
+  const eventJoin = useEventJoin(rosterEventId, {
+    seed: eventData,
+    language,
+    eager: Boolean(rosterEventId)
+  });
+
   const fetchCampaign = useCallback(async () => {
     if (!issueId) return;
     setLoading(true);
@@ -263,6 +274,12 @@ export function CampaignDetailView({ slug }) {
   const visualStatus = campaignVisualStatus(campaignStatus);
   const isPlanned = PLANNED_STATUSES.has(campaignStatus);
   const isCompleted = campaignStatus === "COMPLETED";
+
+  // Promoted → feed the roster the EVENT data (eventJoin), exactly what the join
+  // modal shows; OPEN → the issue roster (support). One source per status, so
+  // the body roster and the modal roster are identical.
+  const isPromotedRoster = Boolean(rosterEventId) && campaignStatus !== "OPEN";
+  const rosterProps = isPromotedRoster ? eventJoin.panelProps : support.panelProps;
 
   // OPEN → Support (vote); EVENT_DRAFT/SCHEDULED → Join; COMPLETED → contributed.
   const actionMode = issue ? issueActionMode(issue.status) : "none";
@@ -434,12 +451,6 @@ export function CampaignDetailView({ slug }) {
                   <Tag>{content.categoryLabels[issue.category] || issue.category}</Tag>
                 </div>
                 <div className="public-issue-detail-support" id="issue-vote">
-                  {support.panelProps.progress ? (
-                    <CompactConversionProgress
-                      language={language}
-                      progress={support.panelProps.progress}
-                    />
-                  ) : null}
                   {actionMode === "support" ? (
                     <IssueVoteButton
                       className="issue-topline-support-btn"
@@ -455,10 +466,11 @@ export function CampaignDetailView({ slug }) {
                   ) : actionMode === "join" || actionMode === "contributed" ? (
                     <IssueJoinButton
                       issue={issue}
-                      eventId={support.resolvedEventId || getIssueEventId(rawIssue)}
+                      eventId={rosterEventId}
                       eventStatus={eventStatus}
                       language={language}
                       size="large"
+                      join={eventJoin}
                     />
                   ) : null}
                 </div>
@@ -591,10 +603,13 @@ export function CampaignDetailView({ slug }) {
               ) : null}
 
               <ParticipantsPanel
-                {...support.panelProps}
-                totalOverride={Number(issue?.attendingCount) || 0}
-                progress={null}
+                {...rosterProps}
                 language={language}
+                onInterested={isPromotedRoster ? undefined : support.onInterested}
+                interestedActive={
+                  !isPromotedRoster && support.voted && support.voterRole === "INTERESTED"
+                }
+                onWithdraw={isPromotedRoster ? undefined : support.retract}
               />
 
               {/* RECAP — COMPLETED only: outcome + attendees + completion photos. */}
