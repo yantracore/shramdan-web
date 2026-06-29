@@ -7039,11 +7039,19 @@
   color: var(--accent);
 }
 
+.public-issue-location-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+}
+
 .public-issue-location-open-link {
   font-size: 13px;
   font-weight: 600;
   color: var(--accent);
   text-decoration: none;
+  white-space: nowrap;
 }
 
 .public-issue-location-open-link:hover {
