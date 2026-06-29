@@ -352,7 +352,7 @@ export function IssuePreviewPane({
                 }}
               />
             ) : actionMode === "join" ? (
-              <IssueJoinButton issue={issue} language={language} size="large" />
+              <IssueJoinButton issue={issue} language={language} size="large" eager />
             ) : null}
             <Link
               className="event-preview-open"

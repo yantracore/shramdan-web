@@ -259,6 +259,19 @@ export function useEventJoin(eventId, { seed = null, language = "np", eager = fa
       ? { current: participantTotalFilled, target: participantTotalTarget, variant: "fill" }
       : null;
 
+  // Is there an open slot the viewer could actually take? (Any in-scope role
+  // not yet at its target; a role with no cap counts as open.) Lets the CTA read
+  // "Full" instead of a misleading "Join" once every joinable seat is taken.
+  const hasOpenSlot = participantRoles.some((r) => {
+    const inScope =
+      participantJoinableRoles === null ||
+      (Array.isArray(participantJoinableRoles) && participantJoinableRoles.includes(r.role));
+    if (!inScope) return false;
+    const target = Number(r.target);
+    if (!Number.isFinite(target) || target <= 0) return true;
+    return (Number(r.count) || 0) < target;
+  });
+
   const participantCanLeave =
     Boolean(viewerRole) &&
     EVENT_JOINABLE_STATUSES.has(eventData?.status) &&
@@ -421,6 +434,7 @@ export function useEventJoin(eventId, { seed = null, language = "np", eager = fa
     campaignHeader,
     eventData,
     joinable,
+    hasOpenSlot,
     phase,
     viewerRole,
     viewerStatus

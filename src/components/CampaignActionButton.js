@@ -12,7 +12,9 @@
 
 import { CheckCircleFilled } from "@ant-design/icons";
 
-// mode: "act" | "committed" | "readonly" | "disabled"
+// mode: "act" | "committed" | "full" | "readonly" | "disabled"
+//   full = joinable phase but every seat is taken; interactive (opens the modal
+//   to view the all-full roster), muted styling, no "join" promise.
 export function CampaignActionButton({
   mode = "act",
   label,
@@ -27,7 +29,7 @@ export function CampaignActionButton({
   ariaLabel,
   className = ""
 }) {
-  const interactive = (mode === "act" || mode === "committed") && !loading;
+  const interactive = (mode === "act" || mode === "committed" || mode === "full") && !loading;
   const isCommittedLike = mode === "committed" || mode === "readonly";
   const showCount =
     mode === "act" && count !== null && count !== undefined && count !== "";

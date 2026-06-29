@@ -44,22 +44,25 @@ const ROLE_LABELS_EN = {
   LOGISTICS: "Logistics"
 };
 
-export function EventJoinButton({ eventId, seed, language = "np", size, status }) {
+export function EventJoinButton({ eventId, seed, language = "np", size, status, eager = false }) {
   const lang = language === "en" ? "en" : "np";
   const bc = BUTTON_COPY[lang];
 
-  const join = useEventJoin(eventId, { seed, language: lang });
+  // eager (preview panes) loads the roster + the viewer's participation on mount
+  // so the CTA reads committed / Full / Join correctly before the modal opens.
+  const join = useEventJoin(eventId, { seed, language: lang, eager });
 
   // Hidden when the event is completely non-joinable AND viewer is not in.
   // (joinable = false means COMPLETED/CANCELLED/PAUSED with no active viewer role.)
   if (!join.joinable && !join.viewerRole) return null;
 
-  // viewerRole → committed chip; else the solid act CTA (red only when LIVE).
-  // (See docs/design/06-state-color-system.md: teal action colour, LIVE = red.)
+  // viewerRole → committed chip; all seats taken → "Full"; else the solid act
+  // CTA (red only when LIVE). (docs/design/06: teal action colour, LIVE = red.)
   const isLive = status === "active";
   let mode = "act";
   let label = isLive ? (lang === "np" ? "अहिले जोडिने" : "Join now") : bc.join;
   let roleColor;
+  let icon = <UserAddOutlined />;
   if (join.viewerRole) {
     mode = "committed";
     if (join.viewerRole === "COORDINATOR") {
@@ -69,6 +72,10 @@ export function EventJoinButton({ eventId, seed, language = "np", size, status }
       label = bc.joinedAs(join.viewerRole);
       roleColor = ROLE_COLORS[join.viewerRole] || undefined;
     }
+  } else if (!join.hasOpenSlot) {
+    mode = "full";
+    label = lang === "np" ? "सबै भरियो" : "Full";
+    icon = null;
   }
 
   return (
@@ -78,7 +85,7 @@ export function EventJoinButton({ eventId, seed, language = "np", size, status }
         label={label}
         accent={isLive ? "live" : "primary"}
         roleColor={roleColor}
-        icon={<UserAddOutlined />}
+        icon={icon}
         size={size === "large" ? "lg" : "sm"}
         loading={join.loading}
         language={lang}

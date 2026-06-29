@@ -58,6 +58,9 @@ export function IssueJoinButton({
   type = "primary",
   className,
   block = false,
+  // Preview surfaces pass eager so the CTA reads committed / Full / Join
+  // correctly before the modal opens (grid cards stay lazy).
+  eager = false,
   // Optional controlled useEventJoin instance. When a page already drives one
   // (so its body roster and this button's modal stay one live-synced source),
   // it's passed in; otherwise the button creates its own.
@@ -68,12 +71,12 @@ export function IssueJoinButton({
   const eventId = eventIdProp || getIssueEventId(issue);
   const phase = eventJoinPhase(eventStatus);
 
-  // Eager-load only when we need the viewer's role for the COMPLETED chip; join
-  // phases load lazily when the modal opens. A controlled instance, when given,
-  // wins (the page already loaded it).
+  // Eager when asked (preview) or when we need the viewer's role for the
+  // COMPLETED chip; otherwise lazy (loads when the modal opens). A controlled
+  // instance, when given, wins (the page already loaded it).
   const ownJoin = useEventJoin(eventId, {
     language,
-    eager: phase.label === "contributed" && Boolean(eventId)
+    eager: eager || (phase.label === "contributed" && Boolean(eventId))
   });
   const join = controlledJoin ?? ownJoin;
 
@@ -144,10 +147,11 @@ export function IssueJoinButton({
     language
   });
 
-  // committed chip if the viewer already holds a role in a still-joinable phase.
+  // committed chip if already in; "Full" when every seat is taken; else join.
   let mode = "act";
   let label = isLive ? t.joinLive : t.join;
   let roleColor;
+  let icon = <UserAddOutlined />;
   if (join.viewerRole) {
     mode = "committed";
     if (join.viewerRole === "COORDINATOR") {
@@ -160,6 +164,10 @@ export function IssueJoinButton({
           : `Joined as ${t.roles[join.viewerRole] || join.viewerRole}`;
       roleColor = ROLE_COLORS[join.viewerRole] || undefined;
     }
+  } else if (!join.hasOpenSlot) {
+    mode = "full";
+    label = language === "np" ? "सबै भरियो" : "Full";
+    icon = null;
   }
 
   return (
@@ -169,7 +177,7 @@ export function IssueJoinButton({
         label={label}
         accent={isLive ? "live" : "primary"}
         roleColor={roleColor}
-        icon={<UserAddOutlined />}
+        icon={icon}
         size={sizeKey}
         block={block}
         className={className}

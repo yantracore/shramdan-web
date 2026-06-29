@@ -449,6 +449,7 @@ export function EventPreviewPane({
             language={language}
             status={status}
             size="large"
+            eager
           />
           <Link
             className="event-preview-open"

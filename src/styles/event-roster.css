@@ -2058,6 +2058,21 @@
   }
 }
 
+/* FULL — every seat taken: a muted, interactive chip that opens the modal to
+ * view the all-full roster (no misleading "Join"). */
+.campaign-action-btn--full {
+  color: var(--muted);
+  background: color-mix(in srgb, var(--muted) 12%, var(--surface));
+  border: 1px solid var(--line);
+}
+@media (hover: hover) {
+  .campaign-action-btn--full:hover,
+  .campaign-action-btn--full:focus-visible {
+    background: color-mix(in srgb, var(--muted) 18%, var(--surface));
+    border-color: color-mix(in srgb, var(--muted) 40%, var(--line));
+  }
+}
+
 /* READONLY / DISABLED — quiet, non-interactive chips. */
 .campaign-action-btn--readonly {
   color: var(--muted);
