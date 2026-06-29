@@ -27,7 +27,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { FaFacebookF, FaTiktok, FaXTwitter, FaYoutube } from "react-icons/fa6";
-import { AppsStartMenu } from "@/components/AppsStartMenu";
 import { BackToTop } from "@/components/BackToTop";
 import { KeyboardShortcutsDialog } from "@/components/KeyboardShortcutsDialog";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
@@ -211,10 +210,10 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
     // in place; only the nav entry is removed here.
   ];
 
-  // Bottom-left "apps grid" dropdown — secondary nav for places that don't
-  // belong on the top pill (event types, intro, learn, resources, settings,
-  // admin). Resources surfaced here per the 2026-06-05 pivot — its content
-  // moved off the homepage.
+  // Secondary nav for places that don't belong on the top pill (event types,
+  // learn, resources, settings, admin). The bottom-left "apps grid" panel that
+  // used to surface these is removed for now; these entries now feed only the
+  // mobile drawer (mobileMenuItems below).
   const appsGridItems = [
     { href: "/event-types", label: t.nav.eventTypes, icon: <TeamOutlined /> },
     { href: "/resources", label: t.nav.resources, icon: <FolderOpenOutlined /> },
@@ -361,12 +360,6 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
   );
 
 
-
-  const handleAppsTileSelect = (event, item) => {
-    if (pathname === item.href && smoothScrollToTop()) {
-      event.preventDefault();
-    }
-  };
 
   const pagesLinks = [
     { href: "/", label: t.nav.home },
@@ -659,15 +652,8 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
             </div>
           </div>
 
-          {chromeMode === "full" ? (
-            <div className="site-shell-corner site-shell-corner--bottom-left">
-              <AppsStartMenu
-                items={appsGridItems}
-                language={language}
-                onItemSelect={handleAppsTileSelect}
-              />
-            </div>
-          ) : null}
+          {/* Bottom-left apps-grid panel (AppsStartMenu) is removed for now —
+              its entries still live in the mobile drawer via appsGridItems. */}
 
           <div
             className={`site-shell-corner site-shell-corner--bottom-right${
