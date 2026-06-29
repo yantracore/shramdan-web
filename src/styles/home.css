@@ -6272,59 +6272,6 @@
   border-top: 1px solid var(--line);
 }
 
-.public-issue-card-support.ant-btn {
-  cursor: pointer;
-  color: var(--text);
-  background: var(--surface);
-  border-color: var(--line);
-  box-shadow: none;
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
-}
-
-.public-issue-card-support.ant-btn:hover,
-.public-issue-card-support.ant-btn:focus-visible {
-  color: var(--primary);
-  background: color-mix(in srgb, var(--primary) 8%, var(--surface));
-  border-color: color-mix(in srgb, var(--primary) 45%, var(--line));
-}
-
-.public-issue-card-support.ant-btn:disabled,
-.public-issue-card-support.ant-btn[disabled],
-.public-issue-card-support.ant-btn.ant-btn-loading {
-  cursor: not-allowed;
-}
-
-.public-issue-card-support.ant-btn:disabled,
-.public-issue-card-support.ant-btn[disabled] {
-  color: var(--primary);
-  background: color-mix(in srgb, var(--primary) 10%, var(--surface));
-  border-color: color-mix(in srgb, var(--primary) 35%, var(--line));
-  opacity: 1;
-}
-
-.public-issue-card-support .public-issue-card-support-count,
-.public-issue-card-support .public-issue-card-support-label {
-  display: inline-block;
-  margin-left: 6px;
-}
-
-.public-issue-card-support .public-issue-card-support-count {
-  font-weight: 700;
-  color: var(--accent);
-}
-
-.public-issue-card-support .public-issue-card-support-label {
-  color: var(--text);
-  font-weight: 500;
-}
-
-.public-issue-card-support.ant-btn:disabled .public-issue-card-support-label,
-.public-issue-card-support.ant-btn[disabled] .public-issue-card-support-label,
-.public-issue-card-support.ant-btn:disabled .public-issue-card-support-count,
-.public-issue-card-support.ant-btn[disabled] .public-issue-card-support-count {
-  color: var(--primary);
-}
-
 .public-issue-card-actions .card-link {
   font-size: 13px;
   white-space: nowrap;
@@ -6784,37 +6731,6 @@
    Join CTA on the right. Let the progress grow but never crowd the button. */
 .public-issue-detail-support .participants-progress-compact {
   flex: 1 1 200px;
-}
-
-/* Voted state of the topline Support button — drop the flat "default" look for
-   the same highlighted green "joined" pill the roster uses, so the role the
-   viewer committed to (e.g. "Safety Lead") reads as a real, owned commitment. */
-.public-issue-detail-support .issue-topline-support-btn.ant-btn[aria-pressed="true"] {
-  background: color-mix(in srgb, #2e7d32 12%, var(--surface));
-  border-color: color-mix(in srgb, #2e7d32 42%, var(--line));
-  color: #2e7d32;
-  font-weight: 600;
-}
-
-.public-issue-detail-support .issue-topline-support-btn.ant-btn[aria-pressed="true"] .anticon {
-  color: #2e7d32;
-}
-
-.public-issue-detail-support .issue-topline-support-btn.ant-btn[aria-pressed="true"]:hover,
-.public-issue-detail-support .issue-topline-support-btn.ant-btn[aria-pressed="true"]:focus-visible {
-  background: color-mix(in srgb, #2e7d32 18%, var(--surface));
-  border-color: #2e7d32;
-  color: #2e7d32;
-}
-
-:root[data-theme="dark"] .public-issue-detail-support .issue-topline-support-btn.ant-btn[aria-pressed="true"] {
-  color: #4ade80;
-  background: color-mix(in srgb, #4ade80 14%, var(--surface));
-  border-color: color-mix(in srgb, #4ade80 36%, var(--line));
-}
-
-:root[data-theme="dark"] .public-issue-detail-support .issue-topline-support-btn.ant-btn[aria-pressed="true"] .anticon {
-  color: #4ade80;
 }
 
 .public-issue-detail-section-block {
