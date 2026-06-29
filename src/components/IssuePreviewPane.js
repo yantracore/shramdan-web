@@ -333,6 +333,7 @@ export function IssuePreviewPane({
                 // one's over (same reason the count is synced above).
                 key={issue.id}
                 content={content}
+                seed={issue}
                 initialVoteCount={issue.voteCount}
                 initialVoted={issue.isVoted}
                 issueId={issue.id}

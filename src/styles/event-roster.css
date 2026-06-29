@@ -1044,13 +1044,95 @@
   color: #e9b949;
 }
 
-/* --- SupportRolesModal -----------------------------------------------
- * The "how do you want to support?" modal: an "I'm interested" action on top,
- * then the embedded ParticipantsPanel (roles + counts + lead, by default). */
+/* --- CampaignParticipationModal --------------------------------------
+ * The unified join/support modal: a pinned campaign header (cover + title +
+ * status + when/where), an optional "I'm interested" action (OPEN only), then
+ * the embedded ParticipantsPanel (roles + counts + lead, by default). */
 .support-modal-intro {
   margin: 0 0 16px;
   color: var(--muted);
   font-size: 14px;
+}
+
+/* Campaign Participation Modal header — pinned cover + title + status + context.
+ * Lives in the Modal `title` slot so the roster body scrolls beneath it. */
+.campaign-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-right: 28px; /* clear AntD's absolute close (×) button */
+}
+
+.campaign-modal-cover {
+  flex: 0 0 auto;
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.campaign-modal-cover--fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 22px;
+  background: linear-gradient(135deg, var(--primary), color-mix(in srgb, var(--primary) 55%, #000));
+}
+
+.campaign-modal-headmeta {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.campaign-modal-title {
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.campaign-modal-statusline {
+  display: inline-flex;
+}
+
+.campaign-modal-status-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 14%, var(--surface));
+}
+.campaign-modal-status-chip[data-status="open"]      { color: var(--state-open-ink);      background: color-mix(in srgb, var(--state-open) 16%, var(--surface)); }
+.campaign-modal-status-chip[data-status="draft"]     { color: var(--state-draft-ink);     background: color-mix(in srgb, var(--state-draft) 16%, var(--surface)); }
+.campaign-modal-status-chip[data-status="scheduled"] { color: var(--state-scheduled-ink); background: color-mix(in srgb, var(--state-scheduled) 16%, var(--surface)); }
+.campaign-modal-status-chip[data-status="active"]    { color: var(--state-active-ink);    background: color-mix(in srgb, var(--state-active) 16%, var(--surface)); }
+.campaign-modal-status-chip[data-status="completed"] { color: var(--state-completed-ink); background: color-mix(in srgb, var(--state-completed) 16%, var(--surface)); }
+
+.campaign-modal-context {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  font-size: 12.5px;
+  font-weight: 400;
+  color: var(--muted);
+}
+.campaign-modal-context span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .support-modal-interested {

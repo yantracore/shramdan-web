@@ -3,7 +3,7 @@
 import { CheckOutlined, LikeOutlined } from "@ant-design/icons";
 import { Button, Popconfirm, Tooltip } from "antd";
 import { useEffect, useRef, useState } from "react";
-import { SupportRolesModal } from "@/components/SupportRolesModal";
+import { CampaignParticipationModal } from "@/components/CampaignParticipationModal";
 import { useRoleSupport } from "@/lib/useRoleSupport";
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
@@ -258,10 +258,11 @@ export function IssueVoteButton({
   // When already supported, the tooltip names the actual commitment instead of
   // a flat "withdraw support".
   const withdrawTooltip =
-    activeVoterRole === "GOING" && activeEventRole
+    activeVoterRole === "GOING"
       ? roleCopy.joinedTooltipGoing.replace(
           "{role}",
-          roleCopy.eventRoles[activeEventRole] || roleCopy.doneLabels.GOING
+          (activeEventRole && roleCopy.eventRoles[activeEventRole]) ||
+            roleCopy.doneLabels.GOING
         )
       : activeVoterRole === "WANT_TO_LEAD"
         ? roleCopy.joinedTooltipLead
@@ -332,10 +333,11 @@ export function IssueVoteButton({
         </Tooltip>
       </Popconfirm>
 
-      <SupportRolesModal
+      <CampaignParticipationModal
         open={support.open}
         onClose={support.closeModal}
         language={language}
+        campaign={support.campaignHeader}
         onInterested={support.onInterested}
         panelProps={support.panelProps}
       />
