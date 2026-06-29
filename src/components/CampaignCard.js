@@ -63,6 +63,67 @@ function ArrowGlyph() {
   );
 }
 
+// Deterministic supporter/participant avatar discs — the SAME treatment as the
+// map info-window's SupporterStack (IssueMap.js), inlined here so the card never
+// pulls leaflet into every page that renders it. A campaign carries only a count
+// (votes or attendees), never real avatars, so these are stable gradient discs
+// that read as "a group behind this"; the real number sits in the count text.
+const AVATAR_GRADIENTS = [
+  "linear-gradient(135deg, #21a08a, #0e5f4c)",
+  "linear-gradient(135deg, #f5a524, #d97706)",
+  "linear-gradient(135deg, #2f7ed8, #1d4ed8)",
+  "linear-gradient(135deg, #e5679a, #b4318f)",
+  "linear-gradient(135deg, #34b27b, #0f766e)"
+];
+
+function avatarSeed(value) {
+  const str = String(value ?? "");
+  let hash = 0;
+  for (let i = 0; i < str.length; i += 1) {
+    hash = (hash * 31 + str.charCodeAt(i)) | 0;
+  }
+  return Math.abs(hash);
+}
+
+function SupporterStack({ seed, count }) {
+  const shown = Math.min(3, Number(count) || 0);
+  if (shown <= 0) return null;
+  const base = avatarSeed(seed);
+  return (
+    <span className="map-pop-avatars" aria-hidden="true">
+      {Array.from({ length: shown }).map((_, i) => (
+        <span
+          key={i}
+          className="map-pop-avatar"
+          style={{ backgroundImage: AVATAR_GRADIENTS[(base + i) % AVATAR_GRADIENTS.length] }}
+        >
+          <svg viewBox="0 0 24 24" width="10" height="10" aria-hidden="true">
+            <path
+              fill="rgba(255,255,255,0.92)"
+              d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4zm0 2c-3.3 0-8 1.66-8 5v1h16v-1c0-3.34-4.7-5-8-5z"
+            />
+          </svg>
+        </span>
+      ))}
+    </span>
+  );
+}
+
+// The footer count. Before a campaign is dated it's "supporters" (the vote/
+// interest tally); once it's an event-stage it's "participants" (attendees who
+// joined). Either way the map info-window shows this number — so the card must
+// too. Returns null when the count is 0 (the CTA then fills the row).
+function formatCount(count, kind, language) {
+  const n = Number(count) || 0;
+  if (n < 1) return null;
+  const num = toLocalDigits(n, language);
+  if (language === "np") {
+    return kind === "supporters" ? `${num} समर्थक` : `${num} सहभागी`;
+  }
+  if (kind === "supporters") return n === 1 ? "1 supporter" : `${num} supporters`;
+  return n === 1 ? "1 participant" : `${num} participants`;
+}
+
 // Just the "when" — the status word lives in the badge over the image.
 function formatDateLabel(iso, language) {
   if (!iso) return null;
@@ -123,6 +184,9 @@ function normalizeCampaign(campaign, language) {
         : data.scheduledAt;
     const lat = Number(data.latitude ?? data.meetupLatitude ?? linkedIssue?.latitude);
     const lng = Number(data.longitude ?? data.meetupLongitude ?? linkedIssue?.longitude);
+    // Once a campaign is an event-stage it's "participants" — the attendee tally.
+    const count =
+      Number(data.attendeeCount ?? data.attendingCount ?? linkedIssue?.attendingCount) || 0;
     return {
       resolved,
       title: data.title || localizedIssue?.title || linkedIssue?.addressText || "—",
@@ -131,7 +195,9 @@ function normalizeCampaign(campaign, language) {
       slug: issueSlug,
       dateLabel: formatDateLabel(dateIso, language),
       latitude: lat,
-      longitude: lng
+      longitude: lng,
+      count,
+      countKind: "participants"
     };
   }
 
@@ -140,6 +206,12 @@ function normalizeCampaign(campaign, language) {
   const resolved = resolveCampaignStatus(issue.status, null);
   const lat = Number(issue.latitude);
   const lng = Number(issue.longitude);
+  // Before it's dated (OPEN/DRAFT) the tally is "supporters" (votes); once the
+  // issue has gone to an event-stage it's "participants" (people who joined).
+  const isPreEvent = resolved === "OPEN" || resolved === "DRAFT";
+  const count = isPreEvent
+    ? Number(issue.voteCount) || 0
+    : Number(issue.attendingCount ?? issue.voteCount) || 0;
   return {
     resolved,
     title: issue.title || issue.addressText || "—",
@@ -148,7 +220,9 @@ function normalizeCampaign(campaign, language) {
     slug: issue.slug || issue.id,
     dateLabel: null,
     latitude: lat,
-    longitude: lng
+    longitude: lng,
+    count,
+    countKind: isPreEvent ? "supporters" : "participants"
   };
 }
 
@@ -168,6 +242,7 @@ export function CampaignCard({ campaign, language = "np", distanceKm = null }) {
   const accessibleLabel = c.title || c.addressText || statusLabel;
   const ctaLabel = language === "np" ? "विवरण" : "View detail";
   const hasCoords = Number.isFinite(c.latitude) && Number.isFinite(c.longitude);
+  const countText = formatCount(c.count, c.countKind, language);
 
   return (
     <article className="campaign-card" data-status={visual}>
@@ -210,7 +285,13 @@ export function CampaignCard({ campaign, language = "np", distanceKm = null }) {
             <span>{c.addressText}</span>
           </p>
         ) : null}
-        <div className="campaign-card-foot">
+        <div className={`campaign-card-foot${countText ? "" : " campaign-card-foot--solo"}`}>
+          {countText ? (
+            <div className="campaign-card-people">
+              <SupporterStack seed={c.slug || c.title} count={c.count} />
+              <span className="campaign-card-count">{countText}</span>
+            </div>
+          ) : null}
           <Link href={href} className="campaign-card-cta">
             <span>{ctaLabel}</span>
             <ArrowGlyph />

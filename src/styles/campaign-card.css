@@ -160,9 +160,36 @@
   overflow: hidden;
 }
 
+/* Participants/supporters on the left, the View-detail action on the right —
+ * the same split as the map info-window's .map-pop-foot. When the count is 0
+ * the CTA keeps its right-hand spot on its own (--solo). */
 .campaign-card-foot {
   margin-top: auto;
-  padding-top: 6px;
+  padding-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.campaign-card-foot--solo {
+  justify-content: flex-end;
+}
+
+.campaign-card-people {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+
+.campaign-card-count {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .campaign-card-cta {
