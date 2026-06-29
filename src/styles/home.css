@@ -6541,6 +6541,27 @@
   display: block;
 }
 
+/* Representative cover fallback — a static map thumbnail of the campaign's own
+   location stands in when no cover photo exists (never an empty placeholder).
+   The IssueMapThumb span is absolutely positioned to fill the 21/9 hero. */
+.public-issue-detail-cover--map {
+  background: color-mix(in srgb, var(--surface) 80%, #000);
+}
+
+.public-issue-detail-cover--map .issue-map-thumb {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.public-issue-detail-cover--map .issue-map-thumb-tile {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .public-issue-detail-cover-actions {
   position: absolute;
   top: 16px;

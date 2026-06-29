@@ -84,3 +84,45 @@ export function campaignVisualStatus(status) {
 export function campaignStatusKind(status) {
   return CAMPAIGN_STATUSES[status]?.kind || "event";
 }
+
+// Fold the issue's coarse status (OPEN | EVENT_DRAFT | EVENT_SCHEDULED |
+// COMPLETED) and its linked event's fine status (DRAFT | SCHEDULED | ACTIVE |
+// PAUSED | COMPLETED | CANCELLED) into ONE canonical campaign status key from
+// CAMPAIGN_STATUS_SEQUENCE (+ PAUSED). The event status wins whenever present —
+// the issue read is too coarse to tell DRAFT/SCHEDULED/ACTIVE apart, so a
+// promoted issue (EVENT_DRAFT) only ever resolves the finer stage via its
+// event. A COMPLETED issue with no resolvable event still reads COMPLETED.
+// Returns a key in { OPEN, DRAFT, SCHEDULED, ACTIVE, COMPLETED, PAUSED }; the
+// off-path terminal states (REJECTED/DUPLICATE/CANCELLED) keep their own key so
+// callers can branch on them. Used by /campaign/[slug] for the status tag,
+// data-status hook, and the progressive-disclosure gating.
+export function resolveCampaignStatus(issueStatus, eventStatus) {
+  if (eventStatus) {
+    switch (eventStatus) {
+      case "DRAFT":
+        return "DRAFT";
+      case "SCHEDULED":
+        return "SCHEDULED";
+      case "ACTIVE":
+        return "ACTIVE";
+      case "PAUSED":
+        return "PAUSED";
+      case "COMPLETED":
+        return "COMPLETED";
+      case "CANCELLED":
+        return "CANCELLED";
+      default:
+        break;
+    }
+  }
+  if (issueStatus === "OPEN") return "OPEN";
+  if (issueStatus === "COMPLETED") return "COMPLETED";
+  if (issueStatus === "REJECTED") return "REJECTED";
+  if (issueStatus === "DUPLICATE") return "DUPLICATE";
+  // Promoted issue (EVENT_DRAFT / EVENT_SCHEDULED) whose event hasn't resolved
+  // yet — park at the earliest post-promotion stage rather than guess further.
+  if (issueStatus === "EVENT_DRAFT" || issueStatus === "EVENT_SCHEDULED") {
+    return "DRAFT";
+  }
+  return "OPEN";
+}
