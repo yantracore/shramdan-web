@@ -286,7 +286,7 @@ export function IssueVoteButton({
     // Voted already → withdrawal runs through the confirm popover that wraps
     // this button (see Popconfirm below), so the bare click is a no-op here.
     if (support.voted) return;
-    // Open the rich SupportRolesModal (all roles + counts + lead visible).
+    // Open the rich CampaignParticipationModal (all roles + counts + lead visible).
     support.openModal();
   };
 

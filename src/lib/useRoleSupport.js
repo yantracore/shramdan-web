@@ -3,7 +3,7 @@
 // useRoleSupport — shared hook that drives the "Support" flow on any issue
 // surface (IssueVoteButton, PublicIssueCard, IssuePreviewPane). It lazy-loads
 // the full roster + myVote on first openModal(), builds the panelProps object
-// the SupportRolesModal/ParticipantsPanel needs, and delegates all mutations to
+// the CampaignParticipationModal/ParticipantsPanel needs, and delegates all mutations to
 // the existing useIssueVote hook so message toasts + optimistic counts stay
 // consistent with the rest of the app.
 
