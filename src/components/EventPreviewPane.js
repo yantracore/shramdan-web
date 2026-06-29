@@ -448,6 +448,7 @@ export function EventPreviewPane({
             seed={event}
             language={language}
             status={status}
+            size="large"
           />
           <Link
             className="event-preview-open"
