@@ -19,26 +19,12 @@ import {
 } from "@ant-design/icons";
 import { Modal } from "antd";
 import { ParticipantsPanel } from "@/components/ParticipantsPanel";
+import { formatCampaignDateTime } from "@/lib/nepaliDate";
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 function localizeDigits(value, language) {
   const s = String(value ?? "");
   return language === "np" ? s.replace(/\d/g, (d) => NP_DIGITS[Number(d)]) : s;
-}
-
-function formatScheduledAt(value, language) {
-  if (!value) return "";
-  try {
-    const locale = language === "np" ? "ne-NP" : "en-US";
-    return new Date(value).toLocaleString(locale, {
-      month: "long",
-      day: "numeric",
-      hour: "numeric",
-      minute: "2-digit"
-    });
-  } catch {
-    return String(value);
-  }
 }
 
 const COPY = {
@@ -75,7 +61,7 @@ function CampaignModalHeader({ campaign, language, t }) {
     context = (
       <>
         <span>
-          <CalendarOutlined aria-hidden="true" /> {formatScheduledAt(scheduledAt, language)}
+          <CalendarOutlined aria-hidden="true" /> {formatCampaignDateTime(scheduledAt, language)}
         </span>
         {durationMinutes ? (
           <span>
