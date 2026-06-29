@@ -12,8 +12,9 @@
 //   (no event id)    → an honest "almost ready" cue instead of a dead button.
 
 import { CheckCircleFilled, StopOutlined, UserAddOutlined } from "@ant-design/icons";
-import { Button, Modal } from "antd";
-import { ParticipantsPanel } from "@/components/ParticipantsPanel";
+import { Button } from "antd";
+import { CampaignParticipationModal } from "@/components/CampaignParticipationModal";
+import { buildCampaignHeader } from "@/lib/campaignHeader";
 import { useToast } from "@/lib/toast";
 import { useEventJoin } from "@/lib/useEventJoin";
 import { eventJoinPhase, getIssueEventId } from "@/lib/issueActions";
@@ -21,6 +22,7 @@ import { eventJoinPhase, getIssueEventId } from "@/lib/issueActions";
 const COPY = {
   np: {
     join: "जोडिने",
+    joinLive: "अहिले जोडिने",
     title: "कुन भूमिकामा जोडिनुहुन्छ?",
     contributed: "योगदान: {role}",
     contributedPlain: "योगदान गरियो",
@@ -33,6 +35,7 @@ const COPY = {
   },
   en: {
     join: "Join",
+    joinLive: "Join now",
     title: "Which role would you take?",
     contributed: "Contributed as {role}",
     contributedPlain: "Contributed",
@@ -108,6 +111,21 @@ export function IssueJoinButton({
   }
 
   // Join phases (DRAFT / SCHEDULED / ACTIVE) → open the role picker inline.
+  // Hybrid CTA (docs/design/06-state-color-system.md): teal by default, red for
+  // a LIVE event only — the one stage where "join now" carries real urgency.
+  const isLive = eventStatus === "ACTIVE";
+  const liveStyle = isLive
+    ? { background: "var(--state-live)", borderColor: "var(--state-live)" }
+    : undefined;
+
+  // IssueJoinButton holds the full issue (instant cover + title); the hook's
+  // eventData sharpens status + schedule once the modal loads.
+  const campaign = buildCampaignHeader({
+    issue,
+    event: join.eventData || (eventStatus ? { status: eventStatus } : null),
+    language
+  });
+
   return (
     <>
       <Button
@@ -116,6 +134,7 @@ export function IssueJoinButton({
         icon={<UserAddOutlined />}
         size={size}
         type={type}
+        style={liveStyle}
         loading={join.loading}
         onClick={(e) => {
           e.preventDefault();
@@ -123,20 +142,16 @@ export function IssueJoinButton({
           join.openModal();
         }}
       >
-        {t.join}
+        {isLive ? t.joinLive : t.join}
       </Button>
 
-      <Modal
+      <CampaignParticipationModal
         open={join.open}
-        onCancel={join.closeModal}
-        footer={null}
-        width={680}
-        title={t.title}
-        destroyOnHidden
-        className="support-roles-modal"
-      >
-        <ParticipantsPanel {...join.panelProps} embedded language={language} />
-      </Modal>
+        onClose={join.closeModal}
+        language={language}
+        campaign={campaign}
+        panelProps={join.panelProps}
+      />
     </>
   );
 }
