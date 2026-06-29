@@ -56,7 +56,13 @@ function resolveStepIndex(status, eventStatus) {
   return 0;
 }
 
-export function IssueStatusTimeline({ status, eventStatus, content, language = "np" }) {
+export function IssueStatusTimeline({
+  status,
+  eventStatus,
+  content,
+  language = "np",
+  times
+}) {
   const t = STEP_COPY[language] || STEP_COPY.np;
 
   // Off-path terminal states get a banner instead of the progress rail.
@@ -91,13 +97,24 @@ export function IssueStatusTimeline({ status, eventStatus, content, language = "
 
   const current = resolveStepIndex(status, eventStatus);
 
-  const items = STEP_KEYS.map((key, index) => ({
-    title: campaignStatusLabel(key, language),
-    // The current, non-final step wears the in-progress clock; everything else
-    // shows its own milestone icon.
-    icon:
-      index === current && current !== 4 ? <ClockCircleOutlined /> : STEP_ICONS[key]
-  }));
+  const items = STEP_KEYS.map((key, index) => {
+    // Show a milestone's timestamp only once it's actually been reached (the
+    // current step and everything to its left); future steps haven't happened
+    // yet, and not every reached step has a recorded time (e.g. ACTIVE has no
+    // distinct "went live" stamp), so we render whatever the caller supplies.
+    const reached = index <= current;
+    const when = reached && times ? times[key] : null;
+    return {
+      title: campaignStatusLabel(key, language),
+      // The current, non-final step wears the in-progress clock; everything else
+      // shows its own milestone icon.
+      icon:
+        index === current && current !== 4 ? <ClockCircleOutlined /> : STEP_ICONS[key],
+      description: when ? (
+        <span className="public-issue-timeline-when">{when}</span>
+      ) : undefined
+    };
+  });
 
   return (
     <div className="public-issue-status-timeline">

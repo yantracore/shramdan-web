@@ -131,6 +131,23 @@ function formatIssueDate(value, language) {
   }
 }
 
+// Compact one-line date for the status-timeline milestones (e.g. "12 Jun 2026")
+// — the long-form formatIssueDate is too wide stacked under five timeline nodes.
+function formatTimelineDate(value, language) {
+  if (!value) return "";
+  try {
+    const date = new Date(value);
+    const locale = language === "np" ? "ne-NP" : "en-US";
+    return date.toLocaleDateString(locale, {
+      year: "numeric",
+      month: "short",
+      day: "numeric"
+    });
+  } catch {
+    return String(value);
+  }
+}
+
 function formatScheduledAt(value, language) {
   if (!value) return "";
   try {
@@ -317,6 +334,19 @@ export function CampaignDetailView({ slug }) {
   const attendeeCount = eventData?.attendeeCount;
   const completedAt = eventData?.completedAt || null;
 
+  // When each lifecycle milestone happened, keyed by the timeline's step. OPEN
+  // comes off the issue (reported), DRAFT off the event's creation (promoted /
+  // planning began), SCHEDULED off its planned date, COMPLETED off its recap.
+  // ACTIVE has no distinct "went live" stamp, so it stays blank — the timeline
+  // only renders the steps that actually carry a time.
+  const timelineTimes = {
+    OPEN: formatTimelineDate(issue?.createdAt, language),
+    DRAFT: formatTimelineDate(eventData?.createdAt, language),
+    SCHEDULED: formatTimelineDate(scheduledAt, language),
+    ACTIVE: "",
+    COMPLETED: formatTimelineDate(completedAt, language)
+  };
+
   const showSchedule = campaignStatus === "DRAFT" || isPlanned;
   const showMeetup = isPlanned && (meetupAddress || meetupNotes || hasMeetupCoords);
   const showBring = isPlanned && !isCompleted && Boolean(whatToBring);
@@ -488,6 +518,7 @@ export function CampaignDetailView({ slug }) {
                   eventStatus={eventStatus}
                   content={content}
                   language={language}
+                  times={timelineTimes}
                 />
               </section>
 
