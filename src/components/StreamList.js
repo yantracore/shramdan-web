@@ -26,6 +26,7 @@ import {
 } from "@ant-design/icons";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { CampaignCard } from "@/components/CampaignCard";
 import { listAllEvents } from "@/lib/eventsApi";
 import { distanceKmOrNull } from "@/lib/haversine";
 import { useGeolocation } from "@/lib/useGeolocation";
@@ -399,12 +400,11 @@ export function StreamList({
       ) : (
         <div className="home-for-you-grid">
           {entries.map(({ entry, distanceKm }) => (
-            <StreamCard
+            <CampaignCard
               key={`${entry.kind}-${entry.id}`}
-              entry={entry}
+              campaign={{ kind: entry.kind, data: entry.raw }}
               distanceKm={distanceKm}
               language={language}
-              copy={t}
             />
           ))}
         </div>

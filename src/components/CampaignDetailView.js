@@ -40,7 +40,7 @@ import { CompactConversionProgress, ParticipantsPanel } from "@/components/Parti
 import { IssueVoteButton } from "@/components/IssueVoteButton";
 import { CommentSection } from "@/components/comments";
 import { IssueReactions } from "@/components/IssueReactions";
-import { PublicIssueCard } from "@/components/PublicIssueCard";
+import { CampaignCard } from "@/components/CampaignCard";
 import { ReportDialog } from "@/components/ReportDialog";
 import { ScrollProgressBar } from "@/components/ScrollProgressBar";
 import { SiteShell } from "@/components/SiteShell";
@@ -641,12 +641,11 @@ export function CampaignDetailView({ slug }) {
           <section className="public-issue-related">
             <h2>{content.detail.relatedTitle}</h2>
             {related.length > 0 ? (
-              <div className="public-issues-grid">
+              <div className="campaign-card-grid">
                 {related.map((relatedIssue) => (
-                  <PublicIssueCard
+                  <CampaignCard
                     key={relatedIssue.id}
-                    issue={relatedIssue}
-                    content={content}
+                    campaign={{ kind: "issue", data: relatedIssue }}
                     language={language}
                   />
                 ))}

@@ -1,18 +1,14 @@
 "use client";
 
 // /me/saved — every issue the user has bookmarked via the heart icon
-// on PublicIssueCard, fetched from the local-storage-backed
+// (on issue surfaces), fetched from the local-storage-backed
 // useSavedIssues hook. Bookmarks are stored as issue ids; each id is
-// resolved to its real public issue (GET /issues/:id) so the row can
-// show the issue's title and location, with a "remove" affordance.
+// resolved to its real public issue (GET /issues/:id) and rendered as a
+// CampaignCard grid, each with a "remove" (un-save) affordance.
 
-import {
-  ArrowRightOutlined,
-  EnvironmentOutlined,
-  HeartFilled
-} from "@ant-design/icons";
-import Link from "next/link";
+import { HeartFilled } from "@ant-design/icons";
 import { useEffect, useState } from "react";
+import { CampaignCard } from "@/components/CampaignCard";
 import { EmptyState } from "@/components/EmptyState";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
@@ -113,40 +109,30 @@ export default function MeSavedPage() {
             cta={{ label: t.browseLink, href: "/campaigns" }}
           />
         ) : (
-          <ul className="saved-list">
+          <div className="campaign-card-grid saved-grid">
             {ids.map((id) => {
               const meta = issueMap[id];
               return (
-                <li key={id} className="saved-row">
-                  <Link href={`/issues/${meta?.slug ?? id}`} className="saved-row-link">
-                    <span className="saved-row-label">{t.issueLabel}</span>
-                    <strong className="saved-row-title">
-                      {meta?.title || id}
-                    </strong>
-                    {meta?.addressText ? (
-                      <span className="saved-row-address">
-                        <EnvironmentOutlined aria-hidden="true" /> {meta.addressText}
-                      </span>
-                    ) : null}
-                  </Link>
-                  <div className="saved-row-actions">
-                    <Link href={`/issues/${meta?.slug ?? id}`} className="saved-row-view">
-                      {t.viewLabel} <ArrowRightOutlined />
-                    </Link>
-                    <button
-                      type="button"
-                      className="saved-row-remove"
-                      onClick={() => toggle(id)}
-                      aria-label={t.removeLabel}
-                      title={t.removeLabel}
-                    >
-                      <HeartFilled />
-                    </button>
-                  </div>
-                </li>
+                <div key={id} className="saved-card-wrap">
+                  <button
+                    type="button"
+                    className="saved-card-remove"
+                    onClick={() => toggle(id)}
+                    aria-label={t.removeLabel}
+                    title={t.removeLabel}
+                  >
+                    <HeartFilled />
+                  </button>
+                  {meta ? (
+                    <CampaignCard
+                      campaign={{ kind: "issue", data: meta }}
+                      language={language}
+                    />
+                  ) : null}
+                </div>
               );
             })}
-          </ul>
+          </div>
         )}
       </section>
     </SiteShell>

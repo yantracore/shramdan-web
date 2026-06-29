@@ -12,7 +12,7 @@
 // inline dividers in lifecycle order.
 
 import { CloseOutlined, LoadingOutlined, PlusOutlined, ReloadOutlined, SearchOutlined } from "@ant-design/icons";
-import { Button, Empty, Segmented, Select, Skeleton } from "antd";
+import { Button, Empty, Pagination, Segmented, Select, Skeleton } from "antd";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -24,6 +24,7 @@ import { EventPreviewPane } from "@/components/EventPreviewPane";
 import { IssueListCard } from "@/components/IssueListCard";
 import { IssuePreviewPane } from "@/components/IssuePreviewPane";
 import { CampaignsMap } from "@/components/CampaignsMap";
+import { CampaignCard } from "@/components/CampaignCard";
 import { PAGE_COPY as EVENTS_COPY } from "@/app/events/EventsListClient";
 import { usePreferences } from "@/app/providers";
 import { copy } from "@/lib/siteContent";
@@ -39,6 +40,7 @@ import {
 
 const INITIAL_VISIBLE = 8;
 const LOAD_MORE_STEP = 6;
+const THUMBNAILS_PAGE_SIZE = 12;
 const CATEGORY_VALUES = new Set(ISSUE_CATEGORIES);
 
 const PAGE_COPY = {
@@ -51,8 +53,10 @@ const PAGE_COPY = {
     statusFilterAria: "स्थिति फिल्टर",
     viewToggleAria: "दृश्य रोज्नुहोस्",
     viewList: "सूची",
+    viewThumbnails: "ग्रिड",
     viewMap: "नक्सा",
     listAriaLabel: "अभियानहरूको सूची",
+    gridAriaLabel: "अभियानहरूको ग्रिड",
     loadingMore: "थप ल्याउँदै…",
     noMore: "सबै देखाइए।"
   },
@@ -65,8 +69,10 @@ const PAGE_COPY = {
     statusFilterAria: "Status filter",
     viewToggleAria: "Choose view",
     viewList: "List",
+    viewThumbnails: "Thumbnails",
     viewMap: "Map",
     listAriaLabel: "List of campaigns",
+    gridAriaLabel: "Grid of campaigns",
     loadingMore: "Loading more…",
     noMore: "All shown."
   }
@@ -168,23 +174,57 @@ export default function CampaignsListPageContent() {
     setSearchInput(filters.q);
   }, [filters.q]);
 
-  // ----- list / map view toggle (URL-synced via ?view=map) ---------------
+  // ----- list / thumbnails / map view toggle (URL-synced via ?view=) ------
   // `view` is not a filter — it rides on its own ?view= param so a filtered
-  // map is shareable, and filter/selection URL writes preserve it untouched.
-  const [view, setView] = useState(() =>
-    searchParams?.get("view") === "map" ? "map" : "list"
-  );
+  // map/grid is shareable, and filter/selection URL writes preserve it
+  // untouched. Values: "list" (default) | "thumbnails" | "map".
+  const readView = useCallback(() => {
+    const v = searchParams?.get("view");
+    return v === "map" || v === "thumbnails" ? v : "list";
+  }, [searchParams]);
+  const [view, setView] = useState(readView);
   useEffect(() => {
-    const next = searchParams?.get("view") === "map" ? "map" : "list";
+    const next = readView();
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setView((prev) => (prev === next ? prev : next));
-  }, [searchParams]);
+  }, [readView]);
   const handleViewChange = useCallback(
     (nextView) => {
       setView(nextView);
       const params = new URLSearchParams(searchParams?.toString() || "");
-      if (nextView === "map") params.set("view", "map");
-      else params.delete("view");
+      if (nextView === "map" || nextView === "thumbnails") {
+        params.set("view", nextView);
+      } else {
+        params.delete("view");
+      }
+      // Switching views drops any thumbnail page index — it is meaningless
+      // outside the grid.
+      params.delete("page");
+      const query = params.toString();
+      router.replace(query ? `/campaigns?${query}` : "/campaigns", {
+        scroll: false
+      });
+    },
+    [router, searchParams]
+  );
+
+  // ----- thumbnails pagination (URL-synced via ?page=) -------------------
+  const [page, setPage] = useState(() => {
+    const p = Number(searchParams?.get("page"));
+    return Number.isFinite(p) && p >= 1 ? Math.floor(p) : 1;
+  });
+  useEffect(() => {
+    const p = Number(searchParams?.get("page"));
+    const next = Number.isFinite(p) && p >= 1 ? Math.floor(p) : 1;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setPage((prev) => (prev === next ? prev : next));
+  }, [searchParams]);
+  const handlePageChange = useCallback(
+    (nextPage) => {
+      setPage(nextPage);
+      const params = new URLSearchParams(searchParams?.toString() || "");
+      if (nextPage > 1) params.set("page", String(nextPage));
+      else params.delete("page");
       const query = params.toString();
       router.replace(query ? `/campaigns?${query}` : "/campaigns", {
         scroll: false
@@ -280,6 +320,18 @@ export default function CampaignsListPageContent() {
   useEffect(() => {
     setVisibleCount(INITIAL_VISIBLE);
   }, [filters]);
+
+  // ----- thumbnails page window ------------------------------------------
+  const pageCount = Math.max(1, Math.ceil(filteredItems.length / THUMBNAILS_PAGE_SIZE));
+  const safePage = Math.min(page, pageCount);
+  const pagedItems = useMemo(
+    () =>
+      filteredItems.slice(
+        (safePage - 1) * THUMBNAILS_PAGE_SIZE,
+        safePage * THUMBNAILS_PAGE_SIZE
+      ),
+    [filteredItems, safePage]
+  );
 
   const visibleItems = useMemo(
     () => filteredItems.slice(0, visibleCount),
@@ -587,6 +639,7 @@ export default function CampaignsListPageContent() {
               <Segmented
                 options={[
                   { value: "list", label: t.viewList },
+                  { value: "thumbnails", label: t.viewThumbnails },
                   { value: "map", label: t.viewMap }
                 ]}
                 value={view}
@@ -718,6 +771,29 @@ export default function CampaignsListPageContent() {
               mapCopy={homeSearch.map}
               emptyLabel={homeSearch.mapEmpty}
             />
+          ) : view === "thumbnails" ? (
+            <section aria-label={t.gridAriaLabel}>
+              <div className="campaign-card-grid">
+                {pagedItems.map((entry) => (
+                  <CampaignCard
+                    key={entry.id}
+                    campaign={{ kind: entry.kind, data: entry.data }}
+                    language={language}
+                  />
+                ))}
+              </div>
+              {filteredItems.length > THUMBNAILS_PAGE_SIZE ? (
+                <div className="campaign-card-grid-pagination">
+                  <Pagination
+                    current={safePage}
+                    pageSize={THUMBNAILS_PAGE_SIZE}
+                    total={filteredItems.length}
+                    showSizeChanger={false}
+                    onChange={handlePageChange}
+                  />
+                </div>
+              ) : null}
+            </section>
           ) : (
           <section
             className="events-split"
