@@ -240,7 +240,9 @@ export function CampaignCard({ campaign, language = "np", distanceKm = null }) {
   const distanceLabel = formatDistance(distanceKm, language);
   const href = `/campaign/${c.slug}`;
   const accessibleLabel = c.title || c.addressText || statusLabel;
-  const ctaLabel = language === "np" ? "विवरण" : "View detail";
+  // Short, matching the map info-window's own CTA — keeps the footer one line
+  // even on a narrow card so the count beside it never truncates.
+  const ctaLabel = language === "np" ? "विवरण" : "View";
   const hasCoords = Number.isFinite(c.latitude) && Number.isFinite(c.longitude);
   const countText = formatCount(c.count, c.countKind, language);
 
