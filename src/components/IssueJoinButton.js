@@ -11,9 +11,10 @@
 //   CANCELLED        → disabled "Cancelled" chip
 //   (no event id)    → an honest "almost ready" cue instead of a dead button.
 
-import { CheckCircleFilled, StopOutlined, UserAddOutlined } from "@ant-design/icons";
-import { Button } from "antd";
+import { StopOutlined, UserAddOutlined } from "@ant-design/icons";
+import { CampaignActionButton } from "@/components/CampaignActionButton";
 import { CampaignParticipationModal } from "@/components/CampaignParticipationModal";
+import { ROLE_COLORS, LEAD_COLOR } from "@/components/ParticipantsPanel";
 import { buildCampaignHeader } from "@/lib/campaignHeader";
 import { useToast } from "@/lib/toast";
 import { useEventJoin } from "@/lib/useEventJoin";
@@ -70,31 +71,40 @@ export function IssueJoinButton({
     eager: phase.label === "contributed" && Boolean(eventId)
   });
 
-  // No event resolved yet → keep the CTA honest, no dead navigation.
+  const sizeKey = size === "large" ? "lg" : "sm";
+
+  // No event resolved yet → keep the CTA honest (info toast, no dead nav).
   if (!eventId) {
     return (
-      <Button
+      <CampaignActionButton
+        mode="act"
+        accent="primary"
+        icon={<UserAddOutlined />}
+        size={sizeKey}
         block={block}
         className={className}
-        icon={<UserAddOutlined />}
-        size={size}
-        type={type}
+        label={t.join}
+        language={language}
         onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
+          e?.preventDefault?.();
+          e?.stopPropagation?.();
           messageApi.info(t.soon);
         }}
-      >
-        {t.join}
-      </Button>
+      />
     );
   }
 
   if (phase.label === "cancelled") {
     return (
-      <Button block={block} className={className} icon={<StopOutlined />} size={size} disabled>
-        {t.cancelled}
-      </Button>
+      <CampaignActionButton
+        mode="disabled"
+        icon={<StopOutlined />}
+        size={sizeKey}
+        block={block}
+        className={className}
+        label={t.cancelled}
+        language={language}
+      />
     );
   }
 
@@ -104,9 +114,14 @@ export function IssueJoinButton({
       ? t.contributed.replace("{role}", t.roles[role] || role)
       : t.contributedPlain;
     return (
-      <Button block={block} className={className} icon={<CheckCircleFilled />} size={size} disabled>
-        {label}
-      </Button>
+      <CampaignActionButton
+        mode="readonly"
+        size={sizeKey}
+        block={block}
+        className={className}
+        label={label}
+        language={language}
+      />
     );
   }
 
@@ -114,9 +129,6 @@ export function IssueJoinButton({
   // Hybrid CTA (docs/design/06-state-color-system.md): teal by default, red for
   // a LIVE event only — the one stage where "join now" carries real urgency.
   const isLive = eventStatus === "ACTIVE";
-  const liveStyle = isLive
-    ? { background: "var(--state-live)", borderColor: "var(--state-live)" }
-    : undefined;
 
   // IssueJoinButton holds the full issue (instant cover + title); the hook's
   // eventData sharpens status + schedule once the modal loads.
@@ -126,24 +138,43 @@ export function IssueJoinButton({
     language
   });
 
+  // committed chip if the viewer already holds a role in a still-joinable phase.
+  let mode = "act";
+  let label = isLive ? t.joinLive : t.join;
+  let roleColor;
+  if (join.viewerRole) {
+    mode = "committed";
+    if (join.viewerRole === "COORDINATOR") {
+      label = language === "np" ? "नेतृत्वमा" : "Leading";
+      roleColor = LEAD_COLOR;
+    } else {
+      label =
+        language === "np"
+          ? `${t.roles[join.viewerRole] || join.viewerRole}का रूपमा`
+          : `Joined as ${t.roles[join.viewerRole] || join.viewerRole}`;
+      roleColor = ROLE_COLORS[join.viewerRole] || undefined;
+    }
+  }
+
   return (
     <>
-      <Button
+      <CampaignActionButton
+        mode={mode}
+        label={label}
+        accent={isLive ? "live" : "primary"}
+        roleColor={roleColor}
+        icon={<UserAddOutlined />}
+        size={sizeKey}
         block={block}
         className={className}
-        icon={<UserAddOutlined />}
-        size={size}
-        type={type}
-        style={liveStyle}
         loading={join.loading}
+        language={language}
         onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
+          e?.preventDefault?.();
+          e?.stopPropagation?.();
           join.openModal();
         }}
-      >
-        {isLive ? t.joinLive : t.join}
-      </Button>
+      />
 
       <CampaignParticipationModal
         open={join.open}
