@@ -1900,6 +1900,15 @@
   }
 }
 
+/* "I'm interested" block now lives inside ParticipantsPanel (shared by modal +
+ * body). Spacing when it sits between the panel header and the role groups. */
+.participants-interested {
+  margin-top: 4px;
+}
+.participants-intro {
+  margin: 0;
+}
+
 /* --- CampaignActionButton -------------------------------------------
  * The ONE participation CTA across every page + status (see
  * docs/superpowers/specs/2026-06-29-campaign-action-button-design.md).

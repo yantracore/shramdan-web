@@ -9,13 +9,10 @@
 // "I'm interested" shortcut shows only when onInterested is provided (OPEN
 // issues). Purely presentational — all data + handlers come from the caller.
 
-import { useState } from "react";
 import {
   CalendarOutlined,
   ClockCircleOutlined,
-  CheckCircleFilled,
   EnvironmentOutlined,
-  HeartOutlined,
   TeamOutlined
 } from "@ant-design/icons";
 import { Modal } from "antd";
@@ -30,25 +27,11 @@ function localizeDigits(value, language) {
 
 const COPY = {
   np: {
-    interested: "मलाई रुचि छ",
-    interestedHint: "अहिले भूमिका नछानी, समर्थन मात्र दर्ता गर्नुहोस्",
-    interestedSaving: "दर्ता हुँदै…",
-    interestedActive: "समर्थन गरियो",
-    interestedWithdrawHint: "हटाउन क्लिक गर्नुहोस्",
-    interestedWithdrawing: "हट्दै…",
-    orJoin: "वा कुनै भूमिकामा जोडिनुहोस्",
     fallbackTitle: "अभियान",
     durationMin: "{n} मिनेट",
     planningHint: "तालिका तय हुँदै"
   },
   en: {
-    interested: "I'm interested",
-    interestedHint: "Just register your support, no role yet",
-    interestedSaving: "Registering…",
-    interestedActive: "Supported",
-    interestedWithdrawHint: "Click to withdraw",
-    interestedWithdrawing: "Withdrawing…",
-    orJoin: "Or join in a role",
     fallbackTitle: "Campaign",
     durationMin: "{n} min",
     planningHint: "Schedule being set"
@@ -140,11 +123,11 @@ export function CampaignParticipationModal({
   panelProps
 }) {
   const t = COPY[language] || COPY.np;
-  const [interestedPending, setInterestedPending] = useState(false);
-  const [withdrawPending, setWithdrawPending] = useState(false);
 
-  // A successful join/lead dismisses the modal; a thrown error keeps it open
-  // (the page handler re-throws only on real failures).
+  // A successful join/lead/interested dismisses the modal; a thrown error keeps
+  // it open (the page handler re-throws only on real failures). The interested
+  // block + roster all live in ParticipantsPanel now — the modal just wraps the
+  // handlers so success closes it.
   const closeAfter = (fn) =>
     fn
       ? async (...args) => {
@@ -159,32 +142,6 @@ export function CampaignParticipationModal({
     onLead: closeAfter(panelProps?.onLead)
   };
 
-  const handleInterested = async () => {
-    if (interestedPending || !onInterested) return;
-    setInterestedPending(true);
-    try {
-      await onInterested();
-      onClose?.();
-    } catch {
-      /* page surfaces its own error toast; the modal stays open */
-    } finally {
-      setInterestedPending(false);
-    }
-  };
-
-  const handleWithdraw = async () => {
-    if (withdrawPending || !onWithdraw) return;
-    setWithdrawPending(true);
-    try {
-      await onWithdraw();
-      onClose?.();
-    } catch {
-      /* page surfaces its own error toast; the modal stays open */
-    } finally {
-      setWithdrawPending(false);
-    }
-  };
-
   return (
     <Modal
       open={open}
@@ -197,47 +154,14 @@ export function CampaignParticipationModal({
       className="support-roles-modal campaign-participation-modal"
       styles={{ body: { maxHeight: "62vh", overflowY: "auto" } }}
     >
-      {onInterested ? (
-        <>
-          {interestedActive ? (
-            <button
-              type="button"
-              className="support-modal-interested is-active"
-              onClick={handleWithdraw}
-              disabled={withdrawPending}
-              aria-label={`${t.interestedActive} — ${t.interestedWithdrawHint}`}
-            >
-              <span className="support-modal-interested-icon">
-                <CheckCircleFilled aria-hidden="true" />
-              </span>
-              <span className="support-modal-interested-text">
-                <strong>{withdrawPending ? t.interestedWithdrawing : t.interestedActive}</strong>
-                <span>{t.interestedWithdrawHint}</span>
-              </span>
-            </button>
-          ) : (
-            <button
-              type="button"
-              className="support-modal-interested"
-              onClick={handleInterested}
-              disabled={interestedPending}
-            >
-              <span className="support-modal-interested-icon">
-                <HeartOutlined aria-hidden="true" />
-              </span>
-              <span className="support-modal-interested-text">
-                <strong>{interestedPending ? t.interestedSaving : t.interested}</strong>
-                <span>{t.interestedHint}</span>
-              </span>
-            </button>
-          )}
-          <div className="support-modal-divider">
-            <span>{t.orJoin}</span>
-          </div>
-        </>
-      ) : null}
-
-      <ParticipantsPanel {...wrappedPanelProps} embedded language={language} />
+      <ParticipantsPanel
+        {...wrappedPanelProps}
+        embedded
+        language={language}
+        onInterested={onInterested ? closeAfter(onInterested) : undefined}
+        interestedActive={interestedActive}
+        onWithdraw={onWithdraw ? closeAfter(onWithdraw) : undefined}
+      />
     </Modal>
   );
 }

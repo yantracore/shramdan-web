@@ -32,6 +32,7 @@ import {
   ClearOutlined,
   CloseOutlined,
   CrownOutlined,
+  HeartOutlined,
   InboxOutlined,
   MedicineBoxOutlined,
   SafetyOutlined,
@@ -87,6 +88,13 @@ const COPY = {
   np: {
     heading: "सहभागीहरू",
     intro: "तपाईंलाई सुहाउने भूमिकामा जोडिनुहोस् — हरेक भूमिकाले श्रमदान चलाउँछ।",
+    interested: "मलाई रुचि छ",
+    interestedHint: "अहिले भूमिका नछानी, समर्थन मात्र दर्ता गर्नुहोस्",
+    interestedSaving: "दर्ता हुँदै…",
+    interestedActiveLabel: "समर्थन गरियो",
+    interestedWithdrawHint: "हटाउन क्लिक गर्नुहोस्",
+    interestedWithdrawing: "हट्दै…",
+    orJoinInRole: "वा कुनै भूमिकामा जोडिनुहोस्",
     coreGroupLabel: "मुख्य भूमिका",
     additionalGroupLabel: "थप भूमिका",
     coreGroupNote: "यी दुई बिना सफाइ नै हुँदैन — श्रम गर्ने हातहरू, र नेतृत्व गर्ने संयोजक।",
@@ -159,6 +167,13 @@ const COPY = {
   en: {
     heading: "Participants",
     intro: "Join in the role that fits you — every role keeps the cleanup running.",
+    interested: "I'm interested",
+    interestedHint: "Just register your support, no role yet",
+    interestedSaving: "Registering…",
+    interestedActiveLabel: "Supported",
+    interestedWithdrawHint: "Click to withdraw",
+    interestedWithdrawing: "Withdrawing…",
+    orJoinInRole: "Or join in a role",
     coreGroupLabel: "Core roles",
     additionalGroupLabel: "Additional roles",
     coreGroupNote: "No cleanup happens without these: the hands doing the work and the coordinator leading it.",
@@ -308,15 +323,23 @@ export function ParticipantsPanel({
   // derived row sum (events, where the roster IS the full picture).
   totalOverride = null,
   // When the panel is rendered INSIDE another surface (the Support modal), drop
-  // its own section chrome (top divider/margin) and the intro line.
+  // its own section chrome (top divider/margin). Content stays identical.
   embedded = false,
-  language = "np"
+  language = "np",
+  // OPEN-issue support shortcut. When provided, the panel renders the "I'm
+  // interested" block (and, when interestedActive, a one-click withdraw toggle)
+  // so the modal and the detail body show it identically. Absent for events.
+  onInterested,
+  interestedActive = false,
+  onWithdraw
 }) {
   const t = COPY[language] || COPY.np;
   const [pendingRole, setPendingRole] = useState(null);
   const [leaving, setLeaving] = useState(false);
   const [leadPending, setLeadPending] = useState(false);
   const [leadLeaving, setLeadLeaving] = useState(false);
+  const [interestedPending, setInterestedPending] = useState(false);
+  const [withdrawPending, setWithdrawPending] = useState(false);
 
   const viewerRole = viewer?.role || null;
   // The viewer is "committed" if they hold a role OR they're leading — either
@@ -376,6 +399,30 @@ export function ParticipantsPanel({
       /* page handles messaging */
     } finally {
       setLeadLeaving(false);
+    }
+  };
+
+  const handleInterested = async () => {
+    if (interestedPending || !onInterested) return;
+    setInterestedPending(true);
+    try {
+      await onInterested();
+    } catch {
+      /* caller surfaces its own error toast */
+    } finally {
+      setInterestedPending(false);
+    }
+  };
+
+  const handleWithdraw = async () => {
+    if (withdrawPending || !onWithdraw) return;
+    setWithdrawPending(true);
+    try {
+      await onWithdraw();
+    } catch {
+      /* caller surfaces its own error toast */
+    } finally {
+      setWithdrawPending(false);
     }
   };
 
@@ -651,8 +698,48 @@ export function ParticipantsPanel({
             <CompactProgress t={t} language={language} progress={progress} />
           ) : null}
         </div>
-        {embedded ? null : <p>{t.intro}</p>}
+        <p className="participants-intro">{t.intro}</p>
       </header>
+
+      {onInterested ? (
+        <div className="participants-interested">
+          {interestedActive ? (
+            <button
+              type="button"
+              className="support-modal-interested is-active"
+              onClick={handleWithdraw}
+              disabled={withdrawPending}
+              aria-label={`${t.interestedActiveLabel} — ${t.interestedWithdrawHint}`}
+            >
+              <span className="support-modal-interested-icon">
+                <CheckCircleFilled aria-hidden="true" />
+              </span>
+              <span className="support-modal-interested-text">
+                <strong>{withdrawPending ? t.interestedWithdrawing : t.interestedActiveLabel}</strong>
+                <span>{t.interestedWithdrawHint}</span>
+              </span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="support-modal-interested"
+              onClick={handleInterested}
+              disabled={interestedPending}
+            >
+              <span className="support-modal-interested-icon">
+                <HeartOutlined aria-hidden="true" />
+              </span>
+              <span className="support-modal-interested-text">
+                <strong>{interestedPending ? t.interestedSaving : t.interested}</strong>
+                <span>{t.interestedHint}</span>
+              </span>
+            </button>
+          )}
+          <div className="support-modal-divider">
+            <span>{t.orJoinInRole}</span>
+          </div>
+        </div>
+      ) : null}
 
       <div className="participants-groups">
         {/* Core — the two must-fill roles: the Cleaner (the work itself) and
