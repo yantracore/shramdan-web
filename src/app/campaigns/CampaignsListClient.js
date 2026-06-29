@@ -69,7 +69,7 @@ const PAGE_COPY = {
     statusFilterAria: "Status filter",
     viewToggleAria: "Choose view",
     viewList: "List",
-    viewThumbnails: "Thumbnails",
+    viewThumbnails: "Grid",
     viewMap: "Map",
     listAriaLabel: "List of campaigns",
     gridAriaLabel: "Grid of campaigns",
