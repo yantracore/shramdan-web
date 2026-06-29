@@ -1889,3 +1889,150 @@
     max-height: 280px;
   }
 }
+
+/* --- CampaignActionButton -------------------------------------------
+ * The ONE participation CTA across every page + status (see
+ * docs/superpowers/specs/2026-06-29-campaign-action-button-design.md).
+ * act = solid (teal / red LIVE) + sheen + lift; committed = tinted role
+ * chip (never white) that opens the modal; readonly/disabled = quiet
+ * chips. One size system (sm | lg) — only scale differs. */
+.campaign-action-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.15s var(--ease-out-soft, ease),
+    box-shadow 0.15s var(--ease-out-soft, ease),
+    background-color 0.15s var(--ease-out-soft, ease);
+}
+.campaign-action-btn[aria-disabled="true"] {
+  cursor: default;
+}
+.campaign-action-btn--block {
+  width: 100%;
+}
+.campaign-action-btn--lg {
+  padding: 10px 22px;
+  font-size: 15px;
+}
+.campaign-action-btn--sm {
+  padding: 6px 14px;
+  font-size: 13px;
+}
+.campaign-action-btn-icon {
+  display: inline-flex;
+  font-size: 1.05em;
+}
+.campaign-action-btn-count {
+  font-weight: 800;
+}
+
+/* ACT — solid action colour + sheen + soft shadow + hover lift. */
+.campaign-action-btn--act {
+  color: #fff;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 60%),
+    var(--primary);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--primary) 32%, transparent);
+}
+.campaign-action-btn--act[data-accent="live"] {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 60%),
+    var(--state-live);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--state-live) 38%, transparent);
+}
+@media (hover: hover) {
+  .campaign-action-btn--act:hover,
+  .campaign-action-btn--act:focus-visible {
+    transform: translateY(-1px);
+    box-shadow: 0 7px 20px color-mix(in srgb, var(--primary) 42%, transparent);
+  }
+  .campaign-action-btn--act[data-accent="live"]:hover,
+  .campaign-action-btn--act[data-accent="live"]:focus-visible {
+    box-shadow: 0 7px 20px color-mix(in srgb, var(--state-live) 48%, transparent);
+  }
+}
+.campaign-action-btn--act:active {
+  transform: translateY(0);
+}
+.campaign-action-btn--act:disabled {
+  opacity: 0.75;
+  cursor: progress;
+}
+
+/* LIVE subtle pulse ring */
+.campaign-action-btn--act[data-accent="live"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  animation: campaign-cta-pulse 2.4s ease-out infinite;
+}
+@keyframes campaign-cta-pulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--state-live) 55%, transparent);
+  }
+  70% {
+    box-shadow: 0 0 0 10px color-mix(in srgb, var(--state-live) 0%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--state-live) 0%, transparent);
+  }
+}
+
+/* COMMITTED — tinted role chip (never white); opens the modal. */
+.campaign-action-btn--committed {
+  color: var(--role-color, var(--primary));
+  background: color-mix(in srgb, var(--role-color, var(--primary)) 14%, var(--surface));
+  border: 1.5px solid color-mix(in srgb, var(--role-color, var(--primary)) 38%, transparent);
+}
+@media (hover: hover) {
+  .campaign-action-btn--committed:hover,
+  .campaign-action-btn--committed:focus-visible {
+    background: color-mix(in srgb, var(--role-color, var(--primary)) 20%, var(--surface));
+  }
+}
+
+/* READONLY / DISABLED — quiet, non-interactive chips. */
+.campaign-action-btn--readonly {
+  color: var(--muted);
+  background: color-mix(in srgb, var(--muted) 12%, var(--surface));
+}
+.campaign-action-btn--disabled {
+  color: var(--muted);
+  background: color-mix(in srgb, var(--muted) 9%, var(--surface));
+}
+
+/* loading spinner */
+.campaign-action-btn-spinner {
+  width: 1em;
+  height: 1em;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  animation: campaign-cta-spin 0.7s linear infinite;
+}
+@keyframes campaign-cta-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .campaign-action-btn {
+    transition: none;
+  }
+  .campaign-action-btn--act:hover {
+    transform: none;
+  }
+  .campaign-action-btn--act[data-accent="live"]::after {
+    animation: none;
+  }
+}

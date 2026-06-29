@@ -42,7 +42,7 @@ import { Popconfirm } from "antd";
 
 // The leadership ("Coordinator") slot reads in gold — set apart from the
 // participation roles, which it sits below.
-const LEAD_COLOR = "#b7791f";
+export const LEAD_COLOR = "#b7791f";
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 
@@ -57,7 +57,7 @@ function getInitial(name) {
   return trimmed ? Array.from(trimmed)[0] : "?";
 }
 
-const ROLE_COLORS = {
+export const ROLE_COLORS = {
   WORKER: "#2e7d32",
   PHOTOGRAPHER: "#7b3fa0",
   LIVESTREAMER: "#d2360b",
