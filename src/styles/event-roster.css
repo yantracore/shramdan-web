@@ -1909,6 +1909,45 @@
   margin: 0;
 }
 
+/* Whole joinable role row is the click target (the pill is a decorative cue). */
+.event-roster-row.is-clickable {
+  cursor: pointer;
+  transition: transform 0.14s var(--ease-out-soft, ease),
+    box-shadow 0.14s var(--ease-out-soft, ease),
+    border-color 0.14s var(--ease-out-soft, ease),
+    background 0.14s var(--ease-out-soft, ease);
+}
+@media (hover: hover) {
+  .event-roster-row.is-clickable:hover {
+    transform: translateY(-1px);
+    border-color: var(--role-color, var(--primary));
+    box-shadow: 0 4px 14px color-mix(in srgb, var(--role-color, var(--primary)) 18%, transparent);
+  }
+  .event-roster-row.is-clickable:hover .event-roster-open-pill {
+    background: color-mix(in srgb, var(--role-color, var(--primary)) 16%, transparent);
+    border-color: var(--role-color, var(--primary));
+  }
+}
+.event-roster-row.is-clickable:focus-visible {
+  outline: 2px solid var(--role-color, var(--primary));
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .event-roster-row.is-clickable {
+    transition: none;
+  }
+  .event-roster-row.is-clickable:hover {
+    transform: none;
+  }
+}
+
+/* Core roles (Cleaner + Coordinator) — role-tinted card so the must-fill pair
+ * pops over the quiet "additional" group. Own-role keeps its green wash. */
+.participants-group--core .event-roster-row:not(.is-own-role) {
+  background: color-mix(in srgb, var(--role-color, var(--primary)) 8%, var(--surface));
+  border: 1.5px solid color-mix(in srgb, var(--role-color, var(--primary)) 38%, var(--line));
+}
+
 /* --- CampaignActionButton -------------------------------------------
  * The ONE participation CTA across every page + status (see
  * docs/superpowers/specs/2026-06-29-campaign-action-button-design.md).

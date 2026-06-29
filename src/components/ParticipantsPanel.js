@@ -479,12 +479,32 @@ export function ParticipantsPanel({
           ? t.roleCount.replace("{n}", localizeDigits(count, language))
           : "";
     const roleDesc = t.roleDescriptions?.[role] || "";
+    // Whole-row join: the entire row is the click target when this role is
+    // joinable (the pill becomes a decorative cue). Own/full rows are not.
+    const rowJoinable = canJoinThis && !isFullTargetRow && !isOwnRole;
+    const rowClickProps = rowJoinable
+      ? {
+          role: "button",
+          tabIndex: isPending ? -1 : 0,
+          "aria-label": `${t.join} — ${roleLabel}`,
+          "aria-busy": isPending || undefined,
+          onClick: () => handleJoin(role),
+          onKeyDown: (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              handleJoin(role);
+            }
+          }
+        }
+      : {};
     return (
       <li
         key={role}
         className={`event-roster-row${full ? " event-roster-row--full" : ""}${
           isOwnRole ? " is-own-role" : ""
-        }${lockedByOther ? " is-locked" : ""}`}
+        }${lockedByOther ? " is-locked" : ""}${rowJoinable ? " is-clickable" : ""}`}
+        style={{ "--role-color": roleColor }}
+        {...rowClickProps}
       >
         <span
           className="event-roster-role has-icon participants-role"
@@ -561,19 +581,13 @@ export function ParticipantsPanel({
             </span>
           )
         ) : canJoinThis && !isFullTargetRow ? (
-          <button
-            type="button"
-            className="event-roster-open-pill"
-            onClick={() => handleJoin(role)}
-            disabled={isPending || lockedByOther}
-            aria-label={`${t.join} — ${roleLabel}`}
-          >
+          <span className="event-roster-open-pill" aria-hidden="true">
             {isPending
               ? t.joining
               : openCount !== null
                 ? t.openPill.replace("{n}", localizeDigits(openCount, language))
                 : t.join}
-          </button>
+          </span>
         ) : isFullTargetRow ? (
           <span className="event-roster-full-pill">{t.fullPill}</span>
         ) : null}
@@ -583,13 +597,32 @@ export function ParticipantsPanel({
 
   const renderLeaderRow = () => {
     if (!leaderSlot) return null;
+    // Whole-row offer-to-lead when the seat is open and the viewer may take it.
+    const leaderRowJoinable =
+      !leaderSlot.viewerIsLeader && !leaderSlot.name && Boolean(leaderSlot.canLead);
+    const leaderClickProps = leaderRowJoinable
+      ? {
+          role: "button",
+          tabIndex: leadPending ? -1 : 0,
+          "aria-label": t.wantToLead,
+          "aria-busy": leadPending || undefined,
+          onClick: handleLead,
+          onKeyDown: (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              handleLead();
+            }
+          }
+        }
+      : {};
     return (
       <li
         key="__leader"
         className={`event-roster-row event-roster-row--full participants-leader-row${
           leaderSlot.viewerIsLeader ? " is-own-role" : ""
-        }`}
+        }${leaderRowJoinable ? " is-clickable" : ""}`}
         style={{ "--role-color": LEAD_COLOR }}
+        {...leaderClickProps}
       >
         <span className="event-roster-role has-icon participants-role">
           <CrownOutlined className="participants-role-icon" aria-hidden="true" />
@@ -658,15 +691,9 @@ export function ParticipantsPanel({
         ) : leaderSlot.name ? (
           <span className="participants-lead-by">{t.ledBy.replace("{name}", leaderSlot.name)}</span>
         ) : leaderSlot.canLead ? (
-          <button
-            type="button"
-            className="event-roster-open-pill participants-lead-cta"
-            onClick={handleLead}
-            disabled={leadPending}
-            aria-label={t.wantToLead}
-          >
+          <span className="event-roster-open-pill participants-lead-cta" aria-hidden="true">
             {leadPending ? t.joining : t.wantToLead}
-          </button>
+          </span>
         ) : (
           <span className="event-roster-full-pill">{t.leadOpen}</span>
         )}
