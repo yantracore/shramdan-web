@@ -5,14 +5,17 @@
 // same lazy-load → ParticipantsPanel pattern is reused without duplicating API
 // logic. No "I'm interested" header — events have no INTERESTED concept.
 
+import { UserAddOutlined } from "@ant-design/icons";
+import { CampaignActionButton } from "@/components/CampaignActionButton";
 import { CampaignParticipationModal } from "@/components/CampaignParticipationModal";
+import { ROLE_COLORS, LEAD_COLOR } from "@/components/ParticipantsPanel";
 import { useEventJoin } from "@/lib/useEventJoin";
 
 // Button copy — parallel to JOIN_COPY in useEventJoin / events page.
 const BUTTON_COPY = {
   np: {
     join: "सामेल हुने",
-    joinedAs: (role) => `${ROLE_LABELS_NP[role] || role} — जोडिनुभयो`
+    joinedAs: (role) => `${ROLE_LABELS_NP[role] || role}का रूपमा`
   },
   en: {
     join: "Join",
@@ -51,50 +54,36 @@ export function EventJoinButton({ eventId, seed, language = "np", size, status }
   // (joinable = false means COMPLETED/CANCELLED/PAUSED with no active viewer role.)
   if (!join.joinable && !join.viewerRole) return null;
 
-  // Hybrid CTA colour (see docs/design/06-state-color-system.md): one constant
-  // teal action colour, with LIVE as the single exception — a red "join now".
-  // The status colour is identity; this is the action colour, deliberately kept
-  // separate, so we read the lifecycle tokens rather than the card's data-status.
-  const accent = status === "active" ? "var(--state-active)" : "var(--primary)";
-  const liveLabel = lang === "np" ? "अहिले जोडिने" : "Join now";
-
-  const label = join.viewerRole
-    ? bc.joinedAs(join.viewerRole)
-    : status === "active"
-      ? liveLabel
-      : bc.join;
-
-  // Button style: primary when unjoined, default when already in.
-  const btnType = join.viewerRole ? "default" : "primary";
+  // viewerRole → committed chip; else the solid act CTA (red only when LIVE).
+  // (See docs/design/06-state-color-system.md: teal action colour, LIVE = red.)
+  const isLive = status === "active";
+  let mode = "act";
+  let label = isLive ? (lang === "np" ? "अहिले जोडिने" : "Join now") : bc.join;
+  let roleColor;
+  if (join.viewerRole) {
+    mode = "committed";
+    if (join.viewerRole === "COORDINATOR") {
+      label = lang === "np" ? "नेतृत्वमा" : "Leading";
+      roleColor = LEAD_COLOR;
+    } else {
+      label = bc.joinedAs(join.viewerRole);
+      roleColor = ROLE_COLORS[join.viewerRole] || undefined;
+    }
+  }
 
   return (
     <>
-      <button
-        type="button"
-        className={`event-join-btn event-join-btn--${btnType}${join.loading ? " event-join-btn--loading" : ""}`}
-        style={{
-          cursor: "pointer",
-          padding: size === "small" ? "4px 12px" : "6px 16px",
-          borderRadius: 8,
-          border: join.viewerRole ? `1.5px solid ${accent}` : "none",
-          background: join.viewerRole ? "transparent" : accent,
-          color: join.viewerRole ? accent : "#fff",
-          fontWeight: 600,
-          fontSize: size === "small" ? 13 : 14,
-          lineHeight: "1.5",
-          display: "inline-flex",
-          alignItems: "center",
-          gap: 6,
-          minWidth: 80,
-          justifyContent: "center",
-          whiteSpace: "nowrap"
-        }}
+      <CampaignActionButton
+        mode={mode}
+        label={label}
+        accent={isLive ? "live" : "primary"}
+        roleColor={roleColor}
+        icon={<UserAddOutlined />}
+        size={size === "large" ? "lg" : "sm"}
+        loading={join.loading}
+        language={lang}
         onClick={join.openModal}
-        disabled={join.loading}
-        aria-label={label}
-      >
-        {join.loading ? (lang === "np" ? "लोड…" : "Loading…") : label}
-      </button>
+      />
 
       <CampaignParticipationModal
         open={join.open}
