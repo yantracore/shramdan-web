@@ -43,6 +43,70 @@ const LOAD_MORE_STEP = 6;
 const THUMBNAILS_PAGE_SIZE = 12;
 const CATEGORY_VALUES = new Set(ISSUE_CATEGORIES);
 
+// ----- session-scoped list memory --------------------------------------
+// The list lives on /campaigns; a card opens a full detail route
+// (/events/:id, /issues/:id), which unmounts this whole tree. Without help,
+// returning — via the browser back button, the detail page's "back to
+// campaigns" link, or simply revisiting from elsewhere — drops everything:
+// the active tab, how far the user had scrolled (visibleCount), the open
+// item, and the scroll offset. We snapshot all of that into sessionStorage so
+// any return rebuilds the exact list the user left. It is intentionally
+// session-scoped (clears with the tab) and per-browser, not shared.
+const LIST_STATE_KEY = "shramdan:campaigns:list-state";
+// Params that mean "the URL deliberately asks for a specific list" — when any
+// is present (deep link, shared link, browser back) the URL wins over memory.
+const CAMPAIGN_URL_PARAMS = [
+  "status",
+  "category",
+  "province",
+  "district",
+  "q",
+  "view",
+  "page"
+];
+
+function readListState() {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.sessionStorage.getItem(LIST_STATE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeListState(patch) {
+  if (typeof window === "undefined") return;
+  try {
+    const prev = readListState() || {};
+    window.sessionStorage.setItem(
+      LIST_STATE_KEY,
+      JSON.stringify({ ...prev, ...patch })
+    );
+  } catch {
+    /* storage full or unavailable — memory is a best-effort nicety */
+  }
+}
+
+// Two snapshots describe "the same list" only when every dimension that
+// changes which items render matches — otherwise a restored visibleCount /
+// selectedId / scroll would point into a different feed.
+function sameListIdentity(snap, filters, view) {
+  if (!snap) return false;
+  return (
+    (snap.status ?? "all") === filters.status &&
+    (snap.category ?? undefined) === (filters.category ?? undefined) &&
+    (snap.provinceId ?? undefined) === (filters.provinceId ?? undefined) &&
+    (snap.districtId ?? undefined) === (filters.districtId ?? undefined) &&
+    (snap.q ?? "") === (filters.q ?? "") &&
+    (snap.view ?? "list") === view
+  );
+}
+
+function hasExplicitCampaignParams(searchParams) {
+  return CAMPAIGN_URL_PARAMS.some((key) => Boolean(searchParams?.get(key)));
+}
+
 const PAGE_COPY = {
   np: {
     pageTitle: "अभियानहरू",
@@ -129,6 +193,13 @@ export default function CampaignsListPageContent() {
 
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  // Snapshot of the last list state, captured ONCE at first client render —
+  // before any persistence effect below can overwrite it — so restoration is
+  // immune to the mount-time writes those effects make.
+  const [listMemory] = useState(() =>
+    typeof window !== "undefined" ? readListState() : null
+  );
 
   // ----- filter state (status / category / province / district / q) -------
   const readFiltersFromUrl = useCallback(() => {
@@ -279,6 +350,33 @@ export default function CampaignsListPageContent() {
     [filters, applyFilters]
   );
 
+  // ----- restore the tab/view/page from memory ---------------------------
+  // Runs once. If the URL names a specific list (deep link, shared link, or a
+  // browser-back restore that already carries ?status=…), the URL is
+  // authoritative and we leave it alone. If we arrived "bare" — a top-nav
+  // visit, or the detail page's plain `/campaigns` back link — we replay the
+  // remembered tab into the URL, which the sync effects above pick up.
+  const didRestoreFiltersRef = useRef(false);
+  useEffect(() => {
+    if (didRestoreFiltersRef.current) return;
+    didRestoreFiltersRef.current = true;
+    if (hasExplicitCampaignParams(searchParams)) return;
+    const snap = listMemory;
+    if (!snap) return;
+    const params = new URLSearchParams();
+    if (snap.status && snap.status !== "all") params.set("status", snap.status);
+    if (snap.category) params.set("category", snap.category);
+    if (snap.provinceId) params.set("province", snap.provinceId);
+    if (snap.districtId) params.set("district", snap.districtId);
+    if (snap.q) params.set("q", snap.q);
+    if (snap.view === "map" || snap.view === "thumbnails") {
+      params.set("view", snap.view);
+    }
+    if (snap.page && snap.page > 1) params.set("page", String(snap.page));
+    const query = params.toString();
+    if (query) router.replace(`/campaigns?${query}`, { scroll: false });
+  }, [searchParams, router, listMemory]);
+
   // ----- data ------------------------------------------------------------
   const { items, loading, error } = useCampaignFeed({
     status: filters.status,
@@ -357,39 +455,60 @@ export default function CampaignsListPageContent() {
     return () => observer.disconnect();
   }, [hasMore, filteredItems.length]);
 
-  // ----- selection (URL-driven via ?sel=) --------------------------------
+  // ----- selection + window/scroll restore (in-memory only) --------------
+  // `selectedId` lives only in memory, never the URL. On the FIRST settled
+  // load we restore — but only when memory describes this exact list — the
+  // remembered open item, how far the list had been scrolled (visibleCount),
+  // and the scroll offset; otherwise we fall back to selecting the first item.
+  // Gating on `!loading` means the restore measures against real items, not an
+  // empty first frame.
   const [selectedId, setSelectedId] = useState(null);
+  const selectedCardRef = useRef(null);
   const didInitialResolveRef = useRef(false);
 
   useEffect(() => {
     if (didInitialResolveRef.current) return;
+    if (loading) return;
     if (filteredItems.length === 0) return;
     didInitialResolveRef.current = true;
-    const fromUrl = searchParams?.get("sel");
-    let resolvedId = null;
-    let resolvedIndex = -1;
-    if (fromUrl) {
-      resolvedIndex = filteredItems.findIndex((e) => e.id === fromUrl);
-      if (resolvedIndex >= 0) resolvedId = fromUrl;
-    }
-    if (!resolvedId) {
-      resolvedId = filteredItems[0]?.id ?? null;
-      resolvedIndex = 0;
-    }
-    setSelectedId(resolvedId);
-    if (resolvedIndex >= INITIAL_VISIBLE) {
-      setVisibleCount((v) => Math.max(v, resolvedIndex + 1));
-    }
+
+    const restorable = sameListIdentity(listMemory, filters, view);
+
+    let nextSelected = filteredItems[0]?.id ?? null;
     if (
-      fromUrl &&
-      resolvedId &&
-      typeof window !== "undefined" &&
-      window.matchMedia &&
-      window.matchMedia("(max-width: 1023px)").matches
+      restorable &&
+      listMemory.selectedId &&
+      filteredItems.some((e) => e.id === listMemory.selectedId)
     ) {
-      setMobileView("detail");
+      nextSelected = listMemory.selectedId;
     }
-  }, [filteredItems, searchParams]);
+    setSelectedId(nextSelected);
+
+    if (restorable && listMemory.visibleCount > INITIAL_VISIBLE) {
+      setVisibleCount(Math.min(listMemory.visibleCount, filteredItems.length));
+    }
+
+    if (restorable && listMemory.scrollY > 0) {
+      const y = listMemory.scrollY;
+      // The restored visibleCount paints over several frames (and rows can keep
+      // growing the page). Jumping too early lands short, clamped to whatever
+      // height exists at that instant. So wait — frame by frame, up to a small
+      // cap — until the document is actually tall enough to reach the saved
+      // offset, then jump exactly once.
+      let attempts = 0;
+      const restoreScroll = () => {
+        const maxScroll =
+          document.documentElement.scrollHeight - window.innerHeight;
+        if (maxScroll >= y || attempts >= 30) {
+          window.scrollTo(0, y);
+          return;
+        }
+        attempts += 1;
+        requestAnimationFrame(restoreScroll);
+      };
+      requestAnimationFrame(restoreScroll);
+    }
+  }, [loading, filteredItems, filters, view, listMemory]);
 
   useEffect(() => {
     if (!didInitialResolveRef.current) return;
@@ -419,37 +538,59 @@ export default function CampaignsListPageContent() {
     };
   }, []);
 
-  const updateUrl = useCallback(
-    (id, opts) => {
-      const params = new URLSearchParams(searchParams?.toString() || "");
-      if (id) params.set("sel", id);
-      else params.delete("sel");
-      const query = params.toString();
-      const url = query ? `/campaigns?${query}` : "/campaigns";
-      if (opts?.push) router.push(url, { scroll: false });
-      else router.replace(url, { scroll: false });
-    },
-    [router, searchParams]
-  );
-
-  const handleSelect = useCallback(
-    (id) => {
-      setSelectedId(id);
-      const isMobile =
-        typeof window !== "undefined" &&
-        window.matchMedia &&
-        window.matchMedia("(max-width: 1023px)").matches;
-      if (isMobile) {
-        setMobileView("detail");
-        updateUrl(id, { push: true });
-      } else {
-        updateUrl(id);
-      }
-    },
-    [updateUrl]
-  );
+  const handleSelect = useCallback((id) => {
+    setSelectedId(id);
+    const isMobile =
+      typeof window !== "undefined" &&
+      window.matchMedia &&
+      window.matchMedia("(max-width: 1023px)").matches;
+    if (isMobile) setMobileView("detail");
+  }, []);
 
   const handleBack = useCallback(() => setMobileView("list"), []);
+
+  // ----- persist list state to session memory ----------------------------
+  // Each dimension is mirrored into sessionStorage as it settles, so whatever
+  // the user last saw is what a return (back button, detail "back" link, or a
+  // fresh visit) rebuilds. The capture in `listMemory` above froze the
+  // restore-time values before these mount-time writes run, so they cannot
+  // race the restore.
+  useEffect(() => {
+    writeListState({
+      status: filters.status,
+      category: filters.category,
+      provinceId: filters.provinceId,
+      districtId: filters.districtId,
+      q: filters.q,
+      view,
+      page
+    });
+  }, [filters, view, page]);
+
+  useEffect(() => {
+    writeListState({ visibleCount });
+  }, [visibleCount]);
+
+  useEffect(() => {
+    if (selectedId) writeListState({ selectedId });
+  }, [selectedId]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    let raf = 0;
+    const onScroll = () => {
+      if (raf) return;
+      raf = window.requestAnimationFrame(() => {
+        raf = 0;
+        writeListState({ scrollY: window.scrollY });
+      });
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (raf) window.cancelAnimationFrame(raf);
+    };
+  }, []);
 
   // ----- keyboard nav ----------------------------------------------------
   const listRef = useRef(null);
@@ -469,24 +610,6 @@ export default function CampaignsListPageContent() {
       if (nextId) handleSelect(nextId);
     }
   };
-
-  // ----- auto-scroll selected card on initial deep-link ------------------
-  const selectedCardRef = useRef(null);
-  const didInitialScrollRef = useRef(false);
-  useEffect(() => {
-    if (didInitialScrollRef.current) return;
-    if (!selectedId) return;
-    if (!selectedCardRef.current) return;
-    didInitialScrollRef.current = true;
-    const prefersReducedMotion =
-      typeof window !== "undefined" &&
-      window.matchMedia &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    selectedCardRef.current.scrollIntoView({
-      block: "nearest",
-      behavior: prefersReducedMotion ? "auto" : "smooth"
-    });
-  }, [selectedId]);
 
   // ----- filter options --------------------------------------------------
   // Chip row: rich labels with a count badge / loader. The badge for a stage
