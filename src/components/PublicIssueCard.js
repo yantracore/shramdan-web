@@ -18,6 +18,7 @@ import {
   localizeIssue
 } from "@/lib/adminUtils";
 import { issueActionMode } from "@/lib/issueActions";
+import { campaignStatusLabel, resolveCampaignStatus } from "@/lib/campaignStatus";
 import { useSavedIssues } from "@/lib/useSavedIssues";
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
@@ -38,7 +39,10 @@ export function formatSupporters(count, content, language) {
 export function PublicIssueCard({ issue: rawIssue, content, language }) {
   const issue = localizeIssue(rawIssue, language);
   const actionMode = issueActionMode(issue.status);
-  const statusLabel = content.statusLabels[issue.status] || issue.status;
+  const statusLabel = campaignStatusLabel(
+    resolveCampaignStatus(issue.status, null),
+    language
+  );
   const categoryLabel = content.categoryLabels[issue.category] || issue.category;
   const coverImageUrl = getIssueCoverImageUrl(issue);
   const accessibleLabel =
