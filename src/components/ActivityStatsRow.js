@@ -1,12 +1,5 @@
 "use client";
 
-import {
-  CalendarOutlined,
-  CheckCircleFilled,
-  FireFilled,
-  FlagOutlined,
-  TeamOutlined
-} from "@ant-design/icons";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
@@ -88,11 +81,11 @@ function FunnelCount({ target, language }) {
 // The five filterable campaign stages, in lifecycle order. Each links to the
 // unified list filtered by that technical status.
 const STEPS = [
-  { key: "OPEN", icon: FlagOutlined },
-  { key: "DRAFT", icon: TeamOutlined },
-  { key: "SCHEDULED", icon: CalendarOutlined },
-  { key: "ACTIVE", icon: FireFilled },
-  { key: "COMPLETED", icon: CheckCircleFilled }
+  { key: "OPEN" },
+  { key: "DRAFT" },
+  { key: "SCHEDULED" },
+  { key: "ACTIVE" },
+  { key: "COMPLETED" }
 ];
 
 const COPY = {
@@ -177,15 +170,14 @@ function ActivityStatsRowInner({
       aria-label={t.ariaLabel}
     >
       {STEPS.map((step) => {
-        const { key, icon: Icon } = step;
+        const { key } = step;
         const label = campaignStatusLabel(key, language);
         const value = counts[key] || 0;
         const body = (
           <>
-            <span className="activity-funnel-marker" aria-hidden="true">
-              <Icon />
+            <span className="activity-funnel-marker">
+              <FunnelCount target={value} language={language} />
             </span>
-            <FunnelCount target={value} language={language} />
             <span className="activity-funnel-label">{label}</span>
           </>
         );
