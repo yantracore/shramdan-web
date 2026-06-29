@@ -1,123 +1,156 @@
-# Participant Roster Row — Interaction + Core Highlight Design
+# Participant Roster — True Unification + Row Interaction + Core Highlight
 
-> Date: 2026-06-30 · Status: design approved, pending spec review.
-> All changes live in the ONE shared roster component
-> [`ParticipantsPanel`](../../../src/components/ParticipantsPanel.js), so they
-> apply identically in the modal ([CampaignParticipationModal](../../../src/components/CampaignParticipationModal.js))
-> and in every detail body ([CampaignDetailView](../../../src/components/CampaignDetailView.js),
-> legacy issue/event pages).
+> Date: 2026-06-30 · Status: design approved ("do it"), pending implementation.
+> Makes the roster **render identically** in the modal
+> ([CampaignParticipationModal](../../../src/components/CampaignParticipationModal.js))
+> and the detail body ([CampaignDetailView](../../../src/components/CampaignDetailView.js)),
+> then adds the clickable-row + core-highlight changes — all in the shared
+> [`ParticipantsPanel`](../../../src/components/ParticipantsPanel.js).
 
 ---
 
-## Context (already unified)
+## Root cause: same component, different DATA
 
-`ParticipantsPanel` is the single roster component everywhere — there is **no
-separate "EventRosterPanel"** (those are only `event-roster-*` CSS class names).
-The role rows are produced by one `renderRoleRow` / `renderLeaderRow`, so they
-already look and behave the same in the modal and the body. The only modal-vs-
-body differences are contextual chrome driven by props (`embedded` drops the
-intro line; the body passes `progress={null}` and shows conversion in its
-topline). Per the approved scope, **that chrome stays contextual** — we change
-only the role items, which keeps them byte-identical across both surfaces.
+`ParticipantsPanel` is already the single roster component. But what feeds it
+(`panelProps`) differs by surface, so it renders differently:
+
+| Surface | Hook feeding the roster | Roster data |
+|---|---|---|
+| Detail **body** (`CampaignDetailView`) | `useRoleSupport` (issue) — **always** | issue `eventRoleCounts` (votes); sparse/empty once promoted |
+| Join **modal** (`IssueJoinButton` / `EventJoinButton`) | `useEventJoin` (event) | the event's real roster — counts, filled chips, open/Full pills |
+
+So on a promoted/ONGOING campaign the body shows a bare role list (no counts /
+chips / pills) while the modal shows the rich event roster — **two different
+rosters on the same page**. Separately, the "I'm interested" block lives in the
+modal *wrapper*, not in the shared panel, so the OPEN body never shows it.
 
 ## Goals
 
-1. **Whole role row is clickable to join** — not just the inner pill. Pointer
-   cursor + hover affordance. The Join pill stays as a visual cue.
-2. **Core roles (Cleaner + Coordinator) are visually highlighted** as the
-   priority roles to fill.
+1. **Body roster === modal roster** for every status (same data + same content).
+2. The **"I'm interested"** affordance lives in the shared panel (both surfaces).
+3. **Whole role row clickable** to join (pill kept as a cue).
+4. **Core roles (Cleaner + Coordinator) highlighted** as the priority roles.
 
 ## Non-goals
 
-- No API/data changes (`handleJoin` / `handleLead` / `onJoin` / `onLead` /
-  `onLeave` unchanged).
-- No change to the modal/body chrome (intro line, progress placement).
-- The "additional" roles stay quiet (soft wash) — only core is lifted.
+- No API/endpoint changes. No change to join/leave/vote logic.
+- "Additional" roles stay quiet (soft wash); only core is lifted.
 
 ---
 
-## Change 1 — whole row clickable
+## Part A — feed the body the same data as the modal
 
-A role row is **joinable** when it currently renders the open/Join pill
-(`canJoinThis && !isFullTargetRow`, i.e. the viewer is not committed and the
-role isn't full). The leader row is **joinable** when `leaderSlot.canLead`.
+`CampaignDetailView` already owns `support = useRoleSupport(issueId, {eager})`
+(for OPEN) and separately fetches `eventData` (only for schedule/meetup/recap).
+It must also drive the **event roster** for promoted campaigns:
 
-For a joinable row, the row container itself becomes the click target:
+- Add `eventJoin = useEventJoin(eventId, { seed: eventData, language, eager })`
+  where `eventId = support.resolvedEventId || getIssueEventId(rawIssue)` and
+  `eager = Boolean(eventId) && campaignStatus !== "OPEN"`.
+- `const isPromoted = campaignStatus !== "OPEN" && Boolean(eventId);`
+- Feed the body panel from `rosterProps = isPromoted ? eventJoin.panelProps :
+  support.panelProps` — drop the current `totalOverride` / `progress={null}`
+  overrides (each hook's panelProps already carries the right total + progress).
+- Pass that same `eventJoin` to the topline `IssueJoinButton` as a controlled
+  `join` prop (mirroring how `support` is already shared with `IssueVoteButton`)
+  so the topline modal and the body roster are one live-synced instance.
+- Remove the body's separate topline `CompactConversionProgress` — the panel
+  heading now shows progress in both surfaces (no duplicate).
 
-- `<li>` gets `onClick` → `handleJoin(role)` (role rows) / `handleLead()` (leader).
-- `role="button"`, `tabIndex={0}`, `onKeyDown` for Enter/Space → same handler.
-- `aria-label` = the join label (e.g. "जोडिने — सफाइकर्मी" / "संयोजक बन्छु").
-- class `is-clickable`; `cursor: pointer`; hover/focus = subtle lift + border
-  emphasis; `aria-busy` + non-interactive while that role's join is pending.
+`IssueJoinButton` gains an optional controlled `join` prop:
+`const ownJoin = useEventJoin(...); const join = controlledJoin ?? ownJoin;`
+(unconditional hook call, controlled value preferred — exactly the
+`IssueVoteButton` `support` pattern).
 
-To avoid an invalid nested-interactive (button-in-button), the inner pill is
-demoted from `<button>` to a decorative `<span>` (same `event-roster-open-pill`
-look) for joinable rows — the row owns the click now. The pill remains visible
-as the affordance the user asked to keep.
+For OPEN, the body keeps `support.panelProps` (already identical to the OPEN
+modal, which is `IssueVoteButton`'s own `useRoleSupport`).
 
-**Rows that are NOT whole-row clickable** (unchanged):
-- The viewer's **own** role row — keeps its `participants-joined-toggle` /
-  lead toggle (Popconfirm withdraw). Making the whole row leave-on-click risks
-  accidental withdrawal.
-- **Full** rows (`event-roster-full-pill`) and a **read-only** leader
-  ("led by X" / "Coordinator open") — nothing to join, so not interactive.
+## Part B — "I'm interested" moves into ParticipantsPanel
 
-Keyboard + SR: each joinable row is a single focusable `button`-role element
-with a clear `aria-label`; the decorative pill is `aria-hidden`.
+The interested block (and its already-interested → withdraw toggle) moves from
+`CampaignParticipationModal` into `ParticipantsPanel`, rendered at the top of the
+panel body **when `onInterested` is provided**:
 
-## Change 2 — core role highlight
+- `ParticipantsPanel` gains props `onInterested`, `interestedActive`,
+  `onWithdraw`, plus the interested copy (moved from the modal's COPY) and the
+  `interestedPending` / `withdrawPending` state + handlers.
+- `CampaignParticipationModal` stops rendering its own interested block; it
+  forwards `onInterested` / `interestedActive` / `onWithdraw` into the panel
+  (via the spread panelProps or explicit props).
+- `CampaignDetailView` passes `onInterested` (OPEN only) + `interestedActive`
+  (`support.voted && support.voterRole === "INTERESTED"`) + `onWithdraw`
+  (`support.retract`) to the body panel.
 
-The core group (`participants-group--core`: the Cleaner full-width row + the
-Coordinator/leader row) gets a **role-tinted card** treatment so it out-weighs
-the quiet "additional" group:
+Result: the interested block appears identically in modal + body for OPEN, and
+not at all for events (no `onInterested`).
 
-- background `color-mix(var(--role-color) 8%, var(--surface))`
-- `1.5px solid color-mix(var(--role-color) 38%, var(--line))`
-- Cleaner → green (`ROLE_COLORS.WORKER`), Coordinator → gold (`LEAD_COLOR`).
+## Part C — identical panel content (chrome)
 
-`--role-color` must be present on the row `<li>` for the tint to resolve. The
-leader row already sets it; `renderRoleRow` will set `style={{ "--role-color":
-roleColor }}` on its `<li>` too.
+`embedded` must control only **outer spacing** (top margin/padding/divider), not
+content. The intro line and the heading+progress render in **both** surfaces:
 
-Interaction with existing row states (CSS specificity / scoping):
-- The own-role green wash wins — the core tint is scoped
-  `.participants-group--core .event-roster-row:not(.is-own-role)`.
-- The additional group's soft wash is unchanged (it doesn't use `--role-color`).
-- The existing `.participants-leader-row` gold rules become redundant but
-  harmless; the unified core rule produces the same gold via `--role-color`.
+- Stop gating the intro on `embedded` (`{embedded ? null : <p>{t.intro}</p>}` →
+  always render the intro).
+- Both surfaces show the heading "सहभागीहरू N" + the progress bar (Part A makes
+  the body pass real `progress`).
 
-Hover lift applies to any `.is-clickable` row (core or additional); core just
-starts from a stronger resting state.
+## Part D — whole role row clickable (from the approved row-interaction design)
+
+A role row is **joinable** when it renders the open/Join pill (`canJoinThis &&
+!isFullTargetRow`); the leader row is joinable when `leaderSlot.canLead`.
+
+- The joinable `<li>` becomes the click target: `onClick` → `handleJoin(role)` /
+  `handleLead()`, `role="button"`, `tabIndex={0}`, `onKeyDown` (Enter/Space),
+  `aria-label`, class `is-clickable`, `aria-busy`/non-interactive while pending.
+- The inner pill is demoted from `<button>` to a decorative `<span>` (same
+  `event-roster-open-pill` look) to avoid nested interactives — the row owns the
+  click; the pill stays visible as the cue.
+- **Not** whole-row clickable: the viewer's own role row (keeps the
+  `participants-joined-toggle` / lead withdraw toggle), Full rows, and a
+  read-only leader ("led by X" / "Coordinator open").
+
+## Part E — core role highlight (from the approved design)
+
+Core group rows (Cleaner full-width row + Coordinator/leader row) get a
+role-tinted card:
+
+- background `color-mix(var(--role-color) 8%, var(--surface))`,
+  `1.5px solid color-mix(var(--role-color) 38%, var(--line))`.
+- `renderRoleRow` sets `style={{ "--role-color": roleColor }}` on the `<li>` (the
+  leader row already does). Cleaner → green, Coordinator → gold.
+- Scoped `.participants-group--core .event-roster-row:not(.is-own-role)` so the
+  own-role green wash still wins; additional rows (soft wash) unchanged.
+- `.is-clickable` rows get pointer + hover lift + focus ring (core starts from a
+  stronger resting state).
 
 ---
 
 ## Files
 
-- Modify: `src/components/ParticipantsPanel.js`
-  - `renderRoleRow`: add `--role-color` to the `<li>`; when joinable, make the
-    `<li>` a `role="button"` click/keydown target with `is-clickable`; demote
-    the open pill to a `<span>`.
-  - `renderLeaderRow`: when `canLead`, make the `<li>` the click/keydown target;
-    demote the "be coordinator" CTA to a `<span>`.
-- Modify: `src/styles/event-roster.css`
-  - `.event-roster-row.is-clickable` (cursor + hover lift + focus ring).
-  - `.participants-group--core .event-roster-row:not(.is-own-role)` (role-tint
-    card + border), reading `--role-color`.
-  - Pill-as-span: ensure `.event-roster-open-pill` renders correctly as a span
-    (drop reliance on `:disabled`; row owns disabled/pending).
+- `src/components/ParticipantsPanel.js` — interested block + state (Part B); row
+  click target + pill→span (Part D); `--role-color` on `<li>` (Part E); intro
+  always shown (Part C).
+- `src/components/CampaignParticipationModal.js` — drop own interested block;
+  forward interested props to the panel.
+- `src/components/CampaignDetailView.js` — add `useEventJoin`; feed body from the
+  status-correct `panelProps`; pass controlled `join` to `IssueJoinButton`;
+  pass interested props; remove topline conversion duplicate + the
+  `totalOverride`/`progress={null}` overrides.
+- `src/components/IssueJoinButton.js` — accept optional controlled `join` prop.
+- `src/styles/event-roster.css` — `.is-clickable` (cursor/hover/focus); core
+  role-tint card; ensure the open pill renders as a `<span>`.
 
-No other files change — the single component propagates to modal + all bodies.
+No other files — the single component propagates to the modal + every body.
 
 ## Verification
 
-Drive the browser at OPEN (modal + `/campaign` body) and a DRAFT/SCHEDULED
-event (modal + body), asserting:
-1. Clicking anywhere on a joinable role row joins that role (and on the leader
-   row, offers to lead) — verified by the roster updating + the CTA → committed.
-2. Joinable rows show pointer cursor + hover lift; the Join pill is still
-   visible; Enter/Space on a focused row joins.
-3. Core rows (Cleaner + Coordinator) read as highlighted role-tinted cards;
-   additional rows stay quiet; the viewer's own row still shows the green
-   "joined" toggle (not the core tint), and withdraw still works.
-4. The roster looks identical in the modal and the body (same role-item design).
-Clean up any test joins via the withdraw toggle.
+Drive the browser and assert the roster block is byte-identical in the modal and
+the `/campaign/<slug>` body for:
+1. **OPEN** (`drain-blockage-…`) — both show "I'm interested" + conversion
+   progress + all roles with the same counts/pills; clicking a row joins; core
+   highlighted.
+2. **ONGOING/SCHEDULED** (`southern-shore-of-fewa-lake-…`) — body now shows the
+   **event** roster (2/8 Cleaner, filled chips, "open"/"Full" pills, "Coordinated
+   by …") identical to the modal; Cleaner-only join where gated; core highlighted.
+3. Joining via the topline modal updates the body roster (shared instance); the
+   own-role row keeps its withdraw toggle. Clean up test joins via withdraw.
