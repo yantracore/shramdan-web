@@ -5866,6 +5866,13 @@
   padding-bottom: 96px;
 }
 
+/* The "back to all campaigns" link is a utility pill — keep it hugging its
+   content at the start of the grid column, not stretched to full width by the
+   grid's default justify-items: stretch. */
+.public-issue-detail-section > .tertiary-button:first-child {
+  justify-self: start;
+}
+
 /* Phase 5 v0 — slim heading band for /events + /issues. Title drops
  * from `clamp(28, 3.4vw, 40)` to a flatter `clamp(22, 2.4vw, 30)`;
  * eyebrow shrinks to 11px; the intro paragraph clamps to a single
