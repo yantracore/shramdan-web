@@ -5336,15 +5336,15 @@
    * FAB + BackToTop. */
   .site-shell-corner--top-left,
   .site-shell-corner--top-right {
-    top: 8px;
+    top: 0;
   }
 
   .site-shell-corner--top-left {
-    left: 8px;
+    left: 0;
   }
 
   .site-shell-corner--top-right {
-    right: 8px;
+    right: 0;
   }
 
   .site-shell-corner--bottom-left {
@@ -5355,16 +5355,6 @@
     min-height: 40px;
     padding: 6px 10px;
     gap: 6px;
-  }
-
-  /* Top corners are now inset 8px from the walls (above) — they float as
-   * standalone chips. The flush-to-wall treatment (only the inward corner
-   * rounded, the two wall-facing borders dropped) reads as a torn box once
-   * detached, so restore a full border and uniform radius here. */
-  .site-shell-corner--top-left .site-shell-corner__inner,
-  .site-shell-corner--top-right .site-shell-corner__inner {
-    border-width: 1px;
-    border-radius: 14px;
   }
 
   .brand {
@@ -5497,13 +5487,6 @@
   .site-shell-corner--bottom-right {
     bottom: calc(72px + env(safe-area-inset-bottom, 0px));
     right: 12px;
-  }
-
-  /* Detached from the bottom-right wall (above) — float as a full chip
-   * instead of the flush, edge-bleed treatment. */
-  .site-shell-corner--bottom-right .site-shell-corner__inner {
-    border-width: 1px;
-    border-radius: 14px;
   }
 
   .mobile-menu-preferences {
