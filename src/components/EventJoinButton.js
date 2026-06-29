@@ -5,21 +5,18 @@
 // same lazy-load → ParticipantsPanel pattern is reused without duplicating API
 // logic. No "I'm interested" header — events have no INTERESTED concept.
 
-import { Modal } from "antd";
-import { ParticipantsPanel } from "@/components/ParticipantsPanel";
+import { CampaignParticipationModal } from "@/components/CampaignParticipationModal";
 import { useEventJoin } from "@/lib/useEventJoin";
 
 // Button copy — parallel to JOIN_COPY in useEventJoin / events page.
 const BUTTON_COPY = {
   np: {
     join: "सामेल हुने",
-    joinedAs: (role) => `${ROLE_LABELS_NP[role] || role} — जोडिनुभयो`,
-    modalTitle: "अभियानमा सामेल हुने"
+    joinedAs: (role) => `${ROLE_LABELS_NP[role] || role} — जोडिनुभयो`
   },
   en: {
     join: "Join",
-    joinedAs: (role) => `Joined as ${ROLE_LABELS_EN[role] || role}`,
-    modalTitle: "Join this campaign"
+    joinedAs: (role) => `Joined as ${ROLE_LABELS_EN[role] || role}`
   }
 };
 
@@ -99,23 +96,13 @@ export function EventJoinButton({ eventId, seed, language = "np", size, status }
         {join.loading ? (lang === "np" ? "लोड…" : "Loading…") : label}
       </button>
 
-      {/* Same shell + width as SupportRolesModal so the role picker is identical
-          in size across every lifecycle stage (OPEN support vs DRAFT/LIVE join). */}
-      <Modal
+      <CampaignParticipationModal
         open={join.open}
-        onCancel={join.closeModal}
-        footer={null}
-        title={bc.modalTitle}
-        destroyOnHidden
-        width={680}
-        className="support-roles-modal"
-      >
-        <ParticipantsPanel
-          {...join.panelProps}
-          embedded
-          language={lang}
-        />
-      </Modal>
+        onClose={join.closeModal}
+        language={lang}
+        campaign={join.campaignHeader}
+        panelProps={join.panelProps}
+      />
     </>
   );
 }
