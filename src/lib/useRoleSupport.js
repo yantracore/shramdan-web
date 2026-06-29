@@ -17,6 +17,7 @@ import {
 import { getAuthSession, subscribeAuthSession } from "@/lib/authSession";
 import { getListItems } from "@/lib/adminUtils";
 import { resolveEventForIssue } from "@/lib/eventsApi";
+import { buildCampaignHeader } from "@/lib/campaignHeader";
 
 // Role menu order shared with the issue page and event page.
 // COORDINATOR is intentionally excluded — coordination is now exclusively the
@@ -268,6 +269,8 @@ export function useRoleSupport(
   const leave = useCallback(() => handleRetract(), [handleRetract]);
   const retract = useCallback(() => handleRetract(), [handleRetract]);
 
+  const campaignHeader = buildCampaignHeader({ issue, event: linkedEvent, language });
+
   const panelProps = {
     roles,
     viewer,
@@ -313,8 +316,9 @@ export function useRoleSupport(
     resolvedEventStatus: linkedEvent?.status || null,
     // Retract — exposed so IssueVoteButton's withdraw Popconfirm can call it.
     retract,
-    // Panel contract for SupportRolesModal / ParticipantsPanel
+    // Panel contract for CampaignParticipationModal / ParticipantsPanel
     panelProps,
+    campaignHeader,
     // "I'm interested" shortcut used by SupportRolesModal's top button
     onInterested: interested
   };

@@ -25,6 +25,7 @@ import {
 import { eventJoinPhase, PARTICIPANT_ROLE_ORDER } from "@/lib/issueActions";
 import { getResponseData } from "@/lib/adminUtils";
 import { getDemoEventById } from "@/lib/devMockData";
+import { buildCampaignHeader } from "@/lib/campaignHeader";
 
 // Event lifecycle stages that still accept a join.
 const EVENT_JOINABLE_STATUSES = new Set(["DRAFT", "SCHEDULED", "ACTIVE"]);
@@ -389,6 +390,15 @@ export function useEventJoin(eventId, { seed = null, language = "np", eager = fa
 
   const joinable = phase.joinable;
 
+  // Seed (normalized event: title + thumbnailUrl + addressText) merged under the
+  // loaded snapshot (raw event: scheduledAt + duration + meetup + embedded issue)
+  // so the header is complete the moment the modal opens and only sharpens on load.
+  const campaignHeader = buildCampaignHeader({
+    issue: eventData?.issue || null,
+    event: { ...(seed || {}), ...(eventData || {}) },
+    language
+  });
+
   const panelProps = {
     roles: participantRoles,
     viewer: participantViewer,
@@ -408,6 +418,8 @@ export function useEventJoin(eventId, { seed = null, language = "np", eager = fa
     closeModal,
     loading,
     panelProps,
+    campaignHeader,
+    eventData,
     joinable,
     phase,
     viewerRole,
