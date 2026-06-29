@@ -1163,6 +1163,16 @@
   opacity: 0.7;
 }
 
+/* Already-interested → the block becomes a one-click withdraw (selected look). */
+.support-modal-interested.is-active {
+  background: color-mix(in srgb, var(--primary) 14%, var(--surface));
+  border-color: var(--primary);
+}
+.support-modal-interested.is-active:hover:not(:disabled),
+.support-modal-interested.is-active:focus-visible {
+  background: color-mix(in srgb, var(--primary) 20%, var(--surface));
+}
+
 .support-modal-interested-icon {
   display: inline-flex;
   align-items: center;
@@ -1944,8 +1954,8 @@
 }
 .campaign-action-btn--act[data-accent="live"] {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 60%),
-    var(--state-live);
-  box-shadow: 0 4px 14px color-mix(in srgb, var(--state-live) 38%, transparent);
+    var(--state-active);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--state-active) 38%, transparent);
 }
 @media (hover: hover) {
   .campaign-action-btn--act:hover,
@@ -1955,7 +1965,7 @@
   }
   .campaign-action-btn--act[data-accent="live"]:hover,
   .campaign-action-btn--act[data-accent="live"]:focus-visible {
-    box-shadow: 0 7px 20px color-mix(in srgb, var(--state-live) 48%, transparent);
+    box-shadow: 0 7px 20px color-mix(in srgb, var(--state-active) 48%, transparent);
   }
 }
 .campaign-action-btn--act:active {
@@ -1977,13 +1987,13 @@
 }
 @keyframes campaign-cta-pulse {
   0% {
-    box-shadow: 0 0 0 0 color-mix(in srgb, var(--state-live) 55%, transparent);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--state-active) 55%, transparent);
   }
   70% {
-    box-shadow: 0 0 0 10px color-mix(in srgb, var(--state-live) 0%, transparent);
+    box-shadow: 0 0 0 10px color-mix(in srgb, var(--state-active) 0%, transparent);
   }
   100% {
-    box-shadow: 0 0 0 0 color-mix(in srgb, var(--state-live) 0%, transparent);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--state-active) 0%, transparent);
   }
 }
 

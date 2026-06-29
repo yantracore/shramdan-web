@@ -234,6 +234,8 @@ export function IssueVoteButton({
         language={language}
         campaign={support.campaignHeader}
         onInterested={support.onInterested}
+        interestedActive={voted && voterRole === "INTERESTED"}
+        onWithdraw={support.retract}
         panelProps={support.panelProps}
       />
     </>

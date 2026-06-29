@@ -13,6 +13,7 @@ import { useState } from "react";
 import {
   CalendarOutlined,
   ClockCircleOutlined,
+  CheckCircleFilled,
   EnvironmentOutlined,
   HeartOutlined,
   TeamOutlined
@@ -32,6 +33,9 @@ const COPY = {
     interested: "मलाई रुचि छ",
     interestedHint: "अहिले भूमिका नछानी, समर्थन मात्र दर्ता गर्नुहोस्",
     interestedSaving: "दर्ता हुँदै…",
+    interestedActive: "समर्थन गरियो",
+    interestedWithdrawHint: "हटाउन क्लिक गर्नुहोस्",
+    interestedWithdrawing: "हट्दै…",
     orJoin: "वा कुनै भूमिकामा जोडिनुहोस्",
     fallbackTitle: "अभियान",
     durationMin: "{n} मिनेट",
@@ -41,6 +45,9 @@ const COPY = {
     interested: "I'm interested",
     interestedHint: "Just register your support, no role yet",
     interestedSaving: "Registering…",
+    interestedActive: "Supported",
+    interestedWithdrawHint: "Click to withdraw",
+    interestedWithdrawing: "Withdrawing…",
     orJoin: "Or join in a role",
     fallbackTitle: "Campaign",
     durationMin: "{n} min",
@@ -125,10 +132,16 @@ export function CampaignParticipationModal({
   language = "np",
   campaign = null,
   onInterested,
+  // OPEN issues only: when the viewer already holds a plain INTERESTED vote (no
+  // role, so there's no roster row to withdraw from), the interested block turns
+  // into a one-click withdraw via onWithdraw. Absent for events.
+  interestedActive = false,
+  onWithdraw,
   panelProps
 }) {
   const t = COPY[language] || COPY.np;
   const [interestedPending, setInterestedPending] = useState(false);
+  const [withdrawPending, setWithdrawPending] = useState(false);
 
   // A successful join/lead dismisses the modal; a thrown error keeps it open
   // (the page handler re-throws only on real failures).
@@ -159,6 +172,19 @@ export function CampaignParticipationModal({
     }
   };
 
+  const handleWithdraw = async () => {
+    if (withdrawPending || !onWithdraw) return;
+    setWithdrawPending(true);
+    try {
+      await onWithdraw();
+      onClose?.();
+    } catch {
+      /* page surfaces its own error toast; the modal stays open */
+    } finally {
+      setWithdrawPending(false);
+    }
+  };
+
   return (
     <Modal
       open={open}
@@ -173,20 +199,38 @@ export function CampaignParticipationModal({
     >
       {onInterested ? (
         <>
-          <button
-            type="button"
-            className="support-modal-interested"
-            onClick={handleInterested}
-            disabled={interestedPending}
-          >
-            <span className="support-modal-interested-icon">
-              <HeartOutlined aria-hidden="true" />
-            </span>
-            <span className="support-modal-interested-text">
-              <strong>{interestedPending ? t.interestedSaving : t.interested}</strong>
-              <span>{t.interestedHint}</span>
-            </span>
-          </button>
+          {interestedActive ? (
+            <button
+              type="button"
+              className="support-modal-interested is-active"
+              onClick={handleWithdraw}
+              disabled={withdrawPending}
+              aria-label={`${t.interestedActive} — ${t.interestedWithdrawHint}`}
+            >
+              <span className="support-modal-interested-icon">
+                <CheckCircleFilled aria-hidden="true" />
+              </span>
+              <span className="support-modal-interested-text">
+                <strong>{withdrawPending ? t.interestedWithdrawing : t.interestedActive}</strong>
+                <span>{t.interestedWithdrawHint}</span>
+              </span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="support-modal-interested"
+              onClick={handleInterested}
+              disabled={interestedPending}
+            >
+              <span className="support-modal-interested-icon">
+                <HeartOutlined aria-hidden="true" />
+              </span>
+              <span className="support-modal-interested-text">
+                <strong>{interestedPending ? t.interestedSaving : t.interested}</strong>
+                <span>{t.interestedHint}</span>
+              </span>
+            </button>
+          )}
           <div className="support-modal-divider">
             <span>{t.orJoin}</span>
           </div>
