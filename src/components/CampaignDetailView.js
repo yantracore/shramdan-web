@@ -21,7 +21,6 @@ import {
   CalendarOutlined,
   ClockCircleOutlined,
   EnvironmentOutlined,
-  ExportOutlined,
   LinkOutlined,
   SafetyOutlined,
   TeamOutlined
@@ -163,18 +162,6 @@ function formatScheduledAt(value, language) {
   } catch {
     return String(value);
   }
-}
-
-function buildMapsLink(addressText, latitude, longitude) {
-  const lat = Number(latitude);
-  const lng = Number(longitude);
-  if (Number.isFinite(lat) && Number.isFinite(lng)) {
-    return `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
-  }
-  if (addressText) {
-    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addressText)}`;
-  }
-  return null;
 }
 
 export function CampaignDetailView({ slug }) {
@@ -325,7 +312,6 @@ export function CampaignDetailView({ slug }) {
   const meetupLat = Number(eventData?.meetupLatitude);
   const meetupLng = Number(eventData?.meetupLongitude);
   const hasMeetupCoords = Number.isFinite(meetupLat) && Number.isFinite(meetupLng);
-  const meetupMapsLink = buildMapsLink(meetupAddress, meetupLat, meetupLng);
   const whatToBring = eventData?.whatToBring || "";
   const planningNotes = eventData?.planningNotes || "";
   const coordinationLink = eventData?.coordinationLink || "";
@@ -565,15 +551,13 @@ export function CampaignDetailView({ slug }) {
                   <h2>{eventContent.detail.meetupTitle}</h2>
                   {meetupAddress ? (
                     <p className="public-issue-location-address">
-                      <EnvironmentOutlined /> {meetupAddress}
-                      {meetupMapsLink ? (
-                        <>
-                          {" "}
-                          <a href={meetupMapsLink} rel="noreferrer" target="_blank">
-                            {eventContent.detail.openInMaps} <ExportOutlined />
-                          </a>
-                        </>
-                      ) : null}
+                      <button
+                        className="public-issue-detail-meta-link"
+                        onClick={scrollToLocation}
+                        type="button"
+                      >
+                        <EnvironmentOutlined /> {meetupAddress}
+                      </button>
                     </p>
                   ) : null}
                   {meetupNotes ? <p>{meetupNotes}</p> : null}
