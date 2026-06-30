@@ -1277,6 +1277,7 @@ export const copy = {
       title: "श्रमदान अभियानहरू",
       subtitle: "अहिले भइरहेका अभियानहरू हेर्नुहोस्।",
       viewAll: "सबै अभियान हेर्ने",
+      loadingMessage: "अभियानहरू ल्याउँदै…",
       emptyMessage:
         "अहिले कुनै अभियान भइरहेको छैन। जब कुनै सुरु हुन्छ, यहीँ देखिनेछ।",
       ongoingLabel: "अहिले भइरहेको",
@@ -3089,6 +3090,7 @@ export const copy = {
       title: "Shramdan Events",
       subtitle: "See the campaigns happening right now.",
       viewAll: "View All Events",
+      loadingMessage: "Loading events…",
       emptyMessage:
         "Nothing happening right now. Campaigns will surface here as they start.",
       ongoingLabel: "Happening now",

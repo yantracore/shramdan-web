@@ -618,6 +618,48 @@
   opacity: 0.85;
 }
 
+/* Brief in-flight state — shown only while the events fetch is pending, so the
+   empty "🌱 nothing yet" message never flashes during the loading window. */
+.events-home-rail-loading {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 22px;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-soft);
+  color: var(--text);
+}
+
+.events-home-rail-spinner {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 2px solid var(--line);
+  border-top-color: var(--state-active);
+  animation: events-home-rail-spin 0.7s linear infinite;
+}
+
+.events-home-rail-loading p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  opacity: 0.85;
+}
+
+@keyframes events-home-rail-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .events-home-rail-spinner {
+    animation-duration: 1.6s;
+  }
+}
+
 /* Legacy live-rail header (kept for any non-home usage) */
 .live-events-rail-header {
   display: flex;

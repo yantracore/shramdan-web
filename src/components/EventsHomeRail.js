@@ -182,7 +182,8 @@ export function EventsHomeRail({
   liveEvents = [],
   upcomingEvents = [],
   copy,
-  language = "np"
+  language = "np",
+  loading = false
 }) {
   const reduceMotion = useReducedMotion();
 
@@ -190,7 +191,10 @@ export function EventsHomeRail({
     ...liveEvents.map((event) => ({ kind: "active", event })),
     ...upcomingEvents.map((event) => ({ kind: "scheduled", event }))
   ].slice(0, MAX_RAIL_ITEMS);
-  const isEmpty = items.length === 0;
+  // While the fetch is in flight we show a brief loading state instead of the
+  // empty message — the empty message only means "fetch done, nothing here".
+  const isLoading = loading && items.length === 0;
+  const isEmpty = !loading && items.length === 0;
 
   const [activeIndex, setActiveIndex] = useState(0);
   const handleActive = (swiper) => setActiveIndex(swiper.realIndex);
@@ -221,7 +225,21 @@ export function EventsHomeRail({
         </header>
       </div>
 
-      {isEmpty ? (
+      {isLoading ? (
+        <div className="events-home-rail-shell">
+          <div
+            className="events-home-rail-loading"
+            role="status"
+            aria-live="polite"
+          >
+            <span className="events-home-rail-spinner" aria-hidden="true" />
+            <p>
+              {copy?.loadingMessage ||
+                (language === "np" ? "अभियानहरू ल्याउँदै…" : "Loading events…")}
+            </p>
+          </div>
+        </div>
+      ) : isEmpty ? (
         <div className="events-home-rail-shell">
           <div className="events-home-rail-empty">
             <span className="events-home-rail-empty-icon" aria-hidden="true">🌱</span>

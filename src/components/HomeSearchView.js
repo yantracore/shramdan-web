@@ -41,10 +41,12 @@ export default function HomeSearchView() {
   const [liveEvents, setLiveEvents] = useState([]);
   const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [pastEvents, setPastEvents] = useState([]);
+  const [eventsLoading, setEventsLoading] = useState(true);
   const [mapIssues, setMapIssues] = useState([]);
 
   useEffect(() => {
     let cancelled = false;
+    setEventsLoading(true);
     (async () => {
       try {
         // listAllEvents() returns the three buckets in one shot so the
@@ -59,6 +61,8 @@ export default function HomeSearchView() {
         setLiveEvents([]);
         setUpcomingEvents([]);
         setPastEvents([]);
+      } finally {
+        if (!cancelled) setEventsLoading(false);
       }
     })();
     return () => {
@@ -134,6 +138,7 @@ export default function HomeSearchView() {
         upcomingEvents={upcomingEvents}
         copy={rail}
         language={language}
+        loading={eventsLoading}
       />
 
       <section className="home-search-panel" aria-label={search.mapEyebrow}>
