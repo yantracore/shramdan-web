@@ -28,7 +28,7 @@ import { FilterOutlined, SearchOutlined } from "@ant-design/icons";
 // `filtersOpen`      — current panel state (drives aria-expanded + active style).
 // `labels`           — { searchPlaceholder, searchAria, filtersLabel, submitAria }.
 
-const DEFAULT_DEBOUNCE_MS = 300;
+const DEFAULT_DEBOUNCE_MS = 400;
 
 export function PublicSearchBar({
   value,
