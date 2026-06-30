@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useReducedMotion } from "framer-motion";
 import { ArrowRightOutlined, CalendarOutlined, TeamOutlined } from "@ant-design/icons";
@@ -197,7 +197,23 @@ export function EventsHomeRail({
   const isEmpty = !loading && items.length === 0;
 
   const [activeIndex, setActiveIndex] = useState(0);
-  const handleActive = (swiper) => setActiveIndex(swiper.realIndex);
+  const swiperRef = useRef(null);
+  const handleActive = (swiper) => {
+    swiperRef.current = swiper;
+    setActiveIndex(swiper.realIndex);
+  };
+
+  // Browser back/forward restores this page from the bfcache without re-running
+  // JS, so Swiper keeps stale coverflow geometry / slide sizing. `pageshow`
+  // fires on that restore; recompute then.
+  useEffect(() => {
+    const refresh = () => {
+      const s = swiperRef.current;
+      if (s && !s.destroyed) s.update();
+    };
+    window.addEventListener("pageshow", refresh);
+    return () => window.removeEventListener("pageshow", refresh);
+  }, []);
 
   return (
     <section

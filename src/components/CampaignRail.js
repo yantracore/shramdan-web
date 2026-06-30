@@ -4,7 +4,7 @@
 // is EventsHomeRail's hero treatment). Peeks adjacent cards, fades at the edges,
 // prev/next arrows, keyboard + a11y. No autoplay: this is a browse rail.
 
-import { useId } from "react";
+import { useEffect, useId, useRef } from "react";
 import Link from "next/link";
 import { useReducedMotion } from "framer-motion";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -37,6 +37,22 @@ export default function CampaignRail({
   const reduced = useReducedMotion();
   const rawId = useId();
   const uid = rawId.replace(/[^a-zA-Z0-9]/g, "");
+  const swiperRef = useRef(null);
+
+  // Browser back/forward restores this page from the bfcache: the frozen DOM is
+  // re-shown WITHOUT re-running JS, so Swiper never re-initializes and keeps the
+  // slide widths/spacing it measured before — which, if the layout changed (e.g.
+  // a scrollbar appeared/vanished between pages), shows as collapsed gaps and
+  // squished cards. `pageshow` fires on that restore (persisted=true); recompute
+  // then. (observer/observeParents below can't catch it — nothing mutates.)
+  useEffect(() => {
+    const refresh = () => {
+      const s = swiperRef.current;
+      if (s && !s.destroyed) s.update();
+    };
+    window.addEventListener("pageshow", refresh);
+    return () => window.removeEventListener("pageshow", refresh);
+  }, []);
 
   if (!items || items.length === 0) return null;
 
@@ -83,6 +99,9 @@ export default function CampaignRail({
           // make it re-measure whenever its DOM or an ancestor mutates.
           observer
           observeParents
+          onSwiper={(s) => {
+            swiperRef.current = s;
+          }}
           className="campaign-rail-swiper"
         >
           {items.map(({ entry, distanceKm }) => (
