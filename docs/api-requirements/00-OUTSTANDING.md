@@ -26,10 +26,7 @@
 
 ## P3 — entities not started (frontend stubbed / future)
 
-- **discussions** + **feature-votes** — full specs ready; `/discussions` is a live nav surface running on a stub. → [discussions.md](discussions.md), [feature-votes.md](feature-votes.md)
-- **live-streams** — home live rail uses mock data. → [live-streams.md](live-streams.md)
-- **incidents** — FE panels exist (roadmap 4.2); also unblocks events pause/resume + `riskLevel`. → [incidents.md](incidents.md)
-- **donations** — Phase 6 transparency ledger (`/ledger`). Future. → [donations.md](donations.md)
+- **incidents** — FE panels exist (roadmap 4.2); also unblocks events pause/resume + `riskLevel`. The panel already degrades gracefully on a 404/501, so this is non-blocking. → [incidents.md](incidents.md)
 
 ## P4 — minor / nice-to-have
 
@@ -54,5 +51,10 @@
 
 ## Deferred to v2 — not part of this handoff
 
+> **Moved to v2 on 2026-06-30** (product decision): the four entities below are dropped from v1. The frontend has been de-wired from the v1 surfaces — components/routes stay in the repo but no v1 page links into them, and no mock data feeds a shipped surface (all-live, zero-dummy v1).
+
+- **live-streams** — **the home rail no longer means "livestream"; it now shows real _ongoing_ (ACTIVE) events** ("Happening now"), fed by live `GET /events?status=ACTIVE` — no mock, no `liveStream` field reads. The actual live-video playback feature (stream URL, viewer count, player) is the v2 item. → [live-streams.md](live-streams.md)
+- **discussions** + **feature-votes** — discontinued from v1. Already out of the main nav; the remaining v1 entry point (the "Related Discussion" presence block on `/events/[id]`, which read the stub) was removed 2026-06-30. The `/discussions` + `/members/[slug]` routes/components stay but are reachable only directly. → [discussions.md](discussions.md), [feature-votes.md](feature-votes.md)
+- **donations** — Phase 6 transparency ledger (`/ledger`). The `/ledger` route/component stays (dev-only demo data, `isDev()`-gated) but the v1 link into it (the intro "public ledger" tile link) was removed 2026-06-30. → [donations.md](donations.md)
 - **meetings** — two-meeting kickoff / pre-execution flow; no UI consumes it and the TV-app pivot reshaped the planning model. → [meetings.md](meetings.md)
-- **app-development** — task board folded into `/discussions` for now. → [app-development.md](app-development.md)
+- **app-development** — task board folded into `/discussions` (also v2 now). → [app-development.md](app-development.md)
