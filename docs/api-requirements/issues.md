@@ -113,7 +113,7 @@ The reporter can only edit content while the issue sits in `OPEN`.
 **Per-viewer support echo — on `GET /issues/{id}` (detail) AND `GET /issues` (list), authenticated:**
 
 - **isVoted** (`boolean`) — already returned on the list; **must also be added to `GET /issues/{id}`.** Without it the detail page shows "Support" (un-voted) on every refresh and only flips after a click trips `ALREADY_VOTED (409)`. _Interim (2026-06-22): the FE derives this on the detail page from `GET /issues/me/votes`; that extra round-trip can be dropped once the field ships here._
-- **voterRole** (`enum`, nullable) — the caller's stored vote intent (`INTERESTED | GOING | WANT_TO_LEAD`). Needed to render "Supported" vs the specific role.
+- **voterRole** (`enum`, nullable) — the caller's stored vote intent (`INTERESTED | GOING | WANT_TO_LEAD`). Needed to render "Supported" vs the specific role. _Interim (2026-06-30): the homepage rails + `/campaigns` feed (`useCampaignFeed`) now pay ONE page-wide `GET /issues/me/votes` and decorate each OPEN issue with `voterRole`/`eventRole`, so a refreshed card reads the true label (Supported/Joined/Leading) without opening the modal. Echoing these two fields on the `GET /issues` list lets that extra round-trip be dropped._
 - **eventRole** (`enum`, nullable) — the participation role chosen when `voterRole = GOING` (`WORKER | PHOTOGRAPHER | LIVESTREAMER | MEDIC | SAFETY_LEAD | LOGISTICS` — six values; `COORDINATOR` removed from the enum 2026-06-23, see Recent changes). Just echo back what `POST /issues/{id}/vote { voterRole, eventRole }` stored.
 
 **Linked event — on the issue read once promoted (`status = EVENT_SCHEDULED`):**

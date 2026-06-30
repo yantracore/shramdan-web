@@ -52,7 +52,16 @@ export function useRoleSupport(
   // Local issue snapshot — patched optimistically after each vote then
   // reconciled from the server via fetchIssueParticipants.
   const [issue, setIssue] = useState(seed);
-  const [myVote, setMyVote] = useState(null);
+  // Seed the viewer's role from the snapshot when the caller already resolved it
+  // (the campaign feed decorates each OPEN issue with voterRole/eventRole via a
+  // single GET /issues/me/votes). This lets a lazy card render the true label
+  // (Supported / Joined / Leading) on first paint, before the modal's load()
+  // runs — the list read alone carries only `isVoted`, never the role.
+  const [myVote, setMyVote] = useState(
+    seed?.voterRole
+      ? { voterRole: seed.voterRole, eventRole: seed.eventRole ?? null }
+      : null
+  );
   const [participants, setParticipants] = useState([]);
   // The linked campaign event, recovered for a promoted/closed issue so the
   // Coordinator (core) slot can show its resolved leader and the page can route
