@@ -77,6 +77,12 @@ export default function CampaignRail({
           speed={reduced ? 0 : 420}
           watchOverflow
           breakpoints={BREAKPOINTS}
+          // The homepage re-renders often (ticker, live widgets) and remounts on
+          // client navigation. Without observers Swiper can keep stale slide
+          // widths/spacing after a back-nav — gaps collapse, cards squish. These
+          // make it re-measure whenever its DOM or an ancestor mutates.
+          observer
+          observeParents
           className="campaign-rail-swiper"
         >
           {items.map(({ entry, distanceKm }) => (

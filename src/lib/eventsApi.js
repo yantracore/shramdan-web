@@ -18,7 +18,11 @@
 import { getJson } from "@/lib/apiClient";
 import { getListItems, getIssueCoverImageUrl, localizeIssue } from "@/lib/adminUtils";
 
-const ISSUE_COVER_INDEX_LIMIT = 200;
+// Backend caps list `limit` at 100 — a higher value 400s, and the catch below
+// nulls the promise, so every cover lookup would re-fire the failing request
+// (a flood of 400s + constant re-renders that destabilised the home carousels
+// on navigation). Index the first 100; misses fall back to per-id detail reads.
+const ISSUE_COVER_INDEX_LIMIT = 100;
 let issueCoverIndexPromise = null;
 const issueCoverDetailPromises = new Map();
 
