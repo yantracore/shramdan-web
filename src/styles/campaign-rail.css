@@ -19,6 +19,10 @@
 .campaign-rail {
   display: grid;
   gap: 16px;
+  /* Grid/flex children default to min-width:auto, which lets Swiper's slide
+   * widths feed back into the track and blow the rail up to the browser's max
+   * element width. Pin to 0 so the rail takes the available width instead. */
+  min-width: 0;
 }
 
 .campaign-rail-header {
@@ -69,10 +73,12 @@
 
 .campaign-rail-viewport {
   position: relative;
+  min-width: 0;
 }
 
 /* Edge fade: cards "vanish" at the left/right boundaries. */
 .campaign-rail-swiper {
+  width: 100%;
   -webkit-mask-image: linear-gradient(
     90deg,
     transparent 0,
