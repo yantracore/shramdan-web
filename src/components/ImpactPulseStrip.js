@@ -82,14 +82,14 @@ export function ImpactPulseStrip({ language = "np" }) {
       key: "live",
       icon: ThunderboltOutlined,
       value: counts.live,
-      href: "/campaigns?status=ACTIVE",
+      href: "/campaigns/ongoing",
       accent: "live"
     },
     {
       key: "upcoming",
       icon: RiseOutlined,
       value: counts.upcoming,
-      href: "/campaigns?status=SCHEDULED",
+      href: "/campaigns/scheduled",
       accent: "upcoming"
     },
     {
@@ -103,7 +103,7 @@ export function ImpactPulseStrip({ language = "np" }) {
       key: "issues",
       icon: TeamOutlined,
       value: counts.issues,
-      href: "/campaigns?status=OPEN",
+      href: "/campaigns/open",
       accent: "issues"
     }
   ];

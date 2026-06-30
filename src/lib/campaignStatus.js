@@ -63,11 +63,46 @@ export const CAMPAIGN_STATUS_LABELS = {
   }
 };
 
-// Valid values for the `?status=` URL param. "all" is a UI-only umbrella.
+// Valid values for the in-state `filters.status`. "all" is a UI-only umbrella.
 export const CAMPAIGN_FILTER_VALUES = new Set([
   "all",
   ...CAMPAIGN_STATUS_SEQUENCE
 ]);
+
+// URL slugs for the path-based status sections (/campaigns/<slug>). These are
+// the user-facing chip words, NOT the technical status — `planning` (DRAFT) and
+// `ongoing` (ACTIVE) read far better in a shared link than `draft`/`active`.
+// "all" is the bare index (/campaigns) and so has no slug. This slug↔status map
+// is the ONLY place the URL vocabulary lives; everything else stays on the
+// technical status keys.
+export const CAMPAIGN_STATUS_SLUGS = {
+  OPEN: "open",
+  DRAFT: "planning",
+  SCHEDULED: "scheduled",
+  ACTIVE: "ongoing",
+  COMPLETED: "complete"
+};
+
+const CAMPAIGN_SLUG_TO_STATUS = Object.fromEntries(
+  Object.entries(CAMPAIGN_STATUS_SLUGS).map(([status, slug]) => [slug, status])
+);
+
+// status key -> URL slug. Returns null for "all"/unknown (i.e. the bare index).
+export function campaignStatusToSlug(status) {
+  return CAMPAIGN_STATUS_SLUGS[status] || null;
+}
+
+// URL slug -> status key. Returns null for an unknown slug (caller 404s).
+export function campaignSlugToStatus(slug) {
+  return CAMPAIGN_SLUG_TO_STATUS[slug] || null;
+}
+
+// The list path for a given status — `/campaigns` for "all", `/campaigns/<slug>`
+// otherwise. The single source of truth for building campaign-section URLs.
+export function campaignStatusPath(status) {
+  const slug = campaignStatusToSlug(status);
+  return slug ? `/campaigns/${slug}` : "/campaigns";
+}
 
 export function campaignStatusLabel(status, language) {
   const dict = CAMPAIGN_STATUS_LABELS[language] || CAMPAIGN_STATUS_LABELS.np;

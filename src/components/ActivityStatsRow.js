@@ -1,12 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { listAllEvents } from "@/lib/eventsApi";
 import { getJson } from "@/lib/apiClient";
 import { getListItems } from "@/lib/adminUtils";
-import { campaignStatusLabel } from "@/lib/campaignStatus";
+import { campaignStatusLabel, campaignStatusPath } from "@/lib/campaignStatus";
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 
@@ -122,7 +122,6 @@ function ActivityStatsRowInner({
   currentPage
 }) {
   const t = COPY[language] || COPY.np;
-  const pathname = usePathname();
   const searchParams = useSearchParams();
 
   const [issues, setIssues] = useState([]);
@@ -153,15 +152,15 @@ function ActivityStatsRowInner({
   const counts = useMemo(() => foldCounts(issues, buckets), [issues, buckets]);
 
   const hrefFor = (step) => {
-    // On the /campaigns list itself, swap only the status param (preserve the
-    // rest of the URL); otherwise jump to the filtered unified list.
+    // Each stage is its own path section now (/campaigns/<slug>). On the
+    // campaigns surface itself, preserve the secondary filters in the query;
+    // elsewhere just jump to the stage page.
+    const base = campaignStatusPath(step.key);
     if (currentPage === "campaigns") {
-      const params = new URLSearchParams(searchParams?.toString() || "");
-      params.set("status", step.key);
-      const query = params.toString();
-      return query ? `${pathname}?${query}` : pathname;
+      const query = searchParams?.toString();
+      return query ? `${base}?${query}` : base;
     }
-    return `/campaigns?status=${step.key}`;
+    return base;
   };
 
   return (

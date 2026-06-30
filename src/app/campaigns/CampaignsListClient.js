@@ -32,9 +32,9 @@ import { ISSUE_CATEGORIES, localizeIssue } from "@/lib/adminUtils";
 import { useCampaignFeed } from "@/lib/useCampaignFeed";
 import { useCampaignCounts } from "@/lib/useCampaignCounts";
 import {
-  CAMPAIGN_FILTER_VALUES,
   CAMPAIGN_STATUS_SEQUENCE,
   campaignStatusLabel,
+  campaignStatusPath,
   campaignVisualStatus
 } from "@/lib/campaignStatus";
 
@@ -53,10 +53,10 @@ const CATEGORY_VALUES = new Set(ISSUE_CATEGORIES);
 // any return rebuilds the exact list the user left. It is intentionally
 // session-scoped (clears with the tab) and per-browser, not shared.
 const LIST_STATE_KEY = "shramdan:campaigns:list-state";
-// Params that mean "the URL deliberately asks for a specific list" — when any
-// is present (deep link, shared link, browser back) the URL wins over memory.
+// Secondary-filter query params that mean "the URL deliberately asks for a
+// specific list" — when any is present (deep link, shared link, browser back)
+// the URL wins over memory. The status now lives in the PATH, not here.
 const CAMPAIGN_URL_PARAMS = [
-  "status",
   "category",
   "province",
   "district",
@@ -184,7 +184,7 @@ function StatusChip({ text, count, loading, language, status }) {
   );
 }
 
-export default function CampaignsListPageContent() {
+export default function CampaignsListPageContent({ status: routeStatus = "all" }) {
   const { language } = usePreferences();
   const t = PAGE_COPY[language] || PAGE_COPY.np;
   const issuesCopy = (copy[language] || copy.np).issues;
@@ -201,18 +201,23 @@ export default function CampaignsListPageContent() {
     typeof window !== "undefined" ? readListState() : null
   );
 
+  // When the bare index mounts only to bounce to a remembered stage path, it is
+  // a throwaway mount — its mount-time persist writes would clobber the very
+  // snapshot the destination is about to restore from. This latches true the
+  // instant we decide to redirect, so the persist effects below stay quiet.
+  const suppressPersistRef = useRef(false);
+
   // ----- filter state (status / category / province / district / q) -------
+  // `status` is authoritative from the ROUTE (/campaigns = all,
+  // /campaigns/<slug> = a stage); the secondary filters still ride the query
+  // string so a filtered section stays shareable.
   const readFiltersFromUrl = useCallback(() => {
-    const statusParam = searchParams?.get("status");
     const categoryParam = searchParams?.get("category");
     const provinceParam = searchParams?.get("province");
     const districtParam = searchParams?.get("district");
     const qParam = searchParams?.get("q");
     return {
-      status:
-        statusParam && CAMPAIGN_FILTER_VALUES.has(statusParam)
-          ? statusParam
-          : "all",
+      status: routeStatus,
       category:
         categoryParam && CATEGORY_VALUES.has(categoryParam)
           ? categoryParam
@@ -221,7 +226,7 @@ export default function CampaignsListPageContent() {
       districtId: districtParam || undefined,
       q: qParam ? qParam.trim() : ""
     };
-  }, [searchParams]);
+  }, [searchParams, routeStatus]);
 
   const [filters, setFilters] = useState(() => readFiltersFromUrl());
 
@@ -259,6 +264,11 @@ export default function CampaignsListPageContent() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setView((prev) => (prev === next ? prev : next));
   }, [readView]);
+  // The list path for the current section — `/campaigns` (all) or
+  // `/campaigns/<slug>`. Every in-page URL write builds onto this base so the
+  // active status section is preserved.
+  const basePath = useMemo(() => campaignStatusPath(routeStatus), [routeStatus]);
+
   const handleViewChange = useCallback(
     (nextView) => {
       setView(nextView);
@@ -272,11 +282,11 @@ export default function CampaignsListPageContent() {
       // outside the grid.
       params.delete("page");
       const query = params.toString();
-      router.replace(query ? `/campaigns?${query}` : "/campaigns", {
+      router.replace(query ? `${basePath}?${query}` : basePath, {
         scroll: false
       });
     },
-    [router, searchParams]
+    [router, searchParams, basePath]
   );
 
   // ----- thumbnails pagination (URL-synced via ?page=) -------------------
@@ -297,19 +307,20 @@ export default function CampaignsListPageContent() {
       if (nextPage > 1) params.set("page", String(nextPage));
       else params.delete("page");
       const query = params.toString();
-      router.replace(query ? `/campaigns?${query}` : "/campaigns", {
+      router.replace(query ? `${basePath}?${query}` : basePath, {
         scroll: false
       });
     },
-    [router, searchParams]
+    [router, searchParams, basePath]
   );
 
+  // Secondary-filter change (category / province / district / q). Status is
+  // unchanged here, so the path stays put and only the query string moves.
   const applyFilters = useCallback(
     (next) => {
       setFilters(next);
       const params = new URLSearchParams(searchParams?.toString() || "");
-      if (next.status && next.status !== "all") params.set("status", next.status);
-      else params.delete("status");
+      params.delete("status"); // legacy param — never reintroduce it
       if (next.category) params.set("category", next.category);
       else params.delete("category");
       if (next.provinceId) params.set("province", next.provinceId);
@@ -319,16 +330,42 @@ export default function CampaignsListPageContent() {
       if (next.q) params.set("q", next.q);
       else params.delete("q");
       const query = params.toString();
-      router.replace(query ? `/campaigns?${query}` : "/campaigns", {
+      router.replace(query ? `${basePath}?${query}` : basePath, {
         scroll: false
       });
     },
-    [router, searchParams]
+    [router, searchParams, basePath]
+  );
+
+  // Status change = a section change = a PATH change. Carry the secondary
+  // filters over as query, but drop the grid page index (meaningless across a
+  // different feed). We navigate and let the route's `status` prop flow back in
+  // — no local setFilters, so the section is fetched exactly once.
+  const goToStatus = useCallback(
+    (nextStatus) => {
+      const params = new URLSearchParams();
+      if (filters.category) params.set("category", filters.category);
+      if (filters.provinceId) params.set("province", filters.provinceId);
+      if (filters.districtId) params.set("district", filters.districtId);
+      if (filters.q) params.set("q", filters.q);
+      const v = searchParams?.get("view");
+      if (v === "map" || v === "thumbnails") params.set("view", v);
+      const query = params.toString();
+      const path = campaignStatusPath(nextStatus);
+      router.replace(query ? `${path}?${query}` : path, { scroll: false });
+    },
+    [router, searchParams, filters]
   );
 
   const setFilter = useCallback(
-    (key, value) => applyFilters({ ...filters, [key]: value }),
-    [filters, applyFilters]
+    (key, value) => {
+      if (key === "status") {
+        goToStatus(value);
+        return;
+      }
+      applyFilters({ ...filters, [key]: value });
+    },
+    [filters, applyFilters, goToStatus]
   );
 
   const handleSearchSubmit = useCallback(
@@ -351,20 +388,21 @@ export default function CampaignsListPageContent() {
   );
 
   // ----- restore the tab/view/page from memory ---------------------------
-  // Runs once. If the URL names a specific list (deep link, shared link, or a
-  // browser-back restore that already carries ?status=…), the URL is
-  // authoritative and we leave it alone. If we arrived "bare" — a top-nav
-  // visit, or the detail page's plain `/campaigns` back link — we replay the
-  // remembered tab into the URL, which the sync effects above pick up.
+  // Runs once. If the URL already names a specific list — a stage path
+  // (/campaigns/<slug>) or any secondary filter in the query (a deep/shared
+  // link, or a browser-back restore) — the URL is authoritative and we leave it
+  // alone. Only the truly bare index (/campaigns, status "all", no query), i.e.
+  // a top-nav visit or the detail page's plain `/campaigns` back link, replays
+  // the remembered section + filters; the route/sync effects pick it up.
   const didRestoreFiltersRef = useRef(false);
   useEffect(() => {
     if (didRestoreFiltersRef.current) return;
     didRestoreFiltersRef.current = true;
+    if (routeStatus !== "all") return;
     if (hasExplicitCampaignParams(searchParams)) return;
     const snap = listMemory;
     if (!snap) return;
     const params = new URLSearchParams();
-    if (snap.status && snap.status !== "all") params.set("status", snap.status);
     if (snap.category) params.set("category", snap.category);
     if (snap.provinceId) params.set("province", snap.provinceId);
     if (snap.districtId) params.set("district", snap.districtId);
@@ -373,9 +411,16 @@ export default function CampaignsListPageContent() {
       params.set("view", snap.view);
     }
     if (snap.page && snap.page > 1) params.set("page", String(snap.page));
+    const path = campaignStatusPath(snap.status || "all");
     const query = params.toString();
-    if (query) router.replace(`/campaigns?${query}`, { scroll: false });
-  }, [searchParams, router, listMemory]);
+    // Nothing to restore if it resolves right back to the bare index.
+    if (path !== "/campaigns" || query) {
+      // This mount is about to be replaced — keep its persist effects from
+      // overwriting the snapshot the destination mount will restore from.
+      suppressPersistRef.current = true;
+      router.replace(query ? `${path}?${query}` : path, { scroll: false });
+    }
+  }, [routeStatus, searchParams, router, listMemory]);
 
   // ----- data ------------------------------------------------------------
   const { items, loading, error } = useCampaignFeed({
@@ -556,6 +601,7 @@ export default function CampaignsListPageContent() {
   // restore-time values before these mount-time writes run, so they cannot
   // race the restore.
   useEffect(() => {
+    if (suppressPersistRef.current) return;
     writeListState({
       status: filters.status,
       category: filters.category,
@@ -568,10 +614,12 @@ export default function CampaignsListPageContent() {
   }, [filters, view, page]);
 
   useEffect(() => {
+    if (suppressPersistRef.current) return;
     writeListState({ visibleCount });
   }, [visibleCount]);
 
   useEffect(() => {
+    if (suppressPersistRef.current) return;
     if (selectedId) writeListState({ selectedId });
   }, [selectedId]);
 
@@ -579,7 +627,7 @@ export default function CampaignsListPageContent() {
     if (typeof window === "undefined") return;
     let raf = 0;
     const onScroll = () => {
-      if (raf) return;
+      if (raf || suppressPersistRef.current) return;
       raf = window.requestAnimationFrame(() => {
         raf = 0;
         writeListState({ scrollY: window.scrollY });
