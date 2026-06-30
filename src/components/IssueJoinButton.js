@@ -61,6 +61,9 @@ export function IssueJoinButton({
   // Preview surfaces pass eager so the CTA reads committed / Full / Join
   // correctly before the modal opens (grid cards stay lazy).
   eager = false,
+  // Compact = card/thumbnail context: short committed label (drops the
+  // "{role}का रूपमा" form) so a narrow card stays one line.
+  compact = false,
   // Optional controlled useEventJoin instance. When a page already drives one
   // (so its body roster and this button's modal stay one live-synced source),
   // it's passed in; otherwise the button creates its own.
@@ -157,6 +160,9 @@ export function IssueJoinButton({
     if (join.viewerRole === "COORDINATOR") {
       label = language === "np" ? "नेतृत्वमा" : "Leading";
       roleColor = LEAD_COLOR;
+    } else if (compact) {
+      label = language === "np" ? "जोडिनुभयो" : "Joined";
+      roleColor = ROLE_COLORS[join.viewerRole] || undefined;
     } else {
       label =
         language === "np"

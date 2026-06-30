@@ -188,6 +188,19 @@
   justify-content: flex-end;
 }
 
+/* The participation CTA dropped into the footer (replaces the View link where
+   participation is open). Keep it from stretching and cap its label so a long
+   commitment never blows out a narrow card. */
+.campaign-card-foot .campaign-action-btn {
+  flex: 0 0 auto;
+  max-width: 62%;
+}
+.campaign-card-foot .campaign-action-btn .campaign-action-btn-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .campaign-card-people {
   display: flex;
   align-items: center;

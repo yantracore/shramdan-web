@@ -168,6 +168,9 @@ export function IssueVoteButton({
   className,
   onVoteChange,
   seed,
+  // Compact = card/thumbnail context: short committed labels (drops the
+  // "{role}का रूपमा" form) so a narrow card stays one line.
+  compact = false,
   support: controlledSupport
 }) {
   const ownSupport = useRoleSupport(issueId, {
@@ -192,18 +195,19 @@ export function IssueVoteButton({
     if (voterRole === "WANT_TO_LEAD") {
       label = t.doneLabels.WANT_TO_LEAD;
       roleColor = LEAD_COLOR;
-    } else if (voterRole === "GOING" && eventRole) {
-      label = t.committedAs.replace("{role}", t.eventRoles[eventRole] || eventRole);
-      roleColor = ROLE_COLORS[eventRole];
     } else if (voterRole === "GOING") {
-      label = t.doneLabels.GOING;
-      roleColor = ROLE_COLORS.WORKER;
+      roleColor = eventRole ? ROLE_COLORS[eventRole] : ROLE_COLORS.WORKER;
+      label =
+        eventRole && !compact
+          ? t.committedAs.replace("{role}", t.eventRoles[eventRole] || eventRole)
+          : t.doneLabels.GOING;
     } else {
       label = t.doneLabels.INTERESTED; // roleColor stays undefined → --primary tint
     }
   }
 
-  const handleClick = () => {
+  const handleClick = (e) => {
+    e?.stopPropagation?.();
     // Anonymous → the hook's interested path pushes to login; else open the modal.
     if (!support.isAuthenticated) {
       support.onInterested();

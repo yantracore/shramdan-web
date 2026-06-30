@@ -44,7 +44,7 @@ const ROLE_LABELS_EN = {
   LOGISTICS: "Logistics"
 };
 
-export function EventJoinButton({ eventId, seed, language = "np", size, status, eager = false }) {
+export function EventJoinButton({ eventId, seed, language = "np", size, status, eager = false, compact = false }) {
   const lang = language === "en" ? "en" : "np";
   const bc = BUTTON_COPY[lang];
 
@@ -69,7 +69,7 @@ export function EventJoinButton({ eventId, seed, language = "np", size, status, 
       label = lang === "np" ? "नेतृत्वमा" : "Leading";
       roleColor = LEAD_COLOR;
     } else {
-      label = bc.joinedAs(join.viewerRole);
+      label = compact ? (lang === "np" ? "जोडिनुभयो" : "Joined") : bc.joinedAs(join.viewerRole);
       roleColor = ROLE_COLORS[join.viewerRole] || undefined;
     }
   } else if (!join.hasOpenSlot) {
@@ -89,7 +89,10 @@ export function EventJoinButton({ eventId, seed, language = "np", size, status, 
         size={size === "large" ? "lg" : "sm"}
         loading={join.loading}
         language={lang}
-        onClick={join.openModal}
+        onClick={(e) => {
+          e?.stopPropagation?.();
+          join.openModal();
+        }}
       />
 
       <CampaignParticipationModal

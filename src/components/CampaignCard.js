@@ -19,12 +19,17 @@
 
 import Link from "next/link";
 import { IssueMapThumb } from "@/components/IssueMapThumb";
+import { IssueVoteButton } from "@/components/IssueVoteButton";
+import { IssueJoinButton } from "@/components/IssueJoinButton";
+import { EventJoinButton } from "@/components/EventJoinButton";
 import { getIssueCoverImageUrl, localizeIssue } from "@/lib/adminUtils";
 import {
   campaignStatusLabel,
   campaignVisualStatus,
   resolveCampaignStatus
 } from "@/lib/campaignStatus";
+import { issueActionMode } from "@/lib/issueActions";
+import { copy } from "@/lib/siteContent";
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 const FALLBACK_POSTER = "/images/event-types/cleanup.jpg";
@@ -246,6 +251,40 @@ export function CampaignCard({ campaign, language = "np", distanceKm = null }) {
   const hasCoords = Number.isFinite(c.latitude) && Number.isFinite(c.longitude);
   const countText = formatCount(c.count, c.countKind, language);
 
+  // Raw kind + data for the participation CTA (normalizeCampaign keeps only the
+  // display fields). Same kind detection as normalizeCampaign.
+  const wrapped =
+    campaign && typeof campaign === "object" && "data" in campaign && "kind" in campaign;
+  const kind = wrapped ? campaign.kind : campaign?.issue || campaign?.issueId ? "event" : "issue";
+  const data = wrapped ? campaign.data : campaign;
+
+  // Lazy, compact participation CTA opening the unified modal — issue →
+  // support/join, event → join. Rendered only where participation is open; on
+  // completed/closed campaigns the footer keeps the "View" link instead.
+  const issuesCopy = (copy[language] || copy.np).issues;
+  let cta = null;
+  if (kind === "issue") {
+    const mode = issueActionMode(data?.status);
+    if (mode === "support") {
+      cta = (
+        <IssueVoteButton
+          issueId={data.id}
+          seed={data}
+          content={issuesCopy}
+          language={language}
+          showCount={false}
+          compact
+        />
+      );
+    } else if (mode === "join") {
+      cta = <IssueJoinButton issue={data} language={language} compact />;
+    }
+  } else if (["DRAFT", "SCHEDULED", "ACTIVE"].includes(c.resolved)) {
+    cta = (
+      <EventJoinButton eventId={data.id} seed={data} status={visual} language={language} compact />
+    );
+  }
+
   return (
     <article className="campaign-card" data-status={visual}>
       <Link href={href} className="campaign-card-media" aria-label={accessibleLabel}>
@@ -294,10 +333,12 @@ export function CampaignCard({ campaign, language = "np", distanceKm = null }) {
               <span className="campaign-card-count">{countText}</span>
             </div>
           ) : null}
-          <Link href={href} className="campaign-card-cta">
-            <span>{ctaLabel}</span>
-            <ArrowGlyph />
-          </Link>
+          {cta || (
+            <Link href={href} className="campaign-card-cta">
+              <span>{ctaLabel}</span>
+              <ArrowGlyph />
+            </Link>
+          )}
         </div>
       </div>
     </article>
