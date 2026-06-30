@@ -39,20 +39,49 @@ export default function CampaignRail({
   const uid = rawId.replace(/[^a-zA-Z0-9]/g, "");
   const swiperRef = useRef(null);
 
-  // Browser back/forward restores this page from the bfcache: the frozen DOM is
-  // re-shown WITHOUT re-running JS, so Swiper never re-initializes and keeps the
-  // slide widths/spacing it measured before — which, if the layout changed (e.g.
-  // a scrollbar appeared/vanished between pages), shows as collapsed gaps and
-  // squished cards. `pageshow` fires on that restore (persisted=true); recompute
-  // then. (observer/observeParents below can't catch it — nothing mutates.)
+  // Why the rail used to lose its card spacing on every client-side RETURN to
+  // "/": SiteShell keys the page wrapper by pathname, so React REMOUNTS this rail
+  // and a fresh Swiper inits during a transient layout frame. Swiper bakes each
+  // slide's width + gap as INLINE styles from the container's clientWidth at init;
+  // if that read is wrong/0 (deferred data populate, dev Strict-Mode double-mount,
+  // or a scrollbar-gutter width delta between routes) the slides fall back to the
+  // base `width:100%` — one full-width card, no gaps — and it NEVER self-heals:
+  // Swiper's own ResizeObserver only fires on a width *change*, observer/
+  // observeParents only on DOM *mutations*, and `pageshow` only on bfcache. So we
+  // re-measure explicitly. (scrollbar-gutter is also pinned stable in
+  // scrollbars.css to remove the width delta at its source.)
   useEffect(() => {
+    const s = swiperRef.current;
+    if (!s || s.destroyed) return undefined;
+
     const refresh = () => {
-      const s = swiperRef.current;
-      if (s && !s.destroyed) s.update();
+      const inst = swiperRef.current;
+      if (inst && !inst.destroyed) inst.update();
     };
+
+    // 1) Re-measure after the heavy home layout (map, fonts, images) settles.
+    let raf2 = 0;
+    const raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(refresh);
+    });
+
+    // 2) update() on ANY box change of the rail element — including the 0->N
+    //    first settle and scrollbar-gutter delta that Swiper's width-change-
+    //    guarded observer skips. observe() also fires the callback once now.
+    const ro = new ResizeObserver(refresh);
+    if (s.el) ro.observe(s.el);
+
+    // 3) Keep the bfcache hard back/forward path.
     window.addEventListener("pageshow", refresh);
-    return () => window.removeEventListener("pageshow", refresh);
-  }, []);
+
+    return () => {
+      cancelAnimationFrame(raf1);
+      cancelAnimationFrame(raf2);
+      ro.disconnect();
+      window.removeEventListener("pageshow", refresh);
+    };
+    // Re-run when the slide set changes so a late data populate re-measures.
+  }, [items]);
 
   if (!items || items.length === 0) return null;
 
@@ -87,6 +116,9 @@ export default function CampaignRail({
         </button>
 
         <Swiper
+          // Remount cleanly if the slide count changes (e.g. a late data
+          // populate) so a wrongly-sized instance can't linger.
+          key={items.length}
           modules={[Navigation, Keyboard, A11y]}
           navigation={{ prevEl: `.${prevClass}`, nextEl: `.${nextClass}` }}
           keyboard={{ enabled: true }}

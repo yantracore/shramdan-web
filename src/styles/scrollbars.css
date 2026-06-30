@@ -100,6 +100,21 @@
 }
 
 /* ---------------------------------------------------------------------- */
+/* Reserve the page scrollbar gutter ALWAYS.                              */
+/* The custom bar above takes real layout space (10px, not an overlay),   */
+/* so it appears/disappears with page overflow — which means the viewport */
+/* width DIFFERS between a tall page (bar shown) and a short one (no bar). */
+/* Navigating away and back to "/" could therefore re-init the home       */
+/* carousels' Swiper at a 10px-different container width, baking wrong     */
+/* slide widths and collapsing the card spacing. Pinning the gutter keeps  */
+/* the content width identical across every route. (Invisible to Playwright */
+/* automation, which uses overlay scrollbars — hence it never reproduced.) */
+/* ---------------------------------------------------------------------- */
+html {
+  scrollbar-gutter: stable;
+}
+
+/* ---------------------------------------------------------------------- */
 /* Firefox — single color pair. No gradient, no per-element hover.        */
 /* ---------------------------------------------------------------------- */
 * {

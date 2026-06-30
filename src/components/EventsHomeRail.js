@@ -203,17 +203,38 @@ export function EventsHomeRail({
     setActiveIndex(swiper.realIndex);
   };
 
-  // Browser back/forward restores this page from the bfcache without re-running
-  // JS, so Swiper keeps stale coverflow geometry / slide sizing. `pageshow`
-  // fires on that restore; recompute then.
+  // SiteShell remounts this rail on every client-side return to "/", so a fresh
+  // Swiper inits during a transient layout frame and can bake stale coverflow
+  // geometry / slide sizing that never self-heals (Swiper's observer only fires
+  // on a width *change*; pageshow only on bfcache). Re-measure after layout
+  // settles, on any box change, and on bfcache restore. Keyed on item count so a
+  // late data populate re-runs it.
   useEffect(() => {
     const refresh = () => {
-      const s = swiperRef.current;
-      if (s && !s.destroyed) s.update();
+      const inst = swiperRef.current;
+      if (inst && !inst.destroyed) inst.update();
     };
+
+    let raf2 = 0;
+    const raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(refresh);
+    });
+
+    let ro;
+    const s = swiperRef.current;
+    if (s && !s.destroyed && s.el) {
+      ro = new ResizeObserver(refresh);
+      ro.observe(s.el);
+    }
+
     window.addEventListener("pageshow", refresh);
-    return () => window.removeEventListener("pageshow", refresh);
-  }, []);
+    return () => {
+      cancelAnimationFrame(raf1);
+      cancelAnimationFrame(raf2);
+      if (ro) ro.disconnect();
+      window.removeEventListener("pageshow", refresh);
+    };
+  }, [items.length]);
 
   return (
     <section
