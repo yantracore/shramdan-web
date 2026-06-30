@@ -28,6 +28,7 @@ import { usePreferences } from "@/app/providers";
 import { getJson } from "@/lib/apiClient";
 import { copy } from "@/lib/siteContent";
 import { ISSUE_CATEGORIES, getListItems, localizeIssue } from "@/lib/adminUtils";
+import { categoryOptionLabel } from "@/lib/categoryIcons";
 
 const PUBLIC_ISSUE_STATUSES = ["OPEN", "EVENT_SCHEDULED", "COMPLETED"];
 // Server-supported sorts: voteCount, createdAt (no direction param).
@@ -523,7 +524,7 @@ export default function IssuesListPageContent() {
   }));
   const categoryOptions = ISSUE_CATEGORIES.map((value) => ({
     value,
-    label: content.categoryLabels[value] || value
+    label: categoryOptionLabel(value, content.categoryLabels[value] || value)
   }));
   const sortOptions = SORT_OPTIONS.map((option) => ({
     value: option.value,

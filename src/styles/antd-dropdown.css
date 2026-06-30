@@ -357,3 +357,26 @@
 .campaign-filter-opt[data-status="scheduled"] .campaign-filter-dot { background: var(--state-scheduled); }
 .campaign-filter-opt[data-status="active"] .campaign-filter-dot { background: var(--state-active); }
 .campaign-filter-opt[data-status="completed"] .campaign-filter-dot { background: var(--state-completed); }
+
+/* ============================================================
+ * Category Select — a leading type icon per option (road, river, park,
+ * trail…), so issue/event/campaign category dropdowns and the report form
+ * read at a glance. Same node-label pattern as the campaign status dot above.
+ * The icon shows both in the open row and, once chosen, in the closed trigger.
+ * ============================================================ */
+.category-opt {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.category-opt-icon {
+  flex: 0 0 auto;
+  font-size: 1.05em;
+  color: var(--primary);
+}
+.category-opt-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

@@ -29,6 +29,7 @@ import { PAGE_COPY as EVENTS_COPY } from "@/app/events/EventsListClient";
 import { usePreferences } from "@/app/providers";
 import { copy } from "@/lib/siteContent";
 import { ISSUE_CATEGORIES, localizeIssue } from "@/lib/adminUtils";
+import { categoryOptionLabel } from "@/lib/categoryIcons";
 import { useCampaignFeed } from "@/lib/useCampaignFeed";
 import { useCampaignCounts } from "@/lib/useCampaignCounts";
 import {
@@ -695,7 +696,7 @@ export default function CampaignsListPageContent({ status: statusProp = "all" })
   );
   const categoryOptions = ISSUE_CATEGORIES.map((value) => ({
     value,
-    label: issuesCopy.categoryLabels?.[value] || value
+    label: categoryOptionLabel(value, issuesCopy.categoryLabels?.[value] || value)
   }));
   const reportIssueCtaLabel =
     (copy[language] || copy.np)?.issueNew?.cta?.list ?? "Report New Issue";

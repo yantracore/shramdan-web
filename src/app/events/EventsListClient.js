@@ -17,6 +17,7 @@ import { listAllEvents } from "@/lib/eventsApi";
 import { haversineKm } from "@/lib/haversine";
 import { useGeolocation } from "@/lib/useGeolocation";
 import { ISSUE_CATEGORIES } from "@/lib/adminUtils";
+import { categoryOptionLabel } from "@/lib/categoryIcons";
 
 // Exported so the unified /campaigns surface can reuse the exact event-card and
 // event-preview wording without duplicating it. (/events itself redirects to
@@ -613,7 +614,7 @@ export default function EventsListPageContent() {
   ];
   const categoryOptions = ISSUE_CATEGORIES.map((value) => ({
     value,
-    label: t.categoryLabels?.[value] || value
+    label: categoryOptionLabel(value, t.categoryLabels?.[value] || value)
   }));
   const sortOptions = SORT_OPTIONS.map((option) => ({
     value: option.value,

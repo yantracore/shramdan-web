@@ -23,6 +23,7 @@ import {
   ISSUE_PICKER_FIELDS,
   ISSUE_PICKER_FIELD_MAP
 } from "@/lib/adminUtils";
+import { categoryOptionLabel } from "@/lib/categoryIcons";
 import { useStepFormErrors } from "@/hooks/useStepFormErrors";
 import { ISSUE_TEXT_LIMITS, buildIssueTextRules } from "@/lib/issueFormValidation";
 import { getAuthSession } from "@/lib/authSession";
@@ -275,7 +276,11 @@ export default function NewIssuePage() {
   };
 
   const categoryOptions = useMemo(
-    () => ISSUE_CATEGORIES.map((value) => ({ value, label: labels.categories[value] ?? value })),
+    () =>
+      ISSUE_CATEGORIES.map((value) => ({
+        value,
+        label: categoryOptionLabel(value, labels.categories[value] ?? value)
+      })),
     [labels.categories]
   );
 

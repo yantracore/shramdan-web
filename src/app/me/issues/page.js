@@ -41,6 +41,7 @@ import {
   getListItems,
   localizeIssue
 } from "@/lib/adminUtils";
+import { categoryOptionLabel } from "@/lib/categoryIcons";
 import { copy } from "@/lib/siteContent";
 import { useAdminListResource } from "@/hooks/useAdminListResource";
 import { getAuthSession, subscribeAuthSession } from "@/lib/authSession";
@@ -176,7 +177,11 @@ export default function MeIssuesPage() {
     [language]
   );
   const categoryOptions = useMemo(
-    () => ISSUE_CATEGORIES.map((value) => ({ value, label: categoryLabel(value) })),
+    () =>
+      ISSUE_CATEGORIES.map((value) => ({
+        value,
+        label: categoryOptionLabel(value, categoryLabel(value))
+      })),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [language]
   );
