@@ -89,6 +89,8 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
   const [publicCounts, setPublicCounts] = useState(null);
   const [quoteIndex, setQuoteIndex] = useState(0);
   const pathname = usePathname();
+  const campaignsSection =
+    pathname === "/campaigns" || pathname.startsWith("/campaigns/");
   const router = useRouter();
   const mobileMenuRef = useRef(null);
   const lastScrollYRef = useRef(0);
@@ -672,7 +674,14 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
       ) : null}
 
       <div id="main-content" tabIndex={-1}>
-        <div key={pathname} className="page-transition">
+        {/*
+          The transition key remounts the page to replay the enter animation on
+          every route change. The campaigns surface, though, switches lifecycle
+          stages by path (/campaigns/<slug>); those are sub-sections of ONE page,
+          so they share a single key — the chrome stays mounted (no blink) and
+          only the list body updates. Every other route keeps its own key.
+        */}
+        <div key={campaignsSection ? "/campaigns" : pathname} className="page-transition">
           {children}
         </div>
       </div>

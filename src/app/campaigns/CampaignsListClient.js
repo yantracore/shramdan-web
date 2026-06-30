@@ -14,7 +14,7 @@
 import { CloseOutlined, LoadingOutlined, PlusOutlined, ReloadOutlined, SearchOutlined } from "@ant-design/icons";
 import { Button, Empty, Pagination, Segmented, Select, Skeleton } from "antd";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ProvinceDistrictFilter } from "@/components/ProvinceDistrictFilter";
 import { PublicSearchBar } from "@/components/PublicSearchBar";
@@ -33,6 +33,7 @@ import { useCampaignFeed } from "@/lib/useCampaignFeed";
 import { useCampaignCounts } from "@/lib/useCampaignCounts";
 import {
   CAMPAIGN_STATUS_SEQUENCE,
+  campaignSlugToStatus,
   campaignStatusLabel,
   campaignStatusPath,
   campaignVisualStatus
@@ -184,7 +185,7 @@ function StatusChip({ text, count, loading, language, status }) {
   );
 }
 
-export default function CampaignsListPageContent({ status: routeStatus = "all" }) {
+export default function CampaignsListPageContent({ status: statusProp = "all" }) {
   const { language } = usePreferences();
   const t = PAGE_COPY[language] || PAGE_COPY.np;
   const issuesCopy = (copy[language] || copy.np).issues;
@@ -192,7 +193,20 @@ export default function CampaignsListPageContent({ status: routeStatus = "all" }
   const homeSearch = (copy[language] || copy.np).homeSearch || {};
 
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
+
+  // The active stage is read from the PATH, reactively. A chip click updates the
+  // URL with window.history (shallow) rather than a route navigation, so the
+  // page never unmounts/remounts — the chrome above the list stays put instead
+  // of blinking — while usePathname still flips this value and the feed
+  // refetches. Falls back to the SSR-provided prop only if pathname is absent.
+  const routeStatus = useMemo(() => {
+    if (!pathname) return statusProp;
+    const seg = pathname.split("/")[2];
+    if (!seg) return "all";
+    return campaignSlugToStatus(seg) || "all";
+  }, [pathname, statusProp]);
 
   // Snapshot of the last list state, captured ONCE at first client render —
   // before any persistence effect below can overwrite it — so restoration is
@@ -269,6 +283,18 @@ export default function CampaignsListPageContent({ status: routeStatus = "all" }
   // active status section is preserved.
   const basePath = useMemo(() => campaignStatusPath(routeStatus), [routeStatus]);
 
+  // All in-page URL writes go through window.history, NOT the Next router — a
+  // router navigation would remount this page (SiteShell + chrome live inside
+  // it) and blink. Next still mirrors history into usePathname/useSearchParams,
+  // so every sync effect keeps working. Keeping status and the secondary
+  // filters on the same mechanism also avoids a router/history desync (a stale
+  // router URL turning a query tweak into a perceived path change → remount).
+  const writeUrl = useCallback((url, push = false) => {
+    if (typeof window === "undefined") return;
+    if (push) window.history.pushState(null, "", url);
+    else window.history.replaceState(null, "", url);
+  }, []);
+
   const handleViewChange = useCallback(
     (nextView) => {
       setView(nextView);
@@ -282,11 +308,9 @@ export default function CampaignsListPageContent({ status: routeStatus = "all" }
       // outside the grid.
       params.delete("page");
       const query = params.toString();
-      router.replace(query ? `${basePath}?${query}` : basePath, {
-        scroll: false
-      });
+      writeUrl(query ? `${basePath}?${query}` : basePath);
     },
-    [router, searchParams, basePath]
+    [writeUrl, searchParams, basePath]
   );
 
   // ----- thumbnails pagination (URL-synced via ?page=) -------------------
@@ -307,11 +331,9 @@ export default function CampaignsListPageContent({ status: routeStatus = "all" }
       if (nextPage > 1) params.set("page", String(nextPage));
       else params.delete("page");
       const query = params.toString();
-      router.replace(query ? `${basePath}?${query}` : basePath, {
-        scroll: false
-      });
+      writeUrl(query ? `${basePath}?${query}` : basePath);
     },
-    [router, searchParams, basePath]
+    [writeUrl, searchParams, basePath]
   );
 
   // Secondary-filter change (category / province / district / q). Status is
@@ -330,19 +352,21 @@ export default function CampaignsListPageContent({ status: routeStatus = "all" }
       if (next.q) params.set("q", next.q);
       else params.delete("q");
       const query = params.toString();
-      router.replace(query ? `${basePath}?${query}` : basePath, {
-        scroll: false
-      });
+      writeUrl(query ? `${basePath}?${query}` : basePath);
     },
-    [router, searchParams, basePath]
+    [writeUrl, searchParams, basePath]
   );
 
-  // Status change = a section change = a PATH change. Carry the secondary
-  // filters over as query, but drop the grid page index (meaningless across a
-  // different feed). We navigate and let the route's `status` prop flow back in
-  // — no local setFilters, so the section is fetched exactly once.
+  // Status change = a section change = a PATH change, but performed SHALLOWLY
+  // with window.history rather than the Next router. SiteShell (which holds the
+  // page-transition wrapper + the whole chrome) is rendered INSIDE this page, so
+  // a real route navigation would remount it and blink. A shallow URL update
+  // keeps the page mounted; usePathname still flips `routeStatus` so the feed
+  // refetches, and SiteShell's now-stable /campaigns key avoids re-keying.
+  // pushState (not replace) so browser back/forward steps through the stages.
   const goToStatus = useCallback(
     (nextStatus) => {
+      if (nextStatus === routeStatus) return;
       const params = new URLSearchParams();
       if (filters.category) params.set("category", filters.category);
       if (filters.provinceId) params.set("province", filters.provinceId);
@@ -352,9 +376,9 @@ export default function CampaignsListPageContent({ status: routeStatus = "all" }
       if (v === "map" || v === "thumbnails") params.set("view", v);
       const query = params.toString();
       const path = campaignStatusPath(nextStatus);
-      router.replace(query ? `${path}?${query}` : path, { scroll: false });
+      writeUrl(query ? `${path}?${query}` : path, true);
     },
-    [router, searchParams, filters]
+    [writeUrl, routeStatus, searchParams, filters]
   );
 
   const setFilter = useCallback(
