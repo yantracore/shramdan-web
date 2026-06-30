@@ -1,0 +1,135 @@
+/* src/styles/campaign-rail.css
+ * Homepage discovery rails — flat, Netflix-style horizontal carousels.
+ * Paired with CampaignRail.js / HomeDiscoveryRails.js. */
+
+.home-discovery-rails {
+  display: grid;
+  gap: clamp(28px, 4vw, 48px);
+}
+
+.campaign-rail {
+  display: grid;
+  gap: 16px;
+}
+
+.campaign-rail-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px 16px;
+}
+
+.campaign-rail-heading {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.campaign-rail-header h2 {
+  margin: 0;
+  font-size: clamp(20px, 2.1vw, 30px);
+  line-height: 1.18;
+  color: var(--primary-dark);
+}
+
+.campaign-rail-eyebrow {
+  color: color-mix(in srgb, var(--primary-dark) 70%, transparent);
+}
+
+.campaign-rail-viewall {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border: 1px solid color-mix(in srgb, var(--line) 60%, transparent);
+  border-radius: 999px;
+  color: var(--primary-dark);
+  font-weight: 700;
+  font-size: 14px;
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+.campaign-rail-viewall:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--primary) 40%, var(--line));
+}
+
+.campaign-rail-viewport {
+  position: relative;
+}
+
+/* Edge fade: cards "vanish" at the left/right boundaries. */
+.campaign-rail-swiper {
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent 0,
+    #000 28px,
+    #000 calc(100% - 28px),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0,
+    #000 28px,
+    #000 calc(100% - 28px),
+    transparent 100%
+  );
+  padding-block: 4px;
+}
+
+.campaign-rail-slide {
+  height: auto;
+  display: flex;
+}
+
+.campaign-rail-slide > * {
+  width: 100%;
+}
+
+.campaign-rail-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+  border-radius: 999px;
+  color: var(--primary-dark);
+  background: color-mix(in srgb, var(--surface) 86%, transparent);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+  transition: background 160ms ease, transform 160ms ease, opacity 160ms ease;
+}
+
+.campaign-rail-arrow--prev {
+  left: -6px;
+}
+.campaign-rail-arrow--next {
+  right: -6px;
+}
+
+.campaign-rail-arrow:hover {
+  background: var(--surface);
+}
+
+/* Swiper toggles this class on the nav buttons when there is nowhere to go. */
+.campaign-rail-arrow.swiper-button-disabled {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (max-width: 640px) {
+  .campaign-rail-arrow {
+    display: none;
+  }
+}
