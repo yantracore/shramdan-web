@@ -3,8 +3,17 @@
  * Paired with CampaignRail.js / HomeDiscoveryRails.js. */
 
 .home-discovery-rails {
+  width: min(100%, 1280px);
+  margin: 32px auto 48px;
+  padding: 0 32px;
   display: grid;
   gap: clamp(28px, 4vw, 48px);
+}
+
+@media (max-width: 640px) {
+  .home-discovery-rails {
+    padding: 0 18px;
+  }
 }
 
 .campaign-rail {

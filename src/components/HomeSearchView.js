@@ -19,7 +19,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ActivityStatsRow } from "@/components/ActivityStatsRow";
 import EventMapBlock from "@/components/EventMapBlock";
 import { EventsHomeRail } from "@/components/EventsHomeRail";
-import { StreamList } from "@/components/StreamList";
+import HomeDiscoveryRails from "@/components/HomeDiscoveryRails";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
 import { listAllEvents } from "@/lib/eventsApi";
@@ -174,13 +174,8 @@ export default function HomeSearchView() {
         </div>
       </section>
 
-      {/* Events live in the coverflow rail above; this stream lists issues only. */}
-      <StreamList
-        language={language}
-        copy={search.forYou}
-        defaultMode="issue"
-        showModeTabs={false}
-      />
+      {/* Intent-grouped discovery rails (near / happening / support / impact). */}
+      <HomeDiscoveryRails language={language} />
     </SiteShell>
   );
 }
