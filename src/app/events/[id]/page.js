@@ -41,7 +41,6 @@ import {
 import { useEventJoin } from "@/lib/useEventJoin";
 import { getAuthSession, subscribeAuthSession } from "@/lib/authSession";
 import { copy } from "@/lib/siteContent";
-import { discussionPresenceForEvent } from "@/lib/discussionsStub";
 import { useTrackVisit } from "@/lib/useRecentlyViewed";
 import {
   formatEnum,
@@ -114,24 +113,6 @@ export default function EventDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [notFound, setNotFound] = useState(false);
-  const [discussionPresence, setDiscussionPresence] = useState(null);
-
-  useEffect(() => {
-    if (!eventId) return;
-    let cancelled = false;
-    (async () => {
-      try {
-        const presence = await discussionPresenceForEvent(eventId);
-        if (cancelled) return;
-        setDiscussionPresence(presence);
-      } catch (err) {
-        console.error("Failed to load discussion presence:", err);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [eventId]);
 
   const fetchEvent = useCallback(async () => {
     if (!eventId) return;
@@ -690,44 +671,9 @@ export default function EventDetailPage() {
                   </section>
                 ) : null}
 
-                {/* ZONE 5 — DISCUSSION & NAVIGATION */}
-                {discussionPresence ? (
-                  <div className="event-detail-discussion-presence" style={{
-                    marginBottom: "16px",
-                    padding: "16px",
-                    borderRadius: "12px",
-                    background: "color-mix(in srgb, var(--surface) 96%, transparent)",
-                    border: "1px solid color-mix(in srgb, var(--line) 60%, transparent)",
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "6px"
-                  }}>
-                    <div style={{ fontWeight: "700", fontSize: "14px", color: "var(--text)" }}>
-                      {language === "np" ? "सम्बन्धित छलफल" : "Related Discussion"}
-                    </div>
-                    <div style={{ fontSize: "13px", color: "var(--muted)" }}>
-                      <span>
-                        {language === "np"
-                          ? `${localizeDigits(discussionPresence.activeMessageCount, language)} मानिसहरू छलफलमा छन्`
-                          : `${discussionPresence.activeMessageCount} people discussing`}
-                      </span>
-                      <span> • </span>
-                      <span>
-                        {language === "np"
-                          ? `अन्तिम सक्रियता: ${new Date(discussionPresence.lastActivityAt).toLocaleDateString("ne-NP")}`
-                          : `Last active: ${new Date(discussionPresence.lastActivityAt).toLocaleDateString()}`}
-                      </span>
-                    </div>
-                    <div>
-                      <Link href={`/discussions/${discussionPresence.topicSlug}`}>
-                        <Button type="link" style={{ padding: 0 }}>
-                          {language === "np" ? "मुख्य छलफलमा सामेल हुने" : "Join the main discussion"} &rarr;
-                        </Button>
-                      </Link>
-                    </div>
-                  </div>
-                ) : null}
-
+                {/* ZONE 5 — COMMENTS & NAVIGATION
+                    (Standalone /discussions wiring removed — feature deferred to
+                    v2; see docs/api-requirements/00-OUTSTANDING.md.) */}
                 <CommentSection
                   targetType="event"
                   targetId={eventData.id}

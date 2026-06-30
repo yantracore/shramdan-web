@@ -42,8 +42,7 @@ const copy = {
             body:
               "अनुदान प्रत्येक परियोजनासँग जोडिएको छ। हरेक रुपैयाँ — आउनेमा, जानेमा — सार्वजनिक खातामा देखिन्छ।",
             image: "/images/demo-events/hetauda-trees.jpg",
-            imageAlt: "वृक्षारोपणका लागि बिरुवा बोकेका सहभागीहरू",
-            link: { href: "/ledger", label: "पारदर्शी खाता हेर्ने" }
+            imageAlt: "वृक्षारोपणका लागि बिरुवा बोकेका सहभागीहरू"
           },
           {
             id: "no-owner",
@@ -91,8 +90,7 @@ const copy = {
             body:
               "Donations are project-tied. Every rupee — in and out — lands on the public ledger.",
             image: "/images/demo-events/hetauda-trees.jpg",
-            imageAlt: "Tree-planting participants carrying saplings",
-            link: { href: "/ledger", label: "View the public ledger" }
+            imageAlt: "Tree-planting participants carrying saplings"
           },
           {
             id: "no-owner",
