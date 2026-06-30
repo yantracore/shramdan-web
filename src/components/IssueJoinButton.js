@@ -11,7 +11,7 @@
 //   CANCELLED        → disabled "Cancelled" chip
 //   (no event id)    → an honest "almost ready" cue instead of a dead button.
 
-import { StopOutlined, UserAddOutlined } from "@ant-design/icons";
+import { StopOutlined, TeamOutlined, UserAddOutlined } from "@ant-design/icons";
 import { CampaignActionButton } from "@/components/CampaignActionButton";
 import { CampaignParticipationModal } from "@/components/CampaignParticipationModal";
 import { ROLE_COLORS, LEAD_COLOR } from "@/components/ParticipantsPanel";
@@ -167,7 +167,7 @@ export function IssueJoinButton({
   } else if (!join.hasOpenSlot) {
     mode = "full";
     label = language === "np" ? "सबै भरियो" : "Full";
-    icon = null;
+    icon = <TeamOutlined />;
   }
 
   return (

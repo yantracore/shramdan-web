@@ -5,7 +5,7 @@
 // same lazy-load → ParticipantsPanel pattern is reused without duplicating API
 // logic. No "I'm interested" header — events have no INTERESTED concept.
 
-import { UserAddOutlined } from "@ant-design/icons";
+import { TeamOutlined, UserAddOutlined } from "@ant-design/icons";
 import { CampaignActionButton } from "@/components/CampaignActionButton";
 import { CampaignParticipationModal } from "@/components/CampaignParticipationModal";
 import { ROLE_COLORS, LEAD_COLOR } from "@/components/ParticipantsPanel";
@@ -75,7 +75,7 @@ export function EventJoinButton({ eventId, seed, language = "np", size, status, 
   } else if (!join.hasOpenSlot) {
     mode = "full";
     label = lang === "np" ? "सबै भरियो" : "Full";
-    icon = null;
+    icon = <TeamOutlined />;
   }
 
   return (
