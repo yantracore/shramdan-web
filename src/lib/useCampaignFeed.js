@@ -17,52 +17,28 @@
 // no dedup is needed.
 
 import { useCallback, useEffect, useState } from "react";
-import { fetchMyIssueVotes, getJson } from "@/lib/apiClient";
-import { getAuthSession } from "@/lib/authSession";
+import { getJson } from "@/lib/apiClient";
 import { getListItems } from "@/lib/adminUtils";
 import { listEventsByStatus } from "@/lib/eventsApi";
 import { CAMPAIGN_STATUS_SEQUENCE } from "@/lib/campaignStatus";
 
 const ISSUE_LIMIT = 50;
 
-// One lightweight, page-wide round-trip recovering the viewer's stored vote
-// intent across every OPEN issue. The list read (GET /issues) carries `isVoted`
-// but NOT `voterRole`/`eventRole` (a documented backend gap — see
-// docs/api-requirements/issues.md), so a refreshed card knows it was voted yet
-// can't tell Supported from Joined/Leading and falls back to "Supported". This
-// map lets us decorate each issue with its role so the card renders the right
-// label WITHOUT opening the modal. Anonymous viewers skip it entirely. Once the
-// list echoes voterRole/eventRole per-viewer this whole call can be dropped.
-async function fetchMyVotesMap() {
-  if (!getAuthSession()?.user) return null;
-  try {
-    const res = await fetchMyIssueVotes({ limit: 100 });
-    const map = new Map();
-    for (const vote of getListItems(res)) {
-      map.set(String(vote.id), {
-        voterRole: vote.voterRole || "INTERESTED",
-        eventRole: vote.eventRole || null
-      });
-    }
-    return map;
-  } catch {
-    return null;
-  }
-}
-
-async function fetchOpenIssues({ provinceId, districtId, votesMap }) {
+async function fetchOpenIssues({ provinceId, districtId }) {
   const response = await getJson("/issues", {
     params: { status: "OPEN", provinceId, districtId, limit: ISSUE_LIMIT }
   });
-  const entries = getListItems(response).map((issue) => {
-    const mine = votesMap?.get(String(issue.id));
-    // Decorate with the viewer's resolved role so the card's CTA reads the true
-    // commitment (Supported / Joined / Leading) on first paint.
-    const data = mine
-      ? { ...issue, isVoted: true, voterRole: mine.voterRole, eventRole: mine.eventRole }
-      : issue;
-    return { kind: "issue", status: "OPEN", id: issue.id, data };
-  });
+  // The list read (GET /issues) now echoes the viewer's own `isVoted` +
+  // `voterRole` + `eventRole` per item (shipped 2026-06-30), so each card reads
+  // the true commitment (Supported / Joined / Leading) on first paint with no
+  // extra round-trip. (Anonymous viewers simply get no such fields.) The old
+  // page-wide GET /issues/me/votes decoration was dropped here.
+  const entries = getListItems(response).map((issue) => ({
+    kind: "issue",
+    status: "OPEN",
+    id: issue.id,
+    data: issue
+  }));
   // Most-supported first.
   return entries.sort(
     (a, b) => (b.data.voteCount || 0) - (a.data.voteCount || 0)
@@ -96,10 +72,7 @@ export function useCampaignFeed({ status, language, provinceId, districtId }) {
   const [error, setError] = useState("");
 
   const load = useCallback(async () => {
-    // Resolve the viewer's vote roles once up front, then hand the map to every
-    // stage fetch (only fetchOpenIssues consumes it). null for anon viewers.
-    const votesMap = await fetchMyVotesMap();
-    const opts = { language, provinceId, districtId, votesMap };
+    const opts = { language, provinceId, districtId };
     const wanted =
       !status || status === "all" ? CAMPAIGN_STATUS_SEQUENCE : [status];
     // Settle each stage independently: a single failing endpoint contributes
