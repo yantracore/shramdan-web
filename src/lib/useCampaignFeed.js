@@ -24,9 +24,17 @@ import { CAMPAIGN_STATUS_SEQUENCE } from "@/lib/campaignStatus";
 
 const ISSUE_LIMIT = 50;
 
-async function fetchOpenIssues({ provinceId, districtId }) {
+async function fetchOpenIssues({ provinceId, districtId, category, search }) {
   const response = await getJson("/issues", {
-    params: { status: "OPEN", provinceId, districtId, limit: ISSUE_LIMIT }
+    params: {
+      status: "OPEN",
+      provinceId,
+      districtId,
+      // Backend-side filtering — GET /issues accepts `category` + `search`.
+      ...(category ? { category } : {}),
+      ...(search ? { search } : {}),
+      limit: ISSUE_LIMIT
+    }
   });
   // The list read (GET /issues) now echoes the viewer's own `isVoted` +
   // `voterRole` + `eventRole` per item (shipped 2026-06-30), so each card reads
@@ -66,13 +74,15 @@ async function fetchStatus(status, opts) {
   return entries;
 }
 
-export function useCampaignFeed({ status, language, provinceId, districtId }) {
+export function useCampaignFeed({ status, language, provinceId, districtId, category, q }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   const load = useCallback(async () => {
-    const opts = { language, provinceId, districtId };
+    // All filtering is server-side: category + search (q) are forwarded to both
+    // /issues (OPEN) and /events (other stages). No client-side narrowing.
+    const opts = { language, provinceId, districtId, category, search: q };
     const wanted =
       !status || status === "all" ? CAMPAIGN_STATUS_SEQUENCE : [status];
     // Settle each stage independently: a single failing endpoint contributes
@@ -88,7 +98,7 @@ export function useCampaignFeed({ status, language, provinceId, districtId }) {
       else anyError = true;
     });
     return { merged, anyError };
-  }, [status, language, provinceId, districtId]);
+  }, [status, language, provinceId, districtId, category, q]);
 
   useEffect(() => {
     let cancelled = false;

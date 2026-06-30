@@ -169,13 +169,17 @@ async function enrichEventsWithIssueCovers(events) {
 const DEFAULT_LIMIT = 50;
 
 // Raw list — single status filter.
-async function fetchEvents({ status, limit = DEFAULT_LIMIT, fromDate, toDate, provinceId, districtId, language = "np" } = {}) {
+async function fetchEvents({ status, limit = DEFAULT_LIMIT, fromDate, toDate, provinceId, districtId, category, search, language = "np" } = {}) {
   const params = { limit };
   if (status) params.status = status;
   if (fromDate) params.fromDate = fromDate;
   if (toDate) params.toDate = toDate;
   if (provinceId) params.provinceId = provinceId;
   if (districtId) params.districtId = districtId;
+  // Backend-side filtering — GET /events accepts `category` + `search` (the
+  // event inherits the linked issue's category). No client-side narrowing.
+  if (category) params.category = category;
+  if (search) params.search = search;
   const response = await getJson("/events", { params });
   const events = getListItems(response).map((ev) => normalizeEvent(ev, language));
   return enrichEventsWithIssueCovers(events);
@@ -235,8 +239,8 @@ export async function listDraftEvents({ language = "np", limit = DEFAULT_LIMIT, 
 // event status. Unlike listLive/Upcoming/PastEvents it does NO client-side date
 // re-bucketing — the status the user filters by IS the status fetched. This
 // keeps the feed and the chip-row counts in lock-step.
-export async function listEventsByStatus(status, { language = "np", limit = DEFAULT_LIMIT, provinceId, districtId } = {}) {
-  return fetchEvents({ status, limit, language, provinceId, districtId });
+export async function listEventsByStatus(status, { language = "np", limit = DEFAULT_LIMIT, provinceId, districtId, category, search } = {}) {
+  return fetchEvents({ status, limit, language, provinceId, districtId, category, search });
 }
 
 // All lifecycle buckets in parallel — handy for /campaigns + /calendar. Keys use

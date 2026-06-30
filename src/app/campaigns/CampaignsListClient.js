@@ -143,23 +143,6 @@ const PAGE_COPY = {
   }
 };
 
-// A readable title + address for client-side text search, per item kind.
-function itemSearchText(entry, language) {
-  if (entry.kind === "issue") {
-    const localized = localizeIssue(entry.data, language);
-    return {
-      title: (localized.title || "").toLowerCase(),
-      addr: (entry.data.addressText || "").toLowerCase(),
-      desc: (localized.description || "").toLowerCase()
-    };
-  }
-  return {
-    title: (entry.data.title || "").toLowerCase(),
-    addr: (entry.data.addressText || "").toLowerCase(),
-    desc: ""
-  };
-}
-
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 function localizeDigits(value, language) {
   const str = String(value ?? "");
@@ -246,6 +229,7 @@ export default function CampaignsListPageContent({ status: statusProp = "all" })
 
   useEffect(() => {
     const next = readFiltersFromUrl();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setFilters((prev) =>
       prev.status === next.status &&
       prev.category === next.category &&
@@ -445,40 +429,31 @@ export default function CampaignsListPageContent({ status: statusProp = "all" })
     status: filters.status,
     language,
     provinceId: filters.provinceId,
-    districtId: filters.districtId
+    districtId: filters.districtId,
+    category: filters.category,
+    q: filters.q
   });
 
   // Per-stage counts for the chip badges — always all five, independent of the
-  // active filter (so every badge can show a number, not just the selected one).
+  // active status (so every badge shows a number). They honor the SAME
+  // secondary filters as the feed (category + search), so a badge always
+  // matches the size of the list clicking it would produce.
   const { counts, total, loading: countsLoading } = useCampaignCounts({
     provinceId: filters.provinceId,
-    districtId: filters.districtId
+    districtId: filters.districtId,
+    category: filters.category,
+    q: filters.q
   });
 
-  // Client-side category + text narrowing over the merged feed (the feed is
-  // already in lifecycle order).
-  const filteredItems = useMemo(() => {
-    let list = items;
-    if (filters.category) {
-      list = list.filter((entry) => entry.data.category === filters.category);
-    }
-    const needle = filters.q?.trim().toLowerCase();
-    if (needle) {
-      list = list.filter((entry) => {
-        const { title, addr, desc } = itemSearchText(entry, language);
-        return (
-          title.includes(needle) ||
-          addr.includes(needle) ||
-          desc.includes(needle)
-        );
-      });
-    }
-    return list;
-  }, [items, filters.category, filters.q, language]);
+  // No client-side narrowing: category + text search are applied server-side by
+  // useCampaignFeed (forwarded to /issues + /events). The feed already arrives
+  // filtered and in lifecycle order, so the list and the chip counts agree.
+  const filteredItems = items;
 
   // ----- visible window (load-more) --------------------------------------
   const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE);
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setVisibleCount(INITIAL_VISIBLE);
   }, [filters]);
 
@@ -545,6 +520,7 @@ export default function CampaignsListPageContent({ status: statusProp = "all" })
     ) {
       nextSelected = listMemory.selectedId;
     }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSelectedId(nextSelected);
 
     if (restorable && listMemory.visibleCount > INITIAL_VISIBLE) {
@@ -577,6 +553,7 @@ export default function CampaignsListPageContent({ status: statusProp = "all" })
     if (!didInitialResolveRef.current) return;
     if (selectedId === null) return;
     if (filteredItems.length === 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedId(null);
       return;
     }
