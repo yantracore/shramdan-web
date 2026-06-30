@@ -224,7 +224,7 @@ export function EventsHomeRail({
       {isEmpty ? (
         <div className="events-home-rail-shell">
           <div className="events-home-rail-empty">
-            <span className="events-home-rail-empty-icon" aria-hidden="true">📺</span>
+            <span className="events-home-rail-empty-icon" aria-hidden="true">🌱</span>
             <p>{copy?.emptyMessage}</p>
           </div>
         </div>
@@ -280,8 +280,9 @@ export function EventsHomeRail({
 }
 
 function LivePosterCard({ event, copy, language, isActive }) {
-  const durationLabel = formatLiveDuration(event?.liveStream?.startedAt, copy);
-  const thumbnailUrl = event?.liveStream?.thumbnailUrl || event?.thumbnailUrl;
+  const ongoingLabel =
+    copy?.ongoingLabel || (language === "np" ? "अहिले भइरहेको" : "Happening now");
+  const thumbnailUrl = event?.thumbnailUrl;
   const participantsLabel = formatParticipantsLabel(
     getParticipantCount(event),
     language,
@@ -316,7 +317,7 @@ function LivePosterCard({ event, copy, language, isActive }) {
             <div className="events-home-rail-poster-top">
               <span className="events-home-rail-poster-badge events-home-rail-poster-badge--active">
                 <span className="live-dot" aria-hidden="true" />
-                {copy?.liveBadge || "LIVE"}
+                {copy?.liveBadge || ongoingLabel}
               </span>
               {participantsLabel ? (
                 <span className="events-home-rail-poster-badge events-home-rail-poster-badge--meta">
@@ -328,7 +329,7 @@ function LivePosterCard({ event, copy, language, isActive }) {
               <div className="events-home-rail-poster-bottom-text">
                 <BusinessImageStrip images={businessImages} title={event.title} />
                 <h3>{event.title}</h3>
-                {durationLabel ? <p>{durationLabel}</p> : null}
+                <p>{event.addressText || ongoingLabel}</p>
               </div>
               <span className="events-home-rail-poster-cta" aria-hidden="true">
                 {copy?.viewDetails || (language === "np" ? "विवरण" : "View Details")}
@@ -418,18 +419,4 @@ function BusinessImageStrip({ images, title }) {
       ))}
     </span>
   );
-}
-
-function formatLiveDuration(startedAt, copy) {
-  if (!startedAt) return null;
-  const startMs = Date.parse(startedAt);
-  if (Number.isNaN(startMs)) return null;
-  const nowMs = Date.now();
-  const diffMin = Math.max(0, Math.floor((nowMs - startMs) / 60_000));
-  if (diffMin < 1) return copy?.justStarted || "Just started";
-  if (diffMin < 60) return `${diffMin}m ${copy?.durationLive || "live"}`;
-  const hours = Math.floor(diffMin / 60);
-  const mins = diffMin % 60;
-  if (mins === 0) return `${hours}h ${copy?.durationLive || "live"}`;
-  return `${hours}h ${mins}m ${copy?.durationLive || "live"}`;
 }
