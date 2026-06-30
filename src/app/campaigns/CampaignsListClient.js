@@ -258,11 +258,6 @@ export default function CampaignsListPageContent({ status: statusProp = "all" })
   }, [readFiltersFromUrl]);
 
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [searchInput, setSearchInput] = useState(filters.q);
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setSearchInput(filters.q);
-  }, [filters.q]);
 
   // ----- list / thumbnails / map view toggle (URL-synced via ?view=) ------
   // `view` is not a filter — it rides on its own ?view= param so a filtered
@@ -392,12 +387,11 @@ export default function CampaignsListPageContent({ status: statusProp = "all" })
     [filters, applyFilters, goToStatus]
   );
 
-  const handleSearchSubmit = useCallback(
-    (event) => {
-      event.preventDefault();
-      applyFilters({ ...filters, q: searchInput.trim() });
-    },
-    [applyFilters, filters, searchInput]
+  // The search box owns its live typing state and commits a debounced query
+  // here (instant on clear / Enter). We only feed it the committed q.
+  const handleSearch = useCallback(
+    (q) => applyFilters({ ...filters, q }),
+    [applyFilters, filters]
   );
 
   const handleGeographyChange = useCallback(
@@ -875,9 +869,8 @@ export default function CampaignsListPageContent({ status: statusProp = "all" })
 
           <div className="public-issues-search-row">
             <PublicSearchBar
-              value={searchInput}
-              onChange={setSearchInput}
-              onSubmit={handleSearchSubmit}
+              value={filters.q}
+              onSearch={handleSearch}
               onToggleFilters={() => setFiltersOpen((open) => !open)}
               filtersOpen={filtersOpen}
               labels={homeSearch}

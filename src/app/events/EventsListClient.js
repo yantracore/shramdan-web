@@ -281,12 +281,6 @@ export default function EventsListPageContent() {
   // and committed to the URL filters on submit (handler defined below, once
   // applyFilters exists).
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [searchInput, setSearchInput] = useState(filters.q);
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setSearchInput(filters.q);
-  }, [filters.q]);
 
   // ----- raw data + ordered/flattened list ------------------------------
   const [live, setLive] = useState([]);
@@ -338,12 +332,11 @@ export default function EventsListPageContent() {
     [router, searchParams]
   );
 
-  const handleSearchSubmit = useCallback(
-    (event) => {
-      event.preventDefault();
-      applyFilters({ ...filters, q: searchInput.trim() });
-    },
-    [applyFilters, filters, searchInput]
+  // The search box owns its live typing state and commits a debounced query
+  // here (instant on clear / Enter). We only feed it the committed q.
+  const handleSearch = useCallback(
+    (q) => applyFilters({ ...filters, q }),
+    [applyFilters, filters]
   );
 
   // ----- geolocation (for sort=nearest) ----------------------------------
@@ -747,9 +740,8 @@ export default function EventsListPageContent() {
           <ActivityStatsRow language={language} interactive currentPage="events" />
           <div className="public-issues-search-row">
             <PublicSearchBar
-              value={searchInput}
-              onChange={setSearchInput}
-              onSubmit={handleSearchSubmit}
+              value={filters.q}
+              onSearch={handleSearch}
               onToggleFilters={() => setFiltersOpen((open) => !open)}
               filtersOpen={filtersOpen}
               labels={homeSearch}

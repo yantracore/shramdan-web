@@ -97,7 +97,6 @@ export default function IssuesListPageContent() {
   // search bar toggles it open. Search text is kept in a local input buffer
   // and committed to the URL filters on submit.
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [searchInput, setSearchInput] = useState(() => readFiltersFromUrl().q);
 
   // Re-sync state from URL on back/forward navigation.
   useEffect(() => {
@@ -116,13 +115,6 @@ export default function IssuesListPageContent() {
       return next;
     });
   }, [readFiltersFromUrl]);
-
-  // Keep the search input in sync when the query changes from the URL
-  // (back/forward nav, or clearing the search chip).
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setSearchInput(filters.q);
-  }, [filters.q]);
 
   const fetchPage = useCallback(
     async (cursor) => {
@@ -545,12 +537,11 @@ export default function IssuesListPageContent() {
     [filters, applyFilters]
   );
 
-  const handleSearchSubmit = useCallback(
-    (event) => {
-      event.preventDefault();
-      applyFilters({ ...filters, q: searchInput.trim() });
-    },
-    [applyFilters, filters, searchInput]
+  // The search box owns its live typing state and commits a debounced query
+  // here (instant on clear / Enter). We only feed it the committed q.
+  const handleSearch = useCallback(
+    (q) => applyFilters({ ...filters, q }),
+    [applyFilters, filters]
   );
 
   const selectedIssue = sortedItems.find((i) => i.id === selectedId) || null;
@@ -595,9 +586,8 @@ export default function IssuesListPageContent() {
           <ActivityStatsRow language={language} interactive currentPage="issues" />
           <div className="public-issues-search-row">
             <PublicSearchBar
-              value={searchInput}
-              onChange={setSearchInput}
-              onSubmit={handleSearchSubmit}
+              value={filters.q}
+              onSearch={handleSearch}
               onToggleFilters={() => setFiltersOpen((open) => !open)}
               filtersOpen={filtersOpen}
               labels={homeSearch}
