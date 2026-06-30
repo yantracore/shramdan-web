@@ -15,10 +15,10 @@ const RAIL_COPY = {
     impact: { eyebrow: "प्रभाव", title: "भइसकेका काम", viewAll: "सबै हेर्ने", href: "/campaigns?status=COMPLETED" }
   },
   en: {
-    near: { eyebrow: "For you", title: "Near You", viewAll: "View All", href: "/campaigns" },
-    happening: { eyebrow: "Active", title: "Happening Now & Soon", viewAll: "View All", href: "/campaigns?status=ACTIVE" },
-    support: { eyebrow: "Needs support", title: "Needs Your Support", viewAll: "View All", href: "/campaigns?status=OPEN" },
-    impact: { eyebrow: "Impact", title: "Impact So Far", viewAll: "View All", href: "/campaigns?status=COMPLETED" }
+    near: { eyebrow: "In your area", title: "Campaigns Near You", viewAll: "View All", href: "/campaigns" },
+    happening: { eyebrow: "Happening now", title: "Active Campaigns", viewAll: "View All", href: "/campaigns?status=ACTIVE" },
+    support: { eyebrow: "Needs Your Support", title: "Open Issues", viewAll: "View All", href: "/campaigns?status=OPEN" },
+    impact: { eyebrow: "Recently Completed", title: "Completed Events", viewAll: "View All", href: "/campaigns?status=COMPLETED" }
   }
 };
 
