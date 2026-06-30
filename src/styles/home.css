@@ -8648,10 +8648,16 @@
 .public-issues-search-row .public-issues-filters-cta {
   align-self: stretch;
   display: inline-flex;
+  /* Don't let the flex row squeeze the CTA narrower than its button — the
+     button label can't shrink, so a shrunk wrapper made it spill past the
+     section's right edge. The search bar (flex:1 1 auto, min-width:0) absorbs
+     the shrink instead. */
+  flex: 0 0 auto;
 }
 
 .public-issues-search-row .public-issues-filters-cta .ant-btn {
   height: 100%;
+  white-space: nowrap;
 }
 
 /* Glass search box — mirrors .home-search-bar but stretches full width
@@ -8760,12 +8766,34 @@
 }
 
 @media (max-width: 540px) {
+  /* Keep the search box and the "new issue" CTA on ONE row — the CTA stays a
+     real, height-matched button instead of a full-width stubby bar below. */
   .public-issues-search-row {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    gap: 8px;
   }
   .public-issues-search-row .public-issues-filters-cta,
   .public-issues-search-row .public-issues-filters-cta .ant-btn {
-    width: 100%;
+    width: auto;
+  }
+  .public-issues-search-row .public-issues-filters-cta .ant-btn {
+    height: 100%;
+    min-height: 46px;
+    flex: 0 0 auto;
+  }
+  /* The label "नयाँ समस्या" is too wide to sit beside the search box on a
+     phone, so the CTA becomes a compact "+" icon button (its accessible
+     name is preserved via aria-label on the button). Hide ONLY the text
+     span — keep AntD's icon wrapper (.ant-btn-icon) visible. */
+  .public-issues-search-row .public-issues-filters-cta .ant-btn > span:not(.ant-btn-icon) {
+    display: none;
+  }
+  .public-issues-search-row .public-issues-filters-cta .ant-btn {
+    padding-inline: 14px;
+    min-width: var(--tap-min);
+  }
+  .public-issues-search-row .public-issues-filters-cta .ant-btn .ant-btn-icon {
+    margin-inline-end: 0;
   }
   .public-search-bar {
     padding: 6px;
@@ -8937,16 +8965,32 @@
   }
 }
 
-/* Below ~560px the funnel scrolls horizontally rather than wrapping — a
-   wrapped funnel loses its left-to-right meaning. */
+/* Below ~560px the five steps share the row equally so the whole funnel
+   FITS the viewport (no horizontal scroll, no clipped right edge). Markers
+   and labels shrink a notch; the left-to-right lifecycle reading survives. */
 @media (max-width: 560px) {
   .activity-funnel {
-    overflow-x: auto;
-    padding: 12px 8px;
-    -webkit-overflow-scrolling: touch;
+    padding: 12px 4px;
   }
   .activity-funnel-step {
-    flex: 0 0 84px;
+    flex: 1 1 0;
+    min-width: 0;
+  }
+  .activity-funnel-link,
+  .activity-funnel-static {
+    padding: 0 2px;
+  }
+  .activity-funnel-marker {
+    width: 30px;
+    height: 30px;
+    font-size: 13px;
+  }
+  .activity-funnel-count {
+    font-size: 15px;
+  }
+  .activity-funnel-label {
+    font-size: 10px;
+    line-height: 1.15;
   }
 }
 

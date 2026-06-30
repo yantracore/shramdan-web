@@ -678,22 +678,6 @@ export default function CampaignsListPageContent({ status: statusProp = "all" })
     ];
   }, [language, counts, total, countsLoading, loading, filters.status]);
 
-  // Dropdown mirror: plain text labels (the badge/loader belong on the chips).
-  const dropdownOptions = useMemo(
-    () => [
-      { value: "all", label: campaignStatusLabel("all", language) },
-      ...CAMPAIGN_STATUS_SEQUENCE.map((value) => ({
-        value,
-        label: (
-          <span className="campaign-filter-opt" data-status={campaignVisualStatus(value)}>
-            <span className="campaign-filter-dot" aria-hidden="true" />
-            {campaignStatusLabel(value, language)}
-          </span>
-        )
-      }))
-    ],
-    [language]
-  );
   const categoryOptions = ISSUE_CATEGORIES.map((value) => ({
     value,
     label: categoryOptionLabel(value, issuesCopy.categoryLabels?.[value] || value)
@@ -854,7 +838,12 @@ export default function CampaignsListPageContent({ status: statusProp = "all" })
               labels={homeSearch}
             />
             <Link className="public-issues-filters-cta" href="/issues/new">
-              <Button type="primary" icon={<PlusOutlined />} size="large">
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                size="large"
+                aria-label={reportIssueCtaLabel}
+              >
                 {reportIssueCtaLabel}
               </Button>
             </Link>
@@ -862,21 +851,8 @@ export default function CampaignsListPageContent({ status: statusProp = "all" })
 
           {filtersOpen ? (
             <div className="public-issues-filters">
-              {/* Same status filter, mirrored in the detailed panel. */}
-              <div className="public-issues-filter-field">
-                <label
-                  className="public-issues-filter-label"
-                  htmlFor="campaigns-filter-status"
-                >
-                  {issuesCopy.filters.statusLabel}
-                </label>
-                <Select
-                  id="campaigns-filter-status"
-                  onChange={(value) => setFilter("status", value || "all")}
-                  options={dropdownOptions}
-                  value={filters.status}
-                />
-              </div>
+              {/* Status lives in the chip row above; the panel keeps the
+                  secondary filters (category / province / district) + sort. */}
               <div className="public-issues-filter-field">
                 <label
                   className="public-issues-filter-label"

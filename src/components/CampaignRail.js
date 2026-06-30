@@ -20,8 +20,11 @@ import "swiper/css/navigation";
 import "@/styles/campaign-rail.css";
 
 const BREAKPOINTS = {
-  0: { slidesPerView: 1.2, spaceBetween: 14 },
-  640: { slidesPerView: 2.2, spaceBetween: 16 },
+  // Phones show ~1.85 cards so two thumbnails read at once with a peek of the
+  // next — never one giant card. Scales up from there.
+  0: { slidesPerView: 1.85, spaceBetween: 12 },
+  480: { slidesPerView: 2.2, spaceBetween: 14 },
+  640: { slidesPerView: 2.6, spaceBetween: 16 },
   1024: { slidesPerView: 3.2, spaceBetween: 18 },
   1280: { slidesPerView: 4.2, spaceBetween: 20 }
 };

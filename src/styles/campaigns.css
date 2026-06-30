@@ -187,3 +187,49 @@
     backdrop-filter: none;
   }
 }
+
+/* ── Mobile toolbar (≤720px) ──────────────────────────────────────────────
+   Previously the status chips and the view toggle shared one row, so the
+   chips got only half the width and overflowed under the toggle — read as
+   broken. Now they stack: the status chips take the FULL width (scrollable
+   with a fade hint at the edges), and the view toggle drops to its own
+   full-width row as three equal, labelled segments. */
+@media (max-width: 720px) {
+  .campaigns-toolbar-top {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .campaigns-status-chips {
+    width: 100%;
+    /* Fade the scroll edges so the row clearly reads as "swipe for more",
+       not "text is cut off". */
+    -webkit-mask-image: linear-gradient(
+      90deg, transparent 0, #000 14px, #000 calc(100% - 20px), transparent 100%);
+    mask-image: linear-gradient(
+      90deg, transparent 0, #000 14px, #000 calc(100% - 20px), transparent 100%);
+  }
+
+  .campaigns-view-toggle {
+    width: 100%;
+  }
+  .campaigns-view-toggle .ant-segmented,
+  .campaigns-view-toggle .ant-segmented-group {
+    display: flex;
+    width: 100%;
+  }
+  .campaigns-view-toggle .ant-segmented-item {
+    flex: 1 1 0;
+  }
+  .campaigns-view-toggle .ant-segmented-item-label {
+    justify-content: center;
+  }
+  /* Room is back on the full-width toggle — restore the labels next to icons. */
+  .campaigns-view-toggle .campaign-view-chip-text {
+    display: inline;
+  }
+  .campaigns-view-toggle .campaign-view-chip {
+    gap: 6px;
+  }
+}
