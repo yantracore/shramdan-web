@@ -3,20 +3,25 @@
 import {
   CheckCircleTwoTone,
   CloseCircleOutlined,
+  EditOutlined,
   MailOutlined,
   PhoneOutlined,
   SearchOutlined,
   UserOutlined
 } from "@ant-design/icons";
-import { Avatar, Empty, Input, Select, Table, Tag } from "antd";
-import { useMemo } from "react";
+import { Avatar, Button, Empty, Form, Input, Modal, Select, Switch, Table, Tag, message } from "antd";
+import { useMemo, useState } from "react";
 import { AdminResponsiveList } from "@/components/AdminResponsiveList";
 import { AdminShell } from "@/components/AdminShell";
 import { AdminFilters } from "@/components/admin/AdminFilters";
 import { AdminListCard } from "@/components/admin/AdminListCard";
 import { AdminPanelHeading } from "@/components/admin/AdminPanelHeading";
 import { useAdminListResource } from "@/hooks/useAdminListResource";
+import { patchJson } from "@/lib/apiClient";
 import { formatDate, getListItems } from "@/lib/adminUtils";
+
+// Fields the admin can edit via PATCH /users/{id} (shipped 2026-06-30).
+const EDITABLE_USER_FIELDS = ["name", "username", "email", "phone", "city", "bio", "isVerified"];
 
 const USER_ROLES = ["USER", "ADMIN"];
 const ROLE_COLORS = { USER: "default", ADMIN: "green" };
@@ -55,10 +60,69 @@ export default function AdminUsersPage() {
     errorMessage: "Could not load users."
   });
 
+  const [messageApi, messageContext] = message.useMessage();
+  const [editing, setEditing] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [editForm] = Form.useForm();
+
   const roleOptions = useMemo(
     () => USER_ROLES.map((role) => ({ label: role, value: role })),
     []
   );
+
+  const openEdit = (user) => {
+    setEditing(user);
+    editForm.setFieldsValue({
+      name: user.name ?? "",
+      username: user.username ?? "",
+      email: user.email ?? "",
+      phone: user.phone ?? "",
+      city: user.city ?? "",
+      bio: user.bio ?? "",
+      isVerified: Boolean(user.isVerified)
+    });
+  };
+
+  const closeEdit = () => {
+    setEditing(null);
+    editForm.resetFields();
+  };
+
+  const submitEdit = async () => {
+    let values;
+    try {
+      values = await editForm.validateFields();
+    } catch {
+      return;
+    }
+    // Send only fields that actually changed (avoids clobbering with empties).
+    const payload = {};
+    for (const key of EDITABLE_USER_FIELDS) {
+      const next = values[key];
+      const prev = editing?.[key];
+      if (key === "isVerified") {
+        if (Boolean(next) !== Boolean(prev)) payload[key] = Boolean(next);
+      } else {
+        const trimmed = typeof next === "string" ? next.trim() : next;
+        if ((trimmed || "") !== (prev || "")) payload[key] = trimmed || null;
+      }
+    }
+    if (Object.keys(payload).length === 0) {
+      closeEdit();
+      return;
+    }
+    setSaving(true);
+    try {
+      await patchJson(`/users/${editing.id}`, payload, { requireAuth: true });
+      messageApi.success("User updated.");
+      closeEdit();
+      fetchUsers();
+    } catch (err) {
+      messageApi.error(err?.message || "Could not update user.");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const columns = [
     {
@@ -125,16 +189,26 @@ export default function AdminUsersPage() {
       dataIndex: "createdAt",
       key: "createdAt",
       render: (createdAt) => <span>{formatDate(createdAt) || "—"}</span>
+    },
+    {
+      title: "",
+      key: "actions",
+      render: (_, user) => (
+        <Button size="small" icon={<EditOutlined />} onClick={() => openEdit(user)}>
+          Edit
+        </Button>
+      )
     }
   ];
 
   return (
     <AdminShell title="Users">
+      {messageContext}
       <section className="admin-panel">
         <AdminPanelHeading
           eyebrow="Registered users"
           title="Users"
-          description="Browse registered users, filter by role or verification, and search by name, email, username, or phone. Read-only — role changes will land once the backend mutation is wired."
+          description="Browse registered users, filter by role or verification, and search by name, email, username, or phone. Edit a user's profile details and verification with the Edit action."
           onRefresh={fetchUsers}
           refreshing={loadingUsers}
         />
@@ -229,12 +303,53 @@ export default function AdminUsersPage() {
                   <p>
                     <strong>Joined:</strong> {formatDate(user.createdAt) || "—"}
                   </p>
+                  <Button size="small" icon={<EditOutlined />} onClick={() => openEdit(user)}>
+                    Edit
+                  </Button>
                 </>
               }
             />
           ))}
         </AdminResponsiveList>
       </section>
+
+      <Modal
+        title={editing ? `Edit ${getDisplayName(editing)}` : "Edit user"}
+        open={Boolean(editing)}
+        onCancel={closeEdit}
+        onOk={submitEdit}
+        okText="Save changes"
+        confirmLoading={saving}
+        destroyOnClose
+      >
+        <Form form={editForm} layout="vertical">
+          <Form.Item label="Name" name="name">
+            <Input placeholder="Full name" />
+          </Form.Item>
+          <Form.Item label="Username" name="username">
+            <Input placeholder="username" />
+          </Form.Item>
+          <Form.Item
+            label="Email"
+            name="email"
+            rules={[{ type: "email", message: "Enter a valid email." }]}
+          >
+            <Input placeholder="name@example.com" />
+          </Form.Item>
+          <Form.Item label="Phone" name="phone">
+            <Input placeholder="98XXXXXXXX" />
+          </Form.Item>
+          <Form.Item label="City" name="city">
+            <Input placeholder="City" />
+          </Form.Item>
+          <Form.Item label="Bio" name="bio">
+            <Input.TextArea rows={2} placeholder="Short bio" />
+          </Form.Item>
+          <Form.Item label="Verified" name="isVerified" valuePropName="checked">
+            <Switch />
+          </Form.Item>
+        </Form>
+      </Modal>
     </AdminShell>
   );
 }
