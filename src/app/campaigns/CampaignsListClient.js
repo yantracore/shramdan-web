@@ -11,7 +11,7 @@
 // collapsible filter panel. "all" is the default and groups every stage under
 // inline dividers in lifecycle order.
 
-import { CloseOutlined, LoadingOutlined, PlusOutlined, ReloadOutlined, SearchOutlined } from "@ant-design/icons";
+import { AppstoreOutlined, CloseOutlined, EnvironmentOutlined, LoadingOutlined, PlusOutlined, ReloadOutlined, SearchOutlined, UnorderedListOutlined } from "@ant-design/icons";
 import { Button, Empty, Pagination, Segmented, Select, Skeleton } from "antd";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -833,9 +833,39 @@ export default function CampaignsListPageContent({ status: statusProp = "all" })
             >
               <Segmented
                 options={[
-                  { value: "list", label: t.viewList },
-                  { value: "thumbnails", label: t.viewThumbnails },
-                  { value: "map", label: t.viewMap }
+                  {
+                    value: "list",
+                    label: (
+                      <span className="campaign-view-chip">
+                        <UnorderedListOutlined aria-hidden="true" />
+                        <span className="campaign-view-chip-text">
+                          {t.viewList}
+                        </span>
+                      </span>
+                    )
+                  },
+                  {
+                    value: "thumbnails",
+                    label: (
+                      <span className="campaign-view-chip">
+                        <AppstoreOutlined aria-hidden="true" />
+                        <span className="campaign-view-chip-text">
+                          {t.viewThumbnails}
+                        </span>
+                      </span>
+                    )
+                  },
+                  {
+                    value: "map",
+                    label: (
+                      <span className="campaign-view-chip">
+                        <EnvironmentOutlined aria-hidden="true" />
+                        <span className="campaign-view-chip-text">
+                          {t.viewMap}
+                        </span>
+                      </span>
+                    )
+                  }
                 ]}
                 value={view}
                 onChange={handleViewChange}

@@ -98,6 +98,77 @@
   font-size: 12px;
 }
 
+/* List / Grid / Map view toggle — same glassy Segmented as the status chips
+   above (it's a tab row too), just compact: it carries icons, not count
+   badges, and stays a touch smaller so it never competes with the lifecycle
+   chips it sits beside. */
+.campaigns-view-toggle .ant-segmented {
+  display: inline-flex;
+  padding: 5px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  backdrop-filter: blur(16px) saturate(1.2);
+  border: 1px solid color-mix(in srgb, var(--line) 45%, transparent);
+}
+
+.campaigns-view-toggle .ant-segmented-item {
+  border-radius: 9px;
+  transition: color 160ms ease;
+}
+
+.campaigns-view-toggle .ant-segmented-item-label {
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.campaigns-view-toggle .ant-segmented-item-selected,
+.campaigns-view-toggle .ant-segmented-thumb {
+  border-radius: 9px;
+  box-shadow: none;
+}
+
+.campaign-view-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.campaign-view-chip .anticon {
+  font-size: 15px;
+}
+
+.campaign-view-chip-text {
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .campaigns-view-toggle .ant-segmented-item-label {
+    min-height: 36px;
+    padding: 0 11px;
+  }
+  /* Tight viewports: icons carry the toggle, labels fold away so the row
+     never wraps under the status chips. */
+  .campaign-view-chip-text {
+    display: none;
+  }
+  .campaign-view-chip {
+    gap: 0;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .campaigns-view-toggle .ant-segmented {
+    background: var(--surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
 @media (max-width: 640px) {
   .campaigns-status-chips .ant-segmented-item-label {
     min-height: 42px;
