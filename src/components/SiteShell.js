@@ -10,7 +10,6 @@ import {
   FolderOpenOutlined,
   HeartOutlined,
   LogoutOutlined,
-  MenuOutlined,
   MoonOutlined,
   ReadOutlined,
   SettingOutlined,
@@ -22,7 +21,7 @@ import {
   UserAddOutlined,
   UserOutlined
 } from "@ant-design/icons";
-import { Avatar, Button, Dropdown, Popover, Tag, Tooltip } from "antd";
+import { Avatar, Button, Drawer, Dropdown, Popover, Tag, Tooltip } from "antd";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -92,17 +91,12 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
   const campaignsSection =
     pathname === "/campaigns" || pathname.startsWith("/campaigns/");
   const router = useRouter();
-  const mobileMenuRef = useRef(null);
   const lastScrollYRef = useRef(0);
+  const [isMoreOpen, setIsMoreOpen] = useState(false);
 
-  const closeMobileMenu = () => {
-    if (mobileMenuRef.current) {
-      mobileMenuRef.current.open = false;
-    }
-  };
-
+  // Close the "More" sheet whenever the route changes.
   useEffect(() => {
-    closeMobileMenu();
+    setIsMoreOpen(false);
   }, [pathname]);
 
   // Pick the day's footer quote on the client so the date is computed in the
@@ -151,21 +145,6 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
     syncFloatingChrome();
     window.addEventListener("scroll", syncFloatingChrome, { passive: true });
     return () => window.removeEventListener("scroll", syncFloatingChrome);
-  }, []);
-
-  useEffect(() => {
-    const handlePointerDown = (event) => {
-      const node = mobileMenuRef.current;
-      if (!node || !node.open) {
-        return;
-      }
-      if (!node.contains(event.target)) {
-        node.open = false;
-      }
-    };
-
-    document.addEventListener("pointerdown", handlePointerDown);
-    return () => document.removeEventListener("pointerdown", handlePointerDown);
   }, []);
 
   const session = useSyncExternalStore(subscribeAuthSession, getAuthSession, () => null);
@@ -580,76 +559,6 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
                     </button>
                   </Popover>
                 )}
-                <details className="mobile-menu" ref={mobileMenuRef}>
-                  <summary aria-label={t.ariaLabels.openMenu}>
-                    <MenuOutlined />
-                  </summary>
-                  <div className="mobile-menu-panel">
-                    {mobileMenuItems.map((item) => {
-                      const isActive = activePath === item.href;
-                      return (
-                        <Link
-                          aria-current={isActive ? "page" : undefined}
-                          className={isActive ? "is-active" : undefined}
-                          href={item.href}
-                          key={item.href}
-                          onClick={(event) => {
-                            handleSamePageNavClick(event, item.href);
-                            closeMobileMenu();
-                          }}
-                        >
-                          <span className="mobile-menu-link-label">{item.label}</span>
-                          {hasNavCount(item.count) ? (
-                            <span
-                              className={`nav-count-badge nav-count-badge--${item.countTone} mobile-menu-count`}
-                              aria-label={`${item.label}: ${item.count}`}
-                            >
-                              {item.count}
-                            </span>
-                          ) : null}
-                        </Link>
-                      );
-                    })}
-                    <div
-                      className="mobile-menu-preferences"
-                      aria-label={t.ariaLabels.preferences}
-                    >
-                      <button
-                        type="button"
-                        aria-label={t.controls.themeTooltip}
-                        title={t.controls.themeTooltip}
-                        onClick={() => {
-                          toggleMode();
-                          closeMobileMenu();
-                        }}
-                      >
-                        {mode === "light" ? t.controls.darkTheme : t.controls.lightTheme}
-                      </button>
-                      <button
-                        type="button"
-                        aria-label={t.controls.languageTooltip}
-                        title={t.controls.languageTooltip}
-                        onClick={() => {
-                          toggleLanguage();
-                          closeMobileMenu();
-                        }}
-                      >
-                        {t.controls.language}
-                      </button>
-                      {isAuthenticated ? (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            closeMobileMenu();
-                            handleLogout();
-                          }}
-                        >
-                          {t.me.menu.logout}
-                        </button>
-                      ) : null}
-                    </div>
-                  </div>
-                </details>
               </div>
             </div>
           </div>
@@ -693,12 +602,84 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
         counts={{
           campaign: formatNavCount(campaignsCount, language)
         }}
-        onMore={() => {
-          if (mobileMenuRef.current) {
-            mobileMenuRef.current.open = !mobileMenuRef.current.open;
-          }
-        }}
+        onMore={() => setIsMoreOpen((open) => !open)}
       />
+
+      {/* "More" sheet — the single secondary-nav surface below 1180px.
+          Opened from the bottom bar's More tab; replaces the old top-right
+          hamburger drawer. Holds the full nav list, preferences, and auth. */}
+      <Drawer
+        placement="bottom"
+        open={isMoreOpen}
+        onClose={() => setIsMoreOpen(false)}
+        height="auto"
+        closable
+        title={language === "en" ? "Menu" : "मेनु"}
+        rootClassName="more-sheet-root"
+        className="more-sheet"
+        styles={{ body: { padding: 0 } }}
+      >
+        <nav className="more-sheet-nav" aria-label={t.ariaLabels.nav}>
+          {mobileMenuItems.map((item) => {
+            const isActive = activePath === item.href;
+            return (
+              <Link
+                aria-current={isActive ? "page" : undefined}
+                className={`more-sheet-link${isActive ? " is-active" : ""}`}
+                href={item.href}
+                key={item.href}
+                onClick={(event) => {
+                  handleSamePageNavClick(event, item.href);
+                  setIsMoreOpen(false);
+                }}
+              >
+                <span className="more-sheet-link-label">{item.label}</span>
+                {hasNavCount(item.count) ? (
+                  <span
+                    className={`nav-count-badge nav-count-badge--${item.countTone} more-sheet-count`}
+                    aria-label={`${item.label}: ${item.count}`}
+                  >
+                    {item.count}
+                  </span>
+                ) : null}
+              </Link>
+            );
+          })}
+        </nav>
+        <div className="more-sheet-prefs" aria-label={t.ariaLabels.preferences}>
+          <button
+            type="button"
+            className="more-sheet-pref"
+            aria-label={t.controls.themeTooltip}
+            onClick={toggleMode}
+          >
+            {mode === "light" ? <MoonOutlined /> : <SunOutlined />}
+            <span>{mode === "light" ? t.controls.darkTheme : t.controls.lightTheme}</span>
+          </button>
+          <button
+            type="button"
+            className="more-sheet-pref"
+            aria-label={t.controls.languageTooltip}
+            onClick={toggleLanguage}
+          >
+            <TranslationOutlined />
+            <span>{t.controls.language}</span>
+          </button>
+          {isAuthenticated ? (
+            <button
+              type="button"
+              className="more-sheet-pref more-sheet-pref--logout"
+              onClick={() => {
+                setIsMoreOpen(false);
+                handleLogout();
+              }}
+            >
+              <LogoutOutlined />
+              <span>{t.me.menu.logout}</span>
+            </button>
+          ) : null}
+        </div>
+      </Drawer>
 
       {FOOTER_QUOTE_ENABLED && (
         <section className="footer-quote" aria-label={t.footer.quote.ariaLabel}>

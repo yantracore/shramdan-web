@@ -63,6 +63,68 @@
   --z-overlay: 1000;
   --z-modal: 1100;
   --z-toast: 1200;
+
+  /* --- Breakpoint scale (mobile-first) -------------------------------- *
+   * The ONE canonical set. Before this, ~30 ad-hoc widths (720/620/540/
+   * 470/980…) were scattered across files. From now, write every media
+   * query against one of these. CSS custom props can't be read inside an
+   * @media condition, so these vars are documentation + JS use only — the
+   * discipline is human-enforced. Map of intent:
+   *   sm  480  — small phone  → large phone
+   *   md  640  — large phone  → phablet
+   *   lg  768  — tablet portrait
+   *   xl  1024 — tablet landscape / small laptop
+   *   2xl 1280 — desktop
+   *   3xl 1536 — large desktop
+   * Nav: bottom-bar is primary below 1180; the centre pill appears >=1180. */
+  --bp-sm: 480px;
+  --bp-md: 640px;
+  --bp-lg: 768px;
+  --bp-xl: 1024px;
+  --bp-2xl: 1280px;
+  --bp-3xl: 1536px;
+
+  /* --- Fluid type scale ---------------------------------------------- *
+   * clamp(min, preferred, max). Sizes grow smoothly with the viewport so
+   * we stop shipping desktop px values that get crushed on phones. Min
+   * values respect mobile readability (body never below 16px → no iOS
+   * auto-zoom; supporting text never below 12px). Devanagari runs a touch
+   * larger than Latin at the same token, which these mins already allow. */
+  --text-xs:   clamp(0.75rem, 0.72rem + 0.15vw, 0.8125rem);  /* 12 → 13 */
+  --text-sm:   clamp(0.8125rem, 0.78rem + 0.18vw, 0.875rem); /* 13 → 14 */
+  --text-base: clamp(1rem, 0.96rem + 0.2vw, 1.0625rem);      /* 16 → 17 */
+  --text-md:   clamp(1.0625rem, 1rem + 0.3vw, 1.1875rem);    /* 17 → 19 */
+  --text-lg:   clamp(1.125rem, 1.04rem + 0.42vw, 1.375rem);  /* 18 → 22 */
+  --text-xl:   clamp(1.25rem, 1.09rem + 0.78vw, 1.625rem);   /* 20 → 26 */
+  --text-2xl:  clamp(1.5rem, 1.24rem + 1.3vw, 2.125rem);     /* 24 → 34 */
+  --text-3xl:  clamp(1.875rem, 1.45rem + 2.1vw, 2.75rem);    /* 30 → 44 */
+  --text-hero: clamp(2.25rem, 1.55rem + 3.4vw, 4rem);        /* 36 → 64 */
+
+  /* --- Spacing scale (4pt rhythm + fluid section steps) -------------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-8: 48px;
+  --space-10: 64px;
+  --space-12: 96px;
+  /* Fluid vertical rhythm — collapses on phones, breathes on desktop.
+     This is the antidote to the "huge dead space" hero on mobile. */
+  --space-section: clamp(2.5rem, 1.7rem + 3.6vw, 5.5rem);    /* 40 → 88 */
+  --space-section-sm: clamp(1.5rem, 1.1rem + 1.8vw, 3rem);   /* 24 → 48 */
+  --space-block: clamp(1rem, 0.8rem + 1vw, 1.75rem);        /* 16 → 28 */
+
+  /* --- Layout containers + touch ------------------------------------- */
+  /* Symmetric horizontal page gutter — fixes the asymmetric/clipped right
+     edge on mobile. Every page wrapper should use this, never a one-sided
+     margin. */
+  --page-gutter: clamp(1rem, 0.55rem + 2.2vw, 2.5rem);      /* 16 → 40 */
+  --container-max: 1200px;
+  --container-narrow: 760px;
+  /* Minimum interactive target (Apple HIG 44, Material 48). */
+  --tap-min: 44px;
 }
 
 :root[data-theme="dark"] {
