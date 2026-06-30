@@ -107,11 +107,11 @@ export default function AdminIssueEditPage() {
   const handleFinish = async (values) => {
     setSubmitting(true);
 
-    // `additionalImages` is pulled out and intentionally NOT sent: PATCH
-    // /issues rejects `uploadIds` (see docs/api-requirements/issues.md gap), so
-    // photo edits are deferred — the form locks that field. cover/text/category/
-    // location all patch fine.
-    const { cover, additionalImages: _additionalImages, ...rest } = values;
+    // PATCH /issues/{id} now accepts `uploadIds` (shipped 2026-06-30), so the
+    // additional-images set is editable. Mirror POST /issues: `uploadIds` is the
+    // additional gallery (cover is carried separately via `coverImageId`). Send
+    // the full current set so removals persist (replace semantics).
+    const { cover, additionalImages, ...rest } = values;
     const originalCoverId = initialValues?.cover?.id || null;
     const nextCoverId = cover?.id || null;
 
@@ -124,6 +124,20 @@ export default function AdminIssueEditPage() {
     }
     if (nextCoverId !== originalCoverId) {
       payload.coverImageId = nextCoverId;
+    }
+    const nextUploadIds = (Array.isArray(additionalImages) ? additionalImages : [])
+      .map((image) => image?.id)
+      .filter(Boolean);
+    const originalUploadIds = (Array.isArray(initialValues?.additionalImages)
+      ? initialValues.additionalImages
+      : [])
+      .map((image) => image?.id)
+      .filter(Boolean);
+    const uploadsChanged =
+      nextUploadIds.length !== originalUploadIds.length ||
+      nextUploadIds.some((id, i) => id !== originalUploadIds[i]);
+    if (uploadsChanged) {
+      payload.uploadIds = nextUploadIds;
     }
 
     // No catch here: a failure (including backend validation) propagates into
@@ -173,7 +187,6 @@ export default function AdminIssueEditPage() {
             submitLabel="Save changes"
             onSubmit={handleFinish}
             submitErrorMessage="Could not update issue."
-            extraImagesLocked
           />
         ) : null}
       </section>
