@@ -286,8 +286,14 @@ export function CampaignCard({ campaign, language = "np", distanceKm = null }) {
   }
 
   return (
+    // The whole card is one click target. The title link is "stretched" (a
+    // ::after overlay spans the card in campaign-card.css) so a click anywhere
+    // on the media/body navigates to the detail page — we have no explicit
+    // "View detail" button, so the card itself is the affordance. The footer
+    // participation buttons sit above the overlay (z-index) AND already
+    // stopPropagation, so they open their modal instead of navigating.
     <article className="campaign-card" data-status={visual}>
-      <Link href={href} className="campaign-card-media" aria-label={accessibleLabel}>
+      <div className="campaign-card-media">
         {c.coverUrl ? (
           /* eslint-disable-next-line @next/next/no-img-element */
           <img
@@ -315,9 +321,9 @@ export function CampaignCard({ campaign, language = "np", distanceKm = null }) {
           </span>
         ) : null}
         {c.dateLabel ? <span className="campaign-card-eyebrow">{c.dateLabel}</span> : null}
-      </Link>
+      </div>
       <div className="campaign-card-body">
-        <Link href={href} className="campaign-card-title">
+        <Link href={href} className="campaign-card-title" aria-label={accessibleLabel}>
           {c.title}
         </Link>
         {c.addressText ? (

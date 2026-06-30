@@ -12,6 +12,8 @@
    * `data-status` set on the article; falls back to the brand accent. See the
    * `--state-<status>` tokens in globals.css. */
   --cta-core: var(--accent);
+  /* Positioned host for the stretched title link (whole card is clickable). */
+  position: relative;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -137,12 +139,25 @@
   font-size: 15px;
   font-weight: 700;
   line-height: 1.28;
+  /* Always reserve two lines so a one-line title doesn't let the body float up
+   * and leave an uneven gap — every card reads as the exact same size. */
+  min-height: calc(2 * 1.28em);
   color: var(--text);
   text-decoration: none;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+/* Stretch the title link across the whole card so a click anywhere on the
+ * media or body opens the detail page. Interactive footer controls re-raise
+ * themselves above this overlay below. */
+.campaign-card-title::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
 }
 
 .campaign-card-title:hover {
@@ -194,6 +209,10 @@
 .campaign-card-foot .campaign-action-btn {
   flex: 0 0 auto;
   max-width: 62%;
+  /* Above the stretched title-link overlay so it opens its modal (and already
+   * stopPropagation's) instead of navigating to the detail page. */
+  position: relative;
+  z-index: 2;
 }
 .campaign-card-foot .campaign-action-btn .campaign-action-btn-label {
   overflow: hidden;
@@ -219,6 +238,10 @@
 
 .campaign-card-cta {
   flex: none;
+  /* Above the stretched title-link overlay (it shares the same href, but
+   * keeping it on top avoids the overlay swallowing its own hover/focus). */
+  position: relative;
+  z-index: 2;
   white-space: nowrap;
   display: inline-flex;
   align-items: center;
