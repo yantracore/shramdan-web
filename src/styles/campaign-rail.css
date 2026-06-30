@@ -93,7 +93,12 @@
     #000 calc(100% - 28px),
     transparent 100%
   );
-  padding-block: 4px;
+  /* .swiper has overflow:hidden, which clips the cards' box-shadow top/bottom.
+   * Pad the block axis so the shadow has room inside the clip, then pull the
+   * block margin back so the rail's vertical rhythm stays tight. Inline padding
+   * stays 0 to keep the edge-to-edge peek + fade. */
+  padding-block: 22px;
+  margin-block: -14px;
 }
 
 .campaign-rail-slide {
