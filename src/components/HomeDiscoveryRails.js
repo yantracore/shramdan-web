@@ -9,10 +9,10 @@ import CampaignRail from "@/components/CampaignRail";
 
 const RAIL_COPY = {
   np: {
-    near: { eyebrow: "तपाईंका लागि", title: "तपाईं नजिकैका अभियान", viewAll: "सबै हेर्ने", href: "/campaigns" },
-    happening: { eyebrow: "सक्रिय", title: "अहिले र चाँडैका अभियान", viewAll: "सबै हेर्ने", href: "/campaigns?status=ACTIVE" },
-    support: { eyebrow: "साथ चाहिएको", title: "साथ खोज्दै", viewAll: "सबै हेर्ने", href: "/campaigns?status=OPEN" },
-    impact: { eyebrow: "प्रभाव", title: "भइसकेका काम", viewAll: "सबै हेर्ने", href: "/campaigns?status=COMPLETED" }
+    near: { eyebrow: "तपाईंको क्षेत्र वरपर", title: "नजिकैका अभियान", viewAll: "सबै हेर्ने", href: "/campaigns" },
+    happening: { eyebrow: "अहिले हुँदै", title: "सक्रिय अभियान", viewAll: "सबै हेर्ने", href: "/campaigns?status=ACTIVE" },
+    support: { eyebrow: "साथ चाहिएको", title: "खुला अभियान", viewAll: "सबै हेर्ने", href: "/campaigns?status=OPEN" },
+    impact: { eyebrow: "हालै सम्पन्न भएका", title: "सकिएका अभियान", viewAll: "सबै हेर्ने", href: "/campaigns?status=COMPLETED" }
   },
   en: {
     near: { eyebrow: "In your area", title: "Campaigns Near You", viewAll: "View All", href: "/campaigns" },
