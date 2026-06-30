@@ -124,24 +124,29 @@ export function useEventJoin(eventId, { seed = null, language = "np", eager = fa
     }
     setEventData(merged);
 
-    // 3. Fetch my own participation (auth only).
+    // 3. Resolve the viewer's own participation. GET /events/{id} is now
+    // auth-aware and embeds `viewerParticipation` (shipped 2026-06-30), so use
+    // it directly and skip the extra /participants/me round-trip. Fall back to
+    // the dedicated call only if the embed is absent (older/edge response).
     const resolvedId = merged.id || eventId;
-    if (session?.user?.id) {
+    const hasEmbeddedVP = merged && "viewerParticipation" in merged;
+    const toParticipation = (p) =>
+      p?.role && isActiveParticipationStatus(p.status)
+        ? { id: p.id, role: p.role, status: p.status }
+        : null;
+    if (!session?.user?.id) {
+      setMyParticipation(null);
+    } else if (hasEmbeddedVP) {
+      setMyParticipation(toParticipation(merged.viewerParticipation));
+    } else {
       try {
         const meResponse = await getJson(`/events/${resolvedId}/participants/me`, {
           requireAuth: true
         });
-        const meData = meResponse?.data ?? meResponse;
-        setMyParticipation(
-          meData?.role && isActiveParticipationStatus(meData.status)
-            ? { id: meData.id, role: meData.role, status: meData.status }
-            : null
-        );
+        setMyParticipation(toParticipation(meResponse?.data ?? meResponse));
       } catch {
         setMyParticipation(null);
       }
-    } else {
-      setMyParticipation(null);
     }
   }, [eventId, isDemoEvent, session?.user?.id]);
 
