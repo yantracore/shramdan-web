@@ -940,7 +940,8 @@ export default function CampaignsListPageContent() {
                 <>
                   <div ref={sentinelRef} className="events-split-sentinel" aria-hidden="true" />
                   <div className="events-split-loading" role="status" aria-live="polite">
-                    {t.loadingMore}
+                    <LoadingOutlined className="events-split-loading-spinner" aria-hidden="true" spin />
+                    <span>{t.loadingMore}</span>
                   </div>
                 </>
               ) : filteredItems.length > INITIAL_VISIBLE ? (

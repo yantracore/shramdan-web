@@ -334,6 +334,18 @@
   color: var(--muted);
 }
 
+.events-split-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.events-split-loading-spinner {
+  font-size: 16px;
+  color: var(--brand, var(--accent, currentColor));
+}
+
 .events-split-nomore {
   border-top: 1px dashed color-mix(in srgb, var(--line) 80%, transparent);
   padding-top: 18px;
