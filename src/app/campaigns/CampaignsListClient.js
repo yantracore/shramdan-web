@@ -45,6 +45,16 @@ const LOAD_MORE_STEP = 6;
 const THUMBNAILS_PAGE_SIZE = 12;
 const CATEGORY_VALUES = new Set(ISSUE_CATEGORIES);
 
+// Sort choices for the unified feed. Both `voteCount` and `createdAt` are
+// accepted by GET /issues AND GET /events, so one choice orders every lifecycle
+// bucket. The cleared (no-value) state keeps the lifecycle-smart default
+// ordering (OPEN by votes, SCHEDULED soonest-first, COMPLETED latest-done).
+const SORT_OPTIONS = [
+  { value: "votes", sort: "voteCount", order: "desc", labelKey: "sortMostVotes" },
+  { value: "newest", sort: "createdAt", order: "desc", labelKey: "sortNewest" }
+];
+const SORT_VALUES = new Set(SORT_OPTIONS.map((o) => o.value));
+
 // ----- session-scoped list memory --------------------------------------
 // The list lives on /campaigns; a card opens a full detail route
 // (/events/:id, /issues/:id), which unmounts this whole tree. Without help,
@@ -62,6 +72,7 @@ const CAMPAIGN_URL_PARAMS = [
   "category",
   "province",
   "district",
+  "sort",
   "q",
   "view",
   "page"
@@ -100,6 +111,7 @@ function sameListIdentity(snap, filters, view) {
     (snap.category ?? undefined) === (filters.category ?? undefined) &&
     (snap.provinceId ?? undefined) === (filters.provinceId ?? undefined) &&
     (snap.districtId ?? undefined) === (filters.districtId ?? undefined) &&
+    (snap.sort ?? undefined) === (filters.sort ?? undefined) &&
     (snap.q ?? "") === (filters.q ?? "") &&
     (snap.view ?? "list") === view
   );
@@ -213,6 +225,7 @@ export default function CampaignsListPageContent({ status: statusProp = "all" })
     const categoryParam = searchParams?.get("category");
     const provinceParam = searchParams?.get("province");
     const districtParam = searchParams?.get("district");
+    const sortParam = searchParams?.get("sort");
     const qParam = searchParams?.get("q");
     return {
       status: routeStatus,
@@ -222,6 +235,7 @@ export default function CampaignsListPageContent({ status: statusProp = "all" })
           : undefined,
       provinceId: provinceParam || undefined,
       districtId: districtParam || undefined,
+      sort: sortParam && SORT_VALUES.has(sortParam) ? sortParam : undefined,
       q: qParam ? qParam.trim() : ""
     };
   }, [searchParams, routeStatus]);
@@ -236,6 +250,7 @@ export default function CampaignsListPageContent({ status: statusProp = "all" })
       prev.category === next.category &&
       prev.provinceId === next.provinceId &&
       prev.districtId === next.districtId &&
+      prev.sort === next.sort &&
       prev.q === next.q
         ? prev
         : next
@@ -329,6 +344,8 @@ export default function CampaignsListPageContent({ status: statusProp = "all" })
       else params.delete("province");
       if (next.districtId) params.set("district", next.districtId);
       else params.delete("district");
+      if (next.sort) params.set("sort", next.sort);
+      else params.delete("sort");
       if (next.q) params.set("q", next.q);
       else params.delete("q");
       const query = params.toString();
@@ -351,6 +368,7 @@ export default function CampaignsListPageContent({ status: statusProp = "all" })
       if (filters.category) params.set("category", filters.category);
       if (filters.provinceId) params.set("province", filters.provinceId);
       if (filters.districtId) params.set("district", filters.districtId);
+      if (filters.sort) params.set("sort", filters.sort);
       if (filters.q) params.set("q", filters.q);
       const v = searchParams?.get("view");
       if (v === "map" || v === "thumbnails") params.set("view", v);
@@ -409,6 +427,7 @@ export default function CampaignsListPageContent({ status: statusProp = "all" })
     if (snap.category) params.set("category", snap.category);
     if (snap.provinceId) params.set("province", snap.provinceId);
     if (snap.districtId) params.set("district", snap.districtId);
+    if (snap.sort) params.set("sort", snap.sort);
     if (snap.q) params.set("q", snap.q);
     if (snap.view === "map" || snap.view === "thumbnails") {
       params.set("view", snap.view);
@@ -426,13 +445,18 @@ export default function CampaignsListPageContent({ status: statusProp = "all" })
   }, [routeStatus, searchParams, router, listMemory]);
 
   // ----- data ------------------------------------------------------------
+  // Resolve the picked sort choice into the API's { sort, order } pair. No
+  // choice → both undefined → the feed keeps its lifecycle-smart default order.
+  const sortChoice = SORT_OPTIONS.find((o) => o.value === filters.sort) || null;
   const { items, loading, error } = useCampaignFeed({
     status: filters.status,
     language,
     provinceId: filters.provinceId,
     districtId: filters.districtId,
     category: filters.category,
-    q: filters.q
+    q: filters.q,
+    sort: sortChoice?.sort,
+    order: sortChoice?.order
   });
 
   // Per-stage counts for the chip badges — always all five, independent of the
@@ -603,6 +627,7 @@ export default function CampaignsListPageContent({ status: statusProp = "all" })
       category: filters.category,
       provinceId: filters.provinceId,
       districtId: filters.districtId,
+      sort: filters.sort,
       q: filters.q,
       view,
       page
@@ -681,6 +706,10 @@ export default function CampaignsListPageContent({ status: statusProp = "all" })
   const categoryOptions = ISSUE_CATEGORIES.map((value) => ({
     value,
     label: categoryOptionLabel(value, issuesCopy.categoryLabels?.[value] || value)
+  }));
+  const sortOptions = SORT_OPTIONS.map((o) => ({
+    value: o.value,
+    label: issuesCopy.filters?.[o.labelKey] || o.value
   }));
   const reportIssueCtaLabel =
     (copy[language] || copy.np)?.issueNew?.cta?.list ?? "Report New Issue";
@@ -875,6 +904,24 @@ export default function CampaignsListPageContent({ status: statusProp = "all" })
                 onChange={handleGeographyChange}
                 language={language}
               />
+              {/* Sort sits apart on the right (margin-left:auto); category /
+                  province / district stay grouped on the left. */}
+              <div className="public-issues-filter-field public-issues-sort-field">
+                <label
+                  className="public-issues-filter-label"
+                  htmlFor="campaigns-filter-sort"
+                >
+                  {issuesCopy.filters.sortLabel}
+                </label>
+                <Select
+                  id="campaigns-filter-sort"
+                  allowClear
+                  onChange={(value) => setFilter("sort", value)}
+                  options={sortOptions}
+                  placeholder={issuesCopy.filters.sortPlaceholder}
+                  value={filters.sort}
+                />
+              </div>
             </div>
           ) : null}
         </div>

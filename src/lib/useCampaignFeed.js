@@ -24,7 +24,7 @@ import { CAMPAIGN_STATUS_SEQUENCE } from "@/lib/campaignStatus";
 
 const ISSUE_LIMIT = 50;
 
-async function fetchOpenIssues({ provinceId, districtId, category, search }) {
+async function fetchOpenIssues({ provinceId, districtId, category, search, sort, order }) {
   const response = await getJson("/issues", {
     params: {
       status: "OPEN",
@@ -33,6 +33,9 @@ async function fetchOpenIssues({ provinceId, districtId, category, search }) {
       // Backend-side filtering — GET /issues accepts `category` + `search`.
       ...(category ? { category } : {}),
       ...(search ? { search } : {}),
+      // Backend-side ordering — GET /issues accepts `sort` (voteCount |
+      // createdAt) + `order`. Only forwarded when the caller picks a sort.
+      ...(sort ? { sort, order: order || "desc" } : {}),
       limit: ISSUE_LIMIT
     }
   });
@@ -47,7 +50,9 @@ async function fetchOpenIssues({ provinceId, districtId, category, search }) {
     id: issue.id,
     data: issue
   }));
-  // Most-supported first.
+  // An explicit sort is already applied server-side — trust that order.
+  // Otherwise default to most-supported first.
+  if (sort) return entries;
   return entries.sort(
     (a, b) => (b.data.voteCount || 0) - (a.data.voteCount || 0)
   );
@@ -69,12 +74,15 @@ async function fetchStatus(status, opts) {
   // Every later stage maps 1:1 to a backend event status — fetch it raw so the
   // displayed list and the chip-row count agree exactly.
   const entries = toEventEntries(status, await listEventsByStatus(status, opts));
+  // An explicit sort is honoured server-side; keep that order. Without one,
+  // fall back to the lifecycle-smart default (soonest upcoming / latest done).
+  if (opts.sort) return entries;
   if (status === "SCHEDULED") return entries.sort(byScheduledAsc);
   if (status === "COMPLETED") return entries.sort(byCompletedDesc);
   return entries;
 }
 
-export function useCampaignFeed({ status, language, provinceId, districtId, category, q }) {
+export function useCampaignFeed({ status, language, provinceId, districtId, category, q, sort, order }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -82,7 +90,9 @@ export function useCampaignFeed({ status, language, provinceId, districtId, cate
   const load = useCallback(async () => {
     // All filtering is server-side: category + search (q) are forwarded to both
     // /issues (OPEN) and /events (other stages). No client-side narrowing.
-    const opts = { language, provinceId, districtId, category, search: q };
+    // `sort`/`order` (when set) likewise ride to the API per bucket; in "all"
+    // mode the lifecycle grouping stays, with each bucket ordered by the sort.
+    const opts = { language, provinceId, districtId, category, search: q, sort, order };
     const wanted =
       !status || status === "all" ? CAMPAIGN_STATUS_SEQUENCE : [status];
     // Settle each stage independently: a single failing endpoint contributes
@@ -98,7 +108,7 @@ export function useCampaignFeed({ status, language, provinceId, districtId, cate
       else anyError = true;
     });
     return { merged, anyError };
-  }, [status, language, provinceId, districtId, category, q]);
+  }, [status, language, provinceId, districtId, category, q, sort, order]);
 
   useEffect(() => {
     let cancelled = false;

@@ -9006,6 +9006,14 @@
   position: relative;
 }
 
+/* In the campaigns filter panel, sort sits apart on the right while category /
+   province / district stay grouped left. The auto margin only bites while the
+   row is on one line; once items wrap full-width (narrow viewports, see the
+   .public-issues-filter-field width:100% rule) it's a no-op. */
+.public-issues-filters .public-issues-sort-field {
+  margin-left: auto;
+}
+
 .public-issues-actions .public-issues-filter-field {
   min-width: 200px;
 }
