@@ -9,11 +9,7 @@
 
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useIssueVote } from "@/lib/useIssueVote";
-import {
-  fetchIssueParticipants,
-  fetchMyIssueVotes,
-  getJson
-} from "@/lib/apiClient";
+import { fetchIssueParticipants, getJson } from "@/lib/apiClient";
 import { getAuthSession, subscribeAuthSession } from "@/lib/authSession";
 import { getListItems } from "@/lib/adminUtils";
 import { resolveEventForIssue } from "@/lib/eventsApi";
@@ -131,11 +127,8 @@ export function useRoleSupport(
 
   // ── Lazy load ──────────────────────────────────────────────────────────────
   const load = useCallback(async () => {
-    const [detail, myVotesRes, partsRes] = await Promise.all([
+    const [detail, partsRes] = await Promise.all([
       getJson(`/issues/${issueId}`).catch(() => null),
-      getAuthSession()?.user
-        ? fetchMyIssueVotes({ limit: 100 }).catch(() => null)
-        : Promise.resolve(null),
       fetchIssueParticipants(issueId, { limit: 100 }).catch(() => null)
     ]);
     // Merge fetched detail over the seed (detail is the authoritative snapshot).
@@ -143,11 +136,13 @@ export function useRoleSupport(
     if (data) {
       setIssue((prev) => ({ ...(prev || {}), ...data }));
     }
-    const myVotes = myVotesRes ? getListItems(myVotesRes) : [];
-    const mine = myVotes.find((v) => String(v.id) === String(data?.id ?? issueId));
+    // The issue detail read is now auth-aware (shipped 2026-07-01) and echoes the
+    // viewer's own vote — isVoted + voterRole + eventRole — so derive myVote
+    // straight from it. No separate /issues/me/votes round-trip.
+    const voted = Boolean(data?.isVoted || data?.voterRole);
     setMyVote(
-      mine
-        ? { voterRole: mine.voterRole || "INTERESTED", eventRole: mine.eventRole || null }
+      voted
+        ? { voterRole: data.voterRole || "INTERESTED", eventRole: data.eventRole || null }
         : null
     );
     setParticipants(getListItems(partsRes));
@@ -308,7 +303,7 @@ export function useRoleSupport(
     // Vote state (mirrors useIssueVote surface)
     isAuthenticated,
     voteCount,
-    // Reflect the resolved myVote (from fetchMyIssueVotes) in the voted face.
+    // Reflect the resolved myVote (from the issue detail read) in the voted face.
     // useIssueVote only knows seed.isVoted, so on the detail page (controlled +
     // eager) a pre-existing vote — e.g. the viewer is already the coordinator —
     // must surface through myVote, else the topline button wrongly reads
