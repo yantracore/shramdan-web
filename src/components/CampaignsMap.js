@@ -2,15 +2,18 @@
 
 import EventMapBlock from "@/components/EventMapBlock";
 import { campaignVisualStatus } from "@/lib/campaignStatus";
+import { useCampaignMarkers } from "@/lib/useCampaignMarkers";
 
-// Plots the current /campaigns feed — issues AND events together — on one
-// Leaflet map by reusing EventMap's combined-marker support: events ride in as
-// `entries` ({ event, status }) and issues as raw `issues`, both clustered in a
-// single layer. Imported only via EventMapBlock (next/dynamic, ssr:false) so
-// Leaflet never touches `window` on the server.
+// Plots the /campaigns feed — issues AND events together — on one Leaflet map by
+// reusing EventMap's combined-marker support: events ride in as `entries`
+// ({ event, status }) and issues as raw `issues`, both clustered in a single
+// layer. Imported only via EventMapBlock (next/dynamic, ssr:false) so Leaflet
+// never touches `window` on the server.
 //
-// `items` is the already-filtered campaign feed ({ kind, status, id, data }),
-// so the map always reflects exactly what the list would show.
+// Marker source: its OWN lightweight GET /campaigns?mode=minimal fetch
+// (useCampaignMarkers) so the map shows EVERY matching campaign, not just the
+// list's loaded page. While that loads (or if it errors) it falls back to the
+// `items` prop (the in-memory list feed) so it never renders worse than before.
 function isMappable(record) {
   const lat = Number(record?.latitude);
   const lng = Number(record?.longitude);
@@ -25,9 +28,14 @@ export function CampaignsMap({
   emptyLabel,
   height = 600
 }) {
+  const { markers, loading, error } = useCampaignMarkers();
+  // Authoritative once the minimal fetch resolves; the list feed is the fallback
+  // while loading or on error (worst case = the previous behaviour).
+  const source = !loading && !error ? markers : items || [];
+
   const entries = [];
   const issues = [];
-  (items || []).forEach((entry) => {
+  source.forEach((entry) => {
     if (!entry?.data) return;
     if (entry.kind === "event") {
       entries.push({
