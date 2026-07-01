@@ -67,3 +67,21 @@ overlay gradients, data flow, empty/loading states, a11y messages.
 Run the dev server, open `/`, screenshot the rail. Assert: no 3D tilt, flat
 3-up with a dominant center card and scaled/dimmed side cards, tighter vertical
 padding. Tune scale/opacity from the real render if needed.
+
+## Follow-up — click a side slide to focus it (2026-07-01)
+
+Clicking a dimmed side card previously followed its `<Link>` straight to the
+detail page (or, when the click landed on a clipped area, did nothing useful).
+Expected carousel behaviour: clicking a side (non-active) card should slide it
+to center; only the already-centered card opens its detail page.
+
+Implemented with Swiper's `slideToClickedSlide` plus a `handlePosterClick`
+guard on each card `<Link>`: on a genuine pointer click (`event.detail >= 1`)
+of a slide that lacks `.swiper-slide-active`, we `preventDefault()` so Swiper
+focuses it instead of navigating. Next's `<Link>` respects `defaultPrevented`.
+Keyboard activation (Enter → `click` with `detail === 0`) still follows the
+link, since `slideToClickedSlide` is pointer-only.
+
+Verified in-browser (1440): clicking the right neighbour advanced the active
+card by one with the URL staying `/`; clicking the left neighbour moved it
+back; clicking the centered card navigated to its detail page.

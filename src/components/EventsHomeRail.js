@@ -42,6 +42,13 @@ import "swiper/css/pagination";
 //   autoplay, and the CSS transition is turned off via a
 //   `prefers-reduced-motion` rule — nothing moves without input.
 //
+// Click-to-focus:
+//   `slideToClickedSlide` brings a clicked side slide to center.
+//   handlePosterClick() suppresses the card <Link> navigation on a
+//   pointer click of a non-active slide, so clicking a dimmed side
+//   card focuses it instead of navigating. Keyboard Enter on a card
+//   still follows the link.
+//
 // No video preview:
 //   We intentionally do NOT auto-mount a live-stream iframe on
 //   the active LIVE card. The iframe player was a poor UX in a
@@ -94,6 +101,22 @@ function fallBackPoster(event) {
 
 function hideBrokenImage(event) {
   event.currentTarget.hidden = true;
+}
+
+// Clicking a dimmed side slide should bring it to center rather than
+// open its detail page. Swiper's `slideToClickedSlide` does the move;
+// here we suppress the wrapping <Link>'s navigation when the clicked
+// card is NOT the active (centered) slide. We read the live
+// `.swiper-slide-active` class off the DOM so loop-mode clones resolve
+// correctly, and only intercept genuine pointer clicks (event.detail
+// >= 1) — keyboard activation (Enter → click with detail 0) still
+// follows the link, since slideToClickedSlide is pointer-only.
+function handlePosterClick(event) {
+  if (event.detail === 0) return;
+  const slideEl = event.currentTarget.closest(".swiper-slide");
+  if (slideEl && !slideEl.classList.contains("swiper-slide-active")) {
+    event.preventDefault();
+  }
 }
 
 function getBusinessImages(event) {
@@ -282,6 +305,7 @@ export function EventsHomeRail({
           className="events-home-rail-swiper"
           grabCursor
           centeredSlides
+          slideToClickedSlide
           breakpoints={SLIDES_BREAKPOINTS}
           loop={items.length > 3}
           speed={reduceMotion ? SLIDE_SPEED_REDUCED : SLIDE_SPEED_DEFAULT}
@@ -344,6 +368,7 @@ function LivePosterCard({ event, copy, language, isActive }) {
         href={`/events/${event.slug ?? event.id}`}
         className="events-home-rail-poster-link"
         aria-label={event.title}
+        onClick={handlePosterClick}
       >
         <div className="events-home-rail-poster">
           {thumbnailUrl ? (
@@ -406,6 +431,7 @@ function UpcomingPosterCard({ event, language, copy, isActive }) {
         href={`/events/${event.slug ?? event.id}`}
         className="events-home-rail-poster-link"
         aria-label={event.title}
+        onClick={handlePosterClick}
       >
         <div className="events-home-rail-poster">
           {/* eslint-disable-next-line @next/next/no-img-element */}
