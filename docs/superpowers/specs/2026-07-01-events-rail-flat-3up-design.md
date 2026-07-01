@@ -38,8 +38,10 @@ model.
 - Remove the `effect="coverflow"` and `coverflowEffect={…}` props → default
   slide effect.
 - Remove the `COVERFLOW_PARAMS` constant. Rename `COVERFLOW_SPEED_*` →
-  `SLIDE_SPEED_*`; drop the default transition to ~600ms (a flat slide feels
-  snappier than the 900ms coverflow glide). Reduced-motion stays at 0 (snap).
+  `SLIDE_SPEED_*`. Slide speed is 1200ms for a slow, calm glide; the CSS
+  scale/dim transition matches at 1.1s so the side card reaches full
+  size/opacity right as it finishes centering. Reduced-motion stays at 0
+  (snap), with the CSS transition disabled under `prefers-reduced-motion`.
 - Rewrite the DESIGN CONTRACT header comment to describe the flat 3-up model.
 
 ### `live-events-rail.css`

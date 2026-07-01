@@ -62,7 +62,7 @@ import "swiper/css/pagination";
 //   a 3D effect or the autoplay iframe.
 // =============================================================
 
-const SLIDE_SPEED_DEFAULT = 600;
+const SLIDE_SPEED_DEFAULT = 1200;
 const SLIDE_SPEED_REDUCED = 0;
 const MAX_RAIL_ITEMS = 5;
 const RESTROVERSE_BUSINESS_IMAGES = Object.freeze([
