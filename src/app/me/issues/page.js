@@ -9,22 +9,25 @@
 //   Create → /issues/new (already exists)
 //   Read   → GET /issues/me (this page) + public detail /issues/{id}
 //   Update → PATCH /issues/{id}, author-only AND only while status OPEN
-//   Delete → MODERATOR/ADMIN only — members cannot delete/withdraw yet
-// So the "Edit" affordance only appears on OPEN issues; everything else
-// is view-only. See docs/api-requirements/issues.md for the delete gap.
+//   Delete → MODERATOR/ADMIN hard-delete; the author's own soft-takedown is
+//            POST /issues/{id}/withdraw (OPEN only, shipped 2026-07-01).
+// So OPEN issues get Edit + Withdraw; everything else is view-only.
 
 import {
   EditOutlined,
   EnvironmentOutlined,
   EyeOutlined,
   PlusOutlined,
-  RiseOutlined
+  RiseOutlined,
+  StopOutlined
 } from "@ant-design/icons";
-import { Button, Empty, Select, Table, Tag } from "antd";
+import { Button, Empty, Popconfirm, Select, Table, Tag } from "antd";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import { withdrawIssue } from "@/lib/apiClient";
+import { useToast } from "@/lib/toast";
 import { AdminResponsiveList } from "@/components/AdminResponsiveList";
 import { AdminFilters } from "@/components/admin/AdminFilters";
 import { AdminListCard } from "@/components/admin/AdminListCard";
@@ -94,6 +97,12 @@ const COPY = {
     view: "हेर्ने",
     edit: "सम्पादन",
     editLockedTip: "OPEN रहेको समस्या मात्र सम्पादन गर्न मिल्छ।",
+    withdraw: "फिर्ता लिने",
+    withdrawConfirm: "यो समस्या फिर्ता लिने? यो कार्य उल्टाउन मिल्दैन।",
+    withdrawOk: "फिर्ता लिने",
+    withdrawCancel: "रद्द",
+    withdrawn: "समस्या फिर्ता लियो।",
+    withdrawError: "फिर्ता लिन सकिएन। फेरि प्रयास गर्नुहोस्।",
     statusLabels: {
       OPEN: "खुला",
       EVENT_SCHEDULED: "कार्यक्रम तय",
@@ -126,6 +135,12 @@ const COPY = {
     view: "View",
     edit: "Edit",
     editLockedTip: "Only an OPEN issue can be edited.",
+    withdraw: "Withdraw",
+    withdrawConfirm: "Withdraw this issue? This can't be undone.",
+    withdrawOk: "Withdraw",
+    withdrawCancel: "Cancel",
+    withdrawn: "Issue withdrawn.",
+    withdrawError: "Could not withdraw. Please try again.",
     statusLabels: {
       OPEN: "Open",
       EVENT_SCHEDULED: "Event scheduled",
@@ -146,6 +161,8 @@ export default function MeIssuesPage() {
 
   const session = useSyncExternalStore(subscribeAuthSession, getAuthSession, () => null);
   const sessionResolved = typeof window !== "undefined";
+  const messageApi = useToast();
+  const [withdrawingId, setWithdrawingId] = useState(null);
 
   const {
     items: rawIssues,
@@ -199,15 +216,41 @@ export default function MeIssuesPage() {
     }
   }, [router, session, sessionResolved]);
 
+  const handleWithdraw = async (issue) => {
+    setWithdrawingId(issue.id);
+    try {
+      await withdrawIssue(issue.id);
+      messageApi.success(t.withdrawn);
+      refetch();
+    } catch (err) {
+      messageApi.error(err?.message || t.withdrawError);
+    } finally {
+      setWithdrawingId(null);
+    }
+  };
+
   const renderActions = (issue) => (
     <div className="admin-row-actions">
       <Link href={issueHref(issue)}>
         <Button icon={<EyeOutlined />}>{t.view}</Button>
       </Link>
       {issue.status === "OPEN" ? (
-        <Link href={`/me/issues/${issue.id}/edit`}>
-          <Button icon={<EditOutlined />}>{t.edit}</Button>
-        </Link>
+        <>
+          <Link href={`/me/issues/${issue.id}/edit`}>
+            <Button icon={<EditOutlined />}>{t.edit}</Button>
+          </Link>
+          <Popconfirm
+            title={t.withdrawConfirm}
+            okText={t.withdrawOk}
+            cancelText={t.withdrawCancel}
+            okButtonProps={{ danger: true }}
+            onConfirm={() => handleWithdraw(issue)}
+          >
+            <Button danger icon={<StopOutlined />} loading={withdrawingId === issue.id}>
+              {t.withdraw}
+            </Button>
+          </Popconfirm>
+        </>
       ) : (
         <Button icon={<EditOutlined />} disabled title={t.editLockedTip}>
           {t.edit}

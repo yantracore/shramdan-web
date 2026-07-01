@@ -389,9 +389,10 @@ export function submitApplication(values) {
 
 // `eventRole` is REQUIRED when voterRole === "GOING" (the participant role the
 // voter signs up to take at the eventual event — WORKER | PHOTOGRAPHER |
-// LIVESTREAMER | MEDIC | SAFETY_LEAD | COORDINATOR | LOGISTICS) and MUST be
-// omitted for INTERESTED / WANT_TO_LEAD. On conversion, GOING voters carrying a
-// role are auto-added as CONFIRMED participants.
+// LIVESTREAMER | MEDIC | SAFETY_LEAD | LOGISTICS) and MUST be omitted for
+// INTERESTED / WANT_TO_LEAD. COORDINATOR was removed from this enum 2026-06-23
+// (coordination ≡ leadership → the WANT_TO_LEAD path). On conversion, GOING
+// voters carrying a role are auto-added as CONFIRMED participants.
 export function voteOnIssue(issueId, voterRole = "INTERESTED", eventRole) {
   const body = { voterRole };
   if (eventRole) body.eventRole = eventRole;
@@ -402,6 +403,16 @@ export function voteOnIssue(issueId, voterRole = "INTERESTED", eventRole) {
 // (returns 409 otherwise) and responds with { data: { voteCount } }.
 export function retractVoteOnIssue(issueId) {
   return deleteJson(`/issues/${issueId}/vote`, { requireAuth: true });
+}
+
+// An issue's participant roster — the GOING voters who picked a participation
+// role, i.e. the people who'll show up once the issue converts to an event.
+// Public read; paginated ({ items, nextCursor }). Each item is
+// { voteId, eventRole, joinedAt, user: { id, name, username, avatar, city } }.
+// This is the issue-stage analogue of GET /events/{id}/participants — same
+// "who's committed to this activity" surface, one lifecycle stage earlier.
+export function fetchIssueParticipants(issueId, params = {}) {
+  return getJson(`/issues/${issueId}/participants`, { params });
 }
 
 // Event logistics edit + cancel (event leader or admin). updateEvent takes a
@@ -425,6 +436,12 @@ export function cancelEvent(eventId, reason) {
 // deleteJson directly; the comment-report helper lives in commentsApi.js.)
 export function reportIssue(issueId, values) {
   return postJson(`/issues/${issueId}/report`, values, { requireAuth: true });
+}
+
+// Author soft-takedown of their own OPEN issue (POST /issues/{id}/withdraw,
+// no body). Completes member My-issues CRUD (delete stays moderator-only).
+export function withdrawIssue(issueId) {
+  return postJson(`/issues/${issueId}/withdraw`, {}, { requireAuth: true });
 }
 
 // Issues the caller has voted on — full issue objects decorated with
@@ -474,4 +491,10 @@ export function markAllNotificationsRead() {
 
 export function updateNotificationPreferences(values) {
   return putJson("/notifications/preferences", values, { requireAuth: true });
+}
+
+// GET the saved channel prefs → { channels: { sms, email, push } }. Lets the
+// toggles reflect persisted state instead of starting from defaults.
+export function fetchNotificationPreferences() {
+  return getJson("/notifications/preferences", { requireAuth: true });
 }

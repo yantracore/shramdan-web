@@ -1,14 +1,16 @@
 "use client";
 
-// Notification channel preferences — wired to PUT /notifications/preferences
-// { sms, email, push }. The backend exposes no GET for the current values yet
-// (tracked in docs/api-requirements/notifications.md), so the toggles start
-// from sensible defaults and the Save button persists the chosen channels.
+// Notification channel preferences — GET /notifications/preferences hydrates the
+// toggles from the saved state, PUT /notifications/preferences persists changes
+// ({ sms, email, push }). Both shipped 2026-07-01.
 
 import { MailOutlined, MobileOutlined, BellOutlined } from "@ant-design/icons";
 import { Button, Switch } from "antd";
-import { useState } from "react";
-import { updateNotificationPreferences } from "@/lib/apiClient";
+import { useEffect, useState } from "react";
+import {
+  fetchNotificationPreferences,
+  updateNotificationPreferences
+} from "@/lib/apiClient";
 import { useToast } from "@/lib/toast";
 
 const COPY = {
@@ -55,6 +57,29 @@ export function NotificationChannelPrefs({ language = "np" }) {
   const messageApi = useToast();
   const [prefs, setPrefs] = useState({ email: true, push: true, sms: false });
   const [saving, setSaving] = useState(false);
+
+  // Hydrate from the saved channel prefs so the toggles reflect persisted state.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetchNotificationPreferences();
+        const channels = res?.data?.channels || res?.channels;
+        if (!cancelled && channels) {
+          setPrefs((prev) => ({
+            email: Boolean(channels.email ?? prev.email),
+            push: Boolean(channels.push ?? prev.push),
+            sms: Boolean(channels.sms ?? prev.sms)
+          }));
+        }
+      } catch {
+        // Keep the sensible defaults if the read fails.
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const toggle = (key) => (checked) =>
     setPrefs((prev) => ({ ...prev, [key]: checked }));
