@@ -19,15 +19,15 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "@/styles/campaign-rail.css";
 
-const BREAKPOINTS = {
-  // Phones show ~1.85 cards so two thumbnails read at once with a peek of the
-  // next — never one giant card. Scales up from there.
-  0: { slidesPerView: 1.85, spaceBetween: 12 },
-  480: { slidesPerView: 2.2, spaceBetween: 14 },
-  640: { slidesPerView: 2.6, spaceBetween: 16 },
-  1024: { slidesPerView: 3.2, spaceBetween: 18 },
-  1280: { slidesPerView: 4.2, spaceBetween: 20 }
-};
+// NOTE: slide WIDTH and gap are deliberately NOT set here — they're 100%
+// CSS-owned (`.campaign-rail-slide` in campaign-rail.css, sized with `cqw`
+// against the rail's own width). The Swiper runs `slidesPerView="auto"
+// spaceBetween={0}` so it NEVER computes a slide width from the container's
+// clientWidth. That is the actual fix for "spacing lost on return": Swiper used
+// to bake inline slide widths from a clientWidth it read during a transient
+// remount frame, and a wrong read collapsed the cards to full width forever.
+// With CSS-owned widths there is nothing for a bad measurement to corrupt.
+// The old ~1.85/2.2/2.6/3.2/4.2-per-view feel is reproduced by the cqw math.
 
 export default function CampaignRail({
   eyebrow,
@@ -155,11 +155,12 @@ export default function CampaignRail({
           keyboard={{ enabled: true }}
           speed={reduced ? 0 : 420}
           watchOverflow
-          breakpoints={BREAKPOINTS}
-          // The homepage re-renders often (ticker, live widgets) and remounts on
-          // client navigation. Without observers Swiper can keep stale slide
-          // widths/spacing after a back-nav — gaps collapse, cards squish. These
-          // make it re-measure whenever its DOM or an ancestor mutates.
+          // Widths are CSS-owned (see the BREAKPOINTS note above); "auto" makes
+          // Swiper READ each slide's CSS width instead of computing one from
+          // clientWidth, and spaceBetween 0 leaves the gap to CSS margin too.
+          slidesPerView="auto"
+          spaceBetween={0}
+          // Belt-and-suspenders: still re-measure on DOM/ancestor mutation.
           observer
           observeParents
           onSwiper={(s) => {

@@ -112,6 +112,12 @@
 /* Edge fade: cards "vanish" only at a boundary that has more content past it. */
 .campaign-rail-swiper {
   width: 100%;
+  /* Establish this as the query container so the slides below can size their
+   * width with `cqw` (1% of THIS element's width). That makes each card a pure
+   * CSS fraction of the rail — mirroring the old slidesPerView numbers — with
+   * ZERO dependence on Swiper's JS clientWidth measurement, so a mis-timed
+   * measure on a route-return remount can never collapse the spacing again. */
+  container-type: inline-size;
   -webkit-mask-image: linear-gradient(
     90deg,
     transparent 0,
@@ -144,9 +150,48 @@
   }
 }
 
+/* CSS-owned slide width + gap (see .campaign-rail-swiper note). `cqw` is 1% of
+ * the rail's own width, so `100cqw / N - gap` reproduces the old N-per-view feel
+ * exactly, but the browser computes it from real layout — Swiper (slidesPerView
+ * "auto", spaceBetween 0) only READS it. Nothing here can be corrupted by a
+ * stale Swiper measurement, so the cards can never blow up to full width or lose
+ * their gaps on a client-nav return. Phones ~1.85/view → up to 4.2 on desktop. */
 .campaign-rail-slide {
   height: auto;
   display: flex;
+  width: calc(100cqw / 1.85 - 12px);
+  margin-right: 12px;
+}
+
+@media (min-width: 480px) {
+  .campaign-rail-slide {
+    width: calc(100cqw / 2.2 - 14px);
+    margin-right: 14px;
+  }
+}
+@media (min-width: 640px) {
+  .campaign-rail-slide {
+    width: calc(100cqw / 2.6 - 16px);
+    margin-right: 16px;
+  }
+}
+@media (min-width: 1024px) {
+  .campaign-rail-slide {
+    width: calc(100cqw / 3.2 - 18px);
+    margin-right: 18px;
+  }
+}
+@media (min-width: 1280px) {
+  .campaign-rail-slide {
+    width: calc(100cqw / 4.2 - 20px);
+    margin-right: 20px;
+  }
+}
+
+/* The trailing gap would otherwise push the last card partly under the right
+ * edge mask; drop it so the final card sits flush at the end. */
+.campaign-rail-slide:last-child {
+  margin-right: 0;
 }
 
 .campaign-rail-slide > * {
