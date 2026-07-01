@@ -16,12 +16,26 @@
 }
 
 @media (max-width: 640px) {
-  /* Phone — tighten the side gutter (18px → 10px) so the cards use more of
-   * the narrow viewport and the first card's left edge lines up with the
-   * widened events poster + map above. The cards keep their own inner
-   * padding, so content never crowds the screen edge. */
+  /* Phone — full-bleed the scroll rows. The container gutter drops to 0 so the
+   * cards run to the true screen edges and a mid-scroll card clips at the edge
+   * (that "half a card disappearing" is what signals there's more to scroll).
+   * The heading and the resting first/last card keep a tidy 10px inset that
+   * lines up with the widened map + poster above — so only the scrolled cards
+   * bleed, never the resting layout. */
   .home-discovery-rails {
-    padding: 0 10px;
+    padding: 0;
+  }
+  .home-discovery-rails .discovery-strip-head {
+    padding-inline: 10px;
+  }
+  /* Scoped under .home-discovery-rails to out-specify the base
+   * .discovery-strip-track rule further down (which sets padding: 0). The
+   * track box still spans edge-to-edge — cards clip at the true screen edge
+   * when scrolled — while this inline padding seats the resting first/last
+   * card at 10px, aligned with the heading above. */
+  .home-discovery-rails .discovery-strip-track {
+    padding-inline: 10px;
+    scroll-padding-inline: 10px;
   }
 }
 
