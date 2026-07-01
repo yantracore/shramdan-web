@@ -17,6 +17,16 @@
   background: transparent;
 }
 
+/* Below the pill breakpoint the top corner chrome is removed, so content no
+   longer needs to clear a floating chip band — collapse the clear-zone to a
+   thin top inset (plus any notch safe-area). Kills the big empty top gap that
+   the corners used to reserve. */
+@media (max-width: 1024px) {
+  .site-shell {
+    --corner-clear-zone: max(8px, env(safe-area-inset-top, 0px));
+  }
+}
+
 /* Banner is a landmark for AT but contributes no visual box of its own —
  * the four corner blocks are independently positioned. */
 .site-shell-banner {
@@ -215,11 +225,11 @@
   object-fit: contain;
 }
 
-/* Top-center pill nav — CSS-only visibility at >= 1180px so SSR/hydration
- * stays stable; DOM is always present. Flush to the top edge like the
+/* Top-center pill nav — CSS-only visibility at >= 1025px so SSR/hydration
+ * stays stable; DOM is always present. Below 1025 the bottom tab bar is the
+ * only nav (and the corner chrome is hidden). Flush to the top edge like the
  * four corner chips: only the two inward-facing (bottom) corners round,
- * top border drops so it reads as part of the wall. Saves the vertical
- * inset the floating capsule used to claim. */
+ * top border drops so it reads as part of the wall. */
 .site-shell-pill {
   display: none;
   position: fixed;
@@ -247,9 +257,23 @@
     transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-@media (min-width: 1180px) {
+@media (min-width: 1025px) {
   .site-shell-pill {
     display: inline-flex;
+  }
+}
+
+/* Below the pill breakpoint (phones + tablets): the bottom tab bar is the ONLY
+   navigation. Remove the four-corner chrome entirely — brand (TL), quick
+   controls + user menu (TR), and BackToTop/FAB corner (BR). Their functions
+   relocate: brand/home → Home tab, notifications → its own tab, profile → Me
+   tab, theme/language/logout → the More sheet. */
+@media (max-width: 1024px) {
+  .site-shell-corner--top-left,
+  .site-shell-corner--top-right,
+  .site-shell-corner--bottom-left,
+  .site-shell-corner--bottom-right {
+    display: none;
   }
 }
 
@@ -15516,11 +15540,30 @@
   -webkit-backdrop-filter: blur(14px);
   border-top: 1px solid var(--line);
   padding: 6px 0 max(6px, env(safe-area-inset-bottom));
-  /* Primary navigation below the pill breakpoint (mobile + tablet). One
-     surface, no redundant hamburger. The pill takes over at >=1180px. */
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  /* Primary navigation below the pill breakpoint (phones + tablets, <=1024px).
+     Flex (not fixed grid) so the tab count can grow on wider tablets — the
+     `--wide` tabs reveal from 640px up — and the bar always fills its width
+     evenly instead of stretching a few slots thin. */
+  display: flex;
   gap: 2px;
+}
+
+.mobile-bottom-nav-tab {
+  flex: 1 1 0;
+}
+
+/* Wide-only tabs: hidden on phones (keeps a tidy 5-slot bar), revealed on
+   tablets so the stretched bar carries real actions, not gaps. The descendant
+   selector out-specifies the base `.mobile-bottom-nav-tab { display: flex }`
+   below, which would otherwise win on source order. */
+.mobile-bottom-nav .mobile-bottom-nav-tab--wide {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .mobile-bottom-nav .mobile-bottom-nav-tab--wide {
+    display: flex;
+  }
 }
 
 /* Reserve space so the fixed bottom bar never overlaps page content or a
@@ -15529,7 +15572,7 @@
   padding-bottom: calc(58px + env(safe-area-inset-bottom, 0px));
 }
 
-@media (min-width: 1180px) {
+@media (min-width: 1025px) {
   .mobile-bottom-nav {
     display: none;
   }
@@ -15538,12 +15581,9 @@
   }
 }
 
-/* Below the pill breakpoint, float the BackToTop / FAB chip above the bar. */
-@media (max-width: 1179.98px) {
-  .site-shell-corner--bottom-right {
-    bottom: calc(70px + env(safe-area-inset-bottom, 0px));
-    right: 12px;
-  }
+/* Below the pill breakpoint the corner chrome is gone; only float the FAB (if
+   any) above the bottom bar. */
+@media (max-width: 1024px) {
   .quick-fab {
     bottom: calc(78px + env(safe-area-inset-bottom, 0px));
   }

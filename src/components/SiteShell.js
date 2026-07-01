@@ -39,7 +39,7 @@ import { buildLoginHref } from "@/lib/loginRedirect";
 import { getCachedPublicCounts } from "@/lib/publicStats";
 
 const PILL_INTRO_SESSION_KEY = "shramdan.pill.intro.v1";
-const PILL_MIN_WIDTH_PX = 1180;
+const PILL_MIN_WIDTH_PX = 1025;
 const BOTTOM_RIGHT_PANEL_SHOW_AFTER = 100;
 // Footer "quote for today" band — hidden for now. Flip to true to re-enable.
 const FOOTER_QUOTE_ENABLED = false;
