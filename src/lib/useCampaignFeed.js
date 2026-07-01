@@ -17,14 +17,15 @@
 // Routing rule (per the API contract): there is no `kind` field — derive it
 // from the top-level status. OPEN → issue; every other stage → event.
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { getJson } from "@/lib/apiClient";
 import { getListItems } from "@/lib/adminUtils";
 
+// Server-side cursor pagination: fetch a small page, then pull the next page via
+// `nextCursor` as the user scrolls — never a big up-front slab sliced in memory.
 // mode=maximum is heavier per row (descriptions + relations + event block), so
-// keep the page fetch bounded; the /campaigns page slices this in memory for its
-// load-more. At Nepal scale one page covers the whole feed today.
-const FEED_LIMIT = 100;
+// the page stays small.
+const PAGE_SIZE = 20;
 
 // titles:{ne,en} → the translations[] array localizeIssue expects, so a locale
 // toggle re-picks the title with no refetch. description is locale-picked by the
@@ -121,11 +122,12 @@ function adaptCampaignItem(item) {
   return { kind, status: item.status, id: data.id, data };
 }
 
-async function fetchCampaigns({ status, provinceId, districtId, category, search, sort, order }) {
+// One page. Returns { items, nextCursor } — the raw signal the caller pages on.
+async function fetchCampaignPage({ status, provinceId, districtId, category, search, sort, order, cursor }) {
   const response = await getJson("/campaigns", {
     params: {
       mode: "maximum",
-      limit: FEED_LIMIT,
+      limit: PAGE_SIZE,
       // "all" → no status param (backend returns the lifecycle-ordered merge);
       // a specific stage → that status only.
       ...(status && status !== "all" ? { status } : {}),
@@ -133,47 +135,88 @@ async function fetchCampaigns({ status, provinceId, districtId, category, search
       ...(districtId ? { districtId } : {}),
       ...(category ? { category } : {}),
       ...(search ? { search } : {}),
-      ...(sort ? { sort, order: order || "desc" } : {})
+      ...(sort ? { sort, order: order || "desc" } : {}),
+      ...(cursor ? { cursor } : {})
     }
   });
-  return getListItems(response).map(adaptCampaignItem);
+  const data = response?.data ?? response;
+  const items = getListItems(response).map(adaptCampaignItem);
+  const nextCursor = data?.nextCursor ?? null;
+  return { items, nextCursor };
 }
 
 export function useCampaignFeed({ status, language, provinceId, districtId, category, q, sort, order }) {
   const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); // first page
+  const [loadingMore, setLoadingMore] = useState(false); // subsequent pages
   const [error, setError] = useState("");
+  const [hasMore, setHasMore] = useState(false);
 
-  // language isn't sent (the API localizes via Accept-Language / default "ne",
-  // and each card re-localizes from the embedded titles), but it stays in the
-  // dep list so a language flip re-renders cleanly.
-  const load = useCallback(
-    () => fetchCampaigns({ status, provinceId, districtId, category, search: q, sort, order }),
-    [status, provinceId, districtId, category, q, sort, order]
-  );
+  const cursorRef = useRef(null);
+  // Bumped on every filter change so a stale in-flight page (fired against the
+  // OLD filters) can't append into the NEW list.
+  const reqRef = useRef(0);
 
+  const baseParams = { status, provinceId, districtId, category, search: q, sort, order };
+  // Stable filter signature for the effect/callback deps (baseParams is a fresh
+  // object each render). language isn't sent — the API localizes and each card
+  // re-localizes from embedded titles — but it stays in the key so a flip repaints.
+  const filterKey = JSON.stringify({ ...baseParams, language });
+
+  // First page — refetched from scratch whenever any filter changes.
   useEffect(() => {
     let cancelled = false;
+    const myReq = (reqRef.current += 1);
+    cursorRef.current = null;
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
     setError("");
+    setItems([]);
+    setHasMore(false);
     (async () => {
       try {
-        const merged = await load();
-        if (cancelled) return;
-        setItems(merged);
+        const { items: pageItems, nextCursor } = await fetchCampaignPage(baseParams);
+        if (cancelled || reqRef.current !== myReq) return;
+        setItems(pageItems);
+        cursorRef.current = nextCursor;
+        setHasMore(Boolean(nextCursor));
       } catch {
-        if (cancelled) return;
+        if (cancelled || reqRef.current !== myReq) return;
         setItems([]);
         setError("load_failed");
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!cancelled && reqRef.current === myReq) setLoading(false);
       }
     })();
     return () => {
       cancelled = true;
     };
-  }, [load, language]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filterKey]);
 
-  return { items, loading, error };
+  // Next page — appends via nextCursor. No-op while a page is in flight, when
+  // there's nothing more, or before the first page settled.
+  const loadMore = useCallback(async () => {
+    if (loading || loadingMore || !cursorRef.current) return;
+    const myReq = reqRef.current;
+    setLoadingMore(true);
+    try {
+      const { items: pageItems, nextCursor } = await fetchCampaignPage({
+        ...baseParams,
+        cursor: cursorRef.current
+      });
+      // A filter changed mid-flight → this page belongs to the old list; drop it.
+      if (reqRef.current !== myReq) return;
+      setItems((prev) => [...prev, ...pageItems]);
+      cursorRef.current = nextCursor;
+      setHasMore(Boolean(nextCursor));
+    } catch {
+      // Keep what's loaded; the sentinel can retry on the next intersection.
+    } finally {
+      if (reqRef.current === myReq) setLoadingMore(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, loadingMore, filterKey]);
+
+  return { items, loading, loadingMore, error, hasMore, loadMore };
 }

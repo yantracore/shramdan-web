@@ -11,7 +11,7 @@
 // collapsible filter panel. "all" is the default and groups every stage under
 // inline dividers in lifecycle order.
 
-import { AppstoreOutlined, CloseOutlined, EnvironmentOutlined, LoadingOutlined, PlusOutlined, ReloadOutlined, SearchOutlined, UnorderedListOutlined } from "@ant-design/icons";
+import { AppstoreOutlined, EnvironmentOutlined, LoadingOutlined, PlusOutlined, ReloadOutlined, UnorderedListOutlined } from "@ant-design/icons";
 import { Button, Empty, Pagination, Segmented, Select, Skeleton } from "antd";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -32,7 +32,6 @@ import { ISSUE_CATEGORIES, localizeIssue } from "@/lib/adminUtils";
 import { categoryOptionLabel } from "@/lib/categoryIcons";
 import { useCampaignFeed } from "@/lib/useCampaignFeed";
 import { useCampaignCounts } from "@/lib/useCampaignCounts";
-import { getProvinceById, getDistrictById } from "@/lib/geographyApi";
 import {
   CAMPAIGN_STATUS_SEQUENCE,
   campaignSlugToStatus,
@@ -182,27 +181,6 @@ function StatusChip({ text, count, loading, language, status }) {
   );
 }
 
-// One removable pill in the active-filters strip: the human label for a live
-// secondary filter (category / province / district / sort) plus an × that
-// clears just that one. Styled on the existing search-chip look so the whole
-// strip reads as a single family.
-function FilterChip({ label, onRemove, removeLabel }) {
-  return (
-    <span className="public-issues-search-chip campaigns-filter-chip">
-      <span className="campaigns-filter-chip-text">{label}</span>
-      <button
-        type="button"
-        className="public-issues-search-chip-clear"
-        aria-label={`${removeLabel}: ${label}`}
-        title={removeLabel}
-        onClick={onRemove}
-      >
-        <CloseOutlined aria-hidden="true" />
-      </button>
-    </span>
-  );
-}
-
 export default function CampaignsListPageContent({ status: statusProp = "all" }) {
   const { language } = usePreferences();
   const t = PAGE_COPY[language] || PAGE_COPY.np;
@@ -280,12 +258,6 @@ export default function CampaignsListPageContent({ status: statusProp = "all" })
   }, [readFiltersFromUrl]);
 
   const [filtersOpen, setFiltersOpen] = useState(false);
-
-  // Human names for the active province/district chips. The list only carries
-  // the IDs; these resolve to display names off the tab-cached geography lists
-  // (no new network call). While a name is still resolving the chip falls back
-  // to a generic "Province"/"District" label so it never flashes a raw UUID.
-  const [regionNames, setRegionNames] = useState({ province: null, district: null });
 
   // ----- list / thumbnails / map view toggle (URL-synced via ?view=) ------
   // `view` is not a filter — it rides on its own ?view= param so a filtered
@@ -491,7 +463,14 @@ export default function CampaignsListPageContent({ status: statusProp = "all" })
   // Resolve the picked sort choice into the API's { sort, order } pair. No
   // choice → both undefined → the feed keeps its lifecycle-smart default order.
   const sortChoice = SORT_OPTIONS.find((o) => o.value === filters.sort) || null;
-  const { items, loading, error } = useCampaignFeed({
+  const {
+    items,
+    loading,
+    loadingMore,
+    error,
+    hasMore: feedHasMore,
+    loadMore
+  } = useCampaignFeed({
     status: filters.status,
     language,
     provinceId: filters.provinceId,
@@ -518,35 +497,6 @@ export default function CampaignsListPageContent({ status: statusProp = "all" })
   // filtered and in lifecycle order, so the list and the chip counts agree.
   const filteredItems = items;
 
-  // Resolve the active province/district IDs to display names for their chips.
-  // Reads the cached geography lists; re-runs on ID or language change.
-  useEffect(() => {
-    let cancelled = false;
-    const pid = filters.provinceId;
-    const did = filters.districtId;
-    if (!pid && !did) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setRegionNames({ province: null, district: null });
-      return;
-    }
-    const pick = (rec) =>
-      rec ? (language === "np" ? rec.localName || rec.name : rec.name || rec.localName) : null;
-    Promise.all([
-      pid ? getProvinceById(pid) : Promise.resolve(null),
-      did ? getDistrictById(did) : Promise.resolve(null)
-    ])
-      .then(([prov, dist]) => {
-        if (cancelled) return;
-        setRegionNames({ province: pick(prov), district: pick(dist) });
-      })
-      .catch(() => {
-        if (!cancelled) setRegionNames({ province: null, district: null });
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [filters.provinceId, filters.districtId, language]);
-
   // ----- visible window (load-more) --------------------------------------
   const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE);
   useEffect(() => {
@@ -555,7 +505,12 @@ export default function CampaignsListPageContent({ status: statusProp = "all" })
   }, [filters]);
 
   // ----- thumbnails page window ------------------------------------------
-  const pageCount = Math.max(1, Math.ceil(filteredItems.length / THUMBNAILS_PAGE_SIZE));
+  // Grid pages through the SAME progressively-loaded feed. +1 page while the
+  // server still has more, so the "next" arrow stays reachable before it's pulled.
+  const pageCount = Math.max(
+    1,
+    Math.ceil(filteredItems.length / THUMBNAILS_PAGE_SIZE) + (feedHasMore ? 1 : 0)
+  );
   const safePage = Math.min(page, pageCount);
   const pagedItems = useMemo(
     () =>
@@ -566,11 +521,24 @@ export default function CampaignsListPageContent({ status: statusProp = "all" })
     [filteredItems, safePage]
   );
 
+  // Grid: if the current page needs rows past what's loaded and the server has
+  // more, pull the next page.
+  useEffect(() => {
+    if (view !== "thumbnails") return;
+    if (feedHasMore && !loadingMore && safePage * THUMBNAILS_PAGE_SIZE > filteredItems.length) {
+      loadMore();
+    }
+  }, [view, feedHasMore, loadingMore, safePage, filteredItems.length, loadMore]);
+
   const visibleItems = useMemo(
     () => filteredItems.slice(0, visibleCount),
     [filteredItems, visibleCount]
   );
-  const hasMore = visibleCount < filteredItems.length;
+  // Two sources of "more": rows already loaded but not yet revealed by the
+  // window, and pages still on the server. The list reveals the former a step at
+  // a time, then fetches the latter via cursor.
+  const windowHasMore = visibleCount < filteredItems.length;
+  const hasMore = windowHasMore || feedHasMore;
 
   const sentinelRef = useRef(null);
   useEffect(() => {
@@ -580,15 +548,18 @@ export default function CampaignsListPageContent({ status: statusProp = "all" })
     const observer = new IntersectionObserver(
       (entries) => {
         const [entry] = entries;
-        if (entry.isIntersecting) {
-          setVisibleCount((v) => Math.min(v + LOAD_MORE_STEP, filteredItems.length));
+        if (!entry.isIntersecting) return;
+        if (windowHasMore) {
+          setVisibleCount((v) => v + LOAD_MORE_STEP);
+        } else if (feedHasMore && !loadingMore) {
+          loadMore();
         }
       },
       { rootMargin: "400px 0px" }
     );
     observer.observe(el);
     return () => observer.disconnect();
-  }, [hasMore, filteredItems.length]);
+  }, [hasMore, windowHasMore, feedHasMore, loadingMore, loadMore]);
 
   // ----- selection + window/scroll restore (in-memory only) --------------
   // `selectedId` lives only in memory, never the URL. On the FIRST settled
@@ -784,17 +755,9 @@ export default function CampaignsListPageContent({ status: statusProp = "all" })
     label: issuesCopy.filters?.[o.labelKey] || o.value
   }));
 
-  // ----- active-filter chips (secondary filters + search) ----------------
-  // Status is deliberately excluded: it lives in the path, has its own chip
-  // row, and the reset leaves it untouched.
-  const activeCategoryLabel = filters.category
-    ? issuesCopy.categoryLabels?.[filters.category] || filters.category
-    : null;
-  const activeSortLabel = filters.sort
-    ? sortOptions.find((o) => o.value === filters.sort)?.label || filters.sort
-    : null;
-  const provinceFallback = language === "np" ? "प्रदेश" : "Province";
-  const districtFallback = language === "np" ? "जिल्ला" : "District";
+  // Any secondary filter or search active? Drives the "Clear all" affordance
+  // next to the Filters button and the button's own active highlight. Status is
+  // excluded — it lives in the path and has its own always-visible chip row.
   const hasActiveFilters = Boolean(
     filters.q ||
       filters.category ||
@@ -937,6 +900,10 @@ export default function CampaignsListPageContent({ status: statusProp = "all" })
               onSearch={handleSearch}
               onToggleFilters={() => setFiltersOpen((open) => !open)}
               filtersOpen={filtersOpen}
+              filtersActive={hasActiveFilters}
+              showClearAll={hasActiveFilters}
+              onClearAll={clearAllFilters}
+              clearAllLabel={homeSearch.clearAllFilters}
               labels={homeSearch}
             />
             <Link className="public-issues-filters-cta" href="/issues/new">
@@ -952,7 +919,7 @@ export default function CampaignsListPageContent({ status: statusProp = "all" })
           </div>
 
           {filtersOpen ? (
-            <div className="public-issues-filters">
+            <div className="public-issues-filters campaigns-filter-panel">
               {/* Status lives in the chip row above; the panel keeps the
                   secondary filters (category / province / district) + sort. */}
               <div className="public-issues-filter-field">
@@ -998,79 +965,6 @@ export default function CampaignsListPageContent({ status: statusProp = "all" })
             </div>
           ) : null}
         </div>
-
-        {hasActiveFilters ? (
-          <div
-            className="campaigns-active-filters"
-            role="group"
-            aria-label={homeSearch.activeFiltersLabel}
-          >
-            {filters.q ? (
-              <span className="public-issues-search-chip campaigns-filter-chip" role="status">
-                <SearchOutlined aria-hidden="true" />
-                <span className="public-issues-search-chip-label">
-                  {homeSearch.searchingPrefix}
-                </span>
-                <strong>{filters.q}</strong>
-                <button
-                  type="button"
-                  className="public-issues-search-chip-clear"
-                  aria-label={homeSearch.clearSearch}
-                  title={homeSearch.clearSearch}
-                  onClick={() => applyFilters({ ...filters, q: "" })}
-                >
-                  <CloseOutlined aria-hidden="true" />
-                </button>
-              </span>
-            ) : null}
-
-            {filters.category ? (
-              <FilterChip
-                label={activeCategoryLabel}
-                removeLabel={homeSearch.removeFilter}
-                onRemove={() => applyFilters({ ...filters, category: undefined })}
-              />
-            ) : null}
-
-            {filters.provinceId ? (
-              <FilterChip
-                label={regionNames.province || provinceFallback}
-                removeLabel={homeSearch.removeFilter}
-                onRemove={() =>
-                  applyFilters({
-                    ...filters,
-                    provinceId: undefined,
-                    districtId: undefined
-                  })
-                }
-              />
-            ) : null}
-
-            {filters.districtId ? (
-              <FilterChip
-                label={regionNames.district || districtFallback}
-                removeLabel={homeSearch.removeFilter}
-                onRemove={() => applyFilters({ ...filters, districtId: undefined })}
-              />
-            ) : null}
-
-            {filters.sort ? (
-              <FilterChip
-                label={activeSortLabel}
-                removeLabel={homeSearch.removeFilter}
-                onRemove={() => applyFilters({ ...filters, sort: undefined })}
-              />
-            ) : null}
-
-            <button
-              type="button"
-              className="campaigns-active-filters-clear"
-              onClick={clearAllFilters}
-            >
-              {homeSearch.clearAllFilters}
-            </button>
-          </div>
-        ) : null}
 
         {showError ? (
           <div className="public-issues-error" role="alert">
