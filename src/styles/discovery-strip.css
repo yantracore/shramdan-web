@@ -1,0 +1,219 @@
+/* src/styles/discovery-strip.css
+ * Homepage discovery strips — native, library-free horizontal scroll rows.
+ * Paired with DiscoveryStrip.js / HomeDiscoveryRails.js.
+ *
+ * The card WIDTH lives entirely here (no JS ever sets it), so the row can never
+ * inherit a bad measurement on a client-nav remount. Uses only px + vw — units
+ * every browser and embedded webview has supported for a decade. */
+
+/* Outer container that stacks the four strips (formerly in campaign-rail.css). */
+.home-discovery-rails {
+  width: min(100%, 1280px);
+  margin: 32px auto 48px;
+  padding: 0 32px;
+  display: grid;
+  gap: clamp(28px, 4vw, 48px);
+}
+
+@media (max-width: 640px) {
+  .home-discovery-rails {
+    padding: 0 18px;
+  }
+}
+
+.discovery-strip {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+.discovery-strip-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px 16px;
+}
+
+.discovery-strip-titles {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.discovery-strip-title {
+  margin: 0;
+  font-size: clamp(20px, 2.1vw, 30px);
+  line-height: 1.18;
+  color: var(--primary-dark);
+}
+
+.discovery-strip-eyebrow {
+  color: color-mix(in srgb, var(--primary-dark) 70%, transparent);
+}
+
+.discovery-strip-viewall {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border: 1px solid color-mix(in srgb, var(--line) 60%, transparent);
+  border-radius: 999px;
+  color: var(--primary-dark);
+  font-weight: 700;
+  font-size: 14px;
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+.discovery-strip-viewall:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--primary) 40%, var(--line));
+}
+
+.discovery-strip-scroller {
+  position: relative;
+  min-width: 0;
+}
+
+/* The native scroll row. This is the whole engine — a flex list that scrolls
+ * horizontally with snap. No JS measures or sizes anything here. */
+.discovery-strip-track {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x proximity;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  /* Hide the horizontal scrollbar — the peek + arrows signal scrollability. */
+  scrollbar-width: none;
+  /* Room for the cards' drop shadow inside the scroll clip, pulled back so the
+   * vertical rhythm stays tight (matches the old rail). */
+  padding-block: 22px;
+  margin-block: -14px;
+  /* Directional edge fade — only dim the side that has more cards hidden past
+   * it, driven by data-at-start / data-at-end (set from the scroll position).
+   * Purely cosmetic; can never affect card sizing. */
+  --fade-left: 0px;
+  --fade-right: 0px;
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent 0,
+    #000 var(--fade-left),
+    #000 calc(100% - var(--fade-right)),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0,
+    #000 var(--fade-left),
+    #000 calc(100% - var(--fade-right)),
+    transparent 100%
+  );
+}
+
+.discovery-strip-track::-webkit-scrollbar {
+  display: none;
+}
+
+.discovery-strip-track[data-at-start="false"] {
+  --fade-left: 26px;
+}
+.discovery-strip-track[data-at-end="false"] {
+  --fade-right: 26px;
+}
+
+/* One card cell. Width is pure CSS — fixed px on desktop (the rails column is
+ * capped at 1280px there, so a fixed width is exact = ~4.2 cards in view) and
+ * vw below so phones/tablets scale. max-width is a hard floor against ANY
+ * failure: a card can never grow to full width. */
+.discovery-strip-cell {
+  flex: 0 0 auto;
+  width: 46vw;
+  max-width: 90vw;
+  scroll-snap-align: start;
+  display: flex;
+}
+
+@media (min-width: 480px) {
+  .discovery-strip-cell {
+    width: 40vw;
+  }
+}
+@media (min-width: 640px) {
+  .discovery-strip-cell {
+    width: 33vw;
+  }
+}
+@media (min-width: 1024px) {
+  .discovery-strip-cell {
+    width: 28vw;
+  }
+}
+@media (min-width: 1280px) {
+  .discovery-strip-cell {
+    width: 267px;
+  }
+}
+
+.discovery-strip-cell > * {
+  width: 100%;
+}
+
+/* Prev / next — glassy circular overlays, same voice as the rest of the app. */
+.discovery-strip-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+  border-radius: 999px;
+  color: var(--primary-dark);
+  background: color-mix(in srgb, var(--surface) 86%, transparent);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+  transition: background 160ms ease, transform 160ms ease, opacity 160ms ease;
+}
+
+.discovery-strip-nav--prev {
+  left: -6px;
+}
+.discovery-strip-nav--next {
+  right: -6px;
+}
+
+.discovery-strip-nav:hover {
+  background: var(--surface);
+}
+
+/* Faded out when there's nowhere to scroll that way. */
+.discovery-strip-nav.is-off {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (max-width: 640px) {
+  .discovery-strip-nav {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .discovery-strip-track {
+    scroll-behavior: auto;
+  }
+}

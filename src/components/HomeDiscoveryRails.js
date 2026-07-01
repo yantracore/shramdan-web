@@ -1,11 +1,11 @@
 "use client";
 
-// Homepage discovery section: four intent-grouped campaign rails. Rails 2-4
-// hide themselves (CampaignRail returns null) when their bucket is empty, so a
-// thin DB never shows broken empty rails.
+// Homepage discovery section: four intent-grouped campaign strips. Strips 2-4
+// hide themselves (DiscoveryStrip returns null) when their bucket is empty, so a
+// thin DB never shows broken empty strips.
 
 import { useHomeRails } from "@/lib/useHomeRails";
-import CampaignRail from "@/components/CampaignRail";
+import DiscoveryStrip from "@/components/DiscoveryStrip";
 
 const RAIL_COPY = {
   np: {
@@ -32,7 +32,7 @@ export default function HomeDiscoveryRails({ language = "np", provinceId, distri
 
   return (
     <div className="home-discovery-rails">
-      <CampaignRail
+      <DiscoveryStrip
         eyebrow={c.near.eyebrow}
         title={c.near.title}
         viewAllHref={c.near.href}
@@ -40,7 +40,7 @@ export default function HomeDiscoveryRails({ language = "np", provinceId, distri
         items={near}
         language={language}
       />
-      <CampaignRail
+      <DiscoveryStrip
         eyebrow={c.happening.eyebrow}
         title={c.happening.title}
         viewAllHref={c.happening.href}
@@ -48,7 +48,7 @@ export default function HomeDiscoveryRails({ language = "np", provinceId, distri
         items={happening}
         language={language}
       />
-      <CampaignRail
+      <DiscoveryStrip
         eyebrow={c.support.eyebrow}
         title={c.support.title}
         viewAllHref={c.support.href}
@@ -56,7 +56,7 @@ export default function HomeDiscoveryRails({ language = "np", provinceId, distri
         items={support}
         language={language}
       />
-      <CampaignRail
+      <DiscoveryStrip
         eyebrow={c.impact.eyebrow}
         title={c.impact.title}
         viewAllHref={c.impact.href}
