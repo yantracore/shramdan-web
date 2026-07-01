@@ -16,8 +16,12 @@
 }
 
 @media (max-width: 640px) {
+  /* Phone — tighten the side gutter (18px → 10px) so the cards use more of
+   * the narrow viewport and the first card's left edge lines up with the
+   * widened events poster + map above. The cards keep their own inner
+   * padding, so content never crowds the screen edge. */
   .home-discovery-rails {
-    padding: 0 18px;
+    padding: 0 10px;
   }
 }
 

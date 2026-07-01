@@ -186,6 +186,16 @@
   }
 }
 
+/* Phone — pull the panel gutter in from 16px to 10px so the map (a full-width
+ * child) reads nearly edge-to-edge and shows more geographic context, instead
+ * of floating inside a wide margin. Aligns the map/stats left edge with the
+ * widened events poster + discovery rails below it. */
+@media (max-width: 640px) {
+  .home-search-panel {
+    padding: 0 10px;
+  }
+}
+
 @media (max-width: 540px) {
   .home-search-bar {
     padding: 6px;

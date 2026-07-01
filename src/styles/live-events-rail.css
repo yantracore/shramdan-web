@@ -15,7 +15,8 @@
 
 .events-home-rail {
   width: 100%;
-  padding: 48px 0;
+  /* top 48px kept; bottom 0 — the section below supplies its own top spacing */
+  padding: 48px 0 0;
 }
 
 .events-home-rail-shell {
@@ -174,6 +175,17 @@
    * (left/right) slides are meant to be visible at any time. Without
    * this, slides 4 and 5 leak into the page margins on wide viewports. */
   overflow: hidden;
+}
+
+/* Phone — spend the width on the poster, not on the gutter. The default
+ * 16px-each-side gutter is a meaningful slice of a ~390px screen; halve it
+ * to 8px so the focal card (already trimmed to a 1.1 peek in
+ * SLIDES_BREAKPOINTS) fills more of the viewport. The overlay keeps its own
+ * 12px inset, so content never touches the edge. */
+@media (max-width: 640px) {
+  .events-home-rail-swiper {
+    width: calc(100% - 16px);
+  }
 }
 
 /* Explicit slide HEIGHT so the slider has a measurable dimension before

@@ -78,11 +78,18 @@ const RESTROVERSE_BUSINESS_IMAGES = Object.freeze([
 // the viewport — denser counts (5/7) were tried and rejected: too many
 // posters at once diluted the focal "now playing" feel of the rail.
 //
-//   < 640px (phone)    → 1.2 (peek of next)
+//   < 640px (phone)    → 1.1 (slim peek of next)
 //   640-1023 (tablet)  → 2
 //   ≥ 1024 (desktop+)  → 3   ← hard cap, no further increase
+//
+// Phone note (2026-07-01): the peek was 1.2 with a 16px gap, which left the
+// focal poster only ~74% of the viewport — a lot of dead margin on a small
+// screen where the overlay content already keeps its own 12px inset off the
+// card edges. Trimmed to a 1.1 peek + 12px gap so the center poster grows to
+// ~87% of the viewport. Still shows a swipe-hint sliver of the next card
+// (nav arrows are hidden below 720px, so the peek is the phone affordance).
 const SLIDES_BREAKPOINTS = Object.freeze({
-  0: { slidesPerView: 1.2, spaceBetween: 16 },
+  0: { slidesPerView: 1.1, spaceBetween: 12 },
   640: { slidesPerView: 2, spaceBetween: 20 },
   1024: { slidesPerView: 3, spaceBetween: 24 }
 });
