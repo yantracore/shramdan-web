@@ -1052,7 +1052,7 @@
 
 .eyebrow {
   color: var(--accent);
-  font-size: 12px;
+  font-size: var(--text-eyebrow);
   font-weight: 850;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -1636,9 +1636,19 @@
 .section-heading h2 {
   margin: 10px 0 12px;
   color: var(--text);
-  font-size: clamp(34px, 5vw, 56px);
-  line-height: 1.04;
+  line-height: 1.12;
   letter-spacing: 0;
+}
+
+/* h1 = page/hero heading tier, h2 = section/rail heading tier. Both consume
+   the shared responsive scale so every page's titles shrink identically on
+   phones instead of each section picking its own clamp. */
+.section-heading h1 {
+  font-size: var(--text-title-lg);
+}
+
+.section-heading h2 {
+  font-size: var(--text-title-sm);
 }
 
 /* /events and /issues share a normal-flow heading — no stickiness, so
@@ -8765,6 +8775,51 @@
   border-color: color-mix(in srgb, var(--primary) 32%, var(--line));
 }
 
+/* has-active = one or more filters are APPLIED (independent of whether the
+   panel is open). A small accent dot after the label makes "filters applied"
+   legible even while the panel is collapsed. */
+.public-search-filters.has-active {
+  border-color: color-mix(in srgb, var(--primary) 45%, var(--line));
+  color: var(--primary-dark);
+}
+.public-search-filters.has-active::after {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--primary);
+}
+
+/* "Clear all" — appears beside the Filters button only when filters are
+   applied, and wipes them in one press. Kept lighter than the primary submit so
+   it reads as a secondary, reversible action. */
+.public-search-clear-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  min-height: 40px;
+  border: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: background 160ms ease, color 160ms ease, border-color 160ms ease,
+    transform 160ms ease;
+}
+.public-search-clear-all:hover {
+  background: color-mix(in srgb, var(--primary) 12%, var(--surface));
+  color: var(--primary-dark);
+  border-color: color-mix(in srgb, var(--primary) 24%, var(--line));
+  transform: translateY(-1px);
+}
+.public-search-clear-all:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
 .public-search-submit {
   background: var(--primary);
   color: #fff;
@@ -8780,11 +8835,14 @@
 }
 
 @media (max-width: 720px) {
-  .public-search-filters span {
-    /* Hide the "Filter" label below 720px; icon stays for the tap target. */
+  .public-search-filters span,
+  .public-search-clear-all span {
+    /* Hide the "Filter" / "Clear all" labels below 720px; icons stay for the
+       tap target. */
     display: none;
   }
-  .public-search-filters {
+  .public-search-filters,
+  .public-search-clear-all {
     padding: 10px 12px;
   }
 }
@@ -9418,7 +9476,7 @@
   max-width: 820px;
   margin: 0 0 8px;
   color: var(--primary-dark);
-  font-size: clamp(28px, 3vw, 44px);
+  font-size: var(--text-title-lg);
   line-height: 1.14;
   letter-spacing: 0;
 }
@@ -9658,7 +9716,7 @@
   max-width: 820px;
   margin: 4px 0 0;
   color: var(--primary-dark);
-  font-size: clamp(32px, 4vw, 56px);
+  font-size: var(--text-title-lg);
   line-height: 1.1;
   letter-spacing: 0;
 }
@@ -9696,7 +9754,7 @@
 .event-types-page-group-heading h2 {
   margin: 0;
   color: var(--primary-dark);
-  font-size: clamp(24px, 2.6vw, 34px);
+  font-size: var(--text-title-sm);
   line-height: 1.18;
   letter-spacing: 0;
 }
@@ -9898,8 +9956,8 @@
 .event-type-detail-header h1 {
   margin: 4px 0 0;
   color: var(--primary-dark);
-  font-size: clamp(36px, 5vw, 64px);
-  line-height: 1.04;
+  font-size: var(--text-title-lg);
+  line-height: 1.08;
   letter-spacing: 0;
 }
 
@@ -15445,13 +15503,13 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 14px;
+  padding: var(--btn-pad-y) var(--btn-pad-x);
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 999px;
   color: var(--text);
   font: inherit;
-  font-size: 13px;
+  font-size: var(--btn-font);
   font-weight: 600;
   cursor: pointer;
   text-decoration: none;

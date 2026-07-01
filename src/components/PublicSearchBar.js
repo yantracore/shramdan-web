@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { FilterOutlined, SearchOutlined } from "@ant-design/icons";
+import { CloseOutlined, FilterOutlined, SearchOutlined } from "@ant-design/icons";
 
 // Search + filter-toggle bar shared by /campaigns, /issues and /events. Lifted
 // from the homepage hero (HomeSearchView) so the listing pages own the search
@@ -26,6 +26,12 @@ import { FilterOutlined, SearchOutlined } from "@ant-design/icons";
 // `debounceMs`       — idle delay before a typed query commits (default 300).
 // `onToggleFilters`  — flips the detailed filter panel open/closed.
 // `filtersOpen`      — current panel state (drives aria-expanded + active style).
+// `filtersActive`    — any filter currently applied (tints the Filters button so
+//                      applied state reads even while the panel is collapsed).
+// `showClearAll`     — render the "Clear all" affordance beside the Filters
+//                      button (opt-in; pages without it pass nothing → no button).
+// `onClearAll`       — called when "Clear all" is pressed.
+// `clearAllLabel`    — text/aria for the "Clear all" button.
 // `labels`           — { searchPlaceholder, searchAria, filtersLabel, submitAria }.
 
 const DEFAULT_DEBOUNCE_MS = 400;
@@ -35,6 +41,10 @@ export function PublicSearchBar({
   onSearch,
   onToggleFilters,
   filtersOpen,
+  filtersActive = false,
+  showClearAll = false,
+  onClearAll,
+  clearAllLabel,
   labels,
   debounceMs = DEFAULT_DEBOUNCE_MS
 }) {
@@ -111,7 +121,9 @@ export function PublicSearchBar({
       </label>
       <button
         type="button"
-        className={`public-search-filters${filtersOpen ? " is-active" : ""}`}
+        className={`public-search-filters${filtersOpen ? " is-active" : ""}${
+          filtersActive ? " has-active" : ""
+        }`}
         aria-label={t.filtersLabel}
         title={t.filtersLabel}
         aria-expanded={filtersOpen}
@@ -120,6 +132,18 @@ export function PublicSearchBar({
         <FilterOutlined aria-hidden="true" />
         <span>{t.filtersLabel}</span>
       </button>
+      {showClearAll ? (
+        <button
+          type="button"
+          className="public-search-clear-all"
+          aria-label={clearAllLabel}
+          title={clearAllLabel}
+          onClick={onClearAll}
+        >
+          <CloseOutlined aria-hidden="true" />
+          <span>{clearAllLabel}</span>
+        </button>
+      ) : null}
       <button
         type="submit"
         className="public-search-submit"

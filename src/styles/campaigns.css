@@ -241,57 +241,26 @@
   height: clamp(340px, 62vh, 560px) !important;
 }
 
-/* ── Active-filters strip ──────────────────────────────────────────────
-   One row that surfaces every live secondary filter (search + category +
-   province + district + sort) as a removable pill, plus a single "Clear all".
-   Renders only when at least one filter is active; wraps on narrow screens so
-   it never forces horizontal scroll. Pills reuse the .public-issues-search-chip
-   look (home.css) so the whole strip reads as one family. */
-.campaigns-active-filters {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 14px;
+/* ── Active-filter highlight ───────────────────────────────────────────
+   No separate "applied filters" row — instead each control that currently
+   holds a value is highlighted in place. A filled AntD Select marks its content
+   node with .ant-select-content-has-value (empty selects lack it), so :has()
+   lights up exactly the active category / province / district / sort selects
+   with an accent border + faint tint, plus a bolder label. The outlined border
+   lives on the .ant-select wrapper itself. Scoped to the campaigns panel so
+   other pages are untouched. */
+.campaigns-filter-panel .ant-select:has(.ant-select-content-has-value) {
+  border-color: var(--primary) !important;
+  background: color-mix(in srgb, var(--primary) 8%, var(--surface)) !important;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 35%, transparent) !important;
 }
 
-/* The search chip carries its own margin-bottom from home.css; inside the
-   flex strip the gap handles spacing, so drop it to keep the row even. */
-.campaigns-active-filters .public-issues-search-chip {
-  margin-bottom: 0;
-}
-
-.campaigns-filter-chip-text {
-  font-weight: 700;
+/* Bolder, accent label above any active field. :has() on the field wrapper
+   catches category/sort (own wrappers) AND province/district (rendered inside
+   ProvinceDistrictFilter with the same .public-issues-filter-field shell). */
+.campaigns-filter-panel
+  .public-issues-filter-field:has(.ant-select-content-has-value)
+  .public-issues-filter-label {
   color: var(--primary-dark);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 32ch;
-}
-
-.campaigns-active-filters-clear {
-  display: inline-flex;
-  align-items: center;
-  height: 34px;
-  padding: 0 14px;
-  border: 1px solid color-mix(in srgb, var(--line) 60%, transparent);
-  border-radius: 999px;
-  background: transparent;
-  color: var(--muted);
-  font-size: 13px;
   font-weight: 700;
-  cursor: pointer;
-  transition: color 160ms ease, border-color 160ms ease, background 160ms ease;
-}
-
-.campaigns-active-filters-clear:hover {
-  color: var(--primary-dark);
-  border-color: color-mix(in srgb, var(--primary) 40%, var(--line));
-  background: color-mix(in srgb, var(--primary) 8%, transparent);
-}
-
-.campaigns-active-filters-clear:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
 }
