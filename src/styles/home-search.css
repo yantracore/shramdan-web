@@ -274,6 +274,14 @@
   overflow: hidden;
 }
 
+/* The home map is only a preview/teaser (browsing + filters live on
+ * /campaigns), so keep it a short, viewport-proportional container instead of
+ * the tall browse height. Overrides EventMap's inline px height (hence
+ * !important). Fullscreen escapes this. */
+.home-search-map-frame .issue-map-wrap:not(.issue-map-wrap--fullscreen) {
+  height: clamp(200px, 30vh, 320px) !important;
+}
+
 /* Prevent the glass frame from trapping the fixed-position fullscreen map */
 .home-search-map-frame:has(.issue-map-wrap--fullscreen) {
   -webkit-backdrop-filter: none;

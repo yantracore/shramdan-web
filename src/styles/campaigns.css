@@ -233,3 +233,10 @@
     gap: 6px;
   }
 }
+
+/* Campaigns map VIEW is a browse surface, so it stays tall — but
+   viewport-proportional and a notch shorter than the old fixed 600px, and it
+   never eats the whole phone screen. Overrides EventMap's inline px height. */
+.campaigns-map-frame .issue-map-wrap:not(.issue-map-wrap--fullscreen) {
+  height: clamp(340px, 62vh, 560px) !important;
+}

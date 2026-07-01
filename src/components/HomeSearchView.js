@@ -167,7 +167,7 @@ export default function HomeSearchView() {
                   issuesContent={t.issues}
                   t={search.map}
                   language={language}
-                  height={544}
+                  height={320}
                   interactive
                   enableFullscreen
                   fullscreenLabel={search.map.fullscreenOpen}
