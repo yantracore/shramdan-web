@@ -612,7 +612,6 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
         placement="bottom"
         open={isMoreOpen}
         onClose={() => setIsMoreOpen(false)}
-        height="auto"
         closable
         title={language === "en" ? "Menu" : "मेनु"}
         rootClassName="more-sheet-root"

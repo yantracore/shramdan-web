@@ -15591,6 +15591,12 @@
 /* --- "More" sheet (bottom Drawer) ------------------------------------ *
  * The single secondary-nav surface below the pill breakpoint. Opened from
  * the bottom bar; replaces the removed top-right hamburger drawer. */
+/* Auto-height bottom sheet (fit content) without AntD's deprecated `height`
+   prop — the default bottom Drawer is a fixed 378px, so release the wrapper. */
+.more-sheet-root .ant-drawer-content-wrapper {
+  height: auto !important;
+}
+
 .more-sheet-root .ant-drawer-content {
   border-radius: 18px 18px 0 0;
 }
