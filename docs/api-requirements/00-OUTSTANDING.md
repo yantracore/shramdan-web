@@ -13,11 +13,10 @@ _(none open — the issue-detail per-viewer echo shipped 2026-07-01.)_
 
 ## P2 — functionality gaps
 
-1. **campaigns — enrich the `GET /campaigns` LIST item so the FE can switch the main feed onto it.** Today the list item is minimal: `{ slug, status, lat, lng, title, addressText, image, supporterCount, myVote }`. The unified `/campaigns` feed is otherwise ready (cursor pagination, filters, bbox, `supporterCount`, `myVote`), but the FE list still uses the older per-status `GET /issues` + `GET /events` calls because the card needs a few fields the item lacks. **Requested on the list item:** `kind` (`issue|event`), `category`, `scheduledAt`, `completedAt`, and `participantCount` (events' joined count — `supporterCount` only covers issue supporters). With those, the FE swaps 5 calls → 1 with no card regression. → [campaigns-feed.md](campaigns-feed.md)
-2. **campaigns — dedicated all-markers map endpoint** (no pagination, minimal record incl. `participantCount` + viewer role). Confirmed being built; **not live yet** — live-probed `/campaigns/map`, `/campaigns/all`, `/campaigns/markers`, `/map/campaigns`, etc. → all 404/400. Interim: `GET /campaigns?limit=<max>` already returns every campaign with `lat`/`lng` in one shot. FE map wiring waits for the dedicated endpoint (per product call). → [campaigns-feed.md](campaigns-feed.md)
-3. **events** — reminder-cadence config so participants get pre-event reminders (scheduled notifications; backend-owned). Spec-verified: no reminder-cadence field. → [events.md](events.md), [notifications.md](notifications.md)
-4. **members** — behavioural confirms on the shipped admin user routes (`PATCH /users/{id}` landed ✅): confirm the `GET /users` `take` Int-cast bug is fixed, and that `DELETE /users/{id}` soft-deletes + cascades ownership to a tombstone. → [members.md](members.md)
-5. **event-participants** — confirm `POST /events/{id}/participants/{id}/check-in` is **not** gated on stored `status === ACTIVE` (SCHEDULED→ACTIVE is time-derived on the FE; status may stay SCHEDULED through the event window). → [event-participants.md](event-participants.md)
+1. **events** — reminder-cadence config so participants get pre-event reminders (scheduled notifications; backend-owned). Spec-verified: no reminder-cadence field. → [events.md](events.md), [notifications.md](notifications.md)
+2. **members** — behavioural confirms on the shipped admin user routes (`PATCH /users/{id}` landed ✅): confirm the `GET /users` `take` Int-cast bug is fixed, and that `DELETE /users/{id}` soft-deletes + cascades ownership to a tombstone. → [members.md](members.md)
+3. **event-participants** — confirm `POST /events/{id}/participants/{id}/check-in` is **not** gated on stored `status === ACTIVE` (SCHEDULED→ACTIVE is time-derived on the FE; status may stay SCHEDULED through the event window). → [event-participants.md](event-participants.md)
+4. **campaigns (nice-to-have)** — add a live `participantCount` (events' joined workers) to the `GET /campaigns` item; today only `supporterCount` (issue votes) + `attendingCount` (GOING voters) ride the feed, so event cards can't show "N joined" without a detail fetch. Non-blocking (the list never showed it). → [campaigns-feed.md](campaigns-feed.md)
 
 ## P3 — entities not started (frontend stubbed / future)
 
@@ -32,6 +31,13 @@ _(none open — the issue-detail per-viewer echo shipped 2026-07-01.)_
 - **applications — `ApplicationRole` enum mismatch — NOT a backend ask (FE dead config).** `siteContent.js` lists three values the backend rejects (`QA_ENGINEER`/`DEVOPS_ENGINEER`/`CONTENT_WRITER`) but the form hard-codes `role: "VOLUNTEER"`, so they're never sent. FE cleanup only.
 
 ---
+
+## FE wired 2026-07-01 (round 4) — campaigns fully unified + SSE
+
+- **campaigns LIST → `GET /campaigns?mode=maximum`** ✅ — the `mode=maximum` rich payload (category, both-locale `titles`, `event` block, `supporterCount`/`attendingCount`, `myVote`) removed the enrichment blocker. FE swapped the 5-call `/issues`+`/events` split for one call; a data-layer adapter maps items back to the existing card shapes (cards untouched).
+- **campaigns MAP → `GET /campaigns?mode=minimal`** ✅ — no dedicated endpoint needed; `mode=minimal` is the all-markers payload. Map self-fetches it (limit 1000) so it plots every campaign, not just the list page.
+- **campaigns counts → `GET /campaigns/counts`** ✅ (round 3) — exact per-stage totals.
+- **notifications live stream (SSE)** ✅ — `GET /notifications/stream?token=` is live (`200 text/event-stream`); the pre-built `notificationsStream.js` + `NotificationsProvider` now connect (no code change needed).
 
 ## Closed 2026-07-01 (round 3) — shipped, FE wired
 
