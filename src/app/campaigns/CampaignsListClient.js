@@ -338,6 +338,10 @@ export default function CampaignsListPageContent({ status: statusProp = "all" })
       setFilters(next);
       const params = new URLSearchParams(searchParams?.toString() || "");
       params.delete("status"); // legacy param — never reintroduce it
+      // Any secondary-filter change/clear reshapes the result set, so the grid
+      // must fall back to page 1 (the list window + feed cursor already reset on
+      // the filter change). Drop the stale `page` param.
+      params.delete("page");
       if (next.category) params.set("category", next.category);
       else params.delete("category");
       if (next.provinceId) params.set("province", next.provinceId);
