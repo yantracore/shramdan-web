@@ -9,36 +9,38 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import {
   A11y,
   Autoplay,
-  EffectCoverflow,
   Keyboard,
   Navigation,
   Pagination
 } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/autoplay";
-import "swiper/css/effect-coverflow";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 
 // =============================================================
-// DESIGN CONTRACT — DO NOT BRANCH THIS COMPONENT.
+// DESIGN CONTRACT — flat 3-up focus rail.
 // -------------------------------------------------------------
-// This rail has exactly ONE render path: Swiper EffectCoverflow.
-// There is no flat fallback. Coverflow geometry is the design.
+// This rail is a 3-up centered slider using Swiper's DEFAULT
+// slide effect. There is no 3D geometry. "Focus" is expressed
+// FLAT and entirely in CSS: the active (center) slide sits at
+// full size/opacity; the side slides are scaled down + dimmed
+// (see .events-home-rail-slide rules in live-events-rail.css).
 //
-// Why no fallback:
-//   Prior versions gated coverflow on `entranceAnimation` and
-//   `prefers-reduced-motion`. The flat fallback that resulted
-//   looked nothing like the intended slider, so any flip of those
-//   preferences silently "ruined" the homepage. Reported by the
-//   user as a recurring regression — locked here on 2026-06-02.
+// History:
+//   Until 2026-07-01 this used Swiper EffectCoverflow (rotate:50
+//   depth:100). The heavy 3D tilt read as a "concert-stage"
+//   display — too fancy for a civic activity feed. Replaced with
+//   the flat scale/dim model per user direction, keeping the same
+//   size, prominence, autoplay, loop, nav and a11y. The old
+//   "coverflow is the only path, do not branch" lock is retired.
 //
 // Reduced-motion handling:
-//   Coverflow geometry is STATIC when idle (it only animates
-//   during user-initiated slide changes). For reduced-motion
-//   users we keep the geometry and just shorten the transition
-//   `speed` so swipes snap rather than glide, and disable
-//   autoplay so nothing moves without their input.
+//   The scaled/dimmed geometry is STATIC when idle (it only
+//   transitions during a slide change). For reduced-motion users
+//   we set transition `speed` to 0 so swipes snap, disable
+//   autoplay, and the CSS transition is turned off via a
+//   `prefers-reduced-motion` rule — nothing moves without input.
 //
 // No video preview:
 //   We intentionally do NOT auto-mount a live-stream iframe on
@@ -49,20 +51,12 @@ import "swiper/css/pagination";
 //   through to the detail page is where playback happens.
 //
 // If you must change this:
-//   Keep coverflow the only path. Tweak params (rotate/depth) —
-//   do not re-introduce a `slidesPerView`-based flat branch or
-//   the autoplay iframe.
+//   Tune the side-slide scale/opacity in CSS. Do not re-introduce
+//   a 3D effect or the autoplay iframe.
 // =============================================================
 
-const COVERFLOW_PARAMS = Object.freeze({
-  rotate: 50,
-  stretch: 0,
-  depth: 100,
-  modifier: 1,
-  slideShadows: false
-});
-const COVERFLOW_SPEED_DEFAULT = 900;
-const COVERFLOW_SPEED_REDUCED = 0;
+const SLIDE_SPEED_DEFAULT = 600;
+const SLIDE_SPEED_REDUCED = 0;
 const MAX_RAIL_ITEMS = 5;
 const RESTROVERSE_BUSINESS_IMAGES = Object.freeze([
   "/images/homepage/business/restroverse/restroverse-business-1.jpg",
@@ -286,14 +280,12 @@ export function EventsHomeRail({
       ) : (
         <Swiper
           className="events-home-rail-swiper"
-          effect="coverflow"
           grabCursor
           centeredSlides
           breakpoints={SLIDES_BREAKPOINTS}
           loop={items.length > 3}
-          speed={reduceMotion ? COVERFLOW_SPEED_REDUCED : COVERFLOW_SPEED_DEFAULT}
+          speed={reduceMotion ? SLIDE_SPEED_REDUCED : SLIDE_SPEED_DEFAULT}
           keyboard={{ enabled: true }}
-          coverflowEffect={COVERFLOW_PARAMS}
           autoplay={reduceMotion ? false : AUTOPLAY_OPTIONS}
           pagination={{ clickable: true }}
           navigation
@@ -304,7 +296,7 @@ export function EventsHomeRail({
             nextSlideMessage: copy?.nextAria,
             containerRoleDescriptionMessage: copy?.ariaCarousel
           }}
-          modules={[EffectCoverflow, Pagination, Navigation, Keyboard, A11y, Autoplay]}
+          modules={[Pagination, Navigation, Keyboard, A11y, Autoplay]}
         >
           {items.map((item, index) => {
             const isActive = index === activeIndex;

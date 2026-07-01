@@ -165,29 +165,50 @@
 .events-home-rail-swiper {
   width: min(1920px, calc(100% - 32px));
   margin: 0 auto;
-  /* Top padding has to clear the projected "lift" of the tilted side
-   * cards: with rotate:50 + depth:100 + Swiper's 1200px perspective,
-   * the upper-back corner of each side card projects ~25% of the slide
-   * height above its natural top. At max slide height (560px) that's
-   * ~140px; bottom is symmetric for the foreshortened lower corner,
-   * plus a few px for the pagination row. clamp() scales both ends
-   * proportionally with the viewport width. */
-  padding-block: clamp(64px, 10vw, 160px) clamp(48px, 6vw, 96px);
+  /* Flat 3-up needs only modest vertical breathing room — there are no
+   * tilted side cards projecting a "lift" above the rail anymore. Enough
+   * to seat the full-size center card comfortably plus the pagination
+   * row; clamp() scales both ends with the viewport width. */
+  padding-block: clamp(24px, 3.5vw, 56px) clamp(20px, 3vw, 44px);
   /* Clip to the rail width — only the active slide + the two adjacent
    * (left/right) slides are meant to be visible at any time. Without
    * this, slides 4 and 5 leak into the page margins on wide viewports. */
   overflow: hidden;
 }
 
-/* Coverflow needs explicit slide HEIGHT so Swiper's 3D layout math has
- * a measurable dimension before the browser paints. Width is intentionally
- * NOT set here — Swiper controls it via the `slidesPerView` breakpoints
- * declared in EventsHomeRail.js, so exactly 3 cards fit on desktop,
- * 2 on tablet, 1.2 on mobile (the .2 peek hints at swipeability).
- * Height ceiling scales to 560px so wide-viewport cards don't end up
- * abnormally landscape. See DESIGN CONTRACT in EventsHomeRail.js. */
+/* Explicit slide HEIGHT so the slider has a measurable dimension before
+ * the browser paints. Width is intentionally NOT set here — Swiper
+ * controls it via the `slidesPerView` breakpoints declared in
+ * EventsHomeRail.js, so exactly 3 cards fit on desktop, 2 on tablet,
+ * 1.2 on mobile (the .2 peek hints at swipeability). Height ceiling
+ * scales to 560px so wide-viewport cards don't end up abnormally
+ * landscape. See DESIGN CONTRACT in EventsHomeRail.js.
+ *
+ * Flat focus: every slide is scaled down + dimmed so the eye lands on
+ * the center card, which the .swiper-slide-active rule below overrides
+ * back to full size/opacity. Only .swiper-wrapper carries Swiper's
+ * horizontal translate in the default slide effect, so a per-slide
+ * `transform: scale()` is safe here — it doesn't fight the slider. */
 .events-home-rail-swiper .events-home-rail-slide.swiper-slide {
   height: clamp(280px, 30vw, 560px) !important;
+  transform: scale(0.86);
+  opacity: 0.5;
+  transition:
+    transform 0.45s var(--ease-out-soft),
+    opacity 0.45s var(--ease-out-soft);
+}
+
+.events-home-rail-swiper .events-home-rail-slide.swiper-slide-active {
+  transform: scale(1);
+  opacity: 1;
+}
+
+/* Reduced motion: keep the flat focus geometry but don't animate it —
+ * slides snap between states instead of gliding. */
+@media (prefers-reduced-motion: reduce) {
+  .events-home-rail-swiper .events-home-rail-slide.swiper-slide {
+    transition: none;
+  }
 }
 
 /* --- Netflix-poster card -------------------------------------------- */
