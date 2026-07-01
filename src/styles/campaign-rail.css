@@ -112,12 +112,6 @@
 /* Edge fade: cards "vanish" only at a boundary that has more content past it. */
 .campaign-rail-swiper {
   width: 100%;
-  /* Establish this as the query container so the slides below can size their
-   * width with `cqw` (1% of THIS element's width). That makes each card a pure
-   * CSS fraction of the rail — mirroring the old slidesPerView numbers — with
-   * ZERO dependence on Swiper's JS clientWidth measurement, so a mis-timed
-   * measure on a route-return remount can never collapse the spacing again. */
-  container-type: inline-size;
   -webkit-mask-image: linear-gradient(
     90deg,
     transparent 0,
@@ -150,40 +144,49 @@
   }
 }
 
-/* CSS-owned slide width + gap (see .campaign-rail-swiper note). `cqw` is 1% of
- * the rail's own width, so `100cqw / N - gap` reproduces the old N-per-view feel
- * exactly, but the browser computes it from real layout — Swiper (slidesPerView
- * "auto", spaceBetween 0) only READS it. Nothing here can be corrupted by a
- * stale Swiper measurement, so the cards can never blow up to full width or lose
- * their gaps on a client-nav return. Phones ~1.85/view → up to 4.2 on desktop. */
+/* CSS-owned slide width + gap. The Swiper runs slidesPerView="auto"
+ * spaceBetween={0}, so it NEVER bakes an inline slide width from clientWidth —
+ * it only READS these values. That is the fix for "spacing lost on return":
+ * with a numeric slidesPerView, Swiper computed the width in JS during a
+ * transient remount frame and a wrong read collapsed the cards to full width
+ * forever. Here the width is plain CSS the browser recomputes on every reflow,
+ * so it can never be stale. Uses only universally-supported units (vw + px, NOT
+ * container-query cqw, which silently fails in older embedded webviews and left
+ * one giant card). Desktop (>=1280) is a fixed px because the rail container is
+ * capped at 1280px there, so a fixed width is exact and stable. max-width is a
+ * hard safety: even if a width ever fails to apply, a card can't go full-width.
+ * Phones ~1.85/view scaling up to 4.2/view on desktop. */
 .campaign-rail-slide {
   height: auto;
   display: flex;
-  width: calc(100cqw / 1.85 - 12px);
+  width: 46vw;
+  max-width: 90vw;
   margin-right: 12px;
 }
 
 @media (min-width: 480px) {
   .campaign-rail-slide {
-    width: calc(100cqw / 2.2 - 14px);
+    width: 40vw;
     margin-right: 14px;
   }
 }
 @media (min-width: 640px) {
   .campaign-rail-slide {
-    width: calc(100cqw / 2.6 - 16px);
+    width: 33vw;
     margin-right: 16px;
   }
 }
 @media (min-width: 1024px) {
   .campaign-rail-slide {
-    width: calc(100cqw / 3.2 - 18px);
+    width: 28vw;
     margin-right: 18px;
   }
 }
 @media (min-width: 1280px) {
   .campaign-rail-slide {
-    width: calc(100cqw / 4.2 - 20px);
+    /* Rail container is capped at ~1206px for every viewport >=1280, so a fixed
+     * width gives an exact, stable ~4.2 cards per view. */
+    width: 267px;
     margin-right: 20px;
   }
 }
