@@ -1142,6 +1142,9 @@ export const copy = {
       submitAria: "खोज सुरु गर्ने",
       searchingPrefix: "खोज्दै:",
       clearSearch: "खोज खाली गर्ने",
+      activeFiltersLabel: "लागू फिल्टर",
+      clearAllFilters: "सबै हटाउने",
+      removeFilter: "हटाउने",
       mapEyebrow: "नक्सामा",
       mapEmpty: "अहिले नक्सामा देखाउन कुनै अभियान छैन।",
       map: {
@@ -2955,6 +2958,9 @@ export const copy = {
       submitAria: "Submit search",
       searchingPrefix: "Searching:",
       clearSearch: "Clear search",
+      activeFiltersLabel: "Active filters",
+      clearAllFilters: "Clear All",
+      removeFilter: "Remove",
       mapEyebrow: "On the map",
       mapEmpty: "No campaigns to map right now.",
       map: {

@@ -32,6 +32,7 @@ import { ISSUE_CATEGORIES, localizeIssue } from "@/lib/adminUtils";
 import { categoryOptionLabel } from "@/lib/categoryIcons";
 import { useCampaignFeed } from "@/lib/useCampaignFeed";
 import { useCampaignCounts } from "@/lib/useCampaignCounts";
+import { getProvinceById, getDistrictById } from "@/lib/geographyApi";
 import {
   CAMPAIGN_STATUS_SEQUENCE,
   campaignSlugToStatus,
@@ -181,6 +182,27 @@ function StatusChip({ text, count, loading, language, status }) {
   );
 }
 
+// One removable pill in the active-filters strip: the human label for a live
+// secondary filter (category / province / district / sort) plus an × that
+// clears just that one. Styled on the existing search-chip look so the whole
+// strip reads as a single family.
+function FilterChip({ label, onRemove, removeLabel }) {
+  return (
+    <span className="public-issues-search-chip campaigns-filter-chip">
+      <span className="campaigns-filter-chip-text">{label}</span>
+      <button
+        type="button"
+        className="public-issues-search-chip-clear"
+        aria-label={`${removeLabel}: ${label}`}
+        title={removeLabel}
+        onClick={onRemove}
+      >
+        <CloseOutlined aria-hidden="true" />
+      </button>
+    </span>
+  );
+}
+
 export default function CampaignsListPageContent({ status: statusProp = "all" }) {
   const { language } = usePreferences();
   const t = PAGE_COPY[language] || PAGE_COPY.np;
@@ -258,6 +280,12 @@ export default function CampaignsListPageContent({ status: statusProp = "all" })
   }, [readFiltersFromUrl]);
 
   const [filtersOpen, setFiltersOpen] = useState(false);
+
+  // Human names for the active province/district chips. The list only carries
+  // the IDs; these resolve to display names off the tab-cached geography lists
+  // (no new network call). While a name is still resolving the chip falls back
+  // to a generic "Province"/"District" label so it never flashes a raw UUID.
+  const [regionNames, setRegionNames] = useState({ province: null, district: null });
 
   // ----- list / thumbnails / map view toggle (URL-synced via ?view=) ------
   // `view` is not a filter — it rides on its own ?view= param so a filtered
@@ -408,6 +436,21 @@ export default function CampaignsListPageContent({ status: statusProp = "all" })
     [filters, applyFilters]
   );
 
+  // Reset the SECONDARY filters + search in one shot. Status is intentionally
+  // left alone — it lives in the path and has its own always-visible chip row —
+  // so this clears exactly the "old filters" a returning visitor gets stuck
+  // with (category / province / district / sort / query) and nothing else.
+  const clearAllFilters = useCallback(() => {
+    applyFilters({
+      ...filters,
+      category: undefined,
+      provinceId: undefined,
+      districtId: undefined,
+      sort: undefined,
+      q: ""
+    });
+  }, [filters, applyFilters]);
+
   // ----- restore the tab/view/page from memory ---------------------------
   // Runs once. If the URL already names a specific list — a stage path
   // (/campaigns/<slug>) or any secondary filter in the query (a deep/shared
@@ -474,6 +517,35 @@ export default function CampaignsListPageContent({ status: statusProp = "all" })
   // useCampaignFeed (forwarded to /issues + /events). The feed already arrives
   // filtered and in lifecycle order, so the list and the chip counts agree.
   const filteredItems = items;
+
+  // Resolve the active province/district IDs to display names for their chips.
+  // Reads the cached geography lists; re-runs on ID or language change.
+  useEffect(() => {
+    let cancelled = false;
+    const pid = filters.provinceId;
+    const did = filters.districtId;
+    if (!pid && !did) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setRegionNames({ province: null, district: null });
+      return;
+    }
+    const pick = (rec) =>
+      rec ? (language === "np" ? rec.localName || rec.name : rec.name || rec.localName) : null;
+    Promise.all([
+      pid ? getProvinceById(pid) : Promise.resolve(null),
+      did ? getDistrictById(did) : Promise.resolve(null)
+    ])
+      .then(([prov, dist]) => {
+        if (cancelled) return;
+        setRegionNames({ province: pick(prov), district: pick(dist) });
+      })
+      .catch(() => {
+        if (!cancelled) setRegionNames({ province: null, district: null });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [filters.provinceId, filters.districtId, language]);
 
   // ----- visible window (load-more) --------------------------------------
   const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE);
@@ -711,6 +783,26 @@ export default function CampaignsListPageContent({ status: statusProp = "all" })
     value: o.value,
     label: issuesCopy.filters?.[o.labelKey] || o.value
   }));
+
+  // ----- active-filter chips (secondary filters + search) ----------------
+  // Status is deliberately excluded: it lives in the path, has its own chip
+  // row, and the reset leaves it untouched.
+  const activeCategoryLabel = filters.category
+    ? issuesCopy.categoryLabels?.[filters.category] || filters.category
+    : null;
+  const activeSortLabel = filters.sort
+    ? sortOptions.find((o) => o.value === filters.sort)?.label || filters.sort
+    : null;
+  const provinceFallback = language === "np" ? "प्रदेश" : "Province";
+  const districtFallback = language === "np" ? "जिल्ला" : "District";
+  const hasActiveFilters = Boolean(
+    filters.q ||
+      filters.category ||
+      filters.provinceId ||
+      filters.districtId ||
+      filters.sort
+  );
+
   const reportIssueCtaLabel =
     (copy[language] || copy.np)?.issueNew?.cta?.list ?? "Report New Issue";
 
@@ -777,25 +869,6 @@ export default function CampaignsListPageContent({ status: statusProp = "all" })
           <h1>{t.title}</h1>
           <p>{t.intro}</p>
         </div>
-
-        {filters.q ? (
-          <div className="public-issues-search-chip" role="status">
-            <SearchOutlined aria-hidden="true" />
-            <span className="public-issues-search-chip-label">
-              {homeSearch.searchingPrefix}
-            </span>
-            <strong>{filters.q}</strong>
-            <button
-              type="button"
-              className="public-issues-search-chip-clear"
-              aria-label={homeSearch.clearSearch}
-              title={homeSearch.clearSearch}
-              onClick={() => applyFilters({ ...filters, q: "" })}
-            >
-              <CloseOutlined aria-hidden="true" />
-            </button>
-          </div>
-        ) : null}
 
         <div className="public-issues-toolbar">
           {/* Status filter (chip row, always visible) + list/map view toggle. */}
@@ -925,6 +998,79 @@ export default function CampaignsListPageContent({ status: statusProp = "all" })
             </div>
           ) : null}
         </div>
+
+        {hasActiveFilters ? (
+          <div
+            className="campaigns-active-filters"
+            role="group"
+            aria-label={homeSearch.activeFiltersLabel}
+          >
+            {filters.q ? (
+              <span className="public-issues-search-chip campaigns-filter-chip" role="status">
+                <SearchOutlined aria-hidden="true" />
+                <span className="public-issues-search-chip-label">
+                  {homeSearch.searchingPrefix}
+                </span>
+                <strong>{filters.q}</strong>
+                <button
+                  type="button"
+                  className="public-issues-search-chip-clear"
+                  aria-label={homeSearch.clearSearch}
+                  title={homeSearch.clearSearch}
+                  onClick={() => applyFilters({ ...filters, q: "" })}
+                >
+                  <CloseOutlined aria-hidden="true" />
+                </button>
+              </span>
+            ) : null}
+
+            {filters.category ? (
+              <FilterChip
+                label={activeCategoryLabel}
+                removeLabel={homeSearch.removeFilter}
+                onRemove={() => applyFilters({ ...filters, category: undefined })}
+              />
+            ) : null}
+
+            {filters.provinceId ? (
+              <FilterChip
+                label={regionNames.province || provinceFallback}
+                removeLabel={homeSearch.removeFilter}
+                onRemove={() =>
+                  applyFilters({
+                    ...filters,
+                    provinceId: undefined,
+                    districtId: undefined
+                  })
+                }
+              />
+            ) : null}
+
+            {filters.districtId ? (
+              <FilterChip
+                label={regionNames.district || districtFallback}
+                removeLabel={homeSearch.removeFilter}
+                onRemove={() => applyFilters({ ...filters, districtId: undefined })}
+              />
+            ) : null}
+
+            {filters.sort ? (
+              <FilterChip
+                label={activeSortLabel}
+                removeLabel={homeSearch.removeFilter}
+                onRemove={() => applyFilters({ ...filters, sort: undefined })}
+              />
+            ) : null}
+
+            <button
+              type="button"
+              className="campaigns-active-filters-clear"
+              onClick={clearAllFilters}
+            >
+              {homeSearch.clearAllFilters}
+            </button>
+          </div>
+        ) : null}
 
         {showError ? (
           <div className="public-issues-error" role="alert">
