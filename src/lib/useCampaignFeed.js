@@ -1,85 +1,142 @@
 "use client";
 
-// Unified campaign feed. Reads the right backend source per status and returns
-// a single ordered list of `{ kind, status, id, data }` entries the
-// /campaigns page renders through a card/preview dispatcher.
+// Unified campaign feed — ONE call to GET /campaigns?mode=maximum (shipped
+// 2026-07-01) instead of the old 5-way split over /issues + /events.
 //
-//   OPEN      -> /issues?status=OPEN         (kind: "issue")
-//   DRAFT     -> listDraftEvents             (kind: "event")
-//   SCHEDULED -> listUpcomingEvents          (kind: "event")
-//   ACTIVE    -> listLiveEvents              (kind: "event")
-//   COMPLETED -> listPastEvents              (kind: "event")
+// The backend now merges issues + events into a single lifecycle-ordered feed
+// (OPEN → DRAFT → SCHEDULED → ACTIVE → COMPLETED), localized, filtered and
+// counted server-side. `mode=maximum` returns a card-ready superset (category,
+// both-locale titles, event block, supporterCount/attendingCount, myVote).
 //
-// For status "all" every stage is fetched in parallel and concatenated in
-// lifecycle order (OPEN -> DRAFT -> SCHEDULED -> ACTIVE -> COMPLETED). The
-// buckets are disjoint by construction (an issue contributes only its OPEN
-// stage; a stale SCHEDULED event surfaces under ACTIVE, never under both), so
-// no dedup is needed.
+// To keep the /campaigns page's cards (IssueListCard / EventListCard / preview
+// panes / CampaignCard) untouched, this hook ADAPTS each maximum-mode item back
+// into the exact `{ kind, status, id, data }` shape those cards already read —
+// issue-shaped for OPEN, normalized-event-shaped otherwise. So the switch is a
+// pure data-layer change; the UI layer sees no difference.
+//
+// Routing rule (per the API contract): there is no `kind` field — derive it
+// from the top-level status. OPEN → issue; every other stage → event.
 
 import { useCallback, useEffect, useState } from "react";
 import { getJson } from "@/lib/apiClient";
 import { getListItems } from "@/lib/adminUtils";
-import { listEventsByStatus } from "@/lib/eventsApi";
-import { CAMPAIGN_STATUS_SEQUENCE } from "@/lib/campaignStatus";
 
-const ISSUE_LIMIT = 50;
+// mode=maximum is heavier per row (descriptions + relations + event block), so
+// keep the page fetch bounded; the /campaigns page slices this in memory for its
+// load-more. At Nepal scale one page covers the whole feed today.
+const FEED_LIMIT = 100;
 
-async function fetchOpenIssues({ provinceId, districtId, category, search, sort, order }) {
-  const response = await getJson("/issues", {
+// titles:{ne,en} → the translations[] array localizeIssue expects, so a locale
+// toggle re-picks the title with no refetch. description is locale-picked by the
+// API; we attach it to both entries (only the title actually toggles per card).
+function buildTranslations(titles, description) {
+  const tr = [];
+  if (titles?.ne) tr.push({ locale: "ne", title: titles.ne, description: description || "" });
+  if (titles?.en) tr.push({ locale: "en", title: titles.en, description: description || "" });
+  return tr;
+}
+
+// OPEN campaign → issue-shaped record (what IssueListCard / IssuePreviewPane /
+// IssueVoteButton / CampaignCard's issue branch read).
+function toIssueData(item) {
+  return {
+    id: item.id,
+    slug: item.slug,
+    status: item.status,
+    category: item.category,
+    addressText: item.addressText,
+    latitude: item.lat,
+    longitude: item.lng,
+    voteCount: item.supporterCount ?? 0,
+    attendingCount: item.attendingCount ?? 0,
+    conversionThreshold: item.conversionThreshold ?? 0,
+    promotionProgress: item.promotionProgress ?? 0,
+    title: item.title,
+    description: item.description || "",
+    translations: buildTranslations(item.titles, item.description),
+    coverImage: item.image || null, // getIssueCoverImageUrl accepts a bare URL
+    province: item.province || null,
+    district: item.district || null,
+    municipality: item.municipality || null,
+    ward: item.ward || null,
+    reportedById: item.reportedBy?.id ?? null,
+    // per-viewer echo (auth only) → drives the vote button's "Supported/…" face
+    isVoted: Boolean(item.myVote),
+    voterRole: item.myVote?.voterRole ?? null,
+    eventRole: item.myVote?.eventRole ?? null,
+    createdAt: item.createdAt,
+    updatedAt: item.updatedAt
+  };
+}
+
+// Promoted campaign → normalized-event-shaped record (what EventListCard /
+// EventPreviewPane / CampaignCard's event branch read). Mirrors eventsApi's
+// normalizeEvent output closely enough that the cards render identically.
+// (rolesNeeded / live participantCount aren't in the feed — the campaigns LIST
+// never showed those anyway; that enrichment only happens on the detail page.)
+function toEventData(item) {
+  const ev = item.event || {};
+  const linkedIssue = {
+    slug: item.slug,
+    title: item.title,
+    translations: buildTranslations(item.titles, item.description),
+    addressText: item.addressText,
+    latitude: item.lat,
+    longitude: item.lng,
+    coverImage: item.image || null,
+    status: item.status,
+    voteCount: item.supporterCount ?? 0,
+    attendingCount: item.attendingCount ?? 0
+  };
+  return {
+    id: ev.id || item.id,
+    slug: item.slug,
+    status: item.status,
+    title: item.title,
+    addressText: item.addressText,
+    category: item.category,
+    latitude: item.lat,
+    longitude: item.lng,
+    scheduledAt: ev.scheduledAt ?? null,
+    completedAt: ev.completedAt ?? null,
+    durationMinutes: ev.durationMinutes ?? null,
+    meetupLatitude: ev.meetupLatitude ?? null,
+    meetupLongitude: ev.meetupLongitude ?? null,
+    meetupAddress: ev.meetupAddress ?? null,
+    resultSummary: ev.resultSummary ?? null,
+    attendeeCount: ev.attendeeCount ?? null,
+    attendingCount: item.attendingCount ?? 0,
+    thumbnailUrl: item.image || null,
+    eventLeader: ev.eventLeader ?? null,
+    eventLeaderId: ev.eventLeader?.id ?? null,
+    issueId: item.id,
+    linkedIssue,
+    myVote: item.myVote ?? null
+  };
+}
+
+function adaptCampaignItem(item) {
+  const kind = item.status === "OPEN" ? "issue" : "event";
+  const data = kind === "issue" ? toIssueData(item) : toEventData(item);
+  return { kind, status: item.status, id: data.id, data };
+}
+
+async function fetchCampaigns({ status, provinceId, districtId, category, search, sort, order }) {
+  const response = await getJson("/campaigns", {
     params: {
-      status: "OPEN",
-      provinceId,
-      districtId,
-      // Backend-side filtering — GET /issues accepts `category` + `search`.
+      mode: "maximum",
+      limit: FEED_LIMIT,
+      // "all" → no status param (backend returns the lifecycle-ordered merge);
+      // a specific stage → that status only.
+      ...(status && status !== "all" ? { status } : {}),
+      ...(provinceId ? { provinceId } : {}),
+      ...(districtId ? { districtId } : {}),
       ...(category ? { category } : {}),
       ...(search ? { search } : {}),
-      // Backend-side ordering — GET /issues accepts `sort` (voteCount |
-      // createdAt) + `order`. Only forwarded when the caller picks a sort.
-      ...(sort ? { sort, order: order || "desc" } : {}),
-      limit: ISSUE_LIMIT
+      ...(sort ? { sort, order: order || "desc" } : {})
     }
   });
-  // The list read (GET /issues) now echoes the viewer's own `isVoted` +
-  // `voterRole` + `eventRole` per item (shipped 2026-06-30), so each card reads
-  // the true commitment (Supported / Joined / Leading) on first paint with no
-  // extra round-trip. (Anonymous viewers simply get no such fields.) The old
-  // page-wide GET /issues/me/votes decoration was dropped here.
-  const entries = getListItems(response).map((issue) => ({
-    kind: "issue",
-    status: "OPEN",
-    id: issue.id,
-    data: issue
-  }));
-  // An explicit sort is already applied server-side — trust that order.
-  // Otherwise default to most-supported first.
-  if (sort) return entries;
-  return entries.sort(
-    (a, b) => (b.data.voteCount || 0) - (a.data.voteCount || 0)
-  );
-}
-
-function toEventEntries(status, events) {
-  return events.map((ev) => ({ kind: "event", status, id: ev.id, data: ev }));
-}
-
-function byScheduledAsc(a, b) {
-  return Date.parse(a.data.scheduledAt || 0) - Date.parse(b.data.scheduledAt || 0);
-}
-function byCompletedDesc(a, b) {
-  return Date.parse(b.data.completedAt || 0) - Date.parse(a.data.completedAt || 0);
-}
-
-async function fetchStatus(status, opts) {
-  if (status === "OPEN") return fetchOpenIssues(opts);
-  // Every later stage maps 1:1 to a backend event status — fetch it raw so the
-  // displayed list and the chip-row count agree exactly.
-  const entries = toEventEntries(status, await listEventsByStatus(status, opts));
-  // An explicit sort is honoured server-side; keep that order. Without one,
-  // fall back to the lifecycle-smart default (soonest upcoming / latest done).
-  if (opts.sort) return entries;
-  if (status === "SCHEDULED") return entries.sort(byScheduledAsc);
-  if (status === "COMPLETED") return entries.sort(byCompletedDesc);
-  return entries;
+  return getListItems(response).map(adaptCampaignItem);
 }
 
 export function useCampaignFeed({ status, language, provinceId, districtId, category, q, sort, order }) {
@@ -87,28 +144,13 @@ export function useCampaignFeed({ status, language, provinceId, districtId, cate
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const load = useCallback(async () => {
-    // All filtering is server-side: category + search (q) are forwarded to both
-    // /issues (OPEN) and /events (other stages). No client-side narrowing.
-    // `sort`/`order` (when set) likewise ride to the API per bucket; in "all"
-    // mode the lifecycle grouping stays, with each bucket ordered by the sort.
-    const opts = { language, provinceId, districtId, category, search: q, sort, order };
-    const wanted =
-      !status || status === "all" ? CAMPAIGN_STATUS_SEQUENCE : [status];
-    // Settle each stage independently: a single failing endpoint contributes
-    // nothing instead of blanking the whole page. We only raise an error when
-    // everything failed (nothing to show + at least one failure).
-    const settled = await Promise.allSettled(
-      wanted.map((s) => fetchStatus(s, opts))
-    );
-    const merged = [];
-    let anyError = false;
-    settled.forEach((res) => {
-      if (res.status === "fulfilled") merged.push(...res.value);
-      else anyError = true;
-    });
-    return { merged, anyError };
-  }, [status, language, provinceId, districtId, category, q, sort, order]);
+  // language isn't sent (the API localizes via Accept-Language / default "ne",
+  // and each card re-localizes from the embedded titles), but it stays in the
+  // dep list so a language flip re-renders cleanly.
+  const load = useCallback(
+    () => fetchCampaigns({ status, provinceId, districtId, category, search: q, sort, order }),
+    [status, provinceId, districtId, category, q, sort, order]
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -117,10 +159,9 @@ export function useCampaignFeed({ status, language, provinceId, districtId, cate
     setError("");
     (async () => {
       try {
-        const { merged, anyError } = await load();
+        const merged = await load();
         if (cancelled) return;
         setItems(merged);
-        if (anyError && merged.length === 0) setError("load_failed");
       } catch {
         if (cancelled) return;
         setItems([]);
@@ -132,7 +173,7 @@ export function useCampaignFeed({ status, language, provinceId, districtId, cate
     return () => {
       cancelled = true;
     };
-  }, [load]);
+  }, [load, language]);
 
   return { items, loading, error };
 }
