@@ -71,6 +71,23 @@
   border-color: color-mix(in srgb, var(--primary) 40%, var(--line));
 }
 
+/* Register the fade widths as animatable <length>s. A plain CSS custom property
+ * can't be transitioned and a mask-image gradient can't either — but a
+ * registered <length> that drives the gradient's stops CAN, so the directional
+ * fade eases in/out instead of snapping. inherits:true keeps the value flowing
+ * from .campaign-rail-viewport (where it's toggled) down to .campaign-rail-swiper
+ * (where it's used). */
+@property --rail-fade-left {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 28px;
+}
+@property --rail-fade-right {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 28px;
+}
+
 .campaign-rail-viewport {
   position: relative;
   min-width: 0;
@@ -115,6 +132,16 @@
    * stays 0 to keep the edge-to-edge peek + fade. */
   padding-block: 22px;
   margin-block: -14px;
+  /* Ease the fade in/out as the rail reaches / leaves an edge. The transition
+   * lives here (the element that paints the mask) so it fires when the inherited
+   * fade width changes. */
+  transition: --rail-fade-left 260ms ease, --rail-fade-right 260ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .campaign-rail-swiper {
+    transition: none;
+  }
 }
 
 .campaign-rail-slide {
