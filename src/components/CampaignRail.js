@@ -4,7 +4,7 @@
 // is EventsHomeRail's hero treatment). Peeks adjacent cards, fades at the edges,
 // prev/next arrows, keyboard + a11y. No autoplay: this is a browse rail.
 
-import { useEffect, useId, useRef } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import Link from "next/link";
 import { useReducedMotion } from "framer-motion";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -42,6 +42,25 @@ export default function CampaignRail({
   const uid = rawId.replace(/[^a-zA-Z0-9]/g, "");
   const swiperRef = useRef(null);
 
+  // Directional edge fade: the mask should only dim the side that actually has
+  // more cards hidden past it. At rest (position 0) nothing is hidden to the
+  // LEFT, so a left fade would just eat the flush first card — kill it there and
+  // keep the right fade (a card genuinely peeks). Once scrolled, the left fade
+  // returns and the right one drops off at the end. `watchOverflow` makes a
+  // non-overflowing rail report isBeginning && isEnd → no fade on either side.
+  // Default atStart:true / atEnd:false = sharp first card + right peek fade on
+  // first paint, which is the common (overflowing) case; onSwiper corrects it.
+  const [edges, setEdges] = useState({ atStart: true, atEnd: false });
+  const syncEdges = useCallback((swiper) => {
+    const s = swiper || swiperRef.current;
+    if (!s || s.destroyed) return;
+    setEdges((prev) =>
+      prev.atStart === s.isBeginning && prev.atEnd === s.isEnd
+        ? prev
+        : { atStart: s.isBeginning, atEnd: s.isEnd }
+    );
+  }, []);
+
   // Why the rail used to lose its card spacing on every client-side RETURN to
   // "/": SiteShell keys the page wrapper by pathname, so React REMOUNTS this rail
   // and a fresh Swiper inits during a transient layout frame. Swiper bakes each
@@ -59,7 +78,12 @@ export default function CampaignRail({
 
     const refresh = () => {
       const inst = swiperRef.current;
-      if (inst && !inst.destroyed) inst.update();
+      if (inst && !inst.destroyed) {
+        inst.update();
+        // update() can shift isBeginning/isEnd (breakpoint change, late data
+        // populate), so re-derive the edge fades from the fresh measurement.
+        syncEdges(inst);
+      }
     };
 
     // 1) Re-measure after the heavy home layout (map, fonts, images) settles.
@@ -84,7 +108,7 @@ export default function CampaignRail({
       window.removeEventListener("pageshow", refresh);
     };
     // Re-run when the slide set changes so a late data populate re-measures.
-  }, [items]);
+  }, [items, syncEdges]);
 
   if (!items || items.length === 0) return null;
 
@@ -109,7 +133,11 @@ export default function CampaignRail({
         ) : null}
       </header>
 
-      <div className="campaign-rail-viewport">
+      <div
+        className="campaign-rail-viewport"
+        data-at-start={edges.atStart ? "true" : "false"}
+        data-at-end={edges.atEnd ? "true" : "false"}
+      >
         <button
           type="button"
           className={`campaign-rail-arrow campaign-rail-arrow--prev ${prevClass}`}
@@ -136,7 +164,14 @@ export default function CampaignRail({
           observeParents
           onSwiper={(s) => {
             swiperRef.current = s;
+            syncEdges(s);
           }}
+          // Keep the directional fade in step with the scroll position. onProgress
+          // fires continuously (drag, snap animation, nav clicks); onResize covers
+          // breakpoint changes that flip isEnd. The equality guard in syncEdges
+          // makes the redundant calls no-op re-renders.
+          onProgress={syncEdges}
+          onResize={syncEdges}
           className="campaign-rail-swiper"
         >
           {items.map(({ entry, distanceKm }) => (

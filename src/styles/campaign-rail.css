@@ -74,23 +74,39 @@
 .campaign-rail-viewport {
   position: relative;
   min-width: 0;
+  /* Edge-fade widths, driven by data-at-start / data-at-end that CampaignRail.js
+   * toggles from Swiper's isBeginning / isEnd. A side only fades when there are
+   * more cards hidden past it. */
+  --rail-fade-left: 28px;
+  --rail-fade-right: 28px;
 }
 
-/* Edge fade: cards "vanish" at the left/right boundaries. */
+/* At the left end there is nothing hidden to the left — drop the left fade so
+ * the flush first card stays sharp (this was the "first card looks cut off"
+ * complaint). Same for the right fade at the right end. A non-overflowing rail
+ * reports both edges, so it fades on neither side. */
+.campaign-rail-viewport[data-at-start="true"] {
+  --rail-fade-left: 0px;
+}
+.campaign-rail-viewport[data-at-end="true"] {
+  --rail-fade-right: 0px;
+}
+
+/* Edge fade: cards "vanish" only at a boundary that has more content past it. */
 .campaign-rail-swiper {
   width: 100%;
   -webkit-mask-image: linear-gradient(
     90deg,
     transparent 0,
-    #000 28px,
-    #000 calc(100% - 28px),
+    #000 var(--rail-fade-left),
+    #000 calc(100% - var(--rail-fade-right)),
     transparent 100%
   );
   mask-image: linear-gradient(
     90deg,
     transparent 0,
-    #000 28px,
-    #000 calc(100% - 28px),
+    #000 var(--rail-fade-left),
+    #000 calc(100% - var(--rail-fade-right)),
     transparent 100%
   );
   /* .swiper has overflow:hidden, which clips the cards' box-shadow top/bottom.
