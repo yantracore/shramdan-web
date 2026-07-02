@@ -1,4 +1,4 @@
-# Campaigns feed (unified list · counts · map)
+# Campaigns feed (unified list · counts · map · curated shelves)
 
 > The `/campaigns` page is one surface over the whole campaign lifecycle:
 > **OPEN** (an issue still gathering support) → **DRAFT / Planning** → **SCHEDULED**
@@ -11,7 +11,7 @@
 > nor the badge numbers are real beyond the cap. This file specifies the backend
 > support needed to make the feed, its counts, and its map mode correct at scale.
 
-**Spec status:** `shipped (list + counts + minimal map mode)`
+**Spec status:** `shipped (list + counts + minimal map mode + curated shelves)`
 **Last updated:** 2026-07-02
 **Owner:** Pranish (backend)
 
@@ -82,6 +82,10 @@ callers and for `OPEN` items, same as `/events`.
 (3 requests, limit 100 each) and decorates feed items with the embedded
 `viewerParticipation`. Correct but wasteful — and silently incomplete beyond
 100 events per stage.
+
+The same gap (and the same interim sweep, via `useCuratedCampaigns`) applies to
+`GET /campaigns/curated` markers — when the embed lands, add it to curated's
+event-stage markers too so both sweeps can be deleted together.
 
 ### Ordering
 
@@ -176,10 +180,13 @@ Response:
 > cheap payload" contract (tiny even at `limit=1000`). The original proposal is
 > kept below as the rationale record.
 >
-> **Frontend consumers (map-only, by design):** the `/campaigns` map view
-> (`useCampaignMarkers` — URL-driven filters) and, since 2026-07-02, the home
+> **Frontend consumers (by design, closed list):** the `/campaigns` map view
+> (`useCampaignMarkers` — URL-driven filters); since 2026-07-02 also the home
 > overview map (same hook, explicit `status`-only filter driven by the activity
-> funnel). No other surface may use `mode=minimal`.
+> funnel) and the sitemap (`src/app/sitemap.js` — pure URL enumeration of
+> `/campaign/<slug>`, replacing its old `/issues?limit=500` + `/events?limit=500`
+> fetches). No card/list surface may use `mode=minimal` — cards need the
+> maximum shape.
 
 **Proposal:** one un-paginated endpoint that returns **all** matching campaigns
 as the smallest possible record, cheap enough to ship thousands in a single
@@ -208,6 +215,34 @@ MVP because it breaks accurate totals.
 
 ---
 
+## 4. `GET /campaigns/curated` — home shelves (SHIPPED 2026-07-02)
+
+One public call returns seven fixed-size, server-sorted shelves of the same
+markers `GET /campaigns` emits (`mode`/`locale` honoured, `myVote` for
+authenticated callers, gzip body): `nearby` (≤12, needs `lat`/`lng`, carries
+`distanceKm`), `ongoing` (≤6 ACTIVE), `upcoming` (≤6 SCHEDULED), `planning`
+(≤3 DRAFT, closest kickoff meeting first), `closestToThreshold` (≤8 OPEN,
+carries `remaining`), `newest` (≤4 OPEN, disjoint from `closestToThreshold`),
+`completed` (≤6). Shared scope filters only — no pagination/sort/status params.
+
+**Frontend adoption (2026-07-02, `useCuratedCampaigns`):** the home coverflow
+rail (`ongoing` + `upcoming`) and all four discovery strips now come from this
+one call, replacing the rail's 3× `GET /events` + the `/campaigns` page-1 slice
+the strips used to bucket client-side. Strip composition: near = `nearby`;
+happening = `ongoing` + `upcoming[:3]` + `planning[:3]` (the agreed 6/3/3 = 12
+Active/Upcoming mix); support = `closestToThreshold` + `newest`; impact =
+`completed`.
+
+**Note for Pranish (P3, no action needed):** the agreed home mix takes only
+**3** of `upcoming`'s 6 markers — the frontend slices client-side. Fine as-is;
+only worth shrinking the shelf if the extra rows ever matter for payload size.
+
+### RBAC
+
+`Public` (richer markers for authenticated callers, as on the list).
+
+---
+
 ## Migration notes (frontend side, after this lands)
 
 - `useCampaignFeed` collapses from five fetches + client concat to one paginated
@@ -223,11 +258,21 @@ MVP because it breaks accurate totals.
   `GET /issues?limit=100` + `listAllEvents()` for `GET /campaigns/counts`.
   ✅ (2026-07-02 — the fold was provably wrong live: OPEN read 42 vs 44 real,
   DRAFT read 0 vs 24 real)
+- Home coverflow rail + discovery strips collapse onto one
+  `GET /campaigns/curated` (`useCuratedCampaigns`), with a coords refetch once
+  the user grants location (asked when the strips scroll into view). The old
+  client-side "nearby" (unsorted feed slice) becomes real server-ranked
+  proximity. ✅ (2026-07-02)
 
 ---
 
 ## Recent changes
 
+- `2026-07-02` — **curated shelves shipped + home adoption:** new
+  `GET /campaigns/curated` (section 4) returns seven fixed shelves in one call;
+  the `planning` shelf (≤3 DRAFT) was added the same day for the 6/3/3
+  Active/Upcoming home mix. Home rail + discovery strips migrated same day
+  (`useCuratedCampaigns`); `useHomeRails` deleted.
 - `2026-07-02` — **map mode confirmed shipped + home adoption:** the proposed
   `/campaigns/map` landed as `mode=minimal` on the list endpoint; section 3
   updated to match. The home overview map now consumes it too (funnel-driven

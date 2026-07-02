@@ -15,14 +15,15 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { ActivityStatsRow } from "@/components/ActivityStatsRow";
 import { CampaignsMap } from "@/components/CampaignsMap";
 import { EventsHomeRail } from "@/components/EventsHomeRail";
 import HomeDiscoveryRails from "@/components/HomeDiscoveryRails";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
-import { listAllEvents } from "@/lib/eventsApi";
+import { localizeIssue } from "@/lib/adminUtils";
+import { useCuratedCampaigns } from "@/lib/useCuratedCampaigns";
 import { CAMPAIGN_STATUS_SEQUENCE } from "@/lib/campaignStatus";
 import { copy } from "@/lib/siteContent";
 
@@ -38,34 +39,32 @@ export default function HomeSearchView() {
   const search = t.homeSearch ?? copy.np.homeSearch;
   const rail = t.liveEventsRail ?? copy.np.liveEventsRail;
 
-  const [liveEvents, setLiveEvents] = useState([]);
-  const [upcomingEvents, setUpcomingEvents] = useState([]);
-  const [eventsLoading, setEventsLoading] = useState(true);
   const [mapStatus, setMapStatus] = useState(null);
 
-  useEffect(() => {
-    let cancelled = false;
-    setEventsLoading(true);
-    (async () => {
-      try {
-        // Both rail buckets in one shot — the map no longer rides on these
-        // (it has its own minimal /campaigns fetch via CampaignsMap).
-        const buckets = await listAllEvents({ language });
-        if (cancelled) return;
-        setLiveEvents(buckets.active ?? []);
-        setUpcomingEvents(buckets.scheduled ?? []);
-      } catch {
-        if (cancelled) return;
-        setLiveEvents([]);
-        setUpcomingEvents([]);
-      } finally {
-        if (!cancelled) setEventsLoading(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [language]);
+  // One GET /campaigns/curated feeds the coverflow rail (ongoing + upcoming
+  // shelves) AND the discovery strips below — the old 3× /events rail fetch is
+  // gone. The map doesn't ride on this either (own fetch via CampaignsMap).
+  const { shelves, loading: shelvesLoading, requestLocation } = useCuratedCampaigns();
+
+  // The rail reads event.title directly (it isn't a re-localizing card), so
+  // pick the language's title here from the marker's embedded translations —
+  // a language flip repaints with no refetch.
+  const localizeRailEvents = useCallback(
+    (shelf) =>
+      shelf.map((it) => {
+        const localized = localizeIssue(it.data.linkedIssue, language);
+        return localized?.title ? { ...it.data, title: localized.title } : it.data;
+      }),
+    [language]
+  );
+  const railLive = useMemo(
+    () => localizeRailEvents(shelves.ongoing),
+    [shelves.ongoing, localizeRailEvents]
+  );
+  const railUpcoming = useMemo(
+    () => localizeRailEvents(shelves.upcoming),
+    [shelves.upcoming, localizeRailEvents]
+  );
 
   // Restore the persisted map filter AFTER mount — reading sessionStorage in
   // the useState initializer would make the server and client first paints
@@ -118,11 +117,11 @@ export default function HomeSearchView() {
       </section>
 
       <EventsHomeRail
-        liveEvents={liveEvents}
-        upcomingEvents={upcomingEvents}
+        liveEvents={railLive}
+        upcomingEvents={railUpcoming}
         copy={rail}
         language={language}
-        loading={eventsLoading}
+        loading={shelvesLoading}
       />
 
       <section className="home-search-panel" aria-label={search.mapEyebrow}>
@@ -165,7 +164,11 @@ export default function HomeSearchView() {
       </section>
 
       {/* Intent-grouped discovery rails (near / happening / support / impact). */}
-      <HomeDiscoveryRails language={language} />
+      <HomeDiscoveryRails
+        language={language}
+        shelves={shelves}
+        requestLocation={requestLocation}
+      />
     </SiteShell>
   );
 }

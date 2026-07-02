@@ -117,7 +117,7 @@ function toEventData(item) {
   };
 }
 
-function adaptCampaignItem(raw) {
+export function adaptCampaignItem(raw) {
   // Swap dead-host covers for a local demo photo ONCE here, so every consumer
   // (issue cards, event cards, previews) sees a loadable URL. See
   // resolveUsableImage in adminUtils for the backend story.
@@ -137,7 +137,7 @@ function adaptCampaignItem(raw) {
 // actually render a join CTA (CampaignCard gates on DRAFT/SCHEDULED/ACTIVE).
 const PARTICIPATION_STAGES = ["DRAFT", "SCHEDULED", "ACTIVE"];
 
-async function fetchViewerParticipationMap() {
+export async function fetchViewerParticipationMap() {
   const responses = await Promise.all(
     PARTICIPATION_STAGES.map((status) =>
       getJson("/events", { params: { status, limit: 100 } }).catch(() => null)
