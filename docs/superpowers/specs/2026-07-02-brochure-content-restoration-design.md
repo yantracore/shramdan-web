@@ -157,6 +157,19 @@ resources — ~79 references). Sections render on /intro, /invitations, and
 design-token/glass system rather than rewriting. `home-search.css` brand-band
 styles become unused on home once the hero replaces the band.
 
+## Addendum (2026-07-02, post-deploy): dev-status hero panel
+
+The dropped hero-panel aside returns to the HOME hero only (decision 1
+reversed by an approved follow-up — the panel returns in a new role, not
+the old action-hub one): a glassy in-development notice with (a) `getRoadmapSummary()`
+overall-progress bar, (b) the Mon–Fri 12:00–12:30 NPT LIVE badge on the
+participate / watch-live links, and (c) an "Open Test Site / परीक्षण साइट
+खोल्ने" CTA → stage.shramdan.org, repeated as a third button in the hero
+action row. The CTA hides itself on the staging host (hydration-safe
+`useSyncExternalStore` check). `/intro` keeps the solo hero. Copy lives in
+`siteContent.devPanel` (np + en); panel CSS restored verbatim from
+`3d66f5b^` (commit af76f6f); feature commit 16fa641.
+
 ## Out of scope
 
 - No `SiteShell` / layout-element changes anywhere.
