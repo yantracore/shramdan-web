@@ -48,6 +48,27 @@ video-background work (`93ff0c4`, 2026-06-03) and the live-backend swap
 4. **Resources route:** stays `/resources` (no redirect needed); title, nav
    label, and content change to "खुला स्रोतहरू / Open Resources".
 
+## Data provenance constraints (confirmed 2026-07-02, HARD RULES)
+
+- **Zero frontend dummy data.** All live data (events, issues, campaigns,
+  counts) comes from the backend only — backend-seeded dummy is fine,
+  frontend-baked dummy is not. Nothing from `devMockData` may return. The old
+  HomeClient's only mock touch (`injectMockLiveStream`, used to enrich the
+  mid-page events rail) dies with the dropped rail — no restored section may
+  reintroduce it.
+- **API wiring untouched.** No endpoint, env var, API base URL, or Vercel
+  setting changes. This work must not disturb the staging/production setup.
+- **Everything restored is static content:** copy from `siteContent.js`,
+  content-illustration images under `public/images/{event-types,homepage}/`,
+  external links, and the YouTube playlist embed. The only client-side logic
+  is TimeOfDayGreeting (clock only).
+- **Decorative background videos are allowed** — the
+  `public/images/demo-events/*.mp4` files (+ poster jpgs) are static brand/
+  atmosphere assets, not data. Confirmed restorable (2026-07-02).
+- **Building-now stays** — `getRoadmapSummary()` reads real project roadmap
+  data from `src/lib/roadmap.js` (frontend-local but genuine, same source as
+  /development). Not dummy data.
+
 ## Design
 
 ### 1. Home (`/`) — one change only
