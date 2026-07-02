@@ -19,7 +19,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getJson } from "@/lib/apiClient";
-import { getListItems } from "@/lib/adminUtils";
+import { getListItems, resolveUsableImage } from "@/lib/adminUtils";
 
 // Server-side page pagination (contract switched from cursor → page 2026-07-02):
 // fetch a small page, then pull page+1 as the user scrolls — never a big
@@ -116,7 +116,11 @@ function toEventData(item) {
   };
 }
 
-function adaptCampaignItem(item) {
+function adaptCampaignItem(raw) {
+  // Swap dead-host covers for a local demo photo ONCE here, so every consumer
+  // (issue cards, event cards, previews) sees a loadable URL. See
+  // resolveUsableImage in adminUtils for the backend story.
+  const item = { ...raw, image: resolveUsableImage(raw.image, raw.category) };
   const kind = item.status === "OPEN" ? "issue" : "event";
   const data = kind === "issue" ? toIssueData(item) : toEventData(item);
   return { kind, status: item.status, id: data.id, data };

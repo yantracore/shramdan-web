@@ -56,7 +56,9 @@ import {
   getListItems,
   getResponseData,
   isImageUpload,
-  localizeIssue
+  isUsableImageUrl,
+  localizeIssue,
+  resolveUsableImage
 } from "@/lib/adminUtils";
 import { useRoleSupport } from "@/lib/useRoleSupport";
 import { useEventJoin } from "@/lib/useEventJoin";
@@ -104,21 +106,11 @@ const LOCAL_COPY = {
   }
 };
 
-// Mirror of adminUtils' (unexported) isUsableImageUrl guard: the seed data on
-// the dead cdn.shramdan.org host 404s, so any upload pointing there must be
-// dropped from the galleries — otherwise the photo strip renders black boxes
-// (the cover already filters this host via getIssueCoverImageUrl; we apply the
-// same rule to the body + recap galleries so "representative image always"
-// holds and no broken image ever shows).
-function isUsableUploadUrl(url) {
-  if (!url || typeof url !== "string") return false;
-  try {
-    const parsed = new URL(url, "https://shramdan.org");
-    return parsed.hostname !== "cdn.shramdan.org";
-  } catch {
-    return true;
-  }
-}
+// Dead-host uploads (cdn.shramdan.org) are DROPPED from galleries — repeating
+// one demo substitute across a photo strip would look broken in a different
+// way. The hero cover instead swaps to a category demo photo via
+// resolveUsableImage, so the page never opens on an empty hero.
+const isUsableUploadUrl = isUsableImageUrl;
 
 function formatIssueDate(value, language) {
   if (!value) return "";
@@ -285,7 +277,12 @@ export function CampaignDetailView({ slug }) {
   const actionMode = issue ? issueActionMode(issue.status) : "none";
 
   const uploads = Array.isArray(issue?.uploads) ? issue.uploads : [];
-  const coverImageUrl = getIssueCoverImageUrl(issue);
+  const coverImageUrl =
+    getIssueCoverImageUrl(issue) ||
+    resolveUsableImage(
+      typeof issue?.coverImage === "string" ? issue.coverImage : issue?.coverImage?.url,
+      issue?.category
+    );
   const imageUploads = uploads
     .filter(isImageUpload)
     .filter((upload) => isUsableUploadUrl(upload.url))

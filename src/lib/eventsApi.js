@@ -16,7 +16,7 @@
 // the live-streams backend ships (see docs/api-requirements/live-streams.md).
 
 import { getJson } from "@/lib/apiClient";
-import { getListItems, getIssueCoverImageUrl, localizeIssue } from "@/lib/adminUtils";
+import { getListItems, getIssueCoverImageUrl, localizeIssue, resolveUsableImage } from "@/lib/adminUtils";
 
 // Backend caps list `limit` at 100 — a higher value 400s, and the catch below
 // nulls the promise, so every cover lookup would re-fire the failing request
@@ -63,7 +63,12 @@ export function normalizeEvent(rawEvent, language = "np") {
     category: issue?.category || rawEvent.category || null,
     latitude: rawEvent.meetupLatitude ?? issue?.latitude ?? null,
     longitude: rawEvent.meetupLongitude ?? issue?.longitude ?? null,
-    thumbnailUrl: getIssueCoverImageUrl(issue) || rawEvent.thumbnailUrl || null,
+    // rawEvent.thumbnailUrl can carry a dead-host seed URL — route it through
+    // the guard so it becomes a demo fallback instead of a broken request.
+    thumbnailUrl:
+      getIssueCoverImageUrl(issue) ||
+      resolveUsableImage(rawEvent.thumbnailUrl, issue?.category || rawEvent.category) ||
+      null,
     linkedIssue: localizedIssue,
     rolePlan: Array.isArray(rawEvent.rolePlan) ? rawEvent.rolePlan : []
   };

@@ -203,7 +203,7 @@ export function isImageUpload(upload) {
   return /\.(png|jpe?g|webp|gif|avif)$/i.test(upload.url);
 }
 
-function isUsableImageUrl(url) {
+export function isUsableImageUrl(url) {
   if (!url || typeof url !== "string") return false;
   try {
     const parsed = new URL(url, "https://shramdan.org");
@@ -211,6 +211,34 @@ function isUsableImageUrl(url) {
   } catch {
     return true;
   }
+}
+
+// Old seed batches wrote covers on the dead cdn.shramdan.org host; the 20
+// affected records can't be repaired via the API (PATCH /issues/{id} is
+// reporter-only — even ADMIN gets a 500; backend fix requested 2026-07-02 in
+// docs/api-requirements/issues.md). Until the data is fixed server-side, a
+// dead cover is swapped for a category-matched local demo photo — never an
+// empty placeholder. Only applies when a cover EXISTS but its host is dead;
+// genuinely image-less records keep their normal skeleton.
+const CATEGORY_FALLBACK_COVERS = {
+  DRAINAGE: "/images/demo-events/muglin-drains.jpg",
+  ROADSIDE: "/images/demo-events/galchhi-roadside.jpg",
+  RIVERBANK: "/images/demo-events/melamchi-riverbank.jpg",
+  PARK_PUBLIC_SPACE: "/images/demo-events/ratnapark-cleanup.jpg",
+  HIKING_TRAIL: "/images/demo-events/antu-trail.jpg",
+  VACANT_LAND: "/images/demo-events/bardia-buffer.jpg",
+  OTHER: "/images/demo-events/school-paint.jpg"
+};
+
+export function getCategoryFallbackImage(category) {
+  return CATEGORY_FALLBACK_COVERS[category] || CATEGORY_FALLBACK_COVERS.OTHER;
+}
+
+// null/undefined → null (no image); usable URL → as-is; dead-host URL →
+// category-matched local demo cover.
+export function resolveUsableImage(url, category) {
+  if (!url) return null;
+  return isUsableImageUrl(url) ? url : getCategoryFallbackImage(category);
 }
 
 export function getFirstIssueImage(issue) {
