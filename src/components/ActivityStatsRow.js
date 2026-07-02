@@ -108,16 +108,23 @@ export function ActivityStatsRow({
 
   const isFilter = typeof onSelectStatus === "function";
 
+  // Filter mode leads with "all stages": the reset step (active whenever no
+  // stage is pressed) whose count is the funnel's grand total.
+  const steps = isFilter ? [{ key: ALL_KEY }, ...STEPS] : STEPS;
+  const total = STEPS.reduce((sum, step) => sum + (counts[step.key] || 0), 0);
+
   return (
     <ol
       className={`activity-funnel${isFilter ? " is-interactive" : ""}`}
       aria-label={t.ariaLabel}
     >
-      {STEPS.map((step) => {
+      {steps.map((step) => {
         const { key } = step;
-        const label = campaignStatusLabel(key, language);
-        const value = counts[key] || 0;
-        const isActive = isFilter && activeStatus === key;
+        const isAll = key === ALL_KEY;
+        const label = isAll ? t.allLabel : campaignStatusLabel(key, language);
+        const value = isAll ? total : counts[key] || 0;
+        const isActive =
+          isFilter && (isAll ? activeStatus === null : activeStatus === key);
         const body = (
           <>
             <span className="activity-funnel-marker">
@@ -137,7 +144,7 @@ export function ActivityStatsRow({
                 className="activity-funnel-link"
                 aria-pressed={isActive}
                 aria-label={`${label}: ${value}`}
-                onClick={() => onSelectStatus(isActive ? null : key)}
+                onClick={() => onSelectStatus(isAll || isActive ? null : key)}
               >
                 {body}
               </button>

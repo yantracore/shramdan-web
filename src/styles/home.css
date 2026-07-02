@@ -8664,6 +8664,43 @@
   background: color-mix(in srgb, var(--surface) 50%, transparent);
 }
 
+/* Zero-result state on a LIVE map (funnel-filtered home overview): the Leaflet
+   canvas stays mounted — a filter switch only swaps markers, never the map —
+   and this note floats over it instead of replacing it. pointer-events stays
+   off so the map keeps panning underneath. */
+.campaigns-map-empty-overlay {
+  position: absolute;
+  inset: 0;
+  /* Above Leaflet's panes (≤700), below its controls (1000). */
+  z-index: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  pointer-events: none;
+}
+
+.campaigns-map-empty-note {
+  padding: 10px 18px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--line) 55%, transparent);
+  background: color-mix(in srgb, var(--surface) 78%, transparent);
+  -webkit-backdrop-filter: blur(12px) saturate(1.2);
+  backdrop-filter: blur(12px) saturate(1.2);
+  box-shadow: 0 10px 26px rgba(23, 33, 28, 0.14);
+  color: var(--muted);
+  font-size: 14px;
+  text-align: center;
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .campaigns-map-empty-note {
+    background: var(--surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
 /* Search row — search box (lifted from the homepage hero) on the left and
    the always-visible "report" CTA on the right. The filter button inside the
    search box toggles the detailed filter panel below; ViewSwitch and the
@@ -9014,6 +9051,13 @@ button.activity-funnel-link {
   /* Solid ring masks the connector line right at the marker. */
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--surface) 80%, transparent);
   transition: box-shadow 160ms ease;
+}
+
+/* Filter mode's leading "all stages" reset step: neutral brand tint so it
+   reads as "everything", not another lifecycle state. */
+.activity-funnel .step-all .activity-funnel-marker {
+  background: color-mix(in srgb, var(--primary) 14%, var(--surface));
+  color: var(--primary);
 }
 
 /* Phase tints flow warm → cool → hot → green, mirroring the journey. */

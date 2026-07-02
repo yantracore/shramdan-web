@@ -61,16 +61,22 @@ function createClusterIcon(cluster) {
   });
 }
 
+// Depends on the focus COORDS, not the (per-render) focus object: the map now
+// lives through marker swaps (funnel filter switches), so a stage with one
+// marker must still zoom in and leaving it must re-fit Nepal — but swapping
+// between multi-marker sets keeps the user's pan/zoom untouched.
 function FitView({ focus }) {
   const map = useMap();
+  const lat = focus?.lat;
+  const lng = focus?.lng;
+  const zoom = focus?.zoom;
   useEffect(() => {
-    if (focus) {
-      map.setView([focus.lat, focus.lng], focus.zoom ?? 15, { animate: false });
+    if (Number.isFinite(lat) && Number.isFinite(lng)) {
+      map.setView([lat, lng], zoom ?? 15, { animate: false });
     } else {
       map.fitBounds(NEPAL_BOUNDS, { padding: [12, 12], animate: false });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [map]);
+  }, [map, lat, lng, zoom]);
   return null;
 }
 

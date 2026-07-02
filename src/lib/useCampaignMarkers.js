@@ -12,8 +12,10 @@
 //   - `{ filters }` override: the caller owns the filters outright and the URL is
 //     ignored — the home map passes its own session-scoped status this way, so
 //     home and /campaigns filters never leak into each other.
-// The map component falls back to the in-memory list feed while this loads or if
-// it errors, so it never renders worse than before.
+// The map component falls back to the in-memory list feed until the FIRST fetch
+// resolves (`ready`), so it never renders worse than before. After that, stale
+// markers are kept on screen through refetches (filter switches) — the consumer
+// must never have to unmount a live map just because new markers are in flight.
 
 import { useCallback, useEffect, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
@@ -53,6 +55,9 @@ export function useCampaignMarkers({ filters } = {}) {
   const [markers, setMarkers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  // Flips true on the first successful resolve and stays true: from then on
+  // `markers` is authoritative (if stale during a refetch) — never the fallback.
+  const [ready, setReady] = useState(false);
 
   // Explicit filters win outright; otherwise status lives in the path
   // (/campaigns/<slug>) and the rest ride the query — mirror
@@ -102,6 +107,7 @@ export function useCampaignMarkers({ filters } = {}) {
         const response = await load();
         if (cancelled) return;
         setMarkers(getListItems(response).map(adaptMarker));
+        setReady(true);
       } catch {
         if (!cancelled) setError(true);
       } finally {
@@ -113,5 +119,5 @@ export function useCampaignMarkers({ filters } = {}) {
     };
   }, [load]);
 
-  return { markers, loading, error };
+  return { markers, loading, error, ready };
 }

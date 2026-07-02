@@ -41,10 +41,14 @@ function CampaignsMapInner({
   height = 600,
   filters
 }) {
-  const { markers, loading, error } = useCampaignMarkers({ filters });
-  // Authoritative once the minimal fetch resolves; the list feed is the fallback
-  // while loading or on error (worst case = the previous behaviour).
-  const source = !loading && !error ? markers : items || [];
+  const { markers, loading, error, ready } = useCampaignMarkers({ filters });
+  // Authoritative once the minimal fetch has resolved once (`ready`) — and it
+  // STAYS authoritative through later refetches: a filter switch keeps the
+  // stale markers on the live map until the new set lands, so the Leaflet
+  // canvas never unmounts (unmount → remount is a visible tile-reload flicker).
+  // Before that first resolve the list feed is the fallback (worst case = the
+  // previous behaviour).
+  const source = ready ? markers : items || [];
 
   const entries = [];
   const issues = [];
@@ -63,8 +67,8 @@ function CampaignsMapInner({
   const hasMappable =
     entries.some((e) => isMappable(e.event)) || issues.some(isMappable);
 
-  if (!hasMappable) {
-    // Nothing to plot AND no fallback feed yet → shimmer instead of a premature
+  if (!hasMappable && !ready) {
+    // Nothing to plot AND no marker feed yet → shimmer instead of a premature
     // "no campaigns" verdict (home passes items=[], so this is its whole wait).
     if (loading) return <MapSkeleton />;
     return (
@@ -73,6 +77,9 @@ function CampaignsMapInner({
       </div>
     );
   }
+  // `ready` with zero matches falls through: the funnel above is this map's
+  // filter control, so the canvas stays mounted (markers just clear) and the
+  // "nothing here" note floats on top instead of replacing the map.
 
   return (
     <div className="campaigns-map-frame">
@@ -88,6 +95,11 @@ function CampaignsMapInner({
         fullscreenLabel={mapCopy?.fullscreenOpen}
         exitFullscreenLabel={mapCopy?.fullscreenClose}
       />
+      {!hasMappable ? (
+        <div className="campaigns-map-empty-overlay" role="status">
+          <span className="campaigns-map-empty-note">{emptyLabel}</span>
+        </div>
+      ) : null}
     </div>
   );
 }
