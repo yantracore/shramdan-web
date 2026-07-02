@@ -13,10 +13,9 @@
 // stays in the repo as reference for /intro content. The IntroCinematic at
 // /intro is a separate, already-polished page.
 
-import Image from "next/image";
-import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ActivityStatsRow } from "@/components/ActivityStatsRow";
+import { BrochureHero } from "@/components/BrochureHero";
 import { CampaignsMap } from "@/components/CampaignsMap";
 import { EventsHomeRail } from "@/components/EventsHomeRail";
 import HomeDiscoveryRails from "@/components/HomeDiscoveryRails";
@@ -93,28 +92,7 @@ export default function HomeSearchView() {
 
   return (
     <SiteShell>
-      <section className="home-search-hero" aria-labelledby="home-search-title">
-        <div className="home-search-hero-inner">
-          <header className="home-search-brand">
-            <Image
-              className="home-search-brand-logo"
-              src="/branding/logo-mark.png"
-              alt=""
-              width={112}
-              height={112}
-              priority
-            />
-            <h1 id="home-search-title">{t.brand ?? t.footer?.brand ?? "श्रमदान"}</h1>
-            <p>{search.slogan}</p>
-            <div className="home-search-intro-link">
-              <Link href="/intro">
-                {language === "np" ? "श्रमदान के हो? हेर्ने →" : "What is Shramdan? Learn more →"}
-              </Link>
-            </div>
-          </header>
-
-        </div>
-      </section>
+      <BrochureHero variant="home" />
 
       <EventsHomeRail
         liveEvents={railLive}
