@@ -9,7 +9,13 @@
 
 ## P1 — blocks shipped UX
 
-_(none open — the issue-detail per-viewer echo shipped 2026-07-01.)_
+1. **campaigns — `viewerParticipation` on event-stage `mode=maximum` items** (2026-07-02).
+   Authenticated `GET /campaigns?mode=maximum` carries only the `myVote` vote echo; a
+   direct event join (`POST /events/{id}/participants`) never sets it, so list cards
+   can't show "Joined as …" after a refresh. Mirror the `GET /events` embed (caller's
+   `EventParticipant` row or `null`) on every non-OPEN item. FE ships an interim bulk
+   sweep over `GET /events?status=DRAFT|SCHEDULED|ACTIVE` (3 extra requests per feed
+   mount, breaks past 100 events/stage) — remove it when this lands. → [campaigns-feed.md](campaigns-feed.md)
 
 ## P2 — functionality gaps
 

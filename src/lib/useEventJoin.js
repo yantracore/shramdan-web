@@ -30,6 +30,24 @@ import { buildCampaignHeader } from "@/lib/campaignHeader";
 // Event lifecycle stages that still accept a join.
 const EVENT_JOINABLE_STATUSES = new Set(["DRAFT", "SCHEDULED", "ACTIVE"]);
 
+// A participation row counts only while it grants membership — LEFT/NO_SHOW
+// tombstones keep their old `role`, so status must gate, not role presence.
+function toParticipation(p) {
+  return p?.role && isActiveParticipationStatus(p.status)
+    ? { id: p.id, role: p.role, status: p.status }
+    : null;
+}
+
+// The viewer's participation as embedded in the caller's own payload.
+// GET /events list items carry `viewerParticipation` for authenticated
+// callers (and useCampaignFeed decorates /campaigns items with the same
+// field), so a list card can seed the committed chip without any fetch.
+function seedParticipation(seed) {
+  return seed && typeof seed === "object" && "viewerParticipation" in seed
+    ? toParticipation(seed.viewerParticipation)
+    : null;
+}
+
 // Toasts — copied verbatim from events/[id]/page.js JOIN_COPY so no new copy
 // is invented, and both surfaces always say the same thing.
 const JOIN_COPY = {
@@ -75,7 +93,7 @@ export function useEventJoin(eventId, { seed = null, language = "np", eager = fa
   // eventData is the merged event snapshot (rolePlan → rolesNeeded already
   // aggregated client-side). Seeded from the caller's prop on first render.
   const [eventData, setEventData] = useState(seed);
-  const [myParticipation, setMyParticipation] = useState(null);
+  const [myParticipation, setMyParticipation] = useState(() => seedParticipation(seed));
 
   // isDemoEvent — demo-* id has no backend, mutations stay local.
   const isDemoEvent =
@@ -130,10 +148,6 @@ export function useEventJoin(eventId, { seed = null, language = "np", eager = fa
     // the dedicated call only if the embed is absent (older/edge response).
     const resolvedId = merged.id || eventId;
     const hasEmbeddedVP = merged && "viewerParticipation" in merged;
-    const toParticipation = (p) =>
-      p?.role && isActiveParticipationStatus(p.status)
-        ? { id: p.id, role: p.role, status: p.status }
-        : null;
     if (!session?.user?.id) {
       setMyParticipation(null);
     } else if (hasEmbeddedVP) {
@@ -156,7 +170,7 @@ export function useEventJoin(eventId, { seed = null, language = "np", eager = fa
     loadedIdRef.current = eventId;
     // Clear stale per-event data so the old roster never flashes on the new event.
     setEventData(seed);
-    setMyParticipation(null);
+    setMyParticipation(seedParticipation(seed));
     setLoading(true);
     try {
       await load();
@@ -176,6 +190,23 @@ export function useEventJoin(eventId, { seed = null, language = "np", eager = fa
   useEffect(() => {
     if (eager) ensureLoaded();
   }, [eager, ensureLoaded]);
+
+  // ── Adopt late-arriving seed participation ───────────────────────────────────
+  // List feeds decorate their items with `viewerParticipation` asynchronously
+  // (useCampaignFeed's bulk sweep lands after the cards' first paint), so the
+  // seed prop can gain the field on a later render. Re-derive from it as long
+  // as this hook has no authoritative answer of its own — once ensureLoaded has
+  // run for this eventId, load()/mutations own the state and stale seeds must
+  // not stomp it.
+  const seeded = seedParticipation(seed);
+  const seededKey = seeded
+    ? `${eventId}:${seeded.id}:${seeded.role}:${seeded.status}`
+    : `${eventId}:none`;
+  useEffect(() => {
+    if (loadedIdRef.current === eventId) return;
+    setMyParticipation(seedParticipation(seed));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [seededKey]);
 
   // ── Refetch helpers (mirror page's handleJoinChanged / handleLeaveChanged) ───
   const refetchAll = useCallback(async () => {

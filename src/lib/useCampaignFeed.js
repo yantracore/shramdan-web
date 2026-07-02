@@ -17,8 +17,9 @@
 // Routing rule (per the API contract): there is no `kind` field — derive it
 // from the top-level status. OPEN → issue; every other stage → event.
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { getJson } from "@/lib/apiClient";
+import { getAuthSession, subscribeAuthSession } from "@/lib/authSession";
 import { getListItems, resolveUsableImage } from "@/lib/adminUtils";
 
 // Server-side page pagination (contract switched from cursor → page 2026-07-02):
@@ -126,6 +127,32 @@ function adaptCampaignItem(raw) {
   return { kind, status: item.status, id: data.id, data };
 }
 
+// ── Viewer participation sweep ──────────────────────────────────────────────
+// /campaigns (even mode=maximum) carries NO participation echo — only the
+// myVote field, which a direct event join never sets (verified live
+// 2026-07-02; backend embed requested in docs/api-requirements/campaigns-feed.md).
+// GET /events DOES embed `viewerParticipation` per item for authenticated
+// callers, so until /campaigns grows the same field we recover "which of
+// these events am I in?" with one bulk sweep over the stages whose cards
+// actually render a join CTA (CampaignCard gates on DRAFT/SCHEDULED/ACTIVE).
+const PARTICIPATION_STAGES = ["DRAFT", "SCHEDULED", "ACTIVE"];
+
+async function fetchViewerParticipationMap() {
+  const responses = await Promise.all(
+    PARTICIPATION_STAGES.map((status) =>
+      getJson("/events", { params: { status, limit: 100 } }).catch(() => null)
+    )
+  );
+  const map = new Map();
+  for (const response of responses) {
+    if (!response) continue;
+    for (const ev of getListItems(response)) {
+      if (ev?.id && ev?.viewerParticipation) map.set(ev.id, ev.viewerParticipation);
+    }
+  }
+  return map;
+}
+
 // One page. Returns { items, hasNext } — the raw signal the caller pages on.
 async function fetchCampaignPage({ status, provinceId, districtId, category, search, sort, order, page }) {
   const response = await getJson("/campaigns", {
@@ -162,6 +189,24 @@ export function useCampaignFeed({ status, language, provinceId, districtId, cate
   // Bumped on every filter change so a stale in-flight page (fired against the
   // OLD filters) can't append into the NEW list.
   const reqRef = useRef(0);
+
+  // Viewer's event participations, fetched once per mount (and again if the
+  // signed-in user changes). Stored with the viewerId it belongs to, so a
+  // logout (or user switch) makes the stale map inert without a state reset.
+  const session = useSyncExternalStore(subscribeAuthSession, getAuthSession, () => null);
+  const viewerId = session?.user?.id || null;
+  const [participation, setParticipation] = useState(null);
+
+  useEffect(() => {
+    if (!viewerId) return undefined;
+    let cancelled = false;
+    fetchViewerParticipationMap().then((map) => {
+      if (!cancelled) setParticipation({ viewerId, map });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [viewerId]);
 
   const baseParams = { status, provinceId, districtId, category, search: q, sort, order };
   // Stable filter signature for the effect/callback deps (baseParams is a fresh
@@ -228,5 +273,20 @@ export function useCampaignFeed({ status, language, provinceId, districtId, cate
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading, loadingMore, filterKey]);
 
-  return { items, loading, loadingMore, error, hasMore, loadMore };
+  // Decorate event items with the viewer's participation so their join button
+  // renders the committed chip on first paint — exactly what the /events list
+  // embed gives its own cards. Issue items keep the myVote echo they already
+  // carry. Data refs only change once the sweep lands, so cards don't churn.
+  const decoratedItems = useMemo(() => {
+    const map =
+      participation && participation.viewerId === viewerId ? participation.map : null;
+    if (!map || map.size === 0) return items;
+    return items.map((it) =>
+      it.kind === "event" && map.has(it.id)
+        ? { ...it, data: { ...it.data, viewerParticipation: map.get(it.id) } }
+        : it
+    );
+  }, [items, participation, viewerId]);
+
+  return { items: decoratedItems, loading, loadingMore, error, hasMore, loadMore };
 }
