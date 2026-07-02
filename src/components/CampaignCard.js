@@ -127,21 +127,6 @@ function SupporterStack({ seed, count }) {
   );
 }
 
-// The footer count. Before a campaign is dated it's "supporters" (the vote/
-// interest tally); once it's an event-stage it's "participants" (attendees who
-// joined). Either way the map info-window shows this number — so the card must
-// too. Returns null when the count is 0 (the CTA then fills the row).
-function formatCount(count, kind, language) {
-  const n = Number(count) || 0;
-  if (n < 1) return null;
-  const num = toLocalDigits(n, language);
-  if (language === "np") {
-    return kind === "supporters" ? `${num} समर्थक` : `${num} सहभागी`;
-  }
-  if (kind === "supporters") return n === 1 ? "1 supporter" : `${num} supporters`;
-  return n === 1 ? "1 participant" : `${num} participants`;
-}
-
 // Just the "when" — the status word lives in the badge over the image.
 function formatDateLabel(iso, language) {
   if (!iso) return null;
@@ -262,9 +247,9 @@ export function CampaignCard({ campaign, language = "np", distanceKm = null }) {
   // even on a narrow card so the count beside it never truncates.
   const ctaLabel = language === "np" ? "विवरण" : "View";
   const hasCoords = Number.isFinite(c.latitude) && Number.isFinite(c.longitude);
-  const countText = formatCount(c.count, c.countKind, language);
-  // Count split into number + word so the compact (phone) card can show just the
-  // icon + number while desktop still renders the full "15 supporters" text.
+  // Count as number + word. It ALWAYS renders (0 when there are no supporters /
+  // participants yet); the compact phone card shows just the icon + number, while
+  // desktop shows the full "15 supporters" text.
   const countNum = toLocalDigits(c.count, language);
   const countWord =
     language === "np"
@@ -360,17 +345,18 @@ export function CampaignCard({ campaign, language = "np", distanceKm = null }) {
             <span>{c.addressText}</span>
           </p>
         ) : null}
-        <div className={`campaign-card-foot${countText ? "" : " campaign-card-foot--solo"}`}>
-          {countText ? (
-            <div className="campaign-card-people">
-              <SupporterStack seed={c.slug || c.title} count={c.count} />
-              <CountGlyph />
-              <span className="campaign-card-count">
-                <span className="campaign-card-count-num">{countNum}</span>
-                <span className="campaign-card-count-word"> {countWord}</span>
-              </span>
-            </div>
-          ) : null}
+        <div className="campaign-card-foot">
+          {/* The count ALWAYS shows — 0 when there are no supporters/participants
+              yet — so no card ever has a blank footer. The avatar stack renders
+              only when the count is > 0 (SupporterStack returns null at 0). */}
+          <div className="campaign-card-people">
+            <SupporterStack seed={c.slug || c.title} count={c.count} />
+            <CountGlyph />
+            <span className="campaign-card-count">
+              <span className="campaign-card-count-num">{countNum}</span>
+              <span className="campaign-card-count-word"> {countWord}</span>
+            </span>
+          </div>
           {cta || (
             <Link href={href} className="campaign-card-cta">
               <span>{ctaLabel}</span>
