@@ -390,9 +390,9 @@ export default function NewIssuePage() {
       const created = response?.data ?? response;
       const newSlugOrId = created?.slug ?? created?.id;
       if (newSlugOrId) {
-        router.push(`/issues/${newSlugOrId}`);
+        router.push(`/campaign/${newSlugOrId}`);
       } else {
-        router.push("/issues");
+        router.push("/campaigns");
       }
     } catch (error) {
       // Jump to the earliest step holding an error, pin each error to its field

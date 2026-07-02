@@ -1,10 +1,8 @@
 "use client";
 
-import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useCampaignCounts } from "@/lib/useCampaignCounts";
-import { campaignStatusLabel, campaignStatusPath } from "@/lib/campaignStatus";
+import { campaignStatusLabel } from "@/lib/campaignStatus";
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 
@@ -67,17 +65,10 @@ function FunnelCount({ target, language }) {
 
 // The same five-step lifecycle the IssueStatusTimeline draws, reused here as a
 // left-to-right funnel: how many activities currently sit in each state. A
-// citizen's issue is born OPEN, gets promoted (FORMING), the event is dated
-// (SCHEDULED), runs (LIVE), and finishes (COMPLETED). The line tells the whole
-// story; the counts show the work flowing through it.
-//
-// Each step also owns a destination. OPEN/FORMING belong to the issue (it's not
-// an event yet), so they route to /issues; once dated the campaign is an event,
-// so SCHEDULED/LIVE/COMPLETED route to /events. When the step's page IS the page
-// you're on, we only swap the status param (preserving the rest of the URL);
-// otherwise it's a cross-page jump. Home renders the rail read-only.
-// The five filterable campaign stages, in lifecycle order. Each links to the
-// unified list filtered by that technical status.
+// citizen's issue is born OPEN, gets promoted (DRAFT), the event is dated
+// (SCHEDULED), runs (ACTIVE), and finishes (COMPLETED). The line tells the
+// whole story; the counts show the work flowing through it.
+// The five campaign stages, in lifecycle order.
 const STEPS = [
   { key: "OPEN" },
   { key: "DRAFT" },
@@ -86,26 +77,28 @@ const STEPS = [
   { key: "COMPLETED" }
 ];
 
+// Filter mode's leading pseudo-step: "no status filter". Not a lifecycle
+// stage — picking it hands null back, resetting the map to the full picture.
+const ALL_KEY = "ALL";
+
 const COPY = {
-  np: { ariaLabel: "गतिविधिको चरण" },
-  en: { ariaLabel: "Activity funnel" }
+  np: { ariaLabel: "गतिविधिको चरण", allLabel: "सबै" },
+  en: { ariaLabel: "Activity funnel", allLabel: "All" }
 };
 
-// Three modes, picked per page:
+// Two modes:
 //   - static (default): plain counts — pure read-only rail.
-//   - interactive: each step LINKS to its /campaigns/<slug> section.
 //   - filter (onSelectStatus given): each step is a TOGGLE button — home uses
 //     this to drive the map right below the rail. `activeStatus` marks the
 //     pressed step; clicking it again clears (the row hands null back).
-function ActivityStatsRowInner({
+// (A third link-out mode existed for the /issues and /events listing pages;
+// it went with them when those pages were deleted on 2026-07-02.)
+export function ActivityStatsRow({
   language = "np",
-  interactive = false,
-  currentPage,
   activeStatus = null,
   onSelectStatus
 }) {
   const t = COPY[language] || COPY.np;
-  const searchParams = useSearchParams();
 
   // One global funnel, identical on every page: EXACT per-stage totals from
   // GET /campaigns/counts (keys match STEPS). Replaces the old client-side
@@ -113,23 +106,11 @@ function ActivityStatsRowInner({
   // numbers stopped being real past 100 items and drifted from the map.
   const { counts } = useCampaignCounts({});
 
-  const hrefFor = (step) => {
-    // Each stage is its own path section now (/campaigns/<slug>). On the
-    // campaigns surface itself, preserve the secondary filters in the query;
-    // elsewhere just jump to the stage page.
-    const base = campaignStatusPath(step.key);
-    if (currentPage === "campaigns") {
-      const query = searchParams?.toString();
-      return query ? `${base}?${query}` : base;
-    }
-    return base;
-  };
-
   const isFilter = typeof onSelectStatus === "function";
 
   return (
     <ol
-      className={`activity-funnel${interactive || isFilter ? " is-interactive" : ""}`}
+      className={`activity-funnel${isFilter ? " is-interactive" : ""}`}
       aria-label={t.ariaLabel}
     >
       {STEPS.map((step) => {
@@ -160,14 +141,6 @@ function ActivityStatsRowInner({
               >
                 {body}
               </button>
-            ) : interactive ? (
-              <Link
-                href={hrefFor(step)}
-                className="activity-funnel-link"
-                aria-label={`${label}: ${value}`}
-              >
-                {body}
-              </Link>
             ) : (
               <div className="activity-funnel-static">{body}</div>
             )}
@@ -175,18 +148,5 @@ function ActivityStatsRowInner({
         );
       })}
     </ol>
-  );
-}
-
-// useSearchParams() (called inside the inner component) forces any statically
-// prerendered page that renders this row to bail out of static generation
-// unless the hook sits below a Suspense boundary — without this, `next build`
-// fails on "/" with the missing-suspense-with-csr-bailout error. Wrapping once
-// here gives every call site (home, /issues, /events) the boundary for free.
-export function ActivityStatsRow(props) {
-  return (
-    <Suspense fallback={null}>
-      <ActivityStatsRowInner {...props} />
-    </Suspense>
   );
 }

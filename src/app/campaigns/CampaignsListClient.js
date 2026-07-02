@@ -25,7 +25,7 @@ import { IssueListCard } from "@/components/IssueListCard";
 import { IssuePreviewPane } from "@/components/IssuePreviewPane";
 import { CampaignsMap } from "@/components/CampaignsMap";
 import { CampaignCard } from "@/components/CampaignCard";
-import { PAGE_COPY as EVENTS_COPY } from "@/app/events/EventsListClient";
+import { EVENTS_PAGE_COPY as EVENTS_COPY } from "@/lib/eventsCopy";
 import { usePreferences } from "@/app/providers";
 import { copy } from "@/lib/siteContent";
 import { ISSUE_CATEGORIES, localizeIssue } from "@/lib/adminUtils";

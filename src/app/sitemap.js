@@ -61,24 +61,21 @@ export default async function sitemap() {
     priority: 0.7
   }));
 
-  const [issues, events] = await Promise.all([
-    fetchPublicList("/issues?limit=500"),
-    fetchPublicList("/events?limit=500")
-  ]);
+  // One minimal /campaigns call covers every detail URL. Canonical detail
+  // route is /campaign/<slug> — the old /issues/<slug> and /events/<slug>
+  // URLs are permanent redirects to it (next.config.mjs), and redirected URLs
+  // don't belong in a sitemap. mode=minimal carries no updatedAt, so entries
+  // use the crawl date; the 1800s revalidate keeps that honest enough.
+  const campaigns = await fetchPublicList("/campaigns?mode=minimal&limit=1000");
 
-  const issueEntries = withLastMod(issues).map(({ slugOrId, lastModified }) => ({
-    url: `${SITE_URL}/issues/${slugOrId}`,
-    lastModified: lastModified || now,
-    changeFrequency: "weekly",
-    priority: 0.6
-  }));
+  const campaignEntries = withLastMod(campaigns).map(
+    ({ slugOrId, lastModified }) => ({
+      url: `${SITE_URL}/campaign/${slugOrId}`,
+      lastModified: lastModified || now,
+      changeFrequency: "weekly",
+      priority: 0.6
+    })
+  );
 
-  const eventEntries = withLastMod(events).map(({ slugOrId, lastModified }) => ({
-    url: `${SITE_URL}/events/${slugOrId}`,
-    lastModified: lastModified || now,
-    changeFrequency: "weekly",
-    priority: 0.6
-  }));
-
-  return [...staticEntries, ...eventTypeEntries, ...issueEntries, ...eventEntries];
+  return [...staticEntries, ...eventTypeEntries, ...campaignEntries];
 }

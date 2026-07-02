@@ -38,8 +38,9 @@ export function ApiHealthWatcher() {
       if (cancelled) return;
       try {
         // A success flips health to "up" via apiClient, which re-renders this
-        // to null and tears the loop down. The payload is irrelevant.
-        await getJson("/issues", { params: { limit: 1 } });
+        // to null and tears the loop down. The payload is irrelevant —
+        // /campaigns/counts is the cheapest public endpoint.
+        await getJson("/campaigns/counts");
       } catch {
         // Still unreachable — apiClient already re-reported "down".
       }
