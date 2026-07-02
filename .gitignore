@@ -25,3 +25,5 @@ pnpm-debug.log*
 
 # QA test accounts (live JWTs — never commit)
 .qa-secrets/
+.vercel
+.env*
