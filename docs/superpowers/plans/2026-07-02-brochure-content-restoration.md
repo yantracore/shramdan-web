@@ -45,7 +45,7 @@ Verified line map of `old-HomeClient.js` (954 lines total):
 | 586–649 | `event-types-section` |
 | 650–681 | `cleanup-areas-section` |
 | 682–738 | `core-idea-section` |
-| 739–821 | `volunteer-invite-section` |
+| 739–819 | `volunteer-invite-section` (ends at its closing `</MotionSection>`; 821 is building-now's opener) |
 | 821–892 | `building-now-section` (conditional block, opener `{buildingNowCards.length > 0 ? (` included) |
 | 893–952 | `resources-section` |
 
@@ -472,7 +472,7 @@ git commit -m "feat(intro): restore brochure body — hero, event types, cleanup
 
 - [ ] **Step 1: Create the page**
 
-Scaffold (SLOT D = lines 739–821 of `old-HomeClient.js` verbatim; SLOT E = lines 128–140, the `volunteerRoleIcons` map, verbatim):
+Scaffold (SLOT D = lines 739–819 of `old-HomeClient.js` verbatim; SLOT E = lines 128–140, the `volunteerRoleIcons` map, verbatim):
 
 ```jsx
 "use client";
@@ -506,7 +506,7 @@ export default function InvitationsPage() {
 
   return (
     <SiteShell pageTitle={t.volunteerInvite.pageTitle}>
-      {/* ── SLOT D: lines 739–821 of old-HomeClient.js, verbatim (volunteer-invite-section) ── */}
+      {/* ── SLOT D: lines 739–819 of old-HomeClient.js, verbatim (volunteer-invite-section) ── */}
     </SiteShell>
   );
 }
