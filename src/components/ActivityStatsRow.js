@@ -2,10 +2,8 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useMemo, useRef, useState } from "react";
-import { listAllEvents } from "@/lib/eventsApi";
-import { getJson } from "@/lib/apiClient";
-import { getListItems } from "@/lib/adminUtils";
+import { Suspense, useEffect, useState } from "react";
+import { useCampaignCounts } from "@/lib/useCampaignCounts";
 import { campaignStatusLabel, campaignStatusPath } from "@/lib/campaignStatus";
 
 const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
@@ -93,29 +91,6 @@ const COPY = {
   en: { ariaLabel: "Activity funnel" }
 };
 
-// One global funnel, identical on every page: pull both datasets and fold each
-// campaign into exactly one step. OPEN/DRAFT come off the issue side, SCHEDULED/
-// ACTIVE/COMPLETED off the event side, so nothing is counted twice. DRAFT =
-// promoted issues whose event isn't yet a public (scheduled/active) event — the
-// "planning, awaiting a date" middle.
-function foldCounts(issues, buckets) {
-  const open = issues.filter((i) => i?.status === "OPEN").length;
-  const scheduledIssues = issues.filter(
-    (i) => i?.status === "EVENT_SCHEDULED"
-  ).length;
-  const scheduled = buckets.scheduled.length;
-  const active = buckets.active.length;
-  const completed = buckets.completed.length;
-  const draft = Math.max(0, scheduledIssues - (scheduled + active));
-  return {
-    OPEN: open,
-    DRAFT: draft,
-    SCHEDULED: scheduled,
-    ACTIVE: active,
-    COMPLETED: completed
-  };
-}
-
 // Three modes, picked per page:
 //   - static (default): plain counts — pure read-only rail.
 //   - interactive: each step LINKS to its /campaigns/<slug> section.
@@ -132,32 +107,11 @@ function ActivityStatsRowInner({
   const t = COPY[language] || COPY.np;
   const searchParams = useSearchParams();
 
-  const [issues, setIssues] = useState([]);
-  const [buckets, setBuckets] = useState({ active: [], scheduled: [], completed: [] });
-
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const [issuesRes, eventData] = await Promise.all([
-          getJson("/issues", { params: { limit: 100 } }),
-          listAllEvents({ language })
-        ]);
-        if (cancelled) return;
-        setIssues(getListItems(issuesRes));
-        setBuckets(eventData);
-      } catch {
-        if (cancelled) return;
-        setIssues([]);
-        setBuckets({ active: [], scheduled: [], completed: [] });
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [language]);
-
-  const counts = useMemo(() => foldCounts(issues, buckets), [issues, buckets]);
+  // One global funnel, identical on every page: EXACT per-stage totals from
+  // GET /campaigns/counts (keys match STEPS). Replaces the old client-side
+  // fold over /issues?limit=100 + listAllEvents() — four capped requests whose
+  // numbers stopped being real past 100 items and drifted from the map.
+  const { counts } = useCampaignCounts({});
 
   const hrefFor = (step) => {
     // Each stage is its own path section now (/campaigns/<slug>). On the

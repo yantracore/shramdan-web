@@ -219,9 +219,10 @@ MVP because it breaks accurate totals.
 - `CampaignsMap` consumes the minimal marker payload + client clustering instead
   of the full in-memory feed. ✅ (2026-07-02, via `mode=minimal`; home overview
   map joined the same source the same day)
-- `ActivityStatsRow` (the five-step funnel on home) still folds its counts from
-  `GET /issues?limit=100` + three `GET /events?status=…` calls — capped, wasteful,
-  and drifting from the map's totals. Swap to `GET /campaigns/counts`. ⏳
+- `ActivityStatsRow` (the five-step funnel) swaps its client-side fold over
+  `GET /issues?limit=100` + `listAllEvents()` for `GET /campaigns/counts`.
+  ✅ (2026-07-02 — the fold was provably wrong live: OPEN read 42 vs 44 real,
+  DRAFT read 0 vs 24 real)
 
 ---
 

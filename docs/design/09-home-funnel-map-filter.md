@@ -49,7 +49,8 @@ filter UI.
 - Returning to home with a stored filter fires one unfiltered minimal fetch
   before the post-mount sessionStorage restore refires it filtered. Accepted:
   the payload is tiny and gating the first fetch would complicate hydration.
-- The funnel's *counts* still come from capped `GET /issues?limit=100` +
+- ~~The funnel's *counts* still come from capped `GET /issues?limit=100` +
   `listAllEvents()` folding, so they can drift from the map's true totals
-  (observed live: funnel OPEN=42 vs 44 markers). Fix tracked separately: swap
-  the rail to `GET /campaigns/counts` (see api-requirements/campaigns-feed.md).
+  (observed live: funnel OPEN=42 vs 44 markers).~~ Fixed same day: the rail now
+  reads `GET /campaigns/counts` (exact totals, one call), and its numbers match
+  the map's markers stage for stage.
