@@ -69,6 +69,24 @@ export const copy = {
       join: "योगदान गर्ने",
       learnMore: "थप जान्ने"
     },
+    devPanel: {
+      kicker: "निर्माणाधीन",
+      title: "श्रमदान एप बन्दै छ",
+      body: "यो एप समुदायले नै सार्वजनिक रूपमा बनाउँदै छ — प्रगति तल देखिन्छ। प्रत्यक्ष सत्रमा जोडिनुहोस्, र परीक्षण साइटमा आफैँ चलाएर हेर्नुहोस्।",
+      progressLabel: "समग्र प्रगति",
+      progressAria: "एप निर्माणको समग्र प्रगति",
+      liveBadge: "LIVE",
+      liveAria: "अहिले प्रत्यक्ष सत्र चलिरहेको छ",
+      linksLabel: "प्रत्यक्ष सत्रहरू",
+      links: [
+        { id: "participate", title: "प्रत्यक्ष सहभागिता", label: "सोम–शुक्र, दिनको १२ बजे" },
+        { id: "watchLive", title: "प्रत्यक्ष प्रसारण", label: "युट्युबमा प्रत्यक्ष" }
+      ],
+      testSite: {
+        label: "परीक्षण साइट खोल्ने",
+        href: "https://stage.shramdan.org"
+      }
+    },
     buildInPublic: {
       heroLabel: "एप निर्माण प्रगति",
       heroAria: "एप निर्माण समग्र प्रगति",
@@ -2139,6 +2157,24 @@ export const copy = {
       support: "Not every problem in the country will be solved by waiting for the government. As citizens, we can come together to move basic work forward ourselves, from cleanups and repairs to tree planting and neighborhood improvement. SHRAMDAN is the beginning of that shared responsibility. Small hands together can make big change possible. Our SHRAMDAN today builds a better society tomorrow.",
       join: "Contribute",
       learnMore: "Learn More"
+    },
+    devPanel: {
+      kicker: "In development",
+      title: "The Shramdan app is being built",
+      body: "This app is being built in the open by the community — progress below. Join the live sessions, or take it for a spin on the test site.",
+      progressLabel: "Overall progress",
+      progressAria: "Overall app build progress",
+      liveBadge: "LIVE",
+      liveAria: "Live session running right now",
+      linksLabel: "Live sessions",
+      links: [
+        { id: "participate", title: "Live Participation", label: "Mon–Fri, 12 PM NPT" },
+        { id: "watchLive", title: "Live Broadcast", label: "Live on YouTube" }
+      ],
+      testSite: {
+        label: "Open Test Site",
+        href: "https://stage.shramdan.org"
+      }
     },
     buildInPublic: {
       heroLabel: "App Build Progress",

@@ -31,7 +31,7 @@ import { copy } from "@/lib/siteContent";
 // home must never re-filter the campaigns page, and vice versa.
 const HOME_MAP_STATUS_KEY = "shramdan:home:map-status";
 
-export default function HomeSearchView() {
+export default function HomeSearchView({ overallPercent = null }) {
   const { language } = usePreferences();
   const t = copy[language] ?? copy.np;
   const search = t.homeSearch ?? copy.np.homeSearch;
@@ -91,7 +91,7 @@ export default function HomeSearchView() {
 
   return (
     <SiteShell>
-      <BrochureHero variant="home" />
+      <BrochureHero variant="home" overallPercent={overallPercent} />
 
       <EventsHomeRail
         liveEvents={railLive}
