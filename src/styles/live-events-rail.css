@@ -1,0 +1,1080 @@
+/* EventsHomeRail (Phase 13/14) — unified Netflix-style horizontal strip
+ * combining currently-live + upcoming-scheduled shramdan events on the
+ * homepage. Cards retain the LiveEventCard styles; container scrolls.
+ */
+
+/* Legacy LiveEventsRail container (no longer rendered, kept for any
+ * incidental usage of the bare class). */
+.live-events-rail {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 48px 0;
+}
+
+/* --- EventsHomeRail (paged Netflix-style slider) ------------------- */
+
+.events-home-rail {
+  width: 100%;
+  /* top 48px kept; bottom 0 — the section below supplies its own top spacing */
+  padding: 48px 0 0;
+}
+
+.events-home-rail-shell {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+}
+
+/* Centered header — the slider focuses on the middle card, so the
+ * eyebrow/title/subtitle block sits horizontally centered in the
+ * shell. The "View All" link is pinned absolutely to the right edge
+ * of the same shell, vertically aligned to the center of the text
+ * block. On narrow viewports the absolute positioning is dropped so
+ * the link doesn't overlap a multi-line title. */
+.events-home-rail-header {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.events-home-rail-header-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+}
+
+.events-home-rail-header h2 {
+  font-size: clamp(22px, 2.4vw, 30px);
+  line-height: 1.2;
+  margin: 0;
+}
+
+.events-home-rail-header p {
+  color: var(--muted);
+  margin: 0;
+  font-size: 14px;
+  max-width: 56ch;
+}
+
+/* Position-only override — the visual chassis is .tertiary-button.
+ * We pin to the right edge of the centered header at the text block's
+ * vertical middle. (See <TertiaryButton> in EventsHomeRail.js.) */
+.events-home-rail-view-all {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
+}
+
+/* On narrow viewports drop the link below the centered text block
+ * so it doesn't overlap a wrapped title. */
+@media (max-width: 720px) {
+  .events-home-rail-header {
+    flex-direction: column;
+    gap: 12px;
+  }
+  .events-home-rail-view-all {
+    position: static;
+    transform: none;
+  }
+}
+
+.events-home-rail-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--state-active);
+  font-weight: 600;
+}
+
+.events-home-rail-eyebrow .live-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--state-active);
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--state-active) 55%, transparent);
+  animation: live-dot-pulse 1.6s ease-out infinite;
+}
+
+/* --- Swiper EffectCoverflow theme ---------------------------------- */
+
+.events-home-rail {
+  /* Swiper CSS variables (consumed by .swiper-button-prev/next,
+   * .swiper-pagination-bullet). Brand-aligned. */
+  --swiper-navigation-color: var(--text);
+  --swiper-navigation-size: 20px;
+  --swiper-pagination-color: var(--primary);
+  /* --line is too faint on the light cream background — use --muted
+   * (mid-gray) for inactive bullets so they're visible on both themes. */
+  --swiper-pagination-bullet-inactive-color: var(--muted);
+  --swiper-pagination-bullet-inactive-opacity: 0.45;
+  --swiper-pagination-bullet-size: 9px;
+  --swiper-pagination-bullet-horizontal-gap: 6px;
+}
+
+/* Phase 9 a11y — WCAG 2.2 SC 2.5.8 (target size). Swiper default bullets
+ * are 9px squares with 18px gap centers; axe-core flags both as below
+ * the 24×24 minimum. We keep the visual dot tiny (so the carousel reads
+ * as elegant) and expand only the hit target by moving the colour to a
+ * pseudo-element and letting the outer span be transparent + 24×24. */
+.events-home-rail .swiper-pagination-bullet {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  background: transparent !important;
+  opacity: 1 !important;
+  margin: 0 2px;
+}
+
+.events-home-rail .swiper-pagination-bullet::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--swiper-pagination-bullet-size, 9px);
+  height: var(--swiper-pagination-bullet-size, 9px);
+  border-radius: 50%;
+  background: var(--swiper-pagination-bullet-inactive-color, var(--muted));
+  opacity: var(--swiper-pagination-bullet-inactive-opacity, 0.45);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  transition: background 160ms ease, opacity 160ms ease;
+}
+
+.events-home-rail .swiper-pagination-bullet-active::after {
+  background: var(--swiper-pagination-color, var(--primary));
+  opacity: 1;
+}
+
+.events-home-rail .swiper-pagination-bullet:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* The rail (and ONLY the rail — header still respects the page's
+ * 1180px container) expands to the viewport edges, capped at 1920px
+ * on ultra-wide displays. With slidesPerView=3 this gives the center
+ * card a comfortable size on standard desktop screens (≈480px at
+ * 1440 viewport, ≈610px at 1920 viewport). */
+.events-home-rail-swiper {
+  width: min(1920px, calc(100% - 32px));
+  margin: 0 auto;
+  /* Flat 3-up needs only modest vertical breathing room — there are no
+   * tilted side cards projecting a "lift" above the rail anymore. Enough
+   * to seat the full-size center card comfortably plus the pagination
+   * row; clamp() scales both ends with the viewport width. */
+  padding-block: clamp(24px, 3.5vw, 56px) clamp(20px, 3vw, 44px);
+  /* Clip to the rail width — only the active slide + the two adjacent
+   * (left/right) slides are meant to be visible at any time. Without
+   * this, slides 4 and 5 leak into the page margins on wide viewports. */
+  overflow: hidden;
+}
+
+/* Phone — spend the width on the poster, not on the gutter. The default
+ * 16px-each-side gutter is a meaningful slice of a ~390px screen; halve it
+ * to 8px so the focal card (already trimmed to a 1.1 peek in
+ * SLIDES_BREAKPOINTS) fills more of the viewport. The overlay keeps its own
+ * 12px inset, so content never touches the edge. */
+@media (max-width: 640px) {
+  .events-home-rail-swiper {
+    width: calc(100% - 16px);
+  }
+}
+
+/* Explicit slide HEIGHT so the slider has a measurable dimension before
+ * the browser paints. Width is intentionally NOT set here — Swiper
+ * controls it via the `slidesPerView` breakpoints declared in
+ * EventsHomeRail.js, so exactly 3 cards fit on desktop, 2 on tablet,
+ * 1.2 on mobile (the .2 peek hints at swipeability). Height ceiling
+ * scales to 560px so wide-viewport cards don't end up abnormally
+ * landscape. See DESIGN CONTRACT in EventsHomeRail.js.
+ *
+ * Flat focus: every slide is scaled down + dimmed so the eye lands on
+ * the center card, which the .swiper-slide-active rule below overrides
+ * back to full size/opacity. Only .swiper-wrapper carries Swiper's
+ * horizontal translate in the default slide effect, so a per-slide
+ * `transform: scale()` is safe here — it doesn't fight the slider. */
+.events-home-rail-swiper .events-home-rail-slide.swiper-slide {
+  height: clamp(280px, 30vw, 560px) !important;
+  transform: scale(0.86);
+  opacity: 0.5;
+  transition:
+    transform 1.1s var(--ease-out-soft),
+    opacity 1.1s var(--ease-out-soft);
+}
+
+.events-home-rail-swiper .events-home-rail-slide.swiper-slide-active {
+  transform: scale(1);
+  opacity: 1;
+}
+
+/* Reduced motion: keep the flat focus geometry but don't animate it —
+ * slides snap between states instead of gliding. */
+@media (prefers-reduced-motion: reduce) {
+  .events-home-rail-swiper .events-home-rail-slide.swiper-slide {
+    transition: none;
+  }
+}
+
+/* --- Netflix-poster card -------------------------------------------- */
+
+.events-home-rail-poster-card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: #111;
+  box-shadow: var(--shadow-1);
+  transition: box-shadow 0.3s var(--ease-out-soft);
+}
+
+.events-home-rail-swiper .swiper-slide-active .events-home-rail-poster-card {
+  box-shadow: var(--shadow-hero, 0 22px 48px rgba(0, 0, 0, 0.32));
+}
+
+.events-home-rail-poster-link {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  color: #fff;
+  text-decoration: none;
+}
+
+.events-home-rail-poster-link:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+}
+
+.events-home-rail-poster {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.events-home-rail-poster img,
+.events-home-rail-poster-iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border: 0;
+  display: block;
+  pointer-events: none; /* let the wrapping <Link> catch clicks */
+}
+
+.events-home-rail-poster-fallback {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #222 0%, #111 100%);
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.events-home-rail-poster-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 12px;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.78) 0%,
+      rgba(0, 0, 0, 0.48) 28%,
+      rgba(0, 0, 0, 0) 55%
+    ),
+    linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.30) 0%,
+      rgba(0, 0, 0, 0) 28%
+    );
+}
+
+.events-home-rail-poster-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.events-home-rail-poster-bottom {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.events-home-rail-poster-bottom-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+/* Glassy "View Details" pill — transparent black + backdrop-blur, sits
+ * bottom-right next to the title block. `pointer-events: none` because
+ * the parent <Link> already handles the click; the pill is a visual
+ * affordance, not a separate target (a nested <a> would be invalid HTML
+ * and would steal focus order from screen readers). */
+.events-home-rail-business-strip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  width: fit-content;
+  max-width: 100%;
+  margin-bottom: 5px;
+}
+
+.events-home-rail-business-strip img {
+  /* relative (not static) so --business-image-index, set per image in
+     BusinessImageStrip, can drive paint order: the leftmost thumbnail sits
+     on top of the ones it overlaps, like a stacked-avatar cluster. */
+  position: relative;
+  inset: auto;
+  z-index: calc(100 - var(--business-image-index, 0));
+  width: clamp(30px, 4.2vw, 42px);
+  height: clamp(30px, 4.2vw, 42px);
+  flex: 0 0 auto;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.86);
+  border-radius: 8px;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.32);
+}
+
+.events-home-rail-business-strip img + img {
+  margin-left: -12px;
+}
+
+.events-home-rail-poster-cta {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 11px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.94);
+  background: rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  pointer-events: none;
+  white-space: nowrap;
+  transition: background-color 200ms ease, border-color 200ms ease,
+    transform 200ms ease;
+}
+
+.events-home-rail-poster-card:hover .events-home-rail-poster-cta,
+.events-home-rail-poster-link:focus-visible .events-home-rail-poster-cta {
+  background: rgba(0, 0, 0, 0.6);
+  border-color: rgba(255, 255, 255, 0.45);
+  transform: translateX(2px);
+}
+
+.events-home-rail-poster-cta .anticon {
+  font-size: 10px;
+}
+
+.events-home-rail-poster-bottom h3 {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(15px, 1.5vw, 19px);
+  font-weight: 700;
+  line-height: 1.2;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+.events-home-rail-poster-bottom p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+.events-home-rail-poster-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 9px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  white-space: nowrap;
+}
+
+.events-home-rail-poster-badge--active {
+  background: color-mix(in srgb, var(--state-active) 92%, transparent);
+  animation: live-badge-blink 2.4s ease-in-out infinite;
+}
+
+.events-home-rail-poster-badge--active .live-dot {
+  width: 5px;
+  height: 5px;
+  background: #fff;
+  border-radius: 50%;
+}
+
+.events-home-rail-poster-badge--date {
+  background: color-mix(in srgb, var(--primary) 90%, #000 10%);
+}
+
+.events-home-rail-poster-badge--meta {
+  font-size: 10.5px;
+  letter-spacing: 0.02em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .events-home-rail-poster-badge--active {
+    animation: none;
+  }
+}
+
+/* --- Netflix-style nav buttons ------------------------------------- *
+ * Idle state: invisible. Mouse over the rail → both buttons fade in
+ * as glassmorphism circles centered on each side. Direct hover on a
+ * button deepens the glass + slight scale-up. Keyboard focus uses the
+ * same revealed state as rail hover so it stays discoverable for
+ * a11y. Touch devices show a calm always-visible state since `:hover`
+ * is meaningless there. We override Swiper's font-icon `::after` with
+ * an inline-SVG mask so the chevron is crisp at any size and inherits
+ * `currentColor` for the button's themed stroke. */
+
+.events-home-rail .swiper-button-prev,
+.events-home-rail .swiper-button-next {
+  width: clamp(44px, 3.4vw, 56px);
+  height: clamp(44px, 3.4vw, 56px);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0);
+  border: 1px solid rgba(255, 255, 255, 0);
+  box-shadow: none;
+  color: #fff;
+  opacity: 0;
+  top: 50%;
+  margin-top: 0;
+  transform: translateY(-50%) scale(0.88);
+  -webkit-backdrop-filter: blur(0);
+  backdrop-filter: blur(0);
+  transition:
+    opacity 320ms var(--ease-out-soft),
+    transform 320ms var(--ease-out-soft),
+    background-color 220ms var(--ease-out-soft),
+    border-color 220ms var(--ease-out-soft),
+    box-shadow 220ms var(--ease-out-soft),
+    backdrop-filter 260ms var(--ease-out-soft),
+    -webkit-backdrop-filter 260ms var(--ease-out-soft);
+  z-index: 5;
+  /* Bring the buttons slightly inward from the swiper edge */
+  left: 20px;
+}
+.events-home-rail .swiper-button-next { left: auto; right: 20px; }
+
+/* Swiper React 12+ injects a real `<svg class="swiper-navigation-icon">`
+ * as a child of the button. We style that SVG directly — sizing it
+ * up, recoloring to currentColor, and KILLING Swiper's default
+ * `::after` icon (which is a leftover from older versions and would
+ * otherwise stack a second chevron behind the SVG). */
+.events-home-rail .swiper-button-prev::after,
+.events-home-rail .swiper-button-next::after {
+  content: none !important;
+  display: none !important;
+}
+
+.events-home-rail .swiper-navigation-icon {
+  width: clamp(14px, 1.1vw, 18px);
+  height: auto;
+  color: currentColor;
+  fill: currentColor;
+  flex: 0 0 auto;
+  /* Optical centering: chevrons feel off-center inside a circle until
+   * you nudge them ~1px toward the pointing direction. */
+  transition: transform 200ms var(--ease-out-soft);
+}
+.events-home-rail .swiper-button-prev .swiper-navigation-icon {
+  transform: translateX(-1px);
+}
+.events-home-rail .swiper-button-next .swiper-navigation-icon {
+  transform: translateX(1px);
+}
+.events-home-rail .swiper-button-prev:hover .swiper-navigation-icon {
+  transform: translateX(-3px);
+}
+.events-home-rail .swiper-button-next:hover .swiper-navigation-icon {
+  transform: translateX(3px);
+}
+
+/* Reveal both buttons when the user hovers the rail OR focuses one via
+ * keyboard. The buttons themselves are still children of the section,
+ * so a `:focus-within` on the section catches keyboard focus too. */
+.events-home-rail:hover .swiper-button-prev,
+.events-home-rail:hover .swiper-button-next,
+.events-home-rail:focus-within .swiper-button-prev,
+.events-home-rail:focus-within .swiper-button-next {
+  opacity: 1;
+  transform: translateY(-50%) scale(1);
+  background: rgba(20, 22, 26, 0.42);
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow:
+    0 8px 28px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  backdrop-filter: blur(14px) saturate(140%);
+}
+
+/* Direct hover on the button — deeper glass + lift */
+.events-home-rail .swiper-button-prev:hover,
+.events-home-rail .swiper-button-next:hover {
+  background: rgba(20, 22, 26, 0.62);
+  border-color: rgba(255, 255, 255, 0.35);
+  transform: translateY(-50%) scale(1.08);
+  box-shadow:
+    0 12px 36px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+/* Tap-down feedback */
+.events-home-rail .swiper-button-prev:active,
+.events-home-rail .swiper-button-next:active {
+  transform: translateY(-50%) scale(0.98);
+  transition-duration: 80ms;
+}
+
+/* Keyboard focus ring — primary color, never lost */
+.events-home-rail .swiper-button-prev:focus-visible,
+.events-home-rail .swiper-button-next:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+}
+
+/* Touch devices have no hover — show a calm always-visible state. */
+@media (hover: none) {
+  .events-home-rail .swiper-button-prev,
+  .events-home-rail .swiper-button-next {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+    background: rgba(20, 22, 26, 0.4);
+    border-color: rgba(255, 255, 255, 0.2);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
+}
+
+.events-home-rail .swiper-button-prev.swiper-button-disabled,
+.events-home-rail .swiper-button-next.swiper-button-disabled {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.events-home-rail .swiper-pagination {
+  position: relative;
+  margin-top: 18px;
+  bottom: auto;
+}
+
+.events-home-rail .swiper-pagination-bullet {
+  transition:
+    opacity 0.25s var(--ease-out-soft),
+    transform 0.25s var(--ease-out-soft),
+    background-color 0.25s var(--ease-out-soft);
+}
+
+.events-home-rail .swiper-pagination-bullet:hover {
+  opacity: 0.8;
+  transform: scale(1.15);
+}
+
+.events-home-rail .swiper-pagination-bullet-active {
+  transform: scale(1.2);
+}
+
+@media (max-width: 720px) {
+  .events-home-rail-swiper {
+    padding-block: 36px 12px;
+  }
+  .events-home-rail .swiper-button-prev,
+  .events-home-rail .swiper-button-next {
+    display: none; /* swipe is the natural gesture on touch */
+  }
+}
+
+.events-home-rail-empty {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 22px;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-soft);
+  color: var(--text);
+}
+
+.events-home-rail-empty-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+.events-home-rail-empty p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  opacity: 0.85;
+}
+
+/* Brief in-flight state — shown only while the events fetch is pending, so the
+   empty "🌱 nothing yet" message never flashes during the loading window. */
+.events-home-rail-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 32px 22px;
+  color: var(--text);
+  text-align: center;
+}
+
+.events-home-rail-spinner {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 2px solid var(--line);
+  border-top-color: var(--state-active);
+  animation: events-home-rail-spin 0.7s linear infinite;
+}
+
+.events-home-rail-loading p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  opacity: 0.85;
+}
+
+@keyframes events-home-rail-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .events-home-rail-spinner {
+    animation-duration: 1.6s;
+  }
+}
+
+/* Legacy live-rail header (kept for any non-home usage) */
+.live-events-rail-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 18px;
+}
+
+.live-events-rail-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--state-active);
+  font-weight: 600;
+}
+
+.live-events-rail-eyebrow .live-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--state-active);
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--state-active) 55%, transparent);
+  animation: live-dot-pulse 1.6s ease-out infinite;
+}
+
+@keyframes live-dot-pulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--state-active) 55%, transparent);
+  }
+  70% {
+    box-shadow: 0 0 0 10px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-events-rail-eyebrow .live-dot,
+  .live-events-rail-badge,
+  .event-live-badge {
+    animation: none;
+  }
+}
+
+.live-events-rail-header h2 {
+  font-size: clamp(22px, 2.4vw, 30px);
+  line-height: 1.2;
+  margin: 0;
+}
+
+.live-events-rail-header p {
+  color: var(--muted);
+  margin: 0;
+  font-size: 14px;
+}
+
+.live-events-rail-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+}
+
+.live-events-rail-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  overflow: hidden;
+  box-shadow: var(--shadow-1);
+  transition:
+    box-shadow var(--duration-base) var(--ease-out-soft),
+    transform var(--duration-fast) var(--ease-out-soft);
+}
+
+.live-events-rail-card:hover {
+  box-shadow: var(--shadow-2);
+  transform: translateY(-2px);
+}
+
+.live-events-rail-card-link {
+  display: block;
+  text-decoration: none;
+  color: var(--text);
+}
+
+.live-events-rail-thumb {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: var(--surface-soft);
+  overflow: hidden;
+}
+
+.live-events-rail-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.live-events-rail-thumb-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--surface-soft) 0%, var(--surface) 100%);
+}
+
+.live-events-rail-thumb-fallback span {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--muted);
+  opacity: 0.45;
+}
+
+.live-events-rail-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: color-mix(in srgb, var(--state-active) 92%, transparent);
+  color: #fff;
+  padding: 2px 7px;
+  border-radius: var(--radius-pill);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  animation: live-badge-blink 2.4s ease-in-out infinite;
+}
+
+.live-events-rail-badge .live-dot {
+  width: 4px;
+  height: 4px;
+  background: #fff;
+  border-radius: 50%;
+}
+
+.live-events-rail-duration {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 600;
+  z-index: 2;
+}
+
+/* Hover preview iframe overlay (Phase 14) */
+.live-events-rail-preview {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  z-index: 1;
+}
+
+.live-events-rail-preview iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+/* Hide preview on devices without hover (mobile/touch). */
+@media (hover: none) {
+  .live-events-rail-preview {
+    display: none;
+  }
+}
+
+/* --- Event detail live-stream player (Phase 14, single-page autoplay) */
+
+.event-live-player {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto 24px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-hero);
+  background: #000;
+}
+
+.event-live-player-frame {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: #000;
+}
+
+.event-live-player-frame iframe,
+.event-live-player-frame video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  object-fit: cover;
+  background: #000;
+}
+
+/* "Representative footage" disclosure tag — appears only over native
+ * <video> demo loops, never over real iframe streams. Bottom-right so it
+ * doesn't fight the LIVE badge / viewer counter on the left side. */
+.event-live-player-rep-tag {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  padding: 4px 10px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.92);
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  pointer-events: none;
+  z-index: 2;
+  user-select: none;
+}
+
+.event-live-player-meta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  background: var(--surface);
+  flex-wrap: wrap;
+}
+
+.event-live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: color-mix(in srgb, var(--state-active) 92%, transparent);
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  animation: live-badge-blink 2.4s ease-in-out infinite;
+}
+
+.event-live-badge .live-dot {
+  width: 4px;
+  height: 4px;
+  background: #fff;
+  border-radius: 50%;
+}
+
+@keyframes live-badge-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+
+.event-live-duration,
+.event-live-viewers {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.event-live-viewers-big {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-left: auto;
+  color: var(--state-active);
+  font-weight: 700;
+  animation: live-viewers-breathe 3.2s ease-in-out infinite;
+}
+
+.event-live-viewers-icon {
+  font-size: 18px;
+  transform: translateY(2px);
+  opacity: 0.9;
+}
+
+.event-live-viewers-number {
+  font-size: clamp(22px, 2.6vw, 30px);
+  line-height: 1;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+.event-live-viewers-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  text-transform: none;
+}
+
+@keyframes live-viewers-breathe {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.78; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .event-live-viewers-big {
+    animation: none;
+  }
+}
+
+.event-live-mock-flag {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  border: 1px dashed var(--line);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+}
+
+.live-events-rail-meta {
+  padding: 12px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.live-events-rail-meta h3 {
+  font-size: 16px;
+  line-height: 1.3;
+  margin: 0;
+  font-weight: 600;
+}
+
+.live-events-rail-meta p {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0;
+}
+
+.live-events-rail-viewers {
+  font-size: 12px !important;
+  font-weight: 500;
+}
+
+.live-events-rail-empty {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 22px;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-soft);
+  color: var(--text);
+}
+
+.live-events-rail-empty-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+.live-events-rail-empty p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text);
+  opacity: 0.85;
+}
+
+/* LIVE icon size preference (Phase 9 → Phase 13/14 wiring) */
+:root[data-live-icon="sm"] .live-events-rail-badge {
+  padding: 1px 6px;
+  font-size: 8px;
+}
+
+:root[data-live-icon="lg"] .live-events-rail-badge {
+  padding: 4px 10px;
+  font-size: 11px;
+}
+
+:root[data-live-icon="lg"] .live-events-rail-badge .live-dot {
+  width: 6px;
+  height: 6px;
+}

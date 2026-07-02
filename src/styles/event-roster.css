@@ -1,0 +1,2111 @@
+/* EventRosterPanel — "who's joining" section on /events/[id] */
+
+/* --- Past-event testimonials ------------------------------------------ */
+.event-testimonials {
+  margin-top: 28px;
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
+}
+
+.event-testimonials-header {
+  margin-bottom: 18px;
+}
+
+.event-testimonials-header h2 {
+  font-size: clamp(20px, 2vw, 26px);
+  line-height: 1.2;
+  margin: 0 0 6px;
+}
+
+.event-testimonials-header p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.event-testimonials-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 14px;
+}
+
+.event-testimonial {
+  position: relative;
+  padding: 22px 22px 18px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-1);
+}
+
+.event-testimonial::before {
+  content: "\201C";
+  position: absolute;
+  top: 4px;
+  left: 12px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 44px;
+  line-height: 1;
+  color: var(--primary);
+  opacity: 0.22;
+  pointer-events: none;
+}
+
+.event-testimonial-quote {
+  margin: 0 0 12px;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--text);
+  font-style: normal;
+}
+
+.event-testimonial-attrib {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 12.5px;
+}
+
+.event-testimonial-name {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.event-testimonial-role {
+  color: var(--muted);
+}
+
+/* --- BeforeAfterSlider (past event before/after comparison) ----------- */
+.before-after-section {
+  margin-top: 14px;
+}
+
+.ba-slider {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  user-select: none;
+  cursor: ew-resize;
+  margin-top: 12px;
+  box-shadow: var(--shadow-2);
+}
+
+.ba-slider-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  user-select: none;
+  pointer-events: none;
+}
+
+.ba-slider-after-wrap {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.ba-slider-label {
+  position: absolute;
+  top: 12px;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  z-index: 2;
+}
+
+.ba-slider-label-before {
+  left: 12px;
+}
+
+.ba-slider-label-after {
+  right: 12px;
+  background: var(--primary);
+}
+
+.ba-slider-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: rgba(255, 255, 255, 0.85);
+  transform: translateX(-1px);
+  cursor: ew-resize;
+  z-index: 3;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2);
+}
+
+.ba-slider-handle:focus-visible {
+  outline: none;
+}
+
+.ba-slider-handle:focus-visible .ba-slider-handle-knob {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+}
+
+.ba-slider-handle-bar {
+  display: none;
+}
+
+.ba-slider-handle-knob {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 40px;
+  height: 40px;
+  background: #fff;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+}
+
+.ba-slider-handle-arrow {
+  width: 0;
+  height: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+}
+
+.ba-slider-handle-arrow-left {
+  border-right: 6px solid var(--primary);
+}
+
+.ba-slider-handle-arrow-right {
+  border-left: 6px solid var(--primary);
+}
+
+.event-roster-panel {
+  margin-top: 28px;
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
+}
+
+.event-roster-header {
+  margin-bottom: 18px;
+}
+
+.event-roster-header h2 {
+  font-size: clamp(20px, 2vw, 26px);
+  line-height: 1.2;
+  margin: 0 0 6px;
+}
+
+.event-roster-header p {
+  color: var(--muted);
+  margin: 0;
+  font-size: 14px;
+  max-width: 64ch;
+}
+
+.event-roster-progress {
+  margin: 6px 0 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.event-roster-progress-bar {
+  position: relative;
+  height: 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--line) 70%, transparent);
+  overflow: hidden;
+}
+
+.event-roster-progress-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, #176b5c 90%, var(--primary)) 0%,
+    var(--primary) 100%
+  );
+  border-radius: inherit;
+  transition: width 320ms ease;
+}
+
+.event-roster-progress.is-full .event-roster-progress-fill {
+  background: linear-gradient(90deg, #2e7d32, #4ade80);
+}
+
+.event-roster-progress-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.event-roster-progress-count {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.event-roster-progress-open {
+  color: var(--primary);
+  font-weight: 500;
+}
+
+.event-roster-progress.is-full .event-roster-progress-count {
+  color: #2e7d32;
+}
+
+[data-theme="dark"] .event-roster-progress.is-full .event-roster-progress-count {
+  color: #4ade80;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .event-roster-progress-fill {
+    transition: none;
+  }
+}
+
+.event-roster-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 8px;
+}
+
+.event-roster-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  min-width: 0;
+}
+
+/* The Cleaner leads as a full-width row (there can be many cleaners); the
+   Coordinator/leader slot + the other roles follow as half columns. */
+.event-roster-row--full {
+  grid-column: 1 / -1;
+}
+
+.event-roster-role {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.event-roster-role::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--role-color, var(--primary));
+  flex-shrink: 0;
+}
+
+.event-roster-count {
+  font-size: 12.5px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.event-roster-chips {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  gap: 3px;
+  margin-left: auto;
+}
+
+.event-roster-chip {
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11.5px;
+  font-weight: 600;
+  border-radius: 50%;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.event-roster-chip-filled {
+  background: var(--role-color, var(--primary));
+  color: #fff;
+  box-shadow: var(--shadow-1);
+  border: 1.5px solid var(--surface);
+  margin-left: -6px;
+}
+
+.event-roster-chip-filled:first-child {
+  margin-left: 0;
+}
+
+.event-roster-chip-more {
+  background: var(--surface-soft);
+  color: var(--muted);
+  border: 1px solid var(--line);
+  font-size: 11px;
+  width: auto;
+  min-width: 24px;
+  padding: 0 7px;
+  border-radius: var(--radius-pill);
+  margin-left: 2px;
+}
+
+.event-roster-open-pill,
+.event-roster-full-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  line-height: 1.4;
+}
+
+.event-roster-open-pill {
+  color: var(--primary);
+  border: 1px dashed color-mix(in srgb, var(--primary) 50%, var(--line));
+  background: color-mix(in srgb, var(--primary) 6%, transparent);
+  cursor: pointer;
+  font-family: inherit;
+  transition:
+    background var(--duration-fast) var(--ease-out-soft),
+    border-color var(--duration-fast) var(--ease-out-soft);
+}
+
+.event-roster-open-pill:hover:not(:disabled),
+.event-roster-open-pill:focus-visible {
+  background: color-mix(in srgb, var(--primary) 14%, transparent);
+  border-color: var(--primary);
+}
+
+.event-roster-open-pill:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.event-roster-full-pill {
+  color: var(--muted);
+  background: var(--surface-soft);
+  border: 1px solid var(--line);
+}
+
+/* The role the viewer already holds — green "you're in" confirmation in
+   place of the open-slot pill, with a soft green wash on the whole row. */
+.event-roster-joined-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 11px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  line-height: 1.4;
+  color: #2e7d32;
+  background: color-mix(in srgb, #2e7d32 12%, transparent);
+  border: 1px solid color-mix(in srgb, #2e7d32 40%, var(--line));
+}
+
+.event-roster-joined-pill > .anticon {
+  font-size: 13px;
+}
+
+.event-roster-row.is-own-role {
+  border-color: color-mix(in srgb, #2e7d32 45%, var(--line));
+  background: color-mix(in srgb, #2e7d32 7%, var(--surface));
+}
+
+:root[data-theme="dark"] .event-roster-joined-pill {
+  color: #4ade80;
+  background: color-mix(in srgb, #4ade80 14%, transparent);
+  border-color: color-mix(in srgb, #4ade80 36%, var(--line));
+}
+
+:root[data-theme="dark"] .event-roster-row.is-own-role {
+  border-color: color-mix(in srgb, #4ade80 38%, var(--line));
+  background: color-mix(in srgb, #4ade80 9%, var(--surface));
+}
+
+/* Once the viewer has committed to a role, the other rows simply stop
+   offering a join action (no pill renders) — they stay fully legible, NOT
+   dimmed. Clicks are prevented by the absence of the control, not by fading. */
+
+@media (max-width: 620px) {
+  .event-roster-list {
+    grid-template-columns: 1fr;
+  }
+  .event-roster-chips {
+    margin-left: 0;
+  }
+}
+
+/* --- Issue supporters chip row ---------------------------------------
+ * Sister pattern to EventRosterPanel but simpler: a flat chip line of
+ * supporter initials with a "+N more" pill at the end. Rendered on
+ * /issues/[id] between the vote section and the status timeline. */
+
+.issue-supporters {
+  margin-top: 8px;
+}
+
+.issue-supporters-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.issue-supporters-chip {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--primary) 88%, var(--text) 12%);
+  color: #fff;
+  flex-shrink: 0;
+  box-shadow: var(--shadow-1);
+}
+
+.issue-supporters-chip-more {
+  width: auto;
+  padding: 0 12px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-soft);
+  color: var(--text);
+  border: 1px solid var(--line);
+  font-weight: 600;
+  font-size: 13px;
+  box-shadow: none;
+}
+
+/* --- IssueParticipationPanel ----------------------------------------
+ * The issue-stage twin of EventJoinPanel + EventRosterPanel, rendered on
+ * /issues/[id]. Reuses the .event-roster-progress / .event-roster-list
+ * vocabulary so a role + progress bar read identically across the issue→
+ * event lifecycle. Adds a "your participation" banner that reflects the
+ * viewer's own vote (interested / going-as-role / want-to-lead) back to them. */
+
+.issue-participation-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  margin-top: 8px;
+}
+
+.issue-participation-progress {
+  margin: 0;
+  padding: 18px 20px;
+  border: 1px solid color-mix(in srgb, var(--primary) 18%, var(--line));
+  border-radius: var(--radius-md);
+  background:
+    linear-gradient(135deg,
+      color-mix(in srgb, var(--primary) 7%, var(--surface)) 0%,
+      var(--surface) 100%);
+  box-shadow: var(--shadow-1);
+}
+
+.issue-participation-progress-head {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-bottom: 14px;
+}
+
+.issue-participation-progress-title {
+  margin: 0;
+  font-size: clamp(16px, 1.8vw, 20px);
+  line-height: 1.3;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* "Your participation" banner — soft card whose accent tracks the commitment
+   level. Green for going (mirrors the event "you're in" pill), primary for
+   interested, gold for want-to-lead. */
+.issue-participation-you {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--accent-line, var(--line));
+  background: var(--accent-bg, var(--surface));
+  box-shadow: var(--shadow-1);
+}
+
+.issue-participation-you.is-going {
+  --accent: #2e7d32;
+  --accent-line: color-mix(in srgb, #2e7d32 40%, var(--line));
+  --accent-bg: color-mix(in srgb, #2e7d32 8%, var(--surface));
+}
+
+.issue-participation-you.is-interested {
+  --accent: var(--primary);
+  --accent-line: color-mix(in srgb, var(--primary) 36%, var(--line));
+  --accent-bg: color-mix(in srgb, var(--primary) 7%, var(--surface));
+}
+
+.issue-participation-you.is-lead {
+  --accent: #b7791f;
+  --accent-line: color-mix(in srgb, #b7791f 40%, var(--line));
+  --accent-bg: color-mix(in srgb, #b7791f 9%, var(--surface));
+}
+
+.issue-participation-you-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  font-size: 17px;
+  color: #fff;
+  background: var(--accent, var(--primary));
+  box-shadow: var(--shadow-1);
+}
+
+.issue-participation-you-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.issue-participation-you-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--accent, var(--primary)) 75%, var(--muted));
+}
+
+.issue-participation-you-text {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--text);
+}
+
+:root[data-theme="dark"] .issue-participation-you.is-going {
+  --accent: #4ade80;
+  --accent-line: color-mix(in srgb, #4ade80 34%, var(--line));
+  --accent-bg: color-mix(in srgb, #4ade80 10%, var(--surface));
+}
+
+:root[data-theme="dark"] .issue-participation-you-icon {
+  color: #07271a;
+}
+
+.issue-participation-roster .event-roster-header {
+  margin-bottom: 14px;
+}
+
+/* An as-yet-unclaimed role still shows (event-roster style), with a dashed
+   "open" pill inviting someone to be the first — the issue has no role-plan
+   target, so there's no "+N open" count, just the invitation. */
+.issue-roster-open-pill {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  line-height: 1.4;
+  color: var(--primary);
+  border: 1px dashed color-mix(in srgb, var(--primary) 45%, var(--line));
+  background: color-mix(in srgb, var(--primary) 5%, transparent);
+}
+
+.issue-participation-roster .event-roster-row.is-empty {
+  opacity: 0.72;
+}
+
+/* --- ParticipantsPanel (shared by /issues/[id] AND /events/[id]) ------
+ * The single participation surface. Reuses the .event-roster-* vocabulary
+ * for the shared visual elements (list, rows, chips, progress bar, pills);
+ * the rules below are only the additions it layers on: role icons, the
+ * viewer's own row (name + withdraw on hover/tap), and the progress bar
+ * sitting BELOW the roster on both surfaces. */
+
+.participants-panel {
+  margin-top: 28px;
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
+}
+
+/* Title row holds the heading (+ count badge) on the left and the compact
+   progress on the right — there's room beside the title, so the progress no
+   longer needs a full-width row of its own below the roster. */
+.participants-header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.participants-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 28px;
+  flex-wrap: wrap;
+}
+
+/* Full-width intro — one concise line, not a clamped column that eats
+   vertical space. */
+.participants-header p {
+  max-width: none;
+}
+
+/* A role icon replaces the little colour dot. */
+.event-roster-role.has-icon::before {
+  display: none;
+}
+
+.participants-role-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  color: var(--role-color, var(--primary));
+  flex-shrink: 0;
+}
+
+/* Role cell is a two-line block: the title (+ count) over a small, muted
+   one-line description of what the role does — kept tight under the title so
+   the row only grows a little. The icon aligns to the title line. */
+.participants-role {
+  align-items: flex-start;
+}
+
+.participants-role .participants-role-icon {
+  margin-top: 2px;
+}
+
+.participants-role-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.participants-role-head {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.participants-role-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.participants-role-desc {
+  font-size: 11px;
+  line-height: 1.25;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+/* The viewer's own avatar chip — ringed so they spot themselves at a glance. */
+.participants-chip-you {
+  box-shadow: 0 0 0 2px var(--surface), 0 0 0 3.5px var(--role-color, var(--primary));
+}
+
+/* Count badge beside the heading — "how many are in?" at a glance. */
+.participants-header h2 {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.participants-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 24px;
+  padding: 0 9px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--primary) 14%, var(--surface-soft));
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+/* The viewer's own row keeps a SINGLE in-place pill — no extra row, no height
+   bump. "You Joined" by default; on hover/focus it swaps to a danger "Leave"
+   in the very same slot. Both faces are stacked in one grid cell so the pill
+   width never jumps as they swap. On touch (no hover) it stays "You Joined"
+   and a tap opens the confirm directly. .event-roster-chips' margin-left:auto
+   right-aligns the whole trailing group. */
+.participants-joined-toggle {
+  display: inline-grid;
+  grid-template-areas: "face";
+  align-items: center;
+  justify-items: center;
+  padding: 3px 11px;
+  border-radius: var(--radius-pill);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+  cursor: pointer;
+  color: #2e7d32;
+  background: color-mix(in srgb, #2e7d32 12%, transparent);
+  border: 1px solid color-mix(in srgb, #2e7d32 40%, var(--line));
+  transition:
+    color var(--duration-fast) var(--ease-out-soft),
+    background var(--duration-fast) var(--ease-out-soft),
+    border-color var(--duration-fast) var(--ease-out-soft);
+}
+
+.participants-joined-face {
+  grid-area: face;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: opacity var(--duration-fast) var(--ease-out-soft);
+}
+
+.participants-joined-face > .anticon {
+  font-size: 13px;
+}
+
+.participants-joined-face--leave {
+  opacity: 0;
+}
+
+.participants-joined-toggle:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+@media (hover: hover) {
+  .participants-joined-toggle:hover,
+  .participants-joined-toggle:focus-visible {
+    color: #b42318;
+    background: color-mix(in srgb, #b42318 12%, transparent);
+    border-color: color-mix(in srgb, #b42318 42%, var(--line));
+  }
+  .participants-joined-toggle:hover .participants-joined-face--default,
+  .participants-joined-toggle:focus-visible .participants-joined-face--default {
+    opacity: 0;
+  }
+  .participants-joined-toggle:hover .participants-joined-face--leave,
+  .participants-joined-toggle:focus-visible .participants-joined-face--leave {
+    opacity: 1;
+  }
+}
+
+:root[data-theme="dark"] .participants-joined-toggle {
+  color: #4ade80;
+  background: color-mix(in srgb, #4ade80 14%, transparent);
+  border-color: color-mix(in srgb, #4ade80 36%, var(--line));
+}
+
+@media (hover: hover) {
+  :root[data-theme="dark"] .participants-joined-toggle:hover,
+  :root[data-theme="dark"] .participants-joined-toggle:focus-visible {
+    color: #fca5a5;
+    background: color-mix(in srgb, #fca5a5 14%, transparent);
+    border-color: color-mix(in srgb, #fca5a5 34%, var(--line));
+  }
+}
+
+/* Compact progress beside the title (right side of the header row). A short
+   bar + a one-line caption whose <strong> denominator is the TOTAL needed. */
+.participants-progress-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 190px;
+  max-width: 340px;
+  flex: 0 1 auto;
+}
+
+.participants-progress-compact-eyebrow {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.participants-progress-compact .event-roster-progress-bar {
+  height: 6px;
+}
+
+.participants-progress-compact-meta {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.participants-progress-compact-meta strong {
+  color: var(--text);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.participants-progress-compact.is-full .participants-progress-compact-meta strong {
+  color: #2e7d32;
+}
+
+:root[data-theme="dark"] .participants-progress-compact.is-full .participants-progress-compact-meta strong {
+  color: #4ade80;
+}
+
+/* On narrow screens the compact progress drops below the title (full row). */
+@media (max-width: 560px) {
+  .participants-progress-compact {
+    max-width: none;
+    width: 100%;
+  }
+}
+
+/* --- Core vs Additional role grouping -------------------------------------
+ * The roster splits into two labelled groups: the must-fill CORE roles (the
+ * Cleaner + the Coordinator/leader, which anchor every event) and the optional
+ * ADDITIONAL specialist roles. The coordinator covers any optional role that
+ * goes unfilled — especially early — so those read a notch quieter and the eye
+ * lands on core first. Purely presentational; join/lead behaviour is unchanged. */
+.participants-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.participants-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.participants-group-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.participants-group--core .participants-group-label {
+  color: var(--text);
+}
+
+.participants-group--additional .participants-group-label {
+  color: var(--muted);
+}
+
+/* Short subtitle under each group's title (above its rows) — explains the
+   section at a glance. Pulled up tight so it reads as the label's subtitle. */
+.participants-group-note {
+  margin: -4px 0 0;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+/* Optional roles read a touch quieter (soft wash, no text fade — stays
+   legible) so the must-fill core pair draws the eye first. */
+.participants-group--additional .event-roster-row {
+  background: color-mix(in srgb, var(--surface-soft) 65%, var(--surface));
+}
+
+/* --- Leadership ("Coordinator") slot --------------------------------------
+ * Set apart below the participation roster — the lead is its own commitment,
+ * not one of the role cards. Gold accent + a dashed divider make it read as a
+ * distinct, single seat. Issue: a WANT_TO_LEAD vote; event: the resolved
+ * event leader (read-only). */
+.participants-leader {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.participants-leader-eyebrow {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: #b7791f;
+}
+
+/* Reuses .event-roster-row, washed gold. */
+.participants-leader-row {
+  border-color: color-mix(in srgb, #b7791f 36%, var(--line));
+  background: color-mix(in srgb, #b7791f 6%, var(--surface));
+}
+
+.participants-leader-row.is-own-role {
+  border-color: color-mix(in srgb, #b7791f 52%, var(--line));
+  background: color-mix(in srgb, #b7791f 10%, var(--surface));
+}
+
+.participants-leader-row .participants-role-icon {
+  color: #b7791f;
+}
+
+/* "Led by X" — quiet attribution when someone else holds the lead. */
+.participants-lead-by {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: color-mix(in srgb, #b7791f 85%, var(--text));
+  white-space: nowrap;
+}
+
+/* Gold "Want to Lead" CTA — open-pill recolored. */
+.participants-lead-cta {
+  color: #b7791f;
+  border-color: color-mix(in srgb, #b7791f 50%, var(--line));
+  background: color-mix(in srgb, #b7791f 7%, transparent);
+}
+
+.participants-lead-cta:hover:not(:disabled),
+.participants-lead-cta:focus-visible {
+  background: color-mix(in srgb, #b7791f 15%, transparent);
+  border-color: #b7791f;
+}
+
+/* "You're leading" — gold default; the hover→red (withdraw) is inherited from
+   .participants-joined-toggle, so only the resting colours change here. */
+.participants-lead-pill,
+.participants-lead-toggle {
+  color: #b7791f;
+  background: color-mix(in srgb, #b7791f 12%, transparent);
+  border-color: color-mix(in srgb, #b7791f 40%, var(--line));
+}
+
+:root[data-theme="dark"] .participants-leader-eyebrow,
+:root[data-theme="dark"] .participants-lead-by,
+:root[data-theme="dark"] .participants-lead-cta,
+:root[data-theme="dark"] .participants-lead-pill,
+:root[data-theme="dark"] .participants-lead-toggle {
+  color: #e9b949;
+}
+
+:root[data-theme="dark"] .participants-lead-cta,
+:root[data-theme="dark"] .participants-lead-pill,
+:root[data-theme="dark"] .participants-lead-toggle {
+  background: color-mix(in srgb, #e9b949 14%, transparent);
+  border-color: color-mix(in srgb, #e9b949 32%, var(--line));
+}
+
+:root[data-theme="dark"] .participants-leader-row .participants-role-icon {
+  color: #e9b949;
+}
+
+/* --- CampaignParticipationModal --------------------------------------
+ * The unified join/support modal: a pinned campaign header (cover + title +
+ * status + when/where), an optional "I'm interested" action (OPEN only), then
+ * the embedded ParticipantsPanel (roles + counts + lead, by default). */
+.support-modal-intro {
+  margin: 0 0 16px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* Campaign Participation Modal header — pinned cover + title + status + context.
+ * Lives in the Modal `title` slot so the roster body scrolls beneath it. */
+.campaign-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-right: 28px; /* clear AntD's absolute close (×) button */
+}
+
+.campaign-modal-cover {
+  flex: 0 0 auto;
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.campaign-modal-cover--fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 22px;
+  background: linear-gradient(135deg, var(--primary), color-mix(in srgb, var(--primary) 55%, #000));
+}
+
+.campaign-modal-headmeta {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.campaign-modal-title {
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.campaign-modal-statusline {
+  display: inline-flex;
+}
+
+.campaign-modal-status-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 14%, var(--surface));
+}
+.campaign-modal-status-chip[data-status="open"]      { color: var(--state-open-ink);      background: color-mix(in srgb, var(--state-open) 16%, var(--surface)); }
+.campaign-modal-status-chip[data-status="draft"]     { color: var(--state-draft-ink);     background: color-mix(in srgb, var(--state-draft) 16%, var(--surface)); }
+.campaign-modal-status-chip[data-status="scheduled"] { color: var(--state-scheduled-ink); background: color-mix(in srgb, var(--state-scheduled) 16%, var(--surface)); }
+.campaign-modal-status-chip[data-status="active"]    { color: var(--state-active-ink);    background: color-mix(in srgb, var(--state-active) 16%, var(--surface)); }
+.campaign-modal-status-chip[data-status="completed"] { color: var(--state-completed-ink); background: color-mix(in srgb, var(--state-completed) 16%, var(--surface)); }
+
+.campaign-modal-context {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  font-size: 12.5px;
+  font-weight: 400;
+  color: var(--muted);
+}
+.campaign-modal-context span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.support-modal-interested {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  text-align: left;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid color-mix(in srgb, var(--primary) 32%, var(--line));
+  background: color-mix(in srgb, var(--primary) 6%, var(--surface));
+  cursor: pointer;
+  font: inherit;
+  transition:
+    background var(--duration-fast) var(--ease-out-soft),
+    border-color var(--duration-fast) var(--ease-out-soft);
+}
+
+.support-modal-interested:hover:not(:disabled),
+.support-modal-interested:focus-visible {
+  background: color-mix(in srgb, var(--primary) 12%, var(--surface));
+  border-color: var(--primary);
+}
+
+.support-modal-interested:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Already-interested → the block becomes a one-click withdraw (selected look). */
+.support-modal-interested.is-active {
+  background: color-mix(in srgb, var(--primary) 14%, var(--surface));
+  border-color: var(--primary);
+}
+.support-modal-interested.is-active:hover:not(:disabled),
+.support-modal-interested.is-active:focus-visible {
+  background: color-mix(in srgb, var(--primary) 20%, var(--surface));
+}
+
+.support-modal-interested-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  font-size: 18px;
+  color: #fff;
+  background: var(--primary);
+}
+
+.support-modal-interested-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.support-modal-interested-text strong {
+  font-size: 15px;
+  color: var(--text);
+}
+
+.support-modal-interested-text span {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.support-modal-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 18px 0 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.support-modal-divider::before,
+.support-modal-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+/* The panel, embedded in the modal, drops its section chrome. */
+.participants-panel--embedded {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
+/* Withdraw-confirmation popover (support / role / lead) — keep it narrow so the
+   message wraps onto a few short lines instead of stretching into one very wide
+   row. Portaled to <body>, so these target the overlay's own class. */
+.vote-withdraw-popconfirm,
+.vote-withdraw-popconfirm .ant-popover-inner {
+  max-width: 264px;
+}
+
+.vote-withdraw-popconfirm .ant-popconfirm-message-title,
+.vote-withdraw-popconfirm .ant-popconfirm-description {
+  white-space: normal;
+  word-break: break-word;
+}
+
+.participants-panel--embedded .participants-header h2 {
+  font-size: 18px;
+}
+
+/* --- StickyActionBar -----------------------------------------------
+ * Mobile-first sticky bottom action. Slides up when the user has
+ * scrolled past the in-flow primary CTA (~480px). Glass-tinted chrome.
+ * Desktop: bottom-right pill, stacked ABOVE the global QuickActionFab
+ * (bottom: 18px) so the page-specific CTA and global "+" don't overlap.
+ * Mobile: full-width bar (FAB is pushed to bottom: 84px there).
+ */
+
+.sticky-action-bar {
+  position: fixed;
+  bottom: 84px;
+  right: 16px;
+  z-index: var(--z-sticky);
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity var(--duration-base) var(--ease-out-soft),
+    transform var(--duration-base) var(--ease-out-soft);
+}
+
+.sticky-action-bar[data-visible="true"] {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.sticky-action-bar-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--primary);
+  color: #fff;
+  padding: 12px 22px;
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+  font-size: 15px;
+  text-decoration: none;
+  box-shadow: var(--shadow-3);
+  transition:
+    transform var(--duration-fast) var(--ease-out-soft),
+    box-shadow var(--duration-base) var(--ease-out-soft);
+  white-space: nowrap;
+}
+
+.sticky-action-bar-cta:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 18px 40px rgba(23, 107, 92, 0.28),
+    0 6px 14px rgba(23, 107, 92, 0.18);
+}
+
+.sticky-action-bar-cta:active {
+  transform: scale(0.98);
+}
+
+.sticky-action-bar-icon {
+  display: inline-flex;
+  font-size: 16px;
+}
+
+@media (max-width: 620px) {
+  .sticky-action-bar {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+  }
+  .sticky-action-bar-cta,
+  .sticky-action-bar > * {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sticky-action-bar {
+    transition: opacity var(--duration-fast) linear;
+    transform: none !important;
+  }
+}
+
+/* --- /event-types/[id] stat strip ------------------------------------ */
+
+.event-type-detail-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 14px;
+  margin: 0 0 22px;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--surface) 0%, var(--surface-soft) 100%);
+  box-shadow: var(--shadow-1);
+}
+
+.event-type-detail-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.event-type-detail-stat-value {
+  font-size: clamp(24px, 2.6vw, 32px);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--primary);
+  letter-spacing: -0.01em;
+}
+
+.event-type-detail-stat-unit {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.3;
+}
+
+/* --- /join role-context welcome banner ------------------------------ */
+
+.join-role-context {
+  margin-bottom: 20px;
+  padding: 18px 22px;
+  border: 1px solid color-mix(in srgb, var(--primary) 18%, var(--line));
+  border-radius: var(--radius-md);
+  background:
+    linear-gradient(135deg,
+      color-mix(in srgb, var(--primary) 8%, var(--surface)) 0%,
+      var(--surface) 100%);
+  box-shadow: var(--shadow-1);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.join-role-context-eyebrow {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.join-role-context h2 {
+  font-size: clamp(20px, 2vw, 24px);
+  line-height: 1.2;
+  margin: 0;
+  color: var(--primary);
+}
+
+.join-role-context p {
+  margin: 0;
+  color: var(--text);
+  line-height: 1.5;
+  font-size: 15px;
+}
+
+.join-role-context-event {
+  margin-top: 6px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--line);
+  font-size: 13px !important;
+  color: var(--muted) !important;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, "Roboto Mono", monospace;
+}
+
+/* --- /events list page ---------------------------------------------- */
+
+.events-list-page {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 32px 0 56px;
+}
+
+.events-list-header {
+  margin-bottom: 28px;
+}
+
+.events-list-header h1 {
+  font-size: clamp(28px, 3.2vw, 42px);
+  line-height: 1.15;
+  margin: 6px 0 8px;
+}
+
+.events-list-header p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.events-filter-pills {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: 22px 0 4px;
+  padding: 6px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  width: max-content;
+  max-width: 100%;
+  box-shadow: var(--shadow-1);
+}
+
+.events-filter-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+  font-size: 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.events-filter-pill:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.events-filter-pill:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.events-filter-pill.is-active {
+  background: var(--primary);
+  color: #fff;
+}
+
+.events-filter-pill-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.08);
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.events-filter-pill.is-active .events-filter-pill-count {
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+}
+
+:root[data-theme="dark"] .events-filter-pill:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+:root[data-theme="dark"] .events-filter-pill-count {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.events-section {
+  margin-top: 36px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+
+.events-section:first-of-type {
+  border-top: none;
+  padding-top: 0;
+}
+
+.events-section-header {
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.events-section-header h2 {
+  font-size: clamp(20px, 2.2vw, 28px);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.events-section-empty {
+  padding: 18px 20px;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-soft);
+  color: var(--muted);
+}
+
+.events-section-empty p {
+  margin: 0;
+  font-size: 14px;
+}
+
+.events-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.events-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  box-shadow: var(--shadow-1);
+  overflow: hidden;
+  text-decoration: none;
+  color: var(--text);
+  transition:
+    transform var(--duration-fast) var(--ease-out-soft),
+    box-shadow var(--duration-base) var(--ease-out-soft);
+}
+
+.events-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-2);
+}
+
+.events-card-thumb {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--surface-soft);
+}
+
+.events-card-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.events-card-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #fff;
+}
+
+.events-card-badge-live {
+  background: rgba(210, 54, 11, 0.95);
+}
+
+.events-card-badge-live .live-dot {
+  width: 6px;
+  height: 6px;
+  background: #fff;
+  border-radius: 50%;
+}
+
+.events-card-badge-upcoming {
+  background: color-mix(in srgb, var(--primary) 92%, var(--text) 8%);
+}
+
+.events-card-badge-past {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.events-card-viewers {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.events-card-body {
+  padding: 14px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.events-card-body h3 {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.3;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.events-card-meta-row {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.events-card-meta-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.events-card-meta-grid span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.events-card-summary {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.45;
+  opacity: 0.86;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* --- Homepage upcoming events strip --------------------------------- */
+
+.home-upcoming-strip {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 24px 0;
+  border-top: 1px solid var(--line);
+}
+
+.home-upcoming-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.home-upcoming-header h2 {
+  font-size: clamp(22px, 2.4vw, 30px);
+  line-height: 1.2;
+  margin: 4px 0 6px;
+}
+
+.home-upcoming-header p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  max-width: 56ch;
+}
+
+.home-upcoming-view-all {
+  color: var(--primary);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.home-upcoming-view-all:hover {
+  text-decoration: underline;
+}
+
+.home-upcoming-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+}
+
+/* --- /events/[id] zoned detail card -----------------------------------
+ * One card containing the video player flush at top, then a body with
+ * five vertical zones in source order — essentials, aside (map),
+ * action, leader controls, after-the-campaign, discussion.
+ *
+ * Layout:
+ *   Mobile (<1024px): single column. Aside flows inline between the
+ *     essentials block and the action block, so the map sits next to
+ *     "where to meet" instead of being stranded at the bottom.
+ *   Desktop (>=1024px): two columns via grid-template-areas. The aside
+ *     occupies a sticky right rail that visually spans the full body
+ *     height, while top + rest stack in the left column. */
+
+.event-detail-card {
+  overflow: hidden;
+  padding: 0;
+}
+
+.event-detail-card > .event-live-player {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.event-detail-card > .event-live-player .event-live-player-meta {
+  border-bottom: 1px solid var(--line);
+}
+
+.event-detail-body {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+  padding: 22px 26px 28px;
+}
+
+.event-detail-main,
+.event-detail-side {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+}
+
+.event-detail-main--top {
+  gap: 16px;
+}
+
+.event-detail-main--rest {
+  gap: 18px;
+}
+
+.event-detail-main--top > .campaign-detail-status {
+  margin-bottom: -8px;
+}
+
+.event-detail-main--top > h1 {
+  font-size: clamp(22px, 2.6vw, 30px);
+  line-height: 1.25;
+  margin: 0;
+}
+
+.event-detail-main--top > .public-issue-detail-meta {
+  font-size: 13.5px;
+}
+
+.event-detail-side-location {
+  padding: 14px;
+  gap: 10px;
+}
+
+.event-detail-side-location .public-issue-location-header {
+  gap: 8px;
+  align-items: center;
+}
+
+.event-detail-side-location h2 {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.event-detail-side-location .public-issue-location-open-link {
+  font-size: 12px;
+}
+
+.event-detail-side-location .public-issue-location-map,
+.event-detail-side-location .public-issue-location-map .issue-map-wrap {
+  border-radius: 10px;
+}
+
+/* ---- Zone grouping (Leader controls, After the campaign) ---- */
+
+.event-detail-zone {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 6px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.event-detail-zone-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 2px;
+}
+
+.event-detail-zone-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.event-detail-zone-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+.event-detail-zone--leader .event-detail-zone-eyebrow {
+  color: var(--primary, var(--accent));
+}
+
+@media (min-width: 1024px) {
+  .event-detail-body {
+    grid-template-columns: minmax(0, 1fr) clamp(280px, 28%, 340px);
+    grid-template-areas:
+      "top  side"
+      "rest side";
+    column-gap: 28px;
+    row-gap: 22px;
+    align-items: start;
+    padding: 24px 28px 30px;
+  }
+  .event-detail-main--top {
+    grid-area: top;
+  }
+  .event-detail-main--rest {
+    grid-area: rest;
+  }
+  .event-detail-side {
+    grid-area: side;
+    position: sticky;
+    top: calc(var(--corner-clear-zone, 64px) + 14px);
+    max-height: calc(100vh - var(--corner-clear-zone, 64px) - 28px);
+    overflow-y: auto;
+    padding-right: 4px;
+    gap: 14px;
+  }
+}
+
+@media (max-width: 1023px) {
+  .event-detail-body {
+    padding: 18px 18px 22px;
+  }
+  /* Cap the inline map height on phones so it doesn't dominate the scroll */
+  .event-detail-side-location .public-issue-location-map .issue-map-wrap {
+    max-height: 280px;
+  }
+}
+
+/* "I'm interested" block now lives inside ParticipantsPanel (shared by modal +
+ * body). Spacing when it sits between the panel header and the role groups. */
+.participants-interested {
+  margin-top: 4px;
+}
+.participants-intro {
+  margin: 0;
+}
+
+/* Whole joinable role row is the click target (the pill is a decorative cue). */
+.event-roster-row.is-clickable {
+  cursor: pointer;
+  transition: transform 0.14s var(--ease-out-soft, ease),
+    box-shadow 0.14s var(--ease-out-soft, ease),
+    border-color 0.14s var(--ease-out-soft, ease),
+    background 0.14s var(--ease-out-soft, ease);
+}
+@media (hover: hover) {
+  .event-roster-row.is-clickable:hover {
+    transform: translateY(-1px);
+    border-color: var(--role-color, var(--primary));
+    box-shadow: 0 4px 14px color-mix(in srgb, var(--role-color, var(--primary)) 18%, transparent);
+  }
+  .event-roster-row.is-clickable:hover .event-roster-open-pill {
+    background: color-mix(in srgb, var(--role-color, var(--primary)) 16%, transparent);
+    border-color: var(--role-color, var(--primary));
+  }
+}
+.event-roster-row.is-clickable:focus-visible {
+  outline: 2px solid var(--role-color, var(--primary));
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .event-roster-row.is-clickable {
+    transition: none;
+  }
+  .event-roster-row.is-clickable:hover {
+    transform: none;
+  }
+}
+
+/* Core roles (Cleaner + Coordinator) — role-tinted card so the must-fill pair
+ * pops over the quiet "additional" group. Own-role keeps its green wash. */
+.participants-group--core .event-roster-row:not(.is-own-role) {
+  background: color-mix(in srgb, var(--role-color, var(--primary)) 8%, var(--surface));
+  border: 1.5px solid color-mix(in srgb, var(--role-color, var(--primary)) 38%, var(--line));
+}
+
+/* --- CampaignActionButton -------------------------------------------
+ * The ONE participation CTA across every page + status (see
+ * docs/superpowers/specs/2026-06-29-campaign-action-button-design.md).
+ * act = solid (teal / red LIVE) + sheen + lift; committed = tinted role
+ * chip (never white) that opens the modal; readonly/disabled = quiet
+ * chips. One size system (sm | lg) — only scale differs. */
+.campaign-action-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.15s var(--ease-out-soft, ease),
+    box-shadow 0.15s var(--ease-out-soft, ease),
+    background-color 0.15s var(--ease-out-soft, ease);
+}
+.campaign-action-btn[aria-disabled="true"] {
+  cursor: default;
+}
+.campaign-action-btn--block {
+  width: 100%;
+}
+.campaign-action-btn--lg {
+  padding: 10px 22px;
+  font-size: 15px;
+}
+.campaign-action-btn--sm {
+  padding: 6px 14px;
+  font-size: 13px;
+}
+.campaign-action-btn-icon {
+  display: inline-flex;
+  font-size: 1.05em;
+}
+.campaign-action-btn-count {
+  font-weight: 800;
+}
+
+/* ACT — solid action colour + sheen + soft shadow + hover lift. */
+.campaign-action-btn--act {
+  color: #fff;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 60%),
+    var(--primary);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--primary) 32%, transparent);
+}
+.campaign-action-btn--act[data-accent="live"] {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 60%),
+    var(--state-active);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--state-active) 38%, transparent);
+}
+@media (hover: hover) {
+  .campaign-action-btn--act:hover,
+  .campaign-action-btn--act:focus-visible {
+    transform: translateY(-1px);
+    box-shadow: 0 7px 20px color-mix(in srgb, var(--primary) 42%, transparent);
+  }
+  .campaign-action-btn--act[data-accent="live"]:hover,
+  .campaign-action-btn--act[data-accent="live"]:focus-visible {
+    box-shadow: 0 7px 20px color-mix(in srgb, var(--state-active) 48%, transparent);
+  }
+}
+.campaign-action-btn--act:active {
+  transform: translateY(0);
+}
+.campaign-action-btn--act:disabled {
+  opacity: 0.75;
+  cursor: progress;
+}
+
+/* LIVE subtle pulse ring */
+.campaign-action-btn--act[data-accent="live"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  animation: campaign-cta-pulse 2.4s ease-out infinite;
+}
+@keyframes campaign-cta-pulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--state-active) 55%, transparent);
+  }
+  70% {
+    box-shadow: 0 0 0 10px color-mix(in srgb, var(--state-active) 0%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--state-active) 0%, transparent);
+  }
+}
+
+/* COMMITTED — tinted role chip (never white); opens the modal. */
+.campaign-action-btn--committed {
+  color: var(--role-color, var(--primary));
+  background: color-mix(in srgb, var(--role-color, var(--primary)) 14%, var(--surface));
+  border: 1.5px solid color-mix(in srgb, var(--role-color, var(--primary)) 38%, transparent);
+}
+@media (hover: hover) {
+  .campaign-action-btn--committed:hover,
+  .campaign-action-btn--committed:focus-visible {
+    background: color-mix(in srgb, var(--role-color, var(--primary)) 20%, var(--surface));
+  }
+}
+
+/* FULL — every seat taken: a muted, interactive chip that opens the modal to
+ * view the all-full roster (no misleading "Join"). */
+.campaign-action-btn--full {
+  color: var(--muted);
+  background: color-mix(in srgb, var(--muted) 12%, var(--surface));
+  border: 1px solid var(--line);
+}
+@media (hover: hover) {
+  .campaign-action-btn--full:hover,
+  .campaign-action-btn--full:focus-visible {
+    background: color-mix(in srgb, var(--muted) 18%, var(--surface));
+    border-color: color-mix(in srgb, var(--muted) 40%, var(--line));
+  }
+}
+
+/* READONLY / DISABLED — quiet, non-interactive chips. */
+.campaign-action-btn--readonly {
+  color: var(--muted);
+  background: color-mix(in srgb, var(--muted) 12%, var(--surface));
+}
+.campaign-action-btn--disabled {
+  color: var(--muted);
+  background: color-mix(in srgb, var(--muted) 9%, var(--surface));
+}
+
+/* loading spinner */
+.campaign-action-btn-spinner {
+  width: 1em;
+  height: 1em;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  animation: campaign-cta-spin 0.7s linear infinite;
+}
+@keyframes campaign-cta-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .campaign-action-btn {
+    transition: none;
+  }
+  .campaign-action-btn--act:hover {
+    transform: none;
+  }
+  .campaign-action-btn--act[data-accent="live"]::after {
+    animation: none;
+  }
+}

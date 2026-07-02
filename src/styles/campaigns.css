@@ -1,0 +1,319 @@
+/* Unified /campaigns status filter — the always-visible lifecycle chip row.
+   Bigger, glanceable segments; each carries a live count badge that flips to a
+   spinner while its stage is (re)fetching, so a click reads as "loading below"
+   even when the surrounding page chrome doesn't move. The same five stages +
+   "all" are mirrored in the detailed filter panel's dropdown. */
+
+.campaigns-status-chips {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.campaigns-status-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.campaigns-status-chips .ant-segmented {
+  display: inline-flex;
+  padding: 6px;
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  backdrop-filter: blur(16px) saturate(1.2);
+  border: 1px solid color-mix(in srgb, var(--line) 45%, transparent);
+}
+
+.campaigns-status-chips .ant-segmented-item {
+  border-radius: 11px;
+  transition: color 160ms ease;
+}
+
+.campaigns-status-chips .ant-segmented-item-label {
+  min-height: 46px;
+  display: flex;
+  align-items: center;
+  padding: 0 18px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.campaigns-status-chips .ant-segmented-item-selected,
+.campaigns-status-chips .ant-segmented-thumb {
+  border-radius: 11px;
+  box-shadow: none;
+}
+
+/* chip = label text + count badge */
+.campaign-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.campaign-chip-text {
+  white-space: nowrap;
+}
+
+.campaign-chip-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 25px;
+  height: 22px;
+  padding: 0 7px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--muted);
+  background: color-mix(in srgb, var(--muted) 14%, var(--surface));
+}
+
+/* Per-stage badge tint — every stage's tally carries its lifecycle colour so the
+   status is glanceable on the chip row even before selection. ("all" has no
+   data-status, so it keeps the neutral base badge above.) */
+.campaign-chip[data-status="open"] .campaign-chip-count { color: var(--state-open-ink); background: color-mix(in srgb, var(--state-open) 16%, var(--surface)); }
+.campaign-chip[data-status="draft"] .campaign-chip-count { color: var(--state-draft-ink); background: color-mix(in srgb, var(--state-draft) 16%, var(--surface)); }
+.campaign-chip[data-status="scheduled"] .campaign-chip-count { color: var(--state-scheduled-ink); background: color-mix(in srgb, var(--state-scheduled) 16%, var(--surface)); }
+.campaign-chip[data-status="active"] .campaign-chip-count { color: var(--state-active-ink); background: color-mix(in srgb, var(--state-active) 16%, var(--surface)); }
+.campaign-chip[data-status="completed"] .campaign-chip-count { color: var(--state-completed-ink); background: color-mix(in srgb, var(--state-completed) 16%, var(--surface)); }
+
+/* Selected segment: a faint status wash on the segment + a solid status badge so
+   the active stage pops. The "all" segment keeps the brand badge. */
+.campaigns-status-chips .ant-segmented-item-selected:has(.campaign-chip[data-status="open"]) { background: color-mix(in srgb, var(--state-open) 14%, var(--surface)); }
+.campaigns-status-chips .ant-segmented-item-selected:has(.campaign-chip[data-status="draft"]) { background: color-mix(in srgb, var(--state-draft) 14%, var(--surface)); }
+.campaigns-status-chips .ant-segmented-item-selected:has(.campaign-chip[data-status="scheduled"]) { background: color-mix(in srgb, var(--state-scheduled) 14%, var(--surface)); }
+.campaigns-status-chips .ant-segmented-item-selected:has(.campaign-chip[data-status="active"]) { background: color-mix(in srgb, var(--state-active) 14%, var(--surface)); }
+.campaigns-status-chips .ant-segmented-item-selected:has(.campaign-chip[data-status="completed"]) { background: color-mix(in srgb, var(--state-completed) 14%, var(--surface)); }
+.campaigns-status-chips .ant-segmented-item-selected:has(.campaign-chip[data-status="open"]) .campaign-chip-count { color: #fff; background: var(--state-open); }
+.campaigns-status-chips .ant-segmented-item-selected:has(.campaign-chip[data-status="draft"]) .campaign-chip-count { color: #fff; background: var(--state-draft); }
+.campaigns-status-chips .ant-segmented-item-selected:has(.campaign-chip[data-status="scheduled"]) .campaign-chip-count { color: #fff; background: var(--state-scheduled); }
+.campaigns-status-chips .ant-segmented-item-selected:has(.campaign-chip[data-status="active"]) .campaign-chip-count { color: #fff; background: var(--state-active); }
+.campaigns-status-chips .ant-segmented-item-selected:has(.campaign-chip[data-status="completed"]) .campaign-chip-count { color: #fff; background: var(--state-completed); }
+.campaigns-status-chips .ant-segmented-item-selected:has(.campaign-chip:not([data-status])) .campaign-chip-count { color: #fff; background: var(--primary); }
+
+.campaign-chip-spin {
+  display: inline-flex;
+  font-size: 12px;
+}
+
+/* List / Grid / Map view toggle — same glassy Segmented as the status chips
+   above (it's a tab row too), just compact: it carries icons, not count
+   badges, and stays a touch smaller so it never competes with the lifecycle
+   chips it sits beside. */
+.campaigns-view-toggle .ant-segmented {
+  display: inline-flex;
+  padding: 5px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  backdrop-filter: blur(16px) saturate(1.2);
+  border: 1px solid color-mix(in srgb, var(--line) 45%, transparent);
+}
+
+.campaigns-view-toggle .ant-segmented-item {
+  border-radius: 9px;
+  transition: color 160ms ease;
+}
+
+.campaigns-view-toggle .ant-segmented-item-label {
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.campaigns-view-toggle .ant-segmented-item-selected,
+.campaigns-view-toggle .ant-segmented-thumb {
+  border-radius: 9px;
+  box-shadow: none;
+}
+
+.campaign-view-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.campaign-view-chip .anticon {
+  font-size: 15px;
+}
+
+.campaign-view-chip-text {
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .campaigns-view-toggle .ant-segmented-item-label {
+    min-height: 36px;
+    padding: 0 11px;
+  }
+  /* Tight viewports: icons carry the toggle, labels fold away so the row
+     never wraps under the status chips. */
+  .campaign-view-chip-text {
+    display: none;
+  }
+  .campaign-view-chip {
+    gap: 0;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .campaigns-view-toggle .ant-segmented {
+    background: var(--surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .campaigns-status-chips .ant-segmented {
+    background: var(--surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+/* ── Mobile toolbar (≤720px) — mobile-first redesign ──────────────────────
+   DESKTOP IS UNTOUCHED: everything below is scoped to phones. The status filter
+   becomes a clean horizontal "peek" scroller — full-bleed to the screen edge so
+   the next chip peeks (a swipe hint), NO edge fade, atomic chips that never
+   truncate. The AntD Segmented track goes transparent so its items read as
+   discrete chips, the active one filled with its lifecycle colour. The view
+   toggle shrinks to a compact icon-only control, and the search pill takes the
+   full row (its submit button + the "New" CTA drop away — Enter/debounce runs
+   the search and the bottom nav already carries New).
+   See docs/design/08-mobile-first-sweep.md §3–§6. */
+@media (max-width: 720px) {
+  /* Toolbar stacks: full-width status scroller, a right-aligned compact view
+     toggle, then the search row. */
+  .campaigns-toolbar-top {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  /* Peek scroller — full-bleed to the 16px page gutter, no mask/fade. */
+  .campaigns-status-chips {
+    margin-inline: -16px;
+    padding: 2px 16px 6px;
+    -webkit-mask-image: none;
+    mask-image: none;
+    scroll-snap-type: x proximity;
+  }
+  /* Transparent track so the items read as discrete chips; hide the sliding
+     thumb (the selected item is coloured directly). */
+  .campaigns-status-chips .ant-segmented {
+    background: transparent;
+    border: 0;
+    padding: 0;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .campaigns-status-chips .ant-segmented-thumb {
+    display: none;
+  }
+  .campaigns-status-chips .ant-segmented-group {
+    gap: 8px;
+  }
+  .campaigns-status-chips .ant-segmented-item {
+    scroll-snap-align: start;
+    border: 1px solid color-mix(in srgb, var(--line) 85%, transparent);
+    border-radius: 12px;
+    background: var(--surface);
+    box-shadow: var(--shadow-1);
+  }
+  .campaigns-status-chips .ant-segmented-item-label {
+    min-height: 38px;
+    padding: 0 14px;
+    font-size: 14px;
+  }
+  /* Active chip filled with its lifecycle colour ("all" = brand); the count
+     badge flips to a translucent-white pill so it reads on the fill. */
+  .campaigns-status-chips .ant-segmented-item-selected {
+    background: var(--primary);
+    border-color: var(--primary);
+  }
+  .campaigns-status-chips .ant-segmented-item-selected:has(.campaign-chip[data-status="open"]) { background: var(--state-open); border-color: var(--state-open); }
+  .campaigns-status-chips .ant-segmented-item-selected:has(.campaign-chip[data-status="draft"]) { background: var(--state-draft); border-color: var(--state-draft); }
+  .campaigns-status-chips .ant-segmented-item-selected:has(.campaign-chip[data-status="scheduled"]) { background: var(--state-scheduled); border-color: var(--state-scheduled); }
+  .campaigns-status-chips .ant-segmented-item-selected:has(.campaign-chip[data-status="active"]) { background: var(--state-active); border-color: var(--state-active); }
+  .campaigns-status-chips .ant-segmented-item-selected:has(.campaign-chip[data-status="completed"]) { background: var(--state-completed); border-color: var(--state-completed); }
+  .campaigns-status-chips .ant-segmented-item-selected .campaign-chip-text { color: #fff; }
+  .campaigns-status-chips .ant-segmented-item-selected:has(.campaign-chip[data-status]) .campaign-chip-count,
+  .campaigns-status-chips .ant-segmented-item-selected:has(.campaign-chip:not([data-status])) .campaign-chip-count {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.24);
+  }
+
+  /* View toggle — compact, icon-only, right-aligned on its own line. */
+  .campaigns-view-toggle {
+    align-self: flex-end;
+  }
+  .campaigns-view-toggle .ant-segmented-item-label {
+    min-height: 34px;
+    padding: 0 12px;
+  }
+  .campaigns-view-toggle .campaign-view-chip-text {
+    display: none;
+  }
+  .campaigns-view-toggle .campaign-view-chip {
+    gap: 0;
+  }
+
+  /* Search row — the pill takes the full width; its submit button and the "New"
+     CTA are hidden (bottom nav carries New; Enter/debounce runs the search). */
+  .public-issues-search-row {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .public-issues-search-row .public-search-bar {
+    flex: 1 1 100%;
+  }
+  .public-issues-search-row .public-issues-filters-cta {
+    display: none;
+  }
+  .public-search-submit {
+    display: none;
+  }
+
+  /* Drop the intro line — a mid-sentence clamp reads as broken; the eyebrow +
+     title carry the page on phones. */
+  .public-issues-section .section-heading p {
+    display: none;
+  }
+}
+
+/* Campaigns map VIEW is a browse surface, so it stays tall — but
+   viewport-proportional and a notch shorter than the old fixed 600px, and it
+   never eats the whole phone screen. Overrides EventMap's inline px height. */
+.campaigns-map-frame .issue-map-wrap:not(.issue-map-wrap--fullscreen) {
+  height: clamp(340px, 62vh, 560px) !important;
+}
+
+/* ── Active-filter highlight ───────────────────────────────────────────
+   No separate "applied filters" row — instead each control that currently
+   holds a value is highlighted in place. A filled AntD Select marks its content
+   node with .ant-select-content-has-value (empty selects lack it), so :has()
+   lights up exactly the active category / province / district / sort selects
+   with an accent border + faint tint, plus a bolder label. The outlined border
+   lives on the .ant-select wrapper itself. Scoped to the campaigns panel so
+   other pages are untouched. */
+.campaigns-filter-panel .ant-select:has(.ant-select-content-has-value) {
+  border-color: var(--primary) !important;
+  background: color-mix(in srgb, var(--primary) 8%, var(--surface)) !important;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 35%, transparent) !important;
+}
+
+/* Bolder, accent label above any active field. :has() on the field wrapper
+   catches category/sort (own wrappers) AND province/district (rendered inside
+   ProvinceDistrictFilter with the same .public-issues-filter-field shell). */
+.campaigns-filter-panel
+  .public-issues-filter-field:has(.ant-select-content-has-value)
+  .public-issues-filter-label {
+  color: var(--primary-dark);
+  font-weight: 700;
+}

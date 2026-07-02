@@ -14,7 +14,11 @@ import { useToast } from "@/lib/toast";
 
 const MAX_ITEMS = 10;
 
-export function IssueImagesUpload({ value, onChange, disabled }) {
+// Browsers never expose a file's absolute path, but name + size + lastModified
+// is a strong fingerprint for "the same file picked again" within a session.
+const fileSignature = (file) => `${file.name}::${file.size}::${file.lastModified}`;
+
+export function IssueImagesUpload({ value, onChange, disabled, onUploadingChange }) {
   const toast = useToast();
   const items = Array.isArray(value) ? value : [];
 
@@ -25,6 +29,17 @@ export function IssueImagesUpload({ value, onChange, disabled }) {
 
   const [uploadingCount, setUploadingCount] = useState(0);
   const uploadingCountRef = useRef(0);
+
+  // Let a parent form block its "next"/"submit" button while any tile is still
+  // uploading, so a pending image can't be dropped by advancing too early.
+  useEffect(() => {
+    onUploadingChange?.(uploadingCount > 0);
+  }, [uploadingCount, onUploadingChange]);
+
+  // Signatures currently occupied: in-flight uploads + committed images.
+  const seenSignaturesRef = useRef(new Set());
+  // Committed image id -> signature, so a removed tile frees its signature.
+  const signatureByIdRef = useRef(new Map());
 
   const [dragIndex, setDragIndex] = useState(null);
   const [dragOverIndex, setDragOverIndex] = useState(null);
@@ -51,13 +66,26 @@ export function IssueImagesUpload({ value, onChange, disabled }) {
       return Upload.LIST_IGNORE;
     }
 
+    // Block the same photo from being added twice within this session.
+    const signature = fileSignature(file);
+    if (seenSignaturesRef.current.has(signature)) {
+      toast.error(`${file.name} has already been added.`);
+      return Upload.LIST_IGNORE;
+    }
+    // Reserve synchronously (before the await) so a rapid second pick or a
+    // multi-select batch containing the same file is caught too.
+    seenSignaturesRef.current.add(signature);
+
     uploadingCountRef.current += 1;
     setUploadingCount(uploadingCountRef.current);
 
     try {
       const result = await uploadImage(file);
+      signatureByIdRef.current.set(result.id, signature);
       commit([...valueRef.current, { id: result.id, url: result.url }]);
     } catch (error) {
+      // Release the reservation so the user can retry the same file.
+      seenSignaturesRef.current.delete(signature);
       toast.error(error?.message || `Could not upload ${file.name}.`);
     } finally {
       uploadingCountRef.current -= 1;
@@ -69,6 +97,15 @@ export function IssueImagesUpload({ value, onChange, disabled }) {
 
   const handleRemove = (index) => {
     if (disabled) return;
+    const removed = valueRef.current[index];
+    if (removed) {
+      // Free the signature so the user may deliberately re-add the same photo.
+      const signature = signatureByIdRef.current.get(removed.id);
+      if (signature) {
+        seenSignaturesRef.current.delete(signature);
+        signatureByIdRef.current.delete(removed.id);
+      }
+    }
     commit(valueRef.current.filter((_, i) => i !== index));
   };
 
@@ -136,15 +173,16 @@ export function IssueImagesUpload({ value, onChange, disabled }) {
                 unoptimized
                 width={104}
               />
-              <button
-                aria-label="Remove image"
-                className="admin-issue-images-remove"
-                disabled={disabled}
-                onClick={() => handleRemove(index)}
-                type="button"
-              >
-                <DeleteOutlined />
-              </button>
+              {disabled ? null : (
+                <button
+                  aria-label="Remove image"
+                  className="admin-issue-images-remove"
+                  onClick={() => handleRemove(index)}
+                  type="button"
+                >
+                  <DeleteOutlined />
+                </button>
+              )}
             </div>
           );
         })}
@@ -155,7 +193,7 @@ export function IssueImagesUpload({ value, onChange, disabled }) {
           </div>
         ))}
 
-        {hasRoom ? (
+        {hasRoom && !disabled ? (
           <Upload
             accept={ACCEPTED_IMAGE_ACCEPT_ATTR}
             beforeUpload={handleBeforeUpload}
@@ -171,9 +209,11 @@ export function IssueImagesUpload({ value, onChange, disabled }) {
           </Upload>
         ) : null}
       </div>
-      <p className="admin-issue-images-hint">
-        Up to {MAX_ITEMS} additional images ({totalCount}/{MAX_ITEMS} used). PNG, JPG, WebP, GIF, or AVIF, max 8 MB each. Drag a tile to reorder.
-      </p>
+      {disabled ? null : (
+        <p className="admin-issue-images-hint">
+          Up to {MAX_ITEMS} additional images ({totalCount}/{MAX_ITEMS} used). PNG, JPG, WebP, GIF, or AVIF, max 8 MB each. Drag a tile to reorder.
+        </p>
+      )}
     </div>
   );
 }

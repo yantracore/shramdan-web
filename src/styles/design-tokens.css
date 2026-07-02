@@ -1,0 +1,485 @@
+/* design-tokens.css — Phase 7 foundation.
+ *
+ * The one place where shadows, glass, motion timing, radii, and z-layers
+ * are declared. Every component (Ant Design overrides, custom CSS,
+ * Tailwind-style utility classes if we add them later) reads from here.
+ *
+ * Principle: pleasing to use. Soft, predictable, slightly futuristic.
+ * Apps optimize for "efficient"; we optimize for "pleasant."
+ *
+ * Color tokens (--bg, --surface, --primary, etc.) live in globals.css
+ * because they predate this file. Future cleanup may centralize them
+ * here.
+ */
+
+:root {
+  /* --- Depth (shadows) ------------------------------------------------ */
+  /* Three soft levels. No hard drop-shadows; always with green-gray tint
+     that matches the brand. Use shadow-1 for resting cards, shadow-2
+     for hover/active, shadow-3 for floating chrome (modals, dropdowns). */
+  --shadow-1: 0 1px 2px rgba(23, 33, 28, 0.04), 0 2px 6px rgba(23, 33, 28, 0.05);
+  --shadow-2: 0 4px 12px rgba(23, 33, 28, 0.08), 0 1px 3px rgba(23, 33, 28, 0.05);
+  --shadow-3: 0 12px 32px rgba(23, 33, 28, 0.12), 0 4px 10px rgba(23, 33, 28, 0.07);
+  --shadow-hero: 0 24px 70px rgba(23, 33, 28, 0.1);
+
+  /* --- Glass ---------------------------------------------------------- */
+  /* Light + dark variants. Use for chrome (nav, panels, side rails).
+     Never for content blocks — glass on glass is a fog. */
+  --glass-bg: rgba(255, 255, 255, 0.62);
+  --glass-border: rgba(255, 255, 255, 0.78);
+  --glass-blur: 14px;
+  --glass-saturate: 1.4;
+
+  /* --- Radii ---------------------------------------------------------- */
+  /* Four sizes. Default to --radius-md for cards / panels. */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-pill: 999px;
+
+  /* --- Motion --------------------------------------------------------- */
+  /* One easing curve for the whole app — soft ease-out, no overshoot.
+     Animations should feel like breath, not bounce. */
+  --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --duration-slow: 450ms;
+  --stagger-default: 60ms;
+  /* Entrance grammar (scroll-triggered fade-ups). Revised slower per
+     user feedback 2026-06-01 — too snappy at 450ms / 60ms stagger.
+     Now reveals feel like breath, with each child sliding into place
+     individually rather than the whole section ghosting in at once. */
+  --duration-entrance: 900ms;
+  --duration-entrance-child: 720ms;
+  --stagger-entrance: 110ms;
+  --stagger-entrance-grid: 90ms;
+
+  /* --- Z-layers ------------------------------------------------------- */
+  /* Cheap registry so layers compose predictably. */
+  --z-base: 1;
+  --z-elevated: 10;
+  --z-sticky: 100;
+  --z-overlay: 1000;
+  --z-modal: 1100;
+  --z-toast: 1200;
+
+  /* --- Breakpoint scale (mobile-first) -------------------------------- *
+   * The ONE canonical set. Before this, ~30 ad-hoc widths (720/620/540/
+   * 470/980…) were scattered across files. From now, write every media
+   * query against one of these. CSS custom props can't be read inside an
+   * @media condition, so these vars are documentation + JS use only — the
+   * discipline is human-enforced. Map of intent:
+   *   sm  480  — small phone  → large phone
+   *   md  640  — large phone  → phablet
+   *   lg  768  — tablet portrait
+   *   xl  1024 — tablet landscape / small laptop
+   *   2xl 1280 — desktop
+   *   3xl 1536 — large desktop
+   * Nav: bottom-bar is primary below 1180; the centre pill appears >=1180. */
+  --bp-sm: 480px;
+  --bp-md: 640px;
+  --bp-lg: 768px;
+  --bp-xl: 1024px;
+  --bp-2xl: 1280px;
+  --bp-3xl: 1536px;
+
+  /* --- Fluid type scale ---------------------------------------------- *
+   * clamp(min, preferred, max). Sizes grow smoothly with the viewport so
+   * we stop shipping desktop px values that get crushed on phones. Min
+   * values respect mobile readability (body never below 16px → no iOS
+   * auto-zoom; supporting text never below 12px). Devanagari runs a touch
+   * larger than Latin at the same token, which these mins already allow. */
+  --text-xs:   clamp(0.75rem, 0.72rem + 0.15vw, 0.8125rem);  /* 12 → 13 */
+  --text-sm:   clamp(0.8125rem, 0.78rem + 0.18vw, 0.875rem); /* 13 → 14 */
+  --text-base: clamp(1rem, 0.96rem + 0.2vw, 1.0625rem);      /* 16 → 17 */
+  --text-md:   clamp(1.0625rem, 1rem + 0.3vw, 1.1875rem);    /* 17 → 19 */
+  --text-lg:   clamp(1.125rem, 1.04rem + 0.42vw, 1.375rem);  /* 18 → 22 */
+  --text-xl:   clamp(1.25rem, 1.09rem + 0.78vw, 1.625rem);   /* 20 → 26 */
+  --text-2xl:  clamp(1.5rem, 1.24rem + 1.3vw, 2.125rem);     /* 24 → 34 */
+  --text-3xl:  clamp(1.875rem, 1.45rem + 2.1vw, 2.75rem);    /* 30 → 44 */
+  --text-hero: clamp(2.25rem, 1.55rem + 3.4vw, 4rem);        /* 36 → 64 */
+
+  /* --- Component scale (THE responsive UI principle) ------------------ *
+   * Semantic sizes every title / eyebrow / button / card should consume so
+   * the whole site scales identically instead of each section hardcoding its
+   * own px/clamp. "Balanced" mobile densities. See
+   * docs/design/07-responsive-ui-scale.md. Change here → changes everywhere. */
+  --text-eyebrow:    clamp(0.6875rem, 0.66rem + 0.11vw, 0.8125rem); /* 11 → 13 */
+  --text-title-sm:   clamp(1.25rem, 1.06rem + 0.95vw, 1.875rem);    /* 20 → 30  section/rail headings */
+  --text-title-lg:   clamp(1.625rem, 1.2rem + 2.1vw, 2.75rem);      /* 26 → 44  page/hero headings */
+  --text-card-title: clamp(0.9375rem, 0.9rem + 0.18vw, 1.0625rem);  /* 15 → 17 */
+  --text-lead:       clamp(0.9375rem, 0.9rem + 0.25vw, 1.0625rem);  /* 15 → 17  section intros */
+
+  /* Buttons/pills — one compact-on-mobile sizing everyone shares. Pair with
+     min-height: var(--tap-min) on anything genuinely tappable. */
+  --btn-font:  clamp(0.8125rem, 0.79rem + 0.1vw, 0.875rem);         /* 13 → 14 */
+  --btn-pad-y: clamp(0.5rem, 0.46rem + 0.18vw, 0.625rem);           /* 8 → 10 */
+  --btn-pad-x: clamp(0.75rem, 0.6rem + 0.65vw, 1.125rem);           /* 12 → 18 */
+
+  /* Section vertical rhythm — tighter on phones, airier on desktop. */
+  --space-section-y: clamp(1.5rem, 1.1rem + 1.8vw, 2.5rem);         /* 24 → 40 */
+
+  /* --- Spacing scale (4pt rhythm + fluid section steps) -------------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-8: 48px;
+  --space-10: 64px;
+  --space-12: 96px;
+  /* Fluid vertical rhythm — collapses on phones, breathes on desktop.
+     This is the antidote to the "huge dead space" hero on mobile. */
+  --space-section: clamp(2.5rem, 1.7rem + 3.6vw, 5.5rem);    /* 40 → 88 */
+  --space-section-sm: clamp(1.5rem, 1.1rem + 1.8vw, 3rem);   /* 24 → 48 */
+  --space-block: clamp(1rem, 0.8rem + 1vw, 1.75rem);        /* 16 → 28 */
+
+  /* --- Layout containers + touch ------------------------------------- */
+  /* Symmetric horizontal page gutter — fixes the asymmetric/clipped right
+     edge on mobile. Every page wrapper should use this, never a one-sided
+     margin. */
+  --page-gutter: clamp(1rem, 0.55rem + 2.2vw, 2.5rem);      /* 16 → 40 */
+  --container-max: 1200px;
+  --container-narrow: 760px;
+  /* Minimum interactive target (Apple HIG 44, Material 48). */
+  --tap-min: 44px;
+}
+
+:root[data-theme="dark"] {
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 6px rgba(0, 0, 0, 0.25);
+  --shadow-2: 0 4px 12px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.25);
+  --shadow-3: 0 12px 32px rgba(0, 0, 0, 0.5), 0 4px 10px rgba(0, 0, 0, 0.3);
+  --shadow-hero: 0 24px 70px rgba(0, 0, 0, 0.4);
+
+  --glass-bg: rgba(23, 33, 31, 0.55);
+  --glass-border: rgba(255, 255, 255, 0.08);
+}
+
+/* --- Glass utility class ----------------------------------------------- */
+/* Apply to chrome elements (nav, panels, side rails). */
+.glass-panel {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-2);
+}
+
+/* --- Pressable utility (buttons, clickable cards) --------------------- */
+/* Subtle scale-down on press. Composes with Ant Design's button without
+   overriding its border / fill colors. */
+.pressable {
+  transition: transform var(--duration-fast) var(--ease-out-soft),
+              box-shadow var(--duration-base) var(--ease-out-soft);
+}
+
+.pressable:active {
+  transform: scale(0.98);
+}
+
+/* --- Reduced motion respects user preference ------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .pressable {
+    transition: none;
+  }
+  .pressable:active {
+    transform: none;
+  }
+}
+
+/* --- Entrance grammar: per-child scroll-triggered fade-ups -----------
+ *
+ * Sections wrapped in <MotionSection> (src/components/MotionSection.js)
+ * get the .motion-aware class. IntersectionObserver flips
+ * data-in-view="true" once 12% of the section is visible. Each direct
+ * child of the section fades up individually with a staggered delay —
+ * NOT the whole section at once. Cards inside known grid containers
+ * also fade in one at a time when their parent section enters view.
+ *
+ * Reduced-motion + the user's entranceAnimation toggle both gate this:
+ * MotionSection skips the IntersectionObserver and renders inView=true
+ * immediately, so the styles below become a no-op (initial state never
+ * applies because data-in-view starts at "true").
+ */
+
+.motion-aware > * {
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity var(--duration-entrance) var(--ease-out-soft),
+    transform var(--duration-entrance) var(--ease-out-soft);
+  transition-delay: calc(var(--stagger-index, 0) * var(--stagger-entrance));
+  will-change: opacity, transform;
+}
+
+.motion-aware[data-in-view="true"] > * {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.motion-aware > *:nth-child(1)  { --stagger-index: 0; }
+.motion-aware > *:nth-child(2)  { --stagger-index: 1; }
+.motion-aware > *:nth-child(3)  { --stagger-index: 2; }
+.motion-aware > *:nth-child(4)  { --stagger-index: 3; }
+.motion-aware > *:nth-child(5)  { --stagger-index: 4; }
+.motion-aware > *:nth-child(6)  { --stagger-index: 5; }
+.motion-aware > *:nth-child(n+7) { --stagger-index: 6; }
+
+/* Direct-child grid containers themselves don't fade as a block — only
+ * their inner cards stagger individually. This avoids the opacity-
+ * multiplication problem where the wrapper's fade hides the
+ * already-staggering cards inside.
+ */
+.motion-aware > .event-types-grid,
+.motion-aware > .cleanup-areas-grid,
+.motion-aware > .workflow-grid,
+.motion-aware > .building-now-grid,
+.motion-aware > .resources-grid,
+.motion-aware > .live-events-rail-list {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+
+/* Grid children — known grids inside motion-aware sections.
+ * Their own children fade in one-by-one as well, with a slightly
+ * faster sub-stagger so the cumulative time stays bounded. */
+.motion-aware .event-types-grid > *,
+.motion-aware .cleanup-areas-grid > *,
+.motion-aware .workflow-grid > *,
+.motion-aware .volunteer-role-grid > *,
+.motion-aware .building-now-grid > *,
+.motion-aware .resources-grid > *,
+.motion-aware .live-events-rail-list > * {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity var(--duration-entrance-child) var(--ease-out-soft),
+    transform var(--duration-entrance-child) var(--ease-out-soft);
+  transition-delay: calc(var(--grid-stagger-index, 0) * var(--stagger-entrance-grid));
+  will-change: opacity, transform;
+}
+
+.motion-aware[data-in-view="true"] .event-types-grid > *,
+.motion-aware[data-in-view="true"] .cleanup-areas-grid > *,
+.motion-aware[data-in-view="true"] .workflow-grid > *,
+.motion-aware[data-in-view="true"] .volunteer-role-grid > *,
+.motion-aware[data-in-view="true"] .building-now-grid > *,
+.motion-aware[data-in-view="true"] .resources-grid > *,
+.motion-aware[data-in-view="true"] .live-events-rail-list > * {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* --- Scroll progress bar ---------------------------------------------- */
+/* Thin top-of-viewport bar on long-form pages (/issues/[id]). Driven by
+ * <ScrollProgressBar /> which mutates --transform via inline style. The
+ * bar uses scaleX so the paint stays on the compositor thread. */
+.scroll-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: var(--z-overlay);
+  background: transparent;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 200ms var(--ease-out-soft);
+}
+
+.scroll-progress-bar[data-visible="true"] {
+  opacity: 1;
+}
+
+.scroll-progress-bar-fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  transform-origin: left center;
+  transform: scaleX(0);
+  transition: transform 80ms linear;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-progress-bar-fill {
+    transition: none;
+  }
+}
+
+/* --- Page transitions (App Router) ------------------------------------ */
+/* SiteShell keys the children wrapper by pathname so React re-mounts it
+ * on route change. Each mount plays a small fade-up that overlaps the
+ * browser's paint of the new route — feels like an app, not a fresh load. */
+.page-transition {
+  animation: page-enter 320ms var(--ease-out-soft);
+  animation-fill-mode: backwards;
+}
+
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-transition {
+    animation: none;
+  }
+}
+
+/* --- Vote count tickup ------------------------------------------------ */
+/* The count span in IssueVoteButton re-mounts on every value change
+ * (via a pulseKey state in the component), which replays this small
+ * spring-up. Tactile feedback for a successful vote. */
+.vote-tickup {
+  display: inline-block;
+  animation: vote-tickup-anim 380ms var(--ease-out-soft);
+}
+
+@keyframes vote-tickup-anim {
+  0% { transform: translateY(6px) scale(0.85); opacity: 0; }
+  55% { transform: translateY(-2px) scale(1.18); opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vote-tickup {
+    animation: none;
+  }
+}
+
+/* --- Confetti burst (CSS-only) ---------------------------------------- */
+/* Spawned by <ConfettiBurst />. Pieces fall + spin then vanish ~1.8s in. */
+.confetti-burst {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 4;
+}
+
+.confetti-piece {
+  position: absolute;
+  top: -20px;
+  width: var(--confetti-size, 8px);
+  height: var(--confetti-size, 8px);
+  background: var(--confetti-color, var(--primary));
+  border-radius: 2px;
+  opacity: 0;
+  transform-origin: center;
+  animation: confetti-fall 1700ms var(--ease-out-soft) forwards;
+}
+
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-20px) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(280px) rotate(var(--confetti-rotation, 360deg));
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .confetti-burst {
+    display: none;
+  }
+}
+
+.motion-aware .event-types-grid > *:nth-child(1),
+.motion-aware .cleanup-areas-grid > *:nth-child(1),
+.motion-aware .workflow-grid > *:nth-child(1),
+.motion-aware .volunteer-role-grid > *:nth-child(1),
+.motion-aware .building-now-grid > *:nth-child(1),
+.motion-aware .resources-grid > *:nth-child(1),
+.motion-aware .live-events-rail-list > *:nth-child(1) { --grid-stagger-index: 0; }
+.motion-aware .event-types-grid > *:nth-child(2),
+.motion-aware .cleanup-areas-grid > *:nth-child(2),
+.motion-aware .workflow-grid > *:nth-child(2),
+.motion-aware .volunteer-role-grid > *:nth-child(2),
+.motion-aware .building-now-grid > *:nth-child(2),
+.motion-aware .resources-grid > *:nth-child(2),
+.motion-aware .live-events-rail-list > *:nth-child(2) { --grid-stagger-index: 1; }
+.motion-aware .event-types-grid > *:nth-child(3),
+.motion-aware .cleanup-areas-grid > *:nth-child(3),
+.motion-aware .workflow-grid > *:nth-child(3),
+.motion-aware .volunteer-role-grid > *:nth-child(3),
+.motion-aware .building-now-grid > *:nth-child(3),
+.motion-aware .resources-grid > *:nth-child(3),
+.motion-aware .live-events-rail-list > *:nth-child(3) { --grid-stagger-index: 2; }
+.motion-aware .event-types-grid > *:nth-child(4),
+.motion-aware .cleanup-areas-grid > *:nth-child(4),
+.motion-aware .workflow-grid > *:nth-child(4),
+.motion-aware .volunteer-role-grid > *:nth-child(4),
+.motion-aware .building-now-grid > *:nth-child(4),
+.motion-aware .resources-grid > *:nth-child(4),
+.motion-aware .live-events-rail-list > *:nth-child(4) { --grid-stagger-index: 3; }
+.motion-aware .event-types-grid > *:nth-child(5),
+.motion-aware .cleanup-areas-grid > *:nth-child(5),
+.motion-aware .workflow-grid > *:nth-child(5),
+.motion-aware .volunteer-role-grid > *:nth-child(5),
+.motion-aware .building-now-grid > *:nth-child(5),
+.motion-aware .resources-grid > *:nth-child(5),
+.motion-aware .live-events-rail-list > *:nth-child(5) { --grid-stagger-index: 4; }
+.motion-aware .event-types-grid > *:nth-child(6),
+.motion-aware .cleanup-areas-grid > *:nth-child(6),
+.motion-aware .workflow-grid > *:nth-child(6),
+.motion-aware .volunteer-role-grid > *:nth-child(6),
+.motion-aware .building-now-grid > *:nth-child(6),
+.motion-aware .resources-grid > *:nth-child(6),
+.motion-aware .live-events-rail-list > *:nth-child(6) { --grid-stagger-index: 5; }
+.motion-aware .event-types-grid > *:nth-child(n+7),
+.motion-aware .cleanup-areas-grid > *:nth-child(n+7),
+.motion-aware .workflow-grid > *:nth-child(n+7),
+.motion-aware .volunteer-role-grid > *:nth-child(n+7),
+.motion-aware .building-now-grid > *:nth-child(n+7),
+.motion-aware .resources-grid > *:nth-child(n+7),
+.motion-aware .live-events-rail-list > *:nth-child(n+7) { --grid-stagger-index: 6; }
+
+@media (prefers-reduced-motion: reduce) {
+  .motion-aware > *,
+  .motion-aware .event-types-grid > *,
+  .motion-aware .cleanup-areas-grid > *,
+  .motion-aware .workflow-grid > *,
+  .motion-aware .volunteer-role-grid > *,
+  .motion-aware .building-now-grid > *,
+  .motion-aware .resources-grid > *,
+  .motion-aware .live-events-rail-list > * {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* --- Ant Design button transition override --------------------------- */
+/* Make AntD buttons obey our motion grammar: ease-out-soft, base
+   duration. Color transitions stay AntD's default since they're tied
+   to theme. Only the timing function is unified. */
+.ant-btn {
+  transition-timing-function: var(--ease-out-soft) !important;
+}
+
+.ant-btn:active {
+  transform: scale(0.98);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ant-btn:active {
+    transform: none;
+  }
+}

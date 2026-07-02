@@ -1,0 +1,29 @@
+{
+  "previousFetchedAt": "2026-07-02T12:58:53+05:45",
+  "currentFetchedAt": "2026-07-02T13:30:04+05:45",
+  "comparedAt": "2026-07-02T07:45:04.817Z",
+  "diffDepth": "field-level",
+  "totals": {
+    "added": 0,
+    "removed": 0,
+    "modified": 1
+  },
+  "added": [],
+  "removed": [],
+  "modified": [
+    {
+      "endpoint": "GET /api/v1/campaigns/curated",
+      "changes": [
+        "resp.200 +data.planning[].addressText(string)",
+        "resp.200 +data.planning[].image(null)",
+        "resp.200 +data.planning[].lat(number)",
+        "resp.200 +data.planning[].lng(number)",
+        "resp.200 +data.planning[].slug(string)",
+        "resp.200 +data.planning[].status(string)",
+        "resp.200 +data.planning[].supporterCount(number)",
+        "resp.200 +data.planning[].title(string)"
+      ]
+    }
+  ],
+  "acknowledgedAt": null
+}

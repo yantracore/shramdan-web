@@ -111,7 +111,7 @@ export function organizationSchema() {
     url: SITE_URL,
     logo: {
       "@type": "ImageObject",
-      url: absoluteUrl("/branding/favicon/android-chrome-512x512.png"),
+      url: absoluteUrl("/branding/logo-mark.png"),
       width: 512,
       height: 512
     },

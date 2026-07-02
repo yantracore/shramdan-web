@@ -2,12 +2,28 @@
 
 import { App as AntdApp, ConfigProvider, theme as antdTheme } from "antd";
 import { createContext, useCallback, useContext, useEffect, useMemo, useSyncExternalStore } from "react";
+import { GlobalFileDragWatcher } from "@/components/GlobalFileDragWatcher";
+import { NotificationsProvider } from "@/components/NotificationsProvider";
 import { SessionExpirationWatcher } from "@/components/SessionExpirationWatcher";
+import { ApiHealthWatcher } from "@/components/ApiHealthWatcher";
 
 const PreferenceContext = createContext(null);
 const THEME_STORAGE_KEY = "shramdan-theme";
 const LANGUAGE_STORAGE_KEY = "shramdan-language";
+const ENTRANCE_ANIMATION_STORAGE_KEY = "shramdan-entrance-animation";
+const LIVE_ICON_SIZE_STORAGE_KEY = "shramdan-live-icon-size";
+const ACCENT_STORAGE_KEY = "shramdan-accent";
 const PREFERENCE_EVENT = "shramdan-preferences";
+
+export const ACCENT_PRESETS = {
+  ember: { name: "Ember", color: "#e75f1b" },
+  rose: { name: "Rose", color: "#d04668" },
+  azure: { name: "Azure", color: "#1d4ed8" },
+  violet: { name: "Violet", color: "#7b3fa0" },
+  amber: { name: "Amber", color: "#b7791f" }
+};
+
+const ACCENT_KEYS = Object.keys(ACCENT_PRESETS);
 
 const getStoredMode = () => {
   if (typeof window === "undefined") {
@@ -25,6 +41,28 @@ const getStoredLanguage = () => {
 
   const savedLanguage = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
   return savedLanguage === "en" || savedLanguage === "np" ? savedLanguage : "np";
+};
+
+const getStoredEntranceAnimation = () => {
+  if (typeof window === "undefined") {
+    return true;
+  }
+  const saved = window.localStorage.getItem(ENTRANCE_ANIMATION_STORAGE_KEY);
+  return saved === "off" ? false : true;
+};
+
+const getStoredLiveIconSize = () => {
+  if (typeof window === "undefined") {
+    return "md";
+  }
+  const saved = window.localStorage.getItem(LIVE_ICON_SIZE_STORAGE_KEY);
+  return saved === "sm" || saved === "md" || saved === "lg" ? saved : "md";
+};
+
+const getStoredAccent = () => {
+  if (typeof window === "undefined") return "ember";
+  const saved = window.localStorage.getItem(ACCENT_STORAGE_KEY);
+  return ACCENT_KEYS.includes(saved) ? saved : "ember";
 };
 
 const subscribePreferences = (callback) => {
@@ -57,6 +95,40 @@ const baseTheme = {
     },
     Tag: {
       borderRadiusSM: 999
+    },
+    // Unified dropdown grammar. Trigger height matches Button (40) so
+    // filter rows align; popover radius is a notch larger than trigger
+    // (12 vs 10) — convention that reads as "floating chrome" without
+    // looking like a CSS bug. Colors and shadows ride on top of these
+    // via src/styles/antd-dropdown.css so accent/theme changes carry.
+    Select: {
+      controlHeight: 40,
+      controlHeightSM: 32,
+      borderRadius: 10,
+      borderRadiusLG: 12,
+      borderRadiusSM: 8,
+      optionSelectedFontWeight: 600,
+      controlPaddingHorizontal: 14,
+      paddingSM: 10
+    },
+    DatePicker: {
+      controlHeight: 40,
+      borderRadius: 10,
+      borderRadiusLG: 12
+    },
+    Cascader: {
+      controlHeight: 40
+    },
+    TreeSelect: {
+      controlHeight: 40
+    },
+    AutoComplete: {
+      controlHeight: 40,
+      borderRadius: 10
+    },
+    Dropdown: {
+      borderRadiusLG: 12,
+      paddingBlock: 6
     }
   }
 };
@@ -64,6 +136,21 @@ const baseTheme = {
 export function Providers({ children }) {
   const mode = useSyncExternalStore(subscribePreferences, getStoredMode, () => "light");
   const language = useSyncExternalStore(subscribePreferences, getStoredLanguage, () => "np");
+  const entranceAnimation = useSyncExternalStore(
+    subscribePreferences,
+    getStoredEntranceAnimation,
+    () => true
+  );
+  const liveIconSize = useSyncExternalStore(
+    subscribePreferences,
+    getStoredLiveIconSize,
+    () => "md"
+  );
+  const accent = useSyncExternalStore(
+    subscribePreferences,
+    getStoredAccent,
+    () => "ember"
+  );
 
   const updatePreference = useCallback((key, value) => {
     window.localStorage.setItem(key, value);
@@ -83,10 +170,42 @@ export function Providers({ children }) {
 
   const setLanguage = useCallback(
     (nextLanguage) => {
-      const value = typeof nextLanguage === "function" ? nextLanguage(getStoredLanguage()) : nextLanguage;
+      const current = getStoredLanguage();
+      const value = typeof nextLanguage === "function" ? nextLanguage(current) : nextLanguage;
+      if (value !== "en" && value !== "np") return;
+      if (value === current) return;
 
-      if (value === "en" || value === "np") {
-        updatePreference(LANGUAGE_STORAGE_KEY, value);
+      updatePreference(LANGUAGE_STORAGE_KEY, value);
+    },
+    [updatePreference]
+  );
+
+  const setEntranceAnimation = useCallback(
+    (nextValue) => {
+      const value =
+        typeof nextValue === "function" ? nextValue(getStoredEntranceAnimation()) : nextValue;
+      updatePreference(ENTRANCE_ANIMATION_STORAGE_KEY, value ? "on" : "off");
+    },
+    [updatePreference]
+  );
+
+  const setLiveIconSize = useCallback(
+    (nextValue) => {
+      const value =
+        typeof nextValue === "function" ? nextValue(getStoredLiveIconSize()) : nextValue;
+      if (value === "sm" || value === "md" || value === "lg") {
+        updatePreference(LIVE_ICON_SIZE_STORAGE_KEY, value);
+      }
+    },
+    [updatePreference]
+  );
+
+  const setAccent = useCallback(
+    (nextValue) => {
+      const value =
+        typeof nextValue === "function" ? nextValue(getStoredAccent()) : nextValue;
+      if (ACCENT_KEYS.includes(value)) {
+        updatePreference(ACCENT_STORAGE_KEY, value);
       }
     },
     [updatePreference]
@@ -100,15 +219,44 @@ export function Providers({ children }) {
     document.documentElement.lang = language === "np" ? "ne" : "en";
   }, [language]);
 
+  useEffect(() => {
+    document.documentElement.dataset.liveIcon = liveIconSize;
+  }, [liveIconSize]);
+
+  useEffect(() => {
+    const preset = ACCENT_PRESETS[accent] || ACCENT_PRESETS.ember;
+    document.documentElement.style.setProperty("--accent", preset.color);
+    document.documentElement.dataset.accent = accent;
+  }, [accent]);
+
   const value = useMemo(
     () => ({
       language,
       mode,
+      entranceAnimation,
+      liveIconSize,
+      accent,
       setLanguage,
+      setMode,
+      setEntranceAnimation,
+      setLiveIconSize,
+      setAccent,
       toggleLanguage: () => setLanguage((current) => (current === "np" ? "en" : "np")),
-      toggleMode: () => setMode((current) => (current === "light" ? "dark" : "light"))
+      toggleMode: () => setMode((current) => (current === "light" ? "dark" : "light")),
+      toggleEntranceAnimation: () => setEntranceAnimation((current) => !current)
     }),
-    [language, mode, setLanguage, setMode]
+    [
+      language,
+      mode,
+      entranceAnimation,
+      liveIconSize,
+      accent,
+      setLanguage,
+      setMode,
+      setEntranceAnimation,
+      setLiveIconSize,
+      setAccent
+    ]
   );
 
   const theme = useMemo(
@@ -124,7 +272,9 @@ export function Providers({ children }) {
       <ConfigProvider theme={theme}>
         <AntdApp>
           <SessionExpirationWatcher />
-          {children}
+          <ApiHealthWatcher />
+          <GlobalFileDragWatcher />
+          <NotificationsProvider>{children}</NotificationsProvider>
         </AntdApp>
       </ConfigProvider>
     </PreferenceContext.Provider>

@@ -5,6 +5,7 @@ import { Button } from "antd";
 import Image from "next/image";
 import Link from "next/link";
 import { SiteShell } from "@/components/SiteShell";
+import { TertiaryButton } from "@/components/TertiaryButton";
 import { usePreferences } from "@/app/providers";
 import { copy } from "@/lib/siteContent";
 
@@ -18,10 +19,9 @@ export default function EventTypesPage() {
     <SiteShell pageTitle={page.pageTitle}>
       <section className="event-types-page" aria-labelledby="event-types-page-title">
         <header className="event-types-page-header">
-          <Link className="event-types-page-back" href="/#top">
-            <ArrowLeftOutlined aria-hidden="true" />
+          <TertiaryButton href="/#top" icon={<ArrowLeftOutlined />}>
             {page.backToHome}
-          </Link>
+          </TertiaryButton>
           <span className="eyebrow">{page.eyebrow}</span>
           <h1 id="event-types-page-title">{page.title}</h1>
           <p>{page.intro}</p>
@@ -108,16 +108,15 @@ export default function EventTypesPage() {
 
         <p className="event-types-phase-note phase-note">
           <span aria-hidden="true">
-            <Image alt="" height={96} src="/images/logo.png" width={96} />
+            <Image alt="" height={96} src="/branding/logo-mark.png" width={96} />
           </span>
           {eventTypes.phaseNote}
         </p>
 
         <div className="event-types-page-footer-action">
-          <Link className="event-types-page-back" href="/#top">
-            <ArrowLeftOutlined aria-hidden="true" />
+          <TertiaryButton href="/#top" icon={<ArrowLeftOutlined />}>
             {page.backToHome}
-          </Link>
+          </TertiaryButton>
         </div>
       </section>
     </SiteShell>

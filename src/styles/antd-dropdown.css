@@ -1,0 +1,382 @@
+/* antd-dropdown.css — unified dropdown grammar.
+ *
+ * The one place where every floating menu in the app (Select, DatePicker,
+ * Cascader, TreeSelect, AutoComplete, Dropdown.Menu, Popconfirm content)
+ * gets its polish. Component-level tokens live in src/app/providers.js;
+ * everything that antd's token API does not expose — shadow tint, option
+ * row geometry, the accent rail on selected items, the opening curve —
+ * lives here.
+ *
+ * Design intent
+ * - "Floating chrome": popover sits a notch off the trigger, soft tinted
+ *   shadow (shadow-3) plus a 1px hairline so it reads against busy
+ *   content. Radius 12 — one step rounder than the trigger (10).
+ * - Selected option carries a 3px accent rail on the left edge and a
+ *   subtle accent-tinted fill. The rail is the cheap luxury cue: no
+ *   matter the theme or accent, the selection always feels deliberate.
+ * - Hover / keyboard-active option gets --surface-soft, not accent.
+ *   Reserving accent for the actual selection keeps the popover calm
+ *   when the user is just scanning.
+ * - Opening curve is the project's --ease-out-soft over 160ms. No
+ *   bounce, no scale — a 6px slide and fade. Reduced-motion: instant.
+ *
+ * Trigger (closed state)
+ * - Border: --line. Hover: --primary at 60%. Focus ring: 3px accent at
+ *   12% alpha, no harsh blue box-shadow.
+ * - Multi-select tags inside the trigger are pill-shaped, accent-tinted.
+ *
+ * Knobs (read by selectors below)
+ * - --dropdown-radius          : 12px (popover)
+ * - --dropdown-option-radius   : 8px  (each row)
+ * - --dropdown-option-padding  : 8px 12px
+ * - --dropdown-rail-w          : 3px  (left accent rail on selected row)
+ * - --dropdown-bg              : surface (popover fill)
+ * - --dropdown-border          : line at low alpha (hairline)
+ * - --dropdown-selected-bg     : accent at 10% alpha
+ * - --dropdown-active-bg       : surface-soft (hover / keyboard nav)
+ * - --dropdown-shadow          : shadow-3 (floating chrome)
+ */
+
+:root {
+  --dropdown-radius: 12px;
+  --dropdown-option-radius: 8px;
+  --dropdown-option-padding: 8px 12px;
+  --dropdown-rail-w: 3px;
+  --dropdown-bg: var(--surface);
+  --dropdown-border: color-mix(in srgb, var(--line) 80%, transparent);
+  --dropdown-selected-bg: color-mix(in srgb, var(--accent) 12%, transparent);
+  --dropdown-selected-text: var(--text);
+  --dropdown-active-bg: var(--surface-soft);
+  --dropdown-shadow: var(--shadow-3);
+  --dropdown-focus-ring: color-mix(in srgb, var(--accent) 22%, transparent);
+}
+
+:root[data-theme="dark"] {
+  --dropdown-selected-bg: color-mix(in srgb, var(--accent) 18%, transparent);
+  --dropdown-border: color-mix(in srgb, var(--line) 90%, transparent);
+}
+
+/* ============================================================
+ * Trigger — closed Select / Cascader / TreeSelect / DatePicker
+ *
+ * antd's internal markup changed across versions: older releases used
+ * .ant-select-selector + .ant-select-arrow + .ant-select-selection-*;
+ * the current version renders .ant-select-content + .ant-select-suffix
+ * + .ant-select-placeholder + .ant-select-input. Both class families
+ * are targeted below so this stylesheet survives antd upgrades.
+ * ============================================================ */
+
+.ant-select.ant-select-outlined,
+.ant-select:not(.ant-select-customize-input) .ant-select-selector,
+.ant-picker {
+  border-radius: 10px !important;
+  transition:
+    border-color var(--duration-fast) var(--ease-out-soft),
+    box-shadow var(--duration-base) var(--ease-out-soft),
+    background var(--duration-fast) var(--ease-out-soft);
+}
+
+.ant-select.ant-select-outlined {
+  background: var(--surface) !important;
+  border: 1px solid var(--line) !important;
+}
+
+.ant-select:not(.ant-select-customize-input) .ant-select-selector {
+  border-color: var(--line) !important;
+  background: var(--surface) !important;
+}
+
+.ant-picker {
+  border-color: var(--line) !important;
+  background: var(--surface) !important;
+}
+
+.ant-select.ant-select-outlined:not(.ant-select-disabled):hover,
+.ant-select:not(.ant-select-disabled):hover .ant-select-selector,
+.ant-picker:not(.ant-picker-disabled):hover {
+  border-color: color-mix(in srgb, var(--primary) 60%, var(--line)) !important;
+}
+
+.ant-select-focused.ant-select-outlined,
+.ant-select-focused:not(.ant-select-disabled) .ant-select-selector,
+.ant-picker-focused,
+.ant-picker:focus-within {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3px var(--dropdown-focus-ring) !important;
+}
+
+/* Arrow tilts on open — feels like the trigger is acknowledging the click.
+ * .ant-select-arrow is the legacy class; .ant-select-suffix is current. */
+.ant-select .ant-select-arrow,
+.ant-select .ant-select-suffix {
+  transition: transform var(--duration-base) var(--ease-out-soft),
+              color var(--duration-fast) var(--ease-out-soft);
+  color: var(--muted);
+}
+
+.ant-select-open .ant-select-arrow,
+.ant-select-open .ant-select-suffix {
+  transform: rotate(180deg);
+  color: var(--primary);
+}
+
+/* Multi-select tags inside the trigger — refined pill, accent-tinted. */
+.ant-select-multiple .ant-select-selection-item,
+.ant-select-multiple .ant-select-tag {
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface)) !important;
+  border-color: color-mix(in srgb, var(--accent) 25%, transparent) !important;
+  border-radius: 999px !important;
+  padding-inline: 10px !important;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.ant-select-multiple .ant-select-selection-item .ant-select-selection-item-remove,
+.ant-select-multiple .ant-select-tag-remove {
+  color: var(--muted);
+  transition: color var(--duration-fast) var(--ease-out-soft);
+}
+
+.ant-select-multiple .ant-select-selection-item .ant-select-selection-item-remove:hover,
+.ant-select-multiple .ant-select-tag-remove:hover {
+  color: var(--accent);
+}
+
+/* Placeholder reads as quiet text, not the same color as a value.
+ * Both legacy (.ant-select-selection-placeholder) and current
+ * (.ant-select-placeholder) class names are covered. */
+.ant-select .ant-select-selection-placeholder,
+.ant-select .ant-select-placeholder,
+.ant-picker .ant-picker-input > input::placeholder {
+  color: var(--muted) !important;
+  opacity: 0.85;
+}
+
+/* Selected single-value text — both legacy (.ant-select-selection-item)
+ * and current (text node inside .ant-select-content). */
+.ant-select-single .ant-select-content {
+  padding-inline-start: 4px;
+}
+
+/* ============================================================
+ * Popover surface — Select / Cascader / TreeSelect / DatePicker / Dropdown
+ * ============================================================ */
+
+.ant-select-dropdown,
+.ant-picker-dropdown .ant-picker-panel-container,
+.ant-cascader-dropdown,
+.ant-dropdown .ant-dropdown-menu,
+.ant-dropdown-menu-submenu .ant-dropdown-menu {
+  border-radius: var(--dropdown-radius) !important;
+  background: var(--dropdown-bg) !important;
+  border: 1px solid var(--dropdown-border);
+  box-shadow: var(--dropdown-shadow) !important;
+  padding: 6px !important;
+  overflow: hidden;
+}
+
+/* DatePicker's container is double-wrapped — drop the inner padding so
+ * the panels (calendar grid) don't gain a second frame. */
+.ant-picker-dropdown .ant-picker-panel-container {
+  padding: 0 !important;
+}
+
+.ant-picker-dropdown .ant-picker-panel-container .ant-picker-panel {
+  border: 0;
+}
+
+/* ============================================================
+ * Option rows — Select / Cascader / TreeSelect / Dropdown.Menu
+ * ============================================================ */
+
+.ant-select-item,
+.ant-cascader-menu-item,
+.ant-dropdown-menu-item,
+.ant-dropdown-menu-submenu-title {
+  border-radius: var(--dropdown-option-radius) !important;
+  padding: var(--dropdown-option-padding) !important;
+  margin: 2px 0;
+  position: relative;
+  transition:
+    background var(--duration-fast) var(--ease-out-soft),
+    color var(--duration-fast) var(--ease-out-soft),
+    padding-left var(--duration-base) var(--ease-out-soft);
+}
+
+/* Hover + keyboard-active row — calm surface, no accent yet. */
+.ant-select-item-option-active:not(.ant-select-item-option-selected):not(.ant-select-item-option-disabled),
+.ant-cascader-menu-item-active:not(.ant-cascader-menu-item-disabled),
+.ant-dropdown-menu-item:hover,
+.ant-dropdown-menu-submenu-title:hover {
+  background: var(--dropdown-active-bg) !important;
+  color: var(--text) !important;
+}
+
+/* Selected row — accent-tinted fill plus a 3px accent rail on the left.
+ * The rail is the deliberate cue: this is the chosen option, not just
+ * one the cursor happens to be over. */
+.ant-select-item-option-selected:not(.ant-select-item-option-disabled),
+.ant-cascader-menu-item-active.ant-cascader-menu-item-selected {
+  background: var(--dropdown-selected-bg) !important;
+  color: var(--dropdown-selected-text) !important;
+  font-weight: 600;
+  padding-left: calc(12px + var(--dropdown-rail-w) + 4px) !important;
+}
+
+.ant-select-item-option-selected:not(.ant-select-item-option-disabled)::before,
+.ant-cascader-menu-item-active.ant-cascader-menu-item-selected::before {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: var(--dropdown-rail-w);
+  height: 60%;
+  border-radius: 999px;
+  background: var(--accent);
+}
+
+/* Multi-select checkmark — tint accent instead of antd's blue. */
+.ant-select-item-option-state {
+  color: var(--accent) !important;
+}
+
+/* Disabled options stay quiet — no hover lift. */
+.ant-select-item-option-disabled,
+.ant-cascader-menu-item-disabled,
+.ant-dropdown-menu-item-disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Group label (when antd Select uses <Select.OptGroup>). */
+.ant-select-item-group {
+  color: var(--muted) !important;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 10px 12px 4px !important;
+}
+
+/* Divider inside Dropdown.Menu — hairline only. */
+.ant-dropdown-menu-item-divider,
+.ant-dropdown-menu-submenu-title-divider {
+  background: var(--line);
+  opacity: 0.5;
+}
+
+/* ============================================================
+ * Empty state — when search finds nothing.
+ * ============================================================ */
+
+.ant-select-dropdown .ant-empty,
+.ant-cascader-dropdown .ant-empty {
+  padding: 16px 8px;
+}
+
+.ant-select-dropdown .ant-empty .ant-empty-description {
+  color: var(--muted);
+}
+
+/* ============================================================
+ * Opening curve — soft slide + fade. Reduced-motion: instant.
+ * antd's default motion class is .slide-up-enter / .slide-up-appear;
+ * we override duration + easing without redefining the keyframes.
+ * ============================================================ */
+
+.ant-select-dropdown,
+.ant-cascader-dropdown,
+.ant-picker-dropdown,
+.ant-dropdown {
+  animation-duration: 160ms !important;
+  animation-timing-function: var(--ease-out-soft) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ant-select-dropdown,
+  .ant-cascader-dropdown,
+  .ant-picker-dropdown,
+  .ant-dropdown {
+    animation: none !important;
+  }
+  .ant-select .ant-select-arrow,
+  .ant-select-item,
+  .ant-cascader-menu-item,
+  .ant-dropdown-menu-item {
+    transition: none !important;
+  }
+}
+
+/* ============================================================
+ * DatePicker calendar — same family treatment.
+ * Cells get the option-radius; today and selected use the accent rail
+ * concept reinterpreted as a ring + fill (squares can't carry a left
+ * rail without looking lopsided).
+ * ============================================================ */
+
+.ant-picker-cell .ant-picker-cell-inner {
+  border-radius: var(--dropdown-option-radius) !important;
+  transition: background var(--duration-fast) var(--ease-out-soft);
+}
+
+.ant-picker-cell-in-view.ant-picker-cell-today .ant-picker-cell-inner::before {
+  border-color: var(--accent) !important;
+  border-radius: var(--dropdown-option-radius) !important;
+}
+
+.ant-picker-cell-in-view.ant-picker-cell-selected .ant-picker-cell-inner,
+.ant-picker-cell-in-view.ant-picker-cell-range-start .ant-picker-cell-inner,
+.ant-picker-cell-in-view.ant-picker-cell-range-end .ant-picker-cell-inner {
+  background: var(--accent) !important;
+  color: #fff !important;
+}
+
+.ant-picker-header-view button:hover {
+  color: var(--primary) !important;
+}
+
+/* ============================================================
+ * Campaign status filter — a leading lifecycle-colour dot per option, so the
+ * dropdown mirror of the chip row carries the same status colour. "all" has no
+ * data-status and shows the neutral dot.
+ * ============================================================ */
+.campaign-filter-opt {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.campaign-filter-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: var(--muted);
+  flex: 0 0 auto;
+}
+.campaign-filter-opt[data-status="open"] .campaign-filter-dot { background: var(--state-open); }
+.campaign-filter-opt[data-status="draft"] .campaign-filter-dot { background: var(--state-draft); }
+.campaign-filter-opt[data-status="scheduled"] .campaign-filter-dot { background: var(--state-scheduled); }
+.campaign-filter-opt[data-status="active"] .campaign-filter-dot { background: var(--state-active); }
+.campaign-filter-opt[data-status="completed"] .campaign-filter-dot { background: var(--state-completed); }
+
+/* ============================================================
+ * Category Select — a leading type icon per option (road, river, park,
+ * trail…), so issue/event/campaign category dropdowns and the report form
+ * read at a glance. Same node-label pattern as the campaign status dot above.
+ * The icon shows both in the open row and, once chosen, in the closed trigger.
+ * ============================================================ */
+.category-opt {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.category-opt-icon {
+  flex: 0 0 auto;
+  font-size: 1.05em;
+  color: var(--primary);
+}
+.category-opt-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

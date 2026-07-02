@@ -306,7 +306,7 @@ export default function AdminApplicationsPage() {
           <Form.Item
             label="Admin notes"
             name="adminNotes"
-            rules={[{ required: true, message: "Admin notes cannot be empty." }]}
+            rules={[{ required: true, whitespace: true, message: "Admin notes cannot be empty." }]}
           >
             <Input.TextArea rows={5} />
           </Form.Item>

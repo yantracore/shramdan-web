@@ -1,0 +1,772 @@
+/* --- Event preview comments teaser (used inside /events split view) ---- */
+
+.event-preview-comments {
+  margin-top: 4px;
+}
+
+.event-preview-comments-link {
+  display: block;
+  padding: 10px 12px;
+  background: color-mix(in srgb, var(--primary) 4%, var(--surface));
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  color: inherit;
+  transition: background 140ms ease, border-color 140ms ease, transform 140ms ease;
+}
+
+.event-preview-comments-link:hover {
+  background: color-mix(in srgb, var(--primary) 8%, var(--surface));
+  border-color: color-mix(in srgb, var(--primary) 35%, var(--line));
+}
+
+.event-preview-comments-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.event-preview-comments-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--primary) 14%, transparent);
+  color: var(--primary-dark);
+  font-size: 12px;
+}
+
+.event-preview-comments-count {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.event-preview-comments-open {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.event-preview-comments-link:hover .event-preview-comments-open {
+  color: var(--primary-dark);
+}
+
+.event-preview-comments-empty {
+  margin: 6px 0 0;
+  font-size: 12.5px;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.event-preview-comments-latest {
+  margin: 6px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.event-preview-comments-latest-meta {
+  font-size: 11.5px;
+  color: var(--muted);
+  letter-spacing: 0.01em;
+}
+
+.event-preview-comments-latest-meta strong {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.event-preview-comments-latest-text {
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .event-preview-comments-link {
+    transition: none;
+  }
+}
+
+/* --- Comment system (issues + events) ----------------------------------
+ *
+ * Shared comment surface used by /issues/[id] and /events/[id]. Component
+ * tree:
+ *   .comment-section
+ *     .comment-section-header   ← icon + heading + count chip
+ *     .comment-section-intro
+ *     .comment-composer-top     ← top-level composer (or login wall)
+ *     .comment-list             ← <ul> per depth, recursive
+ *       .comment-node            ← <li> grid: avatar | body
+ *         .comment-body
+ *           .comment-attrib
+ *           .comment-text
+ *           .comment-actions    ← Reply / Edit / Delete
+ *           .comment-reply-composer
+ *           .comment-children   ← nested .comment-list one depth deeper
+ *
+ * Depth modifiers (`.comment-depth-0/1/2`) drive indentation + the left
+ * connector line on depth >0.
+ * ------------------------------------------------------------------- */
+
+.comment-section {
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+  /* Compact density everywhere — Facebook-style.
+   * Pulled into local custom properties so the whole panel scales as a
+   * unit if we ever want a less-tight mode later (e.g. on admin/queue).
+   * Body + author bumped +1px after the compaction pass since the
+   * tighter layout left room for slightly larger reading text. */
+  --comment-padding-y: 8px;
+  --comment-padding-x: 10px;
+  --comment-gap: 6px;
+  --comment-avatar: 28px;
+  --comment-font: 14px;
+  --comment-meta-font: 11.5px;
+  --comment-indent: 22px;
+}
+
+.comment-section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.comment-section-header h2 {
+  margin: 0;
+  font-size: clamp(15px, 1.6vw, 17px);
+  font-weight: 700;
+}
+
+.comment-section-count {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.comment-section-intro {
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
+.comment-section-sort {
+  display: flex;
+  justify-content: flex-end;
+  margin: 10px 0 4px;
+}
+
+/* --- Lists / nesting --------------------------------------------------- */
+
+.comment-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--comment-gap);
+}
+
+/* Top-level list gets a bit more breathing room from the composer above. */
+.comment-list-depth-0 {
+  margin-top: 8px;
+}
+
+/* Nested children: even tighter, with a thin left rail instead of a
+ * full per-node border — that's where most of the saved width comes
+ * from. The rail is shared across the whole nested block, not redrawn
+ * around every individual comment. */
+.comment-children {
+  margin-top: 6px;
+  padding-left: var(--comment-indent);
+  border-left: 2px solid color-mix(in srgb, var(--primary) 18%, transparent);
+}
+
+.comment-children .comment-list {
+  gap: 4px;
+}
+
+.comment-depth-2 ~ .comment-children,
+.comment-depth-1 .comment-children {
+  border-left-color: color-mix(in srgb, var(--accent) 28%, transparent);
+}
+
+/* --- Single comment node ---------------------------------------------- */
+
+.comment-node {
+  display: grid;
+  grid-template-columns: var(--comment-avatar) minmax(0, 1fr);
+  gap: 8px;
+  padding: var(--comment-padding-y) var(--comment-padding-x);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  position: relative;
+}
+
+.comment-node.is-deleted {
+  opacity: 0.78;
+}
+
+/* Pinned + under-review states keep their visual emphasis even in the
+ * compact layout — these are the only nodes that re-acquire a soft
+ * background so the eye can find them. */
+.comment-node.is-pinned {
+  background: color-mix(in srgb, var(--primary) 5%, transparent);
+  border-radius: var(--radius-md);
+}
+
+.comment-node.is-under-review {
+  background: color-mix(in srgb, var(--muted) 6%, transparent);
+  border: 1px dashed var(--line);
+  border-radius: var(--radius-md);
+}
+
+.comment-avatar {
+  width: var(--comment-avatar);
+  height: var(--comment-avatar);
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), color-mix(in srgb, var(--primary) 60%, var(--accent)));
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.comment-avatar-skeleton {
+  background: var(--line);
+  animation: comment-skel 1.2s ease-in-out infinite;
+}
+
+@keyframes comment-skel {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 0.95; }
+}
+
+.comment-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.comment-attrib {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 5px;
+  font-size: var(--comment-meta-font);
+  line-height: 1.3;
+}
+
+.comment-author-name {
+  font-weight: 700;
+  font-size: 13.5px;
+  color: var(--text);
+}
+
+.comment-author-role {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.comment-time {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.comment-edited-pill {
+  font-size: 10px;
+  color: var(--muted);
+  background: color-mix(in srgb, var(--muted) 12%, var(--surface));
+  border: 1px solid var(--line);
+  padding: 0 6px;
+  border-radius: 999px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.comment-pinned-pill {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--primary-dark);
+  background: color-mix(in srgb, var(--primary) 14%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--primary) 35%, transparent);
+  padding: 0 6px;
+  border-radius: 999px;
+  letter-spacing: 0.02em;
+}
+
+.comment-text-review {
+  margin: 0;
+  font-style: italic;
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
+.comment-text {
+  margin: 0;
+  font-size: var(--comment-font);
+  line-height: 1.4;
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.comment-text-deleted {
+  font-style: italic;
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
+.comment-mention {
+  display: inline;
+  color: var(--primary-dark);
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+  padding: 0 5px;
+  border-radius: 6px;
+  font-weight: 600;
+  /* Prevent the chip from breaking mid-name across lines. */
+  white-space: nowrap;
+}
+
+[data-theme="dark"] .comment-mention {
+  background: color-mix(in srgb, var(--primary) 22%, transparent);
+}
+
+/* --- Reactions row ----------------------------------------------------- */
+
+.comment-reactions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+/* Reply chip — sits as the first item in the reactions row to save a
+ * whole separate action row beneath. Matches the reaction-tile
+ * silhouette but with a primary-tinted accent so the call to engage
+ * stays prominent. */
+.comment-reply-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--primary) 30%, var(--line));
+  color: var(--primary-dark);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  padding: 1px 6px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease, border-color 120ms ease, transform 120ms ease;
+}
+
+.comment-reply-pill:hover {
+  background: color-mix(in srgb, var(--primary) 10%, var(--surface));
+  border-color: color-mix(in srgb, var(--primary) 55%, transparent);
+}
+
+.comment-reply-pill:active {
+  transform: scale(0.96);
+}
+
+.comment-reply-pill .anticon {
+  font-size: 9.5px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .comment-reply-pill {
+    transition: none;
+  }
+  .comment-reply-pill:active {
+    transform: none;
+  }
+}
+
+.comment-reaction-tile {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease, border-color 120ms ease, transform 120ms ease;
+}
+
+.comment-reaction-tile:hover:not(:disabled) {
+  color: var(--text);
+  border-color: color-mix(in srgb, var(--primary) 35%, transparent);
+  background: color-mix(in srgb, var(--primary) 6%, var(--surface));
+}
+
+.comment-reaction-tile:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.comment-reaction-tile:disabled {
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
+.comment-reaction-tile.is-picked {
+  background: color-mix(in srgb, var(--primary) 14%, var(--surface));
+  border-color: color-mix(in srgb, var(--primary) 50%, transparent);
+  color: var(--primary-dark);
+}
+
+.comment-reaction-emoji {
+  font-size: 12px;
+  line-height: 1;
+  /* Emoji renders via system font — `apple color emoji` etc. give the
+   * right look on every OS without shipping bytes. */
+  font-family:
+    "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji",
+    "Twemoji Mozilla", "EmojiOne Color", "Android Emoji", sans-serif;
+}
+
+.comment-reaction-count {
+  font-variant-numeric: tabular-nums;
+  /* Tiny gap fix so digits sit on the same visual baseline as emoji. */
+  padding-top: 1px;
+}
+
+.comment-reaction-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  background: transparent;
+  border: 1px dashed var(--line);
+  color: var(--muted);
+  padding: 1px 7px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 11px;
+  transition: color 120ms ease, border-color 120ms ease, background 120ms ease;
+}
+
+.comment-reaction-add:hover:not(:disabled) {
+  color: var(--primary-dark);
+  border-color: color-mix(in srgb, var(--primary) 50%, transparent);
+  background: color-mix(in srgb, var(--primary) 6%, var(--surface));
+}
+
+.comment-reaction-add:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.comment-reaction-add .anticon {
+  font-size: 13px;
+}
+
+.comment-reaction-add-plus {
+  font-size: 11px;
+  font-weight: 800;
+  margin-left: 1px;
+  margin-top: -1px;
+}
+
+/* --- Emoji picker popover ---------------------------------------------- */
+
+.comment-emoji-popover .ant-popover-inner {
+  padding: 10px;
+  border-radius: var(--radius-md);
+}
+
+.comment-emoji-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 248px;
+}
+
+.comment-emoji-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.comment-emoji-section-label {
+  margin: 0;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.comment-emoji-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.comment-emoji-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 4px;
+}
+
+.comment-emoji-tile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 18px;
+  transition: background 120ms ease, border-color 120ms ease, transform 120ms ease;
+  font-family:
+    "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji",
+    "Twemoji Mozilla", "EmojiOne Color", "Android Emoji", sans-serif;
+}
+
+.comment-emoji-tile:hover {
+  background: color-mix(in srgb, var(--primary) 8%, var(--surface));
+  border-color: color-mix(in srgb, var(--primary) 35%, transparent);
+}
+
+.comment-emoji-tile:active {
+  transform: scale(0.92);
+}
+
+.comment-emoji-tile.is-picked {
+  background: color-mix(in srgb, var(--primary) 16%, var(--surface));
+  border-color: color-mix(in srgb, var(--primary) 50%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .comment-reaction-tile,
+  .comment-reaction-add,
+  .comment-emoji-tile {
+    transition: none;
+  }
+  .comment-reaction-tile:active:not(:disabled),
+  .comment-emoji-tile:active {
+    transform: none;
+  }
+}
+
+/* --- Action row -------------------------------------------------------- */
+
+.comment-actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0;
+  margin-top: 2px;
+}
+
+.comment-actions .ant-btn {
+  font-size: 11.5px;
+  font-weight: 600;
+  height: auto;
+  color: var(--muted);
+  padding: 1px 6px;
+  line-height: 1.4;
+}
+
+.comment-actions .ant-btn:hover {
+  color: var(--primary-dark);
+  background: transparent;
+  text-decoration: underline;
+}
+
+.comment-actions .ant-btn .anticon {
+  font-size: 11px;
+}
+
+/* --- Reply / edit composer inside a node ------------------------------- */
+
+.comment-reply-composer {
+  margin-top: 6px;
+}
+
+/* --- Composer (top / reply / edit) ------------------------------------ */
+
+.comment-composer {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+}
+
+.comment-composer-reply,
+.comment-composer-edit {
+  padding: 8px;
+}
+
+.comment-composer textarea,
+.comment-composer .ant-mentions textarea {
+  font-size: var(--comment-font, 13px);
+  line-height: 1.4;
+}
+
+.comment-composer-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.comment-composer-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.comment-composer-spacer {
+  display: inline-block;
+  min-height: 1px;
+}
+
+.comment-composer-error {
+  font-size: 12px;
+  color: #b42318;
+}
+
+/* --- Login wall (replaces top composer when logged out) ---------------- */
+
+.comment-login-wall {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 16px;
+  background: color-mix(in srgb, var(--primary) 5%, var(--surface));
+  border: 1px dashed color-mix(in srgb, var(--primary) 35%, var(--line));
+  border-radius: var(--radius-md);
+}
+
+.comment-login-wall-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.comment-login-wall-body strong {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.comment-login-wall-body p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* --- Empty state ------------------------------------------------------- */
+
+.comment-empty {
+  margin: 18px 0 6px;
+  padding: 18px;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+
+.comment-empty strong {
+  display: block;
+  font-size: 14.5px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.comment-empty p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* --- Skeleton ---------------------------------------------------------- */
+
+.comment-list-skeleton {
+  margin-top: 14px;
+}
+
+/* --- Dark theme tweaks -------------------------------------------------
+ * The CSS vars already shift on `[data-theme="dark"]` (defined in
+ * design-tokens.css). What we adjust here is the dashed/translucent
+ * surfaces that read too light on dark.
+ * --------------------------------------------------------------------- */
+[data-theme="dark"] .comment-login-wall {
+  background: color-mix(in srgb, var(--primary) 14%, var(--surface));
+}
+
+[data-theme="dark"] .comment-edited-pill {
+  background: color-mix(in srgb, var(--muted) 18%, var(--surface));
+}
+
+/* --- Responsive: even tighter on small screens ------------------------ */
+@media (max-width: 640px) {
+  .comment-section {
+    --comment-padding-y: 6px;
+    --comment-padding-x: 8px;
+    --comment-avatar: 26px;
+    --comment-indent: 16px;
+    --comment-font: 13.5px;
+  }
+
+  .comment-avatar {
+    font-size: 11px;
+  }
+
+  .comment-children {
+    padding-left: var(--comment-indent);
+  }
+
+  .comment-login-wall {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: left;
+  }
+}
+
+/* --- Reduced-motion: kill skeleton pulse -------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .comment-avatar-skeleton {
+    animation: none;
+  }
+}

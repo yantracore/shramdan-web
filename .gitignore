@@ -17,3 +17,13 @@ pnpm-debug.log*
 .codex-*.log
 .codex/
 .claude/
+
+# verify / screenshot artifacts (Playwright, manual captures)
+/*.png
+.verify/
+.playwright-mcp/
+
+# QA test accounts (live JWTs — never commit)
+.qa-secrets/
+.vercel
+.env*

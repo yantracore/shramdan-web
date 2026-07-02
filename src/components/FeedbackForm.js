@@ -4,18 +4,35 @@ import { MessageOutlined } from "@ant-design/icons";
 import { Button, Input, Rate, Select } from "antd";
 import { Form } from "@/components/AppForm";
 import { Honeypot } from "@/components/Honeypot";
+import { PublicAttachmentField } from "@/components/PublicAttachmentField";
+import { applyApiErrorsToForm } from "@/lib/formErrors";
 import { toSelectOptions } from "@/lib/siteContent";
+import { useToast } from "@/lib/toast";
+
+// Real, rendered field names — a backend key outside this set surfaces at the
+// form level (toast) rather than on a field that never renders.
+const FEEDBACK_FIELDS = ["name", "email", "type", "experienceRating", "message", "screenshot"];
 
 export function FeedbackForm({ content, eyebrow, title, intro, onSubmit, submitting = false }) {
   const [form] = Form.useForm();
+  const toast = useToast();
   const labels = content.feedback;
-  const requiredRule = { required: true, message: content.messages.required };
+  const requiredRule = { required: true, whitespace: true, message: content.messages.required };
 
+  // The parent's onSubmit performs the API call and THROWS on failure; catch
+  // here so backend validation lands inline on the matching field.
   const handleFinish = async (values) => {
-    const shouldReset = await onSubmit(values);
-
-    if (shouldReset !== false) {
-      form.resetFields();
+    try {
+      const shouldReset = await onSubmit(values);
+      if (shouldReset !== false) {
+        form.resetFields();
+      }
+    } catch (error) {
+      applyApiErrorsToForm(form, error, {
+        knownFields: FEEDBACK_FIELDS,
+        toast,
+        fallbackMessage: content.messages.submitError
+      });
     }
   };
 
@@ -51,8 +68,8 @@ export function FeedbackForm({ content, eyebrow, title, intro, onSubmit, submitt
         <Form.Item name="message" label={labels.message} className="wide-field" rules={[requiredRule]}>
           <Input.TextArea rows={6} maxLength={1000} showCount placeholder={content.placeholders.feedback} />
         </Form.Item>
-        <Form.Item name="screenshot" label={labels.screenshot} className="wide-field">
-          <Input placeholder={content.placeholders.screenshot} />
+        <Form.Item name="screenshot" label={labels.screenshot} className="wide-field" valuePropName="value">
+          <PublicAttachmentField copy={labels.screenshotUpload} />
         </Form.Item>
       </div>
       <Honeypot />

@@ -44,6 +44,34 @@
   gap: 8px;
 }
 
+/* Province + District selects sitting above the map (ProvinceDistrictFilter). */
+.location-picker-region {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.location-picker-region .public-issues-filter-field {
+  flex: 1 1 160px;
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.location-picker-region .public-issues-filter-field .ant-select {
+  width: 100%;
+}
+
+.location-picker-region-status {
+  flex-basis: 100%;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: var(--text-muted, #6b7280);
+}
+
 .location-picker-wrap {
   position: relative;
   width: 100%;
@@ -57,6 +85,12 @@
   background: color-mix(in srgb, var(--surface-soft) 92%, var(--accent));
   font-family: inherit;
   cursor: crosshair;
+}
+
+/* Outside Nepal's border the cursor signals you can't drop a pin there. */
+.location-picker-wrap--blocked .leaflet-container,
+.location-picker-wrap--blocked .leaflet-container.leaflet-grab {
+  cursor: not-allowed;
 }
 
 .location-picker-wrap .leaflet-marker-draggable {
@@ -387,4 +421,104 @@
 [data-theme="dark"] .location-picker-locate-btn:hover:not(:disabled) {
   background: var(--accent);
   border-color: var(--accent);
+}
+
+/* /issues/new — auto-save draft banner + status pill */
+
+.new-issue-draft-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  padding: 14px 18px;
+  background: color-mix(in srgb, var(--primary) 8%, var(--surface));
+  border: 1px dashed color-mix(in srgb, var(--primary) 40%, transparent);
+  border-radius: 12px;
+  animation: new-issue-draft-banner-in 240ms ease;
+}
+
+@keyframes new-issue-draft-banner-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.new-issue-draft-banner-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.new-issue-draft-banner-text > .anticon {
+  font-size: 22px;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.new-issue-draft-banner-text > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.new-issue-draft-banner-text strong {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.new-issue-draft-banner-text span {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.new-issue-draft-banner-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.new-issue-draft-status {
+  margin: 10px 0 0;
+  font-size: 12.5px;
+  color: var(--muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.new-issue-draft-status .anticon {
+  color: #16a34a;
+  font-size: 14px;
+}
+
+@media (max-width: 540px) {
+  .new-issue-draft-banner {
+    align-items: flex-start;
+  }
+  .new-issue-draft-banner-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .new-issue-draft-banner {
+    animation: none;
+  }
+}
+
+[data-theme="dark"] .new-issue-draft-banner {
+  background: color-mix(in srgb, var(--primary) 14%, rgba(255, 255, 255, 0.02));
 }

@@ -1,0 +1,72 @@
+{
+  "mcpServers": {
+    "next-devtools-mcp": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "next-devtools-mcp@latest"
+      ],
+      "env": {}
+    },
+    "playwright": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@playwright/mcp@latest"
+      ],
+      "env": {}
+    },
+    "shadcn": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "shadcn@latest",
+        "mcp"
+      ],
+      "env": {}
+    },
+    "a11y-scanner": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-accessibility-scanner"
+      ],
+      "env": {}
+    },
+    "figma": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "figma-console-mcp"
+      ],
+      "env": {}
+    },
+    "mapbox": {
+      "type": "http",
+      "url": "https://mcp.mapbox.com/mcp"
+    },
+    "i18next": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "i18next-mcp-server@latest"
+      ],
+      "env": {}
+    },
+    "gsap": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@vinhnguyen/gsap-mcp"
+      ],
+      "env": {}
+    }
+  }
+}

@@ -1,59 +1,105 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { ContributorForm } from "@/components/ContributorForm";
 import { isHoneypotTriggered } from "@/components/Honeypot";
 import { SiteShell } from "@/components/SiteShell";
+import { SubmissionSuccessCard } from "@/components/SubmissionSuccessCard";
 import { usePreferences } from "@/app/providers";
-import { postJson } from "@/lib/apiClient";
+import { requestApplicationOtp, submitApplication } from "@/lib/apiClient";
+import { setAuthSession } from "@/lib/authSession";
 import { copy } from "@/lib/siteContent";
 import { useToast } from "@/lib/toast";
 
 function JoinPageContent() {
   const { language } = usePreferences();
-  const searchParams = useSearchParams();
   const t = copy[language];
   const messageApi = useToast();
   const [submitting, setSubmitting] = useState(false);
-  const selectedRole = searchParams.get("role");
-  const allowedRoles = new Set(t.options.applicationRoles.map((role) => role.value));
-  const initialRole = allowedRoles.has(selectedRole) ? selectedRole : undefined;
+  const [submitted, setSubmitted] = useState(false);
 
-  const handleSubmit = async (values) => {
-    if (isHoneypotTriggered(values)) {
-      messageApi.success(t.messages.join);
-      return true;
-    }
-
-    const { consent: _consent, website: _website, ...payload } = values;
-
-    setSubmitting(true);
-
+  // Emails the verification code as the user leaves the motivation step.
+  // Returns false (and surfaces the backend message) so the form keeps the
+  // user on the motivation step when the email already has an account or the
+  // resend cooldown is active.
+  const handleRequestOtp = async (email) => {
     try {
-      await postJson("/applications", payload);
-      messageApi.success(t.messages.join);
+      await requestApplicationOtp(String(email || "").trim());
       return true;
     } catch (error) {
       messageApi.error(error.message || t.messages.submitError);
       return false;
+    }
+  };
+
+  const handleSubmit = async (payload) => {
+    if (isHoneypotTriggered(payload)) {
+      setSubmitted(true);
+      return true;
+    }
+
+    setSubmitting(true);
+
+    // No catch: a failure (including backend validation) propagates into
+    // ContributorForm, which pins each error onto its field and step.
+    try {
+      const response = await submitApplication(payload);
+      const data = response?.data ?? {};
+      // The 201 creates a verified account and signs the applicant in — store
+      // the returned session so they land logged in.
+      if (data.accessToken && data.user) {
+        setAuthSession({
+          accessToken: data.accessToken,
+          refreshToken: data.refreshToken ?? null,
+          user: data.user
+        });
+      }
+      setSubmitted(true);
+      return true;
     } finally {
       setSubmitting(false);
     }
   };
 
+  const shareUrl =
+    typeof window !== "undefined" ? `${window.location.origin}/join` : "https://shramdan.org/join";
+
   return (
     <SiteShell pageTitle={t.pageTitles.join}>
-      <section className="page-section form-section">
-        <ContributorForm
-          content={t}
-          eyebrow={t.join.eyebrow}
-          title={t.join.title}
-          intro={t.join.intro}
-          initialRole={initialRole}
-          onSubmit={handleSubmit}
-          submitting={submitting}
-        />
+      <section className="page-section multi-step-section join-multi-step-section">
+        {submitted ? (
+          <SubmissionSuccessCard
+            language={language}
+            title={
+              language === "np"
+                ? "तपाईं श्रमदानमा जोडिनुभयो!"
+                : "You're in — welcome to Shramdan!"
+            }
+            body={
+              language === "np"
+                ? "तपाईंको खाता बन्यो र आवेदन प्राप्त भयो। अब लग-इन हुनुहुन्छ — समस्या रिपोर्ट गर्न र अभियानमा सामेल हुन तयार।"
+                : "Your account is created and your application is in. You're signed in now — ready to report issues and join campaigns."
+            }
+            shareUrl={shareUrl}
+            shareTitle={language === "np" ? "श्रमदानमा जोडिनुहोस्" : "Join Shramdan"}
+            shareText={
+              language === "np"
+                ? "श्रमदान — सामूहिक श्रमको मञ्च। तपाईं पनि जोडिनुहोस्।"
+                : "Shramdan — a platform for collective community work. Join us."
+            }
+            onReset={() => setSubmitted(false)}
+          />
+        ) : (
+          <ContributorForm
+            content={t}
+            language={language}
+            eyebrow={t.join.eyebrow}
+            intro={t.join.intro}
+            onSubmit={handleSubmit}
+            onRequestOtp={handleRequestOtp}
+            submitting={submitting}
+          />
+        )}
       </section>
     </SiteShell>
   );

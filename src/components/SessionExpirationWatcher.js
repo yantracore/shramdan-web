@@ -4,12 +4,9 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { usePreferences } from "@/app/providers";
 import { subscribeAuthSessionExpired } from "@/lib/authSession";
+import { buildLoginHref } from "@/lib/loginRedirect";
 import { copy } from "@/lib/siteContent";
 import { useToast } from "@/lib/toast";
-
-function isSafeRelativePath(path) {
-  return typeof path === "string" && path.startsWith("/") && !path.startsWith("//");
-}
 
 export function SessionExpirationWatcher() {
   const router = useRouter();
@@ -35,8 +32,7 @@ export function SessionExpirationWatcher() {
         return;
       }
 
-      const nextParam = isSafeRelativePath(pathname) ? `?next=${encodeURIComponent(pathname)}` : "";
-      router.replace(`/login${nextParam}`);
+      router.replace(buildLoginHref(pathname, "expired"));
     });
 
     return unsubscribe;

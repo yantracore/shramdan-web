@@ -11,15 +11,18 @@ import {
 } from "@ant-design/icons";
 import { Alert, Avatar, Button, Input, Spin, Tag } from "antd";
 import { usePreferences } from "@/app/providers";
+import { AccountSecurity } from "@/components/AccountSecurity";
 import { Form } from "@/components/AppForm";
+import { PhoneVerify } from "@/components/PhoneVerify";
 import { SiteShell } from "@/components/SiteShell";
 import { changePassword, fetchMe, updateMe } from "@/lib/apiClient";
-import { setFieldErrorsAndScroll } from "@/lib/formErrors";
+import { applyApiErrorsToForm, setFieldErrorsAndScroll } from "@/lib/formErrors";
 import {
   getAuthSession,
   setAuthSession,
   subscribeAuthSession
 } from "@/lib/authSession";
+import { buildLoginHref } from "@/lib/loginRedirect";
 import { copy } from "@/lib/siteContent";
 import { useToast } from "@/lib/toast";
 import { uploadAvatar } from "@/lib/uploads";
@@ -84,7 +87,7 @@ export default function MePage() {
     if (!sessionResolved) return;
 
     if (!session) {
-      router.replace("/login");
+      router.replace(buildLoginHref("/me"));
     }
   }, [router, session, sessionResolved]);
 
@@ -124,6 +127,9 @@ export default function MePage() {
 
   useEffect(() => {
     if (!session) return;
+    // Intentional fetch-on-mount/session-change; the setState inside
+    // loadProfile is the point of the effect.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadProfile();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session?.accessToken]);
@@ -154,7 +160,13 @@ export default function MePage() {
           { name: "username", errors: [t.errors.usernameTaken] }
         ]);
       } else {
-        messageApi.error(error?.message || globalCopy.messages.submitError);
+        // Any other backend validation (e.g. username format) lands inline on
+        // its field; non-validation failures fall through to a toast.
+        applyApiErrorsToForm(profileForm, error, {
+          knownFields: ["name", "username"],
+          toast: messageApi,
+          fallbackMessage: globalCopy.messages.submitError
+        });
       }
     } finally {
       setSavingProfile(false);
@@ -223,7 +235,13 @@ export default function MePage() {
           { name: "newPassword", errors: [t.errors.samePassword] }
         ]);
       } else {
-        messageApi.error(error?.message || globalCopy.messages.submitError);
+        // Any other backend validation (e.g. password too short) lands inline
+        // on its field; non-validation failures fall through to a toast.
+        applyApiErrorsToForm(passwordForm, error, {
+          knownFields: ["currentPassword", "newPassword", "confirmNewPassword"],
+          toast: messageApi,
+          fallbackMessage: globalCopy.messages.submitError
+        });
       }
     } finally {
       setSavingPassword(false);
@@ -371,14 +389,14 @@ export default function MePage() {
             <Form.Item
               label={t.profile.name}
               name="name"
-              rules={[{ required: true, message: t.validation.required }]}
+              rules={[{ required: true, whitespace: true, message: t.validation.required }]}
             >
               <Input prefix={<UserOutlined />} />
             </Form.Item>
             <Form.Item
               label={t.profile.username}
               name="username"
-              rules={[{ required: true, message: t.validation.required }]}
+              rules={[{ required: true, whitespace: true, message: t.validation.required }]}
             >
               <Input prefix={<UserOutlined />} />
             </Form.Item>
@@ -451,6 +469,15 @@ export default function MePage() {
             description={t.password.oauthDisabled}
           />
         )}
+
+        <PhoneVerify
+          language={language}
+          phone={profile?.phone}
+          verified={Boolean(profile?.phoneVerifiedAt)}
+          onVerified={loadProfile}
+        />
+
+        <AccountSecurity language={language} />
       </section>
     </SiteShell>
   );

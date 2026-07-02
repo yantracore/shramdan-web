@@ -1,0 +1,826 @@
+/* Phase 2 v0: TV-app homepage above-the-fold band.
+ *
+ * Layout per विवेक 2026-06-05 brief:
+ *   - Brand title + slogan (compact, share the column with the search box)
+ *   - Search bar + filters chip + submit
+ *   - EventsHomeRail directly below as the main highlight
+ *
+ * Search sits slightly above center — NOT exactly center like Google. The
+ * carousel earns the eye while the brand band sits comfortably above.
+ */
+
+.home-search-hero {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: calc(var(--corner-clear-zone, 64px) + 20px) 32px 18px;
+}
+
+.home-search-hero-inner {
+  display: grid;
+  gap: 18px;
+  width: min(100%, 720px);
+  text-align: center;
+}
+
+.home-search-brand {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+}
+
+.home-search-brand-logo {
+  width: clamp(76px, 10vw, 112px);
+  height: auto;
+  filter: drop-shadow(0 18px 32px rgba(23, 33, 28, 0.16));
+}
+
+.home-search-brand h1 {
+  margin: 0;
+  color: var(--primary-dark);
+  font-size: clamp(28px, 4vw, 48px);
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.home-search-brand p {
+  margin: 0;
+  color: var(--muted);
+  font-size: clamp(16px, 1.4vw, 20px);
+  line-height: 1.35;
+}
+
+.home-search-panel {
+  width: min(100%, 1280px);
+  margin: 28px auto 0;
+  padding: 0 32px;
+}
+
+.home-search-panel-inner {
+  display: grid;
+  gap: 22px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* Grid items default to min-width:auto and so refuse to shrink below their
+   content's intrinsic width — the funnel (fixed-basis steps) and the Leaflet
+   map both have a large min-content and would overflow the column, then get
+   clipped by the page's overflow:clip. Letting them shrink keeps the band
+   inside the viewport on phones. */
+.home-search-panel-inner > * {
+  min-width: 0;
+}
+
+/* The search bar is the headline interactive element. Glass treatment
+ * matches the corner shell (CC-1) — but heavier shadow so it floats. */
+.home-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-self: center;
+  width: min(100%, 720px);
+  padding: 8px;
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  backdrop-filter: blur(18px) saturate(1.2);
+  border: 1px solid color-mix(in srgb, var(--line) 45%, transparent);
+  border-radius: 16px;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.32) inset,
+    0 18px 48px rgba(23, 33, 28, 0.16);
+}
+
+.home-search-input {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  min-width: 0;
+  color: var(--text);
+  font-size: 16px;
+}
+
+.home-search-input > :first-child {
+  color: var(--muted);
+  font-size: 18px;
+}
+
+.home-search-input input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  outline: none;
+}
+
+.home-search-input input::placeholder {
+  color: color-mix(in srgb, var(--muted) 80%, transparent);
+}
+
+.home-search-filters,
+.home-search-submit {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  min-height: 40px;
+  border: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: background 160ms ease, color 160ms ease, transform 160ms ease, border-color 160ms ease;
+}
+
+.home-search-filters:hover,
+.home-search-submit:hover {
+  background: color-mix(in srgb, var(--primary) 12%, var(--surface));
+  color: var(--primary-dark);
+  border-color: color-mix(in srgb, var(--primary) 24%, var(--line));
+  transform: translateY(-1px);
+}
+
+.home-search-submit {
+  /* Submit is a primary action — slightly heavier visual weight. */
+  background: var(--primary);
+  color: #fff;
+  border-color: transparent;
+  padding: 10px 16px;
+  font-size: 16px;
+}
+
+.home-search-submit:hover {
+  background: var(--primary-dark);
+  color: #fff;
+  border-color: transparent;
+}
+
+@media (max-width: 720px) {
+  .home-search-hero {
+    padding: calc(var(--corner-clear-zone, 64px) + 12px) 16px 12px;
+  }
+
+  .home-search-hero-inner {
+    gap: 14px;
+  }
+
+  .home-search-panel {
+    margin-top: 20px;
+    padding: 0 16px;
+  }
+
+  .home-search-filters span {
+    /* Hide the "Filter" label below 720px; icon stays for tap target. */
+    display: none;
+  }
+
+  .home-search-filters {
+    padding: 10px 12px;
+  }
+}
+
+/* Phone — pull the panel gutter in from 16px to 10px so the map (a full-width
+ * child) reads nearly edge-to-edge and shows more geographic context, instead
+ * of floating inside a wide margin. Aligns the map/stats left edge with the
+ * widened events poster + discovery rails below it. */
+@media (max-width: 640px) {
+  .home-search-panel {
+    padding: 0 10px;
+  }
+}
+
+@media (max-width: 540px) {
+  .home-search-bar {
+    padding: 6px;
+    gap: 6px;
+  }
+
+  .home-search-input {
+    padding: 10px 10px;
+    font-size: 15px;
+  }
+
+  .home-search-submit {
+    padding: 8px 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-search-filters,
+  .home-search-submit {
+    transition: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .home-search-bar {
+    background: var(--surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+/* The lifecycle funnel rail sits between the search bar and the map on the
+ * homepage hero. The rail carries its own glass recipe (see .activity-funnel
+ * in home.css); here we only centre it and cap its width so it reads as part
+ * of the search band rather than a separate brochure section. */
+.home-search-stats {
+  justify-self: center;
+  width: min(100%, 720px);
+}
+
+@media (max-width: 560px) {
+  .home-search-stats {
+    width: 100%;
+  }
+}
+
+/* Map sits below the stats pills — decent size, glass-bordered, rounded
+ * so it reads as part of the search band rather than a separate brochure
+ * block. Leaflet container takes the height we pass via the prop. */
+.home-search-map {
+  width: 100%;
+  display: grid;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.home-search-map-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.home-search-map-eyebrow {
+  /* Reuse the global `.eyebrow` styling but center it under the pills. */
+  text-align: center;
+}
+
+.home-search-map-frame {
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  border: 1px solid color-mix(in srgb, var(--line) 45%, transparent);
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  backdrop-filter: blur(18px) saturate(1.2);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.32) inset,
+    0 18px 48px rgba(23, 33, 28, 0.16);
+}
+
+.home-search-map-frame .issue-map-wrap {
+  /* Strip the inner wrap's own border/radius so the outer glass frame
+   * is the only visible edge — prevents the double-bordered look. */
+  border: 0;
+  border-radius: inherit;
+  overflow: hidden;
+}
+
+/* CampaignsMap ships its own glass frame plus empty/skeleton cards; nested in
+ * the home glass frame those edges would double up. Same rule as above: the
+ * outer frame is the only visible edge. */
+.home-search-map-frame .campaigns-map-frame,
+.home-search-map-frame .campaigns-map-empty,
+.home-search-map-frame .issue-map-skeleton {
+  border: 0;
+  border-radius: inherit;
+  box-shadow: none;
+}
+
+/* Empty/skeleton states hold the same short home-map height as the map itself
+ * (below), so toggling a funnel filter never makes the panel jump. */
+.home-search-map-frame .campaigns-map-empty,
+.home-search-map-frame .issue-map-skeleton {
+  min-height: 0;
+  height: clamp(200px, 30vh, 320px);
+}
+
+/* The home map is only a preview/teaser (browsing + filters live on
+ * /campaigns), so keep it a short, viewport-proportional container instead of
+ * the tall browse height. Overrides EventMap's inline px height (hence
+ * !important). Fullscreen escapes this. */
+.home-search-map-frame .issue-map-wrap:not(.issue-map-wrap--fullscreen) {
+  height: clamp(200px, 30vh, 320px) !important;
+}
+
+/* Prevent the glass frame from trapping the fixed-position fullscreen map */
+.home-search-map-frame:has(.issue-map-wrap--fullscreen) {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  overflow: visible;
+  border-radius: 0;
+  border: none;
+  z-index: 9999;
+}
+
+@media (max-width: 720px) {
+  .home-search-map-frame {
+    border-radius: 12px;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .home-search-map-frame {
+    background: var(--surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+/* Visually-hidden helper for the map's accessible heading. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* --- "For you" curated grid ----------------------------------------- */
+/* Sits below the EventsHomeRail. Scroll-revealed naturally — no JS gate.
+ * Renders up to 12 events in a 3-col grid on desktop, 2-col tablet,
+ * 1-col mobile. Each card uses CC-1 glass + CC-2 representative image
+ * conventions. */
+
+.home-for-you {
+  width: min(100%, 1280px);
+  margin: 32px auto 48px;
+  padding: 0 32px;
+}
+
+.home-for-you-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.home-for-you-header-text {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.home-for-you-eyebrow {
+  /* Use the global .eyebrow base — flush-left for the for-you section. */
+}
+
+.home-for-you-header h2 {
+  margin: 0;
+  font-size: clamp(24px, 2.4vw, 34px);
+  color: var(--primary-dark);
+  line-height: 1.18;
+}
+
+.home-for-you-header p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.home-for-you-header-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.home-for-you-view-all,
+.home-for-you-location-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: 1px solid color-mix(in srgb, var(--line) 60%, transparent);
+  border-radius: 999px;
+  color: var(--primary-dark);
+  font-weight: 700;
+  font-size: 14px;
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  cursor: pointer;
+  transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+.home-for-you-view-all:hover,
+.home-for-you-location-cta:hover {
+  background: color-mix(in srgb, var(--primary) 10%, var(--surface));
+  border-color: color-mix(in srgb, var(--primary) 32%, var(--line));
+  transform: translateY(-1px);
+}
+
+.home-for-you-location-cta {
+  /* Slight emphasis — this is a one-off opt-in action, not part of
+   * the regular nav flow. */
+  background: color-mix(in srgb, var(--primary) 14%, color-mix(in srgb, var(--surface) 80%, transparent));
+  border-color: color-mix(in srgb, var(--primary) 30%, var(--line));
+}
+
+.home-for-you-location-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: var(--primary-dark);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Mode tabs for the unified Events ↔ Issues stream switch (Phase 3 v0).
+ * Button-based (NOT anchors) so toggling stays in-place; the View-all
+ * link in the header still navigates to the deep route. */
+.stream-list-mode-tabs {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 18px;
+  padding: 4px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  backdrop-filter: blur(18px) saturate(1.2);
+  border: 1px solid color-mix(in srgb, var(--line) 45%, transparent);
+}
+
+.stream-list-mode-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.stream-list-mode-tab:hover {
+  color: var(--primary-dark);
+}
+
+.stream-list-mode-tab.is-active {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(23, 107, 92, 0.22);
+}
+
+.stream-list-mode-tab.is-active:hover {
+  color: #fff;
+}
+
+@media (max-width: 540px) {
+  .stream-list-mode-tab {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+  .stream-list-mode-tab span {
+    /* Keep label visible — the homepage already prioritised the eyebrow,
+     * but at 320-360px we want a compact pair. */
+    white-space: nowrap;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .stream-list-mode-tabs {
+    background: var(--surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+.home-for-you-grid {
+  display: grid;
+  /* Compact, auto-filling thumbs — narrower cards mean more per row on
+   * wider screens (4–5), so the issue list reads as a dense overview. */
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 14px;
+}
+
+@media (max-width: 640px) {
+  .home-for-you {
+    padding: 0 16px;
+    margin-top: 24px;
+  }
+  .home-for-you-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+  }
+}
+
+.home-for-you-card {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  backdrop-filter: blur(18px) saturate(1.2);
+  border: 1px solid color-mix(in srgb, var(--line) 45%, transparent);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.32) inset,
+    0 12px 32px rgba(23, 33, 28, 0.12);
+  transition: border-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+}
+
+.home-for-you-card:hover {
+  border-color: color-mix(in srgb, var(--primary) 36%, var(--line));
+  transform: translateY(-3px);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.32) inset,
+    0 18px 44px rgba(23, 33, 28, 0.18);
+}
+
+.home-for-you-card-link {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: 100%;
+}
+
+.home-for-you-card-poster {
+  position: relative;
+  /* Shorter than the old 16/10 — smaller, more compact thumbnails. */
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
+
+.home-for-you-card-poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 320ms ease;
+}
+
+.home-for-you-card:hover .home-for-you-card-poster img {
+  transform: scale(1.04);
+}
+
+.home-for-you-card-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-radius: 999px;
+  /* Glass badge — same recipe as the corner shell pills. */
+  background: color-mix(in srgb, var(--surface) 76%, transparent);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid color-mix(in srgb, var(--line) 50%, transparent);
+  color: var(--text);
+}
+
+.home-for-you-card-badge--active {
+  background: color-mix(in srgb, #ef4444 32%, rgba(0, 0, 0, 0.34));
+  border-color: rgba(255, 255, 255, 0.34);
+  color: #fff;
+}
+
+.home-for-you-card-badge--scheduled {
+  background: color-mix(in srgb, #2563eb 26%, rgba(0, 0, 0, 0.34));
+  border-color: rgba(255, 255, 255, 0.34);
+  color: #fff;
+}
+
+.home-for-you-card-badge--completed {
+  background: color-mix(in srgb, #16a34a 26%, rgba(0, 0, 0, 0.34));
+  border-color: rgba(255, 255, 255, 0.34);
+  color: #fff;
+}
+
+/* Issue status badges (Phase 3 v0) — colour-keyed to /issues page
+ * conventions: open = warm amber, scheduled = blue, completed = green. */
+.home-for-you-card-badge--open {
+  background: color-mix(in srgb, #d97706 28%, rgba(0, 0, 0, 0.34));
+  border-color: rgba(255, 255, 255, 0.34);
+  color: #fff;
+}
+
+.home-for-you-card-badge--event-scheduled {
+  background: color-mix(in srgb, #2563eb 26%, rgba(0, 0, 0, 0.34));
+  border-color: rgba(255, 255, 255, 0.34);
+  color: #fff;
+}
+
+.home-for-you-card-badge--completed {
+  background: color-mix(in srgb, #16a34a 26%, rgba(0, 0, 0, 0.34));
+  border-color: rgba(255, 255, 255, 0.34);
+  color: #fff;
+}
+
+/* Distance pill — bottom-right of the poster. Distinguishable from
+ * the status badge (top-left) so users can scan both at a glance. */
+.home-for-you-card-distance {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.46);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: #fff;
+  white-space: nowrap;
+}
+
+.home-for-you-card-badge .live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.45);
+  animation: home-for-you-live-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes home-for-you-live-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+.home-for-you-card-body {
+  display: grid;
+  gap: 7px;
+  padding: 11px 12px 13px;
+  align-content: start;
+}
+
+.home-for-you-card-body h3 {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.3;
+  color: var(--text);
+  /* Cap at two lines so the grid stays even-height. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
+/* Issue summary under the title — capped at two lines so compact cards
+ * stay even-height. Only renders when the issue carries a description. */
+.home-for-you-card-desc {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: var(--muted);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
+.home-for-you-card-meta {
+  display: grid;
+  gap: 5px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.home-for-you-card-address,
+.home-for-you-card-date {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.home-for-you-card-address span:last-child,
+.home-for-you-card-date span:last-child {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.home-for-you-card-cta {
+  margin-top: 1px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--primary-dark);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-for-you-card,
+  .home-for-you-card-poster img,
+  .home-for-you-view-all {
+    transition: none;
+  }
+  .home-for-you-card-badge .live-dot {
+    animation: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .home-for-you-card,
+  .home-for-you-view-all {
+    background: var(--surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+/* Empty-state card surfaces when listAllEvents returns nothing — keeps
+ * the for-you band from disappearing silently between staging seeds. */
+.home-for-you-empty {
+  display: grid;
+  gap: 14px;
+  justify-items: center;
+  padding: 40px 24px;
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  backdrop-filter: blur(18px) saturate(1.2);
+  border: 1px dashed color-mix(in srgb, var(--line) 55%, transparent);
+  color: var(--muted);
+  text-align: center;
+}
+
+.home-for-you-empty > .anticon {
+  font-size: 32px;
+  color: color-mix(in srgb, var(--primary) 60%, var(--muted));
+}
+
+.home-for-you-empty p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.4;
+  max-width: 36ch;
+}
+
+.home-for-you-empty-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 700;
+  font-size: 14px;
+  transition: background 160ms ease, transform 160ms ease;
+}
+
+.home-for-you-empty-cta:hover {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .home-for-you-empty {
+    background: var(--surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+/* ---- Brand block intro link -------------------------------------- */
+.home-search-intro-link {
+  margin-top: 4px;
+}
+
+.home-search-intro-link a {
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: opacity 180ms ease;
+}
+
+.home-search-intro-link a:hover {
+  opacity: 0.85;
+  text-decoration: underline;
+}

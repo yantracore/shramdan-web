@@ -3,8 +3,10 @@
 import {
   CalendarOutlined,
   CheckCircleOutlined,
+  EditOutlined,
   EnvironmentOutlined,
   EyeOutlined,
+  StopOutlined,
   ThunderboltOutlined,
   UserSwitchOutlined
 } from "@ant-design/icons";
@@ -12,6 +14,8 @@ import {
   Button,
   DatePicker,
   Empty,
+  Input,
+  InputNumber,
   Modal,
   Popconfirm,
   Radio,
@@ -21,16 +25,19 @@ import {
   Table,
   Tag
 } from "antd";
+import dayjs from "dayjs";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { AdminResponsiveList } from "@/components/AdminResponsiveList";
+import { Form } from "@/components/AppForm";
 import { AdminShell } from "@/components/AdminShell";
 import { AdminFilters } from "@/components/admin/AdminFilters";
 import { AdminListCard } from "@/components/admin/AdminListCard";
 import { AdminPanelHeading } from "@/components/admin/AdminPanelHeading";
 import { useAdminListResource } from "@/hooks/useAdminListResource";
-import { getJson, patchJson, postJson } from "@/lib/apiClient";
+import { cancelEvent, getJson, patchJson, postJson, updateEvent } from "@/lib/apiClient";
 import {
   EVENT_RISK_COLORS,
+  EVENT_RISK_LEVELS,
   EVENT_STATUSES,
   EVENT_STATUS_COLORS,
   LEADER_VOTING_STATUS_COLORS,
@@ -84,6 +91,13 @@ export default function AdminEventsPage() {
 
   const [tieBreakOpen, setTieBreakOpen] = useState(false);
   const [selectedCandidateId, setSelectedCandidateId] = useState("");
+
+  const [editForm] = Form.useForm();
+  const [editOpen, setEditOpen] = useState(false);
+  const [cancelOpen, setCancelOpen] = useState(false);
+  const [cancelReason, setCancelReason] = useState("");
+
+  const riskLevelOptions = useMemo(() => buildEnumOptions(EVENT_RISK_LEVELS), []);
 
   const refreshDetail = useCallback(
     async (eventId) => {
@@ -233,6 +247,80 @@ export default function AdminEventsPage() {
       await Promise.all([refreshDetail(detailEvent.id), refreshVoting(detailEvent.id)]);
     } catch (error) {
       messageApi.error(error.message || "Could not settle voting.");
+    } finally {
+      setActionLoading("");
+    }
+  };
+
+  const openEdit = () => {
+    if (!detailEvent) return;
+    editForm.setFieldsValue({
+      scheduledAt: detailEvent.scheduledAt ? dayjs(detailEvent.scheduledAt) : null,
+      durationMinutes: detailEvent.durationMinutes ?? null,
+      meetupAddress: detailEvent.meetupAddress ?? "",
+      meetupLatitude: detailEvent.meetupLatitude ?? null,
+      meetupLongitude: detailEvent.meetupLongitude ?? null,
+      meetupNotes: detailEvent.meetupNotes ?? "",
+      coordinationLink: detailEvent.coordinationLink ?? "",
+      whatToBring: detailEvent.whatToBring ?? "",
+      planningNotes: detailEvent.planningNotes ?? "",
+      riskLevel: detailEvent.riskLevel ?? undefined
+    });
+    setEditOpen(true);
+  };
+
+  const closeEdit = () => {
+    setEditOpen(false);
+    editForm.resetFields();
+  };
+
+  // PATCH /events/{id} is a partial update; compactPayload drops empty fields,
+  // so this edits/sets values but cannot clear an existing field to blank.
+  const handleEditSave = async () => {
+    if (!detailEvent) return;
+    let values;
+    try {
+      values = await editForm.validateFields();
+    } catch {
+      return;
+    }
+    const payload = {
+      ...values,
+      scheduledAt: values.scheduledAt ? values.scheduledAt.toISOString() : undefined
+    };
+    setActionLoading("edit");
+    try {
+      await updateEvent(detailEvent.id, payload);
+      messageApi.success("Event logistics updated.");
+      closeEdit();
+      await refreshDetail(detailEvent.id);
+    } catch (error) {
+      messageApi.error(error.message || "Could not update event.");
+    } finally {
+      setActionLoading("");
+    }
+  };
+
+  const openCancel = () => {
+    setCancelReason("");
+    setCancelOpen(true);
+  };
+
+  const closeCancel = () => {
+    setCancelOpen(false);
+    setCancelReason("");
+  };
+
+  const handleCancelEvent = async () => {
+    if (!detailEvent) return;
+    setActionLoading("cancel");
+    try {
+      await cancelEvent(detailEvent.id, cancelReason.trim() || undefined);
+      messageApi.success("Event cancelled.");
+      closeCancel();
+      await refreshDetail(detailEvent.id);
+    } catch (error) {
+      messageApi.error(error.message || "Could not cancel event.");
     } finally {
       setActionLoading("");
     }
@@ -453,6 +541,24 @@ export default function AdminEventsPage() {
                 <Tag icon={<CalendarOutlined />}>{formatDate(detailEvent.scheduledAt)}</Tag>
               ) : null}
             </div>
+
+            <Space wrap className="admin-modal-actions">
+              <Button icon={<EditOutlined />} onClick={openEdit} disabled={detailLoading}>
+                Edit logistics
+              </Button>
+              <Button
+                danger
+                icon={<StopOutlined />}
+                onClick={openCancel}
+                disabled={
+                  detailLoading ||
+                  detailEvent.status === "CANCELLED" ||
+                  detailEvent.status === "COMPLETED"
+                }
+              >
+                Cancel event
+              </Button>
+            </Space>
 
             {detailIssue?.title ? (
               <div className="admin-modal-section">
@@ -683,6 +789,82 @@ export default function AdminEventsPage() {
             </Space>
           </Radio.Group>
         )}
+      </Modal>
+
+      <Modal
+        confirmLoading={actionLoading === "edit"}
+        okText="Save changes"
+        onCancel={closeEdit}
+        onOk={handleEditSave}
+        open={editOpen}
+        title="Edit event logistics"
+        width={640}
+      >
+        <Form form={editForm} layout="vertical">
+          <Form.Item label="Scheduled at" name="scheduledAt">
+            <DatePicker showTime style={{ width: "100%" }} />
+          </Form.Item>
+          <Form.Item
+            label="Duration (minutes)"
+            name="durationMinutes"
+            rules={[{ type: "number", min: 1, message: "At least 1 minute." }]}
+          >
+            <InputNumber min={1} style={{ width: "100%" }} />
+          </Form.Item>
+          <Form.Item label="Risk level" name="riskLevel">
+            <Select allowClear options={riskLevelOptions} placeholder="Select risk level" />
+          </Form.Item>
+          <Form.Item label="Meetup address" name="meetupAddress">
+            <Input />
+          </Form.Item>
+          <Space style={{ display: "flex" }} align="start">
+            <Form.Item label="Latitude" name="meetupLatitude" style={{ flex: 1 }}>
+              <InputNumber step={0.000001} style={{ width: "100%" }} />
+            </Form.Item>
+            <Form.Item label="Longitude" name="meetupLongitude" style={{ flex: 1 }}>
+              <InputNumber step={0.000001} style={{ width: "100%" }} />
+            </Form.Item>
+          </Space>
+          <Form.Item label="Meetup notes" name="meetupNotes">
+            <Input.TextArea rows={2} />
+          </Form.Item>
+          <Form.Item
+            label="Coordination link"
+            name="coordinationLink"
+            rules={[{ type: "url", message: "Enter a valid URL." }]}
+          >
+            <Input placeholder="https://…" />
+          </Form.Item>
+          <Form.Item label="What to bring" name="whatToBring">
+            <Input.TextArea rows={2} />
+          </Form.Item>
+          <Form.Item label="Planning notes" name="planningNotes">
+            <Input.TextArea rows={2} />
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      <Modal
+        confirmLoading={actionLoading === "cancel"}
+        okButtonProps={{ danger: true }}
+        okText="Cancel event"
+        cancelText="Keep event"
+        onCancel={closeCancel}
+        onOk={handleCancelEvent}
+        open={cancelOpen}
+        title="Cancel this event?"
+      >
+        <p className="admin-muted">
+          Participants are notified. Add an optional reason — it rides along in the notification.
+        </p>
+        <Input.TextArea
+          value={cancelReason}
+          onChange={(e) => setCancelReason(e.target.value)}
+          placeholder="Reason (optional)…"
+          maxLength={1000}
+          rows={3}
+          showCount
+        />
       </Modal>
     </AdminShell>
   );

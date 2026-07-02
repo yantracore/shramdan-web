@@ -1,0 +1,13 @@
+{
+  "source": "https://api.shramdan.org/api-docs.json",
+  "mode": "staging",
+  "localPath": "docs/engineering/07-api-reference.json",
+  "previousPath": "docs/engineering/07-api-reference.prev.json",
+  "changesPath": "docs/engineering/07-api-reference.changes.json",
+  "lastFetchedAt": "2026-07-02T13:30:04+05:45",
+  "lastFetchedAtDisplay": "2026-07-02 13:30 NPT",
+  "stalenessThresholdHours": 6,
+  "timezone": "Asia/Kathmandu (UTC+05:45)",
+  "fetchCommand": "node scripts/refresh-api-docs.mjs",
+  "protocol": "Agents must read this sidecar BEFORE consulting docs/engineering/07-api-reference.json or quoting endpoint contracts. If (now - lastFetchedAt) >= stalenessThresholdHours, run fetchCommand — it backs up the current spec to previousPath, fetches the new spec, writes a shape-level diff to changesPath, and updates lastFetchedAt + lastFetchedAtDisplay in this file. Agents do not hand-edit those fields. Inside the 6h window, trust the local copy and skip the refresh. See docs/engineering/10-frontend-api-usage.md §Freshness protocol."
+}

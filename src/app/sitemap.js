@@ -6,7 +6,7 @@ import { SITE_URL } from "@/lib/seo";
 const STATIC_ROUTES = [
   { path: "/", priority: 1.0, changeFrequency: "weekly" },
   { path: "/event-types", priority: 0.9, changeFrequency: "monthly" },
-  { path: "/issues", priority: 0.9, changeFrequency: "daily" },
+  { path: "/campaigns", priority: 0.9, changeFrequency: "daily" },
   { path: "/issues/new", priority: 0.6, changeFrequency: "yearly" },
   { path: "/join", priority: 0.7, changeFrequency: "monthly" },
   { path: "/feedback", priority: 0.5, changeFrequency: "monthly" },
@@ -33,12 +33,12 @@ async function fetchPublicList(endpoint) {
 function withLastMod(items) {
   return items
     .map((item) => {
-      const id = item?.id || item?.uuid || item?.slug;
-      if (!id) return null;
+      const slugOrId = item?.slug || item?.id || item?.uuid;
+      if (!slugOrId) return null;
       const lastModRaw =
         item?.updatedAt || item?.modifiedAt || item?.createdAt || null;
       const lastModified = lastModRaw ? new Date(lastModRaw) : undefined;
-      return { id, lastModified };
+      return { slugOrId, lastModified };
     })
     .filter(Boolean);
 }
@@ -61,24 +61,21 @@ export default async function sitemap() {
     priority: 0.7
   }));
 
-  const [issues, events] = await Promise.all([
-    fetchPublicList("/issues?limit=500"),
-    fetchPublicList("/events?limit=500")
-  ]);
+  // One minimal /campaigns call covers every detail URL. Canonical detail
+  // route is /campaign/<slug> — the old /issues/<slug> and /events/<slug>
+  // URLs are permanent redirects to it (next.config.mjs), and redirected URLs
+  // don't belong in a sitemap. mode=minimal carries no updatedAt, so entries
+  // use the crawl date; the 1800s revalidate keeps that honest enough.
+  const campaigns = await fetchPublicList("/campaigns?mode=minimal&limit=1000");
 
-  const issueEntries = withLastMod(issues).map(({ id, lastModified }) => ({
-    url: `${SITE_URL}/issues/${id}`,
-    lastModified: lastModified || now,
-    changeFrequency: "weekly",
-    priority: 0.6
-  }));
+  const campaignEntries = withLastMod(campaigns).map(
+    ({ slugOrId, lastModified }) => ({
+      url: `${SITE_URL}/campaign/${slugOrId}`,
+      lastModified: lastModified || now,
+      changeFrequency: "weekly",
+      priority: 0.6
+    })
+  );
 
-  const eventEntries = withLastMod(events).map(({ id, lastModified }) => ({
-    url: `${SITE_URL}/events/${id}`,
-    lastModified: lastModified || now,
-    changeFrequency: "weekly",
-    priority: 0.6
-  }));
-
-  return [...staticEntries, ...eventTypeEntries, ...issueEntries, ...eventEntries];
+  return [...staticEntries, ...eventTypeEntries, ...campaignEntries];
 }

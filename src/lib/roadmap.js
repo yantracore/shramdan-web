@@ -1,11 +1,12 @@
 import fs from "node:fs";
 import path from "node:path";
 
-const ROADMAP_PATH = path.join(process.cwd(), "docs", "00-master-roadmap.md");
+const ROADMAP_PATH = path.join(process.cwd(), "docs", "ops", "00-master-roadmap.md");
 const OVERALL_RE = /^## Overall Progress\s*—\s*(\d+)%/;
 const PHASE_RE = /^## Phase\s+(\d+)\s*—\s*(.+?)\s*`w:(\d+)`\s*📊\s*(\d+)%\s*$/;
 const LEAF_RE = /^(\s*)-\s*\[([ x~!\-])\]\s*([\d.]+[a-z]?)\s+(.+?)\s*$/;
 const DONE_DATE_RE = /←\s*done:\s*(\d{4}-\d{2}-\d{2})/;
+const POLL_TAG_RE = /←\s*poll:\s*([a-z0-9-]+)/i;
 
 const HIDDEN_PHASES = new Set([9, 11, 12]);
 const RECENT_WINDOW_DAYS = 14;
@@ -108,6 +109,57 @@ export function getRoadmapSummary() {
 
   cached = { overallPercent, phases, inProgress, upcoming, recentlyDone };
   return cached;
+}
+
+// Full phase-by-phase leaf tree (roadmap 14.2.2). Returns a map of
+// phase number -> { phase, leaves: [{id, label, status, depth, doneAt?}] }
+// covering ALL leaves regardless of status. Used by the /development
+// Layer 2 tree view; the summary export above stays unchanged.
+let cachedTree = null;
+
+export function getRoadmapFullTree() {
+  if (cachedTree && process.env.NODE_ENV === "production") return cachedTree;
+
+  const text = fs.readFileSync(ROADMAP_PATH, "utf8");
+  const lines = text.split(/\r?\n/);
+  const map = new Map();
+  let currentPhase = null;
+
+  for (const line of lines) {
+    const phase = line.match(PHASE_RE);
+    if (phase) {
+      currentPhase = {
+        number: Number(phase[1]),
+        title: phase[2].trim(),
+        weight: Number(phase[3]),
+        percent: Number(phase[4])
+      };
+      map.set(currentPhase.number, { phase: currentPhase, leaves: [] });
+      continue;
+    }
+
+    const leaf = line.match(LEAF_RE);
+    if (!leaf || !currentPhase) continue;
+
+    const status = leaf[2];
+    const id = leaf[3];
+    const rest = leaf[4];
+    const dateMatch = rest.match(DONE_DATE_RE);
+    const pollMatch = rest.match(POLL_TAG_RE);
+    map.get(currentPhase.number).leaves.push({
+      id,
+      label: cleanLabel(rest),
+      status,
+      depth: leaf[1].length,
+      doneAt: dateMatch ? dateMatch[1] : null,
+      pollSlug: pollMatch ? pollMatch[1] : null
+    });
+  }
+
+  cachedTree = Array.from(map.values()).sort(
+    (a, b) => a.phase.number - b.phase.number
+  );
+  return cachedTree;
 }
 
 export { topId };

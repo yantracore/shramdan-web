@@ -15,8 +15,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { SiteShell } from "@/components/SiteShell";
+import { StickyActionBar } from "@/components/StickyActionBar";
+import { TertiaryButton } from "@/components/TertiaryButton";
 import { usePreferences } from "@/app/providers";
 import { copy } from "@/lib/siteContent";
+import { getDemoEventTypeStats } from "@/lib/devMockData";
 
 export default function EventTypeDetailPage() {
   const params = useParams();
@@ -55,14 +58,21 @@ export default function EventTypeDetailPage() {
     .map((rid) => eventTypes.items.find((entry) => entry.id === rid))
     .filter(Boolean);
 
+  const stats = getDemoEventTypeStats(item.id);
+  const NP_DIGITS = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
+  const formatStatValue = (n) => {
+    const str = String(n);
+    if (language !== "np") return str;
+    return str.replace(/\d/g, (d) => NP_DIGITS[Number(d)]);
+  };
+
   return (
     <SiteShell pageTitle={`${item.title} | ${eventTypes.page.pageTitle}`}>
       <article className="event-type-detail">
         <header className="event-type-detail-header">
-          <Link className="event-type-detail-back" href="/event-types">
-            <ArrowLeftOutlined aria-hidden="true" />
+          <TertiaryButton href="/event-types" icon={<ArrowLeftOutlined />}>
             {detail.backToList}
-          </Link>
+          </TertiaryButton>
           <span className="eyebrow">{detail.eyebrow}</span>
           <h1>{item.title}</h1>
           {item.tagline ? (
@@ -78,6 +88,24 @@ export default function EventTypeDetailPage() {
                 : eventTypes.badgeFuture}
           </span>
         </header>
+
+        {stats.length > 0 ? (
+          <section
+            className="event-type-detail-stats"
+            aria-label={language === "np" ? "अहिलेसम्मको प्रभाव" : "Impact so far"}
+          >
+            {stats.map((stat, i) => (
+              <div className="event-type-detail-stat" key={i}>
+                <span className="event-type-detail-stat-value">
+                  {formatStatValue(stat.value)}
+                </span>
+                <span className="event-type-detail-stat-unit">
+                  {stat.unit?.[language] || stat.unit?.en || ""}
+                </span>
+              </div>
+            ))}
+          </section>
+        ) : null}
 
         <section
           className={`event-type-detail-hero event-type-detail-hero--${item.status}`}
@@ -225,12 +253,16 @@ export default function EventTypeDetailPage() {
         ) : null}
 
         <div className="event-type-detail-footer-actions">
-          <Link className="event-type-detail-back" href="/event-types">
-            <ArrowLeftOutlined aria-hidden="true" />
+          <TertiaryButton href="/event-types" icon={<ArrowLeftOutlined />}>
             {detail.backToList}
-          </Link>
+          </TertiaryButton>
         </div>
       </article>
+
+      <StickyActionBar
+        label={language === "np" ? "यस्तो समस्या रिपोर्ट गर्ने" : "Report this kind of problem"}
+        href={`/issues/new?category=${encodeURIComponent(item.id)}`}
+      />
     </SiteShell>
   );
 }
