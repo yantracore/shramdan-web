@@ -100,6 +100,26 @@
   --text-3xl:  clamp(1.875rem, 1.45rem + 2.1vw, 2.75rem);    /* 30 → 44 */
   --text-hero: clamp(2.25rem, 1.55rem + 3.4vw, 4rem);        /* 36 → 64 */
 
+  /* --- Component scale (THE responsive UI principle) ------------------ *
+   * Semantic sizes every title / eyebrow / button / card should consume so
+   * the whole site scales identically instead of each section hardcoding its
+   * own px/clamp. "Balanced" mobile densities. See
+   * docs/design/07-responsive-ui-scale.md. Change here → changes everywhere. */
+  --text-eyebrow:    clamp(0.6875rem, 0.66rem + 0.11vw, 0.8125rem); /* 11 → 13 */
+  --text-title-sm:   clamp(1.25rem, 1.06rem + 0.95vw, 1.875rem);    /* 20 → 30  section/rail headings */
+  --text-title-lg:   clamp(1.625rem, 1.2rem + 2.1vw, 2.75rem);      /* 26 → 44  page/hero headings */
+  --text-card-title: clamp(0.9375rem, 0.9rem + 0.18vw, 1.0625rem);  /* 15 → 17 */
+  --text-lead:       clamp(0.9375rem, 0.9rem + 0.25vw, 1.0625rem);  /* 15 → 17  section intros */
+
+  /* Buttons/pills — one compact-on-mobile sizing everyone shares. Pair with
+     min-height: var(--tap-min) on anything genuinely tappable. */
+  --btn-font:  clamp(0.8125rem, 0.79rem + 0.1vw, 0.875rem);         /* 13 → 14 */
+  --btn-pad-y: clamp(0.5rem, 0.46rem + 0.18vw, 0.625rem);           /* 8 → 10 */
+  --btn-pad-x: clamp(0.75rem, 0.6rem + 0.65vw, 1.125rem);           /* 12 → 18 */
+
+  /* Section vertical rhythm — tighter on phones, airier on desktop. */
+  --space-section-y: clamp(1.5rem, 1.1rem + 1.8vw, 2.5rem);         /* 24 → 40 */
+
   /* --- Spacing scale (4pt rhythm + fluid section steps) -------------- */
   --space-1: 4px;
   --space-2: 8px;

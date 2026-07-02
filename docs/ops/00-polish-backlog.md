@@ -78,6 +78,10 @@ When you (the coding agent) are working in this repo:
 - [ ] P2 [from 1.2.3] Related-issues ranking weighted by geo-distance, not category alone — effort:M
 - [x] P3 [from 1.2] Scroll-progress indicator on long issue descriptions — effort:S ← done: 2026-06-02 *(new `ScrollProgressBar` component renders a fixed top bar with a primary→accent gradient that fills via `transform: scaleX(progress)`; rendered inside `/issues/[id]`; respects `prefers-reduced-motion`.)*
 - [x] P1 [from 1.1] Public issue card images had no alt fallback when `issue.title` was null — Next.js Image stripped the empty alt and headings rendered empty — effort:S ← done: 2026-06-02 *(`PublicIssueCard` now uses an `accessibleLabel` fallback chain: title → addressText → categoryLabel → statusLabel; applied to both `<Image alt>` and the `<h3>` link)*
+- [ ] P1 [from 1.1] Combined map on `/campaigns` (issues + events with coords) — the `/issues` map was dropped when the list pages merged; restore a unified map of the current filtered results — effort:M
+- [ ] P2 [from 1.1] DRAFT card polish on `/campaigns` — DRAFT events have no `scheduledAt` and often carry junk slugs/titles on staging, so cards need a graceful "तयारीमा" treatment + a real title fallback — effort:S
+- [ ] P2 [from 1.1.2] Cross-kind sort dropdown on `/campaigns` (votes / participants / nearest) — only lifecycle order ships today — effort:M
+- [ ] P2 [from 1.1] Real cursor pagination across the merged `/campaigns` sources — currently each stage is capped ~50 and windowed client-side — effort:M
 
 ## Phase 9 — Admin Control Center
 
@@ -163,6 +167,8 @@ When you (the coding agent) are working in this repo:
 
 - [x] P3 [from 13] Persist `/events` filter pill state in URL query (`?show=live|upcoming|past`) for shareable filtered views — effort:S ← done: 2026-06-02 *(reads `?show=` on mount, syncs state via `router.replace` on click, respects back/forward navigation; `all` is the implicit default and never written.)*
 - [x] P2 [from 13] `/events` and homepage upcoming date pills emitted Latin digits in NP — Chromium's Intl `ne-NP` locale never honoured Devanagari numerals and also produced SSR/CSR hydration mismatch — effort:S ← done: 2026-06-02 *(replaced `Intl.DateTimeFormat("ne-NP", ...)` calls in `src/app/events/page.js` and `src/app/HomeClient.js` with a manual composition using `NP_MONTHS_SHORT` + `NP_WEEKDAYS_SHORT` tables and `localizeDigits` so output reads "बिहि, जुन ४, ६:५४" — deterministic across server and client.)*
+
+- [ ] P2 [from 13] "अब N साथ बाँकी" urgency chip on the support strip's near-threshold cards — the curated shelf already ships `remaining` (votes left to auto-promotion) and `useCuratedCampaigns` carries it on every entry; `CampaignCard` just needs to render it for OPEN cards when present. — effort:S *(logged with the 2026-07-02 curated-shelves migration)*
 
 ## Phase 14 — Live Event Detail
 

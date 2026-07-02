@@ -61,7 +61,7 @@
 
 .discovery-strip-title {
   margin: 0;
-  font-size: clamp(20px, 2.1vw, 30px);
+  font-size: var(--text-title-sm);
   line-height: 1.18;
   color: var(--primary-dark);
 }
@@ -74,12 +74,12 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 14px;
+  padding: var(--btn-pad-y) var(--btn-pad-x);
   border: 1px solid color-mix(in srgb, var(--line) 60%, transparent);
   border-radius: 999px;
   color: var(--primary-dark);
   font-weight: 700;
-  font-size: 14px;
+  font-size: var(--btn-font);
   background: color-mix(in srgb, var(--surface) 70%, transparent);
   -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);

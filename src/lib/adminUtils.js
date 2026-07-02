@@ -37,8 +37,11 @@ export const ISSUE_CATEGORIES = [
   "OTHER"
 ];
 
+// Hues align with the campaign lifecycle state colours
+// (docs/design/06-state-color-system.md): OPEN = indigo (geekblue), a promoted
+// EVENT_SCHEDULED issue = amber/planning (gold), COMPLETED = green.
 export const ISSUE_STATUS_COLORS = {
-  OPEN: "blue",
+  OPEN: "geekblue",
   EVENT_SCHEDULED: "gold",
   COMPLETED: "green",
   REJECTED: "red",

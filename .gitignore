@@ -22,3 +22,6 @@ pnpm-debug.log*
 /*.png
 .verify/
 .playwright-mcp/
+
+# QA test accounts (live JWTs — never commit)
+.qa-secrets/
