@@ -1,17 +1,16 @@
 "use client";
 
-// Phase 2 v0 of the TV-app pivot homepage. Replaces the old brochure-style
-// HomeClient at /. Stacked blocks above the fold:
+// The TV-app pivot homepage. Stacked blocks above the fold:
 //
-//   1. Brand title + slogan
+//   1. BrochureHero — restored pre-pivot video hero, Join + Learn More CTAs
 //   2. EventsHomeRail — the main highlight; viewport-scales 1 → 7 cards
 //   3. Stats pills + overview map
 //   4. Curated for-you stream
 //
-// The search box + filters button now live on /issues and /events (the
-// listing surfaces that actually have a dataset to narrow). HomeClient.js
-// stays in the repo as reference for /intro content. The IntroCinematic at
-// /intro is a separate, already-polished page.
+// The search box + filters button live on /issues and /events (the listing
+// surfaces that actually have a dataset to narrow). The rest of the old
+// brochure HomeClient content lives on /intro, /invitations, and /resources
+// (restored 2026-07-02 from 3d66f5b^).
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ActivityStatsRow } from "@/components/ActivityStatsRow";
