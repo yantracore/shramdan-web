@@ -292,19 +292,17 @@
   justify-content: space-between;
   padding: 12px;
   pointer-events: none;
-  /* Subtle scrims: just enough to keep the white title/badge legible —
-   * heavier stops read as a black curtain over the poster corners. */
   background:
     linear-gradient(
       to top,
-      rgba(0, 0, 0, 0.55) 0%,
-      rgba(0, 0, 0, 0.26) 24%,
-      rgba(0, 0, 0, 0) 46%
+      rgba(0, 0, 0, 0.78) 0%,
+      rgba(0, 0, 0, 0.48) 28%,
+      rgba(0, 0, 0, 0) 55%
     ),
     linear-gradient(
       to bottom,
-      rgba(0, 0, 0, 0.18) 0%,
-      rgba(0, 0, 0, 0) 24%
+      rgba(0, 0, 0, 0.30) 0%,
+      rgba(0, 0, 0, 0) 28%
     );
 }
 
