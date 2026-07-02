@@ -22,6 +22,10 @@
    breaks past 100 events/stage) plus a session-cached roster read per rendered
    fully-capped card — remove both when this lands. → [campaigns-feed.md](campaigns-feed.md)
 
+## Infra / ops — planned, not blocking
+
+1. **Domain naming swap (noted 2026-07-02).** Roles are currently inverted: `backend.shramdan.org` = PRODUCTION backend (clean DB; serves `www.shramdan.org`) while `api.shramdan.org` = seeded TEST-DATA backend (serves `stage.shramdan.org`). Acknowledged mistake; a future swap should make `api.` production and move test data behind a staging-named host. Cutover must be coordinated with the frontend's Vercel env vars (`NEXT_PUBLIC_API_BASE_URL`: Production ↔ Preview) and the committed `FALLBACK_API_BASE_URL` in `src/lib/apiClient.js` — swap both sides in the same window.
+
 ## P2 — functionality gaps
 
 1. **events** — reminder-cadence config so participants get pre-event reminders (scheduled notifications; backend-owned). Spec-verified: no reminder-cadence field. → [events.md](events.md), [notifications.md](notifications.md)
