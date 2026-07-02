@@ -21,10 +21,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { getJson } from "@/lib/apiClient";
 import { getListItems } from "@/lib/adminUtils";
 
-// Server-side cursor pagination: fetch a small page, then pull the next page via
-// `nextCursor` as the user scrolls — never a big up-front slab sliced in memory.
-// mode=maximum is heavier per row (descriptions + relations + event block), so
-// the page stays small.
+// Server-side page pagination (contract switched from cursor → page 2026-07-02):
+// fetch a small page, then pull page+1 as the user scrolls — never a big
+// up-front slab sliced in memory. mode=maximum is heavier per row
+// (descriptions + relations + event block), so the page stays small.
 const PAGE_SIZE = 20;
 
 // titles:{ne,en} → the translations[] array localizeIssue expects, so a locale
@@ -122,12 +122,13 @@ function adaptCampaignItem(item) {
   return { kind, status: item.status, id: data.id, data };
 }
 
-// One page. Returns { items, nextCursor } — the raw signal the caller pages on.
-async function fetchCampaignPage({ status, provinceId, districtId, category, search, sort, order, cursor }) {
+// One page. Returns { items, hasNext } — the raw signal the caller pages on.
+async function fetchCampaignPage({ status, provinceId, districtId, category, search, sort, order, page }) {
   const response = await getJson("/campaigns", {
     params: {
       mode: "maximum",
       limit: PAGE_SIZE,
+      page: page || 1,
       // "all" → no status param (backend returns the lifecycle-ordered merge);
       // a specific stage → that status only.
       ...(status && status !== "all" ? { status } : {}),
@@ -135,14 +136,13 @@ async function fetchCampaignPage({ status, provinceId, districtId, category, sea
       ...(districtId ? { districtId } : {}),
       ...(category ? { category } : {}),
       ...(search ? { search } : {}),
-      ...(sort ? { sort, order: order || "desc" } : {}),
-      ...(cursor ? { cursor } : {})
+      ...(sort ? { sort, order: order || "desc" } : {})
     }
   });
   const data = response?.data ?? response;
   const items = getListItems(response).map(adaptCampaignItem);
-  const nextCursor = data?.nextCursor ?? null;
-  return { items, nextCursor };
+  const hasNext = Boolean(data?.pagination?.hasNext);
+  return { items, hasNext };
 }
 
 export function useCampaignFeed({ status, language, provinceId, districtId, category, q, sort, order }) {
@@ -152,7 +152,9 @@ export function useCampaignFeed({ status, language, provinceId, districtId, cate
   const [error, setError] = useState("");
   const [hasMore, setHasMore] = useState(false);
 
-  const cursorRef = useRef(null);
+  // Last page fetched; loadMore requests pageRef + 1. 0 = nothing loaded yet.
+  const pageRef = useRef(0);
+  const hasNextRef = useRef(false);
   // Bumped on every filter change so a stale in-flight page (fired against the
   // OLD filters) can't append into the NEW list.
   const reqRef = useRef(0);
@@ -167,7 +169,8 @@ export function useCampaignFeed({ status, language, provinceId, districtId, cate
   useEffect(() => {
     let cancelled = false;
     const myReq = (reqRef.current += 1);
-    cursorRef.current = null;
+    pageRef.current = 0;
+    hasNextRef.current = false;
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
     setError("");
@@ -175,11 +178,12 @@ export function useCampaignFeed({ status, language, provinceId, districtId, cate
     setHasMore(false);
     (async () => {
       try {
-        const { items: pageItems, nextCursor } = await fetchCampaignPage(baseParams);
+        const { items: pageItems, hasNext } = await fetchCampaignPage({ ...baseParams, page: 1 });
         if (cancelled || reqRef.current !== myReq) return;
         setItems(pageItems);
-        cursorRef.current = nextCursor;
-        setHasMore(Boolean(nextCursor));
+        pageRef.current = 1;
+        hasNextRef.current = hasNext;
+        setHasMore(hasNext);
       } catch {
         if (cancelled || reqRef.current !== myReq) return;
         setItems([]);
@@ -194,22 +198,24 @@ export function useCampaignFeed({ status, language, provinceId, districtId, cate
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filterKey]);
 
-  // Next page — appends via nextCursor. No-op while a page is in flight, when
+  // Next page — appends page+1. No-op while a page is in flight, when
   // there's nothing more, or before the first page settled.
   const loadMore = useCallback(async () => {
-    if (loading || loadingMore || !cursorRef.current) return;
+    if (loading || loadingMore || !pageRef.current || !hasNextRef.current) return;
     const myReq = reqRef.current;
     setLoadingMore(true);
     try {
-      const { items: pageItems, nextCursor } = await fetchCampaignPage({
+      const nextPage = pageRef.current + 1;
+      const { items: pageItems, hasNext } = await fetchCampaignPage({
         ...baseParams,
-        cursor: cursorRef.current
+        page: nextPage
       });
       // A filter changed mid-flight → this page belongs to the old list; drop it.
       if (reqRef.current !== myReq) return;
       setItems((prev) => [...prev, ...pageItems]);
-      cursorRef.current = nextCursor;
-      setHasMore(Boolean(nextCursor));
+      pageRef.current = nextPage;
+      hasNextRef.current = hasNext;
+      setHasMore(hasNext);
     } catch {
       // Keep what's loaded; the sentinel can retry on the next intersection.
     } finally {

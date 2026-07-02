@@ -339,7 +339,7 @@ export default function CampaignsListPageContent({ status: statusProp = "all" })
       const params = new URLSearchParams(searchParams?.toString() || "");
       params.delete("status"); // legacy param — never reintroduce it
       // Any secondary-filter change/clear reshapes the result set, so the grid
-      // must fall back to page 1 (the list window + feed cursor already reset on
+      // must fall back to page 1 (the list window + feed paging already reset on
       // the filter change). Drop the stale `page` param.
       params.delete("page");
       if (next.category) params.set("category", next.category);
@@ -540,7 +540,7 @@ export default function CampaignsListPageContent({ status: statusProp = "all" })
   );
   // Two sources of "more": rows already loaded but not yet revealed by the
   // window, and pages still on the server. The list reveals the former a step at
-  // a time, then fetches the latter via cursor.
+  // a time, then fetches the latter page by page.
   const windowHasMore = visibleCount < filteredItems.length;
   const hasMore = windowHasMore || feedHasMore;
 
@@ -781,7 +781,10 @@ export default function CampaignsListPageContent({ status: statusProp = "all" })
     if (showDividers && entry.status !== lastStatus) {
       renderedItems.push(
         <li
-          key={`divider-${entry.status}`}
+          // Status can recur later in the stream (backend ordering interleaves
+          // stages since the 2026-07-02 page-pagination swap), so the key must
+          // be unique per occurrence, not per status.
+          key={`divider-${entry.status}-${renderedItems.length}`}
           role="separator"
           className="events-split-divider"
         >
