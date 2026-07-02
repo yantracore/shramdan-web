@@ -524,7 +524,7 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
                     menu={authedUserMenu}
                     placement="bottomRight"
                     trigger={["click"]}
-                    overlayClassName="site-corner-menu site-corner-menu--from-right"
+                    classNames={{ root: "site-corner-menu site-corner-menu--from-right" }}
                   >
                     <button
                       type="button"
@@ -547,7 +547,7 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
                     trigger="click"
                     placement="bottomRight"
                     arrow={false}
-                    overlayClassName="guest-user-popover-overlay site-corner-menu site-corner-menu--from-right"
+                    classNames={{ root: "guest-user-popover-overlay site-corner-menu site-corner-menu--from-right" }}
                   >
                     <button
                       type="button"

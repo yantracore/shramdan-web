@@ -173,7 +173,7 @@ export function NotificationsBell({ language = "np" }) {
 
   return (
     <Dropdown
-      dropdownRender={() => panel}
+      popupRender={() => panel}
       open={open}
       onOpenChange={handleOpenChange}
       placement="bottomRight"

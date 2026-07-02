@@ -107,8 +107,8 @@ export function EmojiPicker({
       open={open}
       onOpenChange={setOpen}
       placement="topLeft"
-      overlayClassName="comment-emoji-popover"
-      destroyTooltipOnHide
+      classNames={{ root: "comment-emoji-popover" }}
+      destroyOnHidden
     >
       {trigger || defaultTrigger}
     </Popover>

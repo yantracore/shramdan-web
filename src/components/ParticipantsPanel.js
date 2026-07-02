@@ -556,7 +556,7 @@ export function ParticipantsPanel({
               cancelText={t.leaveCancel}
               okButtonProps={{ danger: true, loading: leaving }}
               onConfirm={handleLeave}
-              overlayClassName="vote-withdraw-popconfirm"
+              classNames={{ root: "vote-withdraw-popconfirm" }}
             >
               <button
                 type="button"
@@ -664,7 +664,7 @@ export function ParticipantsPanel({
               cancelText={t.leaveCancel}
               okButtonProps={{ danger: true, loading: leadLeaving }}
               onConfirm={handleLeaveLead}
-              overlayClassName="vote-withdraw-popconfirm"
+              classNames={{ root: "vote-withdraw-popconfirm" }}
             >
               <button
                 type="button"
