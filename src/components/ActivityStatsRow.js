@@ -116,10 +116,18 @@ function foldCounts(issues, buckets) {
   };
 }
 
+// Three modes, picked per page:
+//   - static (default): plain counts — pure read-only rail.
+//   - interactive: each step LINKS to its /campaigns/<slug> section.
+//   - filter (onSelectStatus given): each step is a TOGGLE button — home uses
+//     this to drive the map right below the rail. `activeStatus` marks the
+//     pressed step; clicking it again clears (the row hands null back).
 function ActivityStatsRowInner({
   language = "np",
   interactive = false,
-  currentPage
+  currentPage,
+  activeStatus = null,
+  onSelectStatus
 }) {
   const t = COPY[language] || COPY.np;
   const searchParams = useSearchParams();
@@ -163,15 +171,18 @@ function ActivityStatsRowInner({
     return base;
   };
 
+  const isFilter = typeof onSelectStatus === "function";
+
   return (
     <ol
-      className={`activity-funnel${interactive ? " is-interactive" : ""}`}
+      className={`activity-funnel${interactive || isFilter ? " is-interactive" : ""}`}
       aria-label={t.ariaLabel}
     >
       {STEPS.map((step) => {
         const { key } = step;
         const label = campaignStatusLabel(key, language);
         const value = counts[key] || 0;
+        const isActive = isFilter && activeStatus === key;
         const body = (
           <>
             <span className="activity-funnel-marker">
@@ -181,8 +192,21 @@ function ActivityStatsRowInner({
           </>
         );
         return (
-          <li key={key} className={`activity-funnel-step step-${key.toLowerCase()}`}>
-            {interactive ? (
+          <li
+            key={key}
+            className={`activity-funnel-step step-${key.toLowerCase()}${isActive ? " is-active" : ""}`}
+          >
+            {isFilter ? (
+              <button
+                type="button"
+                className="activity-funnel-link"
+                aria-pressed={isActive}
+                aria-label={`${label}: ${value}`}
+                onClick={() => onSelectStatus(isActive ? null : key)}
+              >
+                {body}
+              </button>
+            ) : interactive ? (
               <Link
                 href={hrefFor(step)}
                 className="activity-funnel-link"

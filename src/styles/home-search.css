@@ -284,6 +284,25 @@
   overflow: hidden;
 }
 
+/* CampaignsMap ships its own glass frame plus empty/skeleton cards; nested in
+ * the home glass frame those edges would double up. Same rule as above: the
+ * outer frame is the only visible edge. */
+.home-search-map-frame .campaigns-map-frame,
+.home-search-map-frame .campaigns-map-empty,
+.home-search-map-frame .issue-map-skeleton {
+  border: 0;
+  border-radius: inherit;
+  box-shadow: none;
+}
+
+/* Empty/skeleton states hold the same short home-map height as the map itself
+ * (below), so toggling a funnel filter never makes the panel jump. */
+.home-search-map-frame .campaigns-map-empty,
+.home-search-map-frame .issue-map-skeleton {
+  min-height: 0;
+  height: clamp(200px, 30vh, 320px);
+}
+
 /* The home map is only a preview/teaser (browsing + filters live on
  * /campaigns), so keep it a short, viewport-proportional container instead of
  * the tall browse height. Overrides EventMap's inline px height (hence

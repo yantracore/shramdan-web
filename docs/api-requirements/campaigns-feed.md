@@ -11,7 +11,7 @@
 > nor the badge numbers are real beyond the cap. This file specifies the backend
 > support needed to make the feed, its counts, and its map mode correct at scale.
 
-**Spec status:** `shipped (list + counts); map still proposed`
+**Spec status:** `shipped (list + counts + minimal map mode)`
 **Last updated:** 2026-07-02
 **Owner:** Pranish (backend)
 
@@ -60,6 +60,28 @@ discriminated by `kind`.
 - **voteCount** (`number`, optional, public) — issues: supporter count (drives "2 supporters").
 - **participantCount** (`number`, optional, public) — events: joined workers.
 - **issueId** (`string`, optional, public) — on event items, the originating issue (already present on event payloads).
+
+### Per-viewer participation echo — REQUESTED (P1, 2026-07-02)
+
+**Gap (verified live 2026-07-02):** authenticated `GET /campaigns?mode=maximum`
+carries `myVote` (`{ voterRole, eventRole }` — the caller's *vote* on the
+backing issue) but **no participation echo for the event itself**. Joining an
+event directly (`POST /events/{id}/participants`) never sets `myVote`, so a
+member who joined an ACTIVE/SCHEDULED event sees a plain "Join" button on every
+campaigns-feed card after a refresh — while `GET /events` list items already
+embed exactly the needed field.
+
+**Request:** mirror the `GET /events` behaviour — for authenticated callers,
+add `viewerParticipation` (the caller's `EventParticipant` row
+`{ id, eventId, role, status, joinedAt, confirmedAt, checkedInAt, note }`, or
+`null`) to every **event-stage** item in `mode=maximum`. Omit for anonymous
+callers and for `OPEN` items, same as `/events`.
+
+**Interim frontend workaround (shipped 2026-07-02, remove when this lands):**
+`useCampaignFeed` fires one bulk sweep over `GET /events?status=DRAFT|SCHEDULED|ACTIVE`
+(3 requests, limit 100 each) and decorates feed items with the embedded
+`viewerParticipation`. Correct but wasteful — and silently incomplete beyond
+100 events per stage.
 
 ### Ordering
 
@@ -146,11 +168,18 @@ Response:
 
 ---
 
-## 3. `GET /campaigns/map` — lightweight markers — PROPOSED (under discussion)
+## 3. Lightweight markers — SHIPPED as `GET /campaigns?mode=minimal`
 
-> **Do not build yet.** The map cannot paginate, and "zoom in to load more"
-> would make the on-screen totals wrong, so we are deliberately choosing a
-> different shape. Leading proposal below; to be confirmed before implementation.
+> **Shipped (2026-07-02), with one shape change from the proposal:** instead of
+> a separate `/campaigns/map` path, the backend added `mode=minimal` to the list
+> endpoint. Same idea, same filters, same "ship every matching marker in one
+> cheap payload" contract (tiny even at `limit=1000`). The original proposal is
+> kept below as the rationale record.
+>
+> **Frontend consumers (map-only, by design):** the `/campaigns` map view
+> (`useCampaignMarkers` — URL-driven filters) and, since 2026-07-02, the home
+> overview map (same hook, explicit `status`-only filter driven by the activity
+> funnel). No other surface may use `mode=minimal`.
 
 **Proposal:** one un-paginated endpoint that returns **all** matching campaigns
 as the smallest possible record, cheap enough to ship thousands in a single
@@ -186,14 +215,27 @@ MVP because it breaks accurate totals.
   slicing memory. ✅ (2026-07-01, moved to `page`-based 2026-07-02)
 - The load-more spinner gets bound to a real `loadingMore` state and hidden when
   `pagination.hasNext === false` (fixes the perpetual spinner). ✅
-- `useCampaignCounts` drops its capped list-length counting for `GET /campaigns/counts`.
-- `CampaignsMap` consumes `GET /campaigns/map` + client clustering instead of the
-  full in-memory feed.
+- `useCampaignCounts` drops its capped list-length counting for `GET /campaigns/counts`. ✅
+- `CampaignsMap` consumes the minimal marker payload + client clustering instead
+  of the full in-memory feed. ✅ (2026-07-02, via `mode=minimal`; home overview
+  map joined the same source the same day)
+- `ActivityStatsRow` (the five-step funnel on home) still folds its counts from
+  `GET /issues?limit=100` + three `GET /events?status=…` calls — capped, wasteful,
+  and drifting from the map's totals. Swap to `GET /campaigns/counts`. ⏳
 
 ---
 
 ## Recent changes
 
+- `2026-07-02` — **map mode confirmed shipped + home adoption:** the proposed
+  `/campaigns/map` landed as `mode=minimal` on the list endpoint; section 3
+  updated to match. The home overview map now consumes it too (funnel-driven
+  `status` filter only), replacing its old full `GET /issues?limit=100` fetch +
+  event-bucket reuse.
+- `2026-07-02` — **`viewerParticipation` embed requested (P1):** event-stage
+  `mode=maximum` items need the caller's participation row so list cards can
+  show "Joined as …" after a refresh (see the REQUESTED section under "Item
+  shape"). Interim client-side bulk sweep over `GET /events` shipped same day.
 - `2026-07-02` — **ordering regression flagged:** `status=all` no longer comes
   back lifecycle-grouped (see the ⚠️ callout under "Ordering") — needs a backend
   fix or an explicit contract update.

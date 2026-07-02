@@ -15,22 +15,22 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ActivityStatsRow } from "@/components/ActivityStatsRow";
-import EventMapBlock from "@/components/EventMapBlock";
+import { CampaignsMap } from "@/components/CampaignsMap";
 import { EventsHomeRail } from "@/components/EventsHomeRail";
 import HomeDiscoveryRails from "@/components/HomeDiscoveryRails";
 import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
 import { listAllEvents } from "@/lib/eventsApi";
-import { getJson } from "@/lib/apiClient";
-import { getListItems } from "@/lib/adminUtils";
+import { CAMPAIGN_STATUS_SEQUENCE } from "@/lib/campaignStatus";
 import { copy } from "@/lib/siteContent";
 
-// Issue statuses surfaced publicly (mirrors /issues page) — the home map mixes
-// these raw issues in with scheduled events so the overview shows everything.
-const PUBLIC_ISSUE_STATUSES = ["OPEN", "EVENT_SCHEDULED", "COMPLETED"];
-const MAP_ISSUE_LIMIT = 100;
+// The map's status filter, picked by tapping a step of the activity funnel
+// right above it. Session-scoped and DELIBERATELY separate from /campaigns'
+// URL-driven filters (+ shramdan:campaigns:list-state) — a stage picked on
+// home must never re-filter the campaigns page, and vice versa.
+const HOME_MAP_STATUS_KEY = "shramdan:home:map-status";
 
 export default function HomeSearchView() {
   const { language } = usePreferences();
@@ -40,27 +40,24 @@ export default function HomeSearchView() {
 
   const [liveEvents, setLiveEvents] = useState([]);
   const [upcomingEvents, setUpcomingEvents] = useState([]);
-  const [pastEvents, setPastEvents] = useState([]);
   const [eventsLoading, setEventsLoading] = useState(true);
-  const [mapIssues, setMapIssues] = useState([]);
+  const [mapStatus, setMapStatus] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
     setEventsLoading(true);
     (async () => {
       try {
-        // listAllEvents() returns the three buckets in one shot so the
-        // rail and the map stay in sync without firing 3 parallel calls.
+        // Both rail buckets in one shot — the map no longer rides on these
+        // (it has its own minimal /campaigns fetch via CampaignsMap).
         const buckets = await listAllEvents({ language });
         if (cancelled) return;
         setLiveEvents(buckets.active ?? []);
         setUpcomingEvents(buckets.scheduled ?? []);
-        setPastEvents(buckets.completed ?? []);
       } catch {
         if (cancelled) return;
         setLiveEvents([]);
         setUpcomingEvents([]);
-        setPastEvents([]);
       } finally {
         if (!cancelled) setEventsLoading(false);
       }
@@ -70,43 +67,30 @@ export default function HomeSearchView() {
     };
   }, [language]);
 
-  // Raw issues for the map — independent of the event buckets above. Language
-  // doesn't change the geo filter, so this fires once; markers re-localize via
-  // the `language` prop on render.
+  // Restore the persisted map filter AFTER mount — reading sessionStorage in
+  // the useState initializer would make the server and client first paints
+  // disagree (hydration mismatch on aria-pressed / is-active).
   useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const response = await getJson("/issues", {
-          params: { limit: MAP_ISSUE_LIMIT }
-        });
-        if (cancelled) return;
-        const items = getListItems(response)
-          .filter((issue) => PUBLIC_ISSUE_STATUSES.includes(issue?.status))
-          .filter((issue) => {
-            const lat = Number(issue?.latitude);
-            const lng = Number(issue?.longitude);
-            return Number.isFinite(lat) && Number.isFinite(lng);
-          });
-        setMapIssues(items);
-      } catch {
-        if (!cancelled) setMapIssues([]);
+    try {
+      const stored = window.sessionStorage.getItem(HOME_MAP_STATUS_KEY);
+      if (stored && CAMPAIGN_STATUS_SEQUENCE.includes(stored)) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setMapStatus(stored);
       }
-    })();
-    return () => {
-      cancelled = true;
-    };
+    } catch {
+      /* storage unavailable — filter just starts at "all" */
+    }
   }, []);
 
-  const mapEntries = useMemo(() => {
-    const tag = (events, status) =>
-      (events ?? []).map((event) => ({ event, status }));
-    return [
-      ...tag(liveEvents, "active"),
-      ...tag(upcomingEvents, "scheduled"),
-      ...tag(pastEvents, "completed")
-    ];
-  }, [liveEvents, upcomingEvents, pastEvents]);
+  const handleSelectStatus = useCallback((next) => {
+    setMapStatus(next);
+    try {
+      if (next) window.sessionStorage.setItem(HOME_MAP_STATUS_KEY, next);
+      else window.sessionStorage.removeItem(HOME_MAP_STATUS_KEY);
+    } catch {
+      /* best-effort persistence only */
+    }
+  }, []);
 
   return (
     <SiteShell>
@@ -144,38 +128,39 @@ export default function HomeSearchView() {
       <section className="home-search-panel" aria-label={search.mapEyebrow}>
         <div className="home-search-panel-inner">
           <div className="home-search-stats">
-            <ActivityStatsRow language={language} />
+            <ActivityStatsRow
+              language={language}
+              activeStatus={mapStatus}
+              onSelectStatus={handleSelectStatus}
+            />
           </div>
 
-          {mapEntries.length > 0 || mapIssues.length > 0 ? (
-            <section
-              className="home-search-map"
-              aria-labelledby="home-search-map-title"
-            >
-              <header className="home-search-map-header">
-                <span className="eyebrow home-search-map-eyebrow">
-                  {search.mapEyebrow}
-                </span>
-              </header>
-              <h2 id="home-search-map-title" className="sr-only">
+          {/* Always rendered: the funnel above is this map's filter control,
+              so the canvas has to stay put even when a stage plots nothing. */}
+          <section
+            className="home-search-map"
+            aria-labelledby="home-search-map-title"
+          >
+            <header className="home-search-map-header">
+              <span className="eyebrow home-search-map-eyebrow">
                 {search.mapEyebrow}
-              </h2>
-              <div className="home-search-map-frame">
-                <EventMapBlock
-                  entries={mapEntries}
-                  issues={mapIssues}
-                  issuesContent={t.issues}
-                  t={search.map}
-                  language={language}
-                  height={320}
-                  interactive
-                  enableFullscreen
-                  fullscreenLabel={search.map.fullscreenOpen}
-                  exitFullscreenLabel={search.map.fullscreenClose}
-                />
-              </div>
-            </section>
-          ) : null}
+              </span>
+            </header>
+            <h2 id="home-search-map-title" className="sr-only">
+              {search.mapEyebrow}
+            </h2>
+            <div className="home-search-map-frame">
+              <CampaignsMap
+                items={[]}
+                language={language}
+                content={t.issues}
+                mapCopy={search.map}
+                emptyLabel={search.mapEmpty}
+                height={320}
+                filters={{ status: mapStatus }}
+              />
+            </div>
+          </section>
         </div>
       </section>
 

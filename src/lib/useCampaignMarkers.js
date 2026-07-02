@@ -5,11 +5,15 @@
 // viewports (tiny even at limit=1000, so the map shows EVERY campaign, not just
 // the list's current page).
 //
-// Kept self-contained: it reads the SAME filters the list uses straight from the
-// URL (status from the path, the rest from the query), so the map and list agree
-// without threading new props through the page. The map component falls back to
-// the in-memory list feed while this loads or if it errors, so it never renders
-// worse than before.
+// Two filter sources, one hook:
+//   - Default (no args): reads the SAME filters the /campaigns list uses straight
+//     from the URL (status from the path, the rest from the query), so the map and
+//     list agree without threading new props through the page.
+//   - `{ filters }` override: the caller owns the filters outright and the URL is
+//     ignored — the home map passes its own session-scoped status this way, so
+//     home and /campaigns filters never leak into each other.
+// The map component falls back to the in-memory list feed while this loads or if
+// it errors, so it never renders worse than before.
 
 import { useCallback, useEffect, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
@@ -43,21 +47,34 @@ function adaptMarker(item) {
   };
 }
 
-export function useCampaignMarkers() {
+export function useCampaignMarkers({ filters } = {}) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [markers, setMarkers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
-  // Status lives in the path (/campaigns/<slug>); the rest ride the query —
-  // mirror CampaignsListClient's reading so the map matches the list.
+  // Explicit filters win outright; otherwise status lives in the path
+  // (/campaigns/<slug>) and the rest ride the query — mirror
+  // CampaignsListClient's reading so the map matches the list.
   const slug = (pathname || "").split("/")[2] || null;
-  const status = slug ? campaignSlugToStatus(slug) : null;
-  const category = searchParams?.get("category") || null;
-  const provinceId = searchParams?.get("province") || null;
-  const districtId = searchParams?.get("district") || null;
-  const search = searchParams?.get("q") || null;
+  const status = filters
+    ? filters.status || null
+    : slug
+      ? campaignSlugToStatus(slug)
+      : null;
+  const category = filters
+    ? filters.category || null
+    : searchParams?.get("category") || null;
+  const provinceId = filters
+    ? filters.provinceId || null
+    : searchParams?.get("province") || null;
+  const districtId = filters
+    ? filters.districtId || null
+    : searchParams?.get("district") || null;
+  const search = filters
+    ? filters.search || null
+    : searchParams?.get("q") || null;
 
   const load = useCallback(
     () =>

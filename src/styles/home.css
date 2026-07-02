@@ -8977,6 +8977,29 @@
   outline-offset: 3px;
 }
 
+/* Filter mode (home): the step is a <button> toggling the map's status filter.
+   Strip the UA button chrome so it wears the exact link styling. */
+button.activity-funnel-link {
+  width: 100%;
+  border: 0;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+}
+
+/* The pressed step: a ring in the step's own state colour (the marker's ink is
+   currentColor here) + full-ink label, so the active stage reads at a glance. */
+.activity-funnel-step.is-active .activity-funnel-marker {
+  box-shadow:
+    0 0 0 2px currentColor,
+    0 0 0 6px color-mix(in srgb, var(--surface) 80%, transparent);
+}
+
+.activity-funnel-step.is-active .activity-funnel-label {
+  color: var(--text);
+  font-weight: 700;
+}
+
 .activity-funnel-marker {
   display: inline-flex;
   align-items: center;
