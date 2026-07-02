@@ -88,12 +88,14 @@ looks broken when built wrong. Rules that make it read as intentional:
 - Image: fixed hero height → `~100px` (was 168px). Shorter aspect.
 - Body: padding `8–9px`, inner gap `5–6px`, title `12.5–13px` (2-line clamp),
   meta `10.5px`.
-- Footer: an inline Support/Join button can't fit a 2-col card. If desktop keeps
-  it, hide it on phones only
-  (`@media (max-width:640px){ .campaign-card-foot .campaign-action-btn{display:none} }`)
-  and let the whole-card tap open the detail page where the action lives; completed
-  cards keep their `View ›` link. (Do NOT wrap/restructure the footer JSX — that
-  shifted the desktop button and truncated it.)
+- Footer (consistent across every status): **left** = a small people icon + just
+  the number (drop the avatar stack AND the "supporters/participants" word — a full
+  phrase is noise on a thumbnail); **right** = the CTA for *every* status, but
+  **icon-only** so it always fits beside the count on a ~170px card (keep the label
+  as `sr-only`, not `display:none`, so it stays accessible). Full-word CTA labels do
+  NOT fit at this width — that's the flaw to design around, not truncate. Split the
+  count into `num` + `word` spans in JSX (hide the word on phones) rather than
+  restructuring the footer wrappers, so desktop stays byte-identical.
 - Horizontal list cards: shrink the thumb (`~110px`) + padding on phone so the
   list view is dense too.
 

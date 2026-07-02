@@ -283,6 +283,12 @@
   gap: 18px;
 }
 
+/* People/count icon — shown ONLY on the compact phone card (see the media query
+   below), where the avatar stack is dropped. Hidden on desktop. */
+.campaign-card-count-ico {
+  display: none;
+}
+
 /* Compact 2-column cards on phones — DESKTOP IS UNTOUCHED. Reduce EVERYTHING
    (image height, padding, gaps, type), not just width, so thumbnails read as
    proper mobile cards and two fit per row. The inline participation button is
@@ -321,21 +327,52 @@
   }
   .campaign-card-foot {
     padding-top: 6px;
+    gap: 6px;
   }
-  .campaign-card-count {
-    font-size: 11px;
+  /* Left — drop the avatar stack + the "supporters/participants" word; show just
+     a small people icon + the number. */
+  .campaign-card-people {
+    gap: 4px;
+    min-width: 0;
   }
-  .campaign-card-cta {
-    padding: 5px 9px;
-    font-size: 11px;
-  }
-  /* Inline support/join button doesn't fit a 2-col card — drop it; the card tap
-     opens the detail page. Completed cards keep their "View" link. */
-  .campaign-card-foot .campaign-action-btn {
+  .campaign-card-people .map-pop-avatars {
     display: none;
   }
-  .campaign-card-foot:has(.campaign-action-btn) {
-    justify-content: flex-start;
+  .campaign-card-count-ico {
+    display: inline-flex;
+    flex: none;
+    color: var(--muted);
+  }
+  .campaign-card-count {
+    font-size: 11.5px;
+    font-weight: 700;
+  }
+  .campaign-card-count-word {
+    display: none;
+  }
+  /* Right — keep a CTA for EVERY status, icon-only so it always fits beside the
+     count on a ~170px card. The label stays for screen readers (sr-only), so the
+     participation buttons AND the "View" link collapse to just their icon. */
+  .campaign-card-foot .campaign-action-btn {
+    max-width: none;
+    padding: 6px 9px;
+  }
+  .campaign-card-cta {
+    flex: none;
+    padding: 6px 9px;
+    gap: 0;
+  }
+  .campaign-card-foot .campaign-action-btn .campaign-action-btn-label,
+  .campaign-card-cta span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 }
 

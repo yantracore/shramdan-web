@@ -68,6 +68,19 @@ function ArrowGlyph() {
   );
 }
 
+// Small people glyph shown only on the compact (phone) card, where the avatar
+// stack is dropped and the count collapses to "icon + number".
+function CountGlyph() {
+  return (
+    <svg className="campaign-card-count-ico" viewBox="0 0 24 24" width="13" height="13" aria-hidden="true">
+      <path
+        fill="currentColor"
+        d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4zm0 2c-3.3 0-8 1.66-8 5v1h16v-1c0-3.34-4.7-5-8-5z"
+      />
+    </svg>
+  );
+}
+
 // Deterministic supporter/participant avatar discs — the SAME treatment as the
 // map info-window's SupporterStack (IssueMap.js), inlined here so the card never
 // pulls leaflet into every page that renders it. A campaign carries only a count
@@ -250,6 +263,21 @@ export function CampaignCard({ campaign, language = "np", distanceKm = null }) {
   const ctaLabel = language === "np" ? "विवरण" : "View";
   const hasCoords = Number.isFinite(c.latitude) && Number.isFinite(c.longitude);
   const countText = formatCount(c.count, c.countKind, language);
+  // Count split into number + word so the compact (phone) card can show just the
+  // icon + number while desktop still renders the full "15 supporters" text.
+  const countNum = toLocalDigits(c.count, language);
+  const countWord =
+    language === "np"
+      ? c.countKind === "supporters"
+        ? "समर्थक"
+        : "सहभागी"
+      : c.countKind === "supporters"
+        ? Number(c.count) === 1
+          ? "supporter"
+          : "supporters"
+        : Number(c.count) === 1
+          ? "participant"
+          : "participants";
 
   // Raw kind + data for the participation CTA (normalizeCampaign keeps only the
   // display fields). Same kind detection as normalizeCampaign.
@@ -336,7 +364,11 @@ export function CampaignCard({ campaign, language = "np", distanceKm = null }) {
           {countText ? (
             <div className="campaign-card-people">
               <SupporterStack seed={c.slug || c.title} count={c.count} />
-              <span className="campaign-card-count">{countText}</span>
+              <CountGlyph />
+              <span className="campaign-card-count">
+                <span className="campaign-card-count-num">{countNum}</span>
+                <span className="campaign-card-count-word"> {countWord}</span>
+              </span>
             </div>
           ) : null}
           {cta || (
