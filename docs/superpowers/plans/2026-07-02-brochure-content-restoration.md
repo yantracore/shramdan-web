@@ -38,6 +38,7 @@ Verified line map of `old-HomeClient.js` (954 lines total):
 | --- | --- |
 | 117–126 | `resourceIcons` map |
 | 128–140 | `volunteerRoleIcons` map |
+| 142–148 | `workflowStepIcons` map (used by the core-idea section) |
 | 150–182 | `buildingNowIconByKey` + `buildingNowIconByPhase` maps |
 | 184–254 | `pickBuildingNowIcon`, `relativeShippedLabel`, `buildBuildingNowItems` |
 | 356–377 | hero: `<MotionSection …"hero-section">` + video + `hero-copy` div (aside/panel at 378–440 is NOT restored) |
@@ -45,7 +46,7 @@ Verified line map of `old-HomeClient.js` (954 lines total):
 | 650–681 | `cleanup-areas-section` |
 | 682–738 | `core-idea-section` |
 | 739–821 | `volunteer-invite-section` |
-| 822–892 | `building-now-section` (conditional block) |
+| 821–892 | `building-now-section` (conditional block, opener `{buildingNowCards.length > 0 ? (` included) |
 | 893–952 | `resources-section` |
 
 Verified line map of `old-siteContent.js`:
@@ -369,12 +370,14 @@ import {
   HeartOutlined,
   HomeOutlined,
   LikeOutlined,
+  LineChartOutlined,
   LoadingOutlined,
   MessageOutlined,
   MobileOutlined,
   SafetyOutlined,
   ShareAltOutlined,
   TeamOutlined,
+  ToolOutlined,
   TranslationOutlined,
   UnorderedListOutlined,
   UserOutlined
@@ -389,9 +392,9 @@ import { SiteShell } from "@/components/SiteShell";
 import { usePreferences } from "@/app/providers";
 import { copy } from "@/lib/siteContent";
 
-// ── SLOT A: lines 150–254 of old-HomeClient.js, verbatim ──
-// (buildingNowIconByKey, buildingNowIconByPhase, pickBuildingNowIcon,
-//  relativeShippedLabel, buildBuildingNowItems)
+// ── SLOT A: lines 142–254 of old-HomeClient.js, verbatim ──
+// (workflowStepIcons, buildingNowIconByKey, buildingNowIconByPhase,
+//  pickBuildingNowIcon, relativeShippedLabel, buildBuildingNowItems)
 
 export default function IntroClient({ summary }) {
   const { language } = usePreferences();
@@ -410,8 +413,8 @@ export default function IntroClient({ summary }) {
       {/* ── SLOT B: lines 586–738 of old-HomeClient.js, verbatim ──
           (event-types-section, cleanup-areas-section, core-idea-section) */}
 
-      {/* ── SLOT C: lines 822–892 of old-HomeClient.js, verbatim ──
-          (building-now-section conditional) */}
+      {/* ── SLOT C: lines 821–892 of old-HomeClient.js, verbatim ──
+          (building-now-section conditional, incl. the line-821 opener) */}
     </SiteShell>
   );
 }
@@ -420,9 +423,9 @@ export default function IntroClient({ summary }) {
 Extraction commands for the slots:
 
 ```bash
-sed -n '150,254p' "$SCRATCH/old-HomeClient.js"   # SLOT A
+sed -n '142,254p' "$SCRATCH/old-HomeClient.js"   # SLOT A
 sed -n '586,738p' "$SCRATCH/old-HomeClient.js"   # SLOT B
-sed -n '822,892p' "$SCRATCH/old-HomeClient.js"   # SLOT C
+sed -n '821,892p' "$SCRATCH/old-HomeClient.js"   # SLOT C
 ```
 
 After pasting, verify no dropped-era identifiers slipped in:
