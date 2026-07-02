@@ -27,7 +27,11 @@
 import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { getJson } from "@/lib/apiClient";
 import { getAuthSession, subscribeAuthSession } from "@/lib/authSession";
-import { adaptCampaignItem, fetchViewerParticipationMap } from "@/lib/useCampaignFeed";
+import {
+  adaptCampaignItem,
+  enrichCampaignItem,
+  fetchViewerParticipationMap
+} from "@/lib/useCampaignFeed";
 import { useGeolocation } from "@/lib/useGeolocation";
 
 const SHELF_KEYS = [
@@ -100,23 +104,20 @@ export function useCuratedCampaigns() {
   // HomeDiscoveryRails fires this when the strips scroll into view.
   const requestLocation = useCallback(() => requestGeo(), [requestGeo]);
 
-  // Same viewer-participation gap as /campaigns: curated markers carry myVote
-  // but never viewerParticipation (backend embed requested in
-  // docs/api-requirements/campaigns-feed.md), so signed-in viewers get the
-  // one bulk /events sweep to paint committed join chips.
+  // Same event-card gap as /campaigns: curated markers carry myVote but never
+  // viewerParticipation or rolePlan (backend embed requested in
+  // docs/api-requirements/campaigns-feed.md), so every viewer gets the one
+  // bulk /events sweep — committed join chips for the signed-in, rolePlan
+  // targets (pre-click "Full") for everyone. Stored with the viewerId it
+  // belongs to, so logout makes the stale map inert without a state reset.
   const session = useSyncExternalStore(subscribeAuthSession, getAuthSession, () => null);
   const viewerId = session?.user?.id || null;
-  const [participationMap, setParticipationMap] = useState(null);
+  const [participation, setParticipation] = useState(null);
 
   useEffect(() => {
-    if (!viewerId) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setParticipationMap(null);
-      return undefined;
-    }
     let cancelled = false;
     fetchViewerParticipationMap().then((map) => {
-      if (!cancelled) setParticipationMap(map);
+      if (!cancelled) setParticipation({ viewerId, map });
     });
     return () => {
       cancelled = true;
@@ -124,18 +125,13 @@ export function useCuratedCampaigns() {
   }, [viewerId]);
 
   const decoratedShelves = useMemo(() => {
-    if (!participationMap || participationMap.size === 0) return shelves;
+    const map =
+      participation && participation.viewerId === viewerId ? participation.map : null;
+    if (!map || map.size === 0) return shelves;
     return Object.fromEntries(
-      SHELF_KEYS.map((key) => [
-        key,
-        shelves[key].map((it) =>
-          it.kind === "event" && participationMap.has(it.id)
-            ? { ...it, data: { ...it.data, viewerParticipation: participationMap.get(it.id) } }
-            : it
-        )
-      ])
+      SHELF_KEYS.map((key) => [key, shelves[key].map((it) => enrichCampaignItem(it, map))])
     );
-  }, [shelves, participationMap]);
+  }, [shelves, participation, viewerId]);
 
   return { shelves: decoratedShelves, loading, error, requestLocation };
 }

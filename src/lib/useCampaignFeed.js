@@ -127,14 +127,16 @@ export function adaptCampaignItem(raw) {
   return { kind, status: item.status, id: data.id, data };
 }
 
-// ── Viewer participation sweep ──────────────────────────────────────────────
-// /campaigns (even mode=maximum) carries NO participation echo — only the
-// myVote field, which a direct event join never sets (verified live
-// 2026-07-02; backend embed requested in docs/api-requirements/campaigns-feed.md).
-// GET /events DOES embed `viewerParticipation` per item for authenticated
-// callers, so until /campaigns grows the same field we recover "which of
-// these events am I in?" with one bulk sweep over the stages whose cards
-// actually render a join CTA (CampaignCard gates on DRAFT/SCHEDULED/ACTIVE).
+// ── Event card enrichment sweep ─────────────────────────────────────────────
+// /campaigns markers (even mode=maximum, curated included) carry NO
+// participation echo and NO rolePlan — only the myVote field, which a direct
+// event join never sets (verified live 2026-07-02; backend embed requested in
+// docs/api-requirements/campaigns-feed.md). GET /events items DO carry both:
+// `viewerParticipation` (authenticated callers) and the rolePlan targets. So
+// until /campaigns grows the same fields we recover them with one bulk sweep
+// over the stages whose cards actually render a join CTA (CampaignCard gates
+// on DRAFT/SCHEDULED/ACTIVE). rolePlan is what lets a card show "Full" before
+// any click (useEventJoin resolves the fills from the roster).
 const PARTICIPATION_STAGES = ["DRAFT", "SCHEDULED", "ACTIVE"];
 
 export async function fetchViewerParticipationMap() {
@@ -147,10 +149,30 @@ export async function fetchViewerParticipationMap() {
   for (const response of responses) {
     if (!response) continue;
     for (const ev of getListItems(response)) {
-      if (ev?.id && ev?.viewerParticipation) map.set(ev.id, ev.viewerParticipation);
+      if (!ev?.id) continue;
+      map.set(ev.id, {
+        viewerParticipation: ev.viewerParticipation ?? null,
+        rolePlan: Array.isArray(ev.rolePlan) ? ev.rolePlan : null
+      });
     }
   }
   return map;
+}
+
+// Merge one enrichment entry under an adapted feed/shelf item's card data.
+// Shared by useCampaignFeed and useCuratedCampaigns so both surfaces decorate
+// identically. No-op (same reference back) for issues and unswept events.
+export function enrichCampaignItem(item, map) {
+  if (!map || item.kind !== "event" || !map.has(item.id)) return item;
+  const entry = map.get(item.id);
+  return {
+    ...item,
+    data: {
+      ...item.data,
+      viewerParticipation: entry.viewerParticipation,
+      ...(entry.rolePlan ? { rolePlan: entry.rolePlan } : {})
+    }
+  };
 }
 
 // One page. Returns { items, hasNext } — the raw signal the caller pages on.
@@ -190,15 +212,16 @@ export function useCampaignFeed({ status, language, provinceId, districtId, cate
   // OLD filters) can't append into the NEW list.
   const reqRef = useRef(0);
 
-  // Viewer's event participations, fetched once per mount (and again if the
-  // signed-in user changes). Stored with the viewerId it belongs to, so a
-  // logout (or user switch) makes the stale map inert without a state reset.
+  // Event card enrichment, fetched once per mount (and again if the signed-in
+  // user changes — the participation half is per-viewer). Stored with the
+  // viewerId it belongs to, so a logout (or user switch) makes the stale map
+  // inert without a state reset. Runs for anonymous viewers too: the rolePlan
+  // half is public and drives the pre-click "Full" face.
   const session = useSyncExternalStore(subscribeAuthSession, getAuthSession, () => null);
   const viewerId = session?.user?.id || null;
   const [participation, setParticipation] = useState(null);
 
   useEffect(() => {
-    if (!viewerId) return undefined;
     let cancelled = false;
     fetchViewerParticipationMap().then((map) => {
       if (!cancelled) setParticipation({ viewerId, map });
@@ -273,19 +296,15 @@ export function useCampaignFeed({ status, language, provinceId, districtId, cate
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading, loadingMore, filterKey]);
 
-  // Decorate event items with the viewer's participation so their join button
-  // renders the committed chip on first paint — exactly what the /events list
-  // embed gives its own cards. Issue items keep the myVote echo they already
-  // carry. Data refs only change once the sweep lands, so cards don't churn.
+  // Decorate event items with the viewer's participation (committed join chip
+  // on first paint) and the rolePlan targets (pre-click "Full") — exactly what
+  // the /events list embed gives its own cards. Issue items keep the myVote
+  // echo they already carry. Data refs only change once the sweep lands.
   const decoratedItems = useMemo(() => {
     const map =
       participation && participation.viewerId === viewerId ? participation.map : null;
     if (!map || map.size === 0) return items;
-    return items.map((it) =>
-      it.kind === "event" && map.has(it.id)
-        ? { ...it, data: { ...it.data, viewerParticipation: map.get(it.id) } }
-        : it
-    );
+    return items.map((it) => enrichCampaignItem(it, map));
   }, [items, participation, viewerId]);
 
   return { items: decoratedItems, loading, loadingMore, error, hasMore, loadMore };

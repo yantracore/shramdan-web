@@ -9,13 +9,18 @@
 
 ## P1 — blocks shipped UX
 
-1. **campaigns — `viewerParticipation` on event-stage `mode=maximum` items** (2026-07-02).
+1. **campaigns — event card echo (`viewerParticipation` + `rolePlan` with `filled`) on event-stage `mode=maximum` + curated markers** (2026-07-02).
    Authenticated `GET /campaigns?mode=maximum` carries only the `myVote` vote echo; a
    direct event join (`POST /events/{id}/participants`) never sets it, so list cards
    can't show "Joined as …" after a refresh. Mirror the `GET /events` embed (caller's
-   `EventParticipant` row or `null`) on every non-OPEN item. FE ships an interim bulk
-   sweep over `GET /events?status=DRAFT|SCHEDULED|ACTIVE` (3 extra requests per feed
-   mount, breaks past 100 events/stage) — remove it when this lands. → [campaigns-feed.md](campaigns-feed.md)
+   `EventParticipant` row or `null`) on every non-OPEN item. Same items also need
+   `rolePlan: [{ role, count, filled }]` (filled = CONFIRMED + CHECKED_IN) so a card
+   can read "Full" without opening the modal — no list payload carries fills today
+   (adding `filled` to `GET /events` items' existing rolePlan rows covers that
+   surface too). FE ships an interim bulk sweep over
+   `GET /events?status=DRAFT|SCHEDULED|ACTIVE` (3 extra requests per feed mount,
+   breaks past 100 events/stage) plus a session-cached roster read per rendered
+   fully-capped card — remove both when this lands. → [campaigns-feed.md](campaigns-feed.md)
 
 ## P2 — functionality gaps
 

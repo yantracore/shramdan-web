@@ -23,6 +23,7 @@ import {
   isActiveParticipationStatus
 } from "@/lib/eventParticipants";
 import { eventJoinPhase, PARTICIPANT_ROLE_ORDER } from "@/lib/issueActions";
+import { fetchEventRosterOnce, invalidateEventRoster } from "@/lib/eventRoster";
 import { getResponseData } from "@/lib/adminUtils";
 import { getDemoEventById } from "@/lib/devMockData";
 import { buildCampaignHeader } from "@/lib/campaignHeader";
@@ -46,6 +47,25 @@ function seedParticipation(seed) {
   return seed && typeof seed === "object" && "viewerParticipation" in seed
     ? toParticipation(seed.viewerParticipation)
     : null;
+}
+
+// Whether the card CTA can even read "Full" without knowing the fills: only
+// when every role the phase offers is capped (>0) in the plan. Any in-scope
+// role that's absent or uncapped keeps an open seat forever — the roster
+// can't change the answer, so the fills fetch is skipped entirely.
+function fullnessDependsOnRoster(rolePlan, roleScope) {
+  if (!Array.isArray(rolePlan) || rolePlan.length === 0) return false;
+  const targets = new Map(
+    rolePlan
+      .filter((row) => row.role !== "COORDINATOR")
+      .map((row) => [row.role, Number(row.count)])
+  );
+  const scope = roleScope === null ? PARTICIPANT_ROLE_ORDER : roleScope;
+  if (!Array.isArray(scope) || scope.length === 0) return false;
+  return scope.every((role) => {
+    const target = targets.get(role);
+    return Number.isFinite(target) && target > 0;
+  });
 }
 
 // Toasts — copied verbatim from events/[id]/page.js JOIN_COPY so no new copy
@@ -191,22 +211,18 @@ export function useEventJoin(eventId, { seed = null, language = "np", eager = fa
     if (eager) ensureLoaded();
   }, [eager, ensureLoaded]);
 
-  // ── Adopt late-arriving seed participation ───────────────────────────────────
-  // List feeds decorate their items with `viewerParticipation` asynchronously
-  // (useCampaignFeed's bulk sweep lands after the cards' first paint), so the
-  // seed prop can gain the field on a later render. Re-derive from it as long
-  // as this hook has no authoritative answer of its own — once ensureLoaded has
-  // run for this eventId, load()/mutations own the state and stale seeds must
-  // not stomp it.
-  const seeded = seedParticipation(seed);
-  const seededKey = seeded
-    ? `${eventId}:${seeded.id}:${seeded.role}:${seeded.status}`
-    : `${eventId}:none`;
+  // ── Adopt late-arriving seed data ────────────────────────────────────────────
+  // List feeds decorate their items asynchronously (the bulk /events sweep
+  // adds viewerParticipation + rolePlan after the cards' first paint), so the
+  // seed prop can gain fields on a later render — a new object reference.
+  // Re-derive from it as long as this hook has no authoritative answer of its
+  // own — once ensureLoaded has run for this eventId, load()/mutations own the
+  // state and stale seeds must not stomp it.
   useEffect(() => {
     if (loadedIdRef.current === eventId) return;
+    setEventData(seed);
     setMyParticipation(seedParticipation(seed));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [seededKey]);
+  }, [seed, eventId]);
 
   // ── Refetch helpers (mirror page's handleJoinChanged / handleLeaveChanged) ───
   const refetchAll = useCallback(async () => {
@@ -308,6 +324,48 @@ export function useEventJoin(eventId, { seed = null, language = "np", eager = fa
     return (Number(r.count) || 0) < target;
   });
 
+  // ── Pre-click fullness ────────────────────────────────────────────────────────
+  // A list card must read "Full" BEFORE the modal ever opens. The seed carries
+  // rolePlan targets (natively on /events list items; via the feed sweep on
+  // /campaigns cards) but never the fills, so resolve them once from the
+  // session-cached roster and fold the rolesNeeded summary into eventData —
+  // after which the normal hasOpenSlot derivation above takes over. Skipped
+  // when the answer can't be "Full" anyway (an uncapped in-scope role), when
+  // the viewer is already in (the committed chip wins), and on eager surfaces
+  // (load() brings the same data). Interim until list payloads embed fills —
+  // see docs/api-requirements/campaigns-feed.md.
+  const wantsRosterFills =
+    !eager &&
+    !isDemoEvent &&
+    phase.joinable &&
+    !viewerRole &&
+    !Array.isArray(eventData?.rolesNeeded) &&
+    fullnessDependsOnRoster(eventData?.rolePlan, phase.roleScope);
+
+  useEffect(() => {
+    // loadedIdRef guard lives here (not in the render-computed gate above):
+    // refs must not be read during render, and once ensureLoaded has claimed
+    // this eventId the full load() owns rosters anyway.
+    if (!wantsRosterFills || loadedIdRef.current === eventId) return undefined;
+    let cancelled = false;
+    fetchEventRosterOnce(eventId).then((participants) => {
+      if (cancelled || loadedIdRef.current === eventId) return;
+      setEventData((prev) => {
+        if (!prev || Array.isArray(prev.rolesNeeded) || !Array.isArray(prev.rolePlan)) {
+          return prev;
+        }
+        return {
+          ...prev,
+          rolesNeeded: buildRolesNeeded(prev.rolePlan, participants),
+          participantCount: countActiveParticipants(participants)
+        };
+      });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [wantsRosterFills, eventId]);
+
   const participantCanLeave =
     Boolean(viewerRole) &&
     EVENT_JOINABLE_STATUSES.has(eventData?.status) &&
@@ -364,6 +422,9 @@ export function useEventJoin(eventId, { seed = null, language = "np", eager = fa
           { role },
           { requireAuth: true }
         );
+        // The cached roster snapshot (pre-click fullness) is now stale for
+        // every other surface showing this event.
+        invalidateEventRoster(resolvedId);
         const data = response?.data ?? response;
         if (data?.status && !isActiveParticipationStatus(data.status)) {
           messageApi.error(jc.rejoinBlocked);
@@ -413,6 +474,7 @@ export function useEventJoin(eventId, { seed = null, language = "np", eager = fa
         await deleteJson(`/events/${resolvedId}/participants/${myParticipation.id}`, {
           requireAuth: true
         });
+        invalidateEventRoster(resolvedId);
       } catch (err) {
         messageApi.error(err?.message || jc.leaveError);
         throw err;

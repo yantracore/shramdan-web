@@ -61,31 +61,43 @@ discriminated by `kind`.
 - **participantCount** (`number`, optional, public) — events: joined workers.
 - **issueId** (`string`, optional, public) — on event items, the originating issue (already present on event payloads).
 
-### Per-viewer participation echo — REQUESTED (P1, 2026-07-02)
+### Event card echo — REQUESTED (P1, 2026-07-02)
 
 **Gap (verified live 2026-07-02):** authenticated `GET /campaigns?mode=maximum`
 carries `myVote` (`{ voterRole, eventRole }` — the caller's *vote* on the
-backing issue) but **no participation echo for the event itself**. Joining an
-event directly (`POST /events/{id}/participants`) never sets `myVote`, so a
-member who joined an ACTIVE/SCHEDULED event sees a plain "Join" button on every
-campaigns-feed card after a refresh — while `GET /events` list items already
-embed exactly the needed field.
+backing issue) but **no participation echo for the event itself**, and event
+items carry **no rolePlan and no fill counts** either. Two card faces break:
 
-**Request:** mirror the `GET /events` behaviour — for authenticated callers,
-add `viewerParticipation` (the caller's `EventParticipant` row
-`{ id, eventId, role, status, joinedAt, confirmedAt, checkedInAt, note }`, or
-`null`) to every **event-stage** item in `mode=maximum`. Omit for anonymous
-callers and for `OPEN` items, same as `/events`.
+1. Joining an event directly (`POST /events/{id}/participants`) never sets
+   `myVote`, so a member who joined an ACTIVE/SCHEDULED event sees a plain
+   "Join" button on every campaigns-feed card after a refresh — while
+   `GET /events` list items already embed exactly the needed field.
+2. A card can't read **"Full"** until the modal opens: fullness needs the
+   rolePlan targets *and* the per-role active fills, and no list payload
+   (`/campaigns`, `/campaigns/curated`, even `GET /events`) carries fills —
+   they only exist by folding `GET /events/{id}/participants` client-side.
+
+**Request:** on every **event-stage** item in `mode=maximum` (and the same
+markers in `/campaigns/curated`):
+
+- `viewerParticipation` — the caller's `EventParticipant` row (`{ id, eventId,
+  role, status, joinedAt, confirmedAt, checkedInAt, note }`), or `null`.
+  Authenticated callers only; omit for anonymous and for `OPEN` items, same
+  as `/events`.
+- `rolePlan` with fills — `[{ role, count, filled }]` where `filled` counts
+  CONFIRMED + CHECKED_IN participants (public; the same aggregation the
+  frontend derives from the roster today). Adding `filled` to the
+  `GET /events` list items' existing `rolePlan` rows would serve the same
+  need there.
 
 **Interim frontend workaround (shipped 2026-07-02, remove when this lands):**
-`useCampaignFeed` fires one bulk sweep over `GET /events?status=DRAFT|SCHEDULED|ACTIVE`
-(3 requests, limit 100 each) and decorates feed items with the embedded
-`viewerParticipation`. Correct but wasteful — and silently incomplete beyond
-100 events per stage.
-
-The same gap (and the same interim sweep, via `useCuratedCampaigns`) applies to
-`GET /campaigns/curated` markers — when the embed lands, add it to curated's
-event-stage markers too so both sweeps can be deleted together.
+`useCampaignFeed` / `useCuratedCampaigns` fire one bulk sweep over
+`GET /events?status=DRAFT|SCHEDULED|ACTIVE` (3 requests, limit 100 each) to
+recover `viewerParticipation` + `rolePlan`, and `useEventJoin` resolves fills
+with one session-cached `GET /events/{id}/participants` per rendered card
+whose in-scope roles are all capped (`src/lib/eventRoster.js`). Correct but
+chatty — the roster N+1 is exactly what per-role `filled` on list payloads
+would delete — and silently incomplete beyond 100 events per stage.
 
 ### Ordering
 
