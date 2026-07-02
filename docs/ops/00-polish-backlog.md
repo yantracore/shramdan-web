@@ -162,6 +162,12 @@ When you (the coding agent) are working in this repo:
 - [ ] P2 [from 11.5] Wire `registerAnalyticsSink` to a real platform (Plausible recommended for the launch phase). — effort:S *(logged by the 2026-06-03 analytics scaffold)*
 - [ ] P2 [from 11.5] Instrument the 19 canonical events across call sites; today the scaffold exists but no surface dispatches yet. — effort:M
 - [ ] P2 [from 11] Comment count badges on `IssueListCard` + `EventListCard` + `CommentsSummary` (preview pane) — currently show 0 because the data layer migrated to async backend fetch but the cards still call the deprecated sync `loadComments()` stub. Cheapest fix is a `commentCount` field on the issue/event resource (backend ask); fallback is async-fetch on card mount (N+1, acceptable for low-traffic list views). — effort:S *(regression introduced by Phase B comment wiring 2026-06-04)*
+- [ ] P2 [from 11] `SiteShell` `document.title` effect loses to Next metadata on first hard load (title corrects on any re-render; affects `/intro`, `/resources`, `/calendar`, likely all pages passing `pageTitle`) — consider per-page `generateMetadata`/`export const metadata` instead of the client effect. — effort:M *(surfaced during 2026-07-02 brochure restoration verification)*
+- [ ] P3 [from 11] Mobile drawer: `TeamOutlined` now doubles for `/event-types` and `/invitations` — give invitations a distinct icon (`UserAddOutlined` already imported). — effort:S *(2026-07-02 brochure restoration review note)*
+- [ ] P3 [from 11] `home.css` media-query consolidation: the 2026-07-02 CSS restoration appended new `@media (max-width: 980px/620px)` blocks (additions-only constraint) whose few duplicate declarations mirror existing blocks — fold restored rules into the original breakpoints in a dedicated pass. — effort:S
+- [ ] P3 [from 11] `home-search.css` dead rules: `.home-search-hero*`, `.home-search-brand*`, `.home-search-intro-link*` unused since BrochureHero replaced the brand band (2026-07-02) — delete after a settling period. — effort:S
+- [ ] P3 [from 11] Restored brochure pages (`/intro`, `/invitations`, `/resources`) have no visible `<h1>` (top heading is `h2`, matching the old homepage markup) — decide on a heading-level pass for a11y/SEO. — effort:S *(2026-07-02 restoration review note)*
+- [ ] P3 [from 14] `buildInPublic.taskOverrides` pairings date to 2026-06-05 — refresh titles/blurbs against current roadmap in-progress ids so `/intro` building-now shows the freshest work. — effort:S
 
 ## Phase 13 — Live Events Rail
 
