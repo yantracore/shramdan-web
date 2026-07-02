@@ -914,6 +914,15 @@
   z-index: 2;
 }
 
+/* Hero without the old action-hub aside — single column, copy width capped. */
+.hero-section--solo {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.hero-section--solo .hero-copy {
+  max-width: 760px;
+}
+
 .hero-copy h1 {
   margin: 18px 0 14px;
   color: var(--primary-dark);
