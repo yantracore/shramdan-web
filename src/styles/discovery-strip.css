@@ -112,10 +112,14 @@
   overscroll-behavior-x: contain;
   /* Hide the horizontal scrollbar — the peek + arrows signal scrollability. */
   scrollbar-width: none;
-  /* Room for the cards' drop shadow inside the scroll clip, pulled back so the
-   * vertical rhythm stays tight (matches the old rail). */
-  padding-block: 22px;
-  margin-block: -14px;
+  /* Room for the cards' drop shadow inside the scroll clip, pulled back by the
+   * matching negative margin so the vertical rhythm stays tight (net 8px each
+   * side). Bottom needs more: the hover shadow (0 18px 40px -20px) reaches
+   * ~35px below the card — 22px clipped it into a straight line. Keep the
+   * bottom overshoot ≤28px (the rails' minimum gap) so the track box never
+   * overlaps the next strip's clickable header. */
+  padding-block: 22px 36px;
+  margin-block: -14px -28px;
 }
 
 .discovery-strip-track::-webkit-scrollbar {
