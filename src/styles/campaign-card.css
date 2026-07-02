@@ -283,6 +283,62 @@
   gap: 18px;
 }
 
+/* Compact 2-column cards on phones — DESKTOP IS UNTOUCHED. Reduce EVERYTHING
+   (image height, padding, gaps, type), not just width, so thumbnails read as
+   proper mobile cards and two fit per row. The inline participation button is
+   hidden here (it can't fit legibly at this width); the whole card taps through
+   to the detail page where the action lives.
+   See docs/design/08-mobile-first-sweep.md §4. */
+@media (max-width: 640px) {
+  .campaign-card-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .campaign-card {
+    border-radius: 13px;
+  }
+  .campaign-card-media {
+    height: 100px;
+  }
+  .campaign-card-body {
+    padding: 8px 9px 9px;
+    gap: 4px;
+  }
+  .campaign-card-title {
+    font-size: 12.5px;
+    line-height: 1.25;
+    min-height: calc(2 * 1.25em);
+  }
+  .campaign-card-loc {
+    font-size: 10.5px;
+  }
+  .campaign-card-eyebrow {
+    font-size: 10px;
+  }
+  .campaign-card-badge {
+    font-size: 10px;
+    padding: 2px 8px 2px 7px;
+  }
+  .campaign-card-foot {
+    padding-top: 6px;
+  }
+  .campaign-card-count {
+    font-size: 11px;
+  }
+  .campaign-card-cta {
+    padding: 5px 9px;
+    font-size: 11px;
+  }
+  /* Inline support/join button doesn't fit a 2-col card — drop it; the card tap
+     opens the detail page. Completed cards keep their "View" link. */
+  .campaign-card-foot .campaign-action-btn {
+    display: none;
+  }
+  .campaign-card-foot:has(.campaign-action-btn) {
+    justify-content: flex-start;
+  }
+}
+
 .campaign-card-grid-pagination {
   display: flex;
   justify-content: center;

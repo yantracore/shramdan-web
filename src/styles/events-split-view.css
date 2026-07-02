@@ -981,9 +981,12 @@
   }
 }
 
-@media (max-width: 520px) {
+/* Compact list card across the whole phone range (not just ≤520) so the default
+   list view is dense too — smaller thumb, tighter gap/padding.
+   See docs/design/08-mobile-first-sweep.md §4. */
+@media (max-width: 640px) {
   .event-list-card {
-    grid-template-columns: 110px minmax(0, 1fr);
+    grid-template-columns: 104px minmax(0, 1fr);
     gap: 10px;
     padding: 10px;
   }
