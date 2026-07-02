@@ -168,6 +168,8 @@ When you (the coding agent) are working in this repo:
 - [ ] P3 [from 11] `home-search.css` dead rules: `.home-search-hero*`, `.home-search-brand*`, `.home-search-intro-link*` unused since BrochureHero replaced the brand band (2026-07-02) — delete after a settling period. — effort:S
 - [ ] P3 [from 11] Restored brochure pages (`/intro`, `/invitations`, `/resources`) have no visible `<h1>` (top heading is `h2`, matching the old homepage markup) — decide on a heading-level pass for a11y/SEO. — effort:S *(2026-07-02 restoration review note)*
 - [ ] P3 [from 14] `buildInPublic.taskOverrides` pairings date to 2026-06-05 — refresh titles/blurbs against current roadmap in-progress ids so `/intro` building-now shows the freshest work. — effort:S
+- [ ] P2 [from 11] `/join?role=` prefill: `/invitations` role cards deep-link with a `role` query param but `ContributorForm` ignores it and hardcodes `role: "VOLUNTEER"` in the payload (pre-existing, verbatim-restored behavior) — read the param and preselect/submit the role; backend payload field already exists. — effort:S *(2026-07-02 final review note)*
+- [ ] P3 [from 11] siteContent dead keys after restoration: `buildInPublic.heroLabel/heroAria/roadmapCta` (dropped hero-panel; NP `roadmapCta` still -नुहोस् form but unrendered) and `homeSearch.slogan` (brand band removed) — delete or convert in a copy-cleanup pass. — effort:S
 
 ## Phase 13 — Live Events Rail
 

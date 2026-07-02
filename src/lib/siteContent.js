@@ -2158,7 +2158,7 @@ export const copy = {
       relativeDaysAgo: "Shipped {n} days ago",
       relativeUpcoming: "On deck",
       fallbackBlurb: "Active work in this part of the roadmap; full detail on the roadmap.",
-      fullRoadmapCta: "Read The Roadmap",
+      fullRoadmapCta: "Read the Roadmap",
       taskOverrides: {
         "1.5.1": {
           title: "Vote on community issues",
