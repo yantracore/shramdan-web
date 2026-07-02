@@ -123,11 +123,12 @@
 }
 
 /* Directional edge scrim — where the row continues past the visible area, the
- * cards dissolve into a DARK fade instead of fading into the page colour. Each
- * side lights up only when it actually has hidden cards, driven by the track's
- * data-at-start / data-at-end via :has() (already used elsewhere, e.g.
- * home-search.css). The tone is a fixed deep green-black, NOT a theme token, so
- * the fade reads dark in both the white and dark themes. */
+ * cards dissolve into a SUBTLE dark fade instead of fading into the page
+ * colour. Each side lights up only when it actually has hidden cards, driven
+ * by the track's data-at-start / data-at-end via :has() (already used
+ * elsewhere, e.g. home-search.css). The tone is a fixed deep green-black, NOT
+ * a theme token, so the fade reads the same in both themes. Alpha stays low —
+ * a full-strength edge read as a black curtain over the card corners. */
 .discovery-strip-scroller::before,
 .discovery-strip-scroller::after {
   content: "";
@@ -142,11 +143,11 @@
 }
 .discovery-strip-scroller::before {
   left: 0;
-  background: linear-gradient(to right, #0a110f 0%, rgba(10, 17, 15, 0) 100%);
+  background: linear-gradient(to right, rgba(10, 17, 15, 0.3) 0%, rgba(10, 17, 15, 0) 100%);
 }
 .discovery-strip-scroller::after {
   right: 0;
-  background: linear-gradient(to left, #0a110f 0%, rgba(10, 17, 15, 0) 100%);
+  background: linear-gradient(to left, rgba(10, 17, 15, 0.3) 0%, rgba(10, 17, 15, 0) 100%);
 }
 .discovery-strip-scroller:has(.discovery-strip-track[data-at-start="false"])::before {
   opacity: 1;
