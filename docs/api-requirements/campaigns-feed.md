@@ -99,6 +99,29 @@ whose in-scope roles are all capped (`src/lib/eventRoster.js`). Correct but
 chatty — the roster N+1 is exactly what per-role `filled` on list payloads
 would delete — and silently incomplete beyond 100 events per stage.
 
+### Marker `image` cover-fallback — REQUESTED (P2, 2026-07-02)
+
+**Gap (verified live 2026-07-02):** a marker's `image` resolves ONLY from the
+issue's designated cover (`coverImageId`). An issue that has image uploads but
+no designated cover comes back `image: null` on `/campaigns` and
+`/campaigns/curated` — while the detail page (full `GET /issues/{slug}`) falls
+back to the first upload client-side and shows a photo. So the card and its
+detail page disagree: the home-rail card rendered a dark placeholder for
+`sample-plastic-waste-buildup-along-bagmati-riverbank` (1 upload, no cover;
+record since deleted as demo cleanup) while its detail page showed the photo.
+
+**Request:** resolve marker `image` server-side as
+`cover ?? first image upload ?? null` (same upload order `GET /issues/{id}`
+returns). The frontend cannot recover this client-side without one
+`GET /issues/{slug}` round-trip per imageless marker — exactly the per-row
+refetch the card-ready marker shape exists to avoid.
+
+**Related repair gap:** the data can't be fixed by hand either —
+`PATCH /issues/{id}` rejects event-stage issues (`400 ISSUE_NOT_OPEN`), and
+`PATCH /issues/{id}/status` has no path back to the event stages. Either the
+fallback above or an admin-scoped way to set `coverImageId` on any stage
+unblocks this class of record.
+
 ### Ordering
 
 For `status=all`, lifecycle order, then within each stage:
@@ -280,6 +303,12 @@ only worth shrinking the shelf if the extra rows ever matter for payload size.
 
 ## Recent changes
 
+- `2026-07-02` — **marker `image` cover-fallback requested (P2):** markers
+  resolve `image` from `coverImageId` only; issues with uploads but no cover
+  ship `image: null` and their cards go blank while the detail page shows the
+  photo (see the REQUESTED section under "Item shape"). Surfaced by the SAMPLE
+  Bagmati riverbank campaign on the home rail; that record was deleted the same
+  day as authorized demo cleanup (`DELETE /issues/{id}`, cascade confirmed).
 - `2026-07-02` — **curated shelves shipped + home adoption:** new
   `GET /campaigns/curated` (section 4) returns seven fixed shelves in one call;
   the `planning` shelf (≤3 DRAFT) was added the same day for the 6/3/3

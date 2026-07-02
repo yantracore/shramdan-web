@@ -169,6 +169,7 @@ When you (the coding agent) are working in this repo:
 - [x] P2 [from 13] `/events` and homepage upcoming date pills emitted Latin digits in NP — Chromium's Intl `ne-NP` locale never honoured Devanagari numerals and also produced SSR/CSR hydration mismatch — effort:S ← done: 2026-06-02 *(replaced `Intl.DateTimeFormat("ne-NP", ...)` calls in `src/app/events/page.js` and `src/app/HomeClient.js` with a manual composition using `NP_MONTHS_SHORT` + `NP_WEEKDAYS_SHORT` tables and `localizeDigits` so output reads "बिहि, जुन ४, ६:५४" — deterministic across server and client.)*
 
 - [ ] P2 [from 13] "अब N साथ बाँकी" urgency chip on the support strip's near-threshold cards — the curated shelf already ships `remaining` (votes left to auto-promotion) and `useCuratedCampaigns` carries it on every entry; `CampaignCard` just needs to render it for OPEN cards when present. — effort:S *(logged with the 2026-07-02 curated-shelves migration)*
+- [ ] P2 [from 13] Unify the home rail's missing-thumbnail fallback: `LivePosterCard` renders a dark "श्रमदान" placeholder when `thumbnailUrl` is null while `UpcomingPosterCard` falls back to `FALLBACK_POSTER` — swap the live branch to the same poster (or `getCategoryFallbackImage`) so a coverless ACTIVE campaign never shows a black card (staging Representative-Image rule; surfaced by the since-deleted SAMPLE Bagmati campaign, backend cover-fallback requested in api-requirements/campaigns-feed.md) — effort:S
 
 ## Phase 14 — Live Event Detail
 
