@@ -76,11 +76,14 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
+  /* Kept subtle on purpose: the date eyebrow carries its own text-shadow
+   * and the badges have solid backgrounds, so the scrim only needs a
+   * light anchor at the very bottom — not a dark curtain. */
   background: linear-gradient(
     to top,
-    rgba(8, 20, 16, 0.66) 0%,
-    rgba(8, 20, 16, 0.14) 40%,
-    rgba(8, 20, 16, 0) 62%
+    rgba(8, 20, 16, 0.34) 0%,
+    rgba(8, 20, 16, 0.08) 30%,
+    rgba(8, 20, 16, 0) 48%
   );
 }
 
