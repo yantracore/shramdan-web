@@ -23,6 +23,7 @@ export const copy = {
     pageTitles: {
       brandSuffix: "श्रमदान | SHRAMDAN",
       home: "हाम्रो श्रम, हाम्रो समाज, हाम्रो भविष्य।",
+      intro: "परिचय",
       issues: "समस्याहरू",
       join: "जोडिनुहोस्",
       feedback: "प्रतिक्रिया",
@@ -2093,6 +2094,7 @@ export const copy = {
     pageTitles: {
       brandSuffix: "श्रमदान | SHRAMDAN",
       home: "Our labor, our society, our future.",
+      intro: "Intro",
       issues: "Issues",
       join: "Join",
       feedback: "Feedback",
