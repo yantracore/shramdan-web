@@ -197,6 +197,8 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
   // mobile drawer (mobileMenuItems below).
   const appsGridItems = [
     { href: "/event-types", label: t.nav.eventTypes, icon: <TeamOutlined /> },
+    { href: "/intro", label: t.nav.intro, icon: <BookOutlined /> },
+    { href: "/invitations", label: t.nav.invitations, icon: <TeamOutlined /> },
     { href: "/resources", label: t.nav.resources, icon: <FolderOpenOutlined /> },
     { href: "/learn", label: t.nav.learn, icon: <BookOutlined /> },
     { href: "/settings", label: t.nav.settings, icon: <SettingOutlined /> },
@@ -348,8 +350,10 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
     { href: "/event-types", label: t.nav.eventTypes }
   ];
   const learnLinks = [
+    { href: "/intro", label: t.nav.intro },
     { href: "/event-types", label: t.nav.eventTypes },
-    { href: "/learn", label: t.footer.links.documents }
+    { href: "/learn", label: t.footer.links.documents },
+    { href: "/resources", label: t.nav.resources }
   ];
   const footerLinks = [
     {
@@ -363,6 +367,7 @@ export function SiteShell({ children, pageTitle, chromeMode = "full" }) {
     {
       title: t.footer.columns.getInvolved,
       links: [
+        { href: "/invitations", label: t.nav.invitations },
         { href: "/join", label: t.footer.links.contributor },
         { href: "/feedback", label: t.footer.links.feedback }
       ]
