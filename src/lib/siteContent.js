@@ -69,6 +69,29 @@ export const copy = {
       join: "योगदान गर्ने",
       learnMore: "थप जान्ने"
     },
+    devPanel: {
+      kicker: "एप बनाउन सहयोग गर्नुहोस्",
+      title: "श्रमदान गरेर श्रमदान एप बनाऔँ",
+      body: "श्रमदान अहिले एप निर्माणको चरणमा छ। आफ्नो समय, सीप, विचार र समन्वय दिएर मञ्च आफैं निर्माण गर्न योगदान गर्न सकिन्छ।",
+      progressLabel: "समग्र प्रगति",
+      progressAria: "एप निर्माणको समग्र प्रगति",
+      liveBadge: "लाइभ",
+      liveAria: "अहिले प्रत्यक्ष",
+      linksLabel: "प्रत्यक्ष सत्रहरू",
+      links: [
+        { id: "participate", title: "प्रत्यक्ष सहभागिता", label: "गुगल मीटमा १२ बजे, सोम–शुक्र" },
+        { id: "watchLive", title: "प्रत्यक्ष प्रसारण", label: "युट्युबमा १२ बजे, सोम–शुक्र" }
+      ],
+      helpBuild: {
+        label: "श्रमदान बनाउन सघाउने",
+        href: "https://stage.shramdan.org"
+      }
+    },
+    homeLaunch: {
+      title: "श्रमदान तयार छ",
+      body: "समस्या सूचीबद्ध गर्न, भोट गर्न र सहभागी हुन श्रमदान अब तयार छ। पहिलो समस्या तपाईंकै टोलबाट सुरु गरौँ।",
+      cta: "पहिलो समस्या थप्ने"
+    },
     buildInPublic: {
       heroLabel: "एप निर्माण प्रगति",
       heroAria: "एप निर्माण समग्र प्रगति",
@@ -2139,6 +2162,29 @@ export const copy = {
       support: "Not every problem in the country will be solved by waiting for the government. As citizens, we can come together to move basic work forward ourselves, from cleanups and repairs to tree planting and neighborhood improvement. SHRAMDAN is the beginning of that shared responsibility. Small hands together can make big change possible. Our SHRAMDAN today builds a better society tomorrow.",
       join: "Contribute",
       learnMore: "Learn More"
+    },
+    devPanel: {
+      kicker: "Help us build the app",
+      title: "Build the Shramdan app, together",
+      body: "Shramdan is now in its app-building phase. Contributors can donate their time, skill, ideas, and coordination to help shape the platform itself.",
+      progressLabel: "Overall progress",
+      progressAria: "Overall app build progress",
+      liveBadge: "LIVE",
+      liveAria: "Live right now",
+      linksLabel: "Live sessions",
+      links: [
+        { id: "participate", title: "Participate Live", label: "Google Meet, 12 PM Mon–Fri" },
+        { id: "watchLive", title: "Watch Live Stream", label: "YouTube, 12 PM Mon–Fri" }
+      ],
+      helpBuild: {
+        label: "Help Build Shramdan",
+        href: "https://stage.shramdan.org"
+      }
+    },
+    homeLaunch: {
+      title: "Shramdan is ready",
+      body: "The Shramdan website is ready to list, vote, and participate on issues. Be the one to add the first.",
+      cta: "Add the First Issue"
     },
     buildInPublic: {
       heroLabel: "App Build Progress",

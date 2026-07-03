@@ -1,5 +1,7 @@
 import HomeSearchView from "@/components/HomeSearchView";
+import { getRoadmapSummary } from "@/lib/roadmap";
 
 export default function Page() {
-  return <HomeSearchView />;
+  const summary = getRoadmapSummary();
+  return <HomeSearchView overallPercent={summary?.overallPercent ?? null} />;
 }

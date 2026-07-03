@@ -923,6 +923,229 @@
   max-width: 760px;
 }
 
+/* Launch invite (2026-07-03): replaces the campaigns rail when the backend
+   has zero ongoing/upcoming campaigns — e.g. clean production at launch. */
+.home-launch-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 720px;
+  margin: 12px auto 24px;
+  padding: 44px 24px;
+}
+
+.home-launch-cta h2 {
+  margin: 0;
+  color: var(--primary-dark);
+  font-size: clamp(24px, 3vw, 34px);
+}
+
+.home-launch-cta p {
+  margin: 0 0 10px;
+  color: var(--muted);
+  max-width: 52ch;
+}
+
+/* Restored 2026-07-02 from pre-pivot home.css (3d66f5b^) — hero dev-status panel styles */
+.hero-panel p {
+  color: var(--muted);
+  line-height: 1.75;
+}
+
+.hero-panel,
+.content-card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--surface) 96%, transparent);
+  box-shadow: 0 24px 70px rgba(23, 33, 28, 0.11);
+}
+
+.hero-panel {
+  position: relative;
+  display: grid;
+  gap: 18px;
+  padding: 28px;
+  overflow: hidden;
+  transition:
+    border-color 220ms ease,
+    box-shadow 220ms ease,
+    transform 220ms ease;
+}
+
+.hero-panel::before {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 12% 8%, color-mix(in srgb, var(--accent) 24%, transparent), transparent 34%),
+    radial-gradient(circle at 94% 6%, color-mix(in srgb, var(--primary) 22%, transparent), transparent 32%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.12), transparent 62%);
+  content: "";
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+.hero-panel > * {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-panel-kicker {
+  width: fit-content;
+  max-width: 100%;
+  padding: 8px 10px;
+  border: 1px solid color-mix(in srgb, var(--accent) 36%, rgba(255, 255, 255, 0.26));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 18%, transparent);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.hero-panel h2 {
+  margin: 0;
+  color: var(--primary-dark);
+  font-size: clamp(28px, 3vw, 44px);
+  line-height: 1.05;
+}
+
+.hero-panel p {
+  margin: 0;
+}
+
+.hero-panel-links small {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.hero-panel-links {
+  display: grid;
+  gap: 10px;
+}
+
+.hero-panel-links a {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--surface) 22%, transparent);
+  color: var(--text);
+  transition:
+    border-color 180ms ease,
+    background 180ms ease,
+    transform 180ms ease;
+}
+
+.hero-panel-links a:hover {
+  border-color: color-mix(in srgb, var(--primary) 42%, rgba(255, 255, 255, 0.22));
+  background: color-mix(in srgb, var(--surface) 34%, transparent);
+  transform: translateY(-2px);
+}
+
+.hero-panel-link-icon {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--primary) 14%, var(--surface));
+  color: var(--primary-dark);
+  font-size: 22px;
+}
+
+.hero-panel-links small {
+  display: block;
+}
+
+.hero-panel-links strong {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.2;
+}
+
+.hero-panel-links small {
+  margin-top: 3px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.hero-panel-links a.is-live {
+  border-color: color-mix(in srgb, #ef4444 50%, rgba(255, 255, 255, 0.22));
+  background:
+    linear-gradient(135deg, color-mix(in srgb, #ef4444 14%, transparent), transparent 70%),
+    color-mix(in srgb, var(--surface) 26%, transparent);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, #ef4444 26%, transparent),
+    0 14px 36px color-mix(in srgb, #ef4444 18%, transparent);
+}
+
+.hero-panel-links a.is-live .hero-panel-link-icon {
+  background: color-mix(in srgb, #ef4444 22%, var(--surface));
+  color: #ef4444;
+}
+
+.hero-panel-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: rgba(23, 107, 92, 0.12);
+  border: 1px solid rgba(23, 107, 92, 0.25);
+  margin-top: 12px;
+}
+
+.hero-panel-progress-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.hero-panel-progress-row span {
+  font-weight: 700;
+}
+
+.hero-panel-progress-row strong {
+  font-size: 18px;
+  color: #176b5c;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Restored 2026-07-02 from pre-pivot home.css (3d66f5b^) — hero-panel responsive padding at 720px */
+@media (max-width: 720px) {
+  .content-card,
+  .hero-panel {
+    padding: 18px;
+  }
+
+  .hero-panel-links a {
+    width: 100%;
+  }
+
+  .hero-panel-links a:hover {
+    transform: none;
+  }
+}
+
 .hero-copy h1 {
   margin: 18px 0 14px;
   color: var(--primary-dark);
