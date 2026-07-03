@@ -75,6 +75,7 @@ export const copy = {
       body: "श्रमदान अहिले एप निर्माणको चरणमा छ। आफ्नो समय, सीप, विचार र समन्वय दिएर मञ्च आफैं निर्माण गर्न योगदान गर्न सकिन्छ।",
       progressLabel: "समग्र प्रगति",
       progressAria: "एप निर्माणको समग्र प्रगति",
+      testNote: "यो परीक्षण साइट हो — यहाँ देखिने सबै डेटा नमुना मात्र हो, वास्तविक होइन।",
       liveBadge: "लाइभ",
       liveAria: "अहिले प्रत्यक्ष",
       linksLabel: "प्रत्यक्ष सत्रहरू",
@@ -85,6 +86,10 @@ export const copy = {
       helpBuild: {
         label: "श्रमदान बनाउन सघाउने",
         href: "https://stage.shramdan.org"
+      },
+      mainSite: {
+        label: "मुख्य साइटमा जाने",
+        href: "https://shramdan.org"
       }
     },
     homeLaunch: {
@@ -2169,6 +2174,7 @@ export const copy = {
       body: "Shramdan is now in its app-building phase. Contributors can donate their time, skill, ideas, and coordination to help shape the platform itself.",
       progressLabel: "Overall progress",
       progressAria: "Overall app build progress",
+      testNote: "This is a staging site — all data shown here is sample data, not real.",
       liveBadge: "LIVE",
       liveAria: "Live right now",
       linksLabel: "Live sessions",
@@ -2179,6 +2185,10 @@ export const copy = {
       helpBuild: {
         label: "Help Build Shramdan",
         href: "https://stage.shramdan.org"
+      },
+      mainSite: {
+        label: "Go to Main Site",
+        href: "https://shramdan.org"
       }
     },
     homeLaunch: {
