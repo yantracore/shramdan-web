@@ -2,6 +2,7 @@
 
 import {
   ArrowRightOutlined,
+  GlobalOutlined,
   HeartOutlined,
   ToolOutlined,
   VideoCameraOutlined,
@@ -111,11 +112,21 @@ export function BrochureHero({ variant = "home", overallPercent = null }) {
               {panel.helpBuild.label}
             </Button>
           ) : null}
+          {isHome && onTestSite ? (
+            <Button size="large" href={panel.mainSite.href} icon={<GlobalOutlined />}>
+              {panel.mainSite.label}
+            </Button>
+          ) : null}
         </div>
       </div>
       {isHome ? (
         <aside className="hero-panel glass-panel" aria-label={panel.title}>
           <span className="hero-panel-kicker">{panel.kicker}</span>
+          {onTestSite && panel.testNote ? (
+            <p className="hero-panel-testnote" role="note">
+              {panel.testNote}
+            </p>
+          ) : null}
           <h2>{panel.title}</h2>
           <p>{panel.body}</p>
           {overallPercent != null ? (

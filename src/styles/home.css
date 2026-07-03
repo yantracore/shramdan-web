@@ -1008,6 +1008,20 @@
   -webkit-backdrop-filter: blur(8px);
 }
 
+.hero-panel-testnote {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid color-mix(in srgb, #b45309 42%, rgba(255, 255, 255, 0.28));
+  border-radius: 12px;
+  background: color-mix(in srgb, #f59e0b 16%, transparent);
+  color: color-mix(in srgb, #7c2d12 88%, var(--primary-dark));
+  font-size: 13px;
+  font-weight: 750;
+  line-height: 1.4;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
 .hero-panel h2 {
   margin: 0;
   color: var(--primary-dark);
