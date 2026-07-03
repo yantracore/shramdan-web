@@ -13,6 +13,8 @@
 // (restored 2026-07-02 from 3d66f5b^).
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { PlusOutlined } from "@ant-design/icons";
+import { Button } from "antd";
 import { ActivityStatsRow } from "@/components/ActivityStatsRow";
 import { BrochureHero } from "@/components/BrochureHero";
 import { CampaignsMap } from "@/components/CampaignsMap";
@@ -42,7 +44,12 @@ export default function HomeSearchView({ overallPercent = null }) {
   // One GET /campaigns/curated feeds the coverflow rail (ongoing + upcoming
   // shelves) AND the discovery strips below — the old 3× /events rail fetch is
   // gone. The map doesn't ride on this either (own fetch via CampaignsMap).
-  const { shelves, loading: shelvesLoading, requestLocation } = useCuratedCampaigns();
+  const {
+    shelves,
+    loading: shelvesLoading,
+    error: shelvesError,
+    requestLocation
+  } = useCuratedCampaigns();
 
   // The rail reads event.title directly (it isn't a re-localizing card), so
   // pick the language's title here from the marker's embedded translations —
@@ -93,13 +100,27 @@ export default function HomeSearchView({ overallPercent = null }) {
     <SiteShell>
       <BrochureHero variant="home" overallPercent={overallPercent} />
 
-      <EventsHomeRail
-        liveEvents={railLive}
-        upcomingEvents={railUpcoming}
-        copy={rail}
-        language={language}
-        loading={shelvesLoading}
-      />
+      {!shelvesLoading && !shelvesError && railLive.length === 0 && railUpcoming.length === 0 ? (
+        // Backend answered with zero campaigns (e.g. clean production) —
+        // invite the first listing instead of an empty rail shell. An API
+        // error deliberately falls through to the rail: "ready to list" would
+        // be a lie during an outage.
+        <section className="home-launch-cta" aria-label={t.homeLaunch.title}>
+          <h2>{t.homeLaunch.title}</h2>
+          <p>{t.homeLaunch.body}</p>
+          <Button type="primary" size="large" href="/issues/new" icon={<PlusOutlined />}>
+            {t.homeLaunch.cta}
+          </Button>
+        </section>
+      ) : (
+        <EventsHomeRail
+          liveEvents={railLive}
+          upcomingEvents={railUpcoming}
+          copy={rail}
+          language={language}
+          loading={shelvesLoading}
+        />
+      )}
 
       <section className="home-search-panel" aria-label={search.mapEyebrow}>
         <div className="home-search-panel-inner">

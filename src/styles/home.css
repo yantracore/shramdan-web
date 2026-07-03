@@ -923,10 +923,30 @@
   max-width: 760px;
 }
 
-/* Dev-status panel (2026-07-02): the test-site CTA sits below the restored
-   hero-panel link list and needs its own breathing room. */
-.hero-panel .hero-panel-test-cta {
-  margin-top: 14px;
+/* Launch invite (2026-07-03): replaces the campaigns rail when the backend
+   has zero ongoing/upcoming campaigns — e.g. clean production at launch. */
+.home-launch-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 720px;
+  margin: 12px auto 24px;
+  padding: 44px 24px;
+}
+
+.home-launch-cta h2 {
+  margin: 0;
+  color: var(--primary-dark);
+  font-size: clamp(24px, 3vw, 34px);
+}
+
+.home-launch-cta p {
+  margin: 0 0 10px;
+  color: var(--muted);
+  max-width: 52ch;
 }
 
 /* Restored 2026-07-02 from pre-pivot home.css (3d66f5b^) — hero dev-status panel styles */

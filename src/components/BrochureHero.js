@@ -2,8 +2,8 @@
 
 import {
   ArrowRightOutlined,
-  ExperimentOutlined,
   HeartOutlined,
+  ToolOutlined,
   VideoCameraOutlined,
   YoutubeOutlined
 } from "@ant-design/icons";
@@ -107,8 +107,8 @@ export function BrochureHero({ variant = "home", overallPercent = null }) {
             </Button>
           ) : null}
           {isHome && !onTestSite ? (
-            <Button size="large" href={panel.testSite.href} icon={<ExperimentOutlined />}>
-              {panel.testSite.label}
+            <Button size="large" href={panel.helpBuild.href} icon={<ToolOutlined />}>
+              {panel.helpBuild.label}
             </Button>
           ) : null}
         </div>
@@ -166,16 +166,6 @@ export function BrochureHero({ variant = "home", overallPercent = null }) {
               );
             })}
           </div>
-          {!onTestSite ? (
-            <Button
-              block
-              className="hero-panel-test-cta"
-              href={panel.testSite.href}
-              icon={<ExperimentOutlined />}
-            >
-              {panel.testSite.label}
-            </Button>
-          ) : null}
         </aside>
       ) : null}
     </MotionSection>
